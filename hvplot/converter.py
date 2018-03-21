@@ -446,8 +446,8 @@ class HoloViewsConverter(object):
         if y and self.by:
             ds = Dataset(data)
             return ds.to(Distribution, y, [], self.by).overlay().opts(opts)
-        elif y or ds.ndims == 1:
-            y = y or ds.kdims[0].name
+        elif y or len(data.columns) == 1:
+            y = y or data.columns[0]
             return Distribution(data, y, []).opts(opts)
 
         if self.columns:
