@@ -22,5 +22,6 @@ If you don't already have conda on your machine, you can get it from `Anaconda.c
    :maxdepth: 2
 
    Introduction <self>
-   Tutorial <getting_started/index>
+   Getting Started <getting_started/index>
+   User Guide <user_guide/index>
    About <about>

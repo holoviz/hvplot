@@ -8,6 +8,9 @@ stages:
   - test
   - doc
 
+before_install:
+  - echo -e "machine github.com\n  login $CI_USER\n  password $CI_USER_PASSWORD" >> ~/.netrc
+
 jobs:
   include:
     - &default

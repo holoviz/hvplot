@@ -47,7 +47,7 @@ run the examples shown on the website using
 but should not be needed in earlier or later Jupyter releases.)
 
 To work with JupyterLab you will also need the HoloViews JupyterLab
-extension:
+extension::
 
     conda install -c conda-forge jupyterlab
     jupyter labextension install @pyviz/jupyterlab_holoviews
@@ -55,17 +55,3 @@ extension:
 Once you have installed JupyterLab and the extension launch it with::
 
     jupyter-lab
-
-Exploring Further
------------------
-
-* `Plotting API <plotting.html>`_
-  Introduction to plotting using the API.
-
-
-.. toctree::
-    :titlesonly:
-    :hidden:
-    :maxdepth: 2
-
-    Plotting API <plotting>
