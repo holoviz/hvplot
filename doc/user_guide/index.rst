@@ -2,7 +2,7 @@
 User Guide
 **********
 
-* `Introduction <Introduction.htmk>`_
+* `Introduction <Introduction.html>`_
   Introduction to HvPlot and how to start using it.
 
 * `Plotting API <Plotting_API.html>`_
