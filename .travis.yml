@@ -62,7 +62,7 @@ jobs:
         github_token: $GITHUB_TOKEN
         local_dir: ./doc/_build/html
         on:
-          tags: true
+          branch: master
 
 notifications:
   email: false

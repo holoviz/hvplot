@@ -22,7 +22,7 @@ import pprint
 # You may need to increase run_cell_timeout if you have
 # notebook cells that take a long time to execute.
 
-nbdir = "notebooks"
+nbdir = "examples"
 
 run_skip = []
 
