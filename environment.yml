@@ -35,8 +35,8 @@ dependencies:
   # 
   # Indirect dependencies of our direct dependencies
   # 
-  - selenium         # Required for exporting Bokeh plots to PNG
-  - phantomjs        # Required for exporting Bokeh plots to PNG
+  - selenium=3.3.1   # Required for exporting Bokeh plots to PNG
+  - phantomjs=2.1.1  # Required for exporting Bokeh plots to PNG
   - netcdf4          # Required for reading .nc files
   - fastparquet      # Required for reading Parquet files
   - python-snappy    # Required for reading snappy-compressed Parquet files
