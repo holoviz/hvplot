@@ -27,6 +27,7 @@ dependencies:
   - jupyter
   - pandas
   - xarray
+  - scipy
   # 
   # Directly imported dependencies of certain specialized tutorials
   #
