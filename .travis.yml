@@ -40,12 +40,12 @@ jobs:
           # python ./etc/test_notebooks.py lint
           - python ./etc/test_notebooks.py
 
-    - <<: *default
-      os: osx
-      before_install:
-        # brew-installed geos interferes with cartopy?
-        - brew uninstall --ignore-dependencies geos gdal postgis
-      if: branch = master AND type != pull_request
+    #- <<: *default
+    #  os: osx
+    #  before_install:
+    #    # brew-installed geos interferes with cartopy?
+    #    - brew uninstall --ignore-dependencies geos gdal postgis
+    #  if: branch = master AND type != pull_request
 
     - <<: *default
       stage: doc
