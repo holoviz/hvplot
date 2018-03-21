@@ -23,7 +23,7 @@ at present, the recommended way to install hvPlot is based on conda
 
 3. Set up an environment with all of the dependencies needed to run the examples::
     
-    cd EarthSim
+    cd hvplot
     conda env create --quiet --force -n hvplot -f ./environment.yml
     source activate hvplot
 
