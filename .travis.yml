@@ -50,6 +50,8 @@ jobs:
     - <<: *default
       stage: doc
       script:
+        - python setup.py develop
+        - cp -r examples/user_guide/images doc/user_guide/images
         - conda install -c conda-forge 'sphinx<1.7' beautifulsoup4 graphviz
         - pip install nbsite
         - pip install sphinx_ioam_theme

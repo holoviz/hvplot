@@ -13,11 +13,10 @@ at present, the recommended way to install hvPlot is based on conda
 `conda <http://conda.pydata.org/docs>`_ environments and 
 `git <https://git-scm.com>`_:
 
-
 1. Install Python 3 `miniconda <http://conda.pydata.org/miniconda.html>`_ or 
 `anaconda <http://docs.continuum.io/anaconda/install>`_, if you don't already have it on your system.
 
-2. Clone the EarthSim git repository if you do not already have it::
+2. Clone the hvplot git repository if you do not already have it::
 
     git clone git://github.com/pyviz/hvplot.git
 
@@ -31,7 +30,6 @@ at present, the recommended way to install hvPlot is based on conda
     
     pip install -e .
 
-    
 Usage
 -----
 
