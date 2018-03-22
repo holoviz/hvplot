@@ -8,6 +8,7 @@ import pandas as pd
 
 from holoviews.core.spaces import DynamicMap, Callable
 from holoviews.core.overlay import NdOverlay
+from holoviews.core.layout import NdLayout
 from holoviews.element import (
     Curve, Scatter, Area, Bars, BoxWhisker, Dataset, Distribution,
     Table, HeatMap
@@ -132,7 +133,7 @@ class HoloViewsConverter(object):
                  value_label='value', group_label='Group',
                  colorbar=False, streaming=False, backlog=1000,
                  timeout=1000, persist=False, use_dask=False,
-                 datashade=False, **kwds):
+                 datashade=False, subplots=False, label=None, **kwds):
 
         self.streaming = streaming
         self.use_dask = use_dask
@@ -173,6 +174,7 @@ class HoloViewsConverter(object):
                 self.stream = Buffer(data=self.data, length=backlog, index=False)
             data.stream.gather().sink(self.stream.send)
 
+
         # High-level options
         self.by = by or []
         self.columns = columns
@@ -182,6 +184,9 @@ class HoloViewsConverter(object):
         self.value_label = value_label
         self.group_label = group_label
         self.datashade = datashade
+
+        # By type
+        self._by_type = NdLayout if subplots else NdOverlay
 
         # Process style options
         if 'cmap' in kwds and colormap:
@@ -194,6 +199,8 @@ class HoloViewsConverter(object):
         self._style_opts = dict(**style_opts)
         if cmap:
             self._style_opts['cmap'] = cmap
+        if 'color' in kwds:
+            self._style_opts['color'] = kwds.pop('color')
         if 'size' in kwds:
             self._style_opts['size'] = kwds.pop('size')
         if 'alpha' in kwds:
@@ -229,10 +236,13 @@ class HoloViewsConverter(object):
             plot_options[axis] = rot
         if hover:
             plot_options['tools'] = ['hover']
+        plot_options['legend_position'] = 'right'
+        if title is not None:
+            plot_options['title_format'] = title
         self._hover = hover
         self._plot_opts = plot_options
 
-        self._relabel = {'label': title}
+        self._relabel = {'label': label}
         self._dim_ranges = {'x': xlim or (None, None),
                             'y': ylim or (None, None)}
         self._norm_opts = {'framewise': True}
@@ -285,13 +295,19 @@ class HoloViewsConverter(object):
             else:
                 x = self.use_index
             columns = [c for c in self.columns or data.columns if c != x]
+            renamed = {c: 'Dimension_%d' % c for c in columns if isinstance(c, int)}
+            if renamed:
+                data = data.rename(columns=renamed)
             charts = {}
             for c in columns:
+                c = renamed.get(c, c)
                 chart = element(data, x, c).redim(**{c: self.value_label})
                 ranges = {x: self._dim_ranges['x'], c: self._dim_ranges['y']}
                 charts[c] = (chart.relabel(**self._relabel)
                              .redim.range(**ranges).opts(**opts))
-            return NdOverlay(charts, self.group_label)
+            if len(charts) == 1:
+                return charts[c].redim(**{self.value_label: c})
+            return self._by_type(charts, self.group_label)
         else:
             raise ValueError('Could not determine what to plot. Expected '
                              'either x and y parameters to be declared '
@@ -309,8 +325,7 @@ class HoloViewsConverter(object):
     def scatter(self, x, y, data=None):
         scatter = self.chart(Scatter, x, y, data)
         if 'c' in self.kwds:
-            color_opts = {'Scatter': {'colorbar': self.kwds.get('colorbar', False),
-                                      'color_index': self.kwds['c']}}
+            color_opts = {'Scatter': {'color_index': self.kwds['c']}}
             return scatter.opts(plot=color_opts)
         return scatter
 
@@ -336,7 +351,6 @@ class HoloViewsConverter(object):
         else:
             index = self.use_index
 
-        kdims = [index, self.group_label]
         id_vars = [index]
         invert = not self.kwds.get('vert', True)
         opts = {'plot': dict(self._plot_opts, labelled=[]),
@@ -351,6 +365,11 @@ class HoloViewsConverter(object):
             data = data.reset_index()
         df = melt(data, id_vars=id_vars, var_name=self.group_label,
                   value_name=self.value_label)
+        kdims = [index]
+        if len(df[self.group_label].unique()) > 1:
+            kdims += [self.group_label]
+        elif not 'color_index' in opts['plot']:
+            opts['plot']['color_index'] = 0
         return (element(df, kdims, self.value_label).redim.range(**ranges)
                 .relabel(**self._relabel).opts(**opts))
 
@@ -425,15 +444,17 @@ class HoloViewsConverter(object):
                      'normed': self.kwds.get('normed', False)}
 
         data = self.data if data is None else data
-        ds = Dataset(data)
         if y and self.by:
+            ds = Dataset(data, [self.by], y)
             return histogram(ds.to(Dataset, [], y, self.by), **hist_opts).\
                 overlay().opts({'Histogram': opts})
-        elif y or ds.ndims == 1:
-            y = y or ds.kdims[0].name
+        elif y or len(data.columns) == 1:
+            y = y or data.columns[0]
+            ds = Dataset(data, [], y)
             return histogram(ds, dimension=y, **hist_opts).\
                 opts({'Histogram': opts})
 
+        ds = Dataset(data)
         hists = {}
         columns = self.columns or data.columns
         for col in columns:
