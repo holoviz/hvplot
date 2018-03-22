@@ -237,16 +237,14 @@ class HoloViewsConverter(object):
                             'y': ylim or (None, None)}
         self._norm_opts = {'framewise': True}
 
-    @streaming
-    def table(self, x=None, y=None, data=None):
-        allowed = ['width', 'height']
-        opts = {k: v for k, v in self._plot_opts.items() if k in allowed}
-
-        data = self.data if data is None else data
-        return Table(data, self.columns, []).opts(plot=opts)
 
     def __call__(self, kind, x, y):
         return getattr(self, kind)(x, y)
+
+
+    ##########################
+    #     Simple charts      #
+    ##########################
 
     def single_chart(self, element, x, y, data=None):
         opts = {element.__name__: dict(plot=self._plot_opts, norm=self._norm_opts,
@@ -265,6 +263,7 @@ class HoloViewsConverter(object):
         else:
             chart = element(data, x, ys)
         return chart.redim.range(**ranges).relabel(**self._relabel).opts(opts)
+
 
     def chart(self, element, x, y, data=None):
         "Helper method for simple x vs. y charts"
@@ -292,16 +291,18 @@ class HoloViewsConverter(object):
                 ranges = {x: self._dim_ranges['x'], c: self._dim_ranges['y']}
                 charts[c] = (chart.relabel(**self._relabel)
                              .redim.range(**ranges).opts(**opts))
-            return NdOverlay(charts)
+            return NdOverlay(charts, self.group_label)
         else:
             raise ValueError('Could not determine what to plot. Expected '
                              'either x and y parameters to be declared '
                              'or use_index to be enabled.')
 
+
     @datashading
     @streaming
     def line(self, x, y, data=None):
         return self.chart(Curve, x, y, data)
+
 
     @datashading
     @streaming
@@ -313,12 +314,17 @@ class HoloViewsConverter(object):
             return scatter.opts(plot=color_opts)
         return scatter
 
+
     @streaming
     def area(self, x, y, data=None):
         areas = self.chart(Area, x, y, data)
         if self.stacked:
             areas = areas.map(Area.stack, NdOverlay)
         return areas
+
+    ##########################
+    #  Categorical charts    #
+    ##########################
 
     def _category_plot(self, element, data=None):
         """
@@ -339,37 +345,12 @@ class HoloViewsConverter(object):
 
         if self.columns:
             data = data[self.columns+id_vars]
-        if dd and isinstance(data, dd.DataFrame):
-            data = data.compute()
-        if any(v in data.index.names for v in id_vars):
+
+        melt = dd.melt if dd and isinstance(data, dd.DataFrame) else pd.melt
+        if any(v in [data.index.names]+['index'] for v in id_vars):
             data = data.reset_index()
-        df = pd.melt(data, id_vars=id_vars, var_name=self.group_label,
-                     value_name=self.value_label)
-        return (element(df, kdims, self.value_label).redim.range(**ranges)
-                .relabel(**self._relabel).opts(**opts))
-
-
-    def _stats_plot(self, element, y, data=None):
-        """
-        Helper method to generate element from indexed dataframe.
-        """
-        data = self.data if data is None else data
-
-        opts = {'plot': dict(self._plot_opts, labelled=[]),
-                'norm': self._norm_opts, 'style': self._style_opts}
-        if y:
-            ranges = {y: self._dim_ranges['y']}
-            kdims = [self.by] if self.by else []
-            return (element(data, kdims, y).redim.range(**ranges)
-                .relabel(**self._relabel).opts(**opts))
-
-        kdims = [self.group_label]
-        ranges = {self.value_label: self._dim_ranges['y']}
-        if self.columns:
-            data = data[self.columns]
-        if dd and isinstance(data, dd.DataFrame):
-            data = data.compute()
-        df = pd.melt(data, var_name=self.group_label, value_name=self.value_label)
+        df = melt(data, id_vars=id_vars, var_name=self.group_label,
+                  value_name=self.value_label)
         return (element(df, kdims, self.value_label).redim.range(**ranges)
                 .relabel(**self._relabel).opts(**opts))
 
@@ -391,10 +372,38 @@ class HoloViewsConverter(object):
     def barh(self, x, y, data=None):
         return self.bar(x, y, data).opts(plot={'Bars': dict(invert_axes=True)})
 
+    ##########################
+    #   Statistical charts   #
+    ##########################
+
+    def _stats_plot(self, element, y, data=None):
+        """
+        Helper method to generate element from indexed dataframe.
+        """
+        data = self.data if data is None else data
+
+        opts = {'plot': dict(self._plot_opts, labelled=[]),
+                'norm': self._norm_opts, 'style': self._style_opts}
+        if y:
+            ranges = {y: self._dim_ranges['y']}
+            kdims = [self.by] if self.by else []
+            return (element(data, kdims, y).redim.range(**ranges)
+                .relabel(**self._relabel).opts(**opts))
+
+        kdims = [self.group_label]
+        ranges = {self.value_label: self._dim_ranges['y']}
+        if self.columns:
+            data = data[self.columns]
+        melt = dd.melt if dd and isinstance(data, dd.DataFrame) else pd.melt
+        df = melt(data, var_name=self.group_label, value_name=self.value_label)
+        return (element(df, kdims, self.value_label).redim.range(**ranges)
+                .relabel(**self._relabel).opts(**opts))
+
 
     @streaming
     def box(self, x, y, data=None):
         return self._stats_plot(BoxWhisker, y, data)
+
 
     @streaming
     def violin(self, x, y, data=None):
@@ -403,6 +412,7 @@ class HoloViewsConverter(object):
         except ImportError:
             raise ImportError('Violin plot requires HoloViews version >=1.10')
         return self._stats_plot(Violin, y, data)
+
 
     @streaming
     def hist(self, x, y, data=None):
@@ -433,6 +443,7 @@ class HoloViewsConverter(object):
                           .relabel(**self._relabel).opts(**opts))
         return NdOverlay(hists)
 
+
     @streaming
     def kde(self, x, y, data=None):
         data = self.data if data is None else data
@@ -462,6 +473,11 @@ class HoloViewsConverter(object):
                                 [self.group_label])
         return overlay.relabel(**self._relabel).opts(opts)
 
+
+    ##########################
+    #      Other charts      #
+    ##########################
+
     @streaming
     def heatmap(self, x, y, data=None):
         data = data or self.data
@@ -469,9 +485,17 @@ class HoloViewsConverter(object):
         if not y: y = data.columns[1]
         z = self.kwds.get('C', data.columns[2])
 
-
         opts = dict(plot=self._plot_opts, norm=self._norm_opts, style=self._style_opts)
         hmap = HeatMap(data, [x, y], z).opts(**opts)
         if 'reduce_function' in self.kwds:
             return hmap.aggregate(function=self.kwds['reduce_function'])
         return hmap
+
+
+    @streaming
+    def table(self, x=None, y=None, data=None):
+        allowed = ['width', 'height']
+        opts = {k: v for k, v in self._plot_opts.items() if k in allowed}
+
+        data = self.data if data is None else data
+        return Table(data, self.columns, []).opts(plot=opts)
