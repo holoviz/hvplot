@@ -31,7 +31,7 @@ jobs:
         - conda update conda
         # it might be faster to start from anaconda instead of miniconda
         - travis_wait 20 conda env create
-        - source activate hvplot
+        - source activate holoplot
         # dependencies for tests etc
         - pip install flake8
         - conda env export
@@ -55,7 +55,7 @@ jobs:
         - pip install nbsite
         - pip install sphinx_ioam_theme
         - cp ./doc/user_guide/Streaming_Plots.rst ./doc/user_guide/Streaming_Plots.rst_bak
-        - nbsite_nbpagebuild.py pyviz hvplot ./examples ./doc
+        - nbsite_nbpagebuild.py pyviz holoplot ./examples ./doc
         - cp ./doc/user_guide/Streaming_Plots.rst_bak ./doc/user_guide/Streaming_Plots.rst
         - sphinx-build -b html ./doc ./doc/_build/html
         - nbsite_fix_links.py ./doc/_build/html

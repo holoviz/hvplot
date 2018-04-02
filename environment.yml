@@ -1,4 +1,4 @@
-name: hvplot
+name: holoplot
 channels:
   - pyviz
   - intake

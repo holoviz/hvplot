@@ -1,5 +1,5 @@
 package:
-  name: hvplot
+  name: holoplot
   version: 0.0.1
 
 source:
@@ -68,9 +68,9 @@ requirements:
 
 test:
   imports:
-    - hvplot
+    - holoplot
 
 about:
-  home: https://pyviz.github.io/hvplot
+  home: https://pyviz.github.io/holoplot
   summary: How to solve visualization problems with Python tools
   license: BSD 3-Clause

@@ -2,7 +2,7 @@
 
 from nbsite.shared_conf import *
 
-project = u'HvPlot'
+project = u'HoloPlot'
 authors = u'Philipp Rudiger'
 copyright = u'2017 ' + authors
 description = 'A high-level plotting API for the PyData ecosystem built on HoloViews'
@@ -30,12 +30,12 @@ html_context.update({
     'DESCRIPTION': description,
     'AUTHOR': authors,
     # will work without this - for canonical (so can ignore when building locally or test deploying)
-    'WEBSITE_SERVER': 'https://pyviz.github.io/hvplot',
+    'WEBSITE_SERVER': 'https://pyviz.github.io/holoplot',
     'VERSION': version,
     'NAV': _NAV,
     'LINKS': _NAV,
     'SOCIAL': (
         ('Gitter', '//gitter.im/ioam/holoviews'),
-        ('Github', '//github.com/pyviz/hvplot'),
+        ('Github', '//github.com/pyviz/holoplot'),
     )
 })

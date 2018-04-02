@@ -2,7 +2,7 @@ from .converter import HoloViewsConverter
 
 # Register plotting interfaces
 def _patch_plot(self):
-    return HvPlot(self)
+    return HoloPlot(self)
 
 
 def patch(library):
@@ -45,7 +45,7 @@ def patch(library):
         DataSource.plot = property(_patch_plot)
 
 
-class HvPlot(object):
+class HoloPlot(object):
 
     def __init__(self, data):
         self._data = data

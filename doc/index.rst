@@ -1,6 +1,6 @@
-******
-HvPlot
-******
+********
+HoloPlot
+********
 
 **A high-level plotting API for the PyData ecosystem built on HoloViews.**
 
@@ -20,9 +20,9 @@ plotting APIs are generally built on matplotlib, which provides a
 solid foundation, but means that users miss out the benefits of
 modern, interactive plotting libraries like bokeh and holoviews.
 
-HvPlot provides a high-level plotting API built on HoloViews which
+HoloPlot provides a high-level plotting API built on HoloViews which
 will provide a general and consistent API for plotting data in all the
-abovementioned formats. HvPlot will integrate neatly with the
+abovementioned formats. HoloPlot will integrate neatly with the
 individual libraries if an extension mechanism for the native plot
 APIs is offered or can be used as a standalone component.
 

@@ -7,7 +7,7 @@ except ImportError:
     from distutils.core import setup
 
 setup_args = dict(
-    name='hvplot',
+    name='holoplot',
     version="0.0.1",
     description='A high-level plotting API for the PyData ecosystem built on HoloViews.',
     long_description=open('README.rst').read() if os.path.isfile('README.rst') else 'Consult README.rst',
@@ -15,7 +15,7 @@ setup_args = dict(
     author_email= " developers@pyviz.org",
     maintainer="PyViz developers",
     maintainer_email="developers@pyviz.org",
-    packages = ["hvplot"],
+    packages = ["holoplot"],
     package_data={},
     platforms=['Windows', 'Mac OS X', 'Linux'],
     license='BSD',
