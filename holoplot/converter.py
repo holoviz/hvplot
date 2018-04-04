@@ -460,6 +460,7 @@ class HoloViewsConverter(object):
         id_vars = [index]
         invert = not self.kwds.get('vert', True)
         opts = {'plot': dict(self._plot_opts, labelled=[]),
+                'style': dict(self._style_opts),
                 'norm': self._norm_opts}
         ranges = {self.value_label: self._dim_ranges['y']}
 
@@ -467,15 +468,11 @@ class HoloViewsConverter(object):
             data = data[self.columns+id_vars]
 
         melt = dd.melt if dd and isinstance(data, dd.DataFrame) else pd.melt
-        if any(v in [data.index.names]+['index'] for v in id_vars):
+        if any((v in [data.index.names]+['index']) or v == data.index.name for v in id_vars):
             data = data.reset_index()
         df = melt(data, id_vars=id_vars, var_name=self.group_label,
                   value_name=self.value_label)
-        kdims = [index]
-        if len(df[self.group_label].unique()) > 1:
-            kdims += [self.group_label]
-        elif not 'color_index' in opts['plot']:
-            opts['plot']['color_index'] = 0
+        kdims = [index, self.group_label]
         return (element(df, kdims, self.value_label).redim.range(**ranges)
                 .relabel(**self._relabel).opts(**opts))
 
