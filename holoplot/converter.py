@@ -225,7 +225,7 @@ class HoloViewsConverter(object):
             plot_options['fontsize'] = fontsize
         if colorbar:
             plot_options['colorbar'] = colorbar
-        if self.kwds.get('vert', False):
+        if not self.kwds.get('vert', True):
             plot_options['invert_axes'] = True
         if rot:
             if (kind == 'barh' or kwds.get('orientation') == 'horizontal'
