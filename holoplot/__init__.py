@@ -36,13 +36,19 @@ def patch(library):
         dd.DataFrame.plot = property(_patch_plot)
         dd.Series.plot = property(_patch_plot)
     elif library == 'intake':
-        
         try:
             from intake.source.base import DataSource
         except ImportError:
             raise ImportError('Could not patch plotting API onto intake. '
                               'Intake could not be imported.')
         DataSource.plot = property(_patch_plot)
+    elif library == 'xarray':
+        try:
+            from xarray import Dataset, DataArray
+        except ImportError:
+            raise ImportError('Could not patch plotting API onto xarray. '
+                              'Xarray could not be imported.')
+        DataArray.plot = property(_patch_plot)
 
 
 class HoloPlot(object):
@@ -56,11 +62,11 @@ class HoloPlot(object):
              xticks=None, yticks=None, xlim=None, ylim=None, rot=None,
              fontsize=None, colormap=None, hover=True, **kwds):
         converter = HoloViewsConverter(
-            self._data, width=width, height=height, backlog=backlog,
+            self._data, x, y, width=width, height=height, backlog=backlog,
             title=title, grid=grid, legend=legend, logx=logx,
             logy=logy, loglog=loglog, xticks=xticks, yticks=yticks,
             xlim=xlim, ylim=ylim, rot=rot, fontsize=fontsize,
-            colormap=colormap, hover=hover, **kwds
+            colormap=colormap, hover=hover, kind=kind, **kwds
         )
         return converter(kind, x, y)
 
@@ -246,3 +252,20 @@ class HoloPlot(object):
         Element : Element or NdOverlay of Elements
         """
         return self(kind='table', **dict(kwds, columns=columns))
+
+    def image(self, x=None, y=None, z=None, **kwds):
+        """
+        Image plot
+
+        Parameters
+        ----------
+        x, y, z : label or position, optional
+            Coordinates for each point.
+        **kwds : optional
+            Keyword arguments to pass on to
+            :py:meth:`intake.source.base.DataSource.plot`.
+        Returns
+        -------
+        Element : Element or NdOverlay of Elements
+        """
+        return self(x, y, kind='image', z=z, **kwds)

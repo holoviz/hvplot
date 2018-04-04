@@ -11,10 +11,15 @@ from holoviews.core.overlay import NdOverlay
 from holoviews.core.layout import NdLayout
 from holoviews.element import (
     Curve, Scatter, Area, Bars, BoxWhisker, Dataset, Distribution,
-    Table, HeatMap
+    Table, HeatMap, Image
 )
 from holoviews.operation import histogram
 from holoviews.streams import Buffer, Pipe
+
+try:
+    import xarray as xr
+except ImportError:
+    xr = None
 
 try:
     import streamz.dataframe as sdf
@@ -116,14 +121,26 @@ def datashading(method):
         if 'cmap' in self._style_opts:
             opts['cmap'] = self._style_opts['cmap']
         if self.by:
-            opts['aggregator'] = count_cat(self.by)
+            opts['aggregator'] = count_cat(self.by[0])
         return datashade(plot, **opts).opts(plot=self._plot_opts)
     return datashading_plot
 
 
+def is_series(data):
+    return (isinstance(data, pd.Series) or
+            (sdf and isinstance(data, (sdf.Series, sdf.Seriess))) or
+            (dd and isinstance(data, dd.Series)))
+
+
+def is_streamz(data):
+    return sdf and isinstance(data, (sdf.DataFrame, sdf.Series, sdf.DataFrames, sdf.Seriess))
+
+
 class HoloViewsConverter(object):
 
-    def __init__(self, data, kind=None, by=None, width=700,
+    _gridded_types = ['image', 'contour', 'contourf', 'quadmesh']
+
+    def __init__(self, data, x, y, kind=None, by=None, width=700,
                  height=300, shared_axes=False, columns=None,
                  grid=False, legend=True, rot=None, title=None,
                  xlim=None, ylim=None, xticks=None, yticks=None,
@@ -133,37 +150,37 @@ class HoloViewsConverter(object):
                  value_label='value', group_label='Group',
                  colorbar=False, streaming=False, backlog=1000,
                  timeout=1000, persist=False, use_dask=False,
-                 datashade=False, subplots=False, label=None, **kwds):
+                 datashade=False, subplots=False, label=None,
+                 groupby=None, dynamic=True, index=None, show=True,
+                 **kwds):
 
         self.streaming = streaming
         self.use_dask = use_dask
+        self.kind = None
+
+        gridded = kind in self._gridded_types
+        gridded_data = False
 
         # Validate DataSource
         self.data_source = data
-        if isinstance(data, pd.Series) or (sdf and isinstance(data, (sdf.Series, sdf.Seriess))):
+        if is_series(data):
             data = data.to_frame()
-        if isinstance(data, pd.DataFrame):
-            self.data = data
-        elif DataSource and isinstance(data, DataSource):
+        if DataSource and isinstance(data, DataSource):
             if data.container != 'dataframe':
                 raise NotImplementedError('Plotting interface currently only '
                                           'supports DataSource objects with '
                                           'dataframe container.')
-            if streaming:
-                self.data = data.read()
-                self.stream = Buffer(self.data, length=backlog, index=False)
-                if gen is None:
-                    raise ImportError('Streaming support requires tornado.')
-                @gen.coroutine
-                def f():
-                    self.stream.send(data.read())
-                self.cb = PeriodicCallback(f, timeout)
-            elif (use_dask or persist) and dd is not None:
+            if (use_dask or persist) and dd is not None:
                 ddf = data.to_dask()
-                self.data = ddf.persist() if persist else ddf
+                data = ddf.persist() if persist else ddf
             else:
-                self.data = data.read()
-        elif sdf and (data, sdf.DataFrame, sdf.Series, sdf.DataFrames, sdf.Seriess):
+                data = data.read()
+
+        if isinstance(data, pd.DataFrame):
+            self.data = data
+        elif dd and isinstance(data, dd.DataFrame):
+            self.data = data
+        elif is_streamz(data):
             self.data = data.example
             self.stream_type = data._stream_type
             self.streaming = True
@@ -173,13 +190,88 @@ class HoloViewsConverter(object):
             else:
                 self.stream = Buffer(data=self.data, length=backlog, index=False)
             data.stream.gather().sink(self.stream.send)
+        elif xr and (data, (xr.DataArray, xr.Dataset)):
+            if isinstance(data, xr.DataArray):
+                dataset = data.to_dataset()
+            else:
+                dataset = data
+            data_vars = list(dataset.data_vars)
+            dims = list(dataset.dims)
 
+            if not (x or y) and len(dims) > 1 and not (by or groupby):
+                self.kind = 'image'
+                gridded = True
+                x, y = dims[:2]
+
+            if gridded:
+                gridded_data = True
+                self.data = dataset
+                if len(dims) > 2 and not groupby:
+                    groupby = [d for d in dims if d not in (x, y)]
+                if not columns:
+                    columns = []
+            else:
+                if use_dask:
+                    data = dataset.to_dask_dataframe()
+                else:
+                    data = dataset.to_dataframe()
+                    if len(data.index.names) > 1:
+                        data = data.reset_index()
+                if not columns:
+                    columns = data_vars
+                if not index and not x:
+                    index = data_vars[0] if y and y not in dataset.data_vars else dims[0]
+                if by is None:
+                    by = [c for c in dims if c not in (x, index)]
+                self.data = data
+        else:
+            raise ValueError('Supplied data type %s not understood' % type(data).__name__)
+
+        # Validate data and arguments
+        if groupby is None:
+            groupby = []
+        elif not isinstance(groupby, list):
+            groupby = [groupby]
+
+        if gridded:
+            if not gridded_data:
+                raise ValueError('%s plot type requires gridded data, '
+                                 'e.g. a NumPy array or xarray Dataset, '
+                                 'found %s type' % (kind, type(self.data).__name__))
+            not_found = [g for g in groupby if g not in dataset.coords]
+            if groupby and not_found:
+                raise ValueError('The supplied groupby dimension(s) %s '
+                                 'could not be found, expected one or '
+                                 'more of: %s' % (not_found, list(dataset.coords)))
+        else:
+            if isinstance(self.data, pd.DataFrame):
+                if self.data.index.names == [None]:
+                    indexes = [self.data.index.name or 'index']
+                else:
+                    indexes = self.data.index.names
+            else:
+                indexes = [data.index.name or 'index']
+            groupby_index = [g for g in groupby if g in indexes]
+            if groupby_index:
+                self.data = self.data.reset_index(groupby_index)
+            not_found = [g for g in groupby if g not in list(self.data.columns)+indexes]
+            if groupby and not_found:
+                raise ValueError('The supplied groupby dimension(s) %s '
+                                 'could not be found, expected one or '
+                                 'more of: %s' % (not_found, list(self.data.columns)))
+        self.groupby = groupby
 
         # High-level options
-        self.by = by or []
+        self.index = index
+        if not by:
+            self.by = []
+        else:
+            self.by = by if isinstance(by, list) else [by]
+        self.show = show
+        self.dynamic = dynamic
         self.columns = columns
         self.stacked = stacked
-        self.use_index = use_index
+        self.use_index = use_index or index
         self.kwds = kwds
         self.value_label = value_label
         self.group_label = group_label
@@ -249,7 +341,19 @@ class HoloViewsConverter(object):
 
 
     def __call__(self, kind, x, y):
-        return getattr(self, kind)(x, y)
+        kind = self.kind or kind
+        if not self.groupby:
+            obj = getattr(self, kind)(x, y)
+        else:
+            dataset = Dataset(self.data).groupby(self.groupby, dynamic=self.dynamic)
+            obj = dataset.map(lambda ds: getattr(self, kind)(x, y, data=ds.data), [Dataset])
+        return obj
+
+
+    @streaming
+    def dataset(self, x=None, y=None, data=None):
+        data = self.data if data is None else data
+        return Dataset(data, self.columns, [])
 
 
     ##########################
@@ -269,7 +373,7 @@ class HoloViewsConverter(object):
             ys += [self.kwds['c']]
 
         if self.by:
-            chart = Dataset(data, [self.by, x], ys).to(element, x, ys, self.by).overlay()
+            chart = Dataset(data, self.by+[x], ys).to(element, x, ys, self.by).overlay()
         else:
             chart = element(data, x, ys)
         return chart.redim.range(**ranges).relabel(**self._relabel).opts(opts)
@@ -281,8 +385,10 @@ class HoloViewsConverter(object):
         if not x and not y and len(data.columns) == 1:
             x = data.index.name or 'index'
             y = data.columns[0]
-        if x and y:
-            return self.single_chart(element, x, y, data)
+        if (x or self.index) and y:
+            return self.single_chart(element, x or self.index, y, data)
+        elif x and len(self.columns) == 1:
+            return self.single_chart(element, x, self.columns[0], data)
 
         # Note: Loading dask dataframe into memory due to rename bug
         if self.use_dask: data = data.compute()
@@ -290,10 +396,10 @@ class HoloViewsConverter(object):
                     norm=self._norm_opts, style=self._style_opts)
 
         if self.use_index or x:
-            if self.use_index is not None and isinstance(self.use_index, bool):
-                x = x or data.index.name or 'index'
-            else:
-                x = self.use_index
+            if self.index or x:
+                x = x or self.index
+            elif self.use_index:
+                x = data.index.name or 'index'
             columns = [c for c in self.columns or data.columns if c != x]
             renamed = {c: 'Dimension_%d' % c for c in columns if isinstance(c, int)}
             if renamed:
@@ -346,10 +452,10 @@ class HoloViewsConverter(object):
         Helper method to generate element from indexed dataframe.
         """
         data = self.data if data is None else data
-        if isinstance(self.use_index, bool):
+        if self.index:
+            index = self.index
+        elif self.use_index:
             index = data.index.name or 'index'
-        else:
-            index = self.use_index
 
         id_vars = [index]
         invert = not self.kwds.get('vert', True)
@@ -405,8 +511,7 @@ class HoloViewsConverter(object):
                 'norm': self._norm_opts, 'style': self._style_opts}
         if y:
             ranges = {y: self._dim_ranges['y']}
-            kdims = [self.by] if self.by else []
-            return (element(data, kdims, y).redim.range(**ranges)
+            return (element(data, self.by, y).redim.range(**ranges)
                 .relabel(**self._relabel).opts(**opts))
 
         kdims = [self.group_label]
@@ -445,21 +550,24 @@ class HoloViewsConverter(object):
 
         data = self.data if data is None else data
         if y and self.by:
-            ds = Dataset(data, [self.by], y)
+            ds = Dataset(data, self.by, y)
             return histogram(ds.to(Dataset, [], y, self.by), **hist_opts).\
                 overlay().opts({'Histogram': opts})
         elif y or len(data.columns) == 1:
             y = y or data.columns[0]
             ds = Dataset(data, [], y)
-            return histogram(ds, dimension=y, **hist_opts).\
-                opts({'Histogram': opts})
+            hist = histogram(ds, dimension=y, **hist_opts).opts({'Histogram': opts})
+            ranges = {hist.kdims[0].name: self._dim_ranges['x'],
+                      hist.vdims[0].name: self._dim_ranges['y']}
+            return hist.redim.range(**ranges)
 
         ds = Dataset(data)
         hists = {}
         columns = self.columns or data.columns
         for col in columns:
             hist = histogram(ds, dimension=col, **hist_opts)
-            ranges = {hist.vdims[0].name: self._dim_ranges['y']}
+            ranges = {hist.kdims[0].name: self._dim_ranges['x'],
+                      hist.vdims[0].name: self._dim_ranges['y']}
             hists[col] = (hist.redim.range(**ranges)
                           .relabel(**self._relabel).opts(**opts))
         return NdOverlay(hists)
@@ -520,3 +628,17 @@ class HoloViewsConverter(object):
 
         data = self.data if data is None else data
         return Table(data, self.columns, []).opts(plot=opts)
+
+    ##########################
+    #     Gridded plots      #
+    ##########################
+
+    @streaming
+    @datashading
+    def image(self, x=None, y=None, z=None, data=None):
+        data = self.data if data is None else data
+        if not x or y:
+            x, y = list(data.dims)[::-1]
+        if not z:
+            z = list(data.data_vars)[0]
+        return Image(data, [x, y], z)
