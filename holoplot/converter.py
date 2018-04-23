@@ -11,7 +11,7 @@ from holoviews.core.overlay import NdOverlay
 from holoviews.core.layout import NdLayout
 from holoviews.element import (
     Curve, Scatter, Area, Bars, BoxWhisker, Dataset, Distribution,
-    Table, HeatMap, Image
+    Table, HeatMap, Image, HexTiles
 )
 from holoviews.operation import histogram
 from holoviews.streams import Buffer, Pipe
@@ -606,7 +606,7 @@ class HoloViewsConverter(object):
 
     @streaming
     def heatmap(self, x, y, data=None):
-        data = data or self.data
+        data = self.data if data is None else data
         if not x: x = data.columns[0]
         if not y: y = data.columns[1]
         z = self.kwds.get('C', data.columns[2])
@@ -616,6 +616,21 @@ class HoloViewsConverter(object):
         if 'reduce_function' in self.kwds:
             return hmap.aggregate(function=self.kwds['reduce_function'])
         return hmap
+
+
+    @streaming
+    def hexbin(self, x, y, data=None):
+        data = self.data if data is None else data
+        if not x: x = data.columns[0]
+        if not y: y = data.columns[1]
+        z = self.kwds.get('C')
+
+        opts = dict(plot=self._plot_opts, norm=self._norm_opts, style=self._style_opts)
+        if 'reduce_function' in self.kwds:
+            opts['plot']['aggregator'] = self.kwds['reduce_function']
+        if 'gridsize' in self.kwds:
+            opts['plot']['gridsize'] = self.kwds
+        return HexTiles(data, [x, y], z or []).opts(**opts)
 
 
     @streaming

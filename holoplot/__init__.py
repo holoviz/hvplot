@@ -138,6 +138,23 @@ class HoloPlot(object):
         """
         return self(x, y, kind='heatmap', z=z, **kwds)
 
+    def hexbin(self, x=None, y=None, z=None, **kwds):
+        """
+        HexBin plot
+
+        Parameters
+        ----------
+        x, y : label or position, optional
+            Coordinates for each point.
+        **kwds : optional
+            Keyword arguments to pass on to
+            :py:meth:`intake.source.base.DataSource.plot`.
+        Returns
+        -------
+        Element : Element or NdOverlay of Elements
+        """
+        return self(x, y, kind='hexbin', **kwds)
+
     def bar(self, x=None, y=None, **kwds):
         """
         Bars plot
