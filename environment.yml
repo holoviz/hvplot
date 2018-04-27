@@ -10,7 +10,7 @@ dependencies:
   - bokeh/label/dev::bokeh=0.12.15dev5
   - ioam::holoviews=1.10.1
   - datashader=0.6.5
-  - param=1.5.1
+  - param=1.6.1
   # 
   # Direct dependencies for package installation
   # 
