@@ -7,7 +7,7 @@ dependencies:
   # 
   # Versions for pyviz-maintained packages pinned to ensure mutual compatibility
   # 
-  - bokeh/label/dev::bokeh=0.12.15dev5
+  - bokeh::bokeh=0.12.15
   - ioam::holoviews=1.10.1
   - datashader=0.6.5
   - param=1.6.1
