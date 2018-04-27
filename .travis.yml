@@ -57,7 +57,7 @@ jobs:
         - cp ./doc/user_guide/Streaming_Plots.rst ./doc/user_guide/Streaming_Plots.rst_bak
         - nbsite_nbpagebuild.py pyviz holoplot ./examples ./doc
         - cp ./doc/user_guide/Streaming_Plots.rst_bak ./doc/user_guide/Streaming_Plots.rst
-        - sphinx-build -b html ./doc ./doc/_build/html
+        - HV_DOC_HTML='true' sphinx-build -b html ./doc ./doc/_build/html
         - nbsite_fix_links.py ./doc/_build/html
         - touch ./doc/_build/html/.nojekyll
         - cp -r ./examples/user_guide/images ./doc/_build/html/user_guide/images
