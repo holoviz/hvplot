@@ -22,7 +22,7 @@ dependencies:
   - python>=3.6,<3.7 # Pinned in case of unknown future or past compatibility issues
   - ipython=5        # Pinned to avoid tab-completion issue in ipython=6
   - numpy=1.13       # Pinned to avoid warnings with numpy=1.14 and bokeh=1.12.14
-  - notebook>=5.1    # Pinned to avoid rate limiting for large images with notebook=5.0
+  - notebook>=5.4    # Pinned to avoid rate limiting for large images with notebook=5.0
   - dask=0.17.1      # Pinned in case of future API changes
   - jupyter
   - pandas
