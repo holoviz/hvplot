@@ -1,11 +1,22 @@
+import holoviews
+from holoviews import (
+    extension as _extension, Dimensioned as _Dimensioned, HoloMap as _HoloMap
+)
+
+from bokeh.io import export_png as _export_png, show as _show, save as _save
+from bokeh.models import LayoutDOM as _LayoutDOM
+from bokeh.resources import CDN as _CDN
+
 from .converter import HoloViewsConverter
+
+renderer = holoviews.renderer('bokeh')
 
 # Register plotting interfaces
 def _patch_plot(self):
     return HoloPlot(self)
 
 
-def patch(library):
+def patch(library, extension=None):
     """
     Patch library to support HoloViews based plotting API.
     """
@@ -49,6 +60,8 @@ def patch(library):
             raise ImportError('Could not patch plotting API onto xarray. '
                               'Xarray could not be imported.')
         DataArray.plot = property(_patch_plot)
+    if extension:
+        _extension(extension)
 
 
 class HoloPlot(object):
@@ -56,7 +69,7 @@ class HoloPlot(object):
     def __init__(self, data):
         self._data = data
 
-    def __call__(self, x=None, y=None, kind='line', backlog=1000,
+    def __call__(self, x=None, y=None, kind=None, backlog=1000,
              width=700, height=300, title=None, grid=False,
              legend=True, logx=False, logy=False, loglog=False,
              xticks=None, yticks=None, xlim=None, ylim=None, rot=None,
@@ -286,3 +299,70 @@ class HoloPlot(object):
         Element : Element or NdOverlay of Elements
         """
         return self(x, y, kind='image', z=z, **kwds)
+
+
+
+def save(obj, filename, title=None, resources=None):
+    """
+    Saves HoloViews objects and bokeh plots to file.
+
+    Parameters
+    ----------
+    obj : HoloViews object
+       HoloViews object to export
+    filename : string
+       Filename to save the plot to
+    title : string
+       Optional title for the plot
+    resources: bokeh resources
+       One of the valid bokeh.resources (e.g. CDN or INLINE)
+    """
+    if isinstance(obj, _Dimensioned):
+        plot = renderer.get_plot(obj).state
+    else:
+        raise ValueError('%s type object not recognized and cannot be saved.' %
+                         type(obj).__name__)
+
+    if filename.endswith('png'):
+        _export_png(plot, filename=filename)
+        return
+    if not filename.endswith('.html'):
+        filename = filename + '.html'
+
+    if title is None:
+        title = 'HoloPlot Plot'
+    if resources is None:
+        resources = _CDN
+
+    if obj.traverse(lambda x: x, [_HoloMap]):
+        renderer.save(plot, filename)
+    else:
+        _save(plot, filename, title=title, resources=resources)
+
+
+def show(obj, display_id=None):
+    """
+    Displays HoloViews objects in and outside the notebook
+
+    Parameters
+    ----------
+    obj : HoloViews object
+       HoloViews object to export
+    display_id : string
+       A display id to obtain a notebook display handle
+    """
+    if not isinstance(obj, _Dimensioned):
+        raise ValueError('%s type object not recognized and cannot be shown.' %
+                         type(obj).__name__)
+
+    try:
+        ip = get_ipython() # noqa
+    except:
+        ip = None
+    if ip and renderer.notebook_context:
+        return holoviews.ipython.display(obj, display_id=id)
+
+    if obj.traverse(lambda x: x, [_HoloMap]):
+        renderer.app(obj, show=True, new_window=True)
+    else:
+        _show(renderer.get_plot(obj).state)
