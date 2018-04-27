@@ -14,6 +14,8 @@ User Guide
 * `Streaming Plots <Streaming_Plots.html>`_
   How to use HoloPlot for streaming plots with the streamz library.
 
+* `XArray Plotting <XArray_Plotting.ipynb`_
+  How to use HoloPlot for plotting XArray gridded data.
 
 .. toctree::
     :titlesonly:
@@ -24,3 +26,4 @@ User Guide
 	Displaying and saving plots <Display_and_Saving>
     Plotting API <Plotting_API>
 	Streaming Plots <Streaming_Plots>
+	XArray Plotting <XArray_Plotting>

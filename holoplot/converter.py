@@ -51,6 +51,9 @@ try:
 except:
     pass
 
+renderer = hv.renderer('bokeh')
+
+
 class StreamingCallable(Callable):
     """
     StreamingCallable is a DynamicMap callback wrapper which keeps
@@ -151,12 +154,11 @@ class HoloViewsConverter(object):
                  colorbar=False, streaming=False, backlog=1000,
                  timeout=1000, persist=False, use_dask=False,
                  datashade=False, subplots=False, label=None,
-                 groupby=None, dynamic=True, index=None, show=True,
+                 groupby=None, dynamic=True, index=None, show=False,
                  **kwds):
 
         self.streaming = streaming
         self.use_dask = use_dask
-        self.kind = None
 
         gridded = kind in self._gridded_types
         gridded_data = False
@@ -191,17 +193,14 @@ class HoloViewsConverter(object):
                 self.stream = Buffer(data=self.data, length=backlog, index=False)
             data.stream.gather().sink(self.stream.send)
         elif xr and (data, (xr.DataArray, xr.Dataset)):
-            if isinstance(data, xr.DataArray):
-                dataset = data.to_dataset()
-            else:
-                dataset = data
-            data_vars = list(dataset.data_vars)
+            dataset = data
+            data_vars = list(dataset.data_vars) if isinstance(data, xr.Dataset) else [data.name]
             dims = list(dataset.dims)
 
-            if not (x or y) and len(dims) > 1 and not (by or groupby):
-                self.kind = 'image'
+            if kind is None and not (x or y) and len(dims) > 1 and not (by or groupby):
+                kind = 'image'
                 gridded = True
-                x, y = dims[:2]
+                x, y = dims[::-1][:2]
 
             if gridded:
                 gridded_data = True
@@ -212,6 +211,7 @@ class HoloViewsConverter(object):
                     columns = []
             else:
                 if use_dask:
+                    dataset = dataset if isinstance(dataset, xr.Dataset) else dataset.to_dataset()
                     data = dataset.to_dask_dataframe()
                 else:
                     data = dataset.to_dataframe()
@@ -220,12 +220,14 @@ class HoloViewsConverter(object):
                 if not columns:
                     columns = data_vars
                 if not index and not x:
-                    index = data_vars[0] if y and y not in dataset.data_vars else dims[0]
+                    index = data_vars[0] if y and y not in data_vars else dims[0]
                 if by is None:
                     by = [c for c in dims if c not in (x, index)]
                 self.data = data
         else:
             raise ValueError('Supplied data type %s not understood' % type(data).__name__)
+
+        self.kind = kind or 'line'
 
         # Validate data and arguments
         if groupby is None:
@@ -383,12 +385,12 @@ class HoloViewsConverter(object):
         "Helper method for simple x vs. y charts"
         data = (self.data if data is None else data)
         if not x and not y and len(data.columns) == 1:
-            x = data.index.name or 'index'
+            x = self.index or (data.index.name or 'index')
             y = data.columns[0]
         if (x or self.index) and y:
             return self.single_chart(element, x or self.index, y, data)
-        elif x and len(self.columns) == 1:
-            return self.single_chart(element, x, self.columns[0], data)
+        elif (x or self.index) and len(self.columns) == 1:
+            return self.single_chart(element, x or self.index, self.columns[0], data)
 
         # Note: Loading dask dataframe into memory due to rename bug
         if self.use_dask: data = data.compute()
@@ -645,12 +647,31 @@ class HoloViewsConverter(object):
     #     Gridded plots      #
     ##########################
 
-    @streaming
     @datashading
     def image(self, x=None, y=None, z=None, data=None):
         data = self.data if data is None else data
         if not x or y:
             x, y = list(data.dims)[::-1]
         if not z:
+            z = list(data.data_vars)[0] if isinstance(data, xr.Dataset) else [data.name]
+
+        plot_opts = dict(self._plot_opts)
+        invert = self.kwds.get('orientation', False) == 'horizontal'
+        opts = dict(plot=dict(plot_opts, invert_axes=invert),
+                    style=self._style_opts, norm=self._norm_opts)
+        return Image(data, [x, y], z).opts(**opts)
+
+
+    @datashading
+    def quadmesh(self, x=None, y=None, z=None, data=None):
+        data = self.data if data is None else data
+        if not x or y:
+            x, y = list(data.dims)[::-1]
+        if not z:
             z = list(data.data_vars)[0]
-        return Image(data, [x, y], z)
+
+        plot_opts = dict(self._plot_opts)
+        invert = self.kwds.get('orientation', False) == 'horizontal'
+        opts = dict(plot=dict(plot_opts, invert_axes=invert),
+                    style=self._style_opts, norm=self._norm_opts)
+        return QuadMesh(data, [x, y], z).opts(**opts)
