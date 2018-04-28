@@ -11,7 +11,7 @@ from holoviews.core.overlay import NdOverlay
 from holoviews.core.layout import NdLayout
 from holoviews.element import (
     Curve, Scatter, Area, Bars, BoxWhisker, Dataset, Distribution,
-    Table, HeatMap, Image, HexTiles
+    Table, HeatMap, Image, HexTiles, QuadMesh
 )
 from holoviews.operation import histogram
 from holoviews.streams import Buffer, Pipe
@@ -119,7 +119,7 @@ class HoloViewsConverter(object):
                  timeout=1000, persist=False, use_dask=False,
                  datashade=False, subplots=False, label=None,
                  groupby=None, dynamic=True, index=None, show=False,
-                 **kwds):
+                 crs=None, **kwds):
 
         self.streaming = streaming
         self.use_dask = use_dask
@@ -225,7 +225,6 @@ class HoloViewsConverter(object):
                 raise ValueError('The supplied groupby dimension(s) %s '
                                  'could not be found, expected one or '
                                  'more of: %s' % (not_found, list(self.data.columns)))
-        self.groupby = groupby
 
         # High-level options
         self.index = index
@@ -241,7 +240,9 @@ class HoloViewsConverter(object):
         self.kwds = kwds
         self.value_label = value_label
         self.group_label = group_label
+        self.groupby = groupby
         self.datashade = datashade
+        self.crs = crs
 
         # By type
         self._by_type = NdLayout if subplots else NdOverlay
@@ -300,7 +301,7 @@ class HoloViewsConverter(object):
         self._hover = hover
         self._plot_opts = plot_options
 
-        self._relabel = {'label': label}
+        self._relabel = {'label': label} if label else {}
         self._dim_ranges = {'x': xlim or (None, None),
                             'y': ylim or (None, None)}
         self._norm_opts = {'framewise': True}
@@ -376,7 +377,7 @@ class HoloViewsConverter(object):
             y = data.columns[0]
         if (x or self.index) and y:
             return self.single_chart(element, x or self.index, y, data)
-        elif (x or self.index) and len(self.columns) == 1:
+        elif (x or self.index) and self.columns and len(self.columns) == 1:
             return self.single_chart(element, x or self.index, self.columns[0], data)
 
         # Note: Loading dask dataframe into memory due to rename bug

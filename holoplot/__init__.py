@@ -300,6 +300,23 @@ class HoloPlot(object):
         """
         return self(x, y, kind='image', z=z, **kwds)
 
+    def quadmesh(self, x=None, y=None, z=None, **kwds):
+        """
+        QuadMesh plot
+
+        Parameters
+        ----------
+        x, y, z : label or position, optional
+            Coordinates for each point.
+        **kwds : optional
+            Keyword arguments to pass on to
+            :py:meth:`intake.source.base.DataSource.plot`.
+        Returns
+        -------
+        Element : Element or NdOverlay of Elements
+        """
+        return self(x, y, kind='quadmesh', z=z, **kwds)
+
 
 
 def save(obj, filename, title=None, resources=None):
