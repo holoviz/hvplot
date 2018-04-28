@@ -54,6 +54,7 @@ Overview
 --------
 
 .. notebook:: holoplot ./homepage.ipynb
+   :offset: 1
 
 .. toctree::
    :hidden:
