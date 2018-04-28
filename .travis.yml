@@ -62,6 +62,7 @@ jobs:
         - touch ./doc/_build/html/.nojekyll
         - cp -r ./examples/user_guide/images ./doc/_build/html/user_guide/images
         - cp -r ./examples/assets ./doc/_build/html/assets
+        - cp -r ./doc/assets/* ./doc/_build/html/assets/
         - nbsite_cleandisthtml.py ./doc/_build/html take_a_chance
         - cd ..
       deploy:

@@ -31,6 +31,30 @@ at the `Getting Started Guide <getting_started/index.html>`_ and check
 out the current functionality in the `User Guide
 <user_guide/index.html>`_.
 
+Quickstart
+==========
+
+Installation
+------------
+
+HoloPlot supports Python 2.7-3.7 on Linux, Windows, or Mac and can be installed with conda::
+
+  conda install -c pyviz holoplot
+
+or with pip::
+
+  pip install holoplot
+
+For JupyterLab support the jupyterlab_holoviews extension is also required::
+
+  jupyter labextension install @pyviz/jupyterlab_holoviews
+
+
+Overview
+--------
+
+.. notebook:: holoplot ./homepage.ipynb
+
 .. toctree::
    :hidden:
    :maxdepth: 2
