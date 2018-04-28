@@ -9,9 +9,8 @@ users to work with most types of data, including:
 
 * pandas: DataFrame, Series
 * streamz: DataFrame(s), Series(s)
-* dask: DataFrame, Series, Array
-* xarray: Dataset, DataArray
-* geopandas: DataFrame
+* dask: DataFrame, Series
+* xarray: DataArray
 * intake: DataSource
 
 Many of these libraries have the concept of a high-level plotting API
