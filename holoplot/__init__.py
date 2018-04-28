@@ -20,7 +20,8 @@ def patch(library, extension=None):
     """
     Patch library to support HoloViews based plotting API.
     """
-    if library == 'streamz':
+    if not isinstance(library, list): library = [library]
+    if 'streamz' in library:
         try:
             import streamz.dataframe as sdf
         except ImportError:
@@ -30,7 +31,7 @@ def patch(library, extension=None):
         sdf.DataFrames.plot = property(_patch_plot)
         sdf.Series.plot = property(_patch_plot)
         sdf.Seriess.plot = property(_patch_plot)
-    elif library == 'pandas':
+    if 'pandas' in library:
         try:
             import pandas as pd
         except:
@@ -38,7 +39,7 @@ def patch(library, extension=None):
                               'Pandas could not be imported.')
         pd.DataFrame.plot = property(_patch_plot)
         pd.Series.plot = property(_patch_plot)
-    elif library == 'dask':
+    if 'dask' in library:
         try:
             import dask.dataframe as dd
         except:
@@ -46,14 +47,14 @@ def patch(library, extension=None):
                               'Dask could not be imported.')
         dd.DataFrame.plot = property(_patch_plot)
         dd.Series.plot = property(_patch_plot)
-    elif library == 'intake':
+    if 'intake' in library:
         try:
             from intake.source.base import DataSource
         except ImportError:
             raise ImportError('Could not patch plotting API onto intake. '
                               'Intake could not be imported.')
         DataSource.plot = property(_patch_plot)
-    elif library == 'xarray':
+    if 'xarray' in library:
         try:
             from xarray import Dataset, DataArray
         except ImportError:
