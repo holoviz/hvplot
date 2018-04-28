@@ -92,42 +92,6 @@ class StreamingCallable(Callable):
             raise Exception('PeriodicCallback not running.')
 
 
-def streaming(method):
-    """
-    Decorator to add streaming support to plots.
-    """
-    def streaming_plot(*args, **kwargs):
-        self = args[0]
-        if self.streaming:
-            cbcallable = StreamingCallable(partial(method, *args, **kwargs),
-                                           periodic=self.cb)
-            return DynamicMap(cbcallable, streams=[self.stream])
-        return method(*args, **kwargs)
-    return streaming_plot
-
-
-def datashading(method):
-    """
-    Decorator to add datashading support to a plot.
-    """
-    def datashading_plot(*args, **kwargs):
-        self = args[0]
-        plot = method(*args, **kwargs)
-        if not self.datashade:
-            return plot
-        try:
-            from holoviews.operation.datashader import datashade
-            from datashader import count_cat
-        except:
-            raise ImportError('Datashading is not available')
-        opts = dict(width=self._plot_opts['width'], height=self._plot_opts['height'])
-        if 'cmap' in self._style_opts:
-            opts['cmap'] = self._style_opts['cmap']
-        if self.by:
-            opts['aggregator'] = count_cat(self.by[0])
-        return datashade(plot, **opts).opts(plot=self._plot_opts)
-    return datashading_plot
-
 
 def is_series(data):
     return (isinstance(data, pd.Series) or
@@ -344,15 +308,38 @@ class HoloViewsConverter(object):
 
     def __call__(self, kind, x, y):
         kind = self.kind or kind
-        if not self.groupby:
-            obj = getattr(self, kind)(x, y)
+        method = getattr(self, kind)
+
+        if self.groupby:
+            if self.streaming:
+                raise NotImplementedError("Streaming and groupby not yet implemented")
+            else:
+                dataset = Dataset(self.data).groupby(self.groupby, dynamic=self.dynamic)
+                obj = dataset.map(lambda ds: getattr(self, kind)(x, y, data=ds.data), [Dataset])
         else:
-            dataset = Dataset(self.data).groupby(self.groupby, dynamic=self.dynamic)
-            obj = dataset.map(lambda ds: getattr(self, kind)(x, y, data=ds.data), [Dataset])
-        return obj
+            if self.streaming:
+                cbcallable = StreamingCallable(partial(method, x, y),
+                                               periodic=self.cb)
+                obj = DynamicMap(cbcallable, streams=[self.stream])
+            else:
+                obj = method(x, y)
+
+        if not self.datashade:
+            return obj
+
+        try:
+            from holoviews.operation.datashader import datashade
+            from datashader import count_cat
+        except:
+            raise ImportError('Datashading is not available')
+        opts = dict(width=self._plot_opts['width'], height=self._plot_opts['height'])
+        if 'cmap' in self._style_opts:
+            opts['cmap'] = self._style_opts['cmap']
+        if self.by:
+            opts['aggregator'] = count_cat(self.by[0])
+        return datashade(obj, **opts).opts(plot=self._plot_opts)
 
 
-    @streaming
     def dataset(self, x=None, y=None, data=None):
         data = self.data if data is None else data
         return Dataset(data, self.columns, [])
@@ -421,15 +408,9 @@ class HoloViewsConverter(object):
                              'either x and y parameters to be declared '
                              'or use_index to be enabled.')
 
-
-    @datashading
-    @streaming
     def line(self, x, y, data=None):
         return self.chart(Curve, x, y, data)
 
-
-    @datashading
-    @streaming
     def scatter(self, x, y, data=None):
         scatter = self.chart(Scatter, x, y, data)
         if 'c' in self.kwds:
@@ -437,8 +418,6 @@ class HoloViewsConverter(object):
             return scatter.opts(plot=color_opts)
         return scatter
 
-
-    @streaming
     def area(self, x, y, data=None):
         areas = self.chart(Area, x, y, data)
         if self.stacked:
@@ -478,8 +457,6 @@ class HoloViewsConverter(object):
         return (element(df, kdims, self.value_label).redim.range(**ranges)
                 .relabel(**self._relabel).opts(**opts))
 
-
-    @streaming
     def bar(self, x, y, data=None):
         if x and y:
             return self.single_chart(Bars, x, y, data)
@@ -492,7 +469,6 @@ class HoloViewsConverter(object):
                              'either x and y parameters to be declared '
                              'or use_index to be enabled.')
 
-    @streaming
     def barh(self, x, y, data=None):
         return self.bar(x, y, data).opts(plot={'Bars': dict(invert_axes=True)})
 
@@ -522,13 +498,9 @@ class HoloViewsConverter(object):
         return (element(df, kdims, self.value_label).redim.range(**ranges)
                 .relabel(**self._relabel).opts(**opts))
 
-
-    @streaming
     def box(self, x, y, data=None):
         return self._stats_plot(BoxWhisker, y, data)
 
-
-    @streaming
     def violin(self, x, y, data=None):
         try:
             from holoviews.element import Violin
@@ -536,8 +508,6 @@ class HoloViewsConverter(object):
             raise ImportError('Violin plot requires HoloViews version >=1.10')
         return self._stats_plot(Violin, y, data)
 
-
-    @streaming
     def hist(self, x, y, data=None):
         plot_opts = dict(self._plot_opts)
         invert = self.kwds.get('orientation', False) == 'horizontal'
@@ -571,8 +541,6 @@ class HoloViewsConverter(object):
                           .relabel(**self._relabel).opts(**opts))
         return NdOverlay(hists)
 
-
-    @streaming
     def kde(self, x, y, data=None):
         data = self.data if data is None else data
         plot_opts = dict(self._plot_opts)
@@ -606,7 +574,6 @@ class HoloViewsConverter(object):
     #      Other charts      #
     ##########################
 
-    @streaming
     def heatmap(self, x, y, data=None):
         data = self.data if data is None else data
         if not x: x = data.columns[0]
@@ -619,8 +586,6 @@ class HoloViewsConverter(object):
             return hmap.aggregate(function=self.kwds['reduce_function'])
         return hmap
 
-
-    @streaming
     def hexbin(self, x, y, data=None):
         data = self.data if data is None else data
         if not x: x = data.columns[0]
@@ -634,8 +599,6 @@ class HoloViewsConverter(object):
             opts['plot']['gridsize'] = self.kwds
         return HexTiles(data, [x, y], z or []).opts(**opts)
 
-
-    @streaming
     def table(self, x=None, y=None, data=None):
         allowed = ['width', 'height']
         opts = {k: v for k, v in self._plot_opts.items() if k in allowed}
@@ -647,31 +610,40 @@ class HoloViewsConverter(object):
     #     Gridded plots      #
     ##########################
 
-    @datashading
     def image(self, x=None, y=None, z=None, data=None):
         data = self.data if data is None else data
-        if not x or y:
+        if not (x and y):
             x, y = list(data.dims)[::-1]
         if not z:
             z = list(data.data_vars)[0] if isinstance(data, xr.Dataset) else [data.name]
 
+        params = dict(self._relabel)
         plot_opts = dict(self._plot_opts)
         invert = self.kwds.get('orientation', False) == 'horizontal'
         opts = dict(plot=dict(plot_opts, invert_axes=invert),
                     style=self._style_opts, norm=self._norm_opts)
-        return Image(data, [x, y], z).opts(**opts)
 
+        element = Image
+        if self.crs is not None:
+            from geoviews import Image as element
+            params['crs'] = self.crs
+        return element(data, [x, y], z, **params).opts(**opts)
 
-    @datashading
     def quadmesh(self, x=None, y=None, z=None, data=None):
         data = self.data if data is None else data
-        if not x or y:
-            x, y = list(data.dims)[::-1]
+        if not (x and y):
+            x, y = list([k for k, v in data.coords.items() if v.size > 1])
         if not z:
-            z = list(data.data_vars)[0]
+            z = list(data.data_vars)[0] if isinstance(data, xr.Dataset) else [data.name]
 
+        params = dict(self._relabel)
         plot_opts = dict(self._plot_opts)
         invert = self.kwds.get('orientation', False) == 'horizontal'
         opts = dict(plot=dict(plot_opts, invert_axes=invert),
                     style=self._style_opts, norm=self._norm_opts)
-        return QuadMesh(data, [x, y], z).opts(**opts)
+
+        element = QuadMesh
+        if self.crs is not None:
+            from geoviews import QuadMesh as element
+            params['crs'] = self.crs
+        return element(data, [x, y], z, **params).opts(**opts)
