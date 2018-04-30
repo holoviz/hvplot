@@ -1,14 +1,15 @@
-import holoviews
+import holoviews as _hv
 from holoviews import (
     extension as _extension, Dimensioned as _Dimensioned, HoloMap as _HoloMap
 )
+from holoviews.ipython import display
 
 from bokeh.io import export_png as _export_png, show as _show, save as _save
 from bokeh.resources import CDN as _CDN
 
 from .converter import HoloViewsConverter
 
-renderer = holoviews.renderer('bokeh')
+renderer = _hv.renderer('bokeh')
 
 # Register plotting interfaces
 def _patch_plot(self):
@@ -357,7 +358,7 @@ def save(obj, filename, title=None, resources=None):
         _save(plot, filename, title=title, resources=resources)
 
 
-def show(obj, display_id=None):
+def show(obj):
     """
     Displays HoloViews objects in and outside the notebook
 
@@ -365,19 +366,10 @@ def show(obj, display_id=None):
     ----------
     obj : HoloViews object
        HoloViews object to export
-    display_id : string
-       A display id to obtain a notebook display handle
     """
     if not isinstance(obj, _Dimensioned):
         raise ValueError('%s type object not recognized and cannot be shown.' %
                          type(obj).__name__)
-
-    try:
-        ip = get_ipython() # noqa
-    except:
-        ip = None
-    if ip and renderer.notebook_context:
-        return holoviews.ipython.display(obj, display_id=id)
 
     if obj.traverse(lambda x: x, [_HoloMap]):
         renderer.app(obj, show=True, new_window=True)
