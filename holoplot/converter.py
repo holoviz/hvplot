@@ -393,7 +393,7 @@ class HoloViewsConverter(object):
             for c in columns:
                 c = renamed.get(c, c)
                 chart = element(data, x, c).redim(**{c: self.value_label})
-                ranges = {x: self._dim_ranges['x'], c: self._dim_ranges['y']}
+                ranges = {x: self._dim_ranges['x'], self.value_label: self._dim_ranges['y']}
                 charts[c] = (chart.relabel(**self._relabel)
                              .redim.range(**ranges).opts(**opts))
             if len(charts) == 1:
