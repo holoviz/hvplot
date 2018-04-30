@@ -33,19 +33,15 @@ jobs:
         - travis_wait 20 conda env create
         - source activate holoplot
         # dependencies for tests etc
+        - conda install nose parameterized
         - pip install flake8
         - conda env export
         - conda list
       script:
           # python ./etc/test_notebooks.py lint
-          - python ./etc/test_notebooks.py
-
-    #- <<: *default
-    #  os: osx
-    #  before_install:
-    #    # brew-installed geos interferes with cartopy?
-    #    - brew uninstall --ignore-dependencies geos gdal postgis
-    #  if: branch = master AND type != pull_request
+          # python ./etc/test_notebooks.py
+          - flake8 --ignore=E,W,F999,F405 holoplot
+          - nosetests --with-doctest
 
     - <<: *default
       stage: doc
