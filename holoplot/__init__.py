@@ -4,7 +4,6 @@ from holoviews import (
 )
 
 from bokeh.io import export_png as _export_png, show as _show, save as _save
-from bokeh.models import LayoutDOM as _LayoutDOM
 from bokeh.resources import CDN as _CDN
 
 from .converter import HoloViewsConverter
@@ -56,7 +55,7 @@ def patch(library, extension=None):
         DataSource.plot = property(_patch_plot)
     if 'xarray' in library:
         try:
-            from xarray import Dataset, DataArray
+            from xarray import DataArray
         except ImportError:
             raise ImportError('Could not patch plotting API onto xarray. '
                               'Xarray could not be imported.')

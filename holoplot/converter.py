@@ -32,12 +32,6 @@ except ImportError:
     DataSource = None
 
 try:
-    from tornado.ioloop import PeriodicCallback
-    from tornado import gen
-except ImportError:
-    gen = None
-
-try:
     import dask.dataframe as dd
 except ImportError:
     dd = None
@@ -440,7 +434,6 @@ class HoloViewsConverter(object):
             index = data.index.name or 'index'
 
         id_vars = [index]
-        invert = not self.kwds.get('vert', True)
         opts = {'plot': dict(self._plot_opts, labelled=[]),
                 'style': dict(self._style_opts),
                 'norm': self._norm_opts}
