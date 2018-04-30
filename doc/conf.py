@@ -4,7 +4,7 @@ from nbsite.shared_conf import *
 
 project = u'HoloPlot'
 authors = u'Philipp Rudiger'
-copyright = u'2017 ' + authors
+copyright = u'2018 ' + authors
 description = 'A high-level plotting API for the PyData ecosystem built on HoloViews'
 
 # TODO: gah, version
