@@ -20,13 +20,13 @@ solid foundation, but means that users miss out the benefits of
 modern, interactive plotting libraries like bokeh and holoviews.
 
 HoloPlot provides a high-level plotting API built on HoloViews which
-will provide a general and consistent API for plotting data in all the
-abovementioned formats. HoloPlot will integrate neatly with the
+provides a general and consistent API for plotting data in all the
+abovementioned formats. HoloPlot can integrate neatly with the
 individual libraries if an extension mechanism for the native plot
-APIs is offered or can be used as a standalone component.
+APIs is offered, or it can be used as a standalone component.
 
 The API is currently under heavy development and should not be
-considered stable but if you want to start playing with it have a look
+considered stable. If you want to start playing with it anyway, have a look
 at the `Getting Started Guide <getting_started/index.html>`_ and check
 out the current functionality in the `User Guide
 <user_guide/index.html>`_.

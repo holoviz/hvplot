@@ -33,7 +33,7 @@ at present, the recommended way to install HoloPlot is based on conda
 Usage
 -----
 
-Once you've installed EarthSim as above and are in the EarthSim directory, you can
+Once you've installed HoloPlot as above and are in the HoloPlot directory, you can
 run the examples shown on the website using
 `Jupyter <http://jupyter.org>`_::
 

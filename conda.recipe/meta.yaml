@@ -72,5 +72,5 @@ test:
 
 about:
   home: https://pyviz.github.io/holoplot
-  summary: How to solve visualization problems with Python tools
+  summary: A high-level plotting API for the PyData ecosystem built on HoloViews
   license: BSD 3-Clause

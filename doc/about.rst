@@ -1,9 +1,7 @@
 About Us
 ========
 
-HoloPlot was developed by the developers of `HoloViews <http://holoviews.org>`_.
-
-The authors of all of these tools are working closely together to help
-make them into a coherent solution to a wide range of Python
-visualization problems, funded in part by 
-`Anaconda, Inc. <http://anaconda.com>`_, 
+HoloPlot was created by the developers of `HoloViews <http://holoviews.org>`_, to help
+make the power available in the `PyViz <http://pyviz.org>`_ ecosystem available
+more easily to everyone. This work was funded in part by
+`Anaconda, Inc. <http://anaconda.com>`_.
