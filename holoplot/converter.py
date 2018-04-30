@@ -113,7 +113,7 @@ class HoloViewsConverter(object):
                  timeout=1000, persist=False, use_dask=False,
                  datashade=False, subplots=False, label=None,
                  groupby=None, dynamic=True, index=None, show=False,
-                 crs=None, **kwds):
+                 crs=None, fields={}, **kwds):
 
         self.streaming = streaming
         self.use_dask = use_dask
@@ -299,6 +299,7 @@ class HoloViewsConverter(object):
         self._dim_ranges = {'x': xlim or (None, None),
                             'y': ylim or (None, None)}
         self._norm_opts = {'framewise': True}
+        self._redim = fields
 
 
     def __call__(self, kind, x, y):
@@ -337,7 +338,7 @@ class HoloViewsConverter(object):
 
     def dataset(self, x=None, y=None, data=None):
         data = self.data if data is None else data
-        return Dataset(data, self.columns, [])
+        return Dataset(data, self.columns, []).redim(**self._redim)
 
 
     ##########################
@@ -360,7 +361,7 @@ class HoloViewsConverter(object):
             chart = Dataset(data, self.by+[x], ys).to(element, x, ys, self.by).overlay()
         else:
             chart = element(data, x, ys)
-        return chart.redim.range(**ranges).relabel(**self._relabel).opts(opts)
+        return chart.redim.range(**ranges).redim(**self._redim).relabel(**self._relabel).opts(opts)
 
 
     def chart(self, element, x, y, data=None):
@@ -449,7 +450,7 @@ class HoloViewsConverter(object):
                   value_name=self.value_label)
         kdims = [index, self.group_label]
         return (element(df, kdims, self.value_label).redim.range(**ranges)
-                .relabel(**self._relabel).opts(**opts))
+                .redim(**self._redim).relabel(**self._relabel).opts(**opts))
 
     def bar(self, x, y, data=None):
         if x and y:
@@ -490,7 +491,7 @@ class HoloViewsConverter(object):
         melt = dd.melt if dd and isinstance(data, dd.DataFrame) else pd.melt
         df = melt(data, var_name=self.group_label, value_name=self.value_label)
         return (element(df, kdims, self.value_label).redim.range(**ranges)
-                .relabel(**self._relabel).opts(**opts))
+                .redim(**self._redim).relabel(**self._relabel).opts(**opts))
 
     def box(self, x, y, data=None):
         return self._stats_plot(BoxWhisker, y, data)
@@ -522,7 +523,7 @@ class HoloViewsConverter(object):
             hist = histogram(ds, dimension=y, **hist_opts).opts({'Histogram': opts})
             ranges = {hist.kdims[0].name: self._dim_ranges['x'],
                       hist.vdims[0].name: self._dim_ranges['y']}
-            return hist.redim.range(**ranges)
+            return hist.redim(**self._redim).redim.range(**ranges)
 
         ds = Dataset(data)
         hists = {}
@@ -533,7 +534,7 @@ class HoloViewsConverter(object):
                       hist.vdims[0].name: self._dim_ranges['y']}
             hists[col] = (hist.redim.range(**ranges)
                           .relabel(**self._relabel).opts(**opts))
-        return NdOverlay(hists)
+        return NdOverlay(hists).redim(**self._redim)
 
     def kde(self, x, y, data=None):
         data = self.data if data is None else data
@@ -546,10 +547,10 @@ class HoloViewsConverter(object):
 
         if y and self.by:
             ds = Dataset(data)
-            return ds.to(Distribution, y, [], self.by).overlay().opts(opts)
+            return ds.to(Distribution, y, [], self.by).redim(**self._redim).overlay().opts(opts)
         elif y or len(data.columns) == 1:
             y = y or data.columns[0]
-            return Distribution(data, y, []).opts(opts)
+            return Distribution(data, y, []).redim(**self._redim).opts(opts)
 
         if self.columns:
             data = data[self.columns]
@@ -561,7 +562,7 @@ class HoloViewsConverter(object):
             vdim = self.value_label + ' Density'
             overlay = NdOverlay({0: Area([], self.value_label, vdim)},
                                 [self.group_label])
-        return overlay.relabel(**self._relabel).opts(opts)
+        return overlay.redim(**self._redim).relabel(**self._relabel).opts(opts)
 
 
     ##########################
@@ -575,7 +576,7 @@ class HoloViewsConverter(object):
         z = self.kwds.get('C', data.columns[2])
 
         opts = dict(plot=self._plot_opts, norm=self._norm_opts, style=self._style_opts)
-        hmap = HeatMap(data, [x, y], z).opts(**opts)
+        hmap = HeatMap(data, [x, y], z).redim(**self._redim).opts(**opts)
         if 'reduce_function' in self.kwds:
             return hmap.aggregate(function=self.kwds['reduce_function'])
         return hmap
@@ -591,14 +592,14 @@ class HoloViewsConverter(object):
             opts['plot']['aggregator'] = self.kwds['reduce_function']
         if 'gridsize' in self.kwds:
             opts['plot']['gridsize'] = self.kwds
-        return HexTiles(data, [x, y], z or []).opts(**opts)
+        return HexTiles(data, [x, y], z or []).redim(**self._redim).opts(**opts)
 
     def table(self, x=None, y=None, data=None):
         allowed = ['width', 'height']
         opts = {k: v for k, v in self._plot_opts.items() if k in allowed}
 
         data = self.data if data is None else data
-        return Table(data, self.columns, []).opts(plot=opts)
+        return Table(data, self.columns, []).redim(**self._redim).opts(plot=opts)
 
     ##########################
     #     Gridded plots      #
@@ -619,9 +620,13 @@ class HoloViewsConverter(object):
 
         element = Image
         if self.crs is not None:
-            from geoviews import Image as element
+            try:
+                from geoviews import Image as element
+            except:
+                raise Exception('Coordinate reference system (crs) can only be declared '
+                                'if GeoViews is available.')
             params['crs'] = self.crs
-        return element(data, [x, y], z, **params).opts(**opts)
+        return element(data, [x, y], z, **params).redim(**self._redim).opts(**opts)
 
     def quadmesh(self, x=None, y=None, z=None, data=None):
         data = self.data if data is None else data
@@ -638,6 +643,10 @@ class HoloViewsConverter(object):
 
         element = QuadMesh
         if self.crs is not None:
-            from geoviews import QuadMesh as element
+            try:
+                from geoviews import QuadMesh as element
+            except:
+                raise Exception('Coordinate reference system (crs) can only be declared '
+                                'if GeoViews is available.')
             params['crs'] = self.crs
-        return element(data, [x, y], z, **params).opts(**opts)
+        return element(data, [x, y], z, **params).redim(**self._redim).opts(**opts)
