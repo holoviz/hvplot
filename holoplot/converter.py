@@ -17,26 +17,6 @@ from holoviews.operation import histogram
 from holoviews.streams import Buffer, Pipe
 
 try:
-    import xarray as xr
-except ImportError:
-    xr = None
-
-try:
-    import streamz.dataframe as sdf
-except ImportError:
-    sdf = None
-
-try:
-    from intake.source.base import DataSource
-except ImportError:
-    DataSource = None
-
-try:
-    import dask.dataframe as dd
-except ImportError:
-    dd = None
-
-try:
     import bokeh
     if LooseVersion(bokeh.__version__) <= '0.12.14':
         import warnings
@@ -86,15 +66,49 @@ class StreamingCallable(Callable):
             raise Exception('PeriodicCallback not running.')
 
 
-
 def is_series(data):
-    return (isinstance(data, pd.Series) or
-            (sdf and isinstance(data, (sdf.Series, sdf.Seriess))) or
-            (dd and isinstance(data, dd.Series)))
+    if not check_library(data, ['dask', 'streamz', 'pandas']):
+        return False
+    elif isinstance(data, pd.Series):
+        return True
+    elif check_library(data, 'streamz'):
+        import streamz.dataframe as sdf
+        return isinstance(data, (sdf.Series, sdf.Seriess))
+    elif check_library(data, 'dask'):
+        import dask.dataframe as dd
+        return isinstance(data, dd.Series)
+    else:
+        return False
 
+
+def check_library(obj, library):
+    if not isinstance(library, list):
+        library = [library]
+    return any([obj.__module__.split('.')[0].startswith(l) for l in library])
+
+def is_dask(data):
+    if not check_library(data, 'dask'):
+        return False
+    import dask.dataframe as dd
+    return isinstance(data, (dd.DataFrame, dd.Series))
+
+def is_intake(data):
+    if not check_library(data, 'intake'):
+        return False
+    from intake.source.base import DataSource
+    return isinstance(data, DataSource)
 
 def is_streamz(data):
+    if not check_library(data, 'streamz'):
+        return False
+    import streamz.dataframe as sdf
     return sdf and isinstance(data, (sdf.DataFrame, sdf.Series, sdf.DataFrames, sdf.Seriess))
+
+def is_xarray(data):
+    if not check_library(data, 'xarray'):
+        return False
+    from xarray import DataArray, Dataset
+    return isinstance(data, (DataArray, Dataset))
 
 
 class HoloViewsConverter(object):
@@ -125,7 +139,7 @@ class HoloViewsConverter(object):
         self.data_source = data
         if is_series(data):
             data = data.to_frame()
-        if DataSource and isinstance(data, DataSource):
+        if is_intake(data):
             if data.container != 'dataframe':
                 raise NotImplementedError('Plotting interface currently only '
                                           'supports DataSource objects with '
@@ -138,7 +152,7 @@ class HoloViewsConverter(object):
 
         if isinstance(data, pd.DataFrame):
             self.data = data
-        elif dd and isinstance(data, dd.DataFrame):
+        elif is_dask(data):
             self.data = data
         elif is_streamz(data):
             self.data = data.example
@@ -150,7 +164,7 @@ class HoloViewsConverter(object):
             else:
                 self.stream = Buffer(data=self.data, length=backlog, index=False)
             data.stream.gather().sink(self.stream.send)
-        elif xr and (data, (xr.DataArray, xr.Dataset)):
+        elif is_xarray(data):
             dataset = data
             data_vars = list(dataset.data_vars) if isinstance(data, xr.Dataset) else [data.name]
             dims = list(dataset.dims)
