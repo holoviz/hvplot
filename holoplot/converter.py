@@ -457,7 +457,11 @@ class HoloViewsConverter(object):
         if self.columns:
             data = data[self.columns+id_vars]
 
-        melt = dd.melt if dd and isinstance(data, dd.DataFrame) else pd.melt
+        if check_library(data, 'dask'):
+            melt = dd.melt
+        else:
+            melt = pd.melt
+
         if any((v in [data.index.names]+['index']) or v == data.index.name for v in id_vars):
             data = data.reset_index()
         df = melt(data, id_vars=id_vars, var_name=self.group_label,
@@ -502,7 +506,10 @@ class HoloViewsConverter(object):
         ranges = {self.value_label: self._dim_ranges['y']}
         if self.columns:
             data = data[self.columns]
-        melt = dd.melt if dd and isinstance(data, dd.DataFrame) else pd.melt
+        if check_library(data, 'dask'):
+            melt = dd.melt
+        else:
+            melt = pd.melt
         df = melt(data, var_name=self.group_label, value_name=self.value_label)
         return (element(df, kdims, self.value_label).redim.range(**ranges)
                 .redim(**self._redim).relabel(**self._relabel).opts(**opts))

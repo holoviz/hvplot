@@ -67,20 +67,14 @@ def patch(library, extension=None):
 
 class HoloPlot(object):
 
-    def __init__(self, data):
+    def __init__(self, data, **metadata):
         self._data = data
+        self._metadata = metadata
 
-    def __call__(self, x=None, y=None, kind=None, backlog=1000,
-             width=700, height=300, title=None, grid=False,
-             legend=True, logx=False, logy=False, loglog=False,
-             xticks=None, yticks=None, xlim=None, ylim=None, rot=None,
-             fontsize=None, colormap=None, hover=True, **kwds):
+    def __call__(self, x=None, y=None, kind=None, **kwds):
+        params = dict(self._metadata, **kwds)
         converter = HoloViewsConverter(
-            self._data, x, y, width=width, height=height, backlog=backlog,
-            title=title, grid=grid, legend=legend, logx=logx,
-            logy=logy, loglog=loglog, xticks=xticks, yticks=yticks,
-            xlim=xlim, ylim=ylim, rot=rot, fontsize=fontsize,
-            colormap=colormap, hover=hover, kind=kind, **kwds
+            self._data, x, y, kind=kind, **params
         )
         return converter(kind, x, y)
 
