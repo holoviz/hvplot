@@ -144,7 +144,7 @@ class HoloViewsConverter(object):
                 raise NotImplementedError('Plotting interface currently only '
                                           'supports DataSource objects with '
                                           'dataframe container.')
-            if (use_dask or persist) and dd is not None:
+            if (use_dask or persist):
                 ddf = data.to_dask()
                 data = ddf.persist() if persist else ddf
             else:
@@ -165,6 +165,7 @@ class HoloViewsConverter(object):
                 self.stream = Buffer(data=self.data, length=backlog, index=False)
             data.stream.gather().sink(self.stream.send)
         elif is_xarray(data):
+            import xarray as xr
             dataset = data
             data_vars = list(dataset.data_vars) if isinstance(data, xr.Dataset) else [data.name]
             dims = list(dataset.dims)
@@ -458,7 +459,7 @@ class HoloViewsConverter(object):
             data = data[self.columns+id_vars]
 
         if check_library(data, 'dask'):
-            melt = dd.melt
+            from dask.dataframe import melt
         else:
             melt = pd.melt
 
@@ -506,8 +507,9 @@ class HoloViewsConverter(object):
         ranges = {self.value_label: self._dim_ranges['y']}
         if self.columns:
             data = data[self.columns]
+
         if check_library(data, 'dask'):
-            melt = dd.melt
+            from dask.dataframe import melt
         else:
             melt = pd.melt
         df = melt(data, var_name=self.group_label, value_name=self.value_label)
@@ -627,6 +629,7 @@ class HoloViewsConverter(object):
     ##########################
 
     def image(self, x=None, y=None, z=None, data=None):
+        import xarray as xr
         data = self.data if data is None else data
         if not (x and y):
             x, y = list(data.dims)[::-1]
@@ -650,6 +653,7 @@ class HoloViewsConverter(object):
         return element(data, [x, y], z, **params).redim(**self._redim).opts(**opts)
 
     def quadmesh(self, x=None, y=None, z=None, data=None):
+        import xarray as xr
         data = self.data if data is None else data
         if not (x and y):
             x, y = list([k for k, v in data.coords.items() if v.size > 1])

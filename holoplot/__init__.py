@@ -2,7 +2,7 @@ import holoviews as _hv
 from holoviews import (
     extension as _extension, Dimensioned as _Dimensioned, HoloMap as _HoloMap
 )
-from holoviews.ipython import display
+from holoviews.ipython import display # noqa
 
 from bokeh.io import export_png as _export_png, show as _show, save as _save
 from bokeh.resources import CDN as _CDN
