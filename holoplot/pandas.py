@@ -1,3 +1,4 @@
 from . import patch
 
-patch('pandas')
+patch('pandas', 'bokeh')
+

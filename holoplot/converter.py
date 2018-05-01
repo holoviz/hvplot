@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 from functools import partial
 from distutils.version import LooseVersion
+import difflib
 
 import param
 import holoviews as hv
@@ -15,26 +16,6 @@ from holoviews.element import (
 )
 from holoviews.operation import histogram
 from holoviews.streams import Buffer, Pipe
-
-try:
-    import xarray as xr
-except ImportError:
-    xr = None
-
-try:
-    import streamz.dataframe as sdf
-except ImportError:
-    sdf = None
-
-try:
-    from intake.source.base import DataSource
-except ImportError:
-    DataSource = None
-
-try:
-    import dask.dataframe as dd
-except ImportError:
-    dd = None
 
 try:
     import bokeh
@@ -86,37 +67,86 @@ class StreamingCallable(Callable):
             raise Exception('PeriodicCallback not running.')
 
 
-
 def is_series(data):
-    return (isinstance(data, pd.Series) or
-            (sdf and isinstance(data, (sdf.Series, sdf.Seriess))) or
-            (dd and isinstance(data, dd.Series)))
+    if not check_library(data, ['dask', 'streamz', 'pandas']):
+        return False
+    elif isinstance(data, pd.Series):
+        return True
+    elif check_library(data, 'streamz'):
+        import streamz.dataframe as sdf
+        return isinstance(data, (sdf.Series, sdf.Seriess))
+    elif check_library(data, 'dask'):
+        import dask.dataframe as dd
+        return isinstance(data, dd.Series)
+    else:
+        return False
 
+
+def check_library(obj, library):
+    if not isinstance(library, list):
+        library = [library]
+    return any([obj.__module__.split('.')[0].startswith(l) for l in library])
+
+def is_dask(data):
+    if not check_library(data, 'dask'):
+        return False
+    import dask.dataframe as dd
+    return isinstance(data, (dd.DataFrame, dd.Series))
+
+def is_intake(data):
+    if not check_library(data, 'intake'):
+        return False
+    from intake.source.base import DataSource
+    return isinstance(data, DataSource)
 
 def is_streamz(data):
+    if not check_library(data, 'streamz'):
+        return False
+    import streamz.dataframe as sdf
     return sdf and isinstance(data, (sdf.DataFrame, sdf.Series, sdf.DataFrames, sdf.Seriess))
 
+def is_xarray(data):
+    if not check_library(data, 'xarray'):
+        return False
+    from xarray import DataArray, Dataset
+    return isinstance(data, (DataArray, Dataset))
 
-class HoloViewsConverter(object):
+
+class HoloViewsConverter(param.Parameterized):
 
     _gridded_types = ['image', 'contour', 'contourf', 'quadmesh']
 
-    def __init__(self, data, x, y, kind=None, by=None, width=700,
-                 height=300, shared_axes=False, columns=None,
+    _data_options = ['x', 'y', 'kind', 'by', 'columns', 'index', 'use_index',
+                     'use_dask', 'dynamic', 'crs', 'value_label',
+                     'group_label', 'backlog', 'persist']
+
+    _axis_options = ['width', 'height', 'shared_axes', 'grid', 'legend',
+                     'rot', 'xlim', 'ylim', 'xticks', 'yticks', 'colorbar',
+                     'invert', 'title', 'logx', 'logy', 'loglog']
+
+    _style_options = ['color', 'alpha', 'colormap', 'fontsize']
+
+    _op_options = ['datashade', 'rasterize']
+
+    _kind_options = {
+        'scatter': ['c', 'marker'],
+        'hist'   : ['bins', 'bin_range', 'normed'],
+        'heatmap': ['C', 'reduce_function'],
+        'hexbin' : ['C', 'reduce_function', 'gridsize']
+    }
+
+    def __init__(self, data, x, y, kind=None, by=None, columns=None,
+                 index=None, use_index=True, group_label='Group',
+                 value_label='value', backlog=1000, persist=False,
+                 use_dask=False, crs=None, fields={}, groupby=None,
+                 dynamic=True, width=700, height=300, shared_axes=False,
                  grid=False, legend=True, rot=None, title=None,
                  xlim=None, ylim=None, xticks=None, yticks=None,
-                 fontsize=None, colormap=None, stacked=False,
                  logx=False, logy=False, loglog=False, hover=True,
-                 style_opts={}, plot_opts={}, use_index=True,
-                 value_label='value', group_label='Group',
-                 colorbar=False, streaming=False, backlog=1000,
-                 timeout=1000, persist=False, use_dask=False,
-                 datashade=False, subplots=False, label=None,
-                 groupby=None, dynamic=True, index=None, show=False,
-                 crs=None, fields={}, **kwds):
-
-        self.streaming = streaming
-        self.use_dask = use_dask
+                 subplots=False, label=None, invert=False,
+                 stacked=False, colorbar=False, fontsize=None,
+                 colormap=None, datashade=False, rasterize=False,
+                 **kwds):
 
         gridded = kind in self._gridded_types
         gridded_data = False
@@ -125,32 +155,34 @@ class HoloViewsConverter(object):
         self.data_source = data
         if is_series(data):
             data = data.to_frame()
-        if DataSource and isinstance(data, DataSource):
+        if is_intake(data):
             if data.container != 'dataframe':
                 raise NotImplementedError('Plotting interface currently only '
                                           'supports DataSource objects with '
                                           'dataframe container.')
-            if (use_dask or persist) and dd is not None:
+            if (use_dask or persist):
                 ddf = data.to_dask()
                 data = ddf.persist() if persist else ddf
             else:
                 data = data.read()
 
+        streaming = False
         if isinstance(data, pd.DataFrame):
             self.data = data
-        elif dd and isinstance(data, dd.DataFrame):
+        elif is_dask(data):
             self.data = data
         elif is_streamz(data):
             self.data = data.example
             self.stream_type = data._stream_type
-            self.streaming = True
+            streaming = True
             self.cb = data
             if data._stream_type == 'updating':
                 self.stream = Pipe(data=self.data)
             else:
                 self.stream = Buffer(data=self.data, length=backlog, index=False)
             data.stream.gather().sink(self.stream.send)
-        elif xr and (data, (xr.DataArray, xr.Dataset)):
+        elif is_xarray(data):
+            import xarray as xr
             dataset = data
             data_vars = list(dataset.data_vars) if isinstance(data, xr.Dataset) else [data.name]
             dims = list(dataset.dims)
@@ -185,8 +217,6 @@ class HoloViewsConverter(object):
         else:
             raise ValueError('Supplied data type %s not understood' % type(data).__name__)
 
-        self.kind = kind or 'line'
-
         # Validate data and arguments
         if groupby is None:
             groupby = []
@@ -220,23 +250,26 @@ class HoloViewsConverter(object):
                                  'could not be found, expected one or '
                                  'more of: %s' % (not_found, list(self.data.columns)))
 
-        # High-level options
+        # Data-level options
+        self.kind = kind or 'line'
+        self.use_dask = use_dask
         self.index = index
+        self.columns = columns
+        self.use_index = use_index or index
         if not by:
             self.by = []
         else:
             self.by = by if isinstance(by, list) else [by]
-        self.show = show
-        self.dynamic = dynamic
-        self.columns = columns
-        self.stacked = stacked
-        self.use_index = use_index or index
-        self.kwds = kwds
         self.value_label = value_label
         self.group_label = group_label
         self.groupby = groupby
-        self.datashade = datashade
+        self.dynamic = dynamic
+        self.streaming = streaming
         self.crs = crs
+
+        # Operations
+        self.datashade = datashade
+        self.rasterize = rasterize
 
         # By type
         self._by_type = NdLayout if subplots else NdOverlay
@@ -249,7 +282,7 @@ class HoloViewsConverter(object):
         else:
             cmap = colormap
 
-        self._style_opts = dict(**style_opts)
+        self._style_opts = {}
         if cmap:
             self._style_opts['cmap'] = cmap
         if 'color' in kwds:
@@ -260,7 +293,8 @@ class HoloViewsConverter(object):
             self._style_opts['alpha'] = kwds.pop('alpha')
 
         # Process plot options
-        plot_options = dict(plot_opts)
+        self.stacked = stacked
+        plot_options = {}
         plot_options['logx'] = logx or loglog
         plot_options['logy'] = logy or loglog
         plot_options['show_grid'] = grid
@@ -278,11 +312,10 @@ class HoloViewsConverter(object):
             plot_options['fontsize'] = fontsize
         if colorbar:
             plot_options['colorbar'] = colorbar
-        if not self.kwds.get('vert', True):
-            plot_options['invert_axes'] = True
+        if invert:
+            plot_options['invert_axes'] = kind != 'barh'
         if rot:
-            if (kind == 'barh' or kwds.get('orientation') == 'horizontal'
-                or kwds.get('vert')):
+            if plot_options.get('invert_axes', False):
                 axis = 'yrotation'
             else:
                 axis = 'xrotation'
@@ -301,6 +334,21 @@ class HoloViewsConverter(object):
         self._norm_opts = {'framewise': True}
         self._redim = fields
 
+        # High-level options
+        self._validate_kwds(kwds)
+        self.kwds = kwds
+
+    def _validate_kwds(self, kwds):
+        kind_opts = self._kind_options.get(self.kind, [])
+        mismatches = sorted([k for k in kwds if k not in kind_opts])
+        if not mismatches:
+            return
+        combined_opts = (self._data_options + self._axis_options +
+                         self._style_options + self._op_options + kind_opts)
+        for mismatch in mismatches:
+            suggestions = difflib.get_close_matches(mismatch, combined_opts)
+            self.warning('%s option not found for %s plot, similar options '
+                         'include: %r' % (mismatch, self.kind, suggestions))
 
     def __call__(self, kind, x, y):
         kind = self.kind or kind
@@ -320,20 +368,22 @@ class HoloViewsConverter(object):
             else:
                 obj = method(x, y)
 
-        if not self.datashade:
+        if not self.datashade or self.rasterize:
             return obj
 
         try:
-            from holoviews.operation.datashader import datashade
+            from holoviews.operation.datashader import datashade, rasterize
             from datashader import count_cat
         except:
             raise ImportError('Datashading is not available')
+
         opts = dict(width=self._plot_opts['width'], height=self._plot_opts['height'])
-        if 'cmap' in self._style_opts:
+        if 'cmap' in self._style_opts and self.datashade:
             opts['cmap'] = self._style_opts['cmap']
         if self.by:
             opts['aggregator'] = count_cat(self.by[0])
-        return datashade(obj, **opts).opts(plot=self._plot_opts)
+        operation = datashade if self.datashade else rasterize
+        return operation(obj, **opts).opts(plot=self._plot_opts)
 
 
     def dataset(self, x=None, y=None, data=None):
@@ -409,10 +459,12 @@ class HoloViewsConverter(object):
 
     def scatter(self, x, y, data=None):
         scatter = self.chart(Scatter, x, y, data)
+        opts = {}
         if 'c' in self.kwds:
-            color_opts = {'Scatter': {'color_index': self.kwds['c']}}
-            return scatter.opts(plot=color_opts)
-        return scatter
+            opts['color_index'] = self.kwds['c']
+        if 'marker' in self.kwds:
+            opts['marker'] = self.kwds['marker']
+        return scatter.options('Scatter', **opts) if opts else scatter
 
     def area(self, x, y, data=None):
         areas = self.chart(Area, x, y, data)
@@ -443,7 +495,11 @@ class HoloViewsConverter(object):
         if self.columns:
             data = data[self.columns+id_vars]
 
-        melt = dd.melt if dd and isinstance(data, dd.DataFrame) else pd.melt
+        if check_library(data, 'dask'):
+            from dask.dataframe import melt
+        else:
+            melt = pd.melt
+
         if any((v in [data.index.names]+['index']) or v == data.index.name for v in id_vars):
             data = data.reset_index()
         df = melt(data, id_vars=id_vars, var_name=self.group_label,
@@ -488,7 +544,11 @@ class HoloViewsConverter(object):
         ranges = {self.value_label: self._dim_ranges['y']}
         if self.columns:
             data = data[self.columns]
-        melt = dd.melt if dd and isinstance(data, dd.DataFrame) else pd.melt
+
+        if check_library(data, 'dask'):
+            from dask.dataframe import melt
+        else:
+            melt = pd.melt
         df = melt(data, var_name=self.group_label, value_name=self.value_label)
         return (element(df, kdims, self.value_label).redim.range(**ranges)
                 .redim(**self._redim).relabel(**self._relabel).opts(**opts))
@@ -505,9 +565,8 @@ class HoloViewsConverter(object):
 
     def hist(self, x, y, data=None):
         plot_opts = dict(self._plot_opts)
-        invert = self.kwds.get('orientation', False) == 'horizontal'
-        opts = dict(plot=dict(plot_opts, labelled=['x'], invert_axes=invert),
-                    style=self._style_opts, norm=self._norm_opts)
+        opts = dict(plot=dict(plot_opts, labelled=['x']), style=self._style_opts,
+                    norm=self._norm_opts)
         hist_opts = {'num_bins': self.kwds.get('bins', 10),
                      'bin_range': self.kwds.get('bin_range', None),
                      'normed': self.kwds.get('normed', False)}
@@ -538,12 +597,9 @@ class HoloViewsConverter(object):
 
     def kde(self, x, y, data=None):
         data = self.data if data is None else data
-        plot_opts = dict(self._plot_opts)
-        invert = self.kwds.get('orientation', False) == 'horizontal'
-        opts = dict(plot=dict(plot_opts, invert_axes=invert),
-                    style=self._style_opts, norm=self._norm_opts)
+        opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
         opts = {'Distribution': opts, 'Area': opts,
-                'NdOverlay': {'plot': dict(plot_opts, legend_limit=0)}}
+                'NdOverlay': {'plot': dict(self._plot_opts, legend_limit=0)}}
 
         if y and self.by:
             ds = Dataset(data)
@@ -591,7 +647,7 @@ class HoloViewsConverter(object):
         if 'reduce_function' in self.kwds:
             opts['plot']['aggregator'] = self.kwds['reduce_function']
         if 'gridsize' in self.kwds:
-            opts['plot']['gridsize'] = self.kwds
+            opts['plot']['gridsize'] = self.kwds['gridsize']
         return HexTiles(data, [x, y], z or []).redim(**self._redim).opts(**opts)
 
     def table(self, x=None, y=None, data=None):
@@ -606,6 +662,7 @@ class HoloViewsConverter(object):
     ##########################
 
     def image(self, x=None, y=None, z=None, data=None):
+        import xarray as xr
         data = self.data if data is None else data
         if not (x and y):
             x, y = list(data.dims)[::-1]
@@ -613,10 +670,7 @@ class HoloViewsConverter(object):
             z = list(data.data_vars)[0] if isinstance(data, xr.Dataset) else [data.name]
 
         params = dict(self._relabel)
-        plot_opts = dict(self._plot_opts)
-        invert = self.kwds.get('orientation', False) == 'horizontal'
-        opts = dict(plot=dict(plot_opts, invert_axes=invert),
-                    style=self._style_opts, norm=self._norm_opts)
+        opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
 
         element = Image
         if self.crs is not None:
@@ -629,6 +683,7 @@ class HoloViewsConverter(object):
         return element(data, [x, y], z, **params).redim(**self._redim).opts(**opts)
 
     def quadmesh(self, x=None, y=None, z=None, data=None):
+        import xarray as xr
         data = self.data if data is None else data
         if not (x and y):
             x, y = list([k for k, v in data.coords.items() if v.size > 1])
@@ -636,10 +691,7 @@ class HoloViewsConverter(object):
             z = list(data.data_vars)[0] if isinstance(data, xr.Dataset) else [data.name]
 
         params = dict(self._relabel)
-        plot_opts = dict(self._plot_opts)
-        invert = self.kwds.get('orientation', False) == 'horizontal'
-        opts = dict(plot=dict(plot_opts, invert_axes=invert),
-                    style=self._style_opts, norm=self._norm_opts)
+        opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
 
         element = QuadMesh
         if self.crs is not None:

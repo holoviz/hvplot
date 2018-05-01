@@ -1,3 +1,3 @@
 from . import patch
 
-patch('xarray')
+patch('xarray', 'bokeh')

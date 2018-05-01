@@ -1,14 +1,15 @@
-import holoviews
+import holoviews as _hv
 from holoviews import (
     extension as _extension, Dimensioned as _Dimensioned, HoloMap as _HoloMap
 )
+from holoviews.ipython import display # noqa
 
 from bokeh.io import export_png as _export_png, show as _show, save as _save
 from bokeh.resources import CDN as _CDN
 
 from .converter import HoloViewsConverter
 
-renderer = holoviews.renderer('bokeh')
+renderer = _hv.renderer('bokeh')
 
 # Register plotting interfaces
 def _patch_plot(self):
@@ -66,20 +67,14 @@ def patch(library, extension=None):
 
 class HoloPlot(object):
 
-    def __init__(self, data):
+    def __init__(self, data, **metadata):
         self._data = data
+        self._metadata = metadata
 
-    def __call__(self, x=None, y=None, kind=None, backlog=1000,
-             width=700, height=300, title=None, grid=False,
-             legend=True, logx=False, logy=False, loglog=False,
-             xticks=None, yticks=None, xlim=None, ylim=None, rot=None,
-             fontsize=None, colormap=None, hover=True, **kwds):
+    def __call__(self, x=None, y=None, kind=None, **kwds):
+        params = dict(self._metadata, **kwds)
         converter = HoloViewsConverter(
-            self._data, x, y, width=width, height=height, backlog=backlog,
-            title=title, grid=grid, legend=legend, logx=logx,
-            logy=logy, loglog=loglog, xticks=xticks, yticks=yticks,
-            xlim=xlim, ylim=ylim, rot=rot, fontsize=fontsize,
-            colormap=colormap, hover=hover, kind=kind, **kwds
+            self._data, x, y, kind=kind, **params
         )
         return converter(kind, x, y)
 
@@ -89,14 +84,14 @@ class HoloPlot(object):
 
         Parameters
         ----------
-        x, y : label or position, optional
-            Coordinates for each point.
+        x, y : string, optional
+            Field name to draw x- and y-positions from
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`intake.source.base.DataSource.plot`.
+            :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        Element : Element or NdOverlay of Elements
+        HoloViews object: Object representing the requested visualization
         """
         return self(x, y, kind='line', **kwds)
 
@@ -106,67 +101,77 @@ class HoloPlot(object):
 
         Parameters
         ----------
-        x, y : label or position, optional
-            Coordinates for each point.
+        x, y : string, optional
+            Field name to draw x- and y-positions from
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`intake.source.base.DataSource.plot`.
+            :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        Element : Element or NdOverlay of Elements
+        HoloViews object: Object representing the requested visualization
         """
         return self(x, y, kind='scatter', **kwds)
 
-    def area(self, x=None, y=None, **kwds):
+    def area(self, x=None, y=None, stacked=False, **kwds):
         """
         Area plot
 
         Parameters
         ----------
-        x, y : label or position, optional
-            Coordinates for each point.
+        x, y : string, optional
+            Field name to draw x- and y-positions from
+        stacked : boolean
+            Whether to stack multiple areas
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`intake.source.base.DataSource.plot`.
+            :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        Element : Element or NdOverlay of Elements
+        HoloViews object: Object representing the requested visualization
         """
-        return self(x, y, kind='area', **kwds)
+        return self(x, y, kind='area', stacked=stacked, **kwds)
 
-    def heatmap(self, x=None, y=None, z=None, **kwds):
+    def heatmap(self, x=None, y=None, C=None, **kwds):
         """
         HeatMap plot
 
         Parameters
         ----------
-        x, y, z : label or position, optional
-            Coordinates for each point.
+        x, y : string, optional
+            Field name to draw x- and y-positions from
+        C : string
+            Field to draw heatmap color from
+        reduce_function : function
+            Function to compute statistics for heatmap
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`intake.source.base.DataSource.plot`.
+            :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        Element : Element or NdOverlay of Elements
+        HoloViews object: Object representing the requested visualization
         """
-        return self(x, y, kind='heatmap', z=z, **kwds)
+        return self(x, y, kind='heatmap', C=C, **kwds)
 
-    def hexbin(self, x=None, y=None, z=None, **kwds):
+    def hexbin(self, x=None, y=None, C=None, **kwds):
         """
         HexBin plot
 
         Parameters
         ----------
-        x, y : label or position, optional
-            Coordinates for each point.
+        x, y : string, optional
+            Field name to draw x- and y-positions from
+        C : string
+            Field to draw heatmap color from
+        reduce_function : function
+            Function to compute statistics for hexbins
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`intake.source.base.DataSource.plot`.
+            :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        Element : Element or NdOverlay of Elements
+        HoloViews object: Object representing the requested visualization
         """
-        return self(x, y, kind='hexbin', **kwds)
+        return self(x, y, kind='hexbin', C=C, **kwds)
 
     def bar(self, x=None, y=None, **kwds):
         """
@@ -174,14 +179,14 @@ class HoloPlot(object):
 
         Parameters
         ----------
-        x, y : label or position, optional
-            Coordinates for each point.
+        x, y : string, optional
+            Field name to draw x- and y-positions from
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`intake.source.base.DataSource.plot`.
+            :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        Element : Element or NdOverlay of Elements
+        HoloViews object: Object representing the requested visualization
         """
         return self(x, y, kind='bar', **kwds)
 
@@ -193,10 +198,10 @@ class HoloPlot(object):
         ----------
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`intake.source.base.DataSource.plot`.
+            :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        Element : Element or NdOverlay of Elements
+        HoloViews object: Object representing the requested visualization
         """
         return self(x, y, kind='barh', **kwds)
 
@@ -210,10 +215,10 @@ class HoloPlot(object):
             Column in the DataFrame to group by.
         kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`intake.source.base.DataSource.plot`.
+            :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        Element : Element or NdOverlay of Elements
+        HoloViews object: Object representing the requested visualization
         """
         return self(kind='box', x=None, y=y, **dict(kwds, hover=False))
 
@@ -227,10 +232,10 @@ class HoloPlot(object):
             Column in the DataFrame to group by.
         kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`intake.source.base.DataSource.plot`.
+            :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        Element : Element or NdOverlay of Elements
+        HoloViews object: Object representing the requested visualization
         """
         return self(kind='violin', x=None, y=y, **dict(kwds, hover=False))
 
@@ -244,10 +249,10 @@ class HoloPlot(object):
             Column in the DataFrame to group by.
         kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`intake.source.base.DataSource.plot`.
+            :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        Element : Element or NdOverlay of Elements
+        HoloViews object: Object representing the requested visualization
         """
         return self(kind='hist', x=None, y=y, **kwds)
 
@@ -261,10 +266,10 @@ class HoloPlot(object):
             Column in the DataFrame to group by.
         kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`intake.source.base.DataSource.plot`.
+            :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        Element : Element or NdOverlay of Elements
+        HoloViews object: Object representing the requested visualization
         """
         return self(kind='kde', x=None, y=y, **kwds)
 
@@ -276,46 +281,46 @@ class HoloPlot(object):
         ----------
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`intake.source.base.DataSource.plot`.
+            :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        Element : Element or NdOverlay of Elements
+        HoloViews object: Object representing the requested visualization
         """
         return self(kind='table', **dict(kwds, columns=columns))
 
-    def image(self, x=None, y=None, z=None, **kwds):
+    def image(self, x=None, y=None, **kwds):
         """
         Image plot
 
         Parameters
         ----------
-        x, y, z : label or position, optional
-            Coordinates for each point.
+        x, y : label or position, optional
+            Field name to draw x- and y-positions from
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`intake.source.base.DataSource.plot`.
+            :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        Element : Element or NdOverlay of Elements
+        HoloViews object: Object representing the requested visualization
         """
-        return self(x, y, kind='image', z=z, **kwds)
+        return self(x, y, kind='image', **kwds)
 
-    def quadmesh(self, x=None, y=None, z=None, **kwds):
+    def quadmesh(self, x=None, y=None, **kwds):
         """
         QuadMesh plot
 
         Parameters
         ----------
-        x, y, z : label or position, optional
-            Coordinates for each point.
+        x, y : label or position, optional
+            Field name to draw x- and y-positions from
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`intake.source.base.DataSource.plot`.
+            :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        Element : Element or NdOverlay of Elements
+        HoloViews object: Object representing the requested visualization
         """
-        return self(x, y, kind='quadmesh', z=z, **kwds)
+        return self(x, y, kind='quadmesh', **kwds)
 
 
 
@@ -357,7 +362,7 @@ def save(obj, filename, title=None, resources=None):
         _save(plot, filename, title=title, resources=resources)
 
 
-def show(obj, display_id=None):
+def show(obj):
     """
     Displays HoloViews objects in and outside the notebook
 
@@ -365,19 +370,10 @@ def show(obj, display_id=None):
     ----------
     obj : HoloViews object
        HoloViews object to export
-    display_id : string
-       A display id to obtain a notebook display handle
     """
     if not isinstance(obj, _Dimensioned):
         raise ValueError('%s type object not recognized and cannot be shown.' %
                          type(obj).__name__)
-
-    try:
-        ip = get_ipython() # noqa
-    except:
-        ip = None
-    if ip and renderer.notebook_context:
-        return holoviews.ipython.display(obj, display_id=id)
 
     if obj.traverse(lambda x: x, [_HoloMap]):
         renderer.app(obj, show=True, new_window=True)
