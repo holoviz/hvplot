@@ -6,6 +6,7 @@ import difflib
 import param
 import holoviews as hv
 import pandas as pd
+import numpy as np
 
 from holoviews.core.spaces import DynamicMap, Callable
 from holoviews.core.overlay import NdOverlay
@@ -124,12 +125,12 @@ class HoloViewsConverter(param.Parameterized):
                      'rot', 'xlim', 'ylim', 'xticks', 'yticks', 'colorbar',
                      'invert', 'title', 'logx', 'logy', 'loglog']
 
-    _style_options = ['color', 'alpha', 'colormap', 'fontsize']
+    _style_options = ['color', 'alpha', 'colormap', 'fontsize', 'c']
 
     _op_options = ['datashade', 'rasterize']
 
     _kind_options = {
-        'scatter': ['c', 'marker'],
+        'scatter': ['s', 'marker', 'c'],
         'hist'   : ['bins', 'bin_range', 'normed'],
         'heatmap': ['C', 'reduce_function'],
         'hexbin' : ['C', 'reduce_function', 'gridsize']
@@ -283,18 +284,35 @@ class HoloViewsConverter(param.Parameterized):
             cmap = colormap
 
         self._style_opts = {}
-        if cmap:
-            self._style_opts['cmap'] = cmap
-        if 'color' in kwds:
-            self._style_opts['color'] = kwds.pop('color')
-        if 'size' in kwds:
-            self._style_opts['size'] = kwds.pop('size')
+        plot_options = {}
+        if 'color' in kwds or 'c' in kwds:
+            color = kwds.pop('color', kwds.pop('c', None))
+            if isinstance(color, (np.ndarray, pd.Series)):
+                self.data['_color'] = color
+                kwds['c'] = '_color'
+            else:
+                self._style_opts['color'] = color
+                if 'c' in self._kind_options.get(kind, []):
+                    kwds['c'] = color
+                    if (color in self.data.columns):
+                        if self.data[color].dtype.kind in 'OSU':
+                            cmap = cmap or 'Category10'
+        if 'size' in kwds or 's' in kwds:
+            size = kwds.pop('size', kwds.pop('s', None))
+            if isinstance(size, (np.ndarray, pd.Series)):
+                self.data['_size'] = np.sqrt(size)
+                kwds['s'] = '_size'
+            elif isinstance(size, hv.util.basestring):
+                kwds['s'] = size
+            else:
+                self._style_opts['size'] = np.sqrt(size)
         if 'alpha' in kwds:
             self._style_opts['alpha'] = kwds.pop('alpha')
+        if cmap:
+            self._style_opts['cmap'] = cmap
 
         # Process plot options
         self.stacked = stacked
-        plot_options = {}
         plot_options['logx'] = logx or loglog
         plot_options['logy'] = logy or loglog
         plot_options['show_grid'] = grid
@@ -462,6 +480,8 @@ class HoloViewsConverter(param.Parameterized):
         opts = {}
         if 'c' in self.kwds:
             opts['color_index'] = self.kwds['c']
+        if 's' in self.kwds:
+            opts['size_index'] = self.kwds['s']
         if 'marker' in self.kwds:
             opts['marker'] = self.kwds['marker']
         return scatter.options('Scatter', **opts) if opts else scatter
