@@ -109,7 +109,7 @@ class HoloPlot(object):
         """
         return self(x, y, kind='scatter', **kwds)
 
-    def area(self, x=None, y=None, stacked=False, **kwds):
+    def area(self, x=None, y=None, stacked=True, **kwds):
         """
         Area plot
 
@@ -128,7 +128,7 @@ class HoloPlot(object):
         """
         return self(x, y, kind='area', stacked=stacked, **kwds)
 
-    def heatmap(self, x=None, y=None, C=None, **kwds):
+    def heatmap(self, x=None, y=None, C=None, colorbar=True, **kwds):
         """
         HeatMap plot
 
@@ -138,6 +138,8 @@ class HoloPlot(object):
             Field name to draw x- and y-positions from
         C : string
             Field to draw heatmap color from
+        colorbar: boolean
+            Whether to display a colorbar
         reduce_function : function
             Function to compute statistics for heatmap
         **kwds : optional
@@ -147,9 +149,9 @@ class HoloPlot(object):
         -------
         HoloViews object: Object representing the requested visualization
         """
-        return self(x, y, kind='heatmap', C=C, **kwds)
+        return self(x, y, kind='heatmap', C=C, colorbar=colorbar, **kwds)
 
-    def hexbin(self, x=None, y=None, C=None, **kwds):
+    def hexbin(self, x=None, y=None, C=None, colorbar=True, **kwds):
         """
         HexBin plot
 
@@ -159,6 +161,8 @@ class HoloPlot(object):
             Field name to draw x- and y-positions from
         C : string
             Field to draw heatmap color from
+        colorbar: boolean
+            Whether to display a colorbar
         reduce_function : function
             Function to compute statistics for hexbins
         **kwds : optional
@@ -168,7 +172,7 @@ class HoloPlot(object):
         -------
         HoloViews object: Object representing the requested visualization
         """
-        return self(x, y, kind='hexbin', C=C, **kwds)
+        return self(x, y, kind='hexbin', C=C, colorbar=colorbar, **kwds)
 
     def bar(self, x=None, y=None, **kwds):
         """
@@ -202,12 +206,14 @@ class HoloPlot(object):
         """
         return self(x, y, kind='barh', **kwds)
 
-    def box(self, y=None, **kwds):
+    def box(self, y=None, by=None, **kwds):
         """
         Boxplot
 
         Parameters
         ----------
+        y : string or sequence
+            Column in the DataFrame to compute distribution on.
         by : string or sequence
             Column in the DataFrame to group by.
         kwds : optional
@@ -217,14 +223,16 @@ class HoloPlot(object):
         -------
         HoloViews object: Object representing the requested visualization
         """
-        return self(kind='box', x=None, y=y, **dict(kwds, hover=False))
+        return self(kind='box', x=None, y=y, by=by, **dict(kwds, hover=False))
 
-    def violin(self, y=None, **kwds):
+    def violin(self, y=None, by=None, **kwds):
         """
         Boxplot
 
         Parameters
         ----------
+        y : string or sequence
+            Column in the DataFrame to compute distribution on.
         by : string or sequence
             Column in the DataFrame to group by.
         kwds : optional
@@ -234,14 +242,16 @@ class HoloPlot(object):
         -------
         HoloViews object: Object representing the requested visualization
         """
-        return self(kind='violin', x=None, y=y, **dict(kwds, hover=False))
+        return self(kind='violin', x=None, y=y, by=by, **dict(kwds, hover=False))
 
-    def hist(self, y=None, **kwds):
+    def hist(self, y=None, by=None, **kwds):
         """
         Histogram
 
         Parameters
         ----------
+        y : string or sequence
+            Column in the DataFrame to compute distribution on.
         by : string or sequence
             Column in the DataFrame to group by.
         kwds : optional
@@ -251,14 +261,16 @@ class HoloPlot(object):
         -------
         HoloViews object: Object representing the requested visualization
         """
-        return self(kind='hist', x=None, y=y, **kwds)
+        return self(kind='hist', x=None, y=y, by=by, **kwds)
 
-    def kde(self, y=None, **kwds):
+    def kde(self, y=None, by=None, **kwds):
         """
         KDE
 
         Parameters
         ----------
+        y : string or sequence
+            Column in the DataFrame to compute distribution on.
         by : string or sequence
             Column in the DataFrame to group by.
         kwds : optional
@@ -268,7 +280,7 @@ class HoloPlot(object):
         -------
         HoloViews object: Object representing the requested visualization
         """
-        return self(kind='kde', x=None, y=y, **kwds)
+        return self(kind='kde', x=None, y=y, by=by, **kwds)
 
     def table(self, columns=None, **kwds):
         """
@@ -285,7 +297,7 @@ class HoloPlot(object):
         """
         return self(kind='table', **dict(kwds, columns=columns))
 
-    def image(self, x=None, y=None, **kwds):
+    def image(self, x=None, y=None, colorbar=True, **kwds):
         """
         Image plot
 
@@ -293,6 +305,8 @@ class HoloPlot(object):
         ----------
         x, y : label or position, optional
             Field name to draw x- and y-positions from
+        colorbar: boolean
+            Whether to display a colorbar
         **kwds : optional
             Keyword arguments to pass on to
             :py:meth:`holoplot.converter.HoloViewsConverter`.
@@ -300,7 +314,7 @@ class HoloPlot(object):
         -------
         HoloViews object: Object representing the requested visualization
         """
-        return self(x, y, kind='image', **kwds)
+        return self(x, y, kind='image', colorbar=True, **kwds)
 
     def quadmesh(self, x=None, y=None, **kwds):
         """
@@ -310,6 +324,8 @@ class HoloPlot(object):
         ----------
         x, y : label or position, optional
             Field name to draw x- and y-positions from
+        colorbar: boolean
+            Whether to display a colorbar
         **kwds : optional
             Keyword arguments to pass on to
             :py:meth:`holoplot.converter.HoloViewsConverter`.
@@ -317,7 +333,7 @@ class HoloPlot(object):
         -------
         HoloViews object: Object representing the requested visualization
         """
-        return self(x, y, kind='quadmesh', **kwds)
+        return self(x, y, kind='quadmesh', colorbar=True, **kwds)
 
 
 
