@@ -534,17 +534,17 @@ def parallel_coordinates(data, class_column, cols=None, alpha=0.5,
     labelled = [] if var_name == 'variable' else ['x']
     if value_name != 'value':
         labelled.append('y')
-    options = {'NdOverlay': dict(batched=False, labelled=labelled),
-               'Curve': dict(kwds, alpha=alpha, width=width, height=height)}    
+    options = {'Curve': dict(kwds, labelled=labelled, alpha=alpha, width=width, height=height),
+               'Overlay': dict(legend_limit=5000)}
     colors = _hv.plotting.util.process_cmap('Category10', categorical=True)
     dataset = _hv.Dataset(df)
     groups = dataset.to(_hv.Curve, var_name, value_name).overlay(index).items()
-    return _hv.Overlay([v.relabel(k).options('Curve', color=c)
-                        for c, (k, v) in zip(colors, groups)]).options(options)
+    return _hv.Overlay([curve.relabel(k).options('Curve', color=c)
+                        for c, (k, v) in zip(colors, groups) for curve in v]).options(options)
 
 
 def andrews_curves(data, class_column, samples=200, alpha=0.5,
-                   width=450, height=300, **kwds):
+                   width=600, height=300, **kwds):
     """
     Andrews curve plot.
 
@@ -585,9 +585,10 @@ def andrews_curves(data, class_column, samples=200, alpha=0.5,
 
     labelled = ['x']
     colors = _hv.plotting.util.process_cmap('Category10', categorical=True)
-    options = {'NdOverlay': dict(batched=False, labelled=labelled),
-               'Curve': dict(kwds, alpha=alpha, width=width, height=height, **kwds)}    
+    options = {'Overlay': dict(legend_limit=5000),
+               'Curve': dict(kwds, labelled=labelled, alpha=alpha,
+                             width=width, height=height, **kwds)}
     dataset = _hv.Dataset(df)
     groups = dataset.to(_hv.Curve, 't', 'value').overlay('sample').items()
-    return _hv.Overlay([v.relabel(k).options('Curve', color=c)
-                        for c, (k, v) in zip(colors, groups)]).options(options)
+    return _hv.Overlay([curve.relabel(k).options('Curve', color=c)
+                        for c, (k, v) in zip(colors, groups) for curve in v]).options(options)
