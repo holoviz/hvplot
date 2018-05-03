@@ -19,17 +19,17 @@ Overview
 * `Introduction <Introduction.html>`_
   Introduction to HoloPlot and how to start using it.
 
-* `Displaying and saving plots <Display_and_Saving.html>`_
-  Displaying and saving plots in the notebook and on the commandline
+* `Plotting <Plotting.html>`_
+  Overview of plotting your data with HoloPlot.
 
-* `Plotting API <Plotting_API.html>`_
-  Introduction to plotting using the API.
+* `Viewing <Viewing.html>`_
+  Displaying and saving plots in the notebook, at the command prompt, or in scripts.
 
-* `Streaming Plots <Streaming_Plots.html>`_
+* `Streaming <Streaming.html>`_
   How to use HoloPlot for streaming plots with the streamz library.
 
-* `XArray Plotting <XArray_Plotting.ipynb>`_
-  How to use HoloPlot for plotting XArray gridded data.
+* `Gridded Data <Gridded_Data.ipynb>`_
+  How to use HoloPlot for plotting XArray-based gridded data.
 
 .. toctree::
     :titlesonly:
@@ -37,7 +37,7 @@ Overview
     :maxdepth: 2
 
     Introduction <Introduction>
-	Displaying and saving plots <Display_and_Saving>
-    Plotting API <Plotting_API>
-	Streaming Plots <Streaming_Plots>
-	XArray Plotting <XArray_Plotting>
+    Plotting <Plotting>
+    Viewing <Viewing>
+    Streaming <Streaming>
+    Gridded Data <Gridded_Data>
