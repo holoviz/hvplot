@@ -13,7 +13,7 @@ Once the basics are covered you can learn how to use the plotting API
 with `tabular data <Plotting_API.html>`_, `streaming data
 <Streaming_Plots.html>`_ and `gridded data <XArray_Plotting.html>`_.
 
-Lastly the `Statistical Plots <Statistical_Plots.html`_ section will
+Lastly the `Statistical Plots <Statistical_Plots.html>`_ section will
 take you through a number of specialized plot types modelled on the
 pandas.plotting module.
 
