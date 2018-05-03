@@ -134,7 +134,6 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded):
     dims = list(dataset.dims)
 
     if gridded:
-        gridded_data = True
         data = dataset
         if len(dims) > 2 and not groupby:
             groupby = [d for d in dims if d not in (x, y)]
@@ -342,7 +341,7 @@ class HoloViewsConverter(param.Parameterized):
             if groupby and not_found:
                 raise ValueError('The supplied groupby dimension(s) %s '
                                  'could not be found, expected one or '
-                                 'more of: %s' % (not_found, list(dataset.coords)))
+                                 'more of: %s' % (not_found, list(data.coords)))
         else:
             # Determine valid indexes
             if isinstance(self.data, pd.DataFrame):

@@ -421,11 +421,11 @@ def show(obj):
     obj : HoloViews object
        HoloViews object to export
     """
-    if not isinstance(obj, _Dimensioned):
+    if not isinstance(obj, _hv.Dimensioned):
         raise ValueError('%s type object not recognized and cannot be shown.' %
                          type(obj).__name__)
 
-    if obj.traverse(lambda x: x, [_HoloMap]):
+    if obj.traverse(lambda x: x, [_hv.HoloMap]):
         renderer.app(obj, show=True, new_window=True)
     else:
         _show(renderer.get_plot(obj).state)
