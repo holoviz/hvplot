@@ -13,7 +13,7 @@ def _patch_plot(self):
     return HoloPlot(self)
 
 
-def patch(library, extension=None):
+def patch(library, extension=None, logo=False):
     """
     Patch library to support HoloViews based plotting API.
     """
