@@ -174,6 +174,25 @@ class HoloPlot(object):
         """
         return self(x, y, kind='hexbin', C=C, colorbar=colorbar, **kwds)
 
+    def bivariate(self, x=None, y=None, colorbar=True, **kwds):
+        """
+        Bivariate plot for 2D density
+
+        Parameters
+        ----------
+        x, y : string, optional
+            Field name to draw x- and y-positions from
+        colorbar: boolean
+            Whether to display a colorbar
+        **kwds : optional
+            Keyword arguments to pass on to
+            :py:meth:`holoplot.converter.HoloViewsConverter`.
+        Returns
+        -------
+        HoloViews object: Object representing the requested visualization
+        """
+        return self(x, y, kind='bivariate', colorbar=colorbar, **kwds)
+
     def bar(self, x=None, y=None, **kwds):
         """
         Bars plot
