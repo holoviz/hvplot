@@ -3,7 +3,7 @@
 from nbsite.shared_conf import *
 
 project = u'HoloPlot'
-authors = u'Philipp Rudiger'
+authors = u'PyViz developers'
 copyright = u'2018 ' + authors
 description = 'A high-level plotting API for the PyData ecosystem built on HoloViews'
 
@@ -14,9 +14,9 @@ release = '0.0.1'
 html_static_path += ['_static']
 html_theme = 'sphinx_ioam_theme'
 html_theme_options = {
-    'logo':'holoplot-logo.png',
-    'favicon':'favicon.ico'
-#    'css':'pyviz.css'
+    'logo': 'holoplot-logo.png',
+    'favicon': 'favicon.ico',
+    'css': 'main.css'
 }
 
 _NAV =  (
@@ -24,6 +24,8 @@ _NAV =  (
     ('User Guide', 'user_guide/index'),
     ('About', 'about')
 )
+
+templates_path = ['_templates']
 
 html_context.update({
     'PROJECT': project,
