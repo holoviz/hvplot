@@ -1,3 +1,5 @@
+import numpy as _np
+import pandas as _pd
 import holoviews as _hv
 from holoviews.ipython import display # noqa
 
@@ -411,3 +413,165 @@ def show(obj):
         renderer.app(obj, show=True, new_window=True)
     else:
         _show(renderer.get_plot(obj).state)
+
+
+def scatter_matrix(data, c=None, chart='scatter', diagonal='hist', alpha=0.5, **kwds):
+    """
+    Scatter matrix of numeric columns.
+
+    Parameters:
+    -----------
+    data: DataFrame
+    c: str, optional
+        Column to color by
+    chart: str, optional
+        Chart type (one of 'scatter', 'bivariate', 'hexbin')
+    diagonal: str, optional
+        Chart type for the diagonal (one of 'hist', 'kde')
+    kwds: HoloPlot.scatter options, optional
+
+    Returns:
+    --------
+    obj : HoloViews object
+        The HoloViews representation of the plot.
+    """
+    data = _hv.Dataset(data)
+    if c:
+        data = data.groupby(c).overlay()
+    supported = list(HoloViewsConverter._kind_mapping)
+    if diagonal not in supported:
+        raise ValueError('diagonal type must be one of: %s, found %s' %
+                         (supported, diagonal))
+    if chart not in supported:
+        raise ValueError('Chart type must be one of: %s, found %s' %
+                         (supported, chart))
+    diagonal = HoloViewsConverter._kind_mapping[diagonal]
+    chart = HoloViewsConverter._kind_mapping[chart]
+    opts = {chart.__name__: dict(alpha=alpha, **kwds)}
+    return _hv.operation.gridmatrix(data, diagonal_type=diagonal).options(opts)
+
+
+def lag_plot(data, lag=1, **kwds):
+    """Lag plot for time series.
+
+    Parameters:
+    -----------
+    data: Time series
+    lag: lag of the scatter plot, default 1
+    kwds: HoloPlot.scatter options, optional
+
+    Returns:
+    --------
+    obj : HoloViews object
+        The HoloViews representation of the plot.
+    """
+    if lag != int(lag) or int(lag) <= 0:
+        raise ValueError("lag must be a positive integer")
+    lag = int(lag)
+
+    values = data.values
+    y1 = 'y(t)'
+    y2 = 'y(t + {0})'.format(lag)
+    lags = _pd.DataFrame({y1: values[:-lag].T.ravel(),
+                          y2: values[lag:].T.ravel()})
+    if isinstance(data, _pd.DataFrame):
+        lags['variable'] = _np.repeat(data.columns, lags.shape[0] / data.shape[1])
+        kwds['c'] = 'variable'
+    return HoloPlot(lags).scatter(y1, y2, **kwds)
+
+
+def parallel_coordinates(data, class_column, cols=None, alpha=0.5,
+                         width=600, height=300, var_name='variable',
+                         value_name='value', **kwds):
+    """
+    Parallel coordinates plotting.
+
+    Parameters
+    ----------
+    frame: DataFrame
+    class_column: str
+        Column name containing class names
+    cols: list, optional
+        A list of column names to use
+    alpha: float, optional
+        The transparency of the lines
+
+    Returns
+    -------
+    obj : HoloViews object
+        The HoloViews representation of the plot.
+
+    See Also
+    --------
+    pandas.plotting.parallel_coordinates : matplotlib version of this routine
+    """
+    # Transform the dataframe to be used in Vega-Lite
+    if cols is not None:
+        data = data[list(cols) + [class_column]]
+    cols = data.columns
+    df = data.reset_index()
+    index = (set(df.columns) - set(cols)).pop()
+    assert index in df.columns
+    df = df.melt([index, class_column],
+                 var_name=var_name, value_name=value_name)
+
+    labelled = [] if var_name == 'variable' else ['x']
+    if value_name != 'value':
+        labelled.append('y')
+    options = {'NdOverlay': dict(batched=False, labelled=labelled),
+               'Curve': dict(kwds, alpha=alpha, width=width, height=height)}    
+    colors = _hv.plotting.util.process_cmap('Category10', categorical=True)
+    dataset = _hv.Dataset(df)
+    groups = dataset.to(_hv.Curve, var_name, value_name).overlay(index).items()
+    return _hv.Overlay([v.relabel(k).options('Curve', color=c)
+                        for c, (k, v) in zip(colors, groups)]).options(options)
+
+
+def andrews_curves(data, class_column, samples=200, alpha=0.5,
+                   width=450, height=300, **kwds):
+    """
+    Andrews curve plot.
+
+    Parameters
+    ----------
+    frame: DataFrame
+    class_column: str
+        Column name containing class names
+    samples: int, optional
+        Number of samples to draw
+    alpha: float, optional
+        The transparency of the lines
+
+    Returns
+    -------
+    obj : HoloViews object
+        The HoloViews representation of the plot.
+
+    See Also
+    --------
+    pandas.plotting.parallel_coordinates : matplotlib version of this routine
+    """
+    t = _np.linspace(-_np.pi, _np.pi, samples)
+    vals = data.drop(class_column, axis=1).values.T
+
+    curves = _np.outer(vals[0], _np.ones_like(t))
+    for i in range(1, len(vals)):
+        ft = ((i + 1) // 2) * t
+        if i % 2 == 1:
+            curves += _np.outer(vals[i], _np.sin(ft))
+        else:
+            curves += _np.outer(vals[i], _np.cos(ft))
+
+    df = _pd.DataFrame({'t': _np.tile(_np.arange(samples), curves.shape[0]),
+                       'sample': _np.repeat(_np.arange(curves.shape[0]), curves.shape[1]),
+                       'value': curves.ravel(),
+                       class_column: _np.repeat(data[class_column], samples)})
+
+    labelled = ['x']
+    colors = _hv.plotting.util.process_cmap('Category10', categorical=True)
+    options = {'NdOverlay': dict(batched=False, labelled=labelled),
+               'Curve': dict(kwds, alpha=alpha, width=width, height=height, **kwds)}    
+    dataset = _hv.Dataset(df)
+    groups = dataset.to(_hv.Curve, 't', 'value').overlay('sample').items()
+    return _hv.Overlay([v.relabel(k).options('Curve', color=c)
+                        for c, (k, v) in zip(colors, groups)]).options(options)
