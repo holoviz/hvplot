@@ -1,7 +1,7 @@
-from . import patch, _extension
+from . import patch, _hv
 
 try:
     import intake.plotting # noqa
     patch('intake', 'bokeh')
 except:
-    _extension('bokeh')
+    _hv.extension('bokeh')
