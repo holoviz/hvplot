@@ -50,6 +50,7 @@ jobs:
         - conda install -c conda-forge 'sphinx<1.7' beautifulsoup4 graphviz
         - pip install nbsite
         - pip install sphinx_ioam_theme
+        - python -c "import bokeh; bokeh.sampledata.download()"
         - cp ./doc/user_guide/Streaming.rst ./doc/user_guide/Streaming.rst_bak
         - nbsite_nbpagebuild.py pyviz holoplot ./examples ./doc
         - cp ./doc/user_guide/Streaming.rst_bak ./doc/user_guide/Streaming.rst

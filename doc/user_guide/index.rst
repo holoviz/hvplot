@@ -13,6 +13,10 @@ Once the basics are covered you can learn how to use the plotting API
 with `tabular data <Plotting_API.html>`_, `streaming data
 <Streaming_Plots.html>`_ and `gridded data <XArray_Plotting.html>`_.
 
+Lastly the `Statistical Plots <Statistical_Plots.html`_ section will
+take you through a number of specialized plot types modelled on the
+pandas.plotting module.
+
 Overview
 ========
 
@@ -31,6 +35,9 @@ Overview
 * `Gridded Data <Gridded_Data.ipynb>`_
   How to use HoloPlot for plotting XArray-based gridded data.
 
+* `Statistical Plots <Statistical_Plots.ipynb>`_
+  A number of statistical plot types modeled on the pandas.plotting module.
+
 .. toctree::
     :titlesonly:
     :hidden:
@@ -41,3 +48,4 @@ Overview
     Viewing <Viewing>
     Streaming <Streaming>
     Gridded Data <Gridded_Data>
+	Statistical Plots <Statistical_Plots>
