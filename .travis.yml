@@ -50,9 +50,9 @@ jobs:
         - conda install -c conda-forge 'sphinx<1.7' beautifulsoup4 graphviz
         - pip install nbsite
         - pip install sphinx_ioam_theme
-        - cp ./doc/user_guide/Streaming_Plots.rst ./doc/user_guide/Streaming_Plots.rst_bak
+        - cp ./doc/user_guide/Streaming.rst ./doc/user_guide/Streaming.rst_bak
         - nbsite_nbpagebuild.py pyviz holoplot ./examples ./doc
-        - cp ./doc/user_guide/Streaming_Plots.rst_bak ./doc/user_guide/Streaming_Plots.rst
+        - cp ./doc/user_guide/Streaming.rst_bak ./doc/user_guide/Streaming.rst
         - HV_DOC_HTML='true' sphinx-build -b html ./doc ./doc/_build/html
         - nbsite_fix_links.py ./doc/_build/html
         - touch ./doc/_build/html/.nojekyll
