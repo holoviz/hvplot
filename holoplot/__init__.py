@@ -1,7 +1,4 @@
 import holoviews as _hv
-from holoviews import (
-    extension as _extension, Dimensioned as _Dimensioned, HoloMap as _HoloMap
-)
 from holoviews.ipython import display # noqa
 
 from bokeh.io import export_png as _export_png, show as _show, save as _save
@@ -61,8 +58,8 @@ def patch(library, extension=None):
             raise ImportError('Could not patch plotting API onto xarray. '
                               'Xarray could not be imported.')
         DataArray.plot = property(_patch_plot)
-    if extension:
-        _extension(extension)
+    if extension and not _hv.extension._loaded:
+        _hv.extension(extension, logo=logo)
 
 
 class HoloPlot(object):
@@ -339,7 +336,7 @@ def save(obj, filename, title=None, resources=None):
     resources: bokeh resources
        One of the valid bokeh.resources (e.g. CDN or INLINE)
     """
-    if isinstance(obj, _Dimensioned):
+    if isinstance(obj, _hv.Dimensioned):
         plot = renderer.get_plot(obj).state
     else:
         raise ValueError('%s type object not recognized and cannot be saved.' %
@@ -356,7 +353,7 @@ def save(obj, filename, title=None, resources=None):
     if resources is None:
         resources = _CDN
 
-    if obj.traverse(lambda x: x, [_HoloMap]):
+    if obj.traverse(lambda x: x, [_hv.HoloMap]):
         renderer.save(plot, filename)
     else:
         _save(plot, filename, title=title, resources=resources)
