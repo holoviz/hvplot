@@ -173,7 +173,7 @@ class HoloViewsConverter(param.Parameterized):
     _op_options = ['datashade', 'rasterize', 'xsampling', 'ysampling']
 
     _kind_options = {
-        'scatter': ['s', 'marker', 'c'],
+        'scatter': ['s', 'marker', 'c', 'scale'],
         'hist'   : ['bins', 'bin_range', 'normed'],
         'heatmap': ['C', 'reduce_function'],
         'hexbin' : ['C', 'reduce_function', 'gridsize'],
@@ -418,8 +418,12 @@ class HoloViewsConverter(param.Parameterized):
                 kwds['s'] = '_size'
             elif isinstance(size, hv.util.basestring):
                 kwds['s'] = size
+                if 'scale' in kwds:
+                    style_opts['size'] = kwds['scale']
             else:
                 style_opts['size'] = np.sqrt(size)
+        else:
+            style_opts['size'] = np.sqrt(30)
         if 'alpha' in kwds:
             style_opts['alpha'] = kwds.pop('alpha')
         if cmap:
@@ -676,6 +680,10 @@ class HoloViewsConverter(param.Parameterized):
                      'normed': self.kwds.get('normed', False)}
 
         if not isinstance(y, (list, tuple)):
+            if self.stacked and not self.subplots and not 'bin_range' in self.kwds:
+                ys = data[y]
+                hist_opts['bin_range'] = (ys.min(), ys.max())
+
             ds = Dataset(data, self.by, y)
             hist = hists = histogram(ds.to(Dataset, [], y, self.by), **hist_opts)
             if self.by:
