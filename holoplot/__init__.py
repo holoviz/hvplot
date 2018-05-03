@@ -107,7 +107,8 @@ class HoloPlot(object):
             :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        HoloViews object: Object representing the requested visualization
+        obj : HoloViews object
+            The HoloViews representation of the plot.
         """
         return self(x, y, kind='scatter', **kwds)
 
@@ -126,8 +127,11 @@ class HoloPlot(object):
             :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        HoloViews object: Object representing the requested visualization
+        obj : HoloViews object
+            The HoloViews representation of the plot.
         """
+        if 'alpha' not in kwds and not stacked:
+            kwds['alpha'] = 0.5
         return self(x, y, kind='area', stacked=stacked, **kwds)
 
     def heatmap(self, x=None, y=None, C=None, colorbar=True, **kwds):
@@ -149,7 +153,8 @@ class HoloPlot(object):
             :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        HoloViews object: Object representing the requested visualization
+        obj : HoloViews object
+            The HoloViews representation of the plot.
         """
         return self(x, y, kind='heatmap', C=C, colorbar=colorbar, **kwds)
 
@@ -172,7 +177,8 @@ class HoloPlot(object):
             :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        HoloViews object: Object representing the requested visualization
+        obj : HoloViews object
+            The HoloViews representation of the plot.
         """
         return self(x, y, kind='hexbin', C=C, colorbar=colorbar, **kwds)
 
@@ -191,7 +197,8 @@ class HoloPlot(object):
             :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        HoloViews object: Object representing the requested visualization
+        obj : HoloViews object
+            The HoloViews representation of the plot.
         """
         return self(x, y, kind='bivariate', colorbar=colorbar, **kwds)
 
@@ -208,7 +215,8 @@ class HoloPlot(object):
             :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        HoloViews object: Object representing the requested visualization
+        obj : HoloViews object
+            The HoloViews representation of the plot.
         """
         return self(x, y, kind='bar', **kwds)
 
@@ -223,7 +231,8 @@ class HoloPlot(object):
             :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        HoloViews object: Object representing the requested visualization
+        obj : HoloViews object
+            The HoloViews representation of the plot.
         """
         return self(x, y, kind='barh', **kwds)
 
@@ -242,7 +251,8 @@ class HoloPlot(object):
             :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        HoloViews object: Object representing the requested visualization
+        obj : HoloViews object
+            The HoloViews representation of the plot.
         """
         return self(kind='box', x=None, y=y, by=by, **dict(kwds, hover=False))
 
@@ -261,7 +271,8 @@ class HoloPlot(object):
             :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        HoloViews object: Object representing the requested visualization
+        obj : HoloViews object
+            The HoloViews representation of the plot.
         """
         return self(kind='violin', x=None, y=y, by=by, **dict(kwds, hover=False))
 
@@ -280,7 +291,8 @@ class HoloPlot(object):
             :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        HoloViews object: Object representing the requested visualization
+        obj : HoloViews object
+            The HoloViews representation of the plot.
         """
         return self(kind='hist', x=None, y=y, by=by, **kwds)
 
@@ -299,7 +311,8 @@ class HoloPlot(object):
             :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        HoloViews object: Object representing the requested visualization
+        obj : HoloViews object
+            The HoloViews representation of the plot.
         """
         return self(kind='kde', x=None, y=y, by=by, **kwds)
 
@@ -314,7 +327,8 @@ class HoloPlot(object):
             :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        HoloViews object: Object representing the requested visualization
+        obj : HoloViews object
+            The HoloViews representation of the plot.
         """
         return self(kind='table', **dict(kwds, columns=columns))
 
@@ -333,7 +347,8 @@ class HoloPlot(object):
             :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        HoloViews object: Object representing the requested visualization
+        obj : HoloViews object
+            The HoloViews representation of the plot.
         """
         return self(x, y, kind='image', colorbar=True, **kwds)
 
@@ -352,7 +367,8 @@ class HoloPlot(object):
             :py:meth:`holoplot.converter.HoloViewsConverter`.
         Returns
         -------
-        HoloViews object: Object representing the requested visualization
+        obj : HoloViews object
+            The HoloViews representation of the plot.
         """
         return self(x, y, kind='quadmesh', colorbar=True, **kwds)
 
