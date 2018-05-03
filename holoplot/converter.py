@@ -165,7 +165,8 @@ class HoloViewsConverter(param.Parameterized):
 
     _axis_options = ['width', 'height', 'shared_axes', 'grid', 'legend',
                      'rot', 'xlim', 'ylim', 'xticks', 'yticks', 'colorbar',
-                     'invert', 'title', 'logx', 'logy', 'loglog']
+                     'invert', 'title', 'logx', 'logy', 'loglog', 'xaxis',
+                     'yaxis']
 
     _style_options = ['color', 'alpha', 'colormap', 'fontsize', 'c']
 
@@ -194,17 +195,19 @@ class HoloViewsConverter(param.Parameterized):
                  group_label='Group', value_label='value',
                  backlog=1000, persist=False, use_dask=False,
                  crs=None, fields={}, groupby=None, dynamic=True,
-                 width=700, height=300, shared_axes=False,
+                 width=700, height=300, shared_axes=None,
                  grid=False, legend=True, rot=None, title=None,
                  xlim=None, ylim=None, xticks=None, yticks=None,
                  logx=False, logy=False, loglog=False, hover=True,
                  subplots=False, label=None, invert=False,
                  stacked=False, colorbar=None, fontsize=None,
                  colormap=None, datashade=False, rasterize=False,
-                 row=None, col=None, figsize=None, debug=False, **kwds):
+                 row=None, col=None, figsize=None, debug=False,
+                 xaxis=True, yaxis=True, **kwds):
 
         # Process data and related options
-        self._process_data(kind, data, x, y, by, groupby, use_dask, persist, backlog)
+        self._process_data(kind, data, x, y, by, groupby, row, col,
+                           use_dask, persist, backlog)
         self.use_index = use_index
         self.value_label = value_label
         self.group_label = group_label
@@ -228,12 +231,18 @@ class HoloViewsConverter(param.Parameterized):
         plot_opts['logx'] = logx or loglog
         plot_opts['logy'] = logy or loglog
         plot_opts['show_grid'] = grid
+        if shared_axes is None:
+            shared_axes = bool(subplots or row or col)
         plot_opts['shared_axes'] = shared_axes
         plot_opts['show_legend'] = legend
         if xticks:
             plot_opts['xticks'] = xticks
         if yticks:
             plot_opts['yticks'] = yticks
+        if not xaxis:
+            plot_opts['xaxis'] = None
+        if not yaxis:
+            plot_opts['yaxis'] = None
         if width:
             plot_opts['width'] = width
         if height:
@@ -286,7 +295,7 @@ class HoloViewsConverter(param.Parameterized):
                          'y: {y}, by: {by}, groupby: {groupby}'.format(**kwds))
 
 
-    def _process_data(self, kind, data, x, y, by, groupby, use_dask, persist, backlog):
+    def _process_data(self, kind, data, x, y, by, groupby, row, col, use_dask, persist, backlog):
         gridded = kind in self._gridded_types
         gridded_data = False
 
@@ -321,7 +330,10 @@ class HoloViewsConverter(param.Parameterized):
                 x, y = dims[::-1][:2]
             if gridded:
                 gridded_data = True
-            data, x, y, by, groupby = process_xarray(data, x, y, by, groupby, use_dask, persist, gridded)
+            data, x, y, by, groupby = process_xarray(data, x, y, by, groupby,
+                                                     use_dask, persist, gridded)
+            if groupby:
+                groupby = [g for g in groupby if g not in (row, col)]
             self.data = data
         else:
             raise ValueError('Supplied data type %s not understood' % type(data).__name__)
@@ -458,7 +470,7 @@ class HoloViewsConverter(param.Parameterized):
                 dataset = Dataset(self.data).groupby(self.groupby, dynamic=self.dynamic)
                 obj = dataset.map(lambda ds: getattr(self, kind)(x, y, data=ds.data), [Dataset])
             if grid:
-                obj = obj.grid(grid)
+                obj = obj.grid(grid).options(shared_xaxis=True, shared_yaxis=True)
         else:
             if self.streaming:
                 cbcallable = StreamingCallable(partial(method, x, y),
