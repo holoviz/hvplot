@@ -14,7 +14,7 @@ release = '0.0.1'
 html_static_path += ['_static']
 html_theme = 'sphinx_ioam_theme'
 html_theme_options = {
-    'logo':'pyviz-logo.png',
+    'logo':'holoplot-logo.png',
     'favicon':'favicon.ico'
 #    'css':'pyviz.css'
 }
