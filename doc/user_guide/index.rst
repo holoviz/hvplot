@@ -21,8 +21,7 @@ Lastly the `Statistical Plots <Statistical_Plots.html>`_ section will
 take you through a number of specialized plot types modelled on the
 pandas.plotting module.
 
-Overview
-========
+**Overview**:
 
 * `Introduction <Introduction.html>`_
   Introduction to HoloPlot and how to start using it.
