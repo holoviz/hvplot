@@ -20,16 +20,11 @@ For JupyterLab support, the jupyterlab_holoviews extension is also required::
 Usage
 -----
 
-Once you've installed HoloPlot as above and are in the HoloPlot directory, you can
-run the examples shown on the website using
-`Jupyter <http://jupyter.org>`_::
+Once you've installed HoloPlot as above and have fetched the examples
+shown on the website you can run them using `Jupyter
+<http://jupyter.org>`_::
 
-    cd examples
-    jupyter notebook --NotebookApp.iopub_data_rate_limit=1e8
-
-(Increasing the rate limit in this way is `required for the 5.0 Jupyter version
-<http://holoviews.org/user_guide/Installing_and_Configuring.html>`_,
-but should not be needed in earlier or later Jupyter releases.)
+    jupyter notebook
 
 To work with JupyterLab you will also need the HoloViews JupyterLab
 extension::
@@ -39,7 +34,7 @@ extension::
 
 Once you have installed JupyterLab and the extension launch it with::
 
-    jupyter-lab
+    jupyter lab
 
 
 Developer Instructions
