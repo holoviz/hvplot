@@ -2,33 +2,20 @@
 Getting started
 ***************
 
-
 Installation
 ------------
 
-HoloPlot supports Python 2.7-3.7 on Linux, Windows, or Mac.
+HoloPlot supports Python 2.7, 3.5, 3.6 and 3.7 on Linux, Windows, or Mac and can be installed with conda::
 
-Installable ``holoplot`` packages will be created at some point, but
-at present, the recommended way to install HoloPlot is based on conda
-`conda <http://conda.pydata.org/docs>`_ environments and 
-`git <https://git-scm.com>`_:
+    conda install -c pyviz holoplot
 
-1. Install Python 3 `miniconda <http://conda.pydata.org/miniconda.html>`_ or 
-`anaconda <http://docs.continuum.io/anaconda/install>`_, if you don't already have it on your system.
+or with pip::
 
-2. Clone the holoplot git repository if you do not already have it::
+    pip install holoplot
 
-    git clone git://github.com/pyviz/holoplot.git
+For JupyterLab support, the jupyterlab_holoviews extension is also required::
 
-3. Set up an environment with all of the dependencies needed to run the examples::
-    
-    cd holoplot
-    conda env create --quiet --force -n holoplot -f ./environment.yml
-    source activate holoplot
-
-4. Put the `holoplot` directory into the Python path in this environment::
-    
-    pip install -e .
+    jupyter labextension install @pyviz/jupyterlab_holoviews
 
 Usage
 -----
@@ -53,3 +40,24 @@ extension::
 Once you have installed JupyterLab and the extension launch it with::
 
     jupyter-lab
+
+
+Developer Instructions
+----------------------
+
+1. Install Python 3 `miniconda <http://conda.pydata.org/miniconda.html>`_ or
+`anaconda <http://docs.continuum.io/anaconda/install>`_, if you don't already have it on your system.
+
+2. Clone the holoplot git repository if you do not already have it::
+
+    git clone git://github.com/pyviz/holoplot.git
+
+3. Set up an environment with all of the dependencies needed to run the examples::
+
+    cd holoplot
+    conda env create --quiet --force -n holoplot -f ./environment.yml
+    source activate holoplot
+
+4. Put the `holoplot` directory into the Python path in this environment::
+
+    pip install -e .
