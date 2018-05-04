@@ -1,6 +1,6 @@
-********
-HoloPlot
-********
+.. raw:: html
+
+  <h1><img src="/assets/holoplot_wm.png" width="150"></h1>
 
 .. notebook:: holoplot ./homepage.ipynb
    :offset: 0
