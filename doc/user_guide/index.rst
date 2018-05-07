@@ -52,7 +52,7 @@ pandas.plotting module.
     Introduction <Introduction>
     Plotting <Plotting>
     Viewing <Viewing>
-	Subplots & Grids <Subplots_and_Grids>
+    Subplots <Subplots>
     Streaming <Streaming>
     Gridded Data <Gridded_Data>
-	Statistical Plots <Statistical_Plots>
+    Statistical Plots <Statistical_Plots>
