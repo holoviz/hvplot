@@ -127,6 +127,7 @@ def process_intake(data, use_dask):
         data = data.read()
     return data
 
+
 def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded):
     import xarray as xr
     dataset = data
@@ -203,7 +204,7 @@ class HoloViewsConverter(param.Parameterized):
                  stacked=False, colorbar=None, fontsize=None,
                  colormap=None, datashade=False, rasterize=False,
                  row=None, col=None, figsize=None, debug=False,
-                 xaxis=True, yaxis=True, **kwds):
+                 xaxis=True, yaxis=True, framewise=True, **kwds):
 
         # Process data and related options
         self._process_data(kind, data, x, y, by, groupby, row, col,
@@ -276,7 +277,7 @@ class HoloViewsConverter(param.Parameterized):
                 continue
             style_opts[opt] = Cycle(values=cycle) if isinstance(cycle, list) else cycle
         self._style_opts = style_opts
-        self._norm_opts = {'framewise': True}
+        self._norm_opts = {'framewise': framewise, 'axiswise': not shared_axes}
         self.kwds = kwds
 
         # Process dimensions and labels
