@@ -564,13 +564,13 @@ class HoloViewsConverter(param.Parameterized):
             labelled.append('x' if self.invert else 'y')
         opts = dict(plot=dict(self._plot_opts, labelled=labelled),
                     norm=self._norm_opts, style=self._style_opts)
-        charts = {}
+        charts = []
         for c in y:
             chart = element(data, x, c).redim(**{c: self.value_label})
             ranges = {x: self._dim_ranges['x'], self.value_label: self._dim_ranges['y']}
-            charts[c] = (chart.relabel(**self._relabel)
-                         .redim.range(**ranges).opts(**opts))
-        return self._by_type(charts, self.group_label)
+            charts.append((c, chart.relabel(**self._relabel)
+                           .redim.range(**ranges).opts(**opts)))
+        return self._by_type(charts, self.group_label, sort=False)
 
     def line(self, x, y, data=None):
         return self.chart(Curve, x, y, data)
@@ -706,14 +706,14 @@ class HoloViewsConverter(param.Parameterized):
             return hists.opts({'Histogram': opts}).redim(**self._redim).redim.range(**ranges)
 
         ds = Dataset(data)
-        hists = {}
+        hists = []
         for col in y:
             hist = histogram(ds, dimension=col, **hist_opts)
             ranges = {hist.kdims[0].name: self._dim_ranges['x'],
                       hist.vdims[0].name: self._dim_ranges['y']}
-            hists[col] = (hist.redim.range(**ranges)
-                          .relabel(**self._relabel).opts(**opts))
-        return self._by_type(hists).redim(**self._redim)
+            hists.append((col, hist.redim.range(**ranges)
+                          .relabel(**self._relabel).opts(**opts)))
+        return self._by_type(hists, sort=False).redim(**self._redim)
 
     def kde(self, x, y, data=None):
         data, x, y = self._process_args(data, x, y)
