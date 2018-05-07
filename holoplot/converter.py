@@ -196,7 +196,7 @@ class HoloViewsConverter(param.Parameterized):
                  group_label='Group', value_label='value',
                  backlog=1000, persist=False, use_dask=False,
                  crs=None, fields={}, groupby=None, dynamic=True,
-                 width=700, height=300, shared_axes=None,
+                 width=700, height=300, shared_axes=True,
                  grid=False, legend=True, rot=None, title=None,
                  xlim=None, ylim=None, xticks=None, yticks=None,
                  logx=False, logy=False, loglog=False, hover=True,
@@ -232,8 +232,6 @@ class HoloViewsConverter(param.Parameterized):
         plot_opts['logx'] = logx or loglog
         plot_opts['logy'] = logy or loglog
         plot_opts['show_grid'] = grid
-        if shared_axes is None:
-            shared_axes = bool(subplots or row or col)
         plot_opts['shared_axes'] = shared_axes
         plot_opts['show_legend'] = legend
         if xticks:
