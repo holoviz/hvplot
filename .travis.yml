@@ -1,0 +1,74 @@
+# We deliberately don't use travis's language=python option because
+# we install miniconda and use conda to get python. Additionally, 
+# Travis's auto-install of python doesn't work on osx images (see
+# https://github.com/travis-ci/travis-ci/issues/4729).
+language: generic
+
+stages:
+  - test
+  - doc
+
+before_install:
+  - echo -e "machine github.com\n  login $CI_USER\n  password $CI_USER_PASSWORD" >> ~/.netrc
+
+jobs:
+  include:
+    - &default
+      stage: test
+      os: linux
+      env:
+        - PYTHON_VERSION="3.6"
+      install:
+        # Install conda
+        - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+            wget https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh;
+          else
+            wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+          fi
+        - bash miniconda.sh -b -p $HOME/miniconda
+        - export PATH="$HOME/miniconda/bin:$PATH"
+        - conda config --set always_yes yes --set changeps1 no
+        - conda update conda
+        # it might be faster to start from anaconda instead of miniconda
+        - travis_wait 20 conda env create
+        - source activate holoplot
+        # dependencies for tests etc
+        - conda install nose parameterized
+        - pip install flake8
+        - conda env export
+        - conda list
+      script:
+          # python ./etc/test_notebooks.py lint
+          # python ./etc/test_notebooks.py
+          - flake8 --ignore=E,W,F999,F405 holoplot
+          - nosetests --with-doctest
+
+    - <<: *default
+      stage: doc
+      script:
+        - python setup.py develop
+        - conda install -c conda-forge 'sphinx<1.7' beautifulsoup4 graphviz
+        - pip install nbsite
+        - pip install sphinx_ioam_theme
+        - python -c "import bokeh; bokeh.sampledata.download()"
+        - cp ./doc/user_guide/Streaming.rst ./doc/user_guide/Streaming.rst_bak
+        - nbsite_nbpagebuild.py pyviz holoplot ./examples ./doc
+        - cp ./doc/user_guide/Streaming.rst_bak ./doc/user_guide/Streaming.rst
+        - HV_DOC_HTML='true' sphinx-build -b html ./doc ./doc/_build/html
+        - nbsite_fix_links.py ./doc/_build/html
+        - touch ./doc/_build/html/.nojekyll
+        - cp -r ./examples/user_guide/images ./doc/_build/html/user_guide/images
+        - cp -r ./examples/assets ./doc/_build/html/assets
+        - cp -r ./doc/assets/* ./doc/_build/html/assets/
+        - nbsite_cleandisthtml.py ./doc/_build/html take_a_chance
+        - cd ..
+      deploy:
+        provider: pages
+        skip_cleanup: true
+        github_token: $GITHUB_TOKEN
+        local_dir: ./doc/_build/html
+        on:
+          branch: master
+
+notifications:
+  email: false
