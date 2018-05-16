@@ -103,6 +103,17 @@ jobs:
         - doit package_upload --token=$CONDA_UPLOAD_TOKEN --label=dev --recipe=recommended
 
     - <<: *default
+      stage: conda_package
+      env: DESC="" TRAVIS_NOCACHE=$TRAVIS_JOB_ID
+      install:
+        - doit package_build --recipe=core $CHANS $PKG_TEST_PYTHON --test-group=unit
+        - doit package_build --recipe=recommended $CHANS $PKG_TEST_PYTHON --test-group=examples
+      script:
+        - doit package_upload --token=$CONDA_UPLOAD_TOKEN --label=dev --label=main --recipe=core
+        - doit package_upload --token=$CONDA_UPLOAD_TOKEN --label=dev --label=main --recipe=recommended
+
+
+    - <<: *default
       stage: pip_dev_package
       env: PYPI="https://test.pypi.org/legacy/" TRAVIS_NOCACHE=$TRAVIS_JOB_ID
       install:

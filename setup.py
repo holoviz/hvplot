@@ -147,9 +147,11 @@ extras_require = {
     ],
     'doc': [
         'nbsite',
-        'sphinx_ioam_theme'
+        'sphinx_ioam_theme',
         'selenium',
         'phantomjs'
+        'airline_flights', # Intake
+        'us_crime' # Intake
     ]
 }
 
