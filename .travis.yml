@@ -65,6 +65,8 @@ jobs:
       env: DESC="docs" CHANS_DEV="-c pyviz/label/dev -c ioam -c intake"
       script:
         - doit develop_install $CHANS_DEV -o doc
+        - conda uninstall nbsite --force
+        - pip install git+https://github.com/pyviz/nbsite.git
         - bokeh sampledata
 
         # note: will vastly simplified in a future version of nbsite
