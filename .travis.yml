@@ -7,6 +7,11 @@ sudo: false
 os:
   - linux
 
+cache:
+  timeout: 300
+  directories:
+    - $HOME/miniconda
+
 before_cache:
   - rm -rf $HOME/miniconda/pkgs
   - rm -rf $HOME/miniconda/conda-bld
