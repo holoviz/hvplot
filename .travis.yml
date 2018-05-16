@@ -67,7 +67,7 @@ jobs:
 
     - <<: *default
       stage: doc
-      env: DESC="docs" CHANS_DEV="-c pyviz/label/dev -c ioam -c intake"
+      env: DESC="docs" CHANS_DEV="-c pyviz/label/dev -c pyviz -c ioam -c intake"
       script:
         - doit develop_install $CHANS_DEV -o doc
         - conda uninstall nbsite --force
@@ -77,13 +77,12 @@ jobs:
         # note: will vastly simplified in a future version of nbsite
         - cd doc
         - cp ./user_guide/Streaming.rst ./user_guide/Streaming.rst_bak
-        - nbsite_nbpagebuild.py pyviz holoplot ../examples .
+        - nbsite_nbpagebuild.py ioam holoplot ../examples .
         - cp ./user_guide/Streaming.rst_bak ./user_guide/Streaming.rst
         - HV_DOC_HTML='true' sphinx-build -b html . ./_build/html
         - nbsite_fix_links.py _build/html
         - nbsite_cleandisthtml.py ./_build/html take_a_chance
         - touch ./_build/html/.nojekyll
-        - cp -r ../examples/user_guide/images ./_build/html/user_guide/images
         - cp -r ../examples/assets ./_build/html/assets
         - cp -r ./assets/* ./_build/html/assets/
         - cd ..
