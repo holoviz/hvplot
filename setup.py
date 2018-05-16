@@ -127,6 +127,21 @@ install_requires = [
     'pandas'
 ]
 
+_examples_extra = [
+    'xarray',
+    'streamz >=0.3.0',
+    'intake',
+    'intake-parquet',
+    'dask',
+    'datashader >=0.6.5',
+    'notebook >=5.4',
+    'pillow',
+    'selenium',
+    'phantomjs',
+    'airline_flights',
+    'us_crime'
+]
+
 extras_require = {
     'tests': [
         'coveralls',
@@ -136,22 +151,10 @@ extras_require = {
         'pytest',
         'nbsmoke >=0.2.0'
     ],
-    'examples': [
-        'xarray',
-        'streamz >=0.3.0',
-        'intake',
-        'intake-parquet',
-        'dask',
-        'datashader >=0.6.5',
-        'notebook >=5.4'
-    ],
-    'doc': [
+    'examples': _examples_extra,
+    'doc': _examples_extra + [
         'nbsite',
-        'sphinx_ioam_theme',
-        'selenium',
-        'phantomjs',
-        'airline_flights', # Intake
-        'us_crime' # Intake
+        'sphinx_ioam_theme'
     ]
 }
 
