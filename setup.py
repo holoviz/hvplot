@@ -129,10 +129,12 @@ install_requires = [
 
 extras_require = {
     'tests': [
+        'coveralls',
         'nose',
         'flake8',
         'parameterized',
-        'pytest'
+        'pytest',
+        'nbsmoke >=0.2.0'
     ],
     'examples': [
         'xarray',
