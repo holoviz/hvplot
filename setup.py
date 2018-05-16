@@ -131,7 +131,8 @@ extras_require = {
     'tests': [
         'nose',
         'flake8',
-        'parameterized'
+        'parameterized',
+        'pytest'
     ],
     'examples': [
         'xarray',
