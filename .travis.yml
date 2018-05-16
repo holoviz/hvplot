@@ -92,12 +92,13 @@ jobs:
 
     ########## END-USER PACKAGES ##########
 
+    ### CONDA ####
+
     - <<: *default
       stage: conda_dev_package
       env: DESC="" TRAVIS_NOCACHE=$TRAVIS_JOB_ID
       install:
         - doit package_build --recipe=core $CHANS_DEV $PKG_TEST_PYTHON --test-group=unit
-        - doit package_build --recipe=recommended $CHANS_DEV $PKG_TEST_PYTHON --test-group=examples
       script:
         - doit package_upload --token=$CONDA_UPLOAD_TOKEN --label=dev --recipe=core
         - doit package_upload --token=$CONDA_UPLOAD_TOKEN --label=dev --recipe=recommended
@@ -107,11 +108,11 @@ jobs:
       env: DESC="" TRAVIS_NOCACHE=$TRAVIS_JOB_ID
       install:
         - doit package_build --recipe=core $CHANS $PKG_TEST_PYTHON --test-group=unit
-        - doit package_build --recipe=recommended $CHANS $PKG_TEST_PYTHON --test-group=examples
       script:
         - doit package_upload --token=$CONDA_UPLOAD_TOKEN --label=dev --label=main --recipe=core
         - doit package_upload --token=$CONDA_UPLOAD_TOKEN --label=dev --label=main --recipe=recommended
 
+    ### PyPI ###
 
     - <<: *default
       stage: pip_dev_package
@@ -121,6 +122,15 @@ jobs:
         - doit pip_on_conda
         - doit ecosystem=pip package_build --test-python=py36 --test-group=unit
       script: doit ecosystem=pip package_upload -u $TPPU -p $TPPP -r ${PYPI}
+
+    - <<: *default
+      stage: pip_package
+      env: PYPI="https://upload.pypi.org/legacy/" TRAVIS_NOCACHE=$TRAVIS_JOB_ID
+      install:
+        - doit develop_install $CHANS_DEV -o tests && pip uninstall -y geoviews
+        - doit pip_on_conda
+        - doit ecosystem=pip package_build --test-python=py36 --test-group=unit
+      script: doit ecosystem=pip package_upload -u $PPU -p $PPP -r ${PYPI}
 
 
 notifications:
