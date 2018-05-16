@@ -121,7 +121,11 @@ def package_assets(example_path):
 
 ########## dependencies ##########
 
-install_requires = []
+install_requires = [
+    'bokeh >=0.12.15',
+    'holoviews >=1.10.4',
+    'pandas'
+]
 
 extras_require = {
     'tests': [
@@ -129,10 +133,19 @@ extras_require = {
         'flake8'
     ],
     'examples': [
+        'xarray',
+        'streamz >=0.3.0',
+        'intake',
+        'intake-parquet',
+        'dask',
+        'datashader >=0.6.5',
+        'notebook >=5.4'
     ],
     'doc': [
         'nbsite',
         'sphinx_ioam_theme'
+        'selenium',
+        'phantomjs'
     ]
 }
 
