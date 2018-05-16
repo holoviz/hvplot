@@ -130,7 +130,8 @@ install_requires = [
 extras_require = {
     'tests': [
         'nose',
-        'flake8'
+        'flake8',
+        'parameterized'
     ],
     'examples': [
         'xarray',
