@@ -31,6 +31,10 @@ requirements:
 test:
   imports:
     - holoplot
+  requires:
+    {% for dep in sdata['extras_require']['tests'] %}
+    - {{ dep }}
+    {% endfor %}
 
 about:
   home: {{ sdata['url'] }}
