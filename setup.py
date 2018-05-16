@@ -135,6 +135,7 @@ _examples_extra = [
     'dask',
     'datashader >=0.6.5',
     'notebook >=5.4',
+    'scipy',
     'pillow',
     'selenium',
     'phantomjs',
