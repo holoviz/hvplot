@@ -71,7 +71,7 @@ jobs:
       script:
         - doit develop_install $CHANS_DEV -o doc
         - conda uninstall nbsite --force
-        - pip install git+https://github.com/pyviz/nbsite.git
+        - pip install git+https://github.com/pyviz/nbsite.git --upgrade
         - bokeh sampledata
 
         # note: will vastly simplified in a future version of nbsite
