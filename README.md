@@ -19,3 +19,23 @@ Many of these libraries have the concept of a high-level plotting API that lets 
 HoloPlot provides a high-level plotting API built on HoloViews that provides a general and consistent API for plotting data in all the abovementioned formats. HoloPlot can integrate neatly with the individual libraries if an extension mechanism for the native plot APIs is offered, or it can be used as a standalone component.
 
 The API is currently under heavy development and is not yet ready to be considered stable. That said, the Pandas API that it mirrors is quite stable, so if you want to start playing with it anyway, have a look at the [Getting Started Guide](getting_started/index.html) and check out the current functionality in the [User Guide.](user_guide/index.html)
+
+## Installation
+
+HoloPlot supports Python 2.7, 3.5, 3.6 and 3.7 on Linux, Windows, or Mac and can be installed with ``conda``:
+
+```
+conda install -c pyviz holoplot
+```
+
+or with ``pip``:
+
+```
+pip install holoplot
+```
+
+For JupyterLab support, the ``jupyterlab_pyviz`` extension is also required:
+
+```
+jupyter labextension install @pyviz/jupyterlab_holoviews
+```
