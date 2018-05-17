@@ -133,10 +133,17 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded):
     import xarray as xr
     dataset = data
     data_vars = list(dataset.data_vars) if isinstance(data, xr.Dataset) else [data.name]
-    dims = list(dataset.dims)
+    ignore = (by or []) + (groupby or [])
+    dims = [c for c in data.coords if data[c].shape != () and c not in ignore][::-1]
 
     if gridded:
         data = dataset
+        if not (x or y):
+            x, y = dims[:2]
+        elif x and not y:
+            y = [d for d in dims if d != x][0]
+        elif y and not x:
+            x = [d for d in dims if d != y][0]
         if len(dims) > 2 and not groupby:
             groupby = [d for d in dims if d not in (x, y)]
     else:
@@ -148,18 +155,26 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded):
             data = dataset.to_dataframe()
             if len(data.index.names) > 1:
                 data = data.reset_index()
-        if not y:
-            y = data_vars
-        if not x:
-            x = dims[0]
+        if x and not y:
+            y = dims[0] if x in data_vars else data_vars
+        elif y and not x:
+            x = data_vars[0] if y in dims else dims[0]
+        elif not x and not y:
+            x, y = dims[0], data_vars
+
         if by is None:
-            by = [c for c in dims if c != x]
+            by = [c for c in dims if c not in (x, y)]
+            if len(by) > 1: by = []
+        if groupby is None:
+            groupby = [c for c in dims if c not in by+[x, y]]
     return data, x, y, by, groupby
 
 
 class HoloViewsConverter(param.Parameterized):
 
     _gridded_types = ['image', 'contour', 'contourf', 'quadmesh']
+
+    _stats_types = ['hist', 'kde', 'violin', 'box']
 
     _data_options = ['x', 'y', 'kind', 'by', 'use_index', 'use_dask',
                      'dynamic', 'crs', 'value_label', 'group_label',
@@ -309,6 +324,11 @@ class HoloViewsConverter(param.Parameterized):
         if is_intake(data):
             data = process_intake(data, use_dask or persist)
 
+        if groupby is not None and not isinstance(groupby, list):
+            groupby = [groupby]
+        if by is not None and not isinstance(by, list):
+            by = [by]
+
         streaming = False
         if isinstance(data, pd.DataFrame):
             self.data = data
@@ -329,21 +349,26 @@ class HoloViewsConverter(param.Parameterized):
             if gridded and isinstance(data, xr.Dataset):
                 data = data[kwds.get('z', list(data.data_vars)[0])]
 
-            dims = list(data.dims)
-            if kind is None and not (x or y) and len(dims) > 1 and not (by or groupby):
-                x, y = dims[::-1][:2]
-                if len(data[x]) > 1 and len(data[y]) > 1:
+            ignore = (groupby or []) + (by or [])
+            dims = [c for c in data.coords if data[c].shape != ()
+                    and c not in ignore]
+            if kind is None and not (x or y):
+                if len(dims) == 1:
+                    kind = 'line'
+                elif len(dims) == 2:
                     kind = 'image'
                     gridded = True
                 else:
-                    kind = 'line'
-                    gridded = False
-                    y = None
+                    kind = 'hist'
 
             if gridded:
                 gridded_data = True
-            data, x, y, by, groupby = process_xarray(data, x, y, by, groupby,
-                                                     use_dask, persist, gridded)
+            data, x, y, by_new, groupby_new = process_xarray(data, x, y, by, groupby,
+                                                             use_dask, persist, gridded)
+            if kind not in self._stats_types:
+                if by is None: by = by_new
+                if groupby is None: groupby = groupby_new
+
             if groupby:
                 groupby = [g for g in groupby if g not in (row, col)]
             self.data = data
@@ -351,10 +376,8 @@ class HoloViewsConverter(param.Parameterized):
             raise ValueError('Supplied data type %s not understood' % type(data).__name__)
 
         # Validate data and arguments
-        if groupby is None:
-            groupby = []
-        elif not isinstance(groupby, list):
-            groupby = [groupby]
+        if by is None: by = []
+        if groupby is None: groupby = []
 
         if gridded:
             if not gridded_data:
