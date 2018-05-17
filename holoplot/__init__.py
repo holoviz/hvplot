@@ -340,8 +340,10 @@ class HoloPlot(object):
 
         Parameters
         ----------
-        x, y : label or position, optional
-            Field name to draw x- and y-positions from
+        x, y : string, optional
+            The coordinate variable along the x- and y-axis
+        z : string, optional
+            The data variable to plot
         colorbar: boolean
             Whether to display a colorbar
         **kwds : optional
@@ -352,7 +354,7 @@ class HoloPlot(object):
         obj : HoloViews object
             The HoloViews representation of the plot.
         """
-        return self(x, y, z=z, kind='image', colorbar=True, **kwds)
+        return self(x, y, z=z, kind='image', colorbar=colorbar, **kwds)
 
     def quadmesh(self, x=None, y=None, z=None, colorbar=True, **kwds):
         """
@@ -360,8 +362,10 @@ class HoloPlot(object):
 
         Parameters
         ----------
-        x, y : label or position, optional
-            Field name to draw x- and y-positions from
+        x, y : string, optional
+            The coordinate variable along the x- and y-axis
+        z : string, optional
+            The data variable to plot
         colorbar: boolean
             Whether to display a colorbar
         **kwds : optional
@@ -373,6 +377,72 @@ class HoloPlot(object):
             The HoloViews representation of the plot.
         """
         return self(x, y, z=z, kind='quadmesh', colorbar=colorbar, **kwds)
+
+    def contour(self, x=None, y=None, z=None, colorbar=True, **kwds):
+        """
+        Line contour plot
+
+        Parameters
+        ----------
+        x, y : string, optional
+            The coordinate variable along the x- and y-axis
+        z : string, optional
+            The data variable to plot
+        levels: int, optional
+            The number of contour levels
+        colorbar: boolean
+            Whether to display a colorbar
+        **kwds : optional
+            Keyword arguments to pass on to
+            :py:meth:`holoplot.converter.HoloViewsConverter`.
+        Returns
+        -------
+        obj : HoloViews object
+            The HoloViews representation of the plot.
+        """
+        return self(x, y, z=z, kind='contour', colorbar=colorbar, **kwds)
+
+    def contourf(self, x=None, y=None, z=None, colorbar=True, **kwds):
+        """
+        Filled contour plot
+
+        Parameters
+        ----------
+        x, y : string, optional
+            The coordinate variable along the x- and y-axis
+        z : string, optional
+            The data variable to plot
+        levels: int, optional
+            The number of contour levels
+        colorbar: boolean
+            Whether to display a colorbar
+        **kwds : optional
+            Keyword arguments to pass on to
+            :py:meth:`holoplot.converter.HoloViewsConverter`.
+        Returns
+        -------
+        obj : HoloViews object
+            The HoloViews representation of the plot.
+        """
+        return self(x, y, z=z, kind='contourf', colorbar=colorbar, **kwds)
+
+    def points(self, x=None, y=None, **kwds):
+        """
+        Point plot use for 2D coordinate systems
+
+        Parameters
+        ----------
+        x, y : string, optional
+            The coordinate variable along the x- and y-axis
+        **kwds : optional
+            Keyword arguments to pass on to
+            :py:meth:`holoplot.converter.HoloViewsConverter`.
+        Returns
+        -------
+        obj : HoloViews object
+            The HoloViews representation of the plot.
+        """
+        return self(x, y, kind='points', **kwds)
 
 
 

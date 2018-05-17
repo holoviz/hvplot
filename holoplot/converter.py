@@ -16,7 +16,7 @@ from holoviews.core.layout import NdLayout
 from holoviews.element import (
     Curve, Scatter, Area, Bars, BoxWhisker, Dataset, Distribution,
     Table, HeatMap, Image, HexTiles, QuadMesh, Bivariate, Histogram,
-    Violin
+    Violin, Contours, Polygons
 )
 from holoviews.plotting.util import process_cmap
 from holoviews.operation import histogram
@@ -197,7 +197,9 @@ class HoloViewsConverter(param.Parameterized):
         'dataset'  : ['columns'],
         'table'    : ['columns'],
         'image'    : ['z'],
-        'quadmesh' : ['z']
+        'quadmesh' : ['z'],
+        'contour'  : ['z', 'levels'],
+        'contourf'  : ['z', 'levels']
     }
 
     _kind_mapping = {
@@ -205,10 +207,11 @@ class HoloViewsConverter(param.Parameterized):
         'bivariate': Bivariate, 'quadmesh': QuadMesh, 'hexbin': HexTiles,
         'image': Image, 'table': Table, 'hist': Histogram, 'dataset': Dataset,
         'kde': Distribution, 'area': Area, 'box': BoxWhisker, 'violin': Violin,
-        'bar': Bars, 'barh': Bars
+        'bar': Bars, 'barh': Bars, 'contour': Contours, 'contourf': Polygons
     }
 
-    _colorbar_types = ['image', 'hexbin', 'heatmap', 'quadmesh', 'bivariate']
+    _colorbar_types = ['image', 'hexbin', 'heatmap', 'quadmesh', 'bivariate',
+                       'contours']
 
     def __init__(self, data, x, y, kind=None, by=None, use_index=True,
                  group_label='Group', value_label='value',
@@ -872,3 +875,15 @@ class HoloViewsConverter(param.Parameterized):
                                 'if GeoViews is available.')
             params['crs'] = self.crs
         return element(data, [x, y], z, **params).redim(**self._redim).opts(**opts)
+
+    def contour(self, x=None, y=None, data=None):
+        from holoviews.operation import contours 
+        opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
+        image = self.image(x, y, data)
+        return contours(image, levels=self.kwds.get('levels', 5)).opts(**opts)
+
+    def contourf(self, x=None, y=None, data=None):
+        from holoviews.operation import contours 
+        opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
+        image = self.image(x, y, data)
+        return contours(image, levels=self.kwds.get('levels', 5), filled=True).opts(**opts)
