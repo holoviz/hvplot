@@ -1,6 +1,8 @@
+{% set sdata = load_setup_py_data() %}
+
 package:
   name: holoplot
-  version: 0.0.1
+  version: {{ sdata['version'] }}
 
 source:
   path: ..
@@ -16,61 +18,25 @@ extra:
 
 requirements:
   build:
-    - python
-    - param
-    - numpy
-    - setuptools
+    - python {{ sdata['python_requires'] }}
+    {% for dep in sdata['extras_require']['build'] %}
+    - {{ dep }}
+    {% endfor %}
   run:
-    # 
-    # Versions for pyviz-maintained packages pinned to ensure mutual compatibility
-    # 
-    - bokeh 0.12.14
-    - holoviews 1.9.5
-    - datashader 0.6.5
-    - param 1.5.1
-    # 
-    # Direct dependencies for package installation
-    # 
-    - yaml
-    - requests
-    # 
-    # Direct dependencies of most or all the tutorials
-    # 
-    - python >=3.6,<3.7 # Pinned in case of unknown future or past compatibility issues
-    - ipython 5         # Pinned to avoid tab-completion issue in ipython=6
-    - numpy 1.13        # Pinned to avoid warnings with numpy=1.14 and bokeh=1.12.14
-    - notebook >=5.1    # Pinned to avoid rate limiting for large images with notebook=5.0
-    - dask 0.17.1       # Pinned in case of future API changes
-    - jupyter
-    - pandas
-    - xarray
-    - scipy
-    # 
-    # Directly imported dependencies of certain specialized tutorials
-    # 
-    - streamz 0.3.0 
-    # 
-    # Indirect dependencies of our direct dependencies
-    # 
-    - selenium          # Required for exporting Bokeh plots to PNG
-    - phantomjs         # Required for exporting Bokeh plots to PNG
-    - netcdf4           # Required for reading .nc files
-    - fastparquet       # Required for reading Parquet files
-    - python-snappy     # Required for reading snappy-compressed Parquet files
-    - pytest >=3.2      # Required by? Pinned to avoid installation problems on Windows with 3.1?
-    - cffi              # Unstated dependency of fastparquet?
-    - tornado 4.5.3     # Required for Jupyter notebook and bokeh server
-    # Intake data packages used in documentation #
-    - airline_flights
-    - us_crime
-    - intake
-    - intake-parquet
+    - python {{ sdata['python_requires'] }}
+    {% for dep in sdata.get('install_requires',{}) %}
+    - {{ dep }}
+    {% endfor %}
 
 test:
   imports:
     - holoplot
+  requires:
+    {% for dep in sdata['extras_require']['tests'] %}
+    - {{ dep }}
+    {% endfor %}
 
 about:
-  home: https://pyviz.github.io/holoplot
-  summary: A high-level plotting API for the PyData ecosystem built on HoloViews
-  license: BSD 3-Clause
+  home: {{ sdata['url'] }}
+  summary: {{ sdata['description'] }}
+  license: {{ sdata['license'] }}

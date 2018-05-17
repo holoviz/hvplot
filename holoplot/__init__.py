@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import numpy as _np
 import pandas as _pd
 import holoviews as _hv
@@ -332,7 +334,7 @@ class HoloPlot(object):
         """
         return self(kind='table', **dict(kwds, columns=columns))
 
-    def image(self, x=None, y=None, colorbar=True, **kwds):
+    def image(self, x=None, y=None, z=None, colorbar=True, **kwds):
         """
         Image plot
 
@@ -350,9 +352,9 @@ class HoloPlot(object):
         obj : HoloViews object
             The HoloViews representation of the plot.
         """
-        return self(x, y, kind='image', colorbar=True, **kwds)
+        return self(x, y, z=z, kind='image', colorbar=True, **kwds)
 
-    def quadmesh(self, x=None, y=None, **kwds):
+    def quadmesh(self, x=None, y=None, z=None, colorbar=True, **kwds):
         """
         QuadMesh plot
 
@@ -370,7 +372,7 @@ class HoloPlot(object):
         obj : HoloViews object
             The HoloViews representation of the plot.
         """
-        return self(x, y, kind='quadmesh', colorbar=True, **kwds)
+        return self(x, y, z=z, kind='quadmesh', colorbar=colorbar, **kwds)
 
 
 

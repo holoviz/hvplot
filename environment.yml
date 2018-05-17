@@ -41,7 +41,6 @@ dependencies:
   - fastparquet      # Required for reading Parquet files
   - python-snappy    # Required for reading snappy-compressed Parquet files
   - pytest>=3.2      # Required by? Pinned to avoid installation problems on Windows with 3.1?
-  - ipywidgets=7     # Required for paramnb. Pinned to avoid JS errors for widgets
   - cffi             # Unstated dependency of fastparquet?
   - tornado=4.5.3    # Required for Jupyter notebook and bokeh server
   # Intake data packages used in documentation #

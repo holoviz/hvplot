@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+
 from functools import partial
 from distutils.version import LooseVersion
 import difflib
@@ -117,10 +118,10 @@ def is_xarray(data):
 
 
 def process_intake(data, use_dask):
-    if data.container != 'dataframe':
+    if data.container not in ('dataframe', 'xarray'):
         raise NotImplementedError('Plotting interface currently only '
-                                  'supports DataSource objects with '
-                                  'dataframe container.')
+                                  'supports DataSource objects declaring '
+                                  'a dataframe or xarray container.')
     if use_dask:
         data = data.to_dask()
     else:
@@ -174,12 +175,14 @@ class HoloViewsConverter(param.Parameterized):
     _op_options = ['datashade', 'rasterize', 'xsampling', 'ysampling']
 
     _kind_options = {
-        'scatter': ['s', 'marker', 'c', 'scale'],
-        'hist'   : ['bins', 'bin_range', 'normed'],
-        'heatmap': ['C', 'reduce_function'],
-        'hexbin' : ['C', 'reduce_function', 'gridsize'],
-        'dataset': ['columns'],
-        'table'  : ['columns']
+        'scatter'  : ['s', 'marker', 'c', 'scale'],
+        'hist'     : ['bins', 'bin_range', 'normed'],
+        'heatmap'  : ['C', 'reduce_function'],
+        'hexbin'   : ['C', 'reduce_function', 'gridsize'],
+        'dataset'  : ['columns'],
+        'table'    : ['columns'],
+        'image'    : ['z'],
+        'quadmesh' : ['z']
     }
 
     _kind_mapping = {
@@ -208,7 +211,7 @@ class HoloViewsConverter(param.Parameterized):
 
         # Process data and related options
         self._process_data(kind, data, x, y, by, groupby, row, col,
-                           use_dask, persist, backlog)
+                           use_dask, persist, backlog, kwds)
         self.use_index = use_index
         self.value_label = value_label
         self.group_label = group_label
@@ -294,7 +297,7 @@ class HoloViewsConverter(param.Parameterized):
                          'y: {y}, by: {by}, groupby: {groupby}'.format(**kwds))
 
 
-    def _process_data(self, kind, data, x, y, by, groupby, row, col, use_dask, persist, backlog):
+    def _process_data(self, kind, data, x, y, by, groupby, row, col, use_dask, persist, backlog, kwds):
         gridded = kind in self._gridded_types
         gridded_data = False
 
@@ -322,11 +325,21 @@ class HoloViewsConverter(param.Parameterized):
                 self.stream = Buffer(data=self.data, length=backlog, index=False)
             data.stream.gather().sink(self.stream.send)
         elif is_xarray(data):
+            import xarray as xr
+            if gridded and isinstance(data, xr.Dataset):
+                data = data[kwds.get('z', list(data.data_vars)[0])]
+
             dims = list(data.dims)
             if kind is None and not (x or y) and len(dims) > 1 and not (by or groupby):
-                kind = 'image'
-                gridded = True
                 x, y = dims[::-1][:2]
+                if len(data[x]) > 1 and len(data[y]) > 1:
+                    kind = 'image'
+                    gridded = True
+                else:
+                    kind = 'line'
+                    gridded = False
+                    y = None
+
             if gridded:
                 gridded_data = True
             data, x, y, by, groupby = process_xarray(data, x, y, by, groupby,
@@ -787,9 +800,11 @@ class HoloViewsConverter(param.Parameterized):
     #     Gridded plots      #
     ##########################
 
-    def image(self, x=None, y=None, z=None, data=None):
+    def image(self, x=None, y=None, data=None):
         import xarray as xr
         data = self.data if data is None else data
+
+        z = self.kwds.get('z')
         x = x or self.x
         y = y or self.y
         if not (x and y):
@@ -810,9 +825,11 @@ class HoloViewsConverter(param.Parameterized):
             params['crs'] = self.crs
         return element(data, [x, y], z, **params).redim(**self._redim).opts(**opts)
 
-    def quadmesh(self, x=None, y=None, z=None, data=None):
+    def quadmesh(self, x=None, y=None, data=None):
         import xarray as xr
         data = self.data if data is None else data
+
+        z = self.kwds.get('z')
         x = x or self.x
         y = y or self.y
         if not (x and y):
