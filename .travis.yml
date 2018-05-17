@@ -129,7 +129,7 @@ jobs:
       stage: pip_package
       env: PYPI="https://upload.pypi.org/legacy/" TRAVIS_NOCACHE=$TRAVIS_JOB_ID
       install:
-        - doit develop_install $CHANS_DEV -o tests && pip uninstall -y geoviews
+        - doit develop_install $CHANS_DEV -o tests && pip uninstall -y holoplot
         - doit pip_on_conda
         - doit ecosystem=pip package_build --test-python=py36 --test-group=unit
       script: doit ecosystem=pip package_upload -u $PPU -p $PPP -r ${PYPI}
