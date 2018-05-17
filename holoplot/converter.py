@@ -187,19 +187,19 @@ class HoloViewsConverter(param.Parameterized):
 
     _style_options = ['color', 'alpha', 'colormap', 'fontsize', 'c']
 
-    _op_options = ['datashade', 'rasterize', 'xsampling', 'ysampling']
+    _op_options = ['datashade', 'rasterize', 'xsampling', 'ysampling', 'aggregator']
 
     _kind_options = {
-        'scatter'  : ['s', 'marker', 'c', 'scale'],
+        'scatter'  : ['s', 'marker', 'c', 'scale', 'logz'],
         'hist'     : ['bins', 'bin_range', 'normed'],
-        'heatmap'  : ['C', 'reduce_function'],
-        'hexbin'   : ['C', 'reduce_function', 'gridsize'],
+        'heatmap'  : ['C', 'reduce_function', 'logz'],
+        'hexbin'   : ['C', 'reduce_function', 'gridsize', 'logz'],
         'dataset'  : ['columns'],
         'table'    : ['columns'],
-        'image'    : ['z'],
-        'quadmesh' : ['z'],
-        'contour'  : ['z', 'levels'],
-        'contourf'  : ['z', 'levels']
+        'image'    : ['z', 'logz'],
+        'quadmesh' : ['z', 'logz'],
+        'contour'  : ['z', 'levels', 'logz'],
+        'contourf'  : ['z', 'levels', 'logz']
     }
 
     _kind_mapping = {
@@ -225,7 +225,8 @@ class HoloViewsConverter(param.Parameterized):
                  stacked=False, colorbar=None, fontsize=None,
                  colormap=None, datashade=False, rasterize=False,
                  row=None, col=None, figsize=None, debug=False,
-                 xaxis=True, yaxis=True, framewise=True, **kwds):
+                 xaxis=True, yaxis=True, framewise=True, aggregator=None,
+                 **kwds):
 
         # Process data and related options
         self._process_data(kind, data, x, y, by, groupby, row, col,
@@ -241,6 +242,7 @@ class HoloViewsConverter(param.Parameterized):
         # Operations
         self.datashade = datashade
         self.rasterize = rasterize
+        self.aggregator = aggregator
 
         # By type
         self.subplots = subplots
@@ -477,6 +479,8 @@ class HoloViewsConverter(param.Parameterized):
             style_opts['alpha'] = kwds.pop('alpha')
         if cmap:
             style_opts['cmap'] = cmap
+        if 'logz' in kwds:
+            plot_options['logz'] = kwds['logz']
         return style_opts, plot_options, kwds
 
 
@@ -517,7 +521,7 @@ class HoloViewsConverter(param.Parameterized):
             else:
                 obj = method(x, y)
 
-        if not self.datashade or self.rasterize:
+        if not (self.datashade or self.rasterize):
             return obj
 
         try:
@@ -531,8 +535,18 @@ class HoloViewsConverter(param.Parameterized):
             opts['cmap'] = self._style_opts['cmap']
         if self.by:
             opts['aggregator'] = count_cat(self.by[0])
-        operation = datashade if self.datashade else rasterize
-        return operation(obj, **opts).opts(plot=self._plot_opts)
+        if self.aggregator:
+            opts['aggregator'] = self.aggregator
+        style = {}
+        if self.datashade:
+            operation = datashade
+            eltype = 'RGB'
+        else:
+            operation = rasterize
+            eltype = 'Image'
+            if 'cmap' in self._style_opts:
+                style['cmap'] = self._style_opts['cmap']
+        return operation(obj, **opts).opts({eltype: {'plot': self._plot_opts, 'style': style}})
 
 
     def dataset(self, x=None, y=None, data=None):
