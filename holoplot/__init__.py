@@ -74,6 +74,9 @@ class HoloPlot(object):
 
     def __call__(self, x=None, y=None, kind=None, **kwds):
         params = dict(self._metadata, **kwds)
+        x = x or params.pop('x', None)
+        y = y or params.pop('y', None)
+        kind = kind or params.pop('kind', None)
         converter = HoloViewsConverter(
             self._data, x, y, kind=kind, **params
         )
