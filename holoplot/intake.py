@@ -4,4 +4,4 @@ try:
     import intake.plotting # noqa
     patch('intake', 'bokeh')
 except:
-    _hv.extension('bokeh')
+    _hv.extension('bokeh', logo=False)
