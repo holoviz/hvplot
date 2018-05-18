@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import param
 import numpy as _np
 import pandas as _pd
 import holoviews as _hv
@@ -66,10 +67,11 @@ def patch(library, extension=None, logo=False):
         _hv.extension(extension, logo=logo)
 
 
-class HoloPlot(object):
+class HoloPlot(param.Parameterized):
 
-    def __init__(self, data, **metadata):
+    def __init__(self, data, custom_plots={}, **metadata):
         self._data = data
+        self._plots = custom_plots
         self._metadata = metadata
 
     def __call__(self, x=None, y=None, kind=None, **kwds):
@@ -81,6 +83,29 @@ class HoloPlot(object):
             self._data, x, y, kind=kind, **params
         )
         return converter(kind, x, y)
+
+    def __dir__(self):
+        """
+        List default attributes and custom defined plots.
+        """
+        dirs = super(HoloPlot, self).__dir__()
+        return sorted(list(dirs)+list(self._plots))
+
+    def __getattribute__(self, name):
+        """
+        Custom getattribute to expose user defined subplots.
+        """
+        plots = object.__getattribute__(self, '_plots')
+        if name in plots:
+            plot_opts = plots[name]
+            if 'kind' in plot_opts and name in HoloViewsConverter._kind_mapping:
+                self.warning("Custom options for existing plot types should not "
+                             "declare the 'kind' argument. The .%s plot method "
+                             "was unexpectedly customized with kind=%r."
+                             % (plot_opts['kind'], name))
+                plot_opts['kind'] = name
+            return HoloPlot(self._data, **dict(self._metadata, **plot_opts))
+        return super(HoloPlot, self).__getattribute__(name)
 
     def line(self, x=None, y=None, **kwds):
         """
