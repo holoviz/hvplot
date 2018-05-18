@@ -13,10 +13,6 @@ or with pip::
 
     pip install holoplot
 
-For JupyterLab support, the jupyterlab_holoviews extension is also required::
-
-    jupyter labextension install @pyviz/jupyterlab_holoviews
-
 Usage
 -----
 

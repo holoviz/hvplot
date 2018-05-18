@@ -37,5 +37,5 @@ pip install holoplot
 For JupyterLab support, the ``jupyterlab_pyviz`` extension is also required:
 
 ```
-jupyter labextension install @pyviz/jupyterlab_holoviews
+jupyter labextension install @pyviz/jupyterlab_pyviz
 ```
