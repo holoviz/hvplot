@@ -420,7 +420,7 @@ class HoloViewsConverter(param.Parameterized):
         if self.row: grid.append(self.row)
         if self.col: grid.append(self.col)
         groups += grid
-        if groups or len(z) > 1:
+        if groups or len(zs) > 1:
             if self.streaming:
                 raise NotImplementedError("Streaming and groupby not yet implemented")
             dataset = Dataset(self.data)
@@ -438,11 +438,11 @@ class HoloViewsConverter(param.Parameterized):
                     obj = dataset.map(lambda ds: getattr(self, kind)(x, y, data=ds.data), Dataset)
             elif len(zs) > 1:
                 if self.dynamic:
-                    dataset = DynamicMap(lambda z: getattr(self, kind)(x, y, z, data=ds.data),
+                    dataset = DynamicMap(lambda z: getattr(self, kind)(x, y, z, data=dataset.data),
                                          kdims=[Dimension(self.group_label, values=zs)])
                 else:
                     dataset = HoloMap({z: getattr(self, kind)(x, y, z, data=dataset.data) for z in zs},
-                                      kdims=[group_label])
+                                      kdims=[self.group_label])
             else:
                 obj = getattr(self, kind)(x, y, data=dataset.data)
             if grid:

@@ -58,7 +58,7 @@ def proj_to_cartopy(proj):
 
     import cartopy.crs as ccrs
     try:
-        from osgeo import osr # noqa
+        from osgeo import osr
         has_gdal = True
     except ImportError:
         has_gdal = False
@@ -71,7 +71,6 @@ def proj_to_cartopy(proj):
     srs = proj.srs
     if has_gdal:
         # this is more robust, as srs could be anything (espg, etc.)
-        import osr
         s1 = osr.SpatialReference()
         s1.ImportFromProj4(proj.srs)
         srs = s1.ExportToProj4()

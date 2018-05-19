@@ -1,5 +1,3 @@
-from unittest import SkipTest
-
 import pandas as pd
 from holoplot import HoloPlot, patch
 from holoviews import Store, Scatter
