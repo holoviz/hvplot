@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 
 from functools import partial
-from distutils.version import LooseVersion
 import difflib
 
 import param
@@ -24,7 +23,7 @@ from holoviews.streams import Buffer, Pipe
 
 from .util import (
     is_series, is_dask, is_intake, is_streamz, is_xarray,
-    process_crs, process_intake, process_xarray
+    process_crs, process_intake, process_xarray, check_library
 )
 
 renderer = hv.renderer('bokeh')

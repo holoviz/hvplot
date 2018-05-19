@@ -1,5 +1,4 @@
 from unittest import SkipTest
-from parameterized import parameterized
 
 import pandas as pd
 from holoplot import HoloPlot, patch
@@ -10,10 +9,6 @@ from holoviews.element.comparison import ComparisonTestCase
 class TestOverrides(ComparisonTestCase):
 
     def setUp(self):
-        try:
-            import pandas as pd
-        except:
-            raise SkipTest('Pandas not available')
         patch('pandas')
         self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
 
