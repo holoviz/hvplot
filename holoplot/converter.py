@@ -8,7 +8,8 @@ import holoviews as hv
 import pandas as pd
 import numpy as np
 
-from holoviews.core.spaces import DynamicMap, Callable
+from holoviews.core.dimension import Dimension
+from holoviews.core.spaces import DynamicMap, HoloMap, Callable
 from holoviews.core.overlay import NdOverlay
 from holoviews.core.options import Store, Cycle
 from holoviews.core.layout import NdLayout
@@ -258,8 +259,11 @@ class HoloViewsConverter(param.Parameterized):
             data.stream.gather().sink(self.stream.send)
         elif is_xarray(data):
             import xarray as xr
-            if gridded and isinstance(data, xr.Dataset):
-                data = data[kwds.get('z', list(data.data_vars)[0])]
+            z = kwds.get('z')
+            if z is None:
+                z = list(data.data_vars)[0]
+            if gridded and isinstance(data, xr.Dataset) and not isinstance(z, list):
+                data = data[z]
 
             ignore = (groupby or []) + (by or [])
             dims = [c for c in data.coords if data[c].shape != ()
@@ -410,16 +414,37 @@ class HoloViewsConverter(param.Parameterized):
         method = getattr(self, kind)
 
         groups = self.groupby
+        zs = self.kwds.get('z', [])
+        if not isinstance(zs, list): zs = [zs]
         grid = []
         if self.row: grid.append(self.row)
         if self.col: grid.append(self.col)
         groups += grid
-        if groups:
+        if groups or len(z) > 1:
             if self.streaming:
                 raise NotImplementedError("Streaming and groupby not yet implemented")
+            dataset = Dataset(self.data)
+            if groups:
+                dataset = dataset.groupby(groups, dynamic=self.dynamic)
+                if len(zs) > 1:
+                    dimensions = [Dimension(self.group_label, values=zs)]+dataset.kdims
+                    if self.dynamic:
+                        obj = DynamicMap(lambda *args: getattr(self, kind)(x, y, args[0], dataset[args[1:]].data),
+                                         kdims=dimensions)
+                    else:
+                        obj = HoloMap({(z,)+k: getattr(self, kind)(x, y, z, dataset[k])
+                                       for k, v in dataset.data.items() for z in zs}, kdims=dimensions)
+                else:
+                    obj = dataset.map(lambda ds: getattr(self, kind)(x, y, data=ds.data), Dataset)
+            elif len(zs) > 1:
+                if self.dynamic:
+                    dataset = DynamicMap(lambda z: getattr(self, kind)(x, y, z, data=ds.data),
+                                         kdims=[Dimension(self.group_label, values=zs)])
+                else:
+                    dataset = HoloMap({z: getattr(self, kind)(x, y, z, data=dataset.data) for z in zs},
+                                      kdims=[group_label])
             else:
-                dataset = Dataset(self.data).groupby(self.groupby, dynamic=self.dynamic)
-                obj = dataset.map(lambda ds: getattr(self, kind)(x, y, data=ds.data), [Dataset])
+                obj = getattr(self, kind)(x, y, data=dataset.data)
             if grid:
                 obj = obj.grid(grid).options(shared_xaxis=True, shared_yaxis=True)
         else:
@@ -757,11 +782,11 @@ class HoloViewsConverter(param.Parameterized):
     #     Gridded plots      #
     ##########################
 
-    def image(self, x=None, y=None, data=None):
+    def image(self, x=None, y=None, z=None, data=None):
         import xarray as xr
         data = self.data if data is None else data
 
-        z = self.kwds.get('z')
+        z = z or self.kwds.get('z')
         x = x or self.x
         y = y or self.y
         if not (x and y):
@@ -778,11 +803,11 @@ class HoloViewsConverter(param.Parameterized):
             params['crs'] = self.crs
         return element(data, [x, y], z, **params).redim(**self._redim).opts(**opts)
 
-    def quadmesh(self, x=None, y=None, data=None):
+    def quadmesh(self, x=None, y=None, z=None, data=None):
         import xarray as xr
         data = self.data if data is None else data
 
-        z = self.kwds.get('z')
+        z = z or self.kwds.get('z')
         x = x or self.x
         y = y or self.y
         if not (x and y):
