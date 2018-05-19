@@ -115,7 +115,7 @@ class HoloViewsConverter(param.Parameterized):
                        'contours']
 
     def __init__(self, data, x, y, kind=None, by=None, use_index=True,
-                 group_label='Group', value_label='value',
+                 group_label='Variable', value_label='value',
                  backlog=1000, persist=False, use_dask=False,
                  crs=None, fields={}, groupby=None, dynamic=True,
                  width=700, height=300, shared_axes=True,
