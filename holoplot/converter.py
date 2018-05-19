@@ -456,6 +456,14 @@ class HoloViewsConverter(param.Parameterized):
             eltype = 'Image'
             if 'cmap' in self._style_opts:
                 style['cmap'] = self._style_opts['cmap']
+
+        if self.crs:
+            # Apply projection before rasterizing
+            import cartopy.crs as ccrs
+            from geoviews import project
+            projection = self._plot_opts.get('projection', ccrs.GOOGLE_MERCATOR)
+            obj = project(obj, projection=projection)
+
         return operation(obj, **opts).opts({eltype: {'plot': self._plot_opts, 'style': style}})
 
 
