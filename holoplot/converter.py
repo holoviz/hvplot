@@ -824,18 +824,39 @@ class HoloViewsConverter(param.Parameterized):
             params['crs'] = self.crs
         return element(data, [x, y], z, **params).redim(**self._redim).opts(**opts)
 
-    def contour(self, x=None, y=None, data=None):
+    def contour(self, x=None, y=None, z=None, data=None, filled=False):
         from holoviews.operation import contours
-        opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
-        image = self.image(x, y, data)
-        return contours(image, levels=self.kwds.get('levels', 5)).opts(**opts)
 
-    def contourf(self, x=None, y=None, data=None):
-        from holoviews.operation import contours
-        opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
-        image = self.image(x, y, data)
-        return contours(image, levels=self.kwds.get('levels', 5), filled=True).opts(**opts)
+        if 'projection' in self._plot_opts:
+            import cartopy.crs as ccrs
+            t = self._plot_opts['projection']
+            if isinstance(t, ccrs.CRS) and not isinstance(t, ccrs.Projection):
+                raise ValueError('invalid transform:'
+                                 ' Spherical contouring is not supported - '
+                                 ' consider using PlateCarree/RotatedPole.')
 
+        opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
+        qmesh = self.quadmesh(x, y, z, data)
+
+        if self.crs:
+            # Apply projection before rasterizing
+            import cartopy.crs as ccrs
+            from geoviews import project
+            projection = self._plot_opts.get('projection', ccrs.GOOGLE_MERCATOR)
+            qmesh = project(qmesh, projection=projection)
+
+        if filled:
+            opts['style']['line_alpha'] = 0
+
+        if opts['plot']['colorbar']:
+            opts['plot']['show_legend'] = False
+        levels = self.kwds.get('levels', 5)
+        opts['plot']['color_levels'] = levels
+        return contours(qmesh, filled=filled, levels=levels).opts(**opts)
+
+    def contourf(self, x=None, y=None, z=None, data=None):
+        return self.contour(x, y, z, data, filled=True)
+        
     def points(self, x=None, y=None, data=None):
         data = self.data if data is None else data
         params = dict(self._relabel)
