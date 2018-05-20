@@ -21,7 +21,7 @@ class TestChart1D(ComparisonTestCase):
     def test_wide_chart(self, kind, element):
         plot = self.df.plot(kind=kind)
         obj = NdOverlay({'x': element(self.df, 'index', 'x').redim(x='value'),
-                         'y': element(self.df, 'index', 'y').redim(y='value')}, 'Group')
+                         'y': element(self.df, 'index', 'y').redim(y='value')}, 'Variable')
         self.assertEqual(plot, obj)
 
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
@@ -69,5 +69,5 @@ class TestChart1D(ComparisonTestCase):
     def test_area_stacked(self):
         plot = self.df.plot.area(stacked=True)
         obj = NdOverlay({'x': Area(self.df, 'index', 'x').redim(x='value'),
-                         'y': Area(self.df, 'index', 'y').redim(y='value')}, 'Group')
+                         'y': Area(self.df, 'index', 'y').redim(y='value')}, 'Variable')
         self.assertEqual(plot, Area.stack(obj))
