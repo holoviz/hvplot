@@ -21,8 +21,10 @@ env:
   global:
     - PYENV_VERSION=3.6
     - PKG_TEST_PYTHON="--test-python=py36 --test-python=py27"
+    # TODO: deliberate that intake channel not used for releases (because packages will be on defaults?)
     - CHANS_DEV="-c pyviz/label/dev -c ioam -c intake"
     - CHANS="-c pyviz -c ioam"
+    - PYPI="https://test.pypi.org/legacy/"
 
 stages:
   - test
@@ -114,25 +116,23 @@ jobs:
       script:
         - doit package_upload --token=$CONDA_UPLOAD_TOKEN --label=dev --label=main
 
-    ### PyPI ###
+    ### PIP ###
 
-    - <<: *default
+    - env: PYENV_VERSION=3.6 TRAVIS_NOCACHE=$TRAVIS_JOB_ID
       stage: pip_dev_package
-      env: PYPI="https://test.pypi.org/legacy/" TRAVIS_NOCACHE=$TRAVIS_JOB_ID
+      before_install: pip install pyctdev && doit ecosystem=pip ecosystem_setup
       install:
-        - doit develop_install $CHANS_DEV -o tests && pip uninstall -y holoplot
-        - doit pip_on_conda
-        - doit ecosystem=pip package_build --test-python=py36 --test-group=unit
-      script: doit ecosystem=pip package_upload -u $TPPU -p $TPPP -r ${PYPI}
+        - unset PYENV_VERSION && pyenv global 3.6 2.7
+        - doit ecosystem=pip package_build $PKG_TEST_PYTHON --test-group=unit
+      script: true #doit ecosystem=pip package_upload -u $TPPU -p $TPPP -r ${PYPI}
 
-    - <<: *default
+    - env: PYENV_VERSION=3.6 PYPI="https://upload.pypi.org/legacy/" TRAVIS_NOCACHE=$TRAVIS_JOB_ID
       stage: pip_package
-      env: PYPI="https://upload.pypi.org/legacy/" TRAVIS_NOCACHE=$TRAVIS_JOB_ID
+      before_install: pip install pyctdev && doit ecosystem=pip ecosystem_setup
       install:
-        - doit develop_install $CHANS_DEV -o tests && pip uninstall -y holoplot
-        - doit pip_on_conda
-        - doit ecosystem=pip package_build --test-python=py36 --test-group=unit
-      script: doit ecosystem=pip package_upload -u $PPU -p $PPP -r ${PYPI}
+        - unset PYENV_VERSION && pyenv global 3.6 2.7
+        - doit ecosystem=pip package_build $PKG_TEST_PYTHON --test-group=unit
+      script: true #doit ecosystem=pip package_upload -u $PPU -p $PPP -r ${PYPI}
 
 
 notifications:
