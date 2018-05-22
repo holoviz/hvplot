@@ -32,7 +32,7 @@ stages:
   - name: conda_dev_package
     if: tag =~ ^v(\d+|\.)*[a-z]\d*$
   - name: pip_dev_package
-    if: tag =~ ^v(\d+|\.)*[a-z]\d*$
+    if: branch = packaging_fixups
   - name: conda_package
     if: tag =~ ^v(\d+|\.)*[^a-z]\d*$
   - name: pip_package
@@ -132,7 +132,7 @@ jobs:
       install:
         - unset PYENV_VERSION && pyenv global 3.6 2.7
         - doit ecosystem=pip package_build $PKG_TEST_PYTHON --test-group=unit
-      script: true #doit ecosystem=pip package_upload -u $PPU -p $PPP -r ${PYPI}
+      script: doit ecosystem=pip package_upload -u $PPU -p $PPP -r ${PYPI}
 
 
 notifications:
