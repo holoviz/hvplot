@@ -260,7 +260,7 @@ class HoloViewsConverter(param.Parameterized):
         elif is_xarray(data):
             import xarray as xr
             z = kwds.get('z')
-            if z is None:
+            if z is None and isinstance(data, xr.Dataset):
                 z = list(data.data_vars)[0]
             if gridded and isinstance(data, xr.Dataset) and not isinstance(z, list):
                 data = data[z]
