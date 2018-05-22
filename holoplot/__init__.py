@@ -58,11 +58,12 @@ def patch(library, extension=None, logo=False):
         DataSource.plot = property(_patch_plot)
     if 'xarray' in library:
         try:
-            from xarray import DataArray
+            from xarray import DataArray, Dataset
         except ImportError:
             raise ImportError('Could not patch plotting API onto xarray. '
                               'Xarray could not be imported.')
         DataArray.plot = property(_patch_plot)
+        Dataset.plot = property(_patch_plot)
     if extension and not _hv.extension._loaded:
         _hv.extension(extension, logo=logo)
 
