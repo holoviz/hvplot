@@ -1,7 +1,5 @@
 from unittest import SkipTest
-from parameterized import parameterized
 
-import pandas as pd
 from holoplot import HoloPlot, patch
 from holoviews import Store, Scatter
 from holoviews.element.comparison import ComparisonTestCase
