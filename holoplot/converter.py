@@ -23,7 +23,7 @@ from holoviews.operation import histogram
 from holoviews.streams import Buffer, Pipe
 
 from .util import (
-    is_series, is_dask, is_intake, is_streamz, is_xarray,
+    is_series, is_dask, is_intake, is_streamz, is_xarray, hv_version,
     process_crs, process_intake, process_xarray, check_library
 )
 
@@ -836,7 +836,12 @@ class HoloViewsConverter(param.Parameterized):
                                  ' consider using PlateCarree/RotatedPole.')
 
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
-        qmesh = self.quadmesh(x, y, z, data)
+
+        # Temporary workaround for bug in contours operation
+        if hv_version < '1.10.5':
+            qmesh = self.image(x, y, z, data)
+        else:
+            qmesh = self.quadmesh(x, y, z, data)
 
         if self.crs:
             # Apply projection before rasterizing

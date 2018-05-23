@@ -2,9 +2,14 @@
 Provides utilities to convert data and projections
 """
 
+from distutils.version import LooseVersion
+
 import pandas as pd
+import holoviews as hv
 
 from holoviews.core.util import basestring
+
+hv_version = LooseVersion(hv.__version__)
 
 
 def check_crs(crs):
