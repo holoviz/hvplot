@@ -2,6 +2,7 @@ from . import patch, _hv
 
 try:
     import intake.plotting # noqa
-    patch('intake', 'bokeh')
+    patch('intake', extension='bokeh')
 except:
-    _hv.extension('bokeh', logo=False)
+    if not _hv.extension._loaded:
+        _hv.extension('bokeh', logo=False)

@@ -1,4 +1,3 @@
 from . import patch
 
-patch('pandas', 'bokeh')
-
+patch('pandas', extension='bokeh')

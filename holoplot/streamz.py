@@ -1,3 +1,3 @@
 from . import patch
 
-patch('streamz', 'bokeh')
+patch('streamz', extension='bokeh')
