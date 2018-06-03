@@ -268,10 +268,10 @@ class HoloViewsConverter(param.Parameterized):
             ignore = (groupby or []) + (by or [])
             dims = [c for c in data.coords if data[c].shape != ()
                     and c not in ignore]
-            if kind is None and not (x or y):
+            if kind is None and (not (x or y) or all(c in data.coords for c in (x, y))):
                 if len(dims) == 1:
                     kind = 'line'
-                elif len(dims) == 2:
+                elif len(dims) == 2 or (x and y):
                     kind = 'image'
                     gridded = True
                 else:
@@ -536,12 +536,11 @@ class HoloViewsConverter(param.Parameterized):
         elif not x:
             raise ValueError('Could not determine what to plot. Expected '
                              'x to be declared or use_index to be enabled.')
+
         y = y or self.y
         if not y:
-            if len(data.columns) == 1:
-                y = data.columns[0]
-            else:
-                y = [c for c in data.columns if c != x]
+            ys = [c for c in data.columns if c not in [x]+self.by+self.groupby]
+            y = ys[0] if len(ys) == 1 else ys
         return data, x, y
 
     def chart(self, element, x, y, data=None):
