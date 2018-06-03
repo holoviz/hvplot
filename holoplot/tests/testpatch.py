@@ -12,10 +12,6 @@ from holoplot import patch, HoloPlot
 class TestPatchPandas(TestCase):
 
     def setUp(self):
-        try:
-            import pandas as pd # noqa
-        except:
-            raise SkipTest('Pandas not available')
         patch('pandas')
 
     def test_pandas_series_patched(self):
@@ -60,8 +56,8 @@ class TestPatchXArray(TestCase):
             import xarray as xr # noqa
         except:
             raise SkipTest('XArray not available')
-        import holoplot.xarray
-        
+        import holoplot.xarray # noqa
+
     def test_xarray_dataarray_patched(self):
         import xarray as xr
         array = np.random.rand(100, 100)
