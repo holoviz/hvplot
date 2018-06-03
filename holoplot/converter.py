@@ -523,7 +523,7 @@ class HoloViewsConverter(param.Parameterized):
 
         if self.by:
             chart = Dataset(data, self.by+[x], ys).to(element, x, ys, self.by).relabel(**self._relabel)
-            chart = chart.layout() if self.subplots else chart.overlay()
+            chart = chart.layout() if self.subplots else chart.overlay().options(batched=False)
         else:
             chart = element(data, x, ys).relabel(**self._relabel)
         return chart.redim.range(**ranges).redim(**self._redim).opts(opts)
@@ -562,7 +562,7 @@ class HoloViewsConverter(param.Parameterized):
             ranges = {x: self._dim_ranges['x'], self.value_label: self._dim_ranges['y']}
             charts.append((c, chart.relabel(**self._relabel)
                            .redim.range(**ranges).opts(**opts)))
-        return self._by_type(charts, self.group_label, sort=False)
+        return self._by_type(charts, self.group_label, sort=False).options('NdOverlay', batched=False)
 
     def line(self, x, y, data=None):
         return self.chart(Curve, x, y, data)
