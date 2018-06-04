@@ -466,7 +466,8 @@ class HoloViewsConverter(param.Parameterized):
 
         opts = dict(width=self._plot_opts['width'], height=self._plot_opts['height'])
         if 'cmap' in self._style_opts and self.datashade:
-            opts['cmap'] = self._style_opts['cmap']
+            levels = self._plot_opts.get('color_levels')
+            opts['cmap'] = process_cmap(self._style_opts['cmap'], levels)
         if self.by:
             opts['aggregator'] = count_cat(self.by[0])
         if self.aggregator:
