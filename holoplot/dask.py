@@ -1,3 +1,3 @@
 from . import patch
 
-patch('dask', 'bokeh')
+patch('dask', extension='bokeh')

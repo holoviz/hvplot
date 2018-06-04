@@ -18,52 +18,38 @@ def _patch_plot(self):
     return HoloPlot(self)
 
 
-def patch(library, extension=None, logo=False):
+def patch(library, name='holoplot', extension=None, logo=False):
     """
     Patch library to support HoloViews based plotting API.
     """
     if not isinstance(library, list): library = [library]
+    patch_property = property(_patch_plot)
     if 'streamz' in library:
         try:
             import streamz.dataframe as sdf
         except ImportError:
             raise ImportError('Could not patch plotting API onto streamz. '
                               'Streamz could not be imported.')
-        sdf.DataFrame.plot = property(_patch_plot)
-        sdf.DataFrames.plot = property(_patch_plot)
-        sdf.Series.plot = property(_patch_plot)
-        sdf.Seriess.plot = property(_patch_plot)
+        setattr(sdf.DataFrame, name, patch_property)
+        setattr(sdf.DataFrames, name, patch_property)
+        setattr(sdf.Series, name, patch_property)
+        setattr(sdf.Seriess, name, patch_property)
     if 'pandas' in library:
         try:
             import pandas as pd
         except:
             raise ImportError('Could not patch plotting API onto pandas. '
                               'Pandas could not be imported.')
-        pd.DataFrame.plot = property(_patch_plot)
-        pd.Series.plot = property(_patch_plot)
+        setattr(pd.DataFrame, name, patch_property)
+        setattr(pd.Series, name, patch_property)
     if 'dask' in library:
         try:
             import dask.dataframe as dd
         except:
             raise ImportError('Could not patch plotting API onto dask. '
                               'Dask could not be imported.')
-        dd.DataFrame.plot = property(_patch_plot)
-        dd.Series.plot = property(_patch_plot)
-    if 'intake' in library:
-        try:
-            from intake.source.base import DataSource
-        except ImportError:
-            raise ImportError('Could not patch plotting API onto intake. '
-                              'Intake could not be imported.')
-        DataSource.plot = property(_patch_plot)
-    if 'xarray' in library:
-        try:
-            from xarray import DataArray, Dataset
-        except ImportError:
-            raise ImportError('Could not patch plotting API onto xarray. '
-                              'Xarray could not be imported.')
-        DataArray.plot = property(_patch_plot)
-        Dataset.plot = property(_patch_plot)
+        setattr(dd.DataFrame, name, patch_property)
+        setattr(dd.Series, name, patch_property)
     if extension and not _hv.extension._loaded:
         _hv.extension(extension, logo=logo)
 
