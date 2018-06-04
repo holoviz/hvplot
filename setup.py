@@ -128,6 +128,7 @@ install_requires = [
 ]
 
 _examples_extra = [
+    'geoviews',
     'xarray',
     'streamz >=0.3.0',
     'intake',
