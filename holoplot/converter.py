@@ -794,14 +794,16 @@ class HoloViewsConverter(param.Parameterized):
         if not z:
             z = list(data.data_vars)[0] if isinstance(data, xr.Dataset) else [data.name]
 
+
         params = dict(self._relabel)
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
+        ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y']}
 
         element = Image
         if self.crs is not None:
             from geoviews import Image as element
             params['crs'] = self.crs
-        return element(data, [x, y], z, **params).redim(**self._redim).opts(**opts)
+        return element(data, [x, y], z, **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
 
     def quadmesh(self, x=None, y=None, z=None, data=None):
         import xarray as xr
@@ -817,12 +819,13 @@ class HoloViewsConverter(param.Parameterized):
 
         params = dict(self._relabel)
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
+        ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y']}
 
         element = QuadMesh
         if self.crs is not None:
             from geoviews import QuadMesh as element
             params['crs'] = self.crs
-        return element(data, [x, y], z, **params).redim(**self._redim).opts(**opts)
+        return element(data, [x, y], z, **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
 
     def contour(self, x=None, y=None, z=None, data=None, filled=False):
         from holoviews.operation import contours
@@ -838,10 +841,10 @@ class HoloViewsConverter(param.Parameterized):
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
 
         # Temporary workaround for bug in contours operation
-        if hv_version < '1.10.5':
-            qmesh = self.image(x, y, z, data)
-        else:
+        if hv_version > '1.10.4':
             qmesh = self.quadmesh(x, y, z, data)
+        else:
+            qmesh = self.image(x, y, z, data)
 
         if self.crs:
             # Apply projection before rasterizing
@@ -861,7 +864,7 @@ class HoloViewsConverter(param.Parameterized):
 
     def contourf(self, x=None, y=None, z=None, data=None):
         return self.contour(x, y, z, data, filled=True)
-        
+
     def points(self, x=None, y=None, data=None):
         data = self.data if data is None else data
         params = dict(self._relabel)
@@ -874,6 +877,7 @@ class HoloViewsConverter(param.Parameterized):
         if 'marker' in self.kwds:
             plot_opts['marker'] = self.kwds['marker']
         opts = dict(plot=plot_opts, style=self._style_opts, norm=self._norm_opts)
+        ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y']}
 
         element = Points
         if self.crs is not None:
@@ -883,4 +887,4 @@ class HoloViewsConverter(param.Parameterized):
         vdims = [self.kwds['c']] if 'c' in self.kwds else []
         if 's' in self.kwds:
             vdims.append(self.kwds['s'])
-        return element(data, [x, y], **params).redim(**self._redim).opts(**opts)
+        return element(data, [x, y], **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
