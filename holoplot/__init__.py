@@ -50,6 +50,14 @@ def patch(library, name='holoplot', extension=None, logo=False):
                               'Dask could not be imported.')
         setattr(dd.DataFrame, name, patch_property)
         setattr(dd.Series, name, patch_property)
+    if 'xarray' in library:
+        try:
+            import xarray as xr
+        except:
+            raise ImportError('Could not patch plotting API onto xarray. '
+                              'xarray could not be imported.')
+        xr.register_dataset_accessor(name)(HoloPlot)
+        xr.register_dataarray_accessor(name)(HoloPlot)
     if extension and not _hv.extension._loaded:
         _hv.extension(extension, logo=logo)
 
