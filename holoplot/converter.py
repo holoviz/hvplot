@@ -99,7 +99,8 @@ class HoloViewsConverter(param.Parameterized):
         'quadmesh' : ['z', 'logz'],
         'contour'  : ['z', 'levels', 'logz'],
         'contourf' : ['z', 'levels', 'logz'],
-        'points'   : ['s', 'marker', 'c', 'scale', 'logz']
+        'points'   : ['s', 'marker', 'c', 'scale', 'logz'],
+        'polys'    : ['logz', 'c']
     }
 
     _kind_mapping = {
@@ -112,7 +113,7 @@ class HoloViewsConverter(param.Parameterized):
     }
 
     _colorbar_types = ['image', 'hexbin', 'heatmap', 'quadmesh', 'bivariate',
-                       'contour', 'contourf', 'polygons']
+                       'contour', 'contourf', 'polys']
 
     def __init__(self, data, x, y, kind=None, by=None, use_index=True,
                  group_label='Variable', value_label='value',
@@ -151,7 +152,7 @@ class HoloViewsConverter(param.Parameterized):
         self._by_type = NdLayout if subplots else NdOverlay
 
         # Process options
-        style_opts, plot_opts, kwds = self._process_style(kind, colormap, kwds)
+        style_opts, plot_opts, kwds = self._process_style(colormap, kwds)
         self.stacked = stacked
         self.invert = invert
         plot_opts['logx'] = logx or loglog
@@ -364,8 +365,9 @@ class HoloViewsConverter(param.Parameterized):
         self.streaming = streaming
 
 
-    def _process_style(self, kind, colormap, kwds):
+    def _process_style(self, colormap, kwds):
         style_opts, plot_options = {}, {}
+        kind = self.kind
 
         # Process style options
         if 'cmap' in kwds and colormap:
