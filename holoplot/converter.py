@@ -23,8 +23,8 @@ from holoviews.operation import histogram
 from holoviews.streams import Buffer, Pipe
 
 from .util import (
-    is_series, is_dask, is_intake, is_streamz, is_xarray, hv_version,
-    process_crs, process_intake, process_xarray, check_library, is_geopandas
+    is_series, is_dask, is_intake, is_streamz, is_xarray, process_crs,
+    process_intake, process_xarray, check_library, is_geopandas
 )
 
 renderer = hv.renderer('bokeh')
@@ -100,7 +100,7 @@ class HoloViewsConverter(param.Parameterized):
         'contour'  : ['z', 'levels', 'logz'],
         'contourf' : ['z', 'levels', 'logz'],
         'points'   : ['s', 'marker', 'c', 'scale', 'logz'],
-        'polys'    : ['logz', 'c']
+        'polygons'    : ['logz', 'c']
     }
 
     _kind_mapping = {
@@ -109,11 +109,11 @@ class HoloViewsConverter(param.Parameterized):
         'image': Image, 'table': Table, 'hist': Histogram, 'dataset': Dataset,
         'kde': Distribution, 'area': Area, 'box': BoxWhisker, 'violin': Violin,
         'bar': Bars, 'barh': Bars, 'contour': Contours, 'contourf': Polygons,
-        'points': Points, 'polys': Polygons, 'path': Path
+        'points': Points, 'polygons': Polygons, 'paths': Path
     }
 
     _colorbar_types = ['image', 'hexbin', 'heatmap', 'quadmesh', 'bivariate',
-                       'contour', 'contourf', 'polys']
+                       'contour', 'contourf', 'polygons']
 
     def __init__(self, data, x, y, kind=None, by=None, use_index=True,
                  group_label='Variable', value_label='value',
@@ -257,9 +257,9 @@ class HoloViewsConverter(param.Parameterized):
                 if geom_type == 'Point':
                     kind = 'points'
                 elif geom_type == 'Polygon':
-                    kind = 'polys'
+                    kind = 'polygons'
                 elif geom_type in ('LineString', 'LineRing'):
-                    kind = 'path'
+                    kind = 'paths'
         elif is_dask(data):
             self.data = data.persist() if persist else data
         elif is_streamz(data):
@@ -860,12 +860,7 @@ class HoloViewsConverter(param.Parameterized):
                                  ' consider using PlateCarree/RotatedPole.')
 
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
-
-        # Temporary workaround for bug in contours operation
-        if hv_version > '1.10.4':
-            qmesh = self.quadmesh(x, y, z, data)
-        else:
-            qmesh = self.image(x, y, z, data)
+        qmesh = self.quadmesh(x, y, z, data)
 
         if self.geo:
             # Apply projection before rasterizing
@@ -918,7 +913,7 @@ class HoloViewsConverter(param.Parameterized):
     #    Geometry plots      #
     ##########################
 
-    def _geom_plot(self, x=None, y=None, data=None, kind='polys'):
+    def _geom_plot(self, x=None, y=None, data=None, kind='polygons'):
         data = self.data if data is None else data
         params = dict(self._relabel)
 
@@ -940,8 +935,8 @@ class HoloViewsConverter(param.Parameterized):
         params['vdims'] = [c for c in data.columns if c != 'geometry']
         return element(data, [x, y], **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
 
-    def polys(self, x=None, y=None, data=None):
-        return self._geom_plot(x, y, data, kind='polys')
+    def polygons(self, x=None, y=None, data=None):
+        return self._geom_plot(x, y, data, kind='polygons')
 
-    def path(self, x=None, y=None, data=None):
-        return self._geom_plot(x, y, data, kind='path')
+    def paths(self, x=None, y=None, data=None):
+        return self._geom_plot(x, y, data, kind='paths')

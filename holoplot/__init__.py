@@ -467,7 +467,7 @@ class HoloPlot(param.Parameterized):
         """
         return self(x, y, kind='points', **kwds)
 
-    def polys(self, x=None, y=None, c=None, **kwds):
+    def polygons(self, x=None, y=None, c=None, **kwds):
         """
         Polygon plot for geopandas dataframes
 
@@ -483,9 +483,9 @@ class HoloPlot(param.Parameterized):
         obj : HoloViews object
             The HoloViews representation of the plot.
         """
-        return self(x, y, c=c, kind='polys', **kwds)
+        return self(x, y, c=c, kind='polygons', **kwds)
 
-    def path(self, **kwds):
+    def paths(self, **kwds):
         """
         LineString and LineRing plot for geopandas dataframes.
 
@@ -499,7 +499,7 @@ class HoloPlot(param.Parameterized):
         obj : HoloViews object
             The HoloViews representation of the plot.
         """
-        return self(x=None, y=None, kind='path', **kwds)
+        return self(x=None, y=None, kind='paths', **kwds)
 
 
 
