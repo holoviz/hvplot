@@ -50,6 +50,14 @@ def patch(library, name='holoplot', extension=None, logo=False):
                               'Dask could not be imported.')
         setattr(dd.DataFrame, name, patch_property)
         setattr(dd.Series, name, patch_property)
+    if 'xarray' in library:
+        try:
+            import xarray as xr
+        except:
+            raise ImportError('Could not patch plotting API onto xarray. '
+                              'xarray could not be imported.')
+        xr.register_dataset_accessor(name)(HoloPlot)
+        xr.register_dataarray_accessor(name)(HoloPlot)
     if extension and not _hv.extension._loaded:
         _hv.extension(extension, logo=logo)
 
@@ -458,6 +466,40 @@ class HoloPlot(param.Parameterized):
             The HoloViews representation of the plot.
         """
         return self(x, y, kind='points', **kwds)
+
+    def polygons(self, x=None, y=None, c=None, **kwds):
+        """
+        Polygon plot for geopandas dataframes
+
+        Parameters
+        ----------
+        c: string, optional
+            The dimension to color the polygons by
+        **kwds : optional
+            Keyword arguments to pass on to
+            :py:meth:`holoplot.converter.HoloViewsConverter`.
+        Returns
+        -------
+        obj : HoloViews object
+            The HoloViews representation of the plot.
+        """
+        return self(x, y, c=c, kind='polygons', **kwds)
+
+    def paths(self, **kwds):
+        """
+        LineString and LineRing plot for geopandas dataframes.
+
+        Parameters
+        ----------
+        **kwds : optional
+            Keyword arguments to pass on to
+            :py:meth:`holoplot.converter.HoloViewsConverter`.
+        Returns
+        -------
+        obj : HoloViews object
+            The HoloViews representation of the plot.
+        """
+        return self(x=None, y=None, kind='paths', **kwds)
 
 
 

@@ -19,7 +19,9 @@ for specific types of data including `streaming data
 
 Lastly the `Statistical Plots <Statistical_Plots.html>`_ section will
 take you through a number of specialized plot types modelled on the
-pandas.plotting module.
+pandas.plotting module and the `Geographic Plots
+<Geographic_Plots.html>`_ section will demonstrate how to use GeoViews
+and Cartopy to display data in geographic coordinate systems.
 
 **Overview**:
 
@@ -43,6 +45,9 @@ pandas.plotting module.
 
 * `Statistical Plots <Statistical_Plots.ipynb>`_
   A number of statistical plot types modeled on the pandas.plotting module.
+
+* `Geographic Plots <Geographic_Plots.ipynb>`_
+  Using GeoViews and Cartopy to plot data in geographic coordinate systems.
 
 .. toctree::
     :titlesonly:

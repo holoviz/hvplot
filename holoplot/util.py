@@ -144,16 +144,17 @@ def process_crs(crs):
       1. EPSG codes:   Defined as string of the form "EPSG: {code}" or an integer
       2. proj.4 string: Defined as string of the form "{proj.4 string}"
       3. cartopy.crs.CRS instance
+      4. None defaults to crs.PlateCaree
     """
-    if crs is None:
-        return crs
-
     try:
         import cartopy.crs as ccrs
         import geoviews as gv # noqa
         import pyproj
     except:
         raise ImportError('Geographic projection support requires GeoViews and cartopy.')
+
+    if crs is None:
+        return ccrs.PlateCarree()
 
     if isinstance(crs, basestring) and crs.lower().startswith('epsg'):
         try:
@@ -228,6 +229,10 @@ def process_intake(data, use_dask):
     else:
         data = data.read()
     return data
+
+
+def is_geopandas(data):
+    return isinstance(data, pd.DataFrame) and hasattr(data, 'geom_type') and hasattr(data, 'geometry')
 
 
 def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, value_label):

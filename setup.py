@@ -123,11 +123,13 @@ def package_assets(example_path):
 
 install_requires = [
     'bokeh >=0.12.15',
-    'holoviews >=1.10.4',
+    'holoviews >=1.10.5',
     'pandas'
 ]
 
 _examples_extra = [
+    'geoviews',
+    'geopandas',
     'xarray',
     'streamz >=0.3.0',
     'intake',

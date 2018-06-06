@@ -16,15 +16,15 @@ from holoviews.core.layout import NdLayout
 from holoviews.element import (
     Curve, Scatter, Area, Bars, BoxWhisker, Dataset, Distribution,
     Table, HeatMap, Image, HexTiles, QuadMesh, Bivariate, Histogram,
-    Violin, Contours, Polygons, Points
+    Violin, Contours, Polygons, Points, Path
 )
 from holoviews.plotting.util import process_cmap
 from holoviews.operation import histogram
 from holoviews.streams import Buffer, Pipe
 
 from .util import (
-    is_series, is_dask, is_intake, is_streamz, is_xarray, hv_version,
-    process_crs, process_intake, process_xarray, check_library
+    is_series, is_dask, is_intake, is_streamz, is_xarray, process_crs,
+    process_intake, process_xarray, check_library, is_geopandas
 )
 
 renderer = hv.renderer('bokeh')
@@ -99,7 +99,8 @@ class HoloViewsConverter(param.Parameterized):
         'quadmesh' : ['z', 'logz'],
         'contour'  : ['z', 'levels', 'logz'],
         'contourf' : ['z', 'levels', 'logz'],
-        'points'   : ['s', 'marker', 'c', 'scale', 'logz']
+        'points'   : ['s', 'marker', 'c', 'scale', 'logz'],
+        'polygons'    : ['logz', 'c']
     }
 
     _kind_mapping = {
@@ -108,11 +109,11 @@ class HoloViewsConverter(param.Parameterized):
         'image': Image, 'table': Table, 'hist': Histogram, 'dataset': Dataset,
         'kde': Distribution, 'area': Area, 'box': BoxWhisker, 'violin': Violin,
         'bar': Bars, 'barh': Bars, 'contour': Contours, 'contourf': Polygons,
-        'points': Points
+        'points': Points, 'polygons': Polygons, 'paths': Path
     }
 
     _colorbar_types = ['image', 'hexbin', 'heatmap', 'quadmesh', 'bivariate',
-                       'contours']
+                       'contour', 'contourf', 'polygons']
 
     def __init__(self, data, x, y, kind=None, by=None, use_index=True,
                  group_label='Variable', value_label='value',
@@ -120,14 +121,14 @@ class HoloViewsConverter(param.Parameterized):
                  crs=None, fields={}, groupby=None, dynamic=True,
                  width=700, height=300, shared_axes=True,
                  grid=False, legend=True, rot=None, title=None,
-                 xlim=None, ylim=None, xticks=None, yticks=None,
+                 xlim=None, ylim=None, clim=None, xticks=None, yticks=None,
                  logx=False, logy=False, loglog=False, hover=True,
                  subplots=False, label=None, invert=False,
                  stacked=False, colorbar=None, fontsize=None,
                  colormap=None, datashade=False, rasterize=False,
                  row=None, col=None, figsize=None, debug=False,
                  xaxis=True, yaxis=True, framewise=True, aggregator=None,
-                 projection=None, global_extent=False, **kwds):
+                 projection=None, global_extent=False, geo=False, **kwds):
 
         # Process data and related options
         self._process_data(kind, data, x, y, by, groupby, row, col,
@@ -137,7 +138,8 @@ class HoloViewsConverter(param.Parameterized):
         self.value_label = value_label
         self.group_label = group_label
         self.dynamic = dynamic
-        self.crs = process_crs(crs)
+        self.geo = geo or crs or global_extent or projection
+        self.crs = process_crs(crs) if self.geo else None
         self.row = row
         self.col = col
 
@@ -151,7 +153,7 @@ class HoloViewsConverter(param.Parameterized):
         self._by_type = NdLayout if subplots else NdOverlay
 
         # Process options
-        style_opts, plot_opts, kwds = self._process_style(kind, colormap, kwds)
+        style_opts, plot_opts, kwds = self._process_style(colormap, kwds)
         self.stacked = stacked
         self.invert = invert
         plot_opts['logx'] = logx or loglog
@@ -212,7 +214,8 @@ class HoloViewsConverter(param.Parameterized):
         self.label = label
         self._relabel = {'label': label} if label else {}
         self._dim_ranges = {'x': xlim or (None, None),
-                            'y': ylim or (None, None)}
+                            'y': ylim or (None, None),
+                            'c': clim or (None, None)}
         self._redim = fields
 
         # High-level options
@@ -245,6 +248,18 @@ class HoloViewsConverter(param.Parameterized):
         streaming = False
         if isinstance(data, pd.DataFrame):
             self.data = data
+            if is_geopandas(data) and kind is None:
+                geom_types = set([gt[5:] if 'Multi' in gt else gt for gt in data.geom_type])
+                if len(geom_types) > 1:
+                    raise ValueError('The GeopandasInterface can only read dataframes which '
+                                     'share a common geometry type')
+                geom_type = list(geom_types)[0]
+                if geom_type == 'Point':
+                    kind = 'points'
+                elif geom_type == 'Polygon':
+                    kind = 'polygons'
+                elif geom_type in ('LineString', 'LineRing'):
+                    kind = 'paths'
         elif is_dask(data):
             self.data = data.persist() if persist else data
         elif is_streamz(data):
@@ -303,6 +318,8 @@ class HoloViewsConverter(param.Parameterized):
                                  'e.g. a NumPy array or xarray Dataset, '
                                  'found %s type' % (kind, type(self.data).__name__))
             not_found = [g for g in groupby if g not in data.coords]
+            data_vars = list(data.data_vars) if isinstance(data, xr.Dataset) else [data.name]
+            self.variables = list(data.coords) + data_vars
             if groupby and not_found:
                 raise ValueError('The supplied groupby dimension(s) %s '
                                  'could not be found, expected one or '
@@ -313,7 +330,7 @@ class HoloViewsConverter(param.Parameterized):
                 if self.data.index.names == [None]:
                     indexes = [self.data.index.name or 'index']
                 else:
-                    indexes = self.data.index.names
+                    indexes = list(self.data.index.names)
             else:
                 indexes = [data.index.name or 'index']
 
@@ -321,6 +338,7 @@ class HoloViewsConverter(param.Parameterized):
             renamed = {c: str(c) for c in data.columns if not isinstance(c, hv.util.basestring)}
             if renamed:
                 self.data = self.data.rename(columns=renamed)
+            self.variables = indexes + list(self.data.columns)
 
             # Reset groupby dimensions
             groupby_index = [g for g in groupby if g in indexes]
@@ -348,8 +366,9 @@ class HoloViewsConverter(param.Parameterized):
         self.streaming = streaming
 
 
-    def _process_style(self, kind, colormap, kwds):
+    def _process_style(self, colormap, kwds):
         style_opts, plot_options = {}, {}
+        kind = self.kind
 
         # Process style options
         if 'cmap' in kwds and colormap:
@@ -368,13 +387,12 @@ class HoloViewsConverter(param.Parameterized):
                 style_opts['color'] = color
             else:
                 style_opts['color'] = color
-                if 'c' in self._kind_options.get(kind, []):
+                if 'c' in self._kind_options.get(kind, []) and (color in self.variables):
                     kwds['c'] = color
-                    if (color in self.data.columns):
-                        if self.data[color].dtype.kind in 'OSU':
-                            cmap = cmap or 'Category10'
-                        else:
-                            plot_options['colorbar'] = True
+                    if self.data[color].dtype.kind in 'OSU':
+                        cmap = cmap or 'Category10'
+                    else:
+                        plot_options['colorbar'] = True
         if 'size' in kwds or 's' in kwds:
             size = kwds.pop('size', kwds.pop('s', None))
             if isinstance(size, (np.ndarray, pd.Series)):
@@ -464,9 +482,11 @@ class HoloViewsConverter(param.Parameterized):
         except:
             raise ImportError('Datashading is not available')
 
-        opts = dict(width=self._plot_opts['width'], height=self._plot_opts['height'])
+        opts = dict(width=self._plot_opts['width'], height=self._plot_opts['height'],
+                    dynamic=self.dynamic)
         if 'cmap' in self._style_opts and self.datashade:
-            opts['cmap'] = self._style_opts['cmap']
+            levels = self._plot_opts.get('color_levels')
+            opts['cmap'] = process_cmap(self._style_opts['cmap'], levels)
         if self.by:
             opts['aggregator'] = count_cat(self.by[0])
         if self.aggregator:
@@ -781,6 +801,13 @@ class HoloViewsConverter(param.Parameterized):
     #     Gridded plots      #
     ##########################
 
+    def _get_element(self, kind):
+        element = self._kind_mapping[kind]
+        if self.geo:
+            import geoviews
+            element = getattr(geoviews, element.__name__)
+        return element
+
     def image(self, x=None, y=None, z=None, data=None):
         import xarray as xr
         data = self.data if data is None else data
@@ -791,16 +818,15 @@ class HoloViewsConverter(param.Parameterized):
         if not (x and y):
             x, y = list(data.dims)[::-1]
         if not z:
-            z = list(data.data_vars)[0] if isinstance(data, xr.Dataset) else [data.name]
+            z = list(data.data_vars)[0] if isinstance(data, xr.Dataset) else data.name
 
         params = dict(self._relabel)
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
+        ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y'], z: self._dim_ranges['c']}
 
-        element = Image
-        if self.crs is not None:
-            from geoviews import Image as element
-            params['crs'] = self.crs
-        return element(data, [x, y], z, **params).redim(**self._redim).opts(**opts)
+        element = self._get_element('image')
+        if self.geo: params['crs'] = self.crs
+        return element(data, [x, y], z, **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
 
     def quadmesh(self, x=None, y=None, z=None, data=None):
         import xarray as xr
@@ -812,16 +838,15 @@ class HoloViewsConverter(param.Parameterized):
         if not (x and y):
             x, y = list([k for k, v in data.coords.items() if v.size > 1])
         if not z:
-            z = list(data.data_vars)[0] if isinstance(data, xr.Dataset) else [data.name]
+            z = list(data.data_vars)[0] if isinstance(data, xr.Dataset) else data.name
 
         params = dict(self._relabel)
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
+        ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y'], z: self._dim_ranges['c']}
 
-        element = QuadMesh
-        if self.crs is not None:
-            from geoviews import QuadMesh as element
-            params['crs'] = self.crs
-        return element(data, [x, y], z, **params).redim(**self._redim).opts(**opts)
+        element = self._get_element('quadmesh')
+        if self.geo: params['crs'] = self.crs
+        return element(data, [x, y], z, **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
 
     def contour(self, x=None, y=None, z=None, data=None, filled=False):
         from holoviews.operation import contours
@@ -835,14 +860,9 @@ class HoloViewsConverter(param.Parameterized):
                                  ' consider using PlateCarree/RotatedPole.')
 
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
+        qmesh = self.quadmesh(x, y, z, data)
 
-        # Temporary workaround for bug in contours operation
-        if hv_version < '1.10.5':
-            qmesh = self.image(x, y, z, data)
-        else:
-            qmesh = self.quadmesh(x, y, z, data)
-
-        if self.crs:
+        if self.geo:
             # Apply projection before rasterizing
             import cartopy.crs as ccrs
             from geoviews import project
@@ -860,26 +880,71 @@ class HoloViewsConverter(param.Parameterized):
 
     def contourf(self, x=None, y=None, z=None, data=None):
         return self.contour(x, y, z, data, filled=True)
-        
+
     def points(self, x=None, y=None, data=None):
         data = self.data if data is None else data
         params = dict(self._relabel)
 
+        x = x or self.x
+        y = y or self.y
+        if hasattr(data, 'geom_type') and not (x and y):
+            x, y = 'Longitude', 'Latitude'
+
         plot_opts = dict(self._plot_opts)
+        ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y']}
         if 'c' in self.kwds:
             plot_opts['color_index'] = self.kwds['c']
+            ranges[self.kwds['c']] = self._dim_ranges['c']
         if 's' in self.kwds:
             plot_opts['size_index'] = self.kwds['s']
         if 'marker' in self.kwds:
             plot_opts['marker'] = self.kwds['marker']
         opts = dict(plot=plot_opts, style=self._style_opts, norm=self._norm_opts)
 
-        element = Points
-        if self.crs is not None:
-            from geoviews import Points as element
-            params['crs'] = self.crs
-
+        element = self._get_element('points')
+        if self.geo: params['crs'] = self.crs
         vdims = [self.kwds['c']] if 'c' in self.kwds else []
         if 's' in self.kwds:
             vdims.append(self.kwds['s'])
-        return element(data, [x, y], **params).redim(**self._redim).opts(**opts)
+        params['vdims'] = vdims
+        return element(data, [x, y], **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
+
+    ##########################
+    #    Geometry plots      #
+    ##########################
+
+    def _geom_plot(self, x=None, y=None, data=None, kind='polygons'):
+        data = self.data if data is None else data
+        try:
+            import geopandas as gpd
+        except:
+            raise ImportError('Geometry plots require geopandas, ensure '
+                              'it is installed.')
+        if not isinstance(data, gpd.GeoDataFrame):
+            raise ValueError('Geometry plots only supported on geopandas '
+                             'GeoDataFrame objects.')
+        params = dict(self._relabel)
+
+        x = x or self.x
+        y = y or self.y
+        if hasattr(data, 'geom_type') and not (x and y):
+            x, y = 'Longitude', 'Latitude'
+
+        plot_opts = dict(self._plot_opts)
+        ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y']}
+        if 'c' in self.kwds:
+            plot_opts['color_index'] = self.kwds['c']
+            ranges[self.kwds['c']] = self._dim_ranges['c']
+        plot_opts['show_legend'] = False
+        opts = dict(plot=plot_opts, style=self._style_opts, norm=self._norm_opts)
+
+        element = self._get_element(kind)
+        if self.geo: params['crs'] = self.crs
+        params['vdims'] = [c for c in data.columns if c != 'geometry']
+        return element(data, [x, y], **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
+
+    def polygons(self, x=None, y=None, data=None):
+        return self._geom_plot(x, y, data, kind='polygons')
+
+    def paths(self, x=None, y=None, data=None):
+        return self._geom_plot(x, y, data, kind='paths')
