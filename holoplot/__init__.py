@@ -467,6 +467,40 @@ class HoloPlot(param.Parameterized):
         """
         return self(x, y, kind='points', **kwds)
 
+    def polys(self, x=None, y=None, c=None, **kwds):
+        """
+        Polygon plot for geopandas dataframes
+
+        Parameters
+        ----------
+        c: string, optional
+            The dimension to color the polygons by
+        **kwds : optional
+            Keyword arguments to pass on to
+            :py:meth:`holoplot.converter.HoloViewsConverter`.
+        Returns
+        -------
+        obj : HoloViews object
+            The HoloViews representation of the plot.
+        """
+        return self(x, y, c=c, kind='polys', **kwds)
+
+    def path(self, **kwds):
+        """
+        LineString and LineRing plot for geopandas dataframes.
+
+        Parameters
+        ----------
+        **kwds : optional
+            Keyword arguments to pass on to
+            :py:meth:`holoplot.converter.HoloViewsConverter`.
+        Returns
+        -------
+        obj : HoloViews object
+            The HoloViews representation of the plot.
+        """
+        return self(x=None, y=None, c=c, kind='path', **kwds)
+
 
 
 def save(obj, filename, title=None, resources=None):

@@ -230,6 +230,10 @@ def process_intake(data, use_dask):
     return data
 
 
+def is_geopandas(data):
+    return isinstance(data, pd.DataFrame) and hasattr(data, 'geom_type') and hasattr(data, 'geometry')
+
+
 def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, value_label):
     import xarray as xr
     dataset = data

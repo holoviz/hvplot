@@ -16,7 +16,7 @@ from holoviews.core.layout import NdLayout
 from holoviews.element import (
     Curve, Scatter, Area, Bars, BoxWhisker, Dataset, Distribution,
     Table, HeatMap, Image, HexTiles, QuadMesh, Bivariate, Histogram,
-    Violin, Contours, Polygons, Points
+    Violin, Contours, Polygons, Points, Path
 )
 from holoviews.plotting.util import process_cmap
 from holoviews.operation import histogram
@@ -24,7 +24,7 @@ from holoviews.streams import Buffer, Pipe
 
 from .util import (
     is_series, is_dask, is_intake, is_streamz, is_xarray, hv_version,
-    process_crs, process_intake, process_xarray, check_library
+    process_crs, process_intake, process_xarray, check_library, is_geopandas
 )
 
 renderer = hv.renderer('bokeh')
@@ -108,11 +108,11 @@ class HoloViewsConverter(param.Parameterized):
         'image': Image, 'table': Table, 'hist': Histogram, 'dataset': Dataset,
         'kde': Distribution, 'area': Area, 'box': BoxWhisker, 'violin': Violin,
         'bar': Bars, 'barh': Bars, 'contour': Contours, 'contourf': Polygons,
-        'points': Points
+        'points': Points, 'polys': Polygons, 'path': Path
     }
 
     _colorbar_types = ['image', 'hexbin', 'heatmap', 'quadmesh', 'bivariate',
-                       'contours']
+                       'contour', 'contourf', 'polygons']
 
     def __init__(self, data, x, y, kind=None, by=None, use_index=True,
                  group_label='Variable', value_label='value',
@@ -246,6 +246,18 @@ class HoloViewsConverter(param.Parameterized):
         streaming = False
         if isinstance(data, pd.DataFrame):
             self.data = data
+            if is_geopandas(data) and kind is None:
+                geom_types = set([gt[5:] if 'Multi' in gt else gt for gt in data.geom_type])
+                if len(geom_types) > 1:
+                    raise ValueError('The GeopandasInterface can only read dataframes which '
+                                     'share a common geometry type')
+                geom_type = list(geom_types)[0]
+                if geom_type == 'Point':
+                    kind = 'points'
+                elif geom_type == 'Polygon':
+                    kind = 'polys'
+                elif geom_type in ('LineString', 'LineRing'):
+                    kind = 'path'
         elif is_dask(data):
             self.data = data.persist() if persist else data
         elif is_streamz(data):
@@ -895,4 +907,41 @@ class HoloViewsConverter(param.Parameterized):
         vdims = [self.kwds['c']] if 'c' in self.kwds else []
         if 's' in self.kwds:
             vdims.append(self.kwds['s'])
+        params['vdims'] = vdims
         return element(data, [x, y], **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
+
+    ##########################
+    #    Geometry plots      #
+    ##########################
+
+    def _geom_plot(self, x=None, y=None, data=None, geom='polys'):
+        data = self.data if data is None else data
+        params = dict(self._relabel)
+
+        x = x or self.x
+        y = y or self.y
+        if hasattr(data, 'geom_type') and not (x and y):
+            x, y = 'Longitude', 'Latitude'
+
+        plot_opts = dict(self._plot_opts)
+        ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y']}
+        if 'c' in self.kwds:
+            plot_opts['color_index'] = self.kwds['c']
+            ranges[self.kwds['c']] = self._dim_ranges['c']
+        plot_opts['show_legend'] = False
+        opts = dict(plot=plot_opts, style=self._style_opts, norm=self._norm_opts)
+
+        element = self._kind_mapping[geom]
+        if self.crs is not None:
+            import geoviews
+            element = getattr(geoviews, element.__name__)
+            params['crs'] = self.crs
+
+        params['vdims'] = [c for c in data.columns if c != 'geometry']
+        return element(data, [x, y], **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
+
+    def polys(self, x=None, y=None, data=None):
+        return self._geom_plot(x, y, data, geom='polys')
+
+    def path(self, x=None, y=None, data=None):
+        return self._geom_plot(x, y, data, geom='path')
