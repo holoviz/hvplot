@@ -120,7 +120,7 @@ class HoloViewsConverter(param.Parameterized):
                  crs=None, fields={}, groupby=None, dynamic=True,
                  width=700, height=300, shared_axes=True,
                  grid=False, legend=True, rot=None, title=None,
-                 xlim=None, ylim=None, xticks=None, yticks=None,
+                 xlim=None, ylim=None, clim=None, xticks=None, yticks=None,
                  logx=False, logy=False, loglog=False, hover=True,
                  subplots=False, label=None, invert=False,
                  stacked=False, colorbar=None, fontsize=None,
@@ -212,7 +212,8 @@ class HoloViewsConverter(param.Parameterized):
         self.label = label
         self._relabel = {'label': label} if label else {}
         self._dim_ranges = {'x': xlim or (None, None),
-                            'y': ylim or (None, None)}
+                            'y': ylim or (None, None),
+                            'c': clim or (None, None)}
         self._redim = fields
 
         # High-level options
@@ -303,6 +304,8 @@ class HoloViewsConverter(param.Parameterized):
                                  'e.g. a NumPy array or xarray Dataset, '
                                  'found %s type' % (kind, type(self.data).__name__))
             not_found = [g for g in groupby if g not in data.coords]
+            data_vars = list(data.data_vars) if isinstance(data, xr.Dataset) else [data.name]
+            self.variables = list(data.coords) + data_vars
             if groupby and not_found:
                 raise ValueError('The supplied groupby dimension(s) %s '
                                  'could not be found, expected one or '
@@ -313,7 +316,7 @@ class HoloViewsConverter(param.Parameterized):
                 if self.data.index.names == [None]:
                     indexes = [self.data.index.name or 'index']
                 else:
-                    indexes = self.data.index.names
+                    indexes = list(self.data.index.names)
             else:
                 indexes = [data.index.name or 'index']
 
@@ -321,6 +324,7 @@ class HoloViewsConverter(param.Parameterized):
             renamed = {c: str(c) for c in data.columns if not isinstance(c, hv.util.basestring)}
             if renamed:
                 self.data = self.data.rename(columns=renamed)
+            self.variables = indexes + list(self.data.columns)
 
             # Reset groupby dimensions
             groupby_index = [g for g in groupby if g in indexes]
@@ -368,13 +372,12 @@ class HoloViewsConverter(param.Parameterized):
                 style_opts['color'] = color
             else:
                 style_opts['color'] = color
-                if 'c' in self._kind_options.get(kind, []):
+                if 'c' in self._kind_options.get(kind, []) and (color in self.variables):
                     kwds['c'] = color
-                    if (color in self.data.columns):
-                        if self.data[color].dtype.kind in 'OSU':
-                            cmap = cmap or 'Category10'
-                        else:
-                            plot_options['colorbar'] = True
+                    if self.data[color].dtype.kind in 'OSU':
+                        cmap = cmap or 'Category10'
+                    else:
+                        plot_options['colorbar'] = True
         if 'size' in kwds or 's' in kwds:
             size = kwds.pop('size', kwds.pop('s', None))
             if isinstance(size, (np.ndarray, pd.Series)):
@@ -792,12 +795,11 @@ class HoloViewsConverter(param.Parameterized):
         if not (x and y):
             x, y = list(data.dims)[::-1]
         if not z:
-            z = list(data.data_vars)[0] if isinstance(data, xr.Dataset) else [data.name]
-
+            z = list(data.data_vars)[0] if isinstance(data, xr.Dataset) else data.name
 
         params = dict(self._relabel)
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
-        ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y']}
+        ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y'], z: self._dim_ranges['c']}
 
         element = Image
         if self.crs is not None:
@@ -815,11 +817,11 @@ class HoloViewsConverter(param.Parameterized):
         if not (x and y):
             x, y = list([k for k, v in data.coords.items() if v.size > 1])
         if not z:
-            z = list(data.data_vars)[0] if isinstance(data, xr.Dataset) else [data.name]
+            z = list(data.data_vars)[0] if isinstance(data, xr.Dataset) else data.name
 
         params = dict(self._relabel)
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
-        ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y']}
+        ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y'], z: self._dim_ranges['c']}
 
         element = QuadMesh
         if self.crs is not None:
@@ -869,15 +871,21 @@ class HoloViewsConverter(param.Parameterized):
         data = self.data if data is None else data
         params = dict(self._relabel)
 
+        x = x or self.x
+        y = y or self.y
+        if hasattr(data, 'geom_type') and not (x and y):
+            x, y = 'Longitude', 'Latitude'
+
         plot_opts = dict(self._plot_opts)
+        ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y']}
         if 'c' in self.kwds:
             plot_opts['color_index'] = self.kwds['c']
+            ranges[self.kwds['c']] = self._dim_ranges['c']
         if 's' in self.kwds:
             plot_opts['size_index'] = self.kwds['s']
         if 'marker' in self.kwds:
             plot_opts['marker'] = self.kwds['marker']
         opts = dict(plot=plot_opts, style=self._style_opts, norm=self._norm_opts)
-        ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y']}
 
         element = Points
         if self.crs is not None:
