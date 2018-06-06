@@ -915,6 +915,14 @@ class HoloViewsConverter(param.Parameterized):
 
     def _geom_plot(self, x=None, y=None, data=None, kind='polygons'):
         data = self.data if data is None else data
+        try:
+            import geopandas as gpd
+        except:
+            raise ImportError('Geometry plots require geopandas, ensure '
+                              'it is installed.')
+        if not isinstance(data, gpd.GeoDataFrame):
+            raise ValueError('Geometry plots only supported on geopandas '
+                             'GeoDataFrame objects.')
         params = dict(self._relabel)
 
         x = x or self.x
