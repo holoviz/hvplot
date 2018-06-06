@@ -128,7 +128,7 @@ class HoloViewsConverter(param.Parameterized):
                  colormap=None, datashade=False, rasterize=False,
                  row=None, col=None, figsize=None, debug=False,
                  xaxis=True, yaxis=True, framewise=True, aggregator=None,
-                 projection=None, global_extent=False, **kwds):
+                 projection=None, global_extent=False, geo=False, **kwds):
 
         # Process data and related options
         self._process_data(kind, data, x, y, by, groupby, row, col,
@@ -138,7 +138,8 @@ class HoloViewsConverter(param.Parameterized):
         self.value_label = value_label
         self.group_label = group_label
         self.dynamic = dynamic
-        self.crs = process_crs(crs)
+        self.geo = geo or crs or global_extent or projection
+        self.crs = process_crs(crs) if self.geo else None
         self.row = row
         self.col = col
 
@@ -481,7 +482,8 @@ class HoloViewsConverter(param.Parameterized):
         except:
             raise ImportError('Datashading is not available')
 
-        opts = dict(width=self._plot_opts['width'], height=self._plot_opts['height'])
+        opts = dict(width=self._plot_opts['width'], height=self._plot_opts['height'],
+                    dynamic=self.dynamic)
         if 'cmap' in self._style_opts and self.datashade:
             levels = self._plot_opts.get('color_levels')
             opts['cmap'] = process_cmap(self._style_opts['cmap'], levels)
@@ -799,6 +801,13 @@ class HoloViewsConverter(param.Parameterized):
     #     Gridded plots      #
     ##########################
 
+    def _get_element(self, kind):
+        element = self._kind_mapping[kind]
+        if self.geo:
+            import geoviews
+            element = getattr(geoviews, element.__name__)
+        return element
+
     def image(self, x=None, y=None, z=None, data=None):
         import xarray as xr
         data = self.data if data is None else data
@@ -815,10 +824,8 @@ class HoloViewsConverter(param.Parameterized):
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
         ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y'], z: self._dim_ranges['c']}
 
-        element = Image
-        if self.crs is not None:
-            from geoviews import Image as element
-            params['crs'] = self.crs
+        element = self._get_element('image')
+        if self.geo: params['crs'] = self.crs
         return element(data, [x, y], z, **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
 
     def quadmesh(self, x=None, y=None, z=None, data=None):
@@ -837,10 +844,8 @@ class HoloViewsConverter(param.Parameterized):
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
         ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y'], z: self._dim_ranges['c']}
 
-        element = QuadMesh
-        if self.crs is not None:
-            from geoviews import QuadMesh as element
-            params['crs'] = self.crs
+        element = self._get_element('quadmesh')
+        if self.geo: params['crs'] = self.crs
         return element(data, [x, y], z, **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
 
     def contour(self, x=None, y=None, z=None, data=None, filled=False):
@@ -862,7 +867,7 @@ class HoloViewsConverter(param.Parameterized):
         else:
             qmesh = self.image(x, y, z, data)
 
-        if self.crs:
+        if self.geo:
             # Apply projection before rasterizing
             import cartopy.crs as ccrs
             from geoviews import project
@@ -901,11 +906,8 @@ class HoloViewsConverter(param.Parameterized):
             plot_opts['marker'] = self.kwds['marker']
         opts = dict(plot=plot_opts, style=self._style_opts, norm=self._norm_opts)
 
-        element = Points
-        if self.crs is not None:
-            from geoviews import Points as element
-            params['crs'] = self.crs
-
+        element = self._get_element('points')
+        if self.geo: params['crs'] = self.crs
         vdims = [self.kwds['c']] if 'c' in self.kwds else []
         if 's' in self.kwds:
             vdims.append(self.kwds['s'])
@@ -916,7 +918,7 @@ class HoloViewsConverter(param.Parameterized):
     #    Geometry plots      #
     ##########################
 
-    def _geom_plot(self, x=None, y=None, data=None, geom='polys'):
+    def _geom_plot(self, x=None, y=None, data=None, kind='polys'):
         data = self.data if data is None else data
         params = dict(self._relabel)
 
@@ -933,17 +935,13 @@ class HoloViewsConverter(param.Parameterized):
         plot_opts['show_legend'] = False
         opts = dict(plot=plot_opts, style=self._style_opts, norm=self._norm_opts)
 
-        element = self._kind_mapping[geom]
-        if self.crs is not None:
-            import geoviews
-            element = getattr(geoviews, element.__name__)
-            params['crs'] = self.crs
-
+        element = self._get_element(kind)
+        if self.geo: params['crs'] = self.crs
         params['vdims'] = [c for c in data.columns if c != 'geometry']
         return element(data, [x, y], **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
 
     def polys(self, x=None, y=None, data=None):
-        return self._geom_plot(x, y, data, geom='polys')
+        return self._geom_plot(x, y, data, kind='polys')
 
     def path(self, x=None, y=None, data=None):
-        return self._geom_plot(x, y, data, geom='path')
+        return self._geom_plot(x, y, data, kind='path')
