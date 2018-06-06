@@ -144,7 +144,7 @@ def process_crs(crs):
       1. EPSG codes:   Defined as string of the form "EPSG: {code}" or an integer
       2. proj.4 string: Defined as string of the form "{proj.4 string}"
       3. cartopy.crs.CRS instance
-      4. None defaults to crs.Plate
+      4. None defaults to crs.PlateCaree
     """
     try:
         import cartopy.crs as ccrs
