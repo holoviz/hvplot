@@ -40,13 +40,13 @@ and Cartopy to display data in geographic coordinate systems.
 * `Streaming <Streaming.html>`_
   How to use HoloPlot for streaming plots with the streamz library.
 
-* `Gridded Data <Gridded_Data.ipynb>`_
+* `Gridded Data <Gridded_Data.html>`_
   How to use HoloPlot for plotting XArray-based gridded data.
 
-* `Statistical Plots <Statistical_Plots.ipynb>`_
+* `Statistical Plots <Statistical_Plots.html>`_
   A number of statistical plot types modeled on the pandas.plotting module.
 
-* `Geographic Plots <Geographic_Plots.ipynb>`_
+* `Geographic Plots <Geographic_Plots.html>`_
   Using GeoViews and Cartopy to plot data in geographic coordinate systems.
 
 .. toctree::
@@ -61,3 +61,4 @@ and Cartopy to display data in geographic coordinate systems.
     Streaming <Streaming>
     Gridded Data <Gridded_Data>
     Statistical Plots <Statistical_Plots>
+    Geographic Plots <Geographic_Plots>
