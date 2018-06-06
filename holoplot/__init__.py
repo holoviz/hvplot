@@ -499,7 +499,7 @@ class HoloPlot(param.Parameterized):
         obj : HoloViews object
             The HoloViews representation of the plot.
         """
-        return self(x=None, y=None, c=c, kind='path', **kwds)
+        return self(x=None, y=None, kind='path', **kwds)
 
 
 
