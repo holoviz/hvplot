@@ -129,6 +129,7 @@ install_requires = [
 
 _examples_extra = [
     'geoviews',
+    'geopandas',
     'xarray',
     'streamz >=0.3.0',
     'intake',
