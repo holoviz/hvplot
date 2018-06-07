@@ -46,7 +46,7 @@ and Cartopy to display data in geographic coordinate systems.
 * `Statistical Plots <Statistical_Plots.html>`_
   A number of statistical plot types modeled on the pandas.plotting module.
 
-* `Geographic Plots <Geographic_Plots.html>`_
+* `Geographic Plots <Geographic_Data.html>`_
   Using GeoViews and Cartopy to plot data in geographic coordinate systems.
 
 .. toctree::
@@ -61,4 +61,4 @@ and Cartopy to display data in geographic coordinate systems.
     Streaming <Streaming>
     Gridded Data <Gridded_Data>
     Statistical Plots <Statistical_Plots>
-    Geographic Plots <Geographic_Plots>
+    Geographic Plots <Geographic_Data>
