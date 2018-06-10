@@ -67,7 +67,7 @@ jobs:
 
     - <<: *default
       stage: doc
-      env: DESC="docs" CHANS_DEV="-c pyviz/label/dev -c pyviz -c ioam -c intake -c conda-forge"
+      env: DESC="docs" CHANS_DEV="-c pyviz/label/dev -c pyviz -c ioam -c intake"
       script:
         - doit develop_install $CHANS_DEV -o doc
         - conda uninstall nbsite --force
