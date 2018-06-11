@@ -330,7 +330,14 @@ class HoloViewsConverter(param.Parameterized):
                 else:
                     indexes = list(self.data.index.names)
             else:
-                indexes = [data.index.name or 'index']
+                indexes = [c for c in self.data.reset_index().columns
+                           if c not in self.data.columns]
+
+            if len(indexes) == 2 and not (x or y or by):
+                if kind == 'heatmap':
+                    x, y = indexes
+                elif kind in ('bar', 'barh'):
+                    x, by = indexes
 
             # Rename non-string columns
             renamed = {c: str(c) for c in data.columns if not isinstance(c, hv.util.basestring)}
@@ -758,9 +765,9 @@ class HoloViewsConverter(param.Parameterized):
 
     def heatmap(self, x, y, data=None):
         data = self.data if data is None else data
-        if not x: x = data.columns[0]
-        if not y: y = data.columns[1]
-        z = self.kwds.get('C', data.columns[2])
+        if not x: x = self.x or data.columns[0]
+        if not y: y = self.y or data.columns[1]
+        z = self.kwds.get('C', [c for c in data.columns if c not in (x, y)][0])
 
         opts = dict(plot=self._plot_opts, norm=self._norm_opts, style=self._style_opts)
         hmap = HeatMap(data, [x, y], z).redim(**self._redim).opts(**opts)
