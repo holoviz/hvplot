@@ -202,10 +202,8 @@ class HoloViewsConverter(param.Parameterized):
         for opt in cycled_opts:
             color = style_opts.get('color', None)
             if color is None:
-                cycle = process_cmap(colormap or 'Category10', categorical=True)
-            elif not isinstance(color, (Cycle, list)):
-                continue
-            style_opts[opt] = Cycle(values=cycle) if isinstance(cycle, list) else cycle
+                color = process_cmap(colormap or 'Category10', categorical=True)
+            style_opts[opt] = Cycle(values=color) if isinstance(color, list) else color
         self._style_opts = style_opts
         self._norm_opts = {'framewise': framewise, 'axiswise': not shared_axes}
         self.kwds = kwds
