@@ -129,7 +129,8 @@ class HoloViewsConverter(param.Parameterized):
                  colormap=None, datashade=False, rasterize=False,
                  row=None, col=None, figsize=None, debug=False,
                  xaxis=True, yaxis=True, framewise=True, aggregator=None,
-                 projection=None, global_extent=False, geo=False, **kwds):
+                 projection=None, global_extent=False, geo=False,
+                 precompute=False, **kwds):
 
         # Process data and related options
         self._process_data(kind, data, x, y, by, groupby, row, col,
@@ -148,6 +149,7 @@ class HoloViewsConverter(param.Parameterized):
         self.datashade = datashade
         self.rasterize = rasterize
         self.aggregator = aggregator
+        self.precompute = precompute
 
         # By type
         self.subplots = subplots
@@ -493,10 +495,13 @@ class HoloViewsConverter(param.Parameterized):
         if 'cmap' in self._style_opts and self.datashade:
             levels = self._plot_opts.get('color_levels')
             opts['cmap'] = process_cmap(self._style_opts['cmap'], levels)
+            opts['color_key'] = opts['cmap']
         if self.by:
             opts['aggregator'] = count_cat(self.by[0])
         if self.aggregator:
             opts['aggregator'] = self.aggregator
+        if self.precompute:
+            opts['precompute'] = self.precompute
         style = {}
         if self.datashade:
             operation = datashade
