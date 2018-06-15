@@ -90,6 +90,7 @@ class HoloViewsConverter(param.Parameterized):
 
     _kind_options = {
         'scatter'  : ['s', 'marker', 'c', 'scale', 'logz'],
+        'step'     : ['where'],
         'hist'     : ['bins', 'bin_range', 'normed'],
         'heatmap'  : ['C', 'reduce_function', 'logz'],
         'hexbin'   : ['C', 'reduce_function', 'gridsize', 'logz'],
@@ -109,7 +110,7 @@ class HoloViewsConverter(param.Parameterized):
         'image': Image, 'table': Table, 'hist': Histogram, 'dataset': Dataset,
         'kde': Distribution, 'area': Area, 'box': BoxWhisker, 'violin': Violin,
         'bar': Bars, 'barh': Bars, 'contour': Contours, 'contourf': Polygons,
-        'points': Points, 'polygons': Polygons, 'paths': Path
+        'points': Points, 'polygons': Polygons, 'paths': Path, 'step': Curve
     }
 
     _colorbar_types = ['image', 'hexbin', 'heatmap', 'quadmesh', 'bivariate',
@@ -591,6 +592,10 @@ class HoloViewsConverter(param.Parameterized):
 
     def line(self, x, y, data=None):
         return self.chart(Curve, x, y, data)
+
+    def step(self, x, y, data=None):
+        where = self.kwds.get('where', 'mid')
+        return self.chart(Curve, x, y, data).options('Curve', interpolation='steps-'+where)
 
     def scatter(self, x, y, data=None):
         scatter = self.chart(Scatter, x, y, data)

@@ -119,6 +119,25 @@ class HoloPlot(param.Parameterized):
         """
         return self(x, y, kind='line', **kwds)
 
+    def step(self, x=None, y=None, where='mid', **kwds):
+        """
+        Step plot
+
+        Parameters
+        ----------
+        x, y : string, optional
+            Field name to draw x- and y-positions from
+        where : string, optional
+            Defines where the steps are placed (options: 'mid' (default), 'pre' and 'post')
+        **kwds : optional
+            Keyword arguments to pass on to
+            :py:meth:`holoplot.converter.HoloViewsConverter`.
+        Returns
+        -------
+        HoloViews object: Object representing the requested visualization
+        """
+        return self(x, y, kind='step', **kwds)
+
     def scatter(self, x=None, y=None, **kwds):
         """
         Scatter plot
