@@ -186,7 +186,7 @@ setup_args = dict(
     package_data={'holoplot': ['.version']},
     platforms=['Windows', 'Mac OS X', 'Linux'],
     license='BSD',
-    url='https://pyviz.github.io/hvplot',
+    url='https://pyviz.github.io/holoplot',
     classifiers = [
         "License :: OSI Approved :: BSD License",
         "Development Status :: 5 - Production/Stable",
