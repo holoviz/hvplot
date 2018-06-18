@@ -36,8 +36,7 @@ Once you have installed JupyterLab and the extension launch it with::
 Developer Instructions
 ----------------------
 
-1. Install Python 3 `miniconda <http://conda.pydata.org/miniconda.html>`_ or
-`anaconda <http://docs.continuum.io/anaconda/install>`_, if you don't already have it on your system.
+1. Install Python 3 `miniconda <http://conda.pydata.org/miniconda.html>`_ or `anaconda <http://docs.continuum.io/anaconda/install>`_, if you don't already have it on your system.
 
 2. Clone the holoplot git repository if you do not already have it::
 
