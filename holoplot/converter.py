@@ -320,6 +320,7 @@ class HoloViewsConverter(param.Parameterized):
                                  'found %s type' % (kind, type(self.data).__name__))
             not_found = [g for g in groupby if g not in data.coords]
             data_vars = list(data.data_vars) if isinstance(data, xr.Dataset) else [data.name]
+            indexes = list(data.coords)
             self.variables = list(data.coords) + data_vars
             if groupby and not_found:
                 raise ValueError('The supplied groupby dimension(s) %s '
@@ -363,6 +364,7 @@ class HoloViewsConverter(param.Parameterized):
         self.y = y
         self.kind = kind or 'line'
         self.use_dask = use_dask
+        self.indexes = indexes
         if isinstance(by, (np.ndarray, pd.Series)):
             self.data['by'] = by
             self.by = ['by']
@@ -578,7 +580,7 @@ class HoloViewsConverter(param.Parameterized):
         data = (self.data if data is None else data)
         x = x or self.x
         if not x and self.use_index:
-            x = data.index.name or 'index'
+            x = self.indexes[0]
         elif not x:
             raise ValueError('Could not determine what to plot. Expected '
                              'x to be declared or use_index to be enabled.')
@@ -652,7 +654,7 @@ class HoloViewsConverter(param.Parameterized):
         ranges = {self.value_label: self._dim_ranges['y']}
 
         id_vars = [x]
-        if any((v in [data.index.names]+['index']) or v == data.index.name for v in id_vars):
+        if any(v in self.indexes for v in id_vars):
             data = data.reset_index()
         data = data[y+[x]]
 
