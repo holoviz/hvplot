@@ -91,7 +91,7 @@ class HoloViewsConverter(param.Parameterized):
     _kind_options = {
         'scatter'  : ['s', 'marker', 'c', 'scale', 'logz'],
         'step'     : ['where'],
-        'hist'     : ['bins', 'bin_range', 'normed'],
+        'hist'     : ['bins', 'bin_range', 'normed', 'cumulative'],
         'heatmap'  : ['C', 'reduce_function', 'logz'],
         'hexbin'   : ['C', 'reduce_function', 'gridsize', 'logz'],
         'dataset'  : ['columns'],
@@ -731,9 +731,15 @@ class HoloViewsConverter(param.Parameterized):
         plot_opts = dict(self._plot_opts, labelled=labelled)
         opts = dict(plot=plot_opts, style=self._style_opts,
                     norm=self._norm_opts)
-        hist_opts = {'num_bins': self.kwds.get('bins', 10),
-                     'bin_range': self.kwds.get('bin_range', None),
-                     'normed': self.kwds.get('normed', False)}
+        hist_opts = {'bin_range': self.kwds.get('bin_range', None),
+                     'normed': self.kwds.get('normed', False),
+                     'cumulative': self.kwds.get('cumulative', False)}
+        if 'bins' in self.kwds:
+            bins = self.kwds['bins']
+            if isinstance(bins, int):
+                hist_opts['num_bins'] = bins
+            else:
+                hist_opts['bins'] = bins
 
         if not isinstance(y, (list, tuple)):
             if self.stacked and not self.subplots and not 'bin_range' in self.kwds:
