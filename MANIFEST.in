@@ -1,4 +1,4 @@
-include holoplot/.version
+include hvplot/.version
 include LICENSE
 graft examples
 global-exclude *.py[co]

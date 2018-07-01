@@ -77,7 +77,7 @@ jobs:
         # note: will vastly simplified in a future version of nbsite
         - cd doc
         - cp ./user_guide/Streaming.rst ./user_guide/Streaming.rst_bak
-        - nbsite_nbpagebuild.py ioam holoplot ../examples .
+        - nbsite_nbpagebuild.py ioam hvplot ../examples .
         - cp ./user_guide/Streaming.rst_bak ./user_guide/Streaming.rst
         - HV_DOC_HTML='true' sphinx-build -b html . ./_build/html
         - nbsite_fix_links.py _build/html
@@ -120,7 +120,7 @@ jobs:
       stage: pip_dev_package
       env: PYPI="https://test.pypi.org/legacy/" TRAVIS_NOCACHE=$TRAVIS_JOB_ID
       install:
-        - doit develop_install $CHANS_DEV -o tests && pip uninstall -y holoplot
+        - doit develop_install $CHANS_DEV -o tests && pip uninstall -y hvplot
         - doit pip_on_conda
         - doit ecosystem=pip package_build --test-python=py36 --test-group=unit
       script: doit ecosystem=pip package_upload -u $TPPU -p $TPPP -r ${PYPI}
@@ -129,7 +129,7 @@ jobs:
       stage: pip_package
       env: PYPI="https://upload.pypi.org/legacy/" TRAVIS_NOCACHE=$TRAVIS_JOB_ID
       install:
-        - doit develop_install $CHANS_DEV -o tests && pip uninstall -y holoplot
+        - doit develop_install $CHANS_DEV -o tests && pip uninstall -y hvplot
         - doit pip_on_conda
         - doit ecosystem=pip package_build --test-python=py36 --test-group=unit
       script: doit ecosystem=pip package_upload -u $PPU -p $PPP -r ${PYPI}
