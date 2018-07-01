@@ -924,7 +924,8 @@ class HoloViewsConverter(param.Parameterized):
         if opts['plot']['colorbar']:
             opts['plot']['show_legend'] = False
         levels = self.kwds.get('levels', 5)
-        opts['plot']['color_levels'] = levels
+        if isinstance(levels, int):
+            opts['plot']['color_levels'] = levels
         return contours(qmesh, filled=filled, levels=levels).opts(**opts)
 
     def contourf(self, x=None, y=None, z=None, data=None):
