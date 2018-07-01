@@ -10,8 +10,7 @@ the `types of plots <Plotting.html>`_ you can generate and how to
 customize them. followed by an overview on how to use it to `display
 and save plots <Display_and_Saving.html>`_ in the notebook, on the
 commandline, and from a script. Another section will introduce you to
-generating `subplots and grids <Subplots_and_Grids.html>`_ from your
-data.
+generating `subplots <Subplots.html>`_ from your data.
 
 Once the basics are covered you can learn how to use the plotting API
 for specific types of data including `streaming data
@@ -34,7 +33,7 @@ and Cartopy to display data in geographic coordinate systems.
 * `Viewing <Viewing.html>`_
   Displaying and saving plots in the notebook, at the command prompt, or in scripts.
 
-* `Subplots & Grids <Subplots_and_Grids.html>`_
+* `Subplots <Subplots.html>`_
   How to generate subplots and grids.
 
 * `Streaming <Streaming.html>`_
