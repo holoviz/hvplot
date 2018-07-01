@@ -2,7 +2,7 @@
 
 from nbsite.shared_conf import *
 
-project = u'HoloPlot'
+project = u'HvPlot'
 authors = u'PyViz developers'
 copyright = u'2018 ' + authors
 description = 'A high-level plotting API for the PyData ecosystem built on HoloViews'

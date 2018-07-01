@@ -15,10 +15,10 @@ renderer = _hv.renderer('bokeh')
 
 # Register plotting interfaces
 def _patch_plot(self):
-    return HoloPlot(self)
+    return HvPlot(self)
 
 
-def patch(library, name='holoplot', extension=None, logo=False):
+def patch(library, name='hvplot', extension=None, logo=False):
     """
     Patch library to support HoloViews based plotting API.
     """
@@ -56,13 +56,13 @@ def patch(library, name='holoplot', extension=None, logo=False):
         except:
             raise ImportError('Could not patch plotting API onto xarray. '
                               'xarray could not be imported.')
-        xr.register_dataset_accessor(name)(HoloPlot)
-        xr.register_dataarray_accessor(name)(HoloPlot)
+        xr.register_dataset_accessor(name)(HvPlot)
+        xr.register_dataarray_accessor(name)(HvPlot)
     if extension and not _hv.extension._loaded:
         _hv.extension(extension, logo=logo)
 
 
-class HoloPlot(param.Parameterized):
+class HvPlot(param.Parameterized):
 
     def __init__(self, data, custom_plots={}, **metadata):
         self._data = data
@@ -83,7 +83,7 @@ class HoloPlot(param.Parameterized):
         """
         List default attributes and custom defined plots.
         """
-        dirs = super(HoloPlot, self).__dir__()
+        dirs = super(HvPlot, self).__dir__()
         return sorted(list(dirs)+list(self._plots))
 
     def __getattribute__(self, name):
@@ -99,8 +99,8 @@ class HoloPlot(param.Parameterized):
                              "was unexpectedly customized with kind=%r."
                              % (plot_opts['kind'], name))
                 plot_opts['kind'] = name
-            return HoloPlot(self._data, **dict(self._metadata, **plot_opts))
-        return super(HoloPlot, self).__getattribute__(name)
+            return HvPlot(self._data, **dict(self._metadata, **plot_opts))
+        return super(HvPlot, self).__getattribute__(name)
 
     def line(self, x=None, y=None, **kwds):
         """
@@ -112,7 +112,7 @@ class HoloPlot(param.Parameterized):
             Field name to draw x- and y-positions from
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`holoplot.converter.HoloViewsConverter`.
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
         Returns
         -------
         HoloViews object: Object representing the requested visualization
@@ -131,7 +131,7 @@ class HoloPlot(param.Parameterized):
             Defines where the steps are placed (options: 'mid' (default), 'pre' and 'post')
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`holoplot.converter.HoloViewsConverter`.
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
         Returns
         -------
         HoloViews object: Object representing the requested visualization
@@ -148,7 +148,7 @@ class HoloPlot(param.Parameterized):
             Field name to draw x- and y-positions from
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`holoplot.converter.HoloViewsConverter`.
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
         Returns
         -------
         obj : HoloViews object
@@ -168,7 +168,7 @@ class HoloPlot(param.Parameterized):
             Whether to stack multiple areas
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`holoplot.converter.HoloViewsConverter`.
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
         Returns
         -------
         obj : HoloViews object
@@ -194,7 +194,7 @@ class HoloPlot(param.Parameterized):
             Function to compute statistics for heatmap
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`holoplot.converter.HoloViewsConverter`.
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
         Returns
         -------
         obj : HoloViews object
@@ -218,7 +218,7 @@ class HoloPlot(param.Parameterized):
             Function to compute statistics for hexbins
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`holoplot.converter.HoloViewsConverter`.
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
         Returns
         -------
         obj : HoloViews object
@@ -238,7 +238,7 @@ class HoloPlot(param.Parameterized):
             Whether to display a colorbar
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`holoplot.converter.HoloViewsConverter`.
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
         Returns
         -------
         obj : HoloViews object
@@ -256,7 +256,7 @@ class HoloPlot(param.Parameterized):
             Field name to draw x- and y-positions from
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`holoplot.converter.HoloViewsConverter`.
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
         Returns
         -------
         obj : HoloViews object
@@ -272,7 +272,7 @@ class HoloPlot(param.Parameterized):
         ----------
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`holoplot.converter.HoloViewsConverter`.
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
         Returns
         -------
         obj : HoloViews object
@@ -292,7 +292,7 @@ class HoloPlot(param.Parameterized):
             Column in the DataFrame to group by.
         kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`holoplot.converter.HoloViewsConverter`.
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
         Returns
         -------
         obj : HoloViews object
@@ -312,7 +312,7 @@ class HoloPlot(param.Parameterized):
             Column in the DataFrame to group by.
         kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`holoplot.converter.HoloViewsConverter`.
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
         Returns
         -------
         obj : HoloViews object
@@ -332,7 +332,7 @@ class HoloPlot(param.Parameterized):
             Column in the DataFrame to group by.
         kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`holoplot.converter.HoloViewsConverter`.
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
         Returns
         -------
         obj : HoloViews object
@@ -352,7 +352,7 @@ class HoloPlot(param.Parameterized):
             Column in the DataFrame to group by.
         kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`holoplot.converter.HoloViewsConverter`.
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
         Returns
         -------
         obj : HoloViews object
@@ -368,7 +368,7 @@ class HoloPlot(param.Parameterized):
         ----------
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`holoplot.converter.HoloViewsConverter`.
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
         Returns
         -------
         obj : HoloViews object
@@ -390,7 +390,7 @@ class HoloPlot(param.Parameterized):
             Whether to display a colorbar
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`holoplot.converter.HoloViewsConverter`.
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
         Returns
         -------
         obj : HoloViews object
@@ -412,7 +412,7 @@ class HoloPlot(param.Parameterized):
             Whether to display a colorbar
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`holoplot.converter.HoloViewsConverter`.
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
         Returns
         -------
         obj : HoloViews object
@@ -436,7 +436,7 @@ class HoloPlot(param.Parameterized):
             Whether to display a colorbar
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`holoplot.converter.HoloViewsConverter`.
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
         Returns
         -------
         obj : HoloViews object
@@ -460,7 +460,7 @@ class HoloPlot(param.Parameterized):
             Whether to display a colorbar
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`holoplot.converter.HoloViewsConverter`.
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
         Returns
         -------
         obj : HoloViews object
@@ -478,7 +478,7 @@ class HoloPlot(param.Parameterized):
             The coordinate variable along the x- and y-axis
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`holoplot.converter.HoloViewsConverter`.
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
         Returns
         -------
         obj : HoloViews object
@@ -496,7 +496,7 @@ class HoloPlot(param.Parameterized):
             The dimension to color the polygons by
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`holoplot.converter.HoloViewsConverter`.
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
         Returns
         -------
         obj : HoloViews object
@@ -512,7 +512,7 @@ class HoloPlot(param.Parameterized):
         ----------
         **kwds : optional
             Keyword arguments to pass on to
-            :py:meth:`holoplot.converter.HoloViewsConverter`.
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
         Returns
         -------
         obj : HoloViews object
@@ -550,7 +550,7 @@ def save(obj, filename, title=None, resources=None):
         filename = filename + '.html'
 
     if title is None:
-        title = 'HoloPlot Plot'
+        title = 'HvPlot Plot'
     if resources is None:
         resources = _CDN
 
@@ -592,7 +592,7 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist', alpha=0.5, **
         Chart type (one of 'scatter', 'bivariate', 'hexbin')
     diagonal: str, optional
         Chart type for the diagonal (one of 'hist', 'kde')
-    kwds: HoloPlot.scatter options, optional
+    kwds: hvplot.scatter options, optional
 
     Returns:
     --------
@@ -635,7 +635,7 @@ def lag_plot(data, lag=1, **kwds):
     -----------
     data: Time series
     lag: lag of the scatter plot, default 1
-    kwds: HoloPlot.scatter options, optional
+    kwds: hvplot.scatter options, optional
 
     Returns:
     --------
@@ -654,7 +654,7 @@ def lag_plot(data, lag=1, **kwds):
     if isinstance(data, _pd.DataFrame):
         lags['variable'] = _np.repeat(data.columns, lags.shape[0] / data.shape[1])
         kwds['c'] = 'variable'
-    return HoloPlot(lags).scatter(y1, y2, **kwds)
+    return HvPlot(lags).scatter(y1, y2, **kwds)
 
 
 def parallel_coordinates(data, class_column, cols=None, alpha=0.5,

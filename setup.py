@@ -75,7 +75,7 @@ def walker(top, names):
     global packages, extensions
     if any(exc in top for exc in excludes):
         return
-    package = top[top.rfind('holoplot'):].replace(os.path.sep, '.')
+    package = top[top.rfind('hvplot'):].replace(os.path.sep, '.')
     packages.append(package)
     for name in names:
         ext = '.'.join(name.split('.')[1:])
@@ -84,7 +84,7 @@ def walker(top, names):
             extensions[package].append(ext_str)
 
 
-def examples(path='holoplot-examples', verbose=False, force=False, root=__file__):
+def examples(path='hvplot-examples', verbose=False, force=False, root=__file__):
     """
     Copies the notebooks to the supplied path.
     """
@@ -173,8 +173,8 @@ extras_require['all'] = sorted(set(sum(extras_require.values(), [])))
 ########## metadata for setuptools ##########
 
 setup_args = dict(
-    name='holoplot',
-    version=get_setup_version("holoplot"),
+    name='hvplot',
+    version=get_setup_version("hvplot"),
     description='A high-level plotting API for the PyData ecosystem built on HoloViews.',
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",    
@@ -183,10 +183,10 @@ setup_args = dict(
     maintainer="PyViz developers",
     maintainer_email="developers@pyviz.org",
     packages=find_packages()+packages,
-    package_data={'holoplot': ['.version']},
+    package_data={'hvplot': ['.version']},
     platforms=['Windows', 'Mac OS X', 'Linux'],
     license='BSD',
-    url='https://pyviz.github.io/holoplot',
+    url='https://pyviz.github.io/hvplot',
     classifiers = [
         "License :: OSI Approved :: BSD License",
         "Development Status :: 5 - Production/Stable",
@@ -206,7 +206,7 @@ setup_args = dict(
     tests_require=extras_require['tests'],
     entry_points={
         'console_scripts': [
-            'holoplot = holoplot.__main__:main'
+            'hvplot = hvplot.__main__:main'
         ]
     },
 )
@@ -214,7 +214,7 @@ setup_args = dict(
 
 if __name__ == '__main__':
     example_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                'holoplot','examples')
+                                'hvplot','examples')
     if 'develop' not in sys.argv:
         package_assets(example_path)
 
