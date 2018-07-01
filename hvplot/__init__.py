@@ -58,6 +58,13 @@ def patch(library, name='hvplot', extension=None, logo=False):
                               'xarray could not be imported.')
         xr.register_dataset_accessor(name)(HvPlot)
         xr.register_dataarray_accessor(name)(HvPlot)
+    if 'intake' in library:
+        try:
+            import intake
+        except:
+            raise ImportError('Could not patch plotting API onto intake. '
+                              'intake could not be imported.')
+        setattr(intake.source.base.DataSource, name, patch_property)
     if extension and not _hv.extension._loaded:
         _hv.extension(extension, logo=logo)
 

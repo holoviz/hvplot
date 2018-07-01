@@ -9,7 +9,7 @@ except:
     import intake
     if LooseVersion(intake.__version__) <= '0.1.5':
         patch('intake', extension='bokeh')
-        patch('intake', 'plot', extension='bokeh')
+        patch('intake', 'plot')
     else:
         if not _hv.extension._loaded:
             _hv.extension('bokeh', logo=False)
