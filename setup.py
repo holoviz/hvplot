@@ -134,7 +134,7 @@ _examples_extra = [
     'streamz >=0.3.0',
     'intake',
     'intake-parquet',
-    'dask',
+    'dask <0.18',
     'datashader >=0.6.5',
     'notebook >=5.4',
     'scipy',
