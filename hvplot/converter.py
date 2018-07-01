@@ -131,7 +131,7 @@ class HoloViewsConverter(param.Parameterized):
                  xaxis=True, yaxis=True, framewise=True, aggregator=None,
                  projection=None, global_extent=False, geo=False,
                  precompute=False, flip_xaxis=False, flip_yaxis=False,
-                 **kwds):
+                 dynspread=False, **kwds):
 
         # Process data and related options
         self._process_data(kind, data, x, y, by, groupby, row, col,
@@ -149,6 +149,7 @@ class HoloViewsConverter(param.Parameterized):
         # Operations
         self.datashade = datashade
         self.rasterize = rasterize
+        self.dynspread = dynspread
         self.aggregator = aggregator
         self.precompute = precompute
 
@@ -433,7 +434,8 @@ class HoloViewsConverter(param.Parameterized):
 
     def _validate_kwds(self, kwds):
         kind_opts = self._kind_options.get(self.kind, [])
-        mismatches = sorted([k for k in kwds if k not in kind_opts])
+        ds_opts = ['max_px', 'threshold']
+        mismatches = sorted([k for k in kwds if k not in kind_opts+ds_opts])
         if not mismatches:
             return
 
@@ -511,7 +513,7 @@ class HoloViewsConverter(param.Parameterized):
             return obj
 
         try:
-            from holoviews.operation.datashader import datashade, rasterize
+            from holoviews.operation.datashader import datashade, rasterize, dynspread
             from datashader import count_cat
         except:
             raise ImportError('Datashading is not available')
@@ -545,7 +547,16 @@ class HoloViewsConverter(param.Parameterized):
             projection = self._plot_opts.get('projection', ccrs.GOOGLE_MERCATOR)
             obj = project(obj, projection=projection)
 
-        return operation(obj, **opts).opts({eltype: {'plot': self._plot_opts, 'style': style}})
+        processed = operation(obj, **opts)
+
+        if self.dynspread:
+            if self.datashade:
+                processed = dynspread(processed, max_px=self.kwds.get('max_px', 3),
+                                      threshold=self.kwds.get('threshold', 0.5))
+            else:
+                self.warning('dynspread may only be applied on datashaded plots, '
+                             'use datashade=True instead of rasterize=True.')
+        return processed.opts({eltype: {'plot': self._plot_opts, 'style': style}})
 
 
     def dataset(self, x=None, y=None, data=None):
