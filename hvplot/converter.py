@@ -130,7 +130,8 @@ class HoloViewsConverter(param.Parameterized):
                  row=None, col=None, figsize=None, debug=False,
                  xaxis=True, yaxis=True, framewise=True, aggregator=None,
                  projection=None, global_extent=False, geo=False,
-                 precompute=False, **kwds):
+                 precompute=False, flip_xaxis=False, flip_yaxis=False,
+                 **kwds):
 
         # Process data and related options
         self._process_data(kind, data, x, y, by, groupby, row, col,
@@ -172,6 +173,10 @@ class HoloViewsConverter(param.Parameterized):
             plot_opts['xaxis'] = None
         if not yaxis:
             plot_opts['yaxis'] = None
+        if flip_xaxis:
+            plot_opts['invert_xaxis'] = True
+        if flip_yaxis:
+            plot_opts['invert_yaxis'] = True
         if width:
             plot_opts['width'] = width
         if height:
