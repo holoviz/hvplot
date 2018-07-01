@@ -368,6 +368,7 @@ class HoloViewsConverter(param.Parameterized):
         self.x = x
         self.y = y
         self.kind = kind or 'line'
+        self.gridded = gridded
         self.use_dask = use_dask
         self.indexes = indexes
         if isinstance(by, (np.ndarray, pd.Series)):
@@ -471,7 +472,10 @@ class HoloViewsConverter(param.Parameterized):
         if groups or len(zs) > 1:
             if self.streaming:
                 raise NotImplementedError("Streaming and groupby not yet implemented")
-            dataset = Dataset(self.data)
+            data = self.data
+            if not self.gridded and any(g in self.indexes for g in groups):
+                data = data.reset_index()
+            dataset = Dataset(data)
             if groups:
                 dataset = dataset.groupby(groups, dynamic=self.dynamic)
                 if len(zs) > 1:
