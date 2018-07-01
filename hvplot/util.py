@@ -244,6 +244,10 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, v
 
     if gridded:
         data = dataset
+        if data_vars == [None]:
+            label = label or value_label
+            data = data.to_dataset(name=label)
+            data_vars = [label]
         if not (x or y):
             x, y = dims[:2]
         elif x and not y:

@@ -130,7 +130,8 @@ class HoloViewsConverter(param.Parameterized):
                  row=None, col=None, figsize=None, debug=False,
                  xaxis=True, yaxis=True, framewise=True, aggregator=None,
                  projection=None, global_extent=False, geo=False,
-                 precompute=False, **kwds):
+                 precompute=False, flip_xaxis=False, flip_yaxis=False,
+                 dynspread=False, **kwds):
 
         # Process data and related options
         self._process_data(kind, data, x, y, by, groupby, row, col,
@@ -148,6 +149,7 @@ class HoloViewsConverter(param.Parameterized):
         # Operations
         self.datashade = datashade
         self.rasterize = rasterize
+        self.dynspread = dynspread
         self.aggregator = aggregator
         self.precompute = precompute
 
@@ -172,6 +174,10 @@ class HoloViewsConverter(param.Parameterized):
             plot_opts['xaxis'] = None
         if not yaxis:
             plot_opts['yaxis'] = None
+        if flip_xaxis:
+            plot_opts['invert_xaxis'] = True
+        if flip_yaxis:
+            plot_opts['invert_yaxis'] = True
         if width:
             plot_opts['width'] = width
         if height:
@@ -363,6 +369,7 @@ class HoloViewsConverter(param.Parameterized):
         self.x = x
         self.y = y
         self.kind = kind or 'line'
+        self.gridded = gridded
         self.use_dask = use_dask
         self.indexes = indexes
         if isinstance(by, (np.ndarray, pd.Series)):
@@ -427,7 +434,8 @@ class HoloViewsConverter(param.Parameterized):
 
     def _validate_kwds(self, kwds):
         kind_opts = self._kind_options.get(self.kind, [])
-        mismatches = sorted([k for k in kwds if k not in kind_opts])
+        ds_opts = ['max_px', 'threshold']
+        mismatches = sorted([k for k in kwds if k not in kind_opts+ds_opts])
         if not mismatches:
             return
 
@@ -466,7 +474,10 @@ class HoloViewsConverter(param.Parameterized):
         if groups or len(zs) > 1:
             if self.streaming:
                 raise NotImplementedError("Streaming and groupby not yet implemented")
-            dataset = Dataset(self.data)
+            data = self.data
+            if not self.gridded and any(g in self.indexes for g in groups):
+                data = data.reset_index()
+            dataset = Dataset(data)
             if groups:
                 dataset = dataset.groupby(groups, dynamic=self.dynamic)
                 if len(zs) > 1:
@@ -502,7 +513,7 @@ class HoloViewsConverter(param.Parameterized):
             return obj
 
         try:
-            from holoviews.operation.datashader import datashade, rasterize
+            from holoviews.operation.datashader import datashade, rasterize, dynspread
             from datashader import count_cat
         except:
             raise ImportError('Datashading is not available')
@@ -536,7 +547,16 @@ class HoloViewsConverter(param.Parameterized):
             projection = self._plot_opts.get('projection', ccrs.GOOGLE_MERCATOR)
             obj = project(obj, projection=projection)
 
-        return operation(obj, **opts).opts({eltype: {'plot': self._plot_opts, 'style': style}})
+        processed = operation(obj, **opts)
+
+        if self.dynspread:
+            if self.datashade:
+                processed = dynspread(processed, max_px=self.kwds.get('max_px', 3),
+                                      threshold=self.kwds.get('threshold', 0.5))
+            else:
+                self.warning('dynspread may only be applied on datashaded plots, '
+                             'use datashade=True instead of rasterize=True.')
+        return processed.opts({eltype: {'plot': self._plot_opts, 'style': style}})
 
 
     def dataset(self, x=None, y=None, data=None):
@@ -570,6 +590,8 @@ class HoloViewsConverter(param.Parameterized):
                 ys += [self.kwds[p]]
 
         if self.by:
+            if element is Bars:
+                return element(data, [x]+self.by, ys).relabel(**self._relabel).redim.range(**ranges).redim(**self._redim).opts(opts)
             chart = Dataset(data, self.by+[x], ys).to(element, x, ys, self.by).relabel(**self._relabel)
             chart = chart.layout() if self.subplots else chart.overlay().options(batched=False)
         else:
@@ -913,7 +935,8 @@ class HoloViewsConverter(param.Parameterized):
         if opts['plot']['colorbar']:
             opts['plot']['show_legend'] = False
         levels = self.kwds.get('levels', 5)
-        opts['plot']['color_levels'] = levels
+        if isinstance(levels, int):
+            opts['plot']['color_levels'] = levels
         return contours(qmesh, filled=filled, levels=levels).opts(**opts)
 
     def contourf(self, x=None, y=None, z=None, data=None):
