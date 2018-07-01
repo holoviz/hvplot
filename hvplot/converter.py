@@ -579,6 +579,8 @@ class HoloViewsConverter(param.Parameterized):
                 ys += [self.kwds[p]]
 
         if self.by:
+            if element is Bars:
+                return element(data, [x]+self.by, ys).relabel(**self._relabel).redim.range(**ranges).redim(**self._redim).opts(opts)
             chart = Dataset(data, self.by+[x], ys).to(element, x, ys, self.by).relabel(**self._relabel)
             chart = chart.layout() if self.subplots else chart.overlay().options(batched=False)
         else:
