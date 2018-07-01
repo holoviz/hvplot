@@ -1,7 +1,7 @@
 [![linux/mac build status](https://travis-ci.org/pyviz/holoplot.svg?branch=master)](https://travis-ci.org/pyviz/hvplot)
 
 <h1>
-HvPlot <img src="/doc/_static/holoplot-logo.png" width="50" height="50">
+HvPlot <img src="/doc/_static/hvplot-logo.png" width="50" height="50">
 </h1>
 
 **A high-level plotting API for the PyData ecosystem built on HoloViews.**
