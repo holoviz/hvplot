@@ -5,7 +5,7 @@ Getting started
 Installation
 ------------
 
-HvPlot supports Python 2.7, 3.5, 3.6 and 3.7 on Linux, Windows, or Mac and can be installed with conda::
+hvPlot supports Python 2.7, 3.5, 3.6 and 3.7 on Linux, Windows, or Mac and can be installed with conda::
 
     conda install -c pyviz hvplot
 
@@ -16,7 +16,7 @@ or with pip::
 Usage
 -----
 
-Once you've installed HvPlot as above and have fetched the examples
+Once you've installed hvPlot as above and have fetched the examples
 shown on the website you can run them using `Jupyter
 <http://jupyter.org>`_::
 

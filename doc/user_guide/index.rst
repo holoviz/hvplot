@@ -3,7 +3,7 @@ User Guide
 **********
 
 The user guide provides a detailed introduction to the API and
-features of HvPlot. In the `Introduction <Introduction.html>`_ you
+features of hvPlot. In the `Introduction <Introduction.html>`_ you
 will learn how to activate the plotting API and start using it. Next
 you will learn to use the API for tabular data and get an overview of
 the `types of plots <Plotting.html>`_ you can generate and how to
@@ -25,10 +25,10 @@ and Cartopy to display data in geographic coordinate systems.
 **Overview**:
 
 * `Introduction <Introduction.html>`_
-  Introduction to HvPlot and how to start using it.
+  Introduction to hvPlot and how to start using it.
 
 * `Plotting <Plotting.html>`_
-  Overview of plotting your data with HvPlot.
+  Overview of plotting your data with hvPlot.
 
 * `Viewing <Viewing.html>`_
   Displaying and saving plots in the notebook, at the command prompt, or in scripts.
@@ -37,10 +37,10 @@ and Cartopy to display data in geographic coordinate systems.
   How to generate subplots and grids.
 
 * `Streaming <Streaming.html>`_
-  How to use HvPlot for streaming plots with the streamz library.
+  How to use hvPlot for streaming plots with the streamz library.
 
 * `Gridded Data <Gridded_Data.html>`_
-  How to use HvPlot for plotting XArray-based gridded data.
+  How to use hvPlot for plotting XArray-based gridded data.
 
 * `Statistical Plots <Statistical_Plots.html>`_
   A number of statistical plot types modeled on the pandas.plotting module.
