@@ -441,14 +441,14 @@ class HoloViewsConverter(param.Parameterized):
 
         if 'ax' in mismatches:
             mismatches.pop(mismatches.index('ax'))
-            self.warning('HvPlot does not have the concept of axes, '
+            self.warning('hvPlot does not have the concept of axes, '
                          'and the ax keyword will be ignored. Compose '
                          'plots with the * operator to overlay plots '
                          '+ operator to lay out plots beside each other '
                          'instead.')
         if 'figsize' in mismatches:
             mismatches.pop(mismatches.index('figsize'))
-            self.warning('HvPlot does not have the concept of a figure, '
+            self.warning('hvPlot does not have the concept of a figure, '
                          'and the figsize keyword will be ignored. The '
                          'size of each subplot in a layout is set '
                          'individually using the width and height options.')

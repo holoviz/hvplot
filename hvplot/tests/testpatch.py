@@ -6,7 +6,7 @@ from unittest import TestCase, SkipTest
 
 import numpy as np
 
-from hvplot import patch, HvPlot
+from hvplot import patch, hvPlot
 
 
 class TestPatchPandas(TestCase):
@@ -17,12 +17,12 @@ class TestPatchPandas(TestCase):
     def test_pandas_series_patched(self):
         import pandas as pd
         series = pd.Series([0, 1, 2])
-        self.assertIsInstance(series.hvplot, HvPlot)
+        self.assertIsInstance(series.hvplot, hvPlot)
 
     def test_pandas_dataframe_patched(self):
         import pandas as pd
         df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
-        self.assertIsInstance(df.hvplot, HvPlot)
+        self.assertIsInstance(df.hvplot, hvPlot)
 
 
 class TestPatchDask(TestCase):
@@ -39,14 +39,14 @@ class TestPatchDask(TestCase):
         import dask.dataframe as dd
         series = pd.Series([0, 1, 2])
         dseries = dd.from_pandas(series, 2)
-        self.assertIsInstance(dseries.hvplot, HvPlot)
+        self.assertIsInstance(dseries.hvplot, hvPlot)
 
     def test_dask_dataframe_patched(self):
         import pandas as pd
         import dask.dataframe as dd
         df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
         ddf = dd.from_pandas(df, 2)
-        self.assertIsInstance(ddf.hvplot, HvPlot)
+        self.assertIsInstance(ddf.hvplot, hvPlot)
 
 
 class TestPatchXArray(TestCase):
@@ -62,14 +62,14 @@ class TestPatchXArray(TestCase):
         import xarray as xr
         array = np.random.rand(100, 100)
         xr_array = xr.DataArray(array, coords={'x': range(100), 'y': range(100)}, dims=('y', 'x'))
-        self.assertIsInstance(xr_array.hvplot, HvPlot)
+        self.assertIsInstance(xr_array.hvplot, hvPlot)
 
     def test_xarray_dataset_patched(self):
         import xarray as xr
         array = np.random.rand(100, 100)
         xr_array = xr.DataArray(array, coords={'x': range(100), 'y': range(100)}, dims=('y', 'x'))
         xr_ds = xr.Dataset({'z': xr_array})
-        self.assertIsInstance(xr_ds.hvplot, HvPlot)
+        self.assertIsInstance(xr_ds.hvplot, hvPlot)
         
 
 class TestPatchStreamz(TestCase):
@@ -84,19 +84,19 @@ class TestPatchStreamz(TestCase):
     def test_streamz_dataframe_patched(self):
         from streamz.dataframe import Random
         random_df = Random()
-        self.assertIsInstance(random_df.hvplot, HvPlot)
+        self.assertIsInstance(random_df.hvplot, hvPlot)
 
     def test_streamz_series_patched(self):
         from streamz.dataframe import Random
         random_df = Random()
-        self.assertIsInstance(random_df.x.hvplot, HvPlot)
+        self.assertIsInstance(random_df.x.hvplot, hvPlot)
 
     def test_streamz_dataframes_patched(self):
         from streamz.dataframe import Random
         random_df = Random()
-        self.assertIsInstance(random_df.groupby('x').sum().hvplot, HvPlot)
+        self.assertIsInstance(random_df.groupby('x').sum().hvplot, hvPlot)
 
     def test_streamz_seriess_patched(self):
         from streamz.dataframe import Random
         random_df = Random()
-        self.assertIsInstance(random_df.groupby('x').sum().y.hvplot, HvPlot)
+        self.assertIsInstance(random_df.groupby('x').sum().y.hvplot, hvPlot)
