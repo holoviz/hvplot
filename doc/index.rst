@@ -1,6 +1,6 @@
 .. raw:: html
 
-  <h1><img src="_static/hvplot-logo.png" width="125"></h1>
+  <h1><img src="assets/hvplot-wm.png" width="125"></h1>
 
 .. notebook:: holoplot ./homepage.ipynb
    :offset: 0
