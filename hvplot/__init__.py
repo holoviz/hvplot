@@ -163,13 +163,13 @@ class hvPlot(param.Parameterized):
         """
         return self(x, y, kind='scatter', **kwds)
 
-    def area(self, x=None, y=None, stacked=True, **kwds):
+    def area(self, x=None, y=None, y2=None, stacked=True, **kwds):
         """
         Area plot
 
         Parameters
         ----------
-        x, y : string, optional
+        x, y, y2 : string, optional
             Field name to draw x- and y-positions from
         stacked : boolean
             Whether to stack multiple areas
@@ -183,7 +183,7 @@ class hvPlot(param.Parameterized):
         """
         if 'alpha' not in kwds and not stacked:
             kwds['alpha'] = 0.5
-        return self(x, y, kind='area', stacked=stacked, **kwds)
+        return self(x, y, y2=y2, kind='area', stacked=stacked, **kwds)
 
     def heatmap(self, x=None, y=None, C=None, colorbar=True, **kwds):
         """
