@@ -131,12 +131,12 @@ class HoloViewsConverter(param.Parameterized):
                  xaxis=True, yaxis=True, framewise=True, aggregator=None,
                  projection=None, global_extent=False, geo=False,
                  precompute=False, flip_xaxis=False, flip_yaxis=False,
-                 dynspread=False, **kwds):
+                 dynspread=False, hover_cols=[], **kwds):
 
         # Process data and related options
         self._process_data(kind, data, x, y, by, groupby, row, col,
                            use_dask, persist, backlog, label, value_label,
-                           kwds)
+                           hover_cols, kwds)
         self.use_index = use_index
         self.value_label = value_label
         self.group_label = group_label
@@ -235,7 +235,8 @@ class HoloViewsConverter(param.Parameterized):
 
 
     def _process_data(self, kind, data, x, y, by, groupby, row, col,
-                      use_dask, persist, backlog, label, value_label, kwds):
+                      use_dask, persist, backlog, label, value_label,
+                      hover_cols, kwds):
         gridded = kind in self._gridded_types
         gridded_data = False
 
@@ -381,6 +382,7 @@ class HoloViewsConverter(param.Parameterized):
             self.by = by if isinstance(by, list) else [by]
         self.groupby = groupby
         self.streaming = streaming
+        self.hover_cols = hover_cols
 
 
     def _process_style(self, colormap, kwds):
@@ -588,6 +590,7 @@ class HoloViewsConverter(param.Parameterized):
         for p in 'cs':
             if p in self.kwds and self.kwds[p] in data.columns:
                 ys += [self.kwds[p]]
+        ys += self.hover_cols
 
         if self.by:
             if element is Bars:
@@ -628,7 +631,7 @@ class HoloViewsConverter(param.Parameterized):
                     norm=self._norm_opts, style=self._style_opts)
         charts = []
         for c in y:
-            chart = element(data, x, c).redim(**{c: self.value_label})
+            chart = element(data, x, [c]+self.hover_cols).redim(**{c: self.value_label})
             ranges = {x: self._dim_ranges['x'], self.value_label: self._dim_ranges['y']}
             charts.append((c, chart.relabel(**self._relabel)
                            .redim.range(**ranges).opts(**opts)))
@@ -687,7 +690,7 @@ class HoloViewsConverter(param.Parameterized):
 
         df = melt(data, id_vars=[x], var_name=self.group_label, value_name=self.value_label)
         kdims = [x, self.group_label]
-        return (element(df, kdims, self.value_label).redim.range(**ranges)
+        return (element(df, kdims, [self.value_label]+self.hover_cols).redim.range(**ranges)
                 .redim(**self._redim).relabel(**self._relabel).opts(**opts))
 
     def bar(self, x, y, data=None):
@@ -823,6 +826,7 @@ class HoloViewsConverter(param.Parameterized):
         if not x: x = self.x or data.columns[0]
         if not y: y = self.y or data.columns[1]
         z = self.kwds.get('C', [c for c in data.columns if c not in (x, y)][0])
+        z = [z] + self.hover_cols
 
         opts = dict(plot=self._plot_opts, norm=self._norm_opts, style=self._style_opts)
         hmap = HeatMap(data, [x, y], z).redim(**self._redim).opts(**opts)
@@ -834,7 +838,10 @@ class HoloViewsConverter(param.Parameterized):
         data = self.data if data is None else data
         if not x: x = data.columns[0]
         if not y: y = data.columns[1]
-        z = self.kwds.get('C')
+        z = []
+        if 'C' in self.kwds:
+            z.append(self.kwds['C'])
+        z += self.hover_cols
 
         opts = dict(plot=self._plot_opts, norm=self._norm_opts, style=self._style_opts)
         if 'reduce_function' in self.kwds:
@@ -879,6 +886,7 @@ class HoloViewsConverter(param.Parameterized):
             x, y = list(data.dims)[::-1]
         if not z:
             z = list(data.data_vars)[0] if isinstance(data, xr.Dataset) else data.name
+        z = [z] + self.hover_cols
 
         params = dict(self._relabel)
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
@@ -899,6 +907,7 @@ class HoloViewsConverter(param.Parameterized):
             x, y = list([k for k, v in data.coords.items() if v.size > 1])
         if not z:
             z = list(data.data_vars)[0] if isinstance(data, xr.Dataset) else data.name
+        z = [z] + self.hover_cols
 
         params = dict(self._relabel)
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
@@ -967,6 +976,7 @@ class HoloViewsConverter(param.Parameterized):
         vdims = [self.kwds['c']] if 'c' in self.kwds else []
         if 's' in self.kwds:
             vdims.append(self.kwds['s'])
+        vdims = vdims + self.hover_cols
         params['vdims'] = vdims
         return element(data, [x, y], **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
 
