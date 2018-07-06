@@ -893,7 +893,7 @@ class HoloViewsConverter(param.Parameterized):
 
         params = dict(self._relabel)
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
-        ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y'], z: self._dim_ranges['c']}
+        ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y'], z[0]: self._dim_ranges['c']}
 
         element = self._get_element('image')
         if self.geo: params['crs'] = self.crs
@@ -914,7 +914,7 @@ class HoloViewsConverter(param.Parameterized):
 
         params = dict(self._relabel)
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
-        ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y'], z: self._dim_ranges['c']}
+        ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y'], z[0]: self._dim_ranges['c']}
 
         element = self._get_element('quadmesh')
         if self.geo: params['crs'] = self.crs
