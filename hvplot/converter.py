@@ -91,6 +91,7 @@ class HoloViewsConverter(param.Parameterized):
     _kind_options = {
         'scatter'  : ['s', 'marker', 'c', 'scale', 'logz'],
         'step'     : ['where'],
+        'area'     : ['y2'],
         'hist'     : ['bins', 'bin_range', 'normed', 'cumulative'],
         'heatmap'  : ['C', 'reduce_function', 'logz'],
         'hexbin'   : ['C', 'reduce_function', 'gridsize', 'logz'],
@@ -587,6 +588,8 @@ class HoloViewsConverter(param.Parameterized):
 
         data = self.data if data is None else data
         ys = [y]
+        if element is Area and self.kwds.get('y2'):
+            ys += [self.kwds['y2']]
         for p in 'cs':
             if p in self.kwds and self.kwds[p] in data.columns:
                 ys += [self.kwds[p]]
@@ -642,7 +645,7 @@ class HoloViewsConverter(param.Parameterized):
 
     def step(self, x, y, data=None):
         where = self.kwds.get('where', 'mid')
-        return self.chart(Curve, x, y, data).options('Curve', interpolation='steps-'+where)
+        return self.line(x, y, data).options('Curve', interpolation='steps-'+where)
 
     def scatter(self, x, y, data=None):
         scatter = self.chart(Scatter, x, y, data)
