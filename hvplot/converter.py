@@ -841,9 +841,7 @@ class HoloViewsConverter(param.Parameterized):
         data = self.data if data is None else data
         if not x: x = data.columns[0]
         if not y: y = data.columns[1]
-        z = []
-        if 'C' in self.kwds:
-            z.append(self.kwds['C'])
+        z = [self.kwds['C']] if self.kwds.get('C') else []
         z += self.hover_cols
 
         opts = dict(plot=self._plot_opts, norm=self._norm_opts, style=self._style_opts)
