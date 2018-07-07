@@ -1,4 +1,4 @@
-[![linux/mac build status](https://travis-ci.org/pyviz/holoplot.svg?branch=master)](https://travis-ci.org/pyviz/hvplot)
+[![linux/mac build status](https://travis-ci.org/pyviz/hvplot.svg?branch=master)](https://travis-ci.org/pyviz/hvplot)
 
 <h1>
 hvPlot <img src="/doc/_static/hvplot-logo.png" width="50" height="50">
