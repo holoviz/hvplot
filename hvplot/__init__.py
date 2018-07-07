@@ -11,6 +11,9 @@ from bokeh.resources import CDN as _CDN
 
 from .converter import HoloViewsConverter
 
+__version__ = str(param.version.Version(fpath=__file__, archive_commit="$Format:%h$",
+                                        reponame="hvplot"))
+
 renderer = _hv.renderer('bokeh')
 
 # Register plotting interfaces
