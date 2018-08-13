@@ -698,12 +698,11 @@ class HoloViewsConverter(param.Parameterized):
 
     def bar(self, x, y, data=None):
         data, x, y = self._process_args(data, x, y)
-        if x and y and not isinstance(y, (list, tuple)):
-            return self.single_chart(Bars, x, y, data)
-        elif x and y and len(y) == 1:
-            return self.single_chart(Bars, x, y[0], data)
         stack_index = 1 if self.stacked else None
         opts = {'Bars': {'stack_index': stack_index, 'show_legend': bool(stack_index)}}
+        if x and y and (self.by or not isinstance(y, (list, tuple) or len(y) == 1)):
+            y = y[0] if isinstance(y, (list, tuple)) else y
+            return self.single_chart(Bars, x, y, data).opts(plot=opts)
         return self._category_plot(Bars, x, list(y), data).opts(plot=opts)
 
     def barh(self, x, y, data=None):
