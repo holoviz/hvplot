@@ -596,7 +596,7 @@ class HoloViewsConverter(param.Parameterized):
         ys += self.hover_cols
 
         if self.by:
-            if element is Bars:
+            if element is Bars and not self.subplots:
                 return element(data, [x]+self.by, ys).relabel(**self._relabel).redim.range(**ranges).redim(**self._redim).opts(opts)
             chart = Dataset(data, self.by+[x], ys).to(element, x, ys, self.by).relabel(**self._relabel)
             chart = chart.layout() if self.subplots else chart.overlay().options(batched=False)
@@ -693,17 +693,20 @@ class HoloViewsConverter(param.Parameterized):
 
         df = melt(data, id_vars=[x], var_name=self.group_label, value_name=self.value_label)
         kdims = [x, self.group_label]
-        return (element(df, kdims, [self.value_label]+self.hover_cols).redim.range(**ranges)
-                .redim(**self._redim).relabel(**self._relabel).opts(**opts))
+        vdims = [self.value_label]+self.hover_cols
+        if self.subplots:
+            obj = Dataset(df, kdims, vdims).to(element, x).layout()
+        else:
+            obj = element(df, kdims, vdims)
+        return obj.redim.range(**ranges).redim(**self._redim).relabel(**self._relabel).opts(**opts)
 
     def bar(self, x, y, data=None):
         data, x, y = self._process_args(data, x, y)
-        if x and y and not isinstance(y, (list, tuple)):
-            return self.single_chart(Bars, x, y, data)
-        elif x and y and len(y) == 1:
-            return self.single_chart(Bars, x, y[0], data)
         stack_index = 1 if self.stacked else None
         opts = {'Bars': {'stack_index': stack_index, 'show_legend': bool(stack_index)}}
+        if x and y and (self.by or not isinstance(y, (list, tuple) or len(y) == 1)):
+            y = y[0] if isinstance(y, (list, tuple)) else y
+            return self.single_chart(Bars, x, y, data).opts(plot=opts)
         return self._category_plot(Bars, x, list(y), data).opts(plot=opts)
 
     def barh(self, x, y, data=None):
