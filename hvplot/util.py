@@ -241,6 +241,7 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, v
     data_vars = list(dataset.data_vars) if isinstance(data, xr.Dataset) else [data.name]
     ignore = (by or []) + (groupby or [])
     dims = [c for c in data.coords if data[c].shape != () and c not in ignore][::-1]
+    index_dims = [d for d in dims if d in data.indexes]
 
     if gridded:
         data = dataset
@@ -249,13 +250,14 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, v
             data = data.to_dataset(name=label)
             data_vars = [label]
         if not (x or y):
-            x, y = dims[:2]
+            x, y = index_dims[:2] if len(index_dims) > 1 else dims[:2]
         elif x and not y:
             y = [d for d in dims if d != x][0]
         elif y and not x:
             x = [d for d in dims if d != y][0]
         if len(dims) > 2 and not groupby:
-            groupby = [d for d in dims if d not in (x, y)]
+            dims = list(data.coords[x].dims) + list(data.coords[y].dims)
+            groupby = [d for d in index_dims if d not in (x, y) and d not in dims]
     else:
         name = None
         if not isinstance(dataset, xr.Dataset):
