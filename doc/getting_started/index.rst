@@ -32,6 +32,10 @@ Once you have installed JupyterLab and the extension launch it with::
 
     jupyter lab
 
+If you have any questions, please refer to http://holoviews.org/FAQ.html
+and if that doesn't help, feel free to post an issue on GitHub, question on
+stackoverflow, or discuss on Gitter.
+
 
 Developer Instructions
 ----------------------
