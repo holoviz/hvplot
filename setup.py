@@ -152,7 +152,8 @@ extras_require = {
         'flake8',
         'parameterized',
         'pytest',
-        'nbsmoke >=0.2.0'
+        'nbsmoke >=0.2.0',
+        'pytest-cov'
     ],
     'examples': _examples_extra,
     'doc': _examples_extra + [
@@ -169,7 +170,7 @@ extras_require['build'] = [
 ]
 
 extras_require['all'] = sorted(set(sum(extras_require.values(), [])))
-    
+
 ########## metadata for setuptools ##########
 
 setup_args = dict(
