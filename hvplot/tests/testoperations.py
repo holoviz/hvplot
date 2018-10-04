@@ -3,7 +3,6 @@ from parameterized import parameterized
 
 from holoviews.element import Image, QuadMesh
 from holoviews.element.comparison import ComparisonTestCase
-from hvplot import patch
 
 
 class TestChart2D(ComparisonTestCase):
