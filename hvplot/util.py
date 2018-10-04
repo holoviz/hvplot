@@ -19,14 +19,6 @@ def check_crs(crs):
 
     (Code copied from https://github.com/fmaussion/salem)
 
-    Examples
-    --------
-    >>> p = check_crs('+units=m +init=epsg:26915')
-    >>> p.srs
-    '+units=m +init=epsg:26915 '
-    >>> p = check_crs('wrong')
-    >>> p is None
-    True
     Returns
     -------
     A valid crs if possible, otherwise None
