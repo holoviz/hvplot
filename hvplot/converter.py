@@ -86,7 +86,8 @@ class HoloViewsConverter(param.Parameterized):
 
     _style_options = ['color', 'alpha', 'colormap', 'fontsize', 'c']
 
-    _op_options = ['datashade', 'rasterize', 'xsampling', 'ysampling', 'aggregator']
+    _op_options = ['datashade', 'rasterize', 'x_sampling', 'y_sampling',
+                   'aggregator']
 
     _kind_options = {
         'scatter'  : ['s', 'marker', 'c', 'scale', 'logz'],
@@ -132,7 +133,8 @@ class HoloViewsConverter(param.Parameterized):
                  xaxis=True, yaxis=True, framewise=True, aggregator=None,
                  projection=None, global_extent=False, geo=False,
                  precompute=False, flip_xaxis=False, flip_yaxis=False,
-                 dynspread=False, hover_cols=[], **kwds):
+                 dynspread=False, hover_cols=[], x_sampling=None,
+                 y_sampling=None, **kwds):
 
         # Process data and related options
         self._process_data(kind, data, x, y, by, groupby, row, col,
@@ -153,6 +155,8 @@ class HoloViewsConverter(param.Parameterized):
         self.dynspread = dynspread
         self.aggregator = aggregator
         self.precompute = precompute
+        self.x_sampling = x_sampling
+        self.y_sampling = y_sampling
 
         # By type
         self.subplots = subplots
@@ -533,6 +537,10 @@ class HoloViewsConverter(param.Parameterized):
             opts['aggregator'] = self.aggregator
         if self.precompute:
             opts['precompute'] = self.precompute
+        if self.x_sampling:
+            opts['x_sampling'] = self.x_sampling
+        if self.y_sampling:
+            opts['y_sampling'] = self.y_sampling
         style = {}
         if self.datashade:
             operation = datashade
