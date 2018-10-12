@@ -450,7 +450,7 @@ class HoloViewsConverter(param.Parameterized):
             mismatches.pop(mismatches.index('ax'))
             self.warning('hvPlot does not have the concept of axes, '
                          'and the ax keyword will be ignored. Compose '
-                         'plots with the * operator to overlay plots '
+                         'plots with the * operator to overlay plots or the '
                          '+ operator to lay out plots beside each other '
                          'instead.')
         if 'figsize' in mismatches:
@@ -464,7 +464,7 @@ class HoloViewsConverter(param.Parameterized):
                          self._style_options + self._op_options + kind_opts)
         for mismatch in mismatches:
             suggestions = difflib.get_close_matches(mismatch, combined_opts)
-            self.warning('%s option not found for %s plot, similar options '
+            self.warning('%s option not found for %s plot; similar options '
                          'include: %r' % (mismatch, self.kind, suggestions))
 
     def __call__(self, kind, x, y):
