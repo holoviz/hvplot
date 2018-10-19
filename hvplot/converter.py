@@ -294,9 +294,9 @@ class HoloViewsConverter(param.Parameterized):
                 data = data[z]
 
             ignore = (groupby or []) + (by or [])
-            dims = [c for c in data.coords if data[c].shape != ()
+            dims = [c for c in data.coords.dims if data[c].shape != ()
                     and c not in ignore]
-            if kind is None and (not (x or y) or all(c in data.coords for c in (x, y))):
+            if kind is None and (not (x or y) or all(c in data.coords.dims for c in (x, y))):
                 if len(dims) == 1:
                     kind = 'line'
                 elif len(dims) == 2 or (x and y):
