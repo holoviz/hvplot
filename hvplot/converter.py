@@ -16,7 +16,7 @@ from holoviews.core.layout import NdLayout
 from holoviews.element import (
     Curve, Scatter, Area, Bars, BoxWhisker, Dataset, Distribution,
     Table, HeatMap, Image, HexTiles, QuadMesh, Bivariate, Histogram,
-    Violin, Contours, Polygons, Points, Path
+    Violin, Contours, Polygons, Points, Path, Labels
 )
 from holoviews.plotting.util import process_cmap
 from holoviews.operation import histogram
@@ -103,7 +103,8 @@ class HoloViewsConverter(param.Parameterized):
         'contour'  : ['z', 'levels', 'logz'],
         'contourf' : ['z', 'levels', 'logz'],
         'points'   : ['s', 'marker', 'c', 'scale', 'logz'],
-        'polygons'    : ['logz', 'c']
+        'polygons' : ['logz', 'c'],
+        'labels'   : ['text', 'c', 's']
     }
 
     _kind_mapping = {
@@ -112,7 +113,8 @@ class HoloViewsConverter(param.Parameterized):
         'image': Image, 'table': Table, 'hist': Histogram, 'dataset': Dataset,
         'kde': Distribution, 'area': Area, 'box': BoxWhisker, 'violin': Violin,
         'bar': Bars, 'barh': Bars, 'contour': Contours, 'contourf': Polygons,
-        'points': Points, 'polygons': Polygons, 'paths': Path, 'step': Curve
+        'points': Points, 'polygons': Polygons, 'paths': Path, 'step': Curve,
+        'labels': Labels
     }
 
     _colorbar_types = ['image', 'hexbin', 'heatmap', 'quadmesh', 'bivariate',
@@ -875,6 +877,20 @@ class HoloViewsConverter(param.Parameterized):
         opts = {k: v for k, v in self._plot_opts.items() if k in allowed}
         data = self.data if data is None else data
         return Table(data, self.kwds.get('columns'), []).redim(**self._redim).opts(plot=opts)
+
+    def labels(self, x, y, data=None):
+        data = self.data if data is None else data
+        if not x: x = self.x or data.columns[0]
+        if not y: y = self.y or data.columns[1]
+        text = self.kwds.get('text', [c for c in data.columns if c not in (x, y)][0])
+        text = [text] + self.hover_cols
+        if 'c' in self.kwds:
+            self._plot_opts['color_index'] = self.kwds['c']
+        if 's' in self.kwds:
+            self._plot_opts['size_index'] = self.kwds['s']
+         opts = dict(plot=self._plot_opts, norm=self._norm_opts, style=self._style_opts)
+        labels = Labels(data, [x, y], text).redim(**self._redim).opts(**opts)
+        return labels
 
     ##########################
     #     Gridded plots      #
