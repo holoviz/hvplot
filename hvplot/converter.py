@@ -145,7 +145,7 @@ class HoloViewsConverter(param.Parameterized):
         self.group_label = group_label
         self.dynamic = dynamic
         self.geo = geo or crs or global_extent or projection
-        self.crs = process_crs(crs) if self.geo else None
+        self.crs = self._process_crs(data, crs) if self.geo else None
         self.row = row
         self.col = col
 
@@ -237,6 +237,21 @@ class HoloViewsConverter(param.Parameterized):
                         groupby=self.groupby)
             self.warning('Plotting {kind} plot with parameters x: {x}, '
                          'y: {y}, by: {by}, groupby: {groupby}'.format(**kwds))
+
+
+    def _process_crs(self, data, crs):
+        """Given crs as proj4 string, data.attr, or cartopy.crs return cartopy.crs
+        """
+        # get the proj string: either the value of data.attrs[crs] or crs itself
+        _crs = getattr(data, 'attrs', {}).get(crs or 'crs', crs)
+        try:
+            return process_crs(_crs)
+        except ValueError:
+            # only raise error if crs was specified in kwargs
+            if crs:
+                raise ValueError(
+                    "'{}' must be either a valid crs or an reference to "
+                    "a `data.attr` containing a valid crs.".format(crs))
 
 
     def _process_data(self, kind, data, x, y, by, groupby, row, col,
