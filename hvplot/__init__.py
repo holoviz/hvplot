@@ -27,6 +27,7 @@ def patch(library, name='hvplot', extension=None, logo=False):
     """
     if not isinstance(library, list): library = [library]
     patch_property = property(_patch_plot)
+    patch_property.__doc__ = hvPlot.__call__.__doc__
     if 'streamz' in library:
         try:
             import streamz.dataframe as sdf
@@ -80,14 +81,33 @@ class hvPlot(param.Parameterized):
         self._metadata = metadata
 
     def __call__(self, x=None, y=None, kind=None, **kwds):
+        """
+        Default plot method (for more detailed options use specific
+        plot method, e.g. df.hvplot.line)
+
+        Parameters
+        ----------
+        x, y : string, optional
+            Field name in the data to draw x- and y-positions from
+        kind : string, optional
+            The kind of plot to generate, e.g. 'line', 'scatter', etc.
+        **kwds : optional
+            Keyword arguments to pass on to
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
+        Returns
+        -------
+        HoloViews object: Object representing the requested visualization
+        """
+        return self._get_converter(x, y, kind, **kwds)(kind, x, y)
+
+    def _get_converter(self, x=None, y=None, kind=None, **kwds):
         params = dict(self._metadata, **kwds)
         x = x or params.pop('x', None)
         y = y or params.pop('y', None)
         kind = kind or params.pop('kind', None)
-        converter = HoloViewsConverter(
+        return HoloViewsConverter(
             self._data, x, y, kind=kind, **params
         )
-        return converter(kind, x, y)
 
     def __dir__(self):
         """
