@@ -4,7 +4,6 @@ import param
 import numpy as _np
 import pandas as _pd
 import holoviews as _hv
-from holoviews.ipython import display # noqa
 
 from bokeh.io import export_png as _export_png, show as _show, save as _save
 from bokeh.resources import CDN as _CDN
