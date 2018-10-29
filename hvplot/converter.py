@@ -883,14 +883,17 @@ class HoloViewsConverter(param.Parameterized):
         if not x: x = self.x or data.columns[0]
         if not y: y = self.y or data.columns[1]
         text = self.kwds.get('text', [c for c in data.columns if c not in (x, y)][0])
-        text = [text] + self.hover_cols
+        vdims = [text]
+        style = self._style_opts
         if 'c' in self.kwds:
             self._plot_opts['color_index'] = self.kwds['c']
+            vdims.append(self.kwds['c'])
+            style.pop('color', None)
         if 's' in self.kwds:
             self._plot_opts['size_index'] = self.kwds['s']
-         opts = dict(plot=self._plot_opts, norm=self._norm_opts, style=self._style_opts)
-        labels = Labels(data, [x, y], text).redim(**self._redim).opts(**opts)
-        return labels
+            vdims.append(self.kwds['s'])
+        opts = dict(plot=self._plot_opts, norm=self._norm_opts, style=style)
+        return Labels(data, [x, y], vdims).redim(**self._redim).opts(**opts)
 
     ##########################
     #     Gridded plots      #
