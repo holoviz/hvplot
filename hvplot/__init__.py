@@ -590,7 +590,7 @@ def save(obj, filename, title=None, resources=None):
         _save(plot, filename, title=title, resources=resources)
 
 
-def show(obj):
+def show(obj, filename=None):
     """
     Displays HoloViews objects in and outside the notebook
 
@@ -606,6 +606,8 @@ def show(obj):
     if obj.traverse(lambda x: x, [_hv.HoloMap]):
         renderer.app(obj, show=True, new_window=True)
     else:
+        from bokeh.io import output_file
+        output_file(filename or 'default.html')
         _show(renderer.get_plot(obj).state)
 
 
