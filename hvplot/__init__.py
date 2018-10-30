@@ -533,8 +533,13 @@ class hvPlot(param.Parameterized):
     def labels(self, x=None, y=None, text=None, **kwds):
         """
         Labels plot.
-         Parameters
+
+        Parameters
         ----------
+        x, y : string, optional
+            The coordinate variable along the x- and y-axis
+        text : string, optional
+            The column to draw the text labels from
         **kwds : optional
             Keyword arguments to pass on to
             :py:meth:`hvplot.converter.HoloViewsConverter`.
