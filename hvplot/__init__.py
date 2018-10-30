@@ -549,6 +549,25 @@ class hvPlot(param.Parameterized):
         """
         return self(x=None, y=None, kind='paths', **kwds)
 
+    def labels(self, x=None, y=None, text=None, **kwds):
+        """
+        Labels plot.
+
+        Parameters
+        ----------
+        x, y : string, optional
+            The coordinate variable along the x- and y-axis
+        text : string, optional
+            The column to draw the text labels from
+        **kwds : optional
+            Keyword arguments to pass on to
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
+        Returns
+        -------
+        obj : HoloViews object
+            The HoloViews representation of the plot.
+        """
+        return self(x, y, text=text, kind='labels', **kwds)
 
 
 def save(obj, filename, title=None, resources=None):
