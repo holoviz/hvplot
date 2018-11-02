@@ -73,6 +73,8 @@ class HoloViewsConverter(param.Parameterized):
 
     _gridded_types = ['image', 'contour', 'contourf', 'quadmesh']
 
+    _geom_types = ['paths', 'polygons']
+
     _stats_types = ['hist', 'kde', 'violin', 'box']
 
     _data_options = ['x', 'y', 'kind', 'by', 'use_index', 'use_dask',
@@ -136,7 +138,7 @@ class HoloViewsConverter(param.Parameterized):
                  projection=None, global_extent=False, geo=False,
                  precompute=False, flip_xaxis=False, flip_yaxis=False,
                  dynspread=False, hover_cols=[], x_sampling=None,
-                 y_sampling=None, **kwds):
+                 y_sampling=None, project=False, **kwds):
 
         # Process data and related options
         self._process_data(kind, data, x, y, by, groupby, row, col,
@@ -148,6 +150,7 @@ class HoloViewsConverter(param.Parameterized):
         self.dynamic = dynamic
         self.geo = geo or crs or global_extent or projection
         self.crs = self._process_crs(data, crs) if self.geo else None
+        self.project = project
         self.row = row
         self.col = col
 
@@ -568,7 +571,7 @@ class HoloViewsConverter(param.Parameterized):
             if 'cmap' in self._style_opts:
                 style['cmap'] = self._style_opts['cmap']
 
-        if self.crs:
+        if self.crs and self.project:
             # Apply projection before rasterizing
             import cartopy.crs as ccrs
             from geoviews import project
