@@ -148,11 +148,21 @@ class HoloViewsConverter(param.Parameterized):
         self.value_label = value_label
         self.group_label = group_label
         self.dynamic = dynamic
-        self.geo = geo or crs or global_extent or projection
+        self.geo = geo or crs or global_extent or projection or project
         self.crs = self._process_crs(data, crs) if self.geo else None
         self.project = project
         self.row = row
         self.col = col
+
+        # Import geoviews if geo-features requested
+        if self.geo:
+            try:
+                import geoviews # noqa
+            except ImportError:
+                raise ImportError('In order to use geo-related features '
+                                  'the geoviews library must be available. '
+                                  'It can be installed with:\n  conda '
+                                  'install -c pyviz geoviews')
 
         # Operations
         self.datashade = datashade
