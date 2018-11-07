@@ -73,6 +73,8 @@ class HoloViewsConverter(param.Parameterized):
 
     _gridded_types = ['image', 'contour', 'contourf', 'quadmesh']
 
+    _geom_types = ['paths', 'polygons']
+
     _stats_types = ['hist', 'kde', 'violin', 'box']
 
     _data_options = ['x', 'y', 'kind', 'by', 'use_index', 'use_dask',
@@ -136,7 +138,7 @@ class HoloViewsConverter(param.Parameterized):
                  projection=None, global_extent=False, geo=False,
                  precompute=False, flip_xaxis=False, flip_yaxis=False,
                  dynspread=False, hover_cols=[], x_sampling=None,
-                 y_sampling=None, **kwds):
+                 y_sampling=None, project=False, **kwds):
 
         # Process data and related options
         self._process_data(kind, data, x, y, by, groupby, row, col,
@@ -146,10 +148,21 @@ class HoloViewsConverter(param.Parameterized):
         self.value_label = value_label
         self.group_label = group_label
         self.dynamic = dynamic
-        self.geo = geo or crs or global_extent or projection
+        self.geo = geo or crs or global_extent or projection or project
         self.crs = self._process_crs(data, crs) if self.geo else None
+        self.project = project
         self.row = row
         self.col = col
+
+        # Import geoviews if geo-features requested
+        if self.geo:
+            try:
+                import geoviews # noqa
+            except ImportError:
+                raise ImportError('In order to use geo-related features '
+                                  'the geoviews library must be available. '
+                                  'It can be installed with:\n  conda '
+                                  'install -c pyviz geoviews')
 
         # Operations
         self.datashade = datashade
@@ -533,6 +546,13 @@ class HoloViewsConverter(param.Parameterized):
             else:
                 obj = method(x, y)
 
+        if self.crs and self.project:
+            # Apply projection before rasterizing
+            import cartopy.crs as ccrs
+            from geoviews import project
+            projection = self._plot_opts.get('projection', ccrs.GOOGLE_MERCATOR)
+            obj = project(obj, projection=projection)
+
         if not (self.datashade or self.rasterize):
             return obj
 
@@ -567,13 +587,6 @@ class HoloViewsConverter(param.Parameterized):
             eltype = 'Image'
             if 'cmap' in self._style_opts:
                 style['cmap'] = self._style_opts['cmap']
-
-        if self.crs:
-            # Apply projection before rasterizing
-            import cartopy.crs as ccrs
-            from geoviews import project
-            projection = self._plot_opts.get('projection', ccrs.GOOGLE_MERCATOR)
-            obj = project(obj, projection=projection)
 
         processed = operation(obj, **opts)
 
