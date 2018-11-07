@@ -536,6 +536,13 @@ class HoloViewsConverter(param.Parameterized):
             else:
                 obj = method(x, y)
 
+        if self.crs and self.project:
+            # Apply projection before rasterizing
+            import cartopy.crs as ccrs
+            from geoviews import project
+            projection = self._plot_opts.get('projection', ccrs.GOOGLE_MERCATOR)
+            obj = project(obj, projection=projection)
+
         if not (self.datashade or self.rasterize):
             return obj
 
@@ -570,13 +577,6 @@ class HoloViewsConverter(param.Parameterized):
             eltype = 'Image'
             if 'cmap' in self._style_opts:
                 style['cmap'] = self._style_opts['cmap']
-
-        if self.crs and self.project:
-            # Apply projection before rasterizing
-            import cartopy.crs as ccrs
-            from geoviews import project
-            projection = self._plot_opts.get('projection', ccrs.GOOGLE_MERCATOR)
-            obj = project(obj, projection=projection)
 
         processed = operation(obj, **opts)
 
