@@ -155,7 +155,7 @@ class HoloViewsConverter(param.Parameterized):
         self.col = col
 
         # Import geoviews if geo-features requested
-        if self.geo:
+        if self.geo or self.datatype == 'geopandas':
             try:
                 import geoviews # noqa
             except ImportError:
@@ -291,7 +291,9 @@ class HoloViewsConverter(param.Parameterized):
         streaming = False
         if isinstance(data, pd.DataFrame):
             self.data = data
+            datatype = 'pandas'
             if is_geopandas(data) and kind is None:
+                datatype = 'geopandas'
                 geom_types = set([gt[5:] if 'Multi' in gt else gt for gt in data.geom_type])
                 if len(geom_types) > 1:
                     raise ValueError('The GeopandasInterface can only read dataframes which '
@@ -304,8 +306,10 @@ class HoloViewsConverter(param.Parameterized):
                 elif geom_type in ('LineString', 'LineRing'):
                     kind = 'paths'
         elif is_dask(data):
+            datatype = 'dask'
             self.data = data.persist() if persist else data
         elif is_streamz(data):
+            datatype = 'streamz'
             self.data = data.example
             self.stream_type = data._stream_type
             streaming = True
@@ -335,7 +339,9 @@ class HoloViewsConverter(param.Parameterized):
                 else:
                     kind = 'hist'
 
+            datatype = 'dask' if use_dask else 'pandas'
             if gridded:
+                datatype = 'xarray'
                 gridded_data = True
             data, x, y, by_new, groupby_new = process_xarray(data, x, y, by, groupby,
                                                              use_dask, persist, gridded,
@@ -400,11 +406,11 @@ class HoloViewsConverter(param.Parameterized):
                 raise ValueError('The supplied groupby dimension(s) %s '
                                  'could not be found, expected one or '
                                  'more of: %s' % (not_found, list(self.data.columns)))
-
         # Set data-level options
         self.x = x
         self.y = y
         self.kind = kind or 'line'
+        self.datatype = datatype
         self.gridded = gridded
         self.use_dask = use_dask
         self.indexes = indexes
@@ -514,7 +520,13 @@ class HoloViewsConverter(param.Parameterized):
             data = self.data
             if not self.gridded and any(g in self.indexes for g in groups):
                 data = data.reset_index()
-            dataset = Dataset(data)
+
+            if self.datatype == 'geopandas':
+                columns = [c for c in data.columns if c != 'geometry']
+                shape_dims = ['Longitude', 'Latitude'] if self.geo else ['x', 'y']
+                dataset = Dataset(data, kdims=shape_dims+columns)
+            else:
+                dataset = Dataset(data)
             if groups:
                 dataset = dataset.groupby(groups, dynamic=self.dynamic)
                 if len(zs) > 1:
