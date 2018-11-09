@@ -156,7 +156,7 @@ extras_require = {
     ],
     'examples': _examples_extra,
     'doc': _examples_extra + [
-        'nbsite >=0.5.0',
+        'nbsite >=0.5.1',
         'sphinx_ioam_theme'
     ]
 }
