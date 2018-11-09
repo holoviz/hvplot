@@ -585,7 +585,7 @@ def save(obj, filename, title=None, resources=None):
     resources: bokeh resources
        One of the valid bokeh.resources (e.g. CDN or INLINE)
     """
-    if isinstance(obj, _hv.Dimensioned):
+    if isinstance(obj, _hv.core.Dimensioned):
         plot = renderer.get_plot(obj).state
     else:
         raise ValueError('%s type object not recognized and cannot be saved.' %
@@ -617,7 +617,7 @@ def show(obj, filename=None):
     obj : HoloViews object
        HoloViews object to export
     """
-    if not isinstance(obj, _hv.Dimensioned):
+    if not isinstance(obj, _hv.core.Dimensioned):
         raise ValueError('%s type object not recognized and cannot be shown.' %
                          type(obj).__name__)
 
