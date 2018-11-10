@@ -25,8 +25,8 @@ def patch(library, name='hvplot', extension=None, logo=False):
     Patch library to support HoloViews based plotting API.
     """
     if not isinstance(library, list): library = [library]
+    _patch_plot.__doc__ = hvPlot.__call__.__doc__
     patch_property = property(_patch_plot)
-    patch_property.__doc__ = hvPlot.__call__.__doc__
     if 'streamz' in library:
         try:
             import streamz.dataframe as sdf
