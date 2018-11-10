@@ -156,7 +156,7 @@ extras_require = {
     ],
     'examples': _examples_extra,
     'doc': _examples_extra + [
-        'nbsite',
+        'nbsite >=0.5.1',
         'sphinx_ioam_theme'
     ]
 }
@@ -169,7 +169,7 @@ extras_require['build'] = [
 ]
 
 extras_require['all'] = sorted(set(sum(extras_require.values(), [])))
-    
+
 ########## metadata for setuptools ##########
 
 setup_args = dict(
@@ -177,7 +177,7 @@ setup_args = dict(
     version=get_setup_version("hvplot"),
     description='A high-level plotting API for the PyData ecosystem built on HoloViews.',
     long_description=open("README.md").read(),
-    long_description_content_type="text/markdown",    
+    long_description_content_type="text/markdown",
     author= "Philipp Rudiger",
     author_email= "developers@pyviz.org",
     maintainer="PyViz developers",

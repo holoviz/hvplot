@@ -7,9 +7,8 @@ authors = u'PyViz developers'
 copyright = u'2018 ' + authors
 description = 'A high-level plotting API for the PyData ecosystem built on HoloViews'
 
-# TODO: gah, version
-version = '0.0.1'
-release = '0.0.1'
+import hvplot
+version = release = hvplot.__version__
 
 html_static_path += ['_static']
 html_theme = 'sphinx_ioam_theme'
@@ -32,12 +31,12 @@ html_context.update({
     'DESCRIPTION': description,
     'AUTHOR': authors,
     # will work without this - for canonical (so can ignore when building locally or test deploying)
-    'WEBSITE_SERVER': 'https://pyviz.github.io/holoplot',
+    'WEBSITE_SERVER': 'https://pyviz.github.io/hvplot',
     'VERSION': version,
     'NAV': _NAV,
     'LINKS': _NAV,
     'SOCIAL': (
         ('Gitter', '//gitter.im/pyviz/pyviz'),
-        ('Github', '//github.com/pyviz/holoplot'),
+        ('Github', '//github.com/pyviz/hvplot'),
     )
 })

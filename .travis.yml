@@ -1,5 +1,5 @@
 # We deliberately don't use travis's language=python option because
-# we install miniconda and use conda to get python. Additionally, 
+# we install miniconda and use conda to get python. Additionally,
 # Travis's auto-install of python doesn't work on osx images (see
 # https://github.com/travis-ci/travis-ci/issues/4729).
 language: generic
@@ -70,30 +70,19 @@ jobs:
       env: DESC="docs" CHANS_DEV="-c pyviz/label/dev -c pyviz -c ioam -c intake"
       script:
         - doit develop_install $CHANS_DEV -o doc
-        - conda uninstall nbsite --force
-        - pip install git+https://github.com/pyviz/nbsite.git --upgrade
         - bokeh sampledata
+        - nbsite generate-rst --org pyviz --project-name hvplot --offset 1 --skip '^.*Streaming.*$'
+        - nbsite build --what=html --output=builtdocs
 
-        # note: will vastly simplified in a future version of nbsite
-        - cd doc
-        - cp ./user_guide/Streaming.rst ./user_guide/Streaming.rst_bak
-        - nbsite_nbpagebuild.py ioam hvplot ../examples .
-        - cp ./user_guide/Streaming.rst_bak ./user_guide/Streaming.rst
-        - HV_DOC_HTML='true' sphinx-build -b html . ./_build/html
-        - nbsite_fix_links.py _build/html
-        - nbsite_cleandisthtml.py ./_build/html take_a_chance
-        - touch ./_build/html/.nojekyll
-        - cp -r ../examples/assets ./_build/html/assets
-        - cp -r ./assets/* ./_build/html/assets/
-        - cd ..
       deploy:
         provider: pages
         skip_cleanup: true
         github_token: $GITHUB_TOKEN
-        local_dir: ./doc/_build/html
+        local_dir: ./builtdocs
         fqdn: hvplot.pyviz.org
         on:
-          branch: master
+          tags: true
+          all_branches: true
 
     ########## END-USER PACKAGES ##########
 
