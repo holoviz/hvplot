@@ -71,7 +71,7 @@ jobs:
       script:
         - doit develop_install $CHANS_DEV -o doc
         - bokeh sampledata
-        - nbsite generate-rst --org pyviz --project-name hvplot --offset 0 --skip '^.*Streaming.*$'
+        - nbsite generate-rst --org pyviz --project-name hvplot --offset 0 --skip '^.*Streaming.*$' --skip '^.*homepage.*$'
         - nbsite build --what=html --output=builtdocs
 
       deploy:

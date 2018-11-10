@@ -2,7 +2,7 @@
 
   <h1><img src="assets/hvplot-wm.png" width="125"></h1>
 
-.. notebook:: hvplot ./homepage.ipynb
+.. notebook:: hvplot ../examples/homepage.ipynb
    :offset: 0
 
 .. toctree::
