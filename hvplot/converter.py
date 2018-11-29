@@ -122,6 +122,10 @@ class HoloViewsConverter(param.Parameterized):
     _colorbar_types = ['image', 'hexbin', 'heatmap', 'quadmesh', 'bivariate',
                        'contour', 'contourf', 'polygons']
 
+    _legend_positions = ("top_right", "top_left", "bottom_left",
+                         "bottom_right", "right", "left", "top",
+                         "bottom")
+
     def __init__(self, data, x, y, kind=None, by=None, use_index=True,
                  group_label='Variable', value_label='value',
                  backlog=1000, persist=False, use_dask=False,
@@ -186,7 +190,16 @@ class HoloViewsConverter(param.Parameterized):
         plot_opts['logy'] = logy or loglog
         plot_opts['show_grid'] = grid
         plot_opts['shared_axes'] = shared_axes
-        plot_opts['show_legend'] = legend
+        plot_opts['show_legend'] = bool(legend)
+
+        if legend in self._legend_positions:
+            plot_opts['legend_position'] = legend
+        elif legend in (True, False, None):
+            plot_opts['legend_position'] = 'right'
+        else:
+            raise ValueError('The legend option should be a boolean or '
+                             'a valid legend position (i.e. one of %s).'
+                             % list(self._legend_positions))
         if xticks:
             plot_opts['xticks'] = xticks
         if yticks:
@@ -229,7 +242,6 @@ class HoloViewsConverter(param.Parameterized):
             plot_opts['global_extent'] = global_extent
         if projection:
             plot_opts['projection'] = process_crs(projection)
-        plot_opts['legend_position'] = 'right'
         if title is not None:
             plot_opts['title_format'] = title
         self._plot_opts = plot_opts
@@ -1052,7 +1064,6 @@ class HoloViewsConverter(param.Parameterized):
         if 'marker' in self.kwds:
             plot_opts['marker'] = self.kwds['marker']
         opts = dict(plot=plot_opts, style=self._style_opts, norm=self._norm_opts)
-
         element = self._get_element('points')
         if self.geo: params['crs'] = self.crs
         vdims = [self.kwds['c']] if 'c' in self.kwds else []
