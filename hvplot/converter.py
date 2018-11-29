@@ -84,7 +84,7 @@ class HoloViewsConverter(param.Parameterized):
     _axis_options = ['width', 'height', 'shared_axes', 'grid', 'legend',
                      'rot', 'xlim', 'ylim', 'xticks', 'yticks', 'colorbar',
                      'invert', 'title', 'logx', 'logy', 'loglog', 'xaxis',
-                     'yaxis']
+                     'yaxis', 'xformatter', 'yformatter', 'xlabel', 'ylabel']
 
     _style_options = ['color', 'alpha', 'colormap', 'fontsize', 'c']
 
@@ -138,7 +138,8 @@ class HoloViewsConverter(param.Parameterized):
                  projection=None, global_extent=False, geo=False,
                  precompute=False, flip_xaxis=False, flip_yaxis=False,
                  dynspread=False, hover_cols=[], x_sampling=None,
-                 y_sampling=None, project=False, **kwds):
+                 y_sampling=None, project=False, xlabel=None, ylabel=None,
+                 xformatter=None, yformatter=None, **kwds):
 
         # Process data and related options
         self._process_data(kind, data, x, y, by, groupby, row, col,
@@ -194,6 +195,14 @@ class HoloViewsConverter(param.Parameterized):
             plot_opts['xaxis'] = None
         if not yaxis:
             plot_opts['yaxis'] = None
+        if xlabel is not None:
+            plot_opts['xlabel'] = xlabel
+        if ylabel is not None:
+            plot_opts['ylabel'] = ylabel
+        if xformatter is not None:
+            plot_opts['xformatter'] = xformatter
+        if yformatter is not None:
+            plot_opts['yformatter'] = yformatter
         if flip_xaxis:
             plot_opts['invert_xaxis'] = True
         if flip_yaxis:
