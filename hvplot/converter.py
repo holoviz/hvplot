@@ -143,7 +143,7 @@ class HoloViewsConverter(param.Parameterized):
                  precompute=False, flip_xaxis=False, flip_yaxis=False,
                  dynspread=False, hover_cols=[], x_sampling=None,
                  y_sampling=None, project=False, xlabel=None, ylabel=None,
-                 xformatter=None, yformatter=None, **kwds):
+                 xformatter=None, yformatter=None, tools=[], **kwds):
 
         # Process data and related options
         self._process_data(kind, data, x, y, by, groupby, row, col,
@@ -235,8 +235,12 @@ class HoloViewsConverter(param.Parameterized):
         if rot:
             axis = 'yrotation' if invert else 'xrotation'
             plot_opts[axis] = rot
-        if hover:
-            plot_opts['tools'] = ['hover']
+
+        tools = list(tools)
+        if hover and not any(t for t in tools if isinstance(t, HoverTool)
+                             or t == 'hover'):
+            tools.append('hover')
+        plot_opts['tools'] = tools
 
         if self.crs and global_extent:
             plot_opts['global_extent'] = global_extent
