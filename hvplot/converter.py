@@ -711,6 +711,7 @@ class HoloViewsConverter(param.Parameterized):
         opts = {}
         if 'c' in self.kwds:
             opts['color_index'] = self.kwds['c']
+            self._style_opts.pop('color', None)
         if 's' in self.kwds:
             opts['size_index'] = self.kwds['s']
         if 'marker' in self.kwds:
@@ -1044,6 +1045,7 @@ class HoloViewsConverter(param.Parameterized):
         ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y']}
         if 'c' in self.kwds:
             plot_opts['color_index'] = self.kwds['c']
+            self._style_opts.pop('color', None)
             ranges[self.kwds['c']] = self._dim_ranges['c']
         if 's' in self.kwds:
             plot_opts['size_index'] = self.kwds['s']
@@ -1085,6 +1087,7 @@ class HoloViewsConverter(param.Parameterized):
         ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y']}
         if 'c' in self.kwds:
             plot_opts['color_index'] = self.kwds['c']
+            self._style_opts.pop('color', None)
             ranges[self.kwds['c']] = self._dim_ranges['c']
         plot_opts['show_legend'] = False
         opts = dict(plot=plot_opts, style=self._style_opts, norm=self._norm_opts)
