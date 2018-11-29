@@ -8,6 +8,7 @@ import holoviews as hv
 import pandas as pd
 import numpy as np
 
+from bokeh.models import HoverTool
 from holoviews.core.dimension import Dimension
 from holoviews.core.spaces import DynamicMap, HoloMap, Callable
 from holoviews.core.overlay import NdOverlay
