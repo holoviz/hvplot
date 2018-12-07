@@ -237,18 +237,21 @@ def is_geopandas(data):
 
 def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, value_label):
     import xarray as xr
-    dataset = data
-    data_vars = list(dataset.data_vars) if isinstance(data, xr.Dataset) else [data.name]
+    if isinstance(data, xr.Dataset):
+        dataset = data
+    else:
+        name = data.name or label or value_label
+        dataset = data.to_dataset(name=name)
+
+    data_vars = list(dataset.data_vars)
     ignore = (by or []) + (groupby or [])
-    dims = [c for c in data.coords if data[c].shape != () and c not in ignore][::-1]
-    index_dims = [d for d in dims if d in data.indexes]
+    dims = [c for c in dataset.coords if dataset[c].shape != () and c not in ignore][::-1]
+    index_dims = [d for d in dims if d in dataset.indexes]
 
     if gridded:
         data = dataset
-        if data_vars == [None]:
-            label = label or value_label
-            data = data.to_dataset(name=label)
-            data_vars = [label]
+        if len(dims) < 2:
+            dims += [dim for dim in list(data.dims)[::-1] if dim not in dims]
         if not (x or y):
             x, y = index_dims[:2] if len(index_dims) > 1 else dims[:2]
         elif x and not y:
@@ -259,19 +262,15 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, v
             dims = list(data.coords[x].dims) + list(data.coords[y].dims)
             groupby = [d for d in index_dims if d not in (x, y) and d not in dims]
     else:
-        name = None
-        if not isinstance(dataset, xr.Dataset):
-            name = dataset.name or label or value_label
-            data_vars = [name]
         if use_dask:
-            if not isinstance(dataset, xr.Dataset):
-                dataset = dataset.to_dataset(name=name)
             data = dataset.to_dask_dataframe()
             data = data.persist() if persist else data
         else:
-            data = dataset.to_dataframe(name=name)
+            data = dataset.to_dataframe()
             if len(data.index.names) > 1:
                 data = data.reset_index()
+        if len(dims) == 0:
+            dims = ['index']
         if x and not y:
             y = dims[0] if x in data_vars else data_vars
         elif y and not x:
