@@ -249,8 +249,9 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, v
     index_dims = [d for d in dims if d in dataset.indexes]
 
     if gridded:
-        print('GRIDDED')
         data = dataset
+        if len(dims) < 2:
+            dims += [dim for dim in list(data.dims)[::-1] if dim not in dims]
         if not (x or y):
             x, y = index_dims[:2] if len(index_dims) > 1 else dims[:2]
         elif x and not y:
@@ -268,6 +269,8 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, v
             data = dataset.to_dataframe()
             if len(data.index.names) > 1:
                 data = data.reset_index()
+        if len(dims) == 0:
+            dims = ['index']
         if x and not y:
             y = dims[0] if x in data_vars else data_vars
         elif y and not x:
