@@ -68,7 +68,7 @@ def patch(library, name='hvplot', extension=None, logo=False):
             raise ImportError('Could not patch plotting API onto intake. '
                               'intake could not be imported.')
         setattr(intake.source.base.DataSource, name, patch_property)
-    if extension and not _hv.extension._loaded:
+    if extension and not getattr(_hv.extension, '_loaded', False):
         _hv.extension(extension, logo=logo)
 
 
