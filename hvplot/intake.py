@@ -11,5 +11,5 @@ except:
         patch('intake', extension='bokeh')
         patch('intake', 'plot')
     else:
-        if not _hv.extension._loaded:
+        if not getattr(_hv.extension, '_loaded', False):
             _hv.extension('bokeh', logo=False)
