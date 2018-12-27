@@ -3,7 +3,6 @@ Loads hvPlot sample data using intake catalogue.
 """
 
 import os
-import glob
 
 try:
     from intake import open_catalog
