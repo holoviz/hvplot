@@ -122,8 +122,8 @@ def package_assets(example_path):
 ########## dependencies ##########
 
 install_requires = [
-    'bokeh >=0.12.15',
-    'holoviews >=1.10.5,<1.11.0a11',
+    'bokeh >=1.0.0',
+    'holoviews >=1.11.0',
     'pandas'
 ]
 
@@ -141,8 +141,6 @@ _examples_extra = [
     'pillow',
     'selenium',
     'phantomjs',
-    'airline_flights',
-    'us_crime'
 ]
 
 extras_require = {
@@ -186,7 +184,7 @@ setup_args = dict(
     package_data={'hvplot': ['.version']},
     platforms=['Windows', 'Mac OS X', 'Linux'],
     license='BSD',
-    url='https://pyviz.github.io/hvplot',
+    url='https://hvplot.pyviz.org',
     classifiers = [
         "License :: OSI Approved :: BSD License",
         "Development Status :: 5 - Production/Stable",
