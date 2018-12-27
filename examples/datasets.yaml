@@ -1,0 +1,24 @@
+sources:
+  airline_flights:
+    description: Airline Flight data
+    driver: parquet
+    cache:
+      - argkey: urlpath
+        regex: 'airline_flights'
+        type: file
+    args:
+      urlpath: 's3://assets.holoviews.org/data/airline_flights.parq'
+      storage_options: {'anon': True}
+
+  us_crime:
+    description: US Crime data
+    driver: csv
+    args:
+      urlpath: '{{ CATALOG_DIR }}/data/crime.csv'
+    metadata:
+      url: https://www.ucrdatatool.gov/Search/Crime/State/StatebyState.cfm
+      plots:
+        example:
+          kind: line
+          y: ['Robbery', 'Burglary']
+          x: 'Year'
