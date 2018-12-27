@@ -22,6 +22,7 @@ from holoviews.element import (
 from holoviews.plotting.util import process_cmap
 from holoviews.operation import histogram
 from holoviews.streams import Buffer, Pipe
+from holoviews.util.transform import dim
 
 from .util import (
     is_series, is_dask, is_intake, is_streamz, is_xarray, process_crs,
@@ -144,7 +145,8 @@ class HoloViewsConverter(param.Parameterized):
                  precompute=False, flip_xaxis=False, flip_yaxis=False,
                  dynspread=False, hover_cols=[], x_sampling=None,
                  y_sampling=None, project=False, xlabel=None, ylabel=None,
-                 xformatter=None, yformatter=None, tools=[], **kwds):
+                 xformatter=None, yformatter=None, tools=[], padding=None,
+                 **kwds):
 
         # Process data and related options
         self._process_data(kind, data, x, y, by, groupby, row, col,
@@ -184,8 +186,8 @@ class HoloViewsConverter(param.Parameterized):
         self._by_type = NdLayout if subplots else NdOverlay
 
         # Process options
-        style_opts, plot_opts, kwds = self._process_style(colormap, kwds)
         self.stacked = stacked
+        style_opts, plot_opts, kwds = self._process_style(colormap, kwds)
         self.invert = invert
         plot_opts['logx'] = logx or loglog
         plot_opts['logy'] = logy or loglog
@@ -213,6 +215,12 @@ class HoloViewsConverter(param.Parameterized):
             plot_opts['xlabel'] = xlabel
         if ylabel is not None:
             plot_opts['ylabel'] = ylabel
+        if xlim is not None:
+            plot_opts['xlim'] = xlim
+        if ylim is not None:
+            plot_opts['ylim'] = ylim
+        if padding is not None:
+            plot_opts['padding'] = padding
         if xformatter is not None:
             plot_opts['xformatter'] = xformatter
         if yformatter is not None:
@@ -266,9 +274,7 @@ class HoloViewsConverter(param.Parameterized):
         # Process dimensions and labels
         self.label = label
         self._relabel = {'label': label} if label else {}
-        self._dim_ranges = {'x': xlim or (None, None),
-                            'y': ylim or (None, None),
-                            'c': clim or (None, None)}
+        self._dim_ranges = {'c': clim or (None, None)}
         self._redim = fields
 
         # High-level options
@@ -453,8 +459,12 @@ class HoloViewsConverter(param.Parameterized):
 
 
     def _process_style(self, colormap, kwds):
-        style_opts, plot_options = {}, {}
+        plot_options = {}
         kind = self.kind
+        eltype = self._kind_mapping[kind]
+        if eltype in Store.registry['bokeh']:
+            valid_opts = Store.registry['bokeh'][eltype].style_opts
+        style_opts = {kw: kwds[kw] for kw in list(kwds) if kw in valid_opts}
 
         # Process style options
         if 'cmap' in kwds and colormap:
@@ -464,6 +474,8 @@ class HoloViewsConverter(param.Parameterized):
         else:
             cmap = colormap
 
+        if kind.startswith('bar'):
+            plot_options['stacked'] = self.stacked
         if 'color' in kwds or 'c' in kwds:
             color = kwds.pop('color', kwds.pop('c', None))
             if isinstance(color, (np.ndarray, pd.Series)):
@@ -488,23 +500,25 @@ class HoloViewsConverter(param.Parameterized):
                 kwds['s'] = size
                 if 'scale' in kwds:
                     style_opts['size'] = kwds['scale']
-            else:
+            elif not isinstance(size, dim):
                 style_opts['size'] = np.sqrt(size)
         else:
             style_opts['size'] = np.sqrt(30)
-        if 'alpha' in kwds:
-            style_opts['alpha'] = kwds.pop('alpha')
+
         if cmap:
             style_opts['cmap'] = cmap
-        if 'logz' in kwds:
-            plot_options['logz'] = kwds['logz']
+
         return style_opts, plot_options, kwds
 
 
     def _validate_kwds(self, kwds):
         kind_opts = self._kind_options.get(self.kind, [])
+        kind = self.kind
+        eltype = self._kind_mapping[kind]
+        if eltype in Store.registry['bokeh']:
+            valid_opts = Store.registry['bokeh'][eltype].style_opts
         ds_opts = ['max_px', 'threshold']
-        mismatches = sorted([k for k in kwds if k not in kind_opts+ds_opts])
+        mismatches = sorted([k for k in kwds if k not in kind_opts+ds_opts+valid_opts])
         if not mismatches:
             return
 
@@ -523,7 +537,8 @@ class HoloViewsConverter(param.Parameterized):
                          'individually using the width and height options.')
 
         combined_opts = (self._data_options + self._axis_options +
-                         self._style_options + self._op_options + kind_opts)
+                         self._style_options + self._op_options + kind_opts +
+                         valid_opts)
         for mismatch in mismatches:
             suggestions = difflib.get_close_matches(mismatch, combined_opts)
             self.warning('%s option not found for %s plot; similar options '
@@ -651,6 +666,10 @@ class HoloViewsConverter(param.Parameterized):
         labelled = ['y' if self.invert else 'x'] if x != 'index' else []
         if not self.is_series:
             labelled.append('x' if self.invert else 'y')
+        if 'xlabel' in self._plot_opts and 'x' not in labelled:
+            labelled.append('x')
+        if 'ylabel' in self._plot_opts and 'y' not in labelled:
+            labelled.append('y')
         elif not self.label:
             self._relabel['label'] = y
 
@@ -658,9 +677,6 @@ class HoloViewsConverter(param.Parameterized):
             plot=dict(self._plot_opts, labelled=labelled),
             norm=self._norm_opts, style=self._style_opts
         )}
-        ranges = {y: self._dim_ranges['y']}
-        if x:
-            ranges[x] = self._dim_ranges['x']
 
         data = self.data if data is None else data
         ys = [y]
@@ -673,12 +689,12 @@ class HoloViewsConverter(param.Parameterized):
 
         if self.by:
             if element is Bars and not self.subplots:
-                return element(data, [x]+self.by, ys).relabel(**self._relabel).redim.range(**ranges).redim(**self._redim).opts(opts)
+                return element(data, [x]+self.by, ys).relabel(**self._relabel).redim(**self._redim).opts(opts)
             chart = Dataset(data, self.by+[x], ys).to(element, x, ys, self.by).relabel(**self._relabel)
             chart = chart.layout() if self.subplots else chart.overlay().options(batched=False)
         else:
             chart = element(data, x, ys).relabel(**self._relabel)
-        return chart.redim.range(**ranges).redim(**self._redim).opts(opts)
+        return chart.redim(**self._redim).opts(opts)
 
     def _process_args(self, data, x, y):
         data = (self.data if data is None else data)
@@ -711,9 +727,7 @@ class HoloViewsConverter(param.Parameterized):
         charts = []
         for c in y:
             chart = element(data, x, [c]+self.hover_cols).redim(**{c: self.value_label})
-            ranges = {x: self._dim_ranges['x'], self.value_label: self._dim_ranges['y']}
-            charts.append((c, chart.relabel(**self._relabel)
-                           .redim.range(**ranges).opts(**opts)))
+            charts.append((c, chart.relabel(**self._relabel).opts(**opts)))
         return self._by_type(charts, self.group_label, sort=False).options('NdOverlay', batched=False)
 
     def line(self, x, y, data=None):
@@ -756,7 +770,6 @@ class HoloViewsConverter(param.Parameterized):
         opts = {'plot': dict(self._plot_opts, labelled=labelled),
                 'style': dict(self._style_opts),
                 'norm': self._norm_opts}
-        ranges = {self.value_label: self._dim_ranges['y']}
 
         id_vars = [x]
         if any(v in self.indexes for v in id_vars):
@@ -775,16 +788,14 @@ class HoloViewsConverter(param.Parameterized):
             obj = Dataset(df, kdims, vdims).to(element, x).layout()
         else:
             obj = element(df, kdims, vdims)
-        return obj.redim.range(**ranges).redim(**self._redim).relabel(**self._relabel).opts(**opts)
+        return obj.redim(**self._redim).relabel(**self._relabel).opts(**opts)
 
     def bar(self, x, y, data=None):
         data, x, y = self._process_args(data, x, y)
-        stack_index = 1 if self.stacked else None
-        opts = {'Bars': {'stack_index': stack_index, 'show_legend': bool(stack_index)}}
         if x and y and (self.by or not isinstance(y, (list, tuple) or len(y) == 1)):
             y = y[0] if isinstance(y, (list, tuple)) else y
-            return self.single_chart(Bars, x, y, data).opts(plot=opts)
-        return self._category_plot(Bars, x, list(y), data).opts(plot=opts)
+            return self.single_chart(Bars, x, y, data)
+        return self._category_plot(Bars, x, list(y), data)
 
     def barh(self, x, y, data=None):
         return self.bar(x, y, data).opts(plot={'Bars': dict(invert_axes=True)})
@@ -802,9 +813,7 @@ class HoloViewsConverter(param.Parameterized):
         opts = {'plot': dict(self._plot_opts), # labelled=[]),
                 'norm': self._norm_opts, 'style': self._style_opts}
         if not isinstance(y, (list, tuple)):
-            ranges = {y: self._dim_ranges['y']}
-            return (element(data, self.by, y).redim.range(**ranges)
-                .relabel(**self._relabel).opts(**opts))
+            return (element(data, self.by, y).relabel(**self._relabel).opts(**opts))
 
         labelled = ['y' if self.invert else 'x'] if self.group_label != 'Group' else []
         if self.value_label != 'value':
@@ -812,15 +821,14 @@ class HoloViewsConverter(param.Parameterized):
         opts['plot']['labelled'] = labelled
 
         kdims = [self.group_label]
-        ranges = {self.value_label: self._dim_ranges['y']}
         data = data[list(y)]
         if check_library(data, 'dask'):
             from dask.dataframe import melt
         else:
             melt = pd.melt
         df = melt(data, var_name=self.group_label, value_name=self.value_label)
-        return (element(df, kdims, self.value_label).redim.range(**ranges)
-                .redim(**self._redim).relabel(**self._relabel).opts(**opts))
+        return (element(df, kdims, self.value_label).redim(**self._redim)
+                .relabel(**self._relabel).opts(**opts))
 
     def box(self, x, y, data=None):
         return self._stats_plot(BoxWhisker, y, data)
@@ -859,18 +867,13 @@ class HoloViewsConverter(param.Parameterized):
             if self.by:
                 hist = hists.last
                 hists = hists.layout() if self.subplots else hists.overlay()
-            ranges = {hist.kdims[0].name: self._dim_ranges['x'],
-                      hist.vdims[0].name: self._dim_ranges['y']}
-            return hists.opts({'Histogram': opts}).redim(**self._redim).redim.range(**ranges)
+            return hists.opts({'Histogram': opts}).redim(**self._redim)
 
         ds = Dataset(data)
         hists = []
         for col in y:
             hist = histogram(ds, dimension=col, **hist_opts)
-            ranges = {hist.kdims[0].name: self._dim_ranges['x'],
-                      hist.vdims[0].name: self._dim_ranges['y']}
-            hists.append((col, hist.redim.range(**ranges)
-                          .relabel(**self._relabel).opts(**opts)))
+            hists.append((col, hist.relabel(**self._relabel).opts(**opts)))
         return self._by_type(hists, sort=False).redim(**self._redim)
 
     def kde(self, x, y, data=None):
@@ -988,7 +991,7 @@ class HoloViewsConverter(param.Parameterized):
 
         params = dict(self._relabel)
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
-        ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y'], z[0]: self._dim_ranges['c']}
+        ranges = {z[0]: self._dim_ranges['c']}
 
         element = self._get_element('image')
         if self.geo: params['crs'] = self.crs
@@ -1009,7 +1012,7 @@ class HoloViewsConverter(param.Parameterized):
 
         params = dict(self._relabel)
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
-        ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y'], z[0]: self._dim_ranges['c']}
+        ranges = {z[0]: self._dim_ranges['c']}
 
         element = self._get_element('quadmesh')
         if self.geo: params['crs'] = self.crs
@@ -1059,7 +1062,7 @@ class HoloViewsConverter(param.Parameterized):
             x, y = 'Longitude', 'Latitude'
 
         plot_opts = dict(self._plot_opts)
-        ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y']}
+        ranges = {}
         if 'c' in self.kwds:
             plot_opts['color_index'] = self.kwds['c']
             self._style_opts.pop('color', None)
@@ -1100,7 +1103,7 @@ class HoloViewsConverter(param.Parameterized):
             x, y = 'Longitude', 'Latitude'
 
         plot_opts = dict(self._plot_opts)
-        ranges = {x: self._dim_ranges['x'], y: self._dim_ranges['y']}
+        ranges = {}
         if 'c' in self.kwds:
             plot_opts['color_index'] = self.kwds['c']
             self._style_opts.pop('color', None)
