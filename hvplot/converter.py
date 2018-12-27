@@ -171,6 +171,20 @@ class HoloViewsConverter(param.Parameterized):
                                   'the geoviews library must be available. '
                                   'It can be installed with:\n  conda '
                                   'install -c pyviz geoviews')
+        if self.geo:
+            from cartopy import crs as ccrs
+            from geoviews.util import project_extents
+            proj_crs = projection or ccrs.GOOGLE_MERCATOR
+            if self.crs != proj_crs:
+                px0, py0, px1, py1 = ccrs.GOOGLE_MERCATOR.boundary.bounds
+                x0, x1 = xlim or (px0, px1)
+                y0, y1 = ylim or (py0, py1)
+                extents = (x0, y0, x1, y1)
+                x0, y0, x1, y1 = project_extents(extents, self.crs, proj_crs)
+                if xlim:
+                    xlim = (x0, x1)
+                if ylim:
+                    ylim = (y0, y1)
 
         # Operations
         self.datashade = datashade
