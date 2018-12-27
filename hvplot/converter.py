@@ -478,6 +478,8 @@ class HoloViewsConverter(param.Parameterized):
         eltype = self._kind_mapping[kind]
         if eltype in Store.registry['bokeh']:
             valid_opts = Store.registry['bokeh'][eltype].style_opts
+        else:
+            valid_opts = []
         style_opts = {kw: kwds[kw] for kw in list(kwds) if kw in valid_opts}
 
         # Process style options
@@ -516,7 +518,7 @@ class HoloViewsConverter(param.Parameterized):
                     style_opts['size'] = kwds['scale']
             elif not isinstance(size, dim):
                 style_opts['size'] = np.sqrt(size)
-        else:
+        elif 'size' in valid_opts:
             style_opts['size'] = np.sqrt(30)
 
         if cmap:
