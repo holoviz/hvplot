@@ -72,6 +72,70 @@ class StreamingCallable(Callable):
 
 
 class HoloViewsConverter(param.Parameterized):
+    """
+    Axes options
+    ------------
+    colorbar (default=False): boolean
+        Enables colorbar
+    flip_xaxis/flip_yaxis: boolean
+        Whether to flip the axis left to right or up and down respectively
+    grid (default=False): boolean
+        Whether to show a grid
+    hover (default=True): boolean
+        Whether to show hover tooltips
+    hover_cols (default=[]): list
+        Additional columns to add to the hover tool
+    invert (default=False): boolean
+        Swaps x- and y-axis
+    legend (default=True): boolean or str
+        Whether to show a legend, or a legend position
+        ('top', 'bottom', 'left', 'right')
+    logx/logy (default=False): boolean
+        Enables logarithmic x- and y-axis respectively
+    loglog (default=False): boolean
+        Enables logarithmic x- and y-axis
+    shared_axes (default=False): boolean
+        Whether to link axes between plots
+    title (default=''): str
+        Title for the plot
+    tools (default=[]): list
+        List of tool instances or strings (e.g. ['tap', box_select'])
+    xformatter/yformatter (default=None): str or TickFormatter
+        Formatter for the x-axis and y-axis (accepts printf formatter,
+        e.g. '%.3f', and bokeh TickFormatter)
+    xlabel/ylabel (default=None): str
+        Axis labels for the x-axis and y-axis
+    xlim/ylim (default=None): tuple
+        Plot limits of the x- and y-axis
+    xticks/yticks (default=None): int or list
+        Ticks along x- and y-axis specified as an integer, list of
+        ticks positions, or list of tuples of the tick positions and labels
+    width (default=800)/height (default=300): int
+        The width and height of the plot in pixels
+
+    Datashader options
+    ------------------
+    aggregator (default=None):
+        Aggregator to use when applying rasterize or datashade operation
+        (valid options include 'mean', 'count', 'min', 'max' and more, and
+        datashader reduction objects)
+    dynamic (default=True):
+        Whether to return a dynamic plot which sends updates on widget and
+        zoom/pan events or whether all the data should be embedded
+        (warning: for large groupby operations embedded data can become
+        very large if dynamic=False)
+    datashade (default=False):
+        Whether to apply rasterization and shading using datashader
+        library returning an RGB object
+    dynspread (default=False):
+        Allows plots generated with datashade=True to increase the point
+        size to make sparse regions more visible
+    rasterize (default=False):
+        Whether to apply rasterization using the datashader library
+        returning an aggregated Image
+    xsampling/ysampling (default=None):
+        Declares a minimum sampling density beyond.
+    """
 
     _gridded_types = ['image', 'contour', 'contourf', 'quadmesh']
 
