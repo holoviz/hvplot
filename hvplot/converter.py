@@ -86,7 +86,8 @@ class HoloViewsConverter(param.Parameterized):
     _axis_options = ['width', 'height', 'shared_axes', 'grid', 'legend',
                      'rot', 'xlim', 'ylim', 'xticks', 'yticks', 'colorbar',
                      'invert', 'title', 'logx', 'logy', 'loglog', 'xaxis',
-                     'yaxis', 'xformatter', 'yformatter', 'xlabel', 'ylabel']
+                     'yaxis', 'xformatter', 'yformatter', 'xlabel', 'ylabel',
+                     'padding']
 
     _style_options = ['color', 'alpha', 'colormap', 'fontsize', 'c']
 
@@ -898,15 +899,16 @@ class HoloViewsConverter(param.Parameterized):
         opts = {'Distribution': opts, 'Area': opts,
                 'NdOverlay': {'plot': dict(self._plot_opts, legend_limit=0)}}
 
+        xlim = opts['plot'].get('xlim', (None, None))
         if not isinstance(y, (list, tuple)):
-            ranges = {y: self._dim_ranges['x']}
+            ranges = {y: xlim}
             if self.by:
                 dists = Dataset(data).to(Distribution, y, [], self.by)
                 dists = dists.layout() if self.subplots else dists.overlay()
             else:
                 dists = Distribution(data, y, [])
         else:
-            ranges = {self.value_label: self._dim_ranges['x']}
+            ranges = {self.value_label: xlim}
             data = data[y]
             df = pd.melt(data, var_name=self.group_label, value_name=self.value_label)
             ds = Dataset(df)
