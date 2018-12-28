@@ -405,6 +405,22 @@ class hvPlot(param.Parameterized):
         """
         return self(kind='table', **dict(kwds, columns=columns))
 
+    def dataset(self, columns=None, **kwds):
+        """
+        Dataset
+
+        Parameters
+        ----------
+        **kwds : optional
+            Keyword arguments to pass on to
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
+        Returns
+        -------
+        obj : HoloViews object
+            The HoloViews representation of the plot.
+        """
+        return self(kind='dataset', **dict(kwds, columns=columns))
+
     def image(self, x=None, y=None, z=None, colorbar=True, **kwds):
         """
         Image plot
