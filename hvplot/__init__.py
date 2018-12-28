@@ -1,5 +1,8 @@
 from __future__ import absolute_import
 
+import inspect
+import textwrap
+
 import param
 import numpy as _np
 import pandas as _pd
@@ -7,8 +10,10 @@ import holoviews as _hv
 
 from bokeh.io import export_png as _export_png, show as _show, save as _save
 from bokeh.resources import CDN as _CDN
+from holoviews import Store
 
 from .converter import HoloViewsConverter
+from .util import get_ipy
 
 __version__ = str(param.version.Version(fpath=__file__, archive_commit="$Format:%h$",
                                         reponame="hvplot"))
@@ -18,6 +23,38 @@ renderer = _hv.renderer('bokeh')
 # Register plotting interfaces
 def _patch_plot(self):
     return hvPlot(self)
+
+
+def _patch_doc(kind):
+    converter = HoloViewsConverter
+    method = getattr(hvPlot, kind)
+    kind_opts = converter._kind_options.get(kind, [])
+    eltype = converter._kind_mapping[kind]
+
+    if get_ipy():
+        formatter = "{kind}({completions})\n{docstring}\n\n{options}"
+    else:
+        formatter = "{docstring}\n\n{options}"
+    if eltype in Store.registry['bokeh']:
+        valid_opts = Store.registry['bokeh'][eltype].style_opts
+    else:
+        valid_opts = []
+
+    parameters = []
+    sig = inspect.signature(method)
+    for name, p in list(sig.parameters.items())[1:]:
+        if p.kind == 1:
+            parameters.append((name, p.default))
+    parameters += [(o, None) for o in
+                   valid_opts+kind_opts+converter._axis_options+converter._op_options]
+
+    completions = ', '.join(['%s=%s' % (n, v) for n, v in parameters])
+
+    options = textwrap.dedent('\n'.join(converter.__doc__.splitlines()[2:]))
+    doc = formatter.format(
+        kind=kind, completions=completions, docstring=textwrap.dedent(method.__doc__),
+        options=options)
+    method.__doc__ = doc
 
 
 def patch(library, name='hvplot', extension=None, logo=False):
@@ -819,3 +856,7 @@ def andrews_curves(data, class_column, samples=200, alpha=0.5,
     groups = dataset.to(_hv.Curve, 't', 'value').overlay('sample').items()
     return _hv.Overlay([curve.relabel(k).options('Curve', color=c)
                         for c, (k, v) in zip(colors, groups) for curve in v]).options(options)
+
+# Patch docstrings
+for _kind in HoloViewsConverter._kind_mapping:
+    _patch_doc(_kind)
