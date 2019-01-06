@@ -95,6 +95,12 @@ class HoloViewsConverter(param.Parameterized):
         Enables logarithmic x- and y-axis respectively
     loglog (default=False): boolean
         Enables logarithmic x- and y-axis
+    padding: number or tuple
+        Fraction by which to increase auto-ranged extents to make
+        datapoints more visible around borders. Supports tuples to
+        specify different amount of padding for x- and y-axis and
+        tuples of tuples to specify different amounts of padding for
+        upper and lower bounds.
     shared_axes (default=False): boolean
         Whether to link axes between plots
     title (default=''): str
@@ -822,9 +828,6 @@ class HoloViewsConverter(param.Parameterized):
     def scatter(self, x, y, data=None):
         scatter = self.chart(Scatter, x, y, data)
         opts = {}
-        if 'c' in self.kwds:
-            opts['color_index'] = self.kwds['c']
-            self._style_opts.pop('color', None)
         if 's' in self.kwds:
             opts['size_index'] = self.kwds['s']
         if 'marker' in self.kwds:
