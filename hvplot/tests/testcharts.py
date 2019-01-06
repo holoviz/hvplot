@@ -1,7 +1,7 @@
 from unittest import SkipTest
 from parameterized import parameterized
 
-from holoviews import NdOverlay
+from holoviews import NdOverlay, Store
 from holoviews.element import Curve, Area, Scatter
 from holoviews.element.comparison import ComparisonTestCase
 from hvplot import patch
@@ -57,14 +57,16 @@ class TestChart1D(ComparisonTestCase):
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
     def test_tidy_chart_ranges(self, kind, element):
         plot = self.df.hvplot(x='x', y='y', kind=kind, xlim=(0, 3), ylim=(5, 10))
-        self.assertEqual(plot.kdims[0].range, (0, 3))
-        self.assertEqual(plot.vdims[0].range, (5, 10))
+        opts = Store.lookup_options('bokeh', plot, 'plot').options
+        self.assertEqual(opts['xlim'], (0, 3))
+        self.assertEqual(opts['ylim'], (5, 10))
 
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
     def test_wide_chart_ranges(self, kind, element):
         plot = self.df.hvplot(kind=kind, xlim=(0, 3), ylim=(5, 10))
-        self.assertEqual(plot.last.kdims[0].range, (0, 3))
-        self.assertEqual(plot.last.vdims[0].range, (5, 10))
+        opts = Store.lookup_options('bokeh', plot.last, 'plot').options
+        self.assertEqual(opts['xlim'], (0, 3))
+        self.assertEqual(opts['ylim'], (5, 10))
 
     def test_area_stacked(self):
         plot = self.df.hvplot.area(stacked=True)

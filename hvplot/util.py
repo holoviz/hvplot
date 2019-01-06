@@ -13,6 +13,14 @@ from holoviews.core.util import basestring
 hv_version = LooseVersion(hv.__version__)
 
 
+def get_ipy():
+    try:
+        ip = get_ipython() # noqa
+    except:
+        ip = None
+    return ip
+
+
 def check_crs(crs):
     """
     Checks if the crs represents a valid grid, projection or ESPG string.

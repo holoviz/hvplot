@@ -1,5 +1,8 @@
 from __future__ import absolute_import
 
+import inspect
+import textwrap
+
 import param
 import numpy as _np
 import pandas as _pd
@@ -7,8 +10,10 @@ import holoviews as _hv
 
 from bokeh.io import export_png as _export_png, show as _show, save as _save
 from bokeh.resources import CDN as _CDN
+from holoviews import Store
 
 from .converter import HoloViewsConverter
+from .util import get_ipy
 
 __version__ = str(param.version.Version(fpath=__file__, archive_commit="$Format:%h$",
                                         reponame="hvplot"))
@@ -18,6 +23,75 @@ renderer = _hv.renderer('bokeh')
 # Register plotting interfaces
 def _patch_plot(self):
     return hvPlot(self)
+
+_METHOD_DOCS = {}
+
+def _get_doc(kind, completions=False, docstring=True, generic=True, style=True):
+    converter = HoloViewsConverter
+    method = getattr(hvPlot, kind)
+    kind_opts = converter._kind_options.get(kind, [])
+    eltype = converter._kind_mapping[kind]
+
+    formatter = ''
+    if completions:
+        formatter = "hvplot.{kind}({completions})"
+    if docstring:
+        if formatter:
+            formatter += '\n'
+        formatter += "{docstring}"
+    if generic:
+        if formatter:
+            formatter += '\n'
+        formatter += "{options}"
+
+    if eltype in Store.registry['bokeh']:
+        valid_opts = Store.registry['bokeh'][eltype].style_opts
+        if style:
+            formatter += '\n{style}'
+    else:
+        valid_opts = []
+
+    style_opts = 'Style options\n-------------\n\n' + '\n'.join(sorted(valid_opts))
+
+    parameters = []
+    sig = inspect.signature(method)
+    for name, p in list(sig.parameters.items())[1:]:
+        if p.kind == 1:
+            parameters.append((name, p.default))
+    parameters += [(o, None) for o in
+                   valid_opts+kind_opts+converter._axis_options+converter._op_options]
+
+    completions = ', '.join(['%s=%s' % (n, v) for n, v in parameters])
+    options = textwrap.dedent(converter.__doc__)
+    method_doc = _METHOD_DOCS.get(kind, method.__doc__)
+    _METHOD_DOCS[kind] = method_doc
+    return formatter.format(
+        kind=kind, completions=completions, docstring=textwrap.dedent(method_doc),
+        options=options, style=style_opts)
+
+
+def _patch_doc(kind):
+    method = getattr(hvPlot, kind)
+    method.__doc__ = _get_doc(kind, get_ipy())
+
+
+def help(kind=None, docstring=True, generic=True, style=True):
+    """
+    Provide a docstring with all valid options which apply to the plot
+    type.
+
+    Parameters
+    ----------
+    kind: str
+        The kind of plot to provide help for
+    docstring: boolean (default=True)
+        Whether to display the docstring
+    generic: boolean (default=True)
+        Whether to provide list of generic options
+    style: boolean (default=True)
+        Whether to provide list of style options
+    """
+    print(_get_doc(kind, docstring=docstring, generic=generic, style=style))
 
 
 def patch(library, name='hvplot', extension=None, logo=False):
@@ -72,7 +146,7 @@ def patch(library, name='hvplot', extension=None, logo=False):
         _hv.extension(extension, logo=logo)
 
 
-class hvPlot(param.Parameterized):
+class hvPlot(object):
 
     def __init__(self, data, custom_plots={}, **metadata):
         self._data = data
@@ -123,10 +197,10 @@ class hvPlot(param.Parameterized):
         if name in plots:
             plot_opts = plots[name]
             if 'kind' in plot_opts and name in HoloViewsConverter._kind_mapping:
-                self.warning("Custom options for existing plot types should not "
-                             "declare the 'kind' argument. The .%s plot method "
-                             "was unexpectedly customized with kind=%r."
-                             % (plot_opts['kind'], name))
+                param.main.warning("Custom options for existing plot types should not "
+                                   "declare the 'kind' argument. The .%s plot method "
+                                   "was unexpectedly customized with kind=%r."
+                                   % (plot_opts['kind'], name))
                 plot_opts['kind'] = name
             return hvPlot(self._data, **dict(self._metadata, **plot_opts))
         return super(hvPlot, self).__getattribute__(name)
@@ -175,6 +249,12 @@ class hvPlot(param.Parameterized):
         ----------
         x, y : string, optional
             Field name to draw x- and y-positions from
+        c: string, optional
+            Name of the field to color points by
+        s: string, optional
+            Name of the field to scale point size by
+        scale: number, optional
+            Scaling factor to apply to point scaling
         **kwds : optional
             Keyword arguments to pass on to
             :py:meth:`hvplot.converter.HoloViewsConverter`.
@@ -404,6 +484,22 @@ class hvPlot(param.Parameterized):
             The HoloViews representation of the plot.
         """
         return self(kind='table', **dict(kwds, columns=columns))
+
+    def dataset(self, columns=None, **kwds):
+        """
+        Dataset
+
+        Parameters
+        ----------
+        **kwds : optional
+            Keyword arguments to pass on to
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
+        Returns
+        -------
+        obj : HoloViews object
+            The HoloViews representation of the plot.
+        """
+        return self(kind='dataset', **dict(kwds, columns=columns))
 
     def image(self, x=None, y=None, z=None, colorbar=True, **kwds):
         """
@@ -803,3 +899,7 @@ def andrews_curves(data, class_column, samples=200, alpha=0.5,
     groups = dataset.to(_hv.Curve, 't', 'value').overlay('sample').items()
     return _hv.Overlay([curve.relabel(k).options('Curve', color=c)
                         for c, (k, v) in zip(colors, groups) for curve in v]).options(options)
+
+# Patch docstrings
+for _kind in HoloViewsConverter._kind_mapping:
+    _patch_doc(_kind)
