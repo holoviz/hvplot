@@ -72,7 +72,7 @@ class StreamingCallable(Callable):
 
 
 
-class HoloViewsConverter(param.Parameterized):
+class HoloViewsConverter(object):
     """
     Generic options
     ---------------
@@ -368,8 +368,8 @@ class HoloViewsConverter(param.Parameterized):
         if debug:
             kwds = dict(x=self.x, y=self.y, by=self.by, kind=self.kind,
                         groupby=self.groupby)
-            self.warning('Plotting {kind} plot with parameters x: {x}, '
-                         'y: {y}, by: {by}, groupby: {groupby}'.format(**kwds))
+            param.main.warning('Plotting {kind} plot with parameters x: {x}, '
+                               'y: {y}, by: {by}, groupby: {groupby}'.format(**kwds))
 
 
     def _process_crs(self, data, crs):
@@ -612,25 +612,25 @@ class HoloViewsConverter(param.Parameterized):
 
         if 'ax' in mismatches:
             mismatches.pop(mismatches.index('ax'))
-            self.warning('hvPlot does not have the concept of axes, '
-                         'and the ax keyword will be ignored. Compose '
-                         'plots with the * operator to overlay plots or the '
-                         '+ operator to lay out plots beside each other '
-                         'instead.')
+            param.main.warning('hvPlot does not have the concept of axes, '
+                               'and the ax keyword will be ignored. Compose '
+                               'plots with the * operator to overlay plots or the '
+                               '+ operator to lay out plots beside each other '
+                               'instead.')
         if 'figsize' in mismatches:
             mismatches.pop(mismatches.index('figsize'))
-            self.warning('hvPlot does not have the concept of a figure, '
-                         'and the figsize keyword will be ignored. The '
-                         'size of each subplot in a layout is set '
-                         'individually using the width and height options.')
+            param.main.warning('hvPlot does not have the concept of a figure, '
+                               'and the figsize keyword will be ignored. The '
+                               'size of each subplot in a layout is set '
+                               'individually using the width and height options.')
 
         combined_opts = (self._data_options + self._axis_options +
                          self._style_options + self._op_options + kind_opts +
                          valid_opts)
         for mismatch in mismatches:
             suggestions = difflib.get_close_matches(mismatch, combined_opts)
-            self.warning('%s option not found for %s plot; similar options '
-                         'include: %r' % (mismatch, self.kind, suggestions))
+            param.main.warning('%s option not found for %s plot; similar options '
+                               'include: %r' % (mismatch, self.kind, suggestions))
 
     def __call__(self, kind, x, y):
         kind = self.kind or kind
@@ -736,8 +736,8 @@ class HoloViewsConverter(param.Parameterized):
                 processed = dynspread(processed, max_px=self.kwds.get('max_px', 3),
                                       threshold=self.kwds.get('threshold', 0.5))
             else:
-                self.warning('dynspread may only be applied on datashaded plots, '
-                             'use datashade=True instead of rasterize=True.')
+                param.main.warning('dynspread may only be applied on datashaded plots, '
+                                   'use datashade=True instead of rasterize=True.')
         return processed.opts({eltype: {'plot': self._plot_opts, 'style': style}})
 
 

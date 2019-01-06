@@ -62,7 +62,7 @@ def _get_doc(kind, completions=False, docstring=True, generic=True, style=True):
                    valid_opts+kind_opts+converter._axis_options+converter._op_options]
 
     completions = ', '.join(['%s=%s' % (n, v) for n, v in parameters])
-    options = textwrap.dedent('\n'.join(converter.__doc__.splitlines()[2:-4]))
+    options = textwrap.dedent(converter.__doc__)
     method_doc = _METHOD_DOCS.get(kind, method.__doc__)
     _METHOD_DOCS[kind] = method_doc
     return formatter.format(
@@ -146,7 +146,7 @@ def patch(library, name='hvplot', extension=None, logo=False):
         _hv.extension(extension, logo=logo)
 
 
-class hvPlot(param.Parameterized):
+class hvPlot(object):
 
     def __init__(self, data, custom_plots={}, **metadata):
         self._data = data
@@ -197,10 +197,10 @@ class hvPlot(param.Parameterized):
         if name in plots:
             plot_opts = plots[name]
             if 'kind' in plot_opts and name in HoloViewsConverter._kind_mapping:
-                self.warning("Custom options for existing plot types should not "
-                             "declare the 'kind' argument. The .%s plot method "
-                             "was unexpectedly customized with kind=%r."
-                             % (plot_opts['kind'], name))
+                param.main.warning("Custom options for existing plot types should not "
+                                   "declare the 'kind' argument. The .%s plot method "
+                                   "was unexpectedly customized with kind=%r."
+                                   % (plot_opts['kind'], name))
                 plot_opts['kind'] = name
             return hvPlot(self._data, **dict(self._metadata, **plot_opts))
         return super(hvPlot, self).__getattribute__(name)
