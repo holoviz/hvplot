@@ -523,6 +523,28 @@ class hvPlot(object):
         """
         return self(x, y, z=z, kind='image', colorbar=colorbar, **kwds)
 
+    def rgb(self, x=None, y=None, z=None, bands=None, **kwds):
+        """
+        RGB plot
+
+        Parameters
+        ----------
+        x, y : string, optional
+            The coordinate variable along the x- and y-axis
+        bands : string, optional
+            The coordinate variable to draw the RGB channels from
+        z : string, optional
+            The data variable to plot
+        **kwds : optional
+            Keyword arguments to pass on to
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
+        Returns
+        -------
+        obj : HoloViews object
+            The HoloViews representation of the plot.
+        """
+        return self(x, y, z=z, bands=bands, kind='rgb', **kwds)
+
     def quadmesh(self, x=None, y=None, z=None, colorbar=True, **kwds):
         """
         QuadMesh plot
