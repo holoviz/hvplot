@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import sys
 import inspect
 import textwrap
 
@@ -54,10 +55,15 @@ def _get_doc(kind, completions=False, docstring=True, generic=True, style=True):
     style_opts = 'Style options\n-------------\n\n' + '\n'.join(sorted(valid_opts))
 
     parameters = []
-    sig = inspect.signature(method)
-    for name, p in list(sig.parameters.items())[1:]:
-        if p.kind == 1:
-            parameters.append((name, p.default))
+    if sys.version_info.major < 3:
+        argspec = inspect.getargspec(method)
+        for arg, dflt in zip(argspec.args[1:], argspec.defaults):
+            parameters.append((arg, dflt))
+    else:
+        sig = inspect.signature(method)
+        for name, p in list(sig.parameters.items())[1:]:
+            if p.kind == 1:
+                parameters.append((name, p.default))
     parameters += [(o, None) for o in
                    valid_opts+kind_opts+converter._axis_options+converter._op_options]
 
