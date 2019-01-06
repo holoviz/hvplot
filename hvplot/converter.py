@@ -754,12 +754,13 @@ class HoloViewsConverter(param.Parameterized):
         labelled = ['y' if self.invert else 'x'] if x != 'index' else []
         if not self.is_series:
             labelled.append('x' if self.invert else 'y')
+        elif not self.label:
+            self._relabel['label'] = y
+
         if 'xlabel' in self._plot_opts and 'x' not in labelled:
             labelled.append('x')
         if 'ylabel' in self._plot_opts and 'y' not in labelled:
             labelled.append('y')
-        elif not self.label:
-            self._relabel['label'] = y
 
         opts = {element.__name__: dict(
             plot=dict(self._plot_opts, labelled=labelled),

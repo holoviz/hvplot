@@ -15,7 +15,7 @@ hv_version = LooseVersion(hv.__version__)
 
 def get_ipy():
     try:
-        ip = get_ipython()
+        ip = get_ipython() # noqa
     except:
         ip = None
     return ip
