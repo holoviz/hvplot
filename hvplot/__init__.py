@@ -24,21 +24,34 @@ renderer = _hv.renderer('bokeh')
 def _patch_plot(self):
     return hvPlot(self)
 
+_METHOD_DOCS = {}
 
-def _patch_doc(kind):
+def _get_doc(kind, completions=False, docstring=True, generic=True, style=True):
     converter = HoloViewsConverter
     method = getattr(hvPlot, kind)
     kind_opts = converter._kind_options.get(kind, [])
     eltype = converter._kind_mapping[kind]
 
-    if get_ipy():
-        formatter = "{kind}({completions})\n{docstring}\n\n{options}"
-    else:
-        formatter = "{docstring}\n\n{options}"
+    formatter = ''
+    if completions:
+        formatter = "hvplot.{kind}({completions})"
+    if docstring:
+        if formatter:
+            formatter += '\n'
+        formatter += "{docstring}"
+    if generic:
+        if formatter:
+            formatter += '\n'
+        formatter += "{options}"
+
     if eltype in Store.registry['bokeh']:
         valid_opts = Store.registry['bokeh'][eltype].style_opts
+        if style:
+            formatter += '\n{style}'
     else:
         valid_opts = []
+
+    style_opts = 'Style options\n-------------\n\n' + '\n'.join(sorted(valid_opts))
 
     parameters = []
     sig = inspect.signature(method)
@@ -49,12 +62,36 @@ def _patch_doc(kind):
                    valid_opts+kind_opts+converter._axis_options+converter._op_options]
 
     completions = ', '.join(['%s=%s' % (n, v) for n, v in parameters])
+    options = textwrap.dedent('\n'.join(converter.__doc__.splitlines()[2:-4]))
+    method_doc = _METHOD_DOCS.get(kind, method.__doc__)
+    _METHOD_DOCS[kind] = method_doc
+    return formatter.format(
+        kind=kind, completions=completions, docstring=textwrap.dedent(method_doc),
+        options=options, style=style_opts)
 
-    options = textwrap.dedent('\n'.join(converter.__doc__.splitlines()[2:]))
-    doc = formatter.format(
-        kind=kind, completions=completions, docstring=textwrap.dedent(method.__doc__),
-        options=options)
-    method.__doc__ = doc
+
+def _patch_doc(kind):
+    method = getattr(hvPlot, kind)
+    method.__doc__ = _get_doc(kind, get_ipy())
+
+
+def help(kind=None, docstring=True, generic=True, style=True):
+    """
+    Provide a docstring with all valid options which apply to the plot
+    type.
+
+    Parameters
+    ----------
+    kind: str
+        The kind of plot to provide help for
+    docstring: boolean (default=True)
+        Whether to display the docstring
+    generic: boolean (default=True)
+        Whether to provide list of generic options
+    style: boolean (default=True)
+        Whether to provide list of style options
+    """
+    print(_get_doc(kind, docstring=docstring, generic=generic, style=style))
 
 
 def patch(library, name='hvplot', extension=None, logo=False):
@@ -212,6 +249,12 @@ class hvPlot(param.Parameterized):
         ----------
         x, y : string, optional
             Field name to draw x- and y-positions from
+        c: string, optional
+            Name of the field to color points by
+        s: string, optional
+            Name of the field to scale point size by
+        scale: number, optional
+            Scaling factor to apply to point scaling
         **kwds : optional
             Keyword arguments to pass on to
             :py:meth:`hvplot.converter.HoloViewsConverter`.

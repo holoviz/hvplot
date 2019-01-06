@@ -14,6 +14,7 @@ from holoviews.core.spaces import DynamicMap, HoloMap, Callable
 from holoviews.core.overlay import NdOverlay
 from holoviews.core.options import Store, Cycle
 from holoviews.core.layout import NdLayout
+from holoviews.core.util import max_range
 from holoviews.element import (
     Curve, Scatter, Area, Bars, BoxWhisker, Dataset, Distribution,
     Table, HeatMap, Image, HexTiles, QuadMesh, Bivariate, Histogram,
@@ -73,8 +74,8 @@ class StreamingCallable(Callable):
 
 class HoloViewsConverter(param.Parameterized):
     """
-    Axes options
-    ------------
+    Generic options
+    ---------------
     colorbar (default=False): boolean
         Enables colorbar
     flip_xaxis/flip_yaxis: boolean
@@ -159,7 +160,7 @@ class HoloViewsConverter(param.Parameterized):
                    'aggregator']
 
     _kind_options = {
-        'scatter'  : ['s', 'marker', 'c', 'scale', 'logz'],
+        'scatter'  : ['s', 'c', 'scale', 'logz'],
         'step'     : ['where'],
         'area'     : ['y2'],
         'hist'     : ['bins', 'bin_range', 'normed', 'cumulative'],
@@ -893,8 +894,11 @@ class HoloViewsConverter(param.Parameterized):
 
         opts = {'plot': dict(self._plot_opts), # labelled=[]),
                 'norm': self._norm_opts, 'style': self._style_opts}
+
+        ylim = self._plot_opts.get('ylim', (None, None))
         if not isinstance(y, (list, tuple)):
-            return (element(data, self.by, y).relabel(**self._relabel).opts(**opts))
+            ranges = {y: ylim}
+            return (element(data, self.by, y).redim.range(**ranges).relabel(**self._relabel).opts(**opts))
 
         labelled = ['y' if self.invert else 'x'] if self.group_label != 'Group' else []
         if self.value_label != 'value':
@@ -908,8 +912,9 @@ class HoloViewsConverter(param.Parameterized):
         else:
             melt = pd.melt
         df = melt(data, var_name=self.group_label, value_name=self.value_label)
+        ranges = {self.value_label: ylim}
         return (element(df, kdims, self.value_label).redim(**self._redim)
-                .relabel(**self._relabel).opts(**opts))
+                .redim.range(**ranges).relabel(**self._relabel).opts(**opts))
 
     def box(self, x, y, data=None):
         return self._stats_plot(BoxWhisker, y, data)
@@ -928,6 +933,7 @@ class HoloViewsConverter(param.Parameterized):
         plot_opts = dict(self._plot_opts, labelled=labelled)
         opts = dict(plot=plot_opts, style=self._style_opts,
                     norm=self._norm_opts)
+
         hist_opts = {'bin_range': self.kwds.get('bin_range', None),
                      'normed': self.kwds.get('normed', False),
                      'cumulative': self.kwds.get('cumulative', False)}
@@ -939,9 +945,12 @@ class HoloViewsConverter(param.Parameterized):
                 hist_opts['bins'] = bins
 
         if not isinstance(y, (list, tuple)):
-            if self.stacked and not self.subplots and not 'bin_range' in self.kwds:
+            if not 'bin_range' in self.kwds:
                 ys = data[y]
-                hist_opts['bin_range'] = (ys.min(), ys.max())
+                ymin, ymax = (ys.min(), ys.max())
+                if is_dask(ys):
+                    ymin, ymax = ymin.compute(), ymax.compute()
+                hist_opts['bin_range'] = ymin, ymax
 
             ds = Dataset(data, self.by, y)
             hist = hists = histogram(ds.to(Dataset, [], y, self.by), **hist_opts)
@@ -949,6 +958,17 @@ class HoloViewsConverter(param.Parameterized):
                 hist = hists.last
                 hists = hists.layout() if self.subplots else hists.overlay()
             return hists.opts({'Histogram': opts}).redim(**self._redim)
+
+        ranges = []
+        for col in y:
+            if not 'bin_range' in self.kwds:
+                ys = data[col]
+                ymin, ymax = (ys.min(), ys.max())
+                if is_dask(ys):
+                    ymin, ymax = ymin.compute(), ymax.compute()
+                ranges.append((ymin, ymax))
+        if ranges:
+            hist_opts['bin_range'] = max_range(ranges)
 
         ds = Dataset(data)
         hists = []
@@ -963,7 +983,7 @@ class HoloViewsConverter(param.Parameterized):
         opts = {'Distribution': opts, 'Area': opts,
                 'NdOverlay': {'plot': dict(self._plot_opts, legend_limit=0)}}
 
-        xlim = opts['plot'].get('xlim', (None, None))
+        xlim = self._plot_opts.get('xlim', (None, None))
         if not isinstance(y, (list, tuple)):
             ranges = {y: xlim}
             if self.by:

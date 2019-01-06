@@ -30,6 +30,9 @@ and Cartopy to display data in geographic coordinate systems.
 * `Plotting <Plotting.html>`_
   Overview of plotting your data with hvPlot.
 
+* `Customization <Customization.html>`_
+  Listing of available options to customize plots.
+
 * `Viewing <Viewing.html>`_
   Displaying and saving plots in the notebook, at the command prompt, or in scripts.
 
@@ -55,6 +58,7 @@ and Cartopy to display data in geographic coordinate systems.
 
     Introduction <Introduction>
     Plotting <Plotting>
+    Customization <Customization>
     Viewing <Viewing>
     Subplots <Subplots>
     Streaming <Streaming>
