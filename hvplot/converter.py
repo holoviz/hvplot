@@ -101,6 +101,9 @@ class HoloViewsConverter(object):
         specify different amount of padding for x- and y-axis and
         tuples of tuples to specify different amounts of padding for
         upper and lower bounds.
+    rot: number
+        Rotates the axis ticks along the x-axis by the specified
+        number of degrees.
     shared_axes (default=False): boolean
         Whether to link axes between plots
     title (default=''): str
