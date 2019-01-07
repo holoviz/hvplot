@@ -57,7 +57,9 @@ def _get_doc(kind, completions=False, docstring=True, generic=True, style=True):
     parameters = []
     if sys.version_info.major < 3:
         argspec = inspect.getargspec(method)
-        for arg, dflt in zip(argspec.args[1:], argspec.defaults):
+        args = argspec.args[1:]
+        defaults = argspec.defaults or [None]*len(args)
+        for arg, dflt in zip(args, defaults):
             parameters.append((arg, dflt))
     else:
         sig = inspect.signature(method)
