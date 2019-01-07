@@ -78,7 +78,11 @@ def _get_doc(kind, completions=False, docstring=True, generic=True, style=True):
 
 def _patch_doc(kind):
     method = getattr(hvPlot, kind)
-    method.__doc__ = _get_doc(kind, get_ipy())
+    docstring = _get_doc(kind, get_ipy())
+    if sys.version_info.major == 2:
+        method.__func__.__doc__ = docstring
+    else:
+        method.__doc__ = docstring
 
 
 def help(kind=None, docstring=True, generic=True, style=True):
