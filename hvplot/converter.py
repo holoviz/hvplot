@@ -1119,13 +1119,15 @@ class HoloViewsConverter(object):
         x = x or coords[2]
         y = y or coords[1]
         bands = bands or coords[0]
-        z = self.kwds.get('z', list(data.data_vars)[0])
+        z = self.kwds.get('z')
+        if z is None:
+            z = list(data.data_vars)[0]
+        data = data[z]
         nbands = len(data.coords[bands])
         if nbands < 3:
             raise ValueError('Selected bands coordinate (%s) has only %d channels,'
                              'expected at least three channels to convert to RGB.' %
                              (bands, nbands))
-        data = data[z]
 
         params = dict(self._relabel)
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
