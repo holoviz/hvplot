@@ -128,13 +128,13 @@ install_requires = [
 ]
 
 _examples_extra = [
-    'geoviews',
+    'geoviews >=1.6.1',
     'geopandas',
     'xarray',
     'streamz >=0.3.0',
     'intake',
     'intake-parquet',
-    'dask <0.18',
+    'dask',
     'datashader >=0.6.5',
     'notebook >=5.4',
     's3fs',
