@@ -137,6 +137,7 @@ _examples_extra = [
     'dask <0.18',
     'datashader >=0.6.5',
     'notebook >=5.4',
+    's3fs',
     'scipy',
     'pillow',
     'selenium',
