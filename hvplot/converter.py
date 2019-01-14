@@ -830,6 +830,12 @@ class HoloViewsConverter(object):
         labelled = ['y' if self.invert else 'x'] if x != 'index' else []
         if self.value_label != 'value':
             labelled.append('x' if self.invert else 'y')
+
+        if 'xlabel' in self._plot_opts and 'x' not in labelled:
+            labelled.append('x')
+        if 'ylabel' in self._plot_opts and 'y' not in labelled:
+            labelled.append('y')
+
         opts = dict(plot=dict(self._plot_opts, labelled=labelled),
                     norm=self._norm_opts, style=self._style_opts)
         charts = []
@@ -871,6 +877,11 @@ class HoloViewsConverter(object):
         labelled = ['y' if self.invert else 'x'] if x != 'index' else []
         if self.value_label != 'value':
             labelled.append('x' if self.invert else 'y')
+
+        if 'xlabel' in self._plot_opts and 'x' not in labelled:
+            labelled.append('x')
+        if 'ylabel' in self._plot_opts and 'y' not in labelled:
+            labelled.append('y')
 
         opts = {'plot': dict(self._plot_opts, labelled=labelled),
                 'style': dict(self._style_opts),
@@ -915,8 +926,8 @@ class HoloViewsConverter(object):
         """
         data, x, y = self._process_args(data, None, y)
 
-        opts = {'plot': dict(self._plot_opts), # labelled=[]),
-                'norm': self._norm_opts, 'style': self._style_opts}
+        opts = {'plot': dict(self._plot_opts), 'norm': self._norm_opts,
+                'style': self._style_opts}
 
         ylim = self._plot_opts.get('ylim', (None, None))
         if not isinstance(y, (list, tuple)):
@@ -926,6 +937,12 @@ class HoloViewsConverter(object):
         labelled = ['y' if self.invert else 'x'] if self.group_label != 'Group' else []
         if self.value_label != 'value':
             labelled.append('x' if self.invert else 'y')
+
+        if 'xlabel' in self._plot_opts and 'x' not in labelled:
+            labelled.append('x')
+        if 'ylabel' in self._plot_opts and 'y' not in labelled:
+            labelled.append('y')
+
         opts['plot']['labelled'] = labelled
 
         kdims = [self.group_label]
@@ -953,6 +970,12 @@ class HoloViewsConverter(object):
         data, x, y = self._process_args(data, x, y)
 
         labelled = ['y'] if self.invert else ['x']
+
+        if 'xlabel' in self._plot_opts and 'x' not in labelled:
+            labelled.append('x')
+        if 'ylabel' in self._plot_opts and 'y' not in labelled:
+            labelled.append('y')
+
         plot_opts = dict(self._plot_opts, labelled=labelled)
         opts = dict(plot=plot_opts, style=self._style_opts,
                     norm=self._norm_opts)
