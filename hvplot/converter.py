@@ -566,6 +566,12 @@ class HoloViewsConverter(object):
             valid_opts = Store.registry['bokeh'][eltype].style_opts
         else:
             valid_opts = []
+
+        for opt in valid_opts:
+            if opt not in kwds or not isinstance(kwds[opt], list) or opt == 'cmap':
+                continue
+            kwds[opt] = Cycle(kwds[opt])
+
         style_opts = {kw: kwds[kw] for kw in list(kwds) if kw in valid_opts}
 
         # Process style options
