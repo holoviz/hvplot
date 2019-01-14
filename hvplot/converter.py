@@ -468,11 +468,18 @@ class HoloViewsConverter(object):
             if gridded:
                 datatype = 'xarray'
                 gridded_data = True
+            if kind == 'rgb':
+                if 'bands' in kwds:
+                    other_dims = [kwds['bands']]
+                else:
+                    other_dims = [d for d in data.coords if d not in (groupby or [])][0]
+            else:
+                other_dims = []
             data, x, y, by_new, groupby_new = process_xarray(data, x, y, by, groupby,
                                                              use_dask, persist, gridded,
-                                                             label, value_label)
+                                                             label, value_label, other_dims)
 
-            if kind not in self._stats_types and kind != 'rgb':
+            if kind not in self._stats_types:
                 if by is None: by = by_new
                 if groupby is None: groupby = groupby_new
 
@@ -714,8 +721,12 @@ class HoloViewsConverter(object):
                     dynamic=self.dynamic)
         if 'cmap' in self._style_opts and self.datashade:
             levels = self._plot_opts.get('color_levels')
-            opts['cmap'] = process_cmap(self._style_opts['cmap'], levels)
-            opts['color_key'] = opts['cmap']
+            cmap = self._style_opts['cmap']
+            if isinstance(cmap, dict):
+                opts['color_key'] = cmap
+            else:
+                opts['cmap'] = process_cmap(cmap, levels)
+
         if self.by:
             opts['aggregator'] = count_cat(self.by[0])
         if self.aggregator:
@@ -726,6 +737,7 @@ class HoloViewsConverter(object):
             opts['x_sampling'] = self.x_sampling
         if self.y_sampling:
             opts['y_sampling'] = self.y_sampling
+
         style = {}
         if self.datashade:
             operation = datashade
@@ -1110,15 +1122,15 @@ class HoloViewsConverter(object):
         if self.geo: params['crs'] = self.crs
         return element(data, [x, y], z, **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
 
-    def rgb(self, x=None, y=None, bands=None, data=None):
+    def rgb(self, x=None, y=None, data=None):
         data = self.data if data is None else data
 
-        coords = list(data.coords)
+        coords = [c for c in data.coords if c not in self.groupby+self.by]
         if len(coords) < 3:
             raise ValueError('Data must be 3D array to be converted to RGB.')
         x = x or coords[2]
         y = y or coords[1]
-        bands = bands or coords[0]
+        bands = self.kwds.get('bands', coords[0])
         z = self.kwds.get('z')
         if z is None:
             z = list(data.data_vars)[0]
@@ -1137,7 +1149,7 @@ class HoloViewsConverter(object):
         ys = data.coords[y][::-1] if yres < 0 else data.coords[y]
         eldata = (xs, ys)
         for b in range(nbands):
-            eldata += (data[b].values,)
+            eldata += (data.isel(**{bands: b}).values,)
         rgb = RGB(eldata, [x, y], RGB.vdims[:nbands], **params)
         return rgb.redim(**self._redim).opts(**opts)
 

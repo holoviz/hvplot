@@ -555,7 +555,9 @@ class hvPlot(object):
         obj : HoloViews object
             The HoloViews representation of the plot.
         """
-        return self(x, y, z=z, bands=bands, kind='rgb', **kwds)
+        if bands is not None:
+            kwds['bands'] = bands
+        return self(x, y, z=z, kind='rgb', **kwds)
 
     def quadmesh(self, x=None, y=None, z=None, colorbar=True, **kwds):
         """
