@@ -97,3 +97,8 @@ class TestChart1D(ComparisonTestCase):
         plot = self.cat_df.hvplot.hist('y', by='category', legend='left')
         opts = Store.lookup_options('bokeh', plot, 'plot')
         self.assertEqual(opts.kwargs['legend_position'], 'left')
+
+    def test_histogram_legend_position(self):
+        plot = self.cat_df.hvplot.hist('y', legend='left')
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['legend_position'], 'left')

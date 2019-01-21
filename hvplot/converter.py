@@ -1031,8 +1031,8 @@ class HoloViewsConverter(object):
         hists = []
         for col in y:
             hist = histogram(ds, dimension=col, **hist_opts)
-            hists.append((col, hist.relabel(**self._relabel).opts(**opts)))
-        return self._by_type(hists, sort=False).redim(**self._redim)
+            hists.append((col, hist.relabel(**self._relabel)))
+        return self._by_type(hists, sort=False).redim(**self._redim).opts(opts)
 
     def kde(self, x, y, data=None):
         data, x, y = self._process_args(data, x, y)
