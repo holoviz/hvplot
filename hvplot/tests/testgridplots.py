@@ -25,30 +25,30 @@ class TestGridPlots(ComparisonTestCase):
 
     def test_rgb_dataarray_no_args(self):
         rgb = self.da_rgb.hvplot()
-        self.assertEqual(rgb, RGB(([0, 1], [0, 1], *self.da_rgb.values)))
+        self.assertEqual(rgb, RGB(([0, 1], [0, 1])+tuple(self.da_rgb.values)))
 
     def test_rgb_dataarray_explicit_args(self):
         rgb = self.da_rgb.hvplot('x', 'y')
-        self.assertEqual(rgb, RGB(([0, 1], [0, 1], *self.da_rgb.values)))
+        self.assertEqual(rgb, RGB(([0, 1], [0, 1])+tuple(self.da_rgb.values)))
 
     def test_rgb_dataarray_explicit_args_and_kind(self):
         rgb = self.da_rgb.hvplot.rgb('x', 'y')
-        self.assertEqual(rgb, RGB(([0, 1], [0, 1], *self.da_rgb.values)))
+        self.assertEqual(rgb, RGB(([0, 1], [0, 1])+tuple(self.da_rgb.values)))
 
     def test_rgb_dataset(self):
         rgb = self.da_rgb.to_dataset(name='z').hvplot.rgb()
-        self.assertEqual(rgb, RGB(([0, 1], [0, 1], *self.da_rgb.values)))
+        self.assertEqual(rgb, RGB(([0, 1], [0, 1])+tuple(self.da_rgb.values)))
 
     def test_rgb_dataset_explicit_z(self):
         rgb = self.da_rgb.to_dataset(name='z').hvplot.rgb(z='z')
-        self.assertEqual(rgb, RGB(([0, 1], [0, 1], *self.da_rgb.values)))
+        self.assertEqual(rgb, RGB(([0, 1], [0, 1])+tuple(self.da_rgb.values)))
 
     def test_rgb_dataarray_groupby_explicit(self):
         rgb = self.da_rgb_by_time.hvplot.rgb('x', 'y', groupby='time')
-        self.assertEqual(rgb[0], RGB(([0, 1], [0, 1], *self.da_rgb_by_time.values[0])))
-        self.assertEqual(rgb[1], RGB(([0, 1], [0, 1], *self.da_rgb_by_time.values[1])))
+        self.assertEqual(rgb[0], RGB(([0, 1], [0, 1])+tuple(self.da_rgb_by_time.values[0])))
+        self.assertEqual(rgb[1], RGB(([0, 1], [0, 1])+tuple(self.da_rgb_by_time.values[1])))
 
     def test_rgb_dataarray_groupby_infer(self):
         rgb = self.da_rgb_by_time.hvplot.rgb('x', 'y', bands='band')
-        self.assertEqual(rgb[0], RGB(([0, 1], [0, 1], *self.da_rgb_by_time.values[0])))
-        self.assertEqual(rgb[1], RGB(([0, 1], [0, 1], *self.da_rgb_by_time.values[1])))
+        self.assertEqual(rgb[0], RGB(([0, 1], [0, 1])+tuple(self.da_rgb_by_time.values[0])))
+        self.assertEqual(rgb[1], RGB(([0, 1], [0, 1])+tuple(self.da_rgb_by_time.values[1])))
