@@ -20,6 +20,7 @@ from holoviews.element import (
     Table, HeatMap, Image, HexTiles, QuadMesh, Bivariate, Histogram,
     Violin, Contours, Polygons, Points, Path, Labels, RGB
 )
+from holoviews.plotting.bokeh import OverlayPlot
 from holoviews.plotting.util import process_cmap
 from holoviews.operation import histogram
 from holoviews.streams import Buffer, Pipe
@@ -293,6 +294,7 @@ class HoloViewsConverter(object):
             raise ValueError('The legend option should be a boolean or '
                              'a valid legend position (i.e. one of %s).'
                              % list(self._legend_positions))
+
         if xticks:
             plot_opts['xticks'] = xticks
         if yticks:
@@ -348,6 +350,8 @@ class HoloViewsConverter(object):
         if title is not None:
             plot_opts['title_format'] = title
         self._plot_opts = plot_opts
+        self._overlay_opts = {k: v for k, v in plot_opts.items()
+                              if k in OverlayPlot.params()}
         options = Store.options(backend='bokeh')
         el_type = self._kind_mapping[self.kind].__name__
         style = options[el_type].groups['style']
@@ -789,8 +793,8 @@ class HoloViewsConverter(object):
 
         opts = {element.__name__: dict(
             plot=dict(self._plot_opts, labelled=labelled),
-            norm=self._norm_opts, style=self._style_opts
-        )}
+            norm=self._norm_opts, style=self._style_opts),
+            'NdOverlay': dict(plot=dict(self._overlay_opts, batched=False))}
 
         data = self.data if data is None else data
         ys = [y]
@@ -805,7 +809,7 @@ class HoloViewsConverter(object):
             if element is Bars and not self.subplots:
                 return element(data, [x]+self.by, ys).relabel(**self._relabel).redim(**self._redim).opts(opts)
             chart = Dataset(data, self.by+[x], ys).to(element, x, ys, self.by).relabel(**self._relabel)
-            chart = chart.layout() if self.subplots else chart.overlay().options(batched=False)
+            chart = chart.layout() if self.subplots else chart.overlay()
         else:
             chart = element(data, x, ys).relabel(**self._relabel)
         return chart.redim(**self._redim).opts(opts)
@@ -842,13 +846,14 @@ class HoloViewsConverter(object):
         if 'ylabel' in self._plot_opts and 'y' not in labelled:
             labelled.append('y')
 
-        opts = dict(plot=dict(self._plot_opts, labelled=labelled),
-                    norm=self._norm_opts, style=self._style_opts)
+        opts = {element.__name__: dict(plot=dict(self._plot_opts, labelled=labelled),
+                                       norm=self._norm_opts, style=self._style_opts),
+                'NdOverlay': dict(plot=dict(self._overlay_opts, batched=False))}
         charts = []
         for c in y:
             chart = element(data, x, [c]+self.hover_cols).redim(**{c: self.value_label})
-            charts.append((c, chart.relabel(**self._relabel).opts(**opts)))
-        return self._by_type(charts, self.group_label, sort=False).options('NdOverlay', batched=False)
+            charts.append((c, chart.relabel(**self._relabel)))
+        return self._by_type(charts, self.group_label, sort=False).opts(opts)
 
     def line(self, x, y, data=None):
         return self.chart(Curve, x, y, data)
@@ -983,9 +988,9 @@ class HoloViewsConverter(object):
             labelled.append('y')
 
         plot_opts = dict(self._plot_opts, labelled=labelled)
-        opts = dict(plot=plot_opts, style=self._style_opts,
-                    norm=self._norm_opts)
-
+        opts = {'Histogram': dict(
+            plot=plot_opts, style=self._style_opts, norm=self._norm_opts),
+                'NdOverlay': dict(plot=self._overlay_opts)}
         hist_opts = {'bin_range': self.kwds.get('bin_range', None),
                      'normed': self.kwds.get('normed', False),
                      'cumulative': self.kwds.get('cumulative', False)}
@@ -1009,7 +1014,7 @@ class HoloViewsConverter(object):
             if self.by:
                 hist = hists.last
                 hists = hists.layout() if self.subplots else hists.overlay()
-            return hists.opts({'Histogram': opts}).redim(**self._redim)
+            return hists.opts(opts).redim(**self._redim)
 
         ranges = []
         for col in y:
@@ -1033,7 +1038,7 @@ class HoloViewsConverter(object):
         data, x, y = self._process_args(data, x, y)
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
         opts = {'Distribution': opts, 'Area': opts,
-                'NdOverlay': {'plot': dict(self._plot_opts, legend_limit=0)}}
+                'NdOverlay': {'plot': dict(self._overlay_opts, legend_limit=0)}}
 
         xlim = self._plot_opts.get('xlim', (None, None))
         if not isinstance(y, (list, tuple)):

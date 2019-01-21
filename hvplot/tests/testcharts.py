@@ -16,6 +16,8 @@ class TestChart1D(ComparisonTestCase):
             raise SkipTest('Pandas not available')
         patch('pandas')
         self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
+        self.cat_df = pd.DataFrame([[1, 2, 'A'], [3, 4, 'B'], [5, 6, 'C']],
+                                   columns=['x', 'y', 'category'])
 
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
     def test_wide_chart(self, kind, element):
@@ -32,10 +34,16 @@ class TestChart1D(ComparisonTestCase):
         self.assertEqual(plot, obj)
 
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    def test_wide_chart_legend_position(self, kind, element):
+        plot = self.df.hvplot(kind=kind, value_label='Test', group_label='Category', legend='left')
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['legend_position'], 'left')
+
+    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
     def test_tidy_chart(self, kind, element):
         plot = self.df.hvplot(x='x', y='y', kind=kind)
         self.assertEqual(plot, element(self.df, 'x', 'y'))
-        
+
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
     def test_tidy_chart_index(self, kind, element):
         plot = self.df.hvplot(x='index', y='y', kind=kind)
@@ -48,7 +56,13 @@ class TestChart1D(ComparisonTestCase):
                          3: element(self.df[self.df.x==3], 'index', 'y'),
                          5: element(self.df[self.df.x==5], 'index', 'y')}, 'x')
         self.assertEqual(plot, obj)
-        
+
+    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    def test_tidy_chart_index_by_legend_position(self, kind, element):
+        plot = self.df.hvplot(x='index', y='y', by='x', kind=kind, legend='left')
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['legend_position'], 'left')
+
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
     def test_use_index_disabled(self, kind, element):
         with self.assertRaises(ValueError):
@@ -73,3 +87,13 @@ class TestChart1D(ComparisonTestCase):
         obj = NdOverlay({'x': Area(self.df, 'index', 'x').redim(x='value'),
                          'y': Area(self.df, 'index', 'y').redim(y='value')}, 'Variable')
         self.assertEqual(plot, Area.stack(obj))
+
+    def test_scatter_color_by_legend_position(self):
+        plot = self.cat_df.hvplot('x', 'y', c='category', legend='left')
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['legend_position'], 'left')
+
+    def test_histogram_by_category_legend_position(self):
+        plot = self.cat_df.hvplot.hist('y', by='category', legend='left')
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['legend_position'], 'left')
