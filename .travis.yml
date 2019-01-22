@@ -70,7 +70,7 @@ jobs:
       env: HV_DOC_HTML="true" DESC="docs" CHANS_DEV="-c pyviz/label/dev -c pyviz -c ioam -c intake"
       script:
         - doit develop_install $CHANS_DEV -o doc
-        - travis_wait 30 conda install $CHANS_DEV cartopy=0.17.0 --force
+        - travis_wait 30 conda install $CHANS_DEV cartopy=0.17.0 --force --no-deps
         - bokeh sampledata
         - nbsite generate-rst --org pyviz --project-name hvplot --offset 0 --skip '^.*Streaming.*$' --skip '^.*homepage.*$'
         - nbsite build --what=html --output=builtdocs
