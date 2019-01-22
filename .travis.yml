@@ -69,7 +69,7 @@ jobs:
       stage: doc
       env: HV_DOC_HTML="true" DESC="docs" CHANS_DEV="-c pyviz/label/dev -c pyviz -c ioam -c intake"
       script:
-        - doit develop_install $CHANS_DEV -o doc
+        - travis_wait 30 doit develop_install $CHANS_DEV -o doc
         - bokeh sampledata
         - nbsite generate-rst --org pyviz --project-name hvplot --offset 0 --skip '^.*Streaming.*$' --skip '^.*homepage.*$'
         - nbsite build --what=html --output=builtdocs
