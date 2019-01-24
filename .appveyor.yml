@@ -1,6 +1,6 @@
 environment:
   global:
-    CHANS_DEV: "-c pyviz/label/dev"
+    CHANS_DEV: "-c pyviz/label/dev -c conda-forge"
   matrix:
     - PY: "2.7"
       CONDA: "C:\\Miniconda-x64"
@@ -16,6 +16,9 @@ install:
   - "doit env_capture"
 
 build: off
+skip_branch_with_pr: true  # only do one run per commit
+clone_depth: 5
+skip_tags: true
 
 test_script:
   - "bokeh sampledata"
