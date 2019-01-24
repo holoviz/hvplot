@@ -111,6 +111,9 @@ class HoloViewsConverter(object):
         Title for the plot
     tools (default=[]): list
         List of tool instances or strings (e.g. ['tap', box_select'])
+    xaxis/yaxis: str or None
+        Whether to show the x/y-axis and whether to place it at the
+        'top'/'bottom' and 'left'/'right' respectively.
     xformatter/yformatter (default=None): str or TickFormatter
         Formatter for the x-axis and y-axis (accepts printf formatter,
         e.g. '%.3f', and bokeh TickFormatter)
@@ -301,8 +304,12 @@ class HoloViewsConverter(object):
             plot_opts['yticks'] = yticks
         if not xaxis:
             plot_opts['xaxis'] = None
+        elif xaxis != True:
+            plot_opts['xaxis'] = xaxis
         if not yaxis:
             plot_opts['yaxis'] = None
+        elif yaxis != True:
+            plot_opts['yaxis'] = yaxis
         if xlabel is not None:
             plot_opts['xlabel'] = xlabel
         if ylabel is not None:
