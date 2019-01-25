@@ -132,6 +132,7 @@ _examples_extra = [
     'geopandas',
     'xarray',
     'networkx',
+    'pygraphviz',
     'streamz >=0.3.0',
     'intake',
     'intake-parquet',
