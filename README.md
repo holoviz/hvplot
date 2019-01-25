@@ -14,6 +14,7 @@ The PyData ecosystem has a number of core Python data containers that allow user
 * [Streamz](http://streamz.readthedocs.io): DataFrame(s), Series(s) (streaming columnar data)
 * [Intake](http://github.com/ContinuumIO/intake): DataSource (data catalogues)
 * [GeoPandas](http://geopandas.org): GeoDataFrame (geometry data)
+* [NetworkX](https://networkx.github.io/documentation/stable/): Graph (network graphs)
 
 Several of these libraries have the concept of a high-level plotting API that lets a user generate common plot types very easily. The native plotting APIs are generally built on [Matplotlib](http://matplotlib.org), which provides a solid foundation, but means that users miss out the benefits of modern, interactive plotting libraries for the web like [Bokeh](http://bokeh.pydata.org) and [HoloViews](http://holoviews.org).
 
