@@ -131,6 +131,7 @@ _examples_extra = [
     'geoviews >=1.6.0',
     'geopandas',
     'xarray',
+    'networkx',
     'streamz >=0.3.0',
     'intake',
     'intake-parquet',
