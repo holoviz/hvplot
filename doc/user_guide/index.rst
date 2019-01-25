@@ -14,7 +14,8 @@ generating `subplots <Subplots.html>`_ from your data.
 
 Once the basics are covered you can learn how to use the plotting API
 for specific types of data including `streaming data
-<Streaming_Plots.html>`_ and `gridded data <XArray_Plotting.html>`_.
+<Streaming_Plots.html>`_, `gridded data <XArray_Plotting.html>`_ and
+`network graphs <NetworkX.html>`_.
 
 Lastly the `Statistical Plots <Statistical_Plots.html>`_ section will
 take you through a number of specialized plot types modelled on the
@@ -45,6 +46,9 @@ and Cartopy to display data in geographic coordinate systems.
 * `Gridded Data <Gridded_Data.html>`_
   How to use hvPlot for plotting XArray-based gridded data.
 
+* `Network Graphs <NetworkX.html>`_
+  How to use hvPlot for plotting NetworkX graphs.
+
 * `Statistical Plots <Statistical_Plots.html>`_
   A number of statistical plot types modeled on the pandas.plotting module.
 
@@ -63,5 +67,6 @@ and Cartopy to display data in geographic coordinate systems.
     Subplots <Subplots>
     Streaming <Streaming>
     Gridded Data <Gridded_Data>
+    Network Graphs <NetworkX>
     Statistical Plots <Statistical_Plots>
     Geographic Plots <Geographic_Data>
