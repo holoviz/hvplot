@@ -2,8 +2,7 @@ import numpy as np
 import networkx as nx
 import holoviews as _hv
 
-from holoviews import Graph, Nodes, Labels, dim
-from holoviews.core.util import wrap_tuple
+from holoviews import Graph, Labels, dim
 from holoviews.plotting.bokeh import GraphPlot, LabelsPlot
 
 from .utilities import save, show # noqa
@@ -170,14 +169,14 @@ def draw(G, pos=None, **kwargs):
     if opts.get('node_fill_color') in g.nodes.dimensions():
         lims = (kwargs.get('vmin', None), kwargs.get('vmax', None))
         if lims != (None, None):
-            dim = g.nodes.get_dimension(opts.get('node_fill_color'))
-            dim.range = lims
+            dimension = g.nodes.get_dimension(opts.get('node_fill_color'))
+            dimension.range = lims
 
     if opts.get('edge_line_color') in g.dimensions():
         lims = (kwargs.get('edge_vmin', None), kwargs.get('edge_vmax', None))
         if lims != (None, None):
-            dim = g.get_dimension(opts.get('edge_line_color'))
-            dim.range = lims
+            dimension = g.get_dimension(opts.get('edge_line_color'))
+            dimension.range = lims
 
     g.opts(**opts)
 
