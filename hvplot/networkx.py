@@ -215,7 +215,6 @@ def draw(G, pos=None, **kwargs):
                               'the geoviews library must be available. '
                               'It can be installed with:\n  conda '
                               'install -c pyviz geoviews')
-        from cartopy import crs as ccrs
         crs = process_crs(kwargs.get('crs'))
         label_element = geoviews.Labels
         params['cls'] = geoviews.Graph
