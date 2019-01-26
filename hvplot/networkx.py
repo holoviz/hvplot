@@ -216,7 +216,7 @@ def draw(G, pos=None, **kwargs):
                               'It can be installed with:\n  conda '
                               'install -c pyviz geoviews')
         from cartopy import crs as ccrs
-        crs = kwargs.get('crs', ccrs.PlateCarree())
+        crs = process_crs(kwargs.get('crs'))
         label_element = geoviews.Labels
         params['cls'] = geoviews.Graph
         params['crs'] = crs
