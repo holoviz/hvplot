@@ -7,6 +7,11 @@ environment:
     - PY: "3.6"
       CONDA: "C:\\Miniconda36-x64"
 
+matrix:
+  allow_failures:
+    - PY: "2.7"
+    - PY: "3.6"
+
 install:
   - "SET PATH=%CONDA%;%CONDA%\\Scripts;%PATH%"
   - "conda install -y -c pyviz pyctdev && doit ecosystem_setup"
