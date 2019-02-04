@@ -6,6 +6,8 @@ hvPlot <img src="/doc/_static/hvplot-logo.png" width="50" height="50">
 
 **A high-level plotting API for the PyData ecosystem built on HoloViews.**
 
+<img src="http://blog.pyviz.org/images/hvplot_collage.png">
+
 The PyData ecosystem has a number of core Python data containers that allow users to work with a wide array of datatypes, including:
 
 * [Pandas](http://pandas.pydata.org): DataFrame, Series (columnar/tabular data)
