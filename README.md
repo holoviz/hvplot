@@ -53,3 +53,10 @@ For JupyterLab support, the ``jupyterlab_pyviz`` extension is also required:
 ```
 jupyter labextension install @pyviz/jupyterlab_pyviz
 ```
+
+
+## About PyViz
+
+hvPlot is part of the PyViz initiative for making Python-based visualization tools work well together.
+See [pyviz.org](http://pyviz.org) for related packages that you can use with hvPlot and
+[status.pyviz.org](http://status.pyviz.org) for the current status of each PyViz project.
