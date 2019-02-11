@@ -1,12 +1,20 @@
-[![linux/mac build status](https://travis-ci.org/pyviz/hvplot.svg?branch=master)](https://travis-ci.org/pyviz/hvplot)
-
 <h1>
 hvPlot <img src="/doc/_static/hvplot-logo.png" width="50" height="50">
 </h1>
 
 **A high-level plotting API for the PyData ecosystem built on HoloViews.**
 
-<img src="http://blog.pyviz.org/images/hvplot_collage.png">
+|    |    |
+| --- | --- |
+| Build Status | [![Linux/MacOS Build Status](https://travis-ci.org/pyviz/hvplot.svg?branch=master&logo=travis)](https://travis-ci.org/pyviz/hvplot) [![Windows Build status](https://img.shields.io/appveyor/ci/pyviz/hvplot/master.svg?logo=appveyor)](https://ci.appveyor.com/project/pyviz/hvplot/branch/master) |
+| Coverage | [![codecov](https://codecov.io/gh/pyviz/hvplot/branch/master/graph/badge.svg)](https://codecov.io/gh/pyviz/hvplot) |
+| Latest dev release | [![Github tag](https://img.shields.io/github/tag/pyviz/hvplot.svg?label=tag&colorB=11ccbb)](https://github.com/pyviz/hvplot/tags) |
+| Latest release | [![Github release](https://img.shields.io/github/release/pyviz/hvplot.svg?label=tag&colorB=11ccbb)](https://github.com/pyviz/hvplot/releases) [![PyPI version](https://img.shields.io/pypi/v/hvplot.svg?colorB=cc77dd)](https://pypi.python.org/pypi/hvplot) [![hvplot version](https://img.shields.io/conda/v/pyviz/hvplot.svg?colorB=4488ff&style=flat)](https://anaconda.org/pyviz/hvplot) [![conda-forge version](https://img.shields.io/conda/v/conda-forge/hvplot.svg?label=conda%7Cconda-forge&colorB=4488ff)](https://anaconda.org/conda-forge/hvplot) [![defaults version](https://img.shields.io/conda/v/anaconda/hvplot.svg?label=conda%7Cdefaults&style=flat&colorB=4488ff)](https://anaconda.org/anaconda/hvplot) |
+| Docs | [![gh-pages](https://img.shields.io/github/last-commit/pyviz/hvplot/gh-pages.svg)](https://github.com/pyviz/hvplot/tree/gh-pages) [![site](https://img.shields.io/website-up-down-green-red/http/hvplot.pyviz.org.svg)](http://hvplot.pyviz.org) |
+
+
+
+## What is it?
 
 The PyData ecosystem has a number of core Python data containers that allow users to work with a wide array of datatypes, including:
 
@@ -23,6 +31,8 @@ Several of these libraries have the concept of a high-level plotting API that le
 hvPlot provides a high-level plotting API built on HoloViews that provides a general and consistent API for plotting data in all the abovementioned formats. hvPlot can integrate neatly with the individual libraries if an extension mechanism for the native plot APIs is offered, or it can be used as a standalone component.
 
 To start using hvplot have a look at the [Getting Started Guide](https://pyviz.github.io/hvplot/getting_started/index.html) and check out the current functionality in the [User Guide.](https://pyviz.github.io/hvplot/user_guide/index.html)
+
+<img src="http://blog.pyviz.org/images/hvplot_collage.png">
 
 ## Installation
 
