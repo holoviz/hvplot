@@ -445,12 +445,13 @@ class HoloViewsConverter(object):
                     "'{}' must be either a valid crs or an reference to "
                     "a `data.attr` containing a valid crs.".format(crs))
 
-
     def _process_data(self, kind, data, x, y, by, groupby, row, col,
                       use_dask, persist, backlog, label, value_label,
                       hover_cols, kwds):
         gridded = kind in self._gridded_types
         gridded_data = False
+        xyz_tuples = []
+        ds = None
 
         # Validate DataSource
         self.data_source = data
@@ -533,6 +534,7 @@ class HoloViewsConverter(object):
                     other_dims = [d for d in data.coords if d not in (groupby or [])][0]
             else:
                 other_dims = []
+            da = data.copy()
             data, x, y, by_new, groupby_new = process_xarray(data, x, y, by, groupby,
                                                              use_dask, persist, gridded,
                                                              label, value_label, other_dims)
@@ -614,7 +616,30 @@ class HoloViewsConverter(object):
         self.groupby = groupby
         self.streaming = streaming
         self.hover_cols = hover_cols
+        self._redim_label = {}
 
+        if da is not None:
+            try:
+                xyz_tuples = [('x', x, da[x].attrs), ('y', y, da[y].attrs)]
+                xyz_tuples.append(('z', da.name, da.attrs))
+            except ValueError:  # simple plot
+                xyz_tuples = [('x', x, da[x].attrs), ('y', da.name, da.attrs)]
+
+            long_name = {}
+            units = {}
+            # var as in variable name
+            for xyz_str, xyz_name, xyz_attrs in xyz_tuples:
+                print(xyz_str, xyz_attrs)
+                long_name[xyz_str] = xyz_attrs.get('long_name', '')
+                if 'units' in xyz_attrs:
+                    units[xyz_str] = '[{0}]'.format(
+                        xyz_attrs['units'])
+                else:
+                    units[xyz_str] = ''
+                xyz_label = ' '.join([long_name[xyz_str],
+                                      units[xyz_str]])
+                if xyz_label.strip() != '':
+                    self._redim_label[xyz_name] = xyz_label
 
     def _process_style(self, colormap, kwds):
         plot_options = {}
@@ -887,7 +912,6 @@ class HoloViewsConverter(object):
             norm=self._norm_opts, style=self._style_opts),
             'NdOverlay': dict(plot=dict(self._overlay_opts, batched=False))}
 
-        data = self.data if data is None else data
         ys = [y]
         if element is Area and self.kwds.get('y2'):
             ys += [self.kwds['y2']]
@@ -899,13 +923,18 @@ class HoloViewsConverter(object):
 
         if self.by:
             if element is Bars and not self.subplots:
-                return element(data, [x]+self.by, ys).relabel(**self._relabel).redim(**self._redim).opts(opts)
+                return (element(data, [x]+self.by, ys)
+                        .relabel(**self._relabel)
+                        .redim.label(**self._redim_label)
+                        .redim(**self._redim)
+                        .opts(opts))
             chart = Dataset(data, self.by+kdims, vdims).to(
                 element, kdims, vdims, self.by).relabel(**self._relabel)
             chart = chart.layout() if self.subplots else chart.overlay()
         else:
             chart = element(data, kdims, vdims).relabel(**self._relabel)
-        return chart.redim(**self._redim).opts(opts)
+        return (chart.redim(**self._redim).opts(opts)
+                .redim.label(**self._redim_label))
 
     def _process_args(self, data, x, y):
         data = (self.data if data is None else data)
@@ -920,6 +949,7 @@ class HoloViewsConverter(object):
         if not y:
             ys = [c for c in data.columns if c not in [x]+self.by+self.groupby]
             y = ys[0] if len(ys) == 1 else ys
+
         return data, x, y
 
     def chart(self, element, x, y, data=None):
@@ -945,7 +975,8 @@ class HoloViewsConverter(object):
         charts = []
         for c in y:
             kdims, vdims = self._get_dimensions([x], [c])
-            chart = element(data, kdims, vdims).redim(**{c: self.value_label})
+            chart = (element(data, kdims, vdims).redim(**{c: self.value_label})
+                     .redim.label(**self._redim_label))
             charts.append((c, chart.relabel(**self._relabel)))
         return self._by_type(charts, self.group_label, sort=False).opts(opts)
 
@@ -1249,7 +1280,11 @@ class HoloViewsConverter(object):
 
         element = self._get_element('image')
         if self.geo: params['crs'] = self.crs
-        return element(data, [x, y], z, **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
+        return (element(data, [x, y], z, **params)
+                .redim(**self._redim)
+                .redim.range(**ranges)
+                .redim.label(**self._redim_label)
+                .opts(**opts))
 
     def rgb(self, x=None, y=None, data=None):
         data = self.data if data is None else data
@@ -1301,7 +1336,11 @@ class HoloViewsConverter(object):
 
         element = self._get_element('quadmesh')
         if self.geo: params['crs'] = self.crs
-        return element(data, [x, y], z, **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
+        return (element(data, [x, y], z, **params)
+                .redim(**self._redim)
+                .redim.range(**ranges)
+                .redim.label(**self._redim_label)
+                .opts(**opts))
 
     def contour(self, x=None, y=None, z=None, data=None, filled=False):
         from holoviews.operation import contours
@@ -1358,7 +1397,11 @@ class HoloViewsConverter(object):
             obj = Dataset(data).to(element, kdims, vdims, self.by, **params).overlay()
         else:
             obj = element(data, kdims, vdims, **params)
-        return obj.redim(**self._redim).redim.range(**ranges).opts({'Points': opts})
+        return (obj
+                .redim(**self._redim)
+                .redim.range(**ranges)
+                .redim.label(**self._redim_label)
+                .opts({'Points': opts}))
 
     def vectorfield(self, x=None, y=None, angle=None, mag=None, data=None):
         data = self.data if data is None else data
@@ -1404,8 +1447,12 @@ class HoloViewsConverter(object):
 
         element = self._get_element(kind)
         if self.geo: params['crs'] = self.crs
-        params['vdims'] = [c for c in data.columns if c not in ['geometry', x, y]]
-        return element(data, [x, y], **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
+        params['vdims'] = [c for c in data.columns if c != 'geometry']
+        return (element(data, [x, y], **params)
+                .redim(**self._redim)
+                .redim.range(**ranges)
+                .redim.label(**self._redim_label)
+                .opts(**opts))
 
     def polygons(self, x=None, y=None, data=None):
         return self._geom_plot(x, y, data, kind='polygons')
