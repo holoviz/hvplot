@@ -863,6 +863,9 @@ class HoloViewsConverter(object):
         return self._by_type(charts, self.group_label, sort=False).opts(opts)
 
     def line(self, x, y, data=None):
+        if self.geo or self.project or self.crs:
+            param.main.warning('Map projections are unavailable for use with '
+                               'line, use paths instead.')
         return self.chart(Curve, x, y, data)
 
     def step(self, x, y, data=None):
@@ -871,6 +874,10 @@ class HoloViewsConverter(object):
 
     def scatter(self, x, y, data=None):
         scatter = self.chart(Scatter, x, y, data)
+        if self.geo or self.project or self.crs:
+            param.main.warning('Map projections are unavailable for use with '
+                               'scatter, use points instead.')
+
         opts = {}
         if 's' in self.kwds:
             opts['size_index'] = self.kwds['s']
