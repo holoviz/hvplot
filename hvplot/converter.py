@@ -451,7 +451,7 @@ class HoloViewsConverter(object):
         gridded = kind in self._gridded_types
         gridded_data = False
         xyz_tuples = []
-        ds = None
+        da = None
 
         # Validate DataSource
         self.data_source = data
