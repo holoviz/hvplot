@@ -147,7 +147,7 @@ class HoloViewsConverter(object):
     rasterize (default=False):
         Whether to apply rasterization using the datashader library
         returning an aggregated Image
-    xsampling/ysampling (default=None):
+    x_sampling/y_sampling (default=None):
         Declares a minimum sampling density beyond.
     """
 
