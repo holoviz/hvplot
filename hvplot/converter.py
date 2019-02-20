@@ -629,7 +629,6 @@ class HoloViewsConverter(object):
             units = {}
             # var as in variable name
             for xyz_str, xyz_name, xyz_attrs in xyz_tuples:
-                print(xyz_str, xyz_attrs)
                 long_name[xyz_str] = xyz_attrs.get('long_name', '')
                 if 'units' in xyz_attrs:
                     units[xyz_str] = '[{0}]'.format(
