@@ -117,8 +117,8 @@ class HoloViewsConverter(object):
     xformatter/yformatter (default=None): str or TickFormatter
         Formatter for the x-axis and y-axis (accepts printf formatter,
         e.g. '%.3f', and bokeh TickFormatter)
-    xlabel/ylabel (default=None): str
-        Axis labels for the x-axis and y-axis
+    xlabel/ylabel/clabel (default=None): str
+        Axis labels for the x-axis, y-axis, and colorbar
     xlim/ylim (default=None): tuple
         Plot limits of the x- and y-axis
     xticks/yticks (default=None): int or list
@@ -165,7 +165,7 @@ class HoloViewsConverter(object):
                      'rot', 'xlim', 'ylim', 'xticks', 'yticks', 'colorbar',
                      'invert', 'title', 'logx', 'logy', 'loglog', 'xaxis',
                      'yaxis', 'xformatter', 'yformatter', 'xlabel', 'ylabel',
-                     'padding']
+                     'clabel', 'padding']
 
     _style_options = ['color', 'alpha', 'colormap', 'fontsize', 'c']
 
@@ -225,8 +225,8 @@ class HoloViewsConverter(object):
                  precompute=False, flip_xaxis=False, flip_yaxis=False,
                  dynspread=False, hover_cols=[], x_sampling=None,
                  y_sampling=None, project=False, xlabel=None, ylabel=None,
-                 xformatter=None, yformatter=None, tools=[], padding=None,
-                 **kwds):
+                 clabel=None, xformatter=None, yformatter=None, tools=[],
+                 padding=None, **kwds):
 
         # Process data and related options
         self._process_data(kind, data, x, y, by, groupby, row, col,
@@ -314,6 +314,8 @@ class HoloViewsConverter(object):
             plot_opts['xlabel'] = xlabel
         if ylabel is not None:
             plot_opts['ylabel'] = ylabel
+        if clabel is not None:
+            plot_opts['clabel'] = clabel
         if xlim is not None:
             plot_opts['xlim'] = xlim
         if ylim is not None:
