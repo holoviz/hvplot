@@ -628,7 +628,6 @@ class HoloViewsConverter(object):
                 units = {}
                 # var as in variable name
                 for var_name, var_attrs in var_tuples:
-                    print(var_attrs)
                     self._redim[var_name] = hv.Dimension(var_name,
                         label=var_attrs.get('long_name', ''),
                         unit=var_attrs.get('units', ''))
