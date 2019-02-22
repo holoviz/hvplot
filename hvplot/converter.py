@@ -629,8 +629,8 @@ class HoloViewsConverter(object):
                 # var as in variable name
                 for var_name, var_attrs in var_tuples:
                     self._redim[var_name] = hv.Dimension(var_name,
-                        label=var_attrs.get('long_name', ''),
-                        unit=var_attrs.get('units', ''))
+                        label=var_attrs.get('long_name', None),
+                        unit=var_attrs.get('units', None))
             except Exception as e:
                 param.main.warning('Unable to auto label using xarray attrs '
                                    'because {e}; suppress this warning '
