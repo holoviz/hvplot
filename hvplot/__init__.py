@@ -334,6 +334,9 @@ class hvPlot(object):
             Whether to display a colorbar
         reduce_function : function
             Function to compute statistics for hexbins
+        min_count : number
+            The display threshold before a bin is shown, by default bins with
+            a count of less than 1 are hidden
         **kwds : optional
             Keyword arguments to pass on to
             :py:meth:`hvplot.converter.HoloViewsConverter`.
