@@ -178,7 +178,7 @@ class HoloViewsConverter(object):
         'area'     : ['y2'],
         'hist'     : ['bins', 'bin_range', 'normed', 'cumulative'],
         'heatmap'  : ['C', 'reduce_function', 'logz'],
-        'hexbin'   : ['C', 'reduce_function', 'gridsize', 'logz'],
+        'hexbin'   : ['C', 'reduce_function', 'gridsize', 'logz', 'min_count'],
         'dataset'  : ['columns'],
         'table'    : ['columns'],
         'image'    : ['z', 'logz'],
@@ -1105,6 +1105,8 @@ class HoloViewsConverter(object):
             opts['plot']['aggregator'] = self.kwds['reduce_function']
         if 'gridsize' in self.kwds:
             opts['plot']['gridsize'] = self.kwds['gridsize']
+        if 'min_count' in self.kwds:
+            opts['plot']['min_count'] = self.kwds['min_count']
         return HexTiles(data, [x, y], z or []).redim(**self._redim).opts(**opts)
 
     def bivariate(self, x, y, data=None):
