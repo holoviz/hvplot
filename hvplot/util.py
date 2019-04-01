@@ -227,13 +227,15 @@ def is_xarray(data):
     return isinstance(data, (DataArray, Dataset))
 
 
-def process_intake(data, use_dask):
+def process_intake(data, use_dask, persist):
     if data.container not in ('dataframe', 'xarray'):
         raise NotImplementedError('Plotting interface currently only '
                                   'supports DataSource objects declaring '
                                   'a dataframe or xarray container.')
-    if use_dask:
+    if use_dask or persist:
         data = data.to_dask()
+    if persist:
+        data = data.persist()
     else:
         data = data.read()
     return data

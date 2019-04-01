@@ -414,7 +414,7 @@ class HoloViewsConverter(object):
         if self.is_series:
             data = data.to_frame()
         if is_intake(data):
-            data = process_intake(data, use_dask or persist)
+            data = process_intake(data, use_dask, persist)
 
         if groupby is not None and not isinstance(groupby, list):
             groupby = [groupby]
