@@ -298,14 +298,16 @@ class hvPlot(object):
 
     def errorbars(self, x=None, y=None, yerr1=None, yerr2=None, **kwds):
         """
-        Errorbars plot
+        ErrorBars plot
 
         Parameters
         ----------
         x, y, y2 : string, optional
             Field name to draw x- and y-positions from
-        stacked : boolean
-            Whether to stack multiple areas
+        yerr1 : string, optional
+            Field name to draw symmetric / negative errors from
+        yerr2 : string, optional
+            Field name to draw positive errors from
         **kwds : optional
             Keyword arguments to pass on to
             :py:meth:`hvplot.converter.HoloViewsConverter`.
