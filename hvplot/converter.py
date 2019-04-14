@@ -18,7 +18,7 @@ from holoviews.core.util import max_range
 from holoviews.element import (
     Curve, Scatter, Area, Bars, BoxWhisker, Dataset, Distribution,
     Table, HeatMap, Image, HexTiles, QuadMesh, Bivariate, Histogram,
-    Violin, Contours, Polygons, Points, Path, Labels, RGB
+    Violin, Contours, Polygons, Points, Path, Labels, RGB, ErrorBars
 )
 from holoviews.plotting.bokeh import OverlayPlot
 from holoviews.plotting.util import process_cmap
@@ -176,6 +176,7 @@ class HoloViewsConverter(object):
         'scatter'  : ['s', 'c', 'scale', 'logz'],
         'step'     : ['where'],
         'area'     : ['y2'],
+        'errorbars': ['yerr1', 'yerr2'],
         'hist'     : ['bins', 'bin_range', 'normed', 'cumulative'],
         'heatmap'  : ['C', 'reduce_function', 'logz'],
         'hexbin'   : ['C', 'reduce_function', 'gridsize', 'logz', 'min_count'],
@@ -198,7 +199,7 @@ class HoloViewsConverter(object):
         'kde': Distribution, 'area': Area, 'box': BoxWhisker, 'violin': Violin,
         'bar': Bars, 'barh': Bars, 'contour': Contours, 'contourf': Polygons,
         'points': Points, 'polygons': Polygons, 'paths': Path, 'step': Curve,
-        'labels': Labels, 'rgb': RGB
+        'labels': Labels, 'rgb': RGB, 'errorbars': ErrorBars
     }
 
     _colorbar_types = ['image', 'hexbin', 'heatmap', 'quadmesh', 'bivariate',
@@ -807,6 +808,11 @@ class HoloViewsConverter(object):
         ys = [y]
         if element is Area and self.kwds.get('y2'):
             ys += [self.kwds['y2']]
+        if element is ErrorBars and self.kwds.get('yerr1') and self.kwds.get('yerr2'):
+            ys += [self.kwds['yerr1'], self.kwds['yerr2']]
+        elif element is ErrorBars and self.kwds.get('yerr1'):
+            ys += [self.kwds['yerr1']]
+
         for p in 'cs':
             if p in self.kwds and self.kwds[p] in data.columns:
                 ys += [self.kwds[p]]
@@ -890,6 +896,10 @@ class HoloViewsConverter(object):
         if self.stacked:
             areas = areas.map(Area.stack, NdOverlay)
         return areas
+
+    def errorbars(self, x, y, data=None):
+        errorbars = self.chart(ErrorBars, x, y, data)
+        return errorbars
 
     ##########################
     #  Categorical charts    #
