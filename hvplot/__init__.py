@@ -296,6 +296,29 @@ class hvPlot(object):
             kwds['alpha'] = 0.5
         return self(x, y, y2=y2, kind='area', stacked=stacked, **kwds)
 
+    def errorbars(self, x=None, y=None, yerr1=None, yerr2=None, **kwds):
+        """
+        ErrorBars plot
+
+        Parameters
+        ----------
+        x, y, y2 : string, optional
+            Field name to draw x- and y-positions from
+        yerr1 : string, optional
+            Field name to draw symmetric / negative errors from
+        yerr2 : string, optional
+            Field name to draw positive errors from
+        **kwds : optional
+            Keyword arguments to pass on to
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
+        Returns
+        -------
+        obj : HoloViews object
+            The HoloViews representation of the plot.
+        """
+        return self(x, y, kind='errorbars',
+                    yerr1=yerr1, yerr2=yerr2, **kwds)
+
     def heatmap(self, x=None, y=None, C=None, colorbar=True, **kwds):
         """
         HeatMap plot
