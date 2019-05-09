@@ -459,7 +459,12 @@ class HoloViewsConverter(object):
         self.label = label
         self._relabel = {'label': label} if label else {}
 
-        clim = self._process_clim(clim, center)
+        try:
+            if self.kind in self._colorbar_types and not use_dask:
+                clim = self._process_clim(clim, center)
+        except TypeError:
+            pass
+
         self._dim_ranges = {'c': clim or (None, None)}
 
         # High-level options
@@ -478,8 +483,8 @@ class HoloViewsConverter(object):
                 data = self.data
 
             # round to the nearest 5, 0.5, 0.05, 0.005, 0.0005, etc
-            cmin = roundn(np.quantile(data, 0.05), method='down')
-            cmax = roundn(np.quantile(data, 0.95), method='up')
+            cmin = roundn(np.nanquantile(data, 0.05), method='down')
+            cmax = roundn(np.nanquantile(data, 0.95), method='up')
             clim = (cmin, cmax)
             auto = True
         else:
