@@ -506,9 +506,9 @@ class HoloViewsConverter(object):
                 clim = (cmin, cmax)
 
             # if cmap isn't explicitly provided and the values center
-            # around 0 use the RdBu_r colormap instead of fire colormap
+            # around 0 use the coolwarm colormap instead of fire colormap
             if not self._style_opts.get('cmap', None):
-                self._style_opts['cmap'] = 'RdBu_r'
+                self._style_opts['cmap'] = 'coolwarm'
 
         return clim
 
