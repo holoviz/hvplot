@@ -65,11 +65,6 @@ class TestChart1D(ComparisonTestCase):
         self.assertEqual(opts.kwargs['legend_position'], 'left')
 
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
-    def test_tidy_chart_defaults(self, kind, element):
-        plot = self.df.hvplot(kind=kind)
-        self.assertEqual(plot, element(self.df))
-
-    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
     def test_tidy_chart(self, kind, element):
         plot = self.df.hvplot(x='x', y='y', kind=kind)
         self.assertEqual(plot, element(self.df, 'x', 'y'))
