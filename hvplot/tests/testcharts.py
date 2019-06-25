@@ -2,10 +2,35 @@ from unittest import SkipTest
 from parameterized import parameterized
 
 from holoviews import NdOverlay, Store
-from holoviews.element import Curve, Area, Scatter
+from holoviews.element import Curve, Area, Scatter, Points
 from holoviews.element.comparison import ComparisonTestCase
 from hvplot import patch
 
+class TestChart2D(ComparisonTestCase):
+    def setUp(self):
+        try:
+            import pandas as pd
+        except:
+            raise SkipTest('Pandas not available')
+        patch('pandas')
+        self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
+        self.cat_df = pd.DataFrame([[1, 2, 'A'], [3, 4, 'B'], [5, 6, 'C']],
+                                   columns=['x', 'y', 'category'])
+
+    @parameterized.expand([('points', Points)])
+    def test_tidy_chart_defaults(self, kind, element):
+        plot = self.df.hvplot(kind=kind)
+        self.assertEqual(plot, element(self.df))
+
+    @parameterized.expand([('points', Points)])
+    def test_tidy_chart(self, kind, element):
+        plot = self.df.hvplot(x='x', y='y', kind=kind)
+        self.assertEqual(plot, element(self.df, ['x', 'y']))
+
+    @parameterized.expand([('points', Points)])
+    def test_tidy_chart_index_and_c(self, kind, element):
+        plot = self.df.hvplot(x='index', y='y', c='x', kind=kind)
+        self.assertEqual(plot, element(self.df, ['index', 'y'], ['x']))
 
 class TestChart1D(ComparisonTestCase):
 
@@ -38,6 +63,11 @@ class TestChart1D(ComparisonTestCase):
         plot = self.df.hvplot(kind=kind, value_label='Test', group_label='Category', legend='left')
         opts = Store.lookup_options('bokeh', plot, 'plot')
         self.assertEqual(opts.kwargs['legend_position'], 'left')
+
+    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    def test_tidy_chart_defaults(self, kind, element):
+        plot = self.df.hvplot(kind=kind)
+        self.assertEqual(plot, element(self.df))
 
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
     def test_tidy_chart(self, kind, element):

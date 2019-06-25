@@ -1274,17 +1274,9 @@ class HoloViewsConverter(object):
 
         x = x if x is not None else self.x
         y = y if y is not None else self.y
+
         if hasattr(data, 'geom_type') and not (x and y):
             x, y = 'Longitude', 'Latitude'
-
-        if x is None or y is None:
-            if x is None and y is not None:
-                missing = 'x'
-            elif x is not None and y is None:
-                missing = 'y'
-            else:
-                missing = 'x and y'
-            raise TypeError("points() missing required argument(s): {}".format(missing))
 
         plot_opts = dict(self._plot_opts)
         ranges = {}
@@ -1300,11 +1292,12 @@ class HoloViewsConverter(object):
         element = self._get_element('points')
         if self.geo: params['crs'] = self.crs
         vdims = [self.kwds['c']] if 'c' in self.kwds else []
+        kdims = [x, y] if x is not None and y is not None else None
         if 's' in self.kwds:
             vdims.append(self.kwds['s'])
         vdims = vdims + self.hover_cols
         params['vdims'] = vdims
-        return element(data, [x, y], **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
+        return element(data, kdims, **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
 
     ##########################
     #    Geometry plots      #
