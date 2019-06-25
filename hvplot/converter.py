@@ -1272,8 +1272,9 @@ class HoloViewsConverter(object):
         data = self.data if data is None else data
         params = dict(self._relabel)
 
-        x = x or self.x
-        y = y or self.y
+        x = x if x is not None else self.x
+        y = y if y is not None else self.y
+
         if hasattr(data, 'geom_type') and not (x and y):
             x, y = 'Longitude', 'Latitude'
 
@@ -1291,11 +1292,12 @@ class HoloViewsConverter(object):
         element = self._get_element('points')
         if self.geo: params['crs'] = self.crs
         vdims = [self.kwds['c']] if 'c' in self.kwds else []
+        kdims = [x, y] if x is not None and y is not None else None
         if 's' in self.kwds:
             vdims.append(self.kwds['s'])
         vdims = vdims + self.hover_cols
         params['vdims'] = vdims
-        return element(data, [x, y], **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
+        return element(data, kdims, **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
 
     ##########################
     #    Geometry plots      #
