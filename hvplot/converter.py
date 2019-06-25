@@ -1272,10 +1272,19 @@ class HoloViewsConverter(object):
         data = self.data if data is None else data
         params = dict(self._relabel)
 
-        x = x or self.x
-        y = y or self.y
+        x = x if x is not None else self.x
+        y = y if y is not None else self.y
         if hasattr(data, 'geom_type') and not (x and y):
             x, y = 'Longitude', 'Latitude'
+
+        if x is None or y is None:
+            if x is None and y is not None:
+                missing = 'x'
+            elif x is not None and y is None:
+                missing = 'y'
+            else:
+                missing = 'x and y'
+            raise TypeError("points() missing required argument(s): {}".format(missing))
 
         plot_opts = dict(self._plot_opts)
         ranges = {}
