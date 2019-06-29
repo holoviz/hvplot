@@ -451,7 +451,7 @@ class HoloViewsConverter(object):
         try:
             if self.kind in self._colorbar_types and not use_dask:
                 plot_opts['symmetric'] = self._process_symmetric(
-                    clim, symmetric)
+                    clim, symmetric, kwds)
         except TypeError:
             pass
 
@@ -476,12 +476,12 @@ class HoloViewsConverter(object):
             param.main.warning('Plotting {kind} plot with parameters x: {x}, '
                                'y: {y}, by: {by}, groupby: {groupby}'.format(**kwds))
 
-    def _process_symmetric(self, clim, symmetric):
+    def _process_symmetric(self, clim, symmetric, kwds):
         if clim is None and symmetric is None:
             if is_xarray(self.data):
                 data = self.data[list(self.data.data_vars)[0]]
             else:
-                data = self.data
+                data = self.data[kwds['C']]
 
             cmin = np.nanquantile(data, 0.05)
             cmax = np.nanquantile(data, 0.95)
