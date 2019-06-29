@@ -30,8 +30,8 @@ from holoviews.util.transform import dim
 from .util import (
     is_tabular, is_series, is_dask, is_intake, is_streamz, is_xarray,
     process_crs, process_intake, process_xarray, check_library, is_geopandas,
-    process_derived_datetime_xarray, process_derived_datetime_pandas, roundn,
-    order_magn)
+    process_derived_datetime_xarray, process_derived_datetime_pandas
+)
 
 renderer = hv.renderer('bokeh')
 
@@ -280,7 +280,7 @@ class HoloViewsConverter(object):
                  backlog=1000, persist=False, use_dask=False,
                  crs=None, fields={}, groupby=None, dynamic=True,
                  grid=None, legend=None, rot=None, title=None,
-                 xlim=None, ylim=None, clim=None, center=None,
+                 xlim=None, ylim=None, clim=None, symmetric=None,
                  logx=None, logy=None, loglog=None, hover=None,
                  subplots=False, label=None, invert=False,
                  stacked=False, colorbar=None, fontsize=None,
@@ -448,6 +448,13 @@ class HoloViewsConverter(object):
         if title is not None:
             plot_opts['title_format'] = title
 
+        try:
+            if self.kind in self._colorbar_types and not use_dask:
+                plot_opts['symmetric'] = self._process_symmetric(
+                    clim, symmetric)
+        except TypeError:
+            pass
+
         self._plot_opts = plot_opts
         self._overlay_opts = {k: v for k, v in self._plot_opts.items()
                               if k in OverlayPlot.params()}
@@ -459,12 +466,6 @@ class HoloViewsConverter(object):
         self.label = label
         self._relabel = {'label': label} if label else {}
 
-        try:
-            if self.kind in self._colorbar_types and not use_dask:
-                clim = self._process_clim(clim, center)
-        except TypeError:
-            pass
-
         self._dim_ranges = {'c': clim or (None, None)}
 
         # High-level options
@@ -475,42 +476,22 @@ class HoloViewsConverter(object):
             param.main.warning('Plotting {kind} plot with parameters x: {x}, '
                                'y: {y}, by: {by}, groupby: {groupby}'.format(**kwds))
 
-    def _process_clim(self, clim, center):
-        if clim is None:
+    def _process_symmetric(self, clim, symmetric):
+        if clim is None and symmetric is None:
             if is_xarray(self.data):
                 data = self.data[list(self.data.data_vars)[0]]
             else:
                 data = self.data
 
-            # round to the nearest 5, 0.5, 0.05, 0.005, 0.0005, etc
-            cmin = roundn(np.nanquantile(data, 0.05), method='down')
-            cmax = roundn(np.nanquantile(data, 0.95), method='up')
+            cmin = np.nanquantile(data, 0.05)
+            cmax = np.nanquantile(data, 0.95)
             clim = (cmin, cmax)
-            auto = True
-        else:
-            cmin, cmax = clim
-            auto = False
-
-        if center is None:
             divergent = cmin < 0 and cmax > 0
-            # if the order of magnitudes equate; we don't want to
-            # center the clim or use a divergent colormap
-            # if cmin == -1 and cmax == 20 since it's mostly positive
-            equal_oom = order_magn(cmin) == order_magn(cmax)
-            center = divergent and equal_oom
+            if divergent:
+                symmetric = True
+            # TODO: add cmap from hv.config
 
-        if center:
-            if auto:  # if user provided clim, don't change it
-                cmax = np.max([np.abs(cmin), np.abs(cmax)])
-                cmin = -cmax  # make top == bottom
-                clim = (cmin, cmax)
-
-            # if cmap isn't explicitly provided and the values center
-            # around 0 use the coolwarm colormap instead of fire colormap
-            if not self._style_opts.get('cmap', None):
-                self._style_opts['cmap'] = 'coolwarm'
-
-        return clim
+        return symmetric
 
     def _process_crs(self, data, crs):
         """Given crs as proj4 string, data.attr, or cartopy.crs return cartopy.crs

@@ -372,26 +372,3 @@ def process_derived_datetime_pandas(data, not_found, indexes=None):
     not_found = [var for var in not_found if var not in extra_cols.keys()]
 
     return not_found, data
-
-
-def order_magn(x):
-    if x == 0:
-        return 0
-    else:
-        return np.floor(np.log10(np.abs(x)))
-
-
-def roundn(x, base=None, method='up'):
-    if base is None:
-        oom = order_magn(x)
-        scale = 10 ** oom
-        if oom > 0:
-            scale = np.log10(scale)
-        base = scale * 5
-
-    if method == 'up':
-        return np.ceil(x / base) * base
-    elif method == 'down':
-        return np.floor(x / base) * base
-    else:
-        return np.round(x / base) * base
