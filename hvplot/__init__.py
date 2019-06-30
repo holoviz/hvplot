@@ -903,3 +903,15 @@ def andrews_curves(data, class_column, samples=200, alpha=0.5,
 # Patch docstrings
 for _kind in HoloViewsConverter._kind_mapping:
     _patch_doc(_kind)
+
+
+def plot(data, kind, extension='bokeh', logo=False, **kwargs):
+
+    if extension and not getattr(_hv.extension, '_loaded', False):
+        _hv.extension(extension, logo=logo)
+
+    if kwargs['grid'] is None:
+        kwargs['grid'] = False
+
+    plotter = hvPlot(data=data, kind=kind, **kwargs)
+    return plotter()
