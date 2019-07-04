@@ -910,8 +910,5 @@ def plot(data, kind, extension='bokeh', logo=False, **kwargs):
     if extension and not getattr(_hv.extension, '_loaded', False):
         _hv.extension(extension, logo=logo)
 
-    if kwargs['grid'] is None:
-        kwargs['grid'] = False
-
     plotter = hvPlot(data=data, kind=kind, **kwargs)
     return plotter()
