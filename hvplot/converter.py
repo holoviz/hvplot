@@ -227,7 +227,7 @@ class HoloViewsConverter(object):
                  dynspread=False, hover_cols=[], x_sampling=None,
                  y_sampling=None, project=False, xlabel=None, ylabel=None,
                  clabel=None, xformatter=None, yformatter=None, tools=[],
-                 padding=None, **kwds):
+                 padding=None, coastline=None, **kwds):
 
         # Process data and related options
         self._process_data(kind, data, x, y, by, groupby, row, col,
@@ -237,8 +237,9 @@ class HoloViewsConverter(object):
         self.value_label = value_label
         self.group_label = group_label
         self.dynamic = dynamic
-        self.geo = geo or crs or global_extent or projection or project
+        self.geo = geo or crs or global_extent or projection or project or coastline
         self.crs = self._process_crs(data, crs) if self.geo else None
+        self.coastline = coastline
         self.project = project
         self.row = row
         self.col = col
@@ -632,6 +633,12 @@ class HoloViewsConverter(object):
 
         return style_opts, plot_options, kwds
 
+
+    def _process_coastline(self, plot):
+        if self.coastline:
+            import geoviews
+            return plot * geoviews.feature.coastline()
+        return plot
 
     def _validate_kwds(self, kwds):
         kind_opts = self._kind_options.get(self.kind, [])
@@ -1182,7 +1189,9 @@ class HoloViewsConverter(object):
 
         element = self._get_element('image')
         if self.geo: params['crs'] = self.crs
-        return element(data, [x, y], z, **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
+        return self._process_coastline(
+            element(data, [x, y], z, **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
+        )
 
     def rgb(self, x=None, y=None, data=None):
         data = self.data if data is None else data
@@ -1213,7 +1222,7 @@ class HoloViewsConverter(object):
         for b in range(nbands):
             eldata += (data.isel(**{bands: b}).values,)
         rgb = RGB(eldata, [x, y], RGB.vdims[:nbands], **params)
-        return rgb.redim(**self._redim).opts(**opts)
+        return self._process_coastline(rgb.redim(**self._redim).opts(**opts))
 
     def quadmesh(self, x=None, y=None, z=None, data=None):
         import xarray as xr
@@ -1234,7 +1243,9 @@ class HoloViewsConverter(object):
 
         element = self._get_element('quadmesh')
         if self.geo: params['crs'] = self.crs
-        return element(data, [x, y], z, **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
+        return self._process_coastline(
+            element(data, [x, y], z, **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
+        )
 
     def contour(self, x=None, y=None, z=None, data=None, filled=False):
         from holoviews.operation import contours
@@ -1265,7 +1276,9 @@ class HoloViewsConverter(object):
         levels = self.kwds.get('levels', 5)
         if isinstance(levels, int):
             opts['plot']['color_levels'] = levels
-        return contours(qmesh, filled=filled, levels=levels).opts(**opts)
+        return self._process_coastline(
+            contours(qmesh, filled=filled, levels=levels).opts(**opts)
+        )
 
     def contourf(self, x=None, y=None, z=None, data=None):
         return self.contour(x, y, z, data, filled=True)
@@ -1299,7 +1312,9 @@ class HoloViewsConverter(object):
             vdims.append(self.kwds['s'])
         vdims = vdims + self.hover_cols
         params['vdims'] = vdims
-        return element(data, kdims, **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
+        return self._process_coastline(
+            element(data, kdims, **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
+        )
 
     ##########################
     #    Geometry plots      #
@@ -1334,7 +1349,9 @@ class HoloViewsConverter(object):
         element = self._get_element(kind)
         if self.geo: params['crs'] = self.crs
         params['vdims'] = [c for c in data.columns if c != 'geometry']
-        return element(data, [x, y], **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
+        return self._process_coastline(
+            element(data, [x, y], **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
+        )
 
     def polygons(self, x=None, y=None, data=None):
         return self._geom_plot(x, y, data, kind='polygons')
