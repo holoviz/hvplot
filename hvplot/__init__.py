@@ -652,6 +652,30 @@ class hvPlot(object):
         """
         return self(x, y, z=z, kind='contourf', colorbar=colorbar, **kwds)
 
+    def contourf(self, x=None, y=None, z=None, colorbar=True, **kwds):
+        """
+        Filled contour plot
+
+        Parameters
+        ----------
+        x, y : string, optional
+            The coordinate variable along the x- and y-axis
+        z : string, optional
+            The data variable to plot
+        levels: int, optional
+            The number of contour levels
+        colorbar: boolean
+            Whether to display a colorbar
+        **kwds : optional
+            Keyword arguments to pass on to
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
+        Returns
+        -------
+        obj : HoloViews object
+            The HoloViews representation of the plot.
+        """
+        return self(x, y, z=z, kind='contourf', colorbar=colorbar, **kwds)
+
     def points(self, x=None, y=None, **kwds):
         """
         Point plot use for 2D coordinate systems
@@ -669,6 +693,28 @@ class hvPlot(object):
             The HoloViews representation of the plot.
         """
         return self(x, y, kind='points', **kwds)
+
+    def vectorfield(self, x=None, y=None, angle=None, mag=None, **kwds):
+        """
+        Vectorfield plot
+
+        Parameters
+        ----------
+        x, y, y2 : string, optional
+            Field name to draw x- and y-positions from
+        mag : string, optional
+            Magnitude
+        angle : string, optional
+            Angle
+        **kwds : optional
+            Keyword arguments to pass on to
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
+        Returns
+        -------
+        obj : HoloViews object
+            The HoloViews representation of the plot.
+        """
+        return self(x, y, angle=angle, mag=mag, kind='vectorfield', **kwds)
 
     def polygons(self, x=None, y=None, c=None, **kwds):
         """
