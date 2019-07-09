@@ -18,7 +18,8 @@ from holoviews.core.util import max_range
 from holoviews.element import (
     Curve, Scatter, Area, Bars, BoxWhisker, Dataset, Distribution,
     Table, HeatMap, Image, HexTiles, QuadMesh, Bivariate, Histogram,
-    Violin, Contours, Polygons, Points, Path, Labels, RGB, ErrorBars
+    Violin, Contours, Polygons, Points, Path, Labels, RGB, ErrorBars,
+    VectorField
 )
 from holoviews.plotting.bokeh import OverlayPlot
 from holoviews.plotting.util import process_cmap
@@ -187,6 +188,7 @@ class HoloViewsConverter(object):
         'quadmesh' : ['z', 'logz'],
         'contour'  : ['z', 'levels', 'logz'],
         'contourf' : ['z', 'levels', 'logz'],
+        'vectorfield': ['angle', 'mag'],
         'points'   : ['s', 'marker', 'c', 'scale', 'logz'],
         'polygons' : ['logz', 'c'],
         'labels'   : ['text', 'c', 's']
@@ -199,7 +201,8 @@ class HoloViewsConverter(object):
         'kde': Distribution, 'area': Area, 'box': BoxWhisker, 'violin': Violin,
         'bar': Bars, 'barh': Bars, 'contour': Contours, 'contourf': Polygons,
         'points': Points, 'polygons': Polygons, 'paths': Path, 'step': Curve,
-        'labels': Labels, 'rgb': RGB, 'errorbars': ErrorBars
+        'labels': Labels, 'rgb': RGB, 'errorbars': ErrorBars,
+        'vectorfield': VectorField,
     }
 
     _colorbar_types = ['image', 'hexbin', 'heatmap', 'quadmesh', 'bivariate',
@@ -1300,6 +1303,27 @@ class HoloViewsConverter(object):
         vdims = vdims + self.hover_cols
         params['vdims'] = vdims
         return element(data, kdims, **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
+
+    def vectorfield(self, x=None, y=None, angle=None, mag=None, data=None):
+        import xarray as xr
+        data = self.data if data is None else data
+
+        x = x or self.x
+        y = y or self.y
+        if not (x and y):
+            x, y = list([k for k, v in data.coords.items() if v.size > 1])
+
+        angle = self.kwds.get('angle')
+        mag = self.kwds.get('mag')
+        z = [angle, mag] + self.hover_cols
+        ranges = {z[1]: self._dim_ranges['c']}
+
+        params = dict(self._relabel)
+        opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
+
+        element = self._get_element('vectorfield')
+        if self.geo: params['crs'] = self.crs
+        return element(data, [x, y], z, **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
 
     ##########################
     #    Geometry plots      #
