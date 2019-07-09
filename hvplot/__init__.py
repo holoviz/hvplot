@@ -676,7 +676,7 @@ class hvPlot(object):
 
         Parameters
         ----------
-        x, y, y2 : string, optional
+        x, y : string, optional
             Field name to draw x- and y-positions from
         mag : string, optional
             Magnitude
