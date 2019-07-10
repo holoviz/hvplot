@@ -1305,7 +1305,6 @@ class HoloViewsConverter(object):
         return element(data, kdims, **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
 
     def vectorfield(self, x=None, y=None, angle=None, mag=None, data=None):
-        import xarray as xr
         data = self.data if data is None else data
 
         x = x or self.x
