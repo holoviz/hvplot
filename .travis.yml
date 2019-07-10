@@ -54,7 +54,7 @@ jobs:
         - pip install pyctdev && doit miniconda_install && pip uninstall -y doit pyctdev
         - export PATH="$HOME/miniconda/bin:$PATH" && hash -r
         - conda config --set always_yes True
-        - conda install -c pyviz "pyctdev>=0.5" cloudpickle --force && doit ecosystem_setup
+        - conda install -c pyviz "pyctdev>=0.5" cloudpickle pluggy --force && doit ecosystem_setup
       install:
         - doit env_create $CHANS_DEV --python=$PYTHON_VERSION
         - source activate test-environment
