@@ -54,6 +54,7 @@ jobs:
         - pip install pyctdev && doit miniconda_install && pip uninstall -y doit pyctdev
         - export PATH="$HOME/miniconda/bin:$PATH" && hash -r
         - conda config --set always_yes True
+        - conda install conda --force-reinstall
         - conda update --all
         - conda install -c pyviz "pyctdev>=0.5" && doit ecosystem_setup
       install:
