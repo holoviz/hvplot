@@ -7,7 +7,7 @@ sudo: false
 os:
   - linux
 
-dist: xenial
+dist: trusty
 
 cache:
   timeout: 300
