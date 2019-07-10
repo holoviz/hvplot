@@ -3,7 +3,7 @@
 # Travis's auto-install of python doesn't work on osx images (see
 # https://github.com/travis-ci/travis-ci/issues/4729).
 language: generic
-sudo: false
+
 os:
   - linux
 
