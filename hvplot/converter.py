@@ -97,12 +97,22 @@ class HoloViewsConverter(object):
         Enables logarithmic x- and y-axis respectively
     loglog (default=False): boolean
         Enables logarithmic x- and y-axis
+    max_width/max_height: int
+        The maximum width and height of the plot for responsive modes
+    min_width/min_height: int
+        The minimum width and height of the plot for responsive modes
     padding: number or tuple
         Fraction by which to increase auto-ranged extents to make
         datapoints more visible around borders. Supports tuples to
         specify different amount of padding for x- and y-axis and
         tuples of tuples to specify different amounts of padding for
         upper and lower bounds.
+    responsive: boolean
+        Whether the plot should responsively resize depending on the
+        size of the browser. Responsive mode will only work if at
+        least one dimension of the plot is left undefined, e.g. when
+        width and height or width and aspect are set the plot is set
+        to a fixed size, ignoring any responsive option.
     rot: number
         Rotates the axis ticks along the x-axis by the specified
         number of degrees.
@@ -219,7 +229,7 @@ class HoloViewsConverter(object):
                  group_label='Variable', value_label='value',
                  backlog=1000, persist=False, use_dask=False,
                  crs=None, fields={}, groupby=None, dynamic=True,
-                 width=700, height=300, shared_axes=True,
+                 width=None, height=None, shared_axes=True,
                  grid=False, legend=True, rot=None, title=None,
                  xlim=None, ylim=None, clim=None, xticks=None, yticks=None,
                  logx=False, logy=False, loglog=False, hover=True,
@@ -233,7 +243,9 @@ class HoloViewsConverter(object):
                  dynspread=False, hover_cols=[], x_sampling=None,
                  y_sampling=None, project=False, xlabel=None, ylabel=None,
                  clabel=None, xformatter=None, yformatter=None, tools=[],
-                 padding=None, **kwds):
+                 padding=None, responsive=False, min_width=None,
+                 min_height=None, max_height=None, max_width=None,
+                 **kwds):
 
         # Process data and related options
         self._process_data(kind, data, x, y, by, groupby, row, col,
@@ -342,10 +354,24 @@ class HoloViewsConverter(object):
             plot_opts['invert_xaxis'] = True
         if flip_yaxis:
             plot_opts['invert_yaxis'] = True
-        if width:
-            plot_opts['width'] = width
-        if height:
-            plot_opts['height'] = height
+        if responsive:
+            if width:
+                plot_opts['width'] = width
+            if height:
+                plot_opts['height'] = height
+        else:
+            plot_opts['width'] = width or 700
+            plot_opts['height'] = height or 300
+        if min_width is not None:
+            plot_opts['min_width'] = min_width
+        if min_height is not None:
+            plot_opts['min_height'] = min_height
+        if max_width is not None:
+            plot_opts['max_width'] = max_width
+        if max_height is not None:
+            plot_opts['max_height'] = max_height
+        if responsive:
+            plot_opts['responsive'] = responsive
         if fontsize:
             plot_opts['fontsize'] = fontsize
         if isinstance(colorbar, bool):
