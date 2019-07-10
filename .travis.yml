@@ -21,7 +21,7 @@ before_cache:
 
 env:
   global:
-    - PYENV_VERSION=3.7
+    - PYENV_VERSION=3.6
     - PKG_TEST_PYTHON="--test-python=py36 --test-python=py27"
     - CHANS_DEV="-c pyviz/label/dev -c ioam -c intake"
     - CHANS="-c pyviz -c ioam"
@@ -54,8 +54,6 @@ jobs:
         - pip install pyctdev && doit miniconda_install && pip uninstall -y doit pyctdev
         - export PATH="$HOME/miniconda/bin:$PATH" && hash -r
         - conda config --set always_yes True
-        - conda install conda --force-reinstall
-        - conda update --all
         - conda install -c pyviz "pyctdev>=0.5" && doit ecosystem_setup
       install:
         - doit env_create $CHANS_DEV --python=$PYTHON_VERSION
