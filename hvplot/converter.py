@@ -156,6 +156,9 @@ class HoloViewsConverter(object):
 
     _geom_types = ['paths', 'polygons']
 
+    _geo_types = sorted(_gridded_types + _geom_types + [
+        'points', 'vectorfield', 'labels', 'hexbin', 'bivariate'])
+
     _stats_types = ['hist', 'kde', 'violin', 'box']
 
     _data_options = ['x', 'y', 'kind', 'by', 'use_index', 'use_dask',
@@ -256,6 +259,11 @@ class HoloViewsConverter(object):
                                   'It can be installed with:\n  conda '
                                   'install -c pyviz geoviews')
         if self.geo:
+            if kind not in self._geom_types:
+                param.main.warning(
+                    "geo option cannot be used with kind=%r plot "
+                    "type. Geographic plots are only supported for "
+                    "following plot types: %r" % (kind, self._geo_types))
             from cartopy import crs as ccrs
             from geoviews.util import project_extents
             proj_crs = projection or ccrs.GOOGLE_MERCATOR
@@ -874,9 +882,6 @@ class HoloViewsConverter(object):
         return self._by_type(charts, self.group_label, sort=False).opts(opts)
 
     def line(self, x, y, data=None):
-        if self.geo or self.project or self.crs:
-            param.main.warning('Map projections are unavailable for use with '
-                               'line, use paths instead.')
         return self.chart(Curve, x, y, data)
 
     def step(self, x, y, data=None):
@@ -885,10 +890,6 @@ class HoloViewsConverter(object):
 
     def scatter(self, x, y, data=None):
         scatter = self.chart(Scatter, x, y, data)
-        if self.geo or self.project or self.crs:
-            param.main.warning('Map projections are unavailable for use with '
-                               'scatter, use points instead.')
-
         opts = {}
         if 's' in self.kwds:
             opts['size_index'] = self.kwds['s']
@@ -1330,20 +1331,16 @@ class HoloViewsConverter(object):
 
     def _geom_plot(self, x=None, y=None, data=None, kind='polygons'):
         data = self.data if data is None else data
-        try:
-            import geopandas as gpd
-        except:
-            raise ImportError('Geometry plots require geopandas, ensure '
-                              'it is installed.')
-        if not isinstance(data, gpd.GeoDataFrame):
-            raise ValueError('Geometry plots only supported on geopandas '
-                             'GeoDataFrame objects.')
         params = dict(self._relabel)
 
         x = x or self.x
         y = y or self.y
-        if hasattr(data, 'geom_type') and not (x and y):
-            x, y = 'Longitude', 'Latitude'
+        is_gpd = is_geopandas(data)
+        if not (x and y):
+            if is_gpd:
+                x, y = ('Longitude', 'Latitude') if self.geo else ('x', 'y')
+            else:
+                x, y = data.columns[:2]
 
         plot_opts = dict(self._plot_opts)
         ranges = {}
@@ -1356,7 +1353,7 @@ class HoloViewsConverter(object):
 
         element = self._get_element(kind)
         if self.geo: params['crs'] = self.crs
-        params['vdims'] = [c for c in data.columns if c != 'geometry']
+        params['vdims'] = [c for c in data.columns if c not in ['geometry', x, y]]
         return element(data, [x, y], **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
 
     def polygons(self, x=None, y=None, data=None):
