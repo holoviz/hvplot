@@ -53,6 +53,16 @@ jobs:
       script:
         - bokeh sampledata
         - doit test_all_recommended
+
+    - <<: *default
+      stage: test
+      env: DESC="dev test with extra dependencies"
+      install:
+        - doit env_create $CHANS_DEV --python=$PYTHON_VERSION
+        - source activate test-environment
+        - doit develop_install $CHANS_DEV -o recommended -o tests -o examples
+        - doit env_capture
+      script: doit test_unit_all
       after_success: coveralls
 
     - <<: *default

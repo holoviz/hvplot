@@ -25,7 +25,8 @@ class TestProcessXarray(TestCase):
             'groupby': None,
             'y': None,
             'x': None,
-            'by': None
+            'by': None,
+            'other_dims': [],
         }
         self.ds = xr.tutorial.open_dataset('air_temperature')
 
