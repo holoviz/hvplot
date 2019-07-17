@@ -54,7 +54,7 @@ jobs:
         - bokeh sampledata
         - doit test_all_recommended
 
-     - <<: *default
+    - <<: *default
       stage: test
       env: DESC="dev test with extra dependencies"
       install:
