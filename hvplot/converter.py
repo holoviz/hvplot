@@ -130,7 +130,7 @@ class HoloViewsConverter(object):
         e.g. '%.3f', and bokeh TickFormatter)
     xlabel/ylabel/clabel (default=None): str
         Axis labels for the x-axis, y-axis, and colorbar
-    xlim/ylim (default=None): tuple
+    xlim/ylim (default=None): tuple or list
         Plot limits of the x- and y-axis
     xticks/yticks (default=None): int or list
         Ticks along x- and y-axis specified as an integer, list of
@@ -341,9 +341,9 @@ class HoloViewsConverter(object):
         if clabel is not None:
             plot_opts['clabel'] = clabel
         if xlim is not None:
-            plot_opts['xlim'] = xlim
+            plot_opts['xlim'] = tuple(xlim)
         if ylim is not None:
-            plot_opts['ylim'] = ylim
+            plot_opts['ylim'] = tuple(ylim)
         if padding is not None:
             plot_opts['padding'] = padding
         if xformatter is not None:
