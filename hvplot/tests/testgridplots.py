@@ -27,7 +27,6 @@ class TestGridPlots(ComparisonTestCase):
         self.da_img_by_time = xr.DataArray(np.arange(8).reshape((2, 2, 2)),
                                            coords, ['time', 'lat', 'lon']).assign_coords(
                                                lat1=xr.DataArray([2,3], dims=['lat']))
-        self.da_img_by_time
 
     def test_rgb_dataarray_no_args(self):
         rgb = self.da_rgb.hvplot()
@@ -59,7 +58,11 @@ class TestGridPlots(ComparisonTestCase):
         self.assertEqual(rgb[0], RGB(([0, 1], [0, 1])+tuple(self.da_rgb_by_time.values[0])))
         self.assertEqual(rgb[1], RGB(([0, 1], [0, 1])+tuple(self.da_rgb_by_time.values[1])))
 
+    def test_img_dataarray_infers_correct_other_dims(self):
+        img = self.da_img_by_time[0].hvplot()
+        self.assertEqual(img, Image(self.da_img_by_time[0], ['lon', 'lat'], ['value']))
+
     def test_img_dataarray_groupby_infers_correct_other_dims(self):
         img = self.da_img_by_time.hvplot(groupby='time')
-        self.assertEqual(img[0], Image(([0, 1], [0, 1])+tuple(self.da_img_by_time.values[0])))
-        self.assertEqual(img[1], Image(([0, 1], [0, 1])+tuple(self.da_img_by_time.values[1])))
+        self.assertEqual(img[0], Image(self.da_img_by_time[0], ['lon', 'lat'], ['value']))
+        self.assertEqual(img[1], Image(self.da_img_by_time[1], ['lon', 'lat'], ['value']))
