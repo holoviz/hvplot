@@ -666,14 +666,14 @@ class HoloViewsConverter(object):
                 self.data['_size'] = np.sqrt(size)
                 style_opts['size'] = '_size'
             elif isinstance(size, hv.util.basestring):
-                style_opts['size'] = np.sqrt(dim(size)*kwds['scale'])
+                style_opts['size'] = np.sqrt(dim(size)*kwds.get('scale', 1))
             elif not isinstance(size, dim):
                 style_opts['size'] = np.sqrt(size)
         elif 'size' in valid_opts:
             style_opts['size'] = np.sqrt(30)
 
         # Marker
-        if 'marker' in kwds and 'marker' in self._kind_opts[self.kind]:
+        if 'marker' in kwds and 'marker' in self._kind_options[self.kind]:
             style_opts['marker'] = kwds.pop('marker')
 
         # Alpha
@@ -1340,10 +1340,12 @@ class HoloViewsConverter(object):
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
         ranges = {self._color_dim: self._dim_ranges['c']} if self._color_dim else {}
         kdims, vdims = self._get_dimensions([x, y], [])
-        params['vdims'] = vdims
         element = self._get_element('points')
         if self.geo: params['crs'] = self.crs
-        return element(data, kdims, **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
+        obj = Dataset(data).to(element, kdims, vdims, self.by, **params)
+        if self.by:
+            obj = obj.overlay()
+        return obj.redim(**self._redim).redim.range(**ranges).opts({'Points': opts})
 
     def vectorfield(self, x=None, y=None, angle=None, mag=None, data=None):
         data = self.data if data is None else data
