@@ -501,15 +501,18 @@ class HoloViewsConverter(object):
                 data = data[z]
 
             ignore = (groupby or []) + (by or [])
-            dims = [c for c in data.coords if data[c].shape != ()
+            coords = [c for c in data.coords if data[c].shape != ()
+                      and c not in ignore]
+            dims = [c for c in data.dims if data[c].shape != ()
                     and c not in ignore]
+
             if kind is None and (not (x or y) or all(c in data.coords for c in (x, y))):
                 if list(data.coords) == ['band', 'y', 'x']:
                     kind = 'rgb'
                     gridded = True
-                elif len(dims) == 1:
+                elif len(coords) == 1:
                     kind = 'line'
-                elif len(dims) == 2 or (x and y):
+                elif len(coords) == 2 or (x and y) or len([c for c in coords if c in dims]) == 2:
                     kind = 'image'
                     gridded = True
                 else:

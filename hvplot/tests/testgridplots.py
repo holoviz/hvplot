@@ -2,7 +2,7 @@ from unittest import SkipTest
 from collections import OrderedDict
 
 import numpy as np
-from holoviews.element import RGB
+from holoviews.element import RGB, Image
 from holoviews.element.comparison import ComparisonTestCase
 from hvplot import patch
 
@@ -22,6 +22,11 @@ class TestGridPlots(ComparisonTestCase):
         coords = OrderedDict([('time', [0, 1]), ('band', [1, 2, 3]), ('y', [0, 1]), ('x', [0, 1])])
         self.da_rgb_by_time = xr.DataArray(np.arange(24).reshape((2, 3, 2, 2)),
                                            coords, ['time', 'band', 'y', 'x'])
+
+        coords = OrderedDict([('time', [0, 1]), ('lat', [0, 1]), ('lon', [0, 1])])
+        self.da_img_by_time = xr.DataArray(np.arange(8).reshape((2, 2, 2)),
+                                           coords, ['time', 'lat', 'lon']).assign_coords(
+                                               lat1=xr.DataArray([2,3], dims=['lat']))
 
     def test_rgb_dataarray_no_args(self):
         rgb = self.da_rgb.hvplot()
@@ -52,3 +57,12 @@ class TestGridPlots(ComparisonTestCase):
         rgb = self.da_rgb_by_time.hvplot.rgb('x', 'y', bands='band')
         self.assertEqual(rgb[0], RGB(([0, 1], [0, 1])+tuple(self.da_rgb_by_time.values[0])))
         self.assertEqual(rgb[1], RGB(([0, 1], [0, 1])+tuple(self.da_rgb_by_time.values[1])))
+
+    def test_img_dataarray_infers_correct_other_dims(self):
+        img = self.da_img_by_time[0].hvplot()
+        self.assertEqual(img, Image(self.da_img_by_time[0], ['lon', 'lat'], ['value']))
+
+    def test_img_dataarray_groupby_infers_correct_other_dims(self):
+        img = self.da_img_by_time.hvplot(groupby='time')
+        self.assertEqual(img[0], Image(self.da_img_by_time[0], ['lon', 'lat'], ['value']))
+        self.assertEqual(img[1], Image(self.da_img_by_time[1], ['lon', 'lat'], ['value']))
