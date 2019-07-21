@@ -1336,15 +1336,18 @@ class HoloViewsConverter(object):
 
         if hasattr(data, 'geom_type') and not (x and y):
             x, y = 'Longitude', 'Latitude'
+        elif not (x and y):
+            x, y = data.columns[:2]
 
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
         ranges = {self._color_dim: self._dim_ranges['c']} if self._color_dim else {}
         kdims, vdims = self._get_dimensions([x, y], [])
         element = self._get_element('points')
         if self.geo: params['crs'] = self.crs
-        obj = Dataset(data).to(element, kdims, vdims, self.by, **params)
         if self.by:
-            obj = obj.overlay()
+            obj = Dataset(data).to(element, kdims, vdims, self.by, **params).overlay()
+        else:
+            obj = element(data, kdims, vdims, **params)
         return obj.redim(**self._redim).redim.range(**ranges).opts({'Points': opts})
 
     def vectorfield(self, x=None, y=None, angle=None, mag=None, data=None):
