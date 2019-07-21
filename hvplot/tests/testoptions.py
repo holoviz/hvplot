@@ -1,7 +1,6 @@
 from unittest import SkipTest
 
-from holoviews import NdOverlay, Store
-from holoviews.element import Curve, Area, Scatter
+from holoviews import Store
 from holoviews.element.comparison import ComparisonTestCase
 from hvplot import patch
 
