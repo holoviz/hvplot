@@ -95,6 +95,8 @@ class HoloViewsConverter(object):
         ('top', 'bottom', 'left', 'right')
     logx/logy (default=False): boolean
         Enables logarithmic x- and y-axis respectively
+    logz (default=False): boolean
+        Enables logarithmic colormapping
     loglog (default=False): boolean
         Enables logarithmic x- and y-axis
     max_width/max_height: int
@@ -271,11 +273,11 @@ class HoloViewsConverter(object):
                                   'It can be installed with:\n  conda '
                                   'install -c pyviz geoviews')
         if self.geo:
-            if kind not in self._geom_types:
+            if self.kind not in self._geom_types:
                 param.main.warning(
                     "geo option cannot be used with kind=%r plot "
                     "type. Geographic plots are only supported for "
-                    "following plot types: %r" % (kind, self._geo_types))
+                    "following plot types: %r" % (self.kind, self._geo_types))
             from cartopy import crs as ccrs
             from geoviews.util import project_extents
             proj_crs = projection or ccrs.GOOGLE_MERCATOR
@@ -378,8 +380,10 @@ class HoloViewsConverter(object):
             plot_opts['colorbar'] = colorbar
         elif self.kind in self._colorbar_types:
             plot_opts['colorbar'] = True
+        if 'logz' in kwds and 'logz' in self._kind_options.get(self.kind, {}):
+            plot_opts['logz'] = kwds.pop('logz')
         if invert:
-            plot_opts['invert_axes'] = kind != 'barh'
+            plot_opts['invert_axes'] = self.kind != 'barh'
         if rot:
             axis = 'yrotation' if invert else 'xrotation'
             plot_opts[axis] = rot
@@ -797,6 +801,8 @@ class HoloViewsConverter(object):
             opts['x_sampling'] = self.x_sampling
         if self.y_sampling:
             opts['y_sampling'] = self.y_sampling
+        if not self.dynamic:
+            opts['dynamic'] = self.dynamic
 
         style = {}
         if self.datashade:
@@ -1119,7 +1125,6 @@ class HoloViewsConverter(object):
                 dists = NdOverlay({0: Area([], self.value_label, vdim)},
                                   [self.group_label])
         return dists.redim(**self._redim).redim.range(**ranges).relabel(**self._relabel).opts(opts)
-
 
     ##########################
     #      Other charts      #
