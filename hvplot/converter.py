@@ -1211,11 +1211,11 @@ class HoloViewsConverter(object):
             if not y: y = self.y or data.columns[1]
             z = self.kwds.get('C', [c for c in data.columns if c not in (x, y)][0])
             z = [z] + self.hover_cols
-        ranges = self._merge_redim({z[0]: self._dim_ranges['c']})
-        hmap = HeatMap(data, [x, y], z, **self._relabel).redim(**redim).opts(**opts)
+        redim = self._merge_redim({z[0]: self._dim_ranges['c']})
+        hmap = HeatMap(data, [x, y], z, **self._relabel)
         if 'reduce_function' in self.kwds:
-            return hmap.aggregate(function=self.kwds['reduce_function'])
-        return hmap
+            hmap = hmap.aggregate(function=self.kwds['reduce_function'])
+        return hmap.redim(**redim).opts(**opts)
 
     def hexbin(self, x, y, data=None):
         data = self.data if data is None else data
