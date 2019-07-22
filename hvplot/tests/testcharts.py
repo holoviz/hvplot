@@ -2,7 +2,7 @@ from unittest import SkipTest
 from parameterized import parameterized
 
 from holoviews import NdOverlay, Store
-from holoviews.element import Curve, Area, Scatter, Points
+from holoviews.element import Curve, Area, Scatter, Points, HeatMap
 from holoviews.element.comparison import ComparisonTestCase
 from hvplot import patch
 
@@ -32,6 +32,13 @@ class TestChart2D(ComparisonTestCase):
         plot = self.df.hvplot(x='index', y='y', c='x', kind=kind)
         self.assertEqual(plot, element(self.df, ['index', 'y'], ['x']))
 
+    def test_heatmap_2d_index_columns(self):
+        plot = self.df.hvplot.heatmap()
+        self.assertEqual(plot, HeatMap((['x', 'y'], [0, 1, 2], self.df.values),
+                                       ['columns', 'index'], 'value'))
+        
+
+        
 class TestChart1D(ComparisonTestCase):
 
     def setUp(self):
