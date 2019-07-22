@@ -36,9 +36,9 @@ class TestChart2D(ComparisonTestCase):
         plot = self.df.hvplot.heatmap()
         self.assertEqual(plot, HeatMap((['x', 'y'], [0, 1, 2], self.df.values),
                                        ['columns', 'index'], 'value'))
-        
 
-        
+
+
 class TestChart1D(ComparisonTestCase):
 
     def setUp(self):
@@ -152,3 +152,16 @@ class TestChart1D(ComparisonTestCase):
                          'lower': element(self.cat_only_df, 'index', 'lower').redim(lower='value'),
                         }, 'Variable')
         self.assertEqual(plot, obj)
+
+class TestChart1DDask(TestChart1D):
+
+    def setUp(self):
+        super().setUp()
+        try:
+            import dask.dataframe as dd
+        except:
+            raise SkipTest('Dask not available')
+        patch('dask')
+        self.df = dd.from_pandas(self.df, npartitions=2)
+        self.cat_df = dd.from_pandas(self.cat_df, npartitions=3)
+        self.cat_only_df = dd.from_pandas(self.cat_only_df, npartitions=1)

@@ -919,7 +919,7 @@ class HoloViewsConverter(object):
         y = y or self.y
         if not y:
             ys = [c for c in data.columns if c not in [x]+self.by+self.groupby]
-            if len(ys) > 1 and self.datatype == 'pandas':
+            if len(ys) > 1:
                 # if columns have different dtypes, only include numeric columns
                 from pandas.api.types import is_numeric_dtype as isnum
                 num_ys = [col for col in data.columns if isnum(data[col])]
