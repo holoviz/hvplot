@@ -249,7 +249,7 @@ class HoloViewsConverter(object):
                  clabel=None, xformatter=None, yformatter=None, tools=[],
                  padding=None, responsive=False, min_width=None,
                  min_height=None, max_height=None, max_width=None,
-                 **kwds):
+                 attr_labels=True, **kwds):
 
         # Process data and related options
         self._process_data(kind, data, x, y, by, groupby, row, col,
