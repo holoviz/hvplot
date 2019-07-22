@@ -1,7 +1,11 @@
 from unittest import TestCase, SkipTest
 
+import numpy as np
+import pandas as pd
+
 
 class TestGeo(TestCase):
+
     def setUp(self):
         try:
             import xarray as xr
@@ -11,6 +15,7 @@ class TestGeo(TestCase):
         except:
             raise SkipTest('xarray, rasterio, geoviews, or cartopy not available')
         import hvplot.xarray  # noqa
+        import hvplot.pandas  # noqa
         self.da = (xr.open_rasterio(
             'https://github.com/mapbox/rasterio/raw/master/tests/data/RGB.byte.tif')
             .sel(band=1))
@@ -46,3 +51,24 @@ class TestGeo(TestCase):
         da.attrs = {'bar': self.crs}
         plot = da.hvplot.image('x', 'y', geo=True)
         self.assertCRS(plot, 'eqc')
+
+
+class TestGeoElements(TestCase):
+
+    def setUp(self):
+        try:
+            import geoviews  # noqa
+            import cartopy.crs as ccrs # noqa
+        except:
+            raise SkipTest('geoviews or cartopy not available')
+        import hvplot.pandas  # noqa
+        self.crs = ccrs.PlateCarree()
+        self.df = pd.DataFrame(np.random.rand(10, 2), columns=['x', 'y'])
+
+    def test_geo_hexbin(self):
+        hextiles = self.df.hvplot.hexbin('x', 'y', geo=True)
+        self.assertEqual(hextiles.crs, self.crs)
+
+    def test_geo_points(self):
+        points = self.df.hvplot.points('x', 'y', geo=True)
+        self.assertEqual(points.crs, self.crs)

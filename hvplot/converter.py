@@ -1183,7 +1183,7 @@ class HoloViewsConverter(object):
             opts['plot']['gridsize'] = self.kwds['gridsize']
         if 'min_count' in self.kwds:
             opts['plot']['min_count'] = self.kwds['min_count']
-        ranges = {z[0]: self._dim_ranges['c']}
+        ranges = {(z[0] if z else 'Count'): self._dim_ranges['c']}
         element = self._get_element('hexbin')
         params = dict(self._relabel)
         if self.geo: params['crs'] = self.crs
