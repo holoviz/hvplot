@@ -1092,7 +1092,7 @@ class HoloViewsConverter(object):
             melt = pd.melt
         df = melt(data, var_name=self.group_label, value_name=self.value_label)
         redim = self._merge_redim({self.value_label: ylim})
-        return (element(df, kdims, self.value_label).redim(**self._redim)
+        return (element(df, kdims, self.value_label).redim(**redim)
                 .relabel(**self._relabel).opts(**opts))
 
     def box(self, x, y, data=None):
@@ -1413,7 +1413,7 @@ class HoloViewsConverter(object):
         angle = self.kwds.get('angle')
         mag = self.kwds.get('mag')
         z = [angle, mag] + self.hover_cols
-        ranges = self._merge_redim({z[1]: self._dim_ranges['c']})
+        redim = self._merge_redim({z[1]: self._dim_ranges['c']})
         params = dict(self._relabel)
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
 
