@@ -252,6 +252,7 @@ class HoloViewsConverter(object):
                  attr_labels=True, **kwds):
 
         # Process data and related options
+        self._redim = fields
         self._process_data(kind, data, x, y, by, groupby, row, col,
                            use_dask, persist, backlog, label, value_label,
                            hover_cols, attr_labels, kwds)
@@ -422,7 +423,6 @@ class HoloViewsConverter(object):
         self.label = label
         self._relabel = {'label': label} if label else {}
         self._dim_ranges = {'c': clim or (None, None)}
-        self._redim.update(fields)
 
         # High-level options
         self._validate_kwds(kwds)
@@ -618,7 +618,6 @@ class HoloViewsConverter(object):
         self.streaming = streaming
         self.hover_cols = hover_cols
 
-        self._redim = {}
         if da is not None and attr_labels:
             try:
                 var_tuples = [(var, da[var].attrs) for var in da.coords]
