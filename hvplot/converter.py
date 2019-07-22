@@ -1183,7 +1183,11 @@ class HoloViewsConverter(object):
             opts['plot']['gridsize'] = self.kwds['gridsize']
         if 'min_count' in self.kwds:
             opts['plot']['min_count'] = self.kwds['min_count']
-        return HexTiles(data, [x, y], z or []).redim(**self._redim).opts(**opts)
+        ranges = {(z[0] if z else 'Count'): self._dim_ranges['c']}
+        element = self._get_element('hexbin')
+        params = dict(self._relabel)
+        if self.geo: params['crs'] = self.crs
+        return element(data, [x, y], z or [], **params).redim(**self._redim).redim.range(**ranges).opts(**opts)
 
     def bivariate(self, x, y, data=None):
         data = self.data if data is None else data
