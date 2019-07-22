@@ -1158,13 +1158,19 @@ class HoloViewsConverter(object):
 
     def heatmap(self, x, y, data=None):
         data = self.data if data is None else data
-        if not x: x = self.x or data.columns[0]
-        if not y: y = self.y or data.columns[1]
-        z = self.kwds.get('C', [c for c in data.columns if c not in (x, y)][0])
-        z = [z] + self.hover_cols
-
         opts = dict(plot=self._plot_opts, norm=self._norm_opts, style=self._style_opts)
-        hmap = HeatMap(data, [x, y], z).redim(**self._redim).opts(**opts)
+        if not (x or y) or (x == 'columns' and y in ('index', data.index.name)):
+            opts['plot']['labelled'] = []
+            x, y = 'columns', 'index'
+            data = (data.columns, data.index, data.values)
+            z = ['value']
+        else:
+            if not x: x = self.x or data.columns[0]
+            if not y: y = self.y or data.columns[1]
+            z = self.kwds.get('C', [c for c in data.columns if c not in (x, y)][0])
+            z = [z] + self.hover_cols
+        ranges = {z[0]: self._dim_ranges['c']}
+        hmap = HeatMap(data, [x, y], z).redim(**self._redim).redim.range(**ranges).opts(**opts)
         if 'reduce_function' in self.kwds:
             return hmap.aggregate(function=self.kwds['reduce_function'])
         return hmap
