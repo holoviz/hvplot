@@ -164,6 +164,27 @@ class HoloViewsConverter(object):
         returning an aggregated Image
     x_sampling/y_sampling (default=None):
         Declares a minimum sampling density beyond.
+
+    Geographic options
+    ------------------
+    coastline (default=False):
+        Whether to display a coastline on top of the plot, setting
+        coastline='10m'/'50m'/'110m' specifies a specific scale.
+    crs (default=None):
+        Coordinate reference system of the data specified as Cartopy
+        CRS object, proj.4 string or EPSG code.
+    geo (default=False):
+        Whether the plot should be treated as geographic (and assume
+        PlateCarree, i.e. lat/lon coordinates).
+    global_extent (default=False):
+        Whether to expand the plot extent to span the whole globe.
+    project (default=False):
+        Whether to project the data before plotting (adds initial
+        overhead but avoids projecting data when plot is dynamically
+        updated).
+    tiles (default=False):
+        Whether to overlay the plot on a tile source. Tiles sources
+        can be selected by name, the default is 'Wikipedia'.
     """
 
     _gridded_types = ['image', 'contour', 'contourf', 'quadmesh', 'rgb', 'points']
@@ -249,7 +270,7 @@ class HoloViewsConverter(object):
                  clabel=None, xformatter=None, yformatter=None, tools=[],
                  padding=None, responsive=False, min_width=None,
                  min_height=None, max_height=None, max_width=None,
-                 attr_labels=True, **kwds):
+                 attr_labels=True, coastline=False, tiles=False, **kwds):
 
         # Process data and related options
         self._redim = fields
@@ -263,6 +284,8 @@ class HoloViewsConverter(object):
         self.geo = geo or crs or global_extent or projection or project
         self.crs = self._process_crs(data, crs) if self.geo else None
         self.project = project
+        self.coastline = coastline
+        self.tiles = tiles
         self.row = row
         self.col = col
 
@@ -809,7 +832,7 @@ class HoloViewsConverter(object):
             obj = project(obj, projection=projection)
 
         if not (self.datashade or self.rasterize):
-            return obj
+            return self._apply_layers(obj)
 
         try:
             from holoviews.operation.datashader import datashade, rasterize, dynspread
@@ -861,7 +884,31 @@ class HoloViewsConverter(object):
             else:
                 param.main.warning('dynspread may only be applied on datashaded plots, '
                                    'use datashade=True instead of rasterize=True.')
-        return processed.opts({eltype: {'plot': self._plot_opts, 'style': style}})
+        return self._apply_layers(processed).opts({eltype: {'plot': self._plot_opts, 'style': style}})
+
+    def _apply_layers(self, obj):
+        if self.coastline:
+            import geoviews as gv
+            coastline = gv.feature.coastline()
+            if self.coastline in ['10m', '50m', '110m']:
+                coastline = coastline.opts(scale=self.coastline)
+            elif self.coastline is not True:
+                param.main.warning("coastline scale of %s not recognized, "
+                                   "must be one of '10m', '50m' or '110m'." %
+                                   self.coastline)
+            obj = obj * coastline
+        if self.tiles:
+            tile_source = 'EsriImagery' if self.tiles == 'ESRI' else self.tiles
+            if tile_source in hv.element.tile_sources:
+                tiles = hv.element.tile_sources[tile_source]()
+            else:
+                tiles = hv.element.tiles.Wikipedia()
+                if tile_source is not True:
+                    param.main.warning(
+                        "%s tiles not recognized, must be one of: %s" %
+                        (tile_source, sorted(hv.element.tile_sources)))
+            obj = tiles * obj
+        return obj
 
     def _merge_redim(self, ranges, attr='range'):
         redim = dict(self._redim)

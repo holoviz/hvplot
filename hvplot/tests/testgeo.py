@@ -2,6 +2,7 @@ from unittest import TestCase, SkipTest
 
 import numpy as np
 import pandas as pd
+import holoviews as hv
 
 
 class TestGeo(TestCase):
@@ -51,6 +52,43 @@ class TestGeo(TestCase):
         da.attrs = {'bar': self.crs}
         plot = da.hvplot.image('x', 'y', geo=True)
         self.assertCRS(plot, 'eqc')
+
+
+class TestGeoAnnotation(TestCase):
+
+    def setUp(self):
+        try:
+            import geoviews  # noqa
+            import cartopy.crs as ccrs # noqa
+        except:
+            raise SkipTest('geoviews or cartopy not available')
+        import hvplot.pandas  # noqa
+        self.crs = ccrs.PlateCarree()
+        self.df = pd.DataFrame(np.random.rand(10, 2), columns=['x', 'y'])
+
+    def test_plot_with_coastline(self):
+        import geoviews as gv
+        plot = self.df.hvplot.points('x', 'y', geo=True, coastline=True)
+        self.assertEqual(len(plot), 2)
+        coastline = plot.get(1)
+        self.assertIsInstance(coastline, gv.Feature)
+
+    def test_plot_with_coastline_scale(self):
+        plot = self.df.hvplot.points('x', 'y', geo=True, coastline='10m')
+        opts = plot.get(1).opts.get('plot')
+        self.assertEqual(opts.kwargs, {'scale': '10m'})
+
+    def test_plot_with_tiles(self):
+        plot = self.df.hvplot.points('x', 'y', geo=True, tiles=True)
+        self.assertEqual(len(plot), 2)
+        self.assertIsInstance(plot.get(0), hv.Tiles)
+        self.assertIn('wikimedia', plot.get(0).data)
+
+    def test_plot_with_specific_tiles(self):
+        plot = self.df.hvplot.points('x', 'y', geo=True, tiles='ESRI')
+        self.assertEqual(len(plot), 2)
+        self.assertIsInstance(plot.get(0), hv.Tiles)
+        self.assertIn('ArcGIS', plot.get(0).data)
 
 
 class TestGeoElements(TestCase):
