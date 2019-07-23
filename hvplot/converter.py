@@ -166,7 +166,7 @@ class HoloViewsConverter(object):
         Declares a minimum sampling density beyond.
     """
 
-    _gridded_types = ['image', 'contour', 'contourf', 'quadmesh', 'rgb']
+    _gridded_types = ['image', 'contour', 'contourf', 'quadmesh', 'rgb', 'points']
 
     _geom_types = ['paths', 'polygons']
 
@@ -451,7 +451,7 @@ class HoloViewsConverter(object):
     def _process_data(self, kind, data, x, y, by, groupby, row, col,
                       use_dask, persist, backlog, label, value_label,
                       hover_cols, attr_labels, kwds):
-        gridded = kind in self._gridded_types or kind == 'points'
+        gridded = kind in self._gridded_types
         gridded_data = False
         da = None
 
@@ -555,11 +555,7 @@ class HoloViewsConverter(object):
         if by is None: by = []
         if groupby is None: groupby = []
 
-        if gridded:
-            if not gridded_data:
-                raise ValueError('%s plot type requires gridded data, '
-                                 'e.g. a NumPy array or xarray Dataset, '
-                                 'found %s type' % (kind, type(self.data).__name__))
+        if gridded_data:
             not_found = [g for g in groupby if g not in data.coords]
             data_vars = list(data.data_vars) if isinstance(data, xr.Dataset) else [data.name]
             indexes = list(data.coords)
@@ -569,6 +565,11 @@ class HoloViewsConverter(object):
                                  'could not be found, expected one or '
                                  'more of: %s' % (not_found, list(data.coords)))
         else:
+            if gridded and not kind == 'points':
+                raise ValueError('%s plot type requires gridded data, '
+                                 'e.g. a NumPy array or xarray Dataset, '
+                                 'found %s type' % (kind, type(self.data).__name__))
+
             # Determine valid indexes
             if isinstance(self.data, pd.DataFrame):
                 if self.data.index.names == [None]:
@@ -606,6 +607,7 @@ class HoloViewsConverter(object):
         self.kind = kind or 'line'
         self.datatype = datatype
         self.gridded = gridded
+        self.gridded_data = gridded_data
         self.use_dask = use_dask
         self.indexes = indexes
         if isinstance(by, (np.ndarray, pd.Series)):
@@ -1394,9 +1396,10 @@ class HoloViewsConverter(object):
         if hasattr(data, 'geom_type') and not (x and y):
             x, y = 'Longitude', 'Latitude'
         elif not (x and y):
-            x, y = self.variables[:2]
-            if self.gridded:
-                x, y = y, x
+            if self.gridded_data:
+                x, y = self.variables[:2:-1]
+            else:
+                x, y = data.columns[:2]
 
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
         redim = self._merge_redim({self._color_dim: self._dim_ranges['c']} if self._color_dim else {})
