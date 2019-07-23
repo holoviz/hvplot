@@ -252,26 +252,26 @@ class HoloViewsConverter(object):
                          "bottom_right", "right", "left", "top",
                          "bottom")
 
+    _default_plot_opts = {
+        'logx': False, 'logy': False, 'show_legend': True, 'legend_position': 'right',
+        'show_grid': False, 'responsive': False, 'shared_axes': True}
+
     def __init__(self, data, x, y, kind=None, by=None, use_index=True,
                  group_label='Variable', value_label='value',
                  backlog=1000, persist=False, use_dask=False,
                  crs=None, fields={}, groupby=None, dynamic=True,
-                 width=None, height=None, shared_axes=None,
                  grid=None, legend=None, rot=None, title=None,
-                 xlim=None, ylim=None, clim=None, xticks=None, yticks=None,
+                 xlim=None, ylim=None, clim=None,
                  logx=None, logy=None, loglog=None, hover=True,
                  subplots=False, label=None, invert=False,
                  stacked=False, colorbar=None, fontsize=None,
                  colormap=None, datashade=False, rasterize=False,
                  row=None, col=None, figsize=None, debug=False,
-                 xaxis=None, yaxis=None, framewise=True, aggregator=None,
+                 xaxis=True, yaxis=True, framewise=True, aggregator=None,
                  projection=None, global_extent=None, geo=False,
                  precompute=False, flip_xaxis=None, flip_yaxis=None,
                  dynspread=False, hover_cols=[], x_sampling=None,
-                 y_sampling=None, project=False, xlabel=None, ylabel=None,
-                 clabel=None, xformatter=None, yformatter=None, tools=[],
-                 padding=None, responsive=False, min_width=None,
-                 min_height=None, max_height=None, max_width=None,
+                 y_sampling=None, project=False, tools=[],
                  attr_labels=True, coastline=False, tiles=False,
                  sort_date=True, **kwds):
 
@@ -338,93 +338,92 @@ class HoloViewsConverter(object):
         # Process options
         self.stacked = stacked
         self._style_opts, kwds = self._process_style(colormap, kwds)
-        self._plot_opts = self._process_plot(self._style_opts.get('color'))
-        self.invert = invert
 
+        plot_opts = {**self._default_plot_opts,
+                     **self._process_plot(self._style_opts.get('color'))}
+        if xlim is not None:
+            plot_opts['xlim'] = tuple(xlim)
+        if ylim is not None:
+            plot_opts['ylim'] = tuple(ylim)
+
+        self.invert = invert
         if loglog is not None:
             logx = logx or loglog
             logy = logy or loglog
-        if xlim is not None:
-            xlim = tuple(xlim)
-        if ylim is not None:
-            ylim = tuple(ylim)
-        if xaxis == False or xaxis == True:
-            xaxis = None
-        if yaxis == False or yaxis == True:
-            yaxis = None
+        if logx is not None:
+            plot_opts['logx'] = logx
+        if logy is not None:
+            plot_opts['logy'] = logy
 
-        # cleaning up legend options
-        if legend not in self._legend_positions + (True, False, None):
+        if grid is not None:
+            plot_opts['show_grid'] = grid
+
+        if legend is not None:
+            plot_opts['show_legend'] = bool(legend)
+
+        if legend in self._legend_positions:
+            plot_opts['legend_position'] = legend
+        elif legend not in (True, False, None):
             raise ValueError('The legend option should be a boolean or '
                              'a valid legend position (i.e. one of %s).'
                              % list(self._legend_positions))
 
-        show_legend = bool(legend) if legend is not None else None
-        legend_position = legend if legend in self._legend_positions else None
+        plotwds = ['xticks', 'yticks', 'xlabel', 'ylabel', 'clabel',
+                   'padding', 'xformatter', 'yformatter',
+                   'height', 'width',
+                   'min_width', 'min_height', 'max_width', 'max_height',
+                   'fontsize', 'responsive', 'shared_axes']
+        for plotwd in plotwds:
+            if plotwd in kwds:
+                plot_opts[plotwd] = kwds.pop(plotwd)
 
-        for bokeh_name, (value, default) in {
-            'logx': (logx, False),
-            'logy': (logy, False),
-            'show_legend': (show_legend, True),
-            'legend_position': (legend_position, 'right'),
-            'show_grid': (grid, False),
-            'shared_axes': (shared_axes, True),
-            'xaxis': (xaxis, None),
-            'yaxis': (yaxis, None),
-            'xticks': (xticks, None),
-            'yticks': (yticks, None),
-            'xlabel': (xlabel, None),
-            'ylabel': (ylabel, None),
-            'clabel': (clabel, None),
-            'xlim': (xlim, None),
-            'ylim': (ylim, None),
-            'padding': (padding, None),
-            'xformatter': (xformatter, None),
-            'yformatter': (yformatter, None),
-            'invert_xaxis': (flip_xaxis, None),
-            'invert_yaxis': (flip_yaxis, None),
-            'width': (width, None),
-            'height': (height, None),
-            'min_width': (min_width, None),
-            'min_height': (min_height, None),
-            'max_width': (max_width, None),
-            'max_height': (max_height, None),
-            'responsive': (responsive, False),
-            'fontsize': (fontsize, None),
-            'colorbar': (colorbar, self.kind in self._colorbar_types),
-            'invert': (invert and self.kind != 'barh', False),
-            'title_format': (title, None),
-            'projection': (process_crs(projection), None),
-            'global_extent': (global_extent, False),
-            }.items():
-            self._update_plot_opts(bokeh_name=bokeh_name, value=value, default=default)
+        if not xaxis:
+            plot_opts['xaxis'] = None
+        elif xaxis != True:
+            plot_opts['xaxis'] = xaxis
+        if not yaxis:
+            plot_opts['yaxis'] = None
+        elif yaxis != True:
+            plot_opts['yaxis'] = yaxis
 
-        # cleaning up height and width options
-        if not self._plot_opts.get('responsive', True):
-            if 'width' not in self._plot_opts:
-                self._plot_opts['width'] = 700
-            if 'height' not in self._plot_opts:
-                self._plot_opts['height'] = 300
+        if flip_xaxis:
+            plot_opts['invert_xaxis'] = True
+        if flip_yaxis:
+            plot_opts['invert_yaxis'] = True
+        if not plot_opts.get('responsive', True):
+            plot_opts['width'] = plot_opts.get('width', 700)
+            plot_opts['height'] = plot_opts.get('height', 300)
 
+        if isinstance(colorbar, bool):
+            plot_opts['colorbar'] = colorbar
+        elif self.kind in self._colorbar_types:
+            plot_opts['colorbar'] = True
         if 'logz' in kwds and 'logz' in self._kind_options.get(self.kind, {}):
-            self._plot_opts['logz'] = kwds.pop('logz')
+            plot_opts['logz'] = kwds.pop('logz')
+        if invert:
+            plot_opts['invert_axes'] = self.kind != 'barh'
         if rot:
             axis = 'yrotation' if invert else 'xrotation'
-            self._plot_opts[axis] = rot
+            plot_opts[axis] = rot
 
-        tools = list(tools) or self._plot_opts.get('tools', [])
+        tools = list(tools) or plot_opts.get('tools', [])
         if hover and not any(t for t in tools if isinstance(t, HoverTool)
                              or t == 'hover'):
             tools.append('hover')
-        self._plot_opts['tools'] = tools
+        plot_opts['tools'] = tools
 
         if self.crs and global_extent:
-            self._plot_opts['global_extent'] = global_extent
+            plot_opts['global_extent'] = global_extent
+        if projection:
+            plot_opts['projection'] = process_crs(projection)
+        if title is not None:
+            plot_opts['title_format'] = title
 
+        self._plot_opts = plot_opts
         self._overlay_opts = {k: v for k, v in self._plot_opts.items()
                               if k in OverlayPlot.params()}
 
-        self._norm_opts = {'framewise': framewise, 'axiswise': not shared_axes}
+        self._norm_opts = {'framewise': framewise, 'axiswise': not plot_opts.get('shared_axes')}
         self.kwds = kwds
 
         # Process dimensions and labels
@@ -665,12 +664,6 @@ class HoloViewsConverter(object):
 
         return plot_opts
 
-    def _update_plot_opts(self, value, bokeh_name, default=None):
-        if value is not None:
-            self._plot_opts[bokeh_name] = value
-        elif default is not None and bokeh_name not in self._plot_opts:
-            self._plot_opts[bokeh_name] = default
-
     def _process_style(self, colormap, kwds):
         kind = self.kind
         eltype = self._kind_mapping[kind]
@@ -688,8 +681,8 @@ class HoloViewsConverter(object):
 
         options = Store.options(backend='bokeh')
         elname = eltype.__name__
-        style = options[elname].groups['style']
-        style_opts = {k: v for k, v in style.kwargs.items() if not isinstance(v, Cycle)}
+        style = options[elname].groups['style'].kwargs if elname in options else {}
+        style_opts = {k: v for k, v in style.items() if not isinstance(v, Cycle)}
         style_opts.update(**{k: v for k, v in kwds.items() if k in valid_opts})
 
         # Process style options
@@ -716,7 +709,7 @@ class HoloViewsConverter(object):
                             style_opts['cmap'] = 'Category10'
 
         color = style_opts.get('color', process_cmap(colormap or 'Category10', categorical=True))
-        for k, v in style.kwargs.items():
+        for k, v in style.items():
             if isinstance(v, Cycle):
                 style_opts[k] = Cycle(values=color) if isinstance(color, list) else color
 
