@@ -28,6 +28,12 @@ class TestGridPlots(ComparisonTestCase):
                                            coords, ['time', 'lat', 'lon']).assign_coords(
                                                lat1=xr.DataArray([2,3], dims=['lat']))
 
+        self.xarr_with_attrs = xr.DataArray(
+            np.random.rand(10, 10), coords=[('x', range(10)), ('y', range(10))],
+            dims=['y', 'x'], attrs={'long_name': 'luminosity', 'units': 'lm'})
+        self.xarr_with_attrs.x.attrs['long_name'] = 'Declination'
+        self.xarr_with_attrs.y.attrs['long_name'] = 'Right Ascension'
+
     def test_rgb_dataarray_no_args(self):
         rgb = self.da_rgb.hvplot()
         self.assertEqual(rgb, RGB(([0, 1], [0, 1])+tuple(self.da_rgb.values)))
@@ -66,3 +72,40 @@ class TestGridPlots(ComparisonTestCase):
         img = self.da_img_by_time.hvplot(groupby='time')
         self.assertEqual(img[0], Image(self.da_img_by_time[0], ['lon', 'lat'], ['value']))
         self.assertEqual(img[1], Image(self.da_img_by_time[1], ['lon', 'lat'], ['value']))
+
+    def test_line_infer_dimension_params_from_xarray_attrs(self):
+        hmap = self.xarr_with_attrs.hvplot.line(groupby='x', dynamic=False)
+        self.assertEqual(hmap.kdims[0].label, 'Declination')
+        self.assertEqual(hmap.last.kdims[0].label, 'Right Ascension')
+        self.assertEqual(hmap.last.vdims[0].label, 'luminosity')
+        self.assertEqual(hmap.last.vdims[0].unit, 'lm')
+
+    def test_img_infer_dimension_params_from_xarray_attrs(self):
+        img = self.xarr_with_attrs.hvplot.image(clim=(0, 2))
+        self.assertEqual(img.kdims[0].label, 'Declination')
+        self.assertEqual(img.kdims[1].label, 'Right Ascension')
+        self.assertEqual(img.vdims[0].label, 'luminosity')
+        self.assertEqual(img.vdims[0].unit, 'lm')
+        self.assertEqual(img.vdims[0].range, (0, 2))
+
+    def test_points_infer_dimension_params_from_xarray_attrs(self):
+        points = self.xarr_with_attrs.hvplot.points(c='value', clim=(0, 2))
+        self.assertEqual(points.kdims[0].label, 'Declination')
+        self.assertEqual(points.kdims[1].label, 'Right Ascension')
+        self.assertEqual(points.vdims[0].label, 'luminosity')
+        self.assertEqual(points.vdims[0].unit, 'lm')
+        self.assertEqual(points.vdims[0].range, (0, 2))
+        
+    def test_dataset_infer_dimension_params_from_xarray_attrs(self):
+        ds = self.xarr_with_attrs.hvplot.dataset()
+        self.assertEqual(ds.kdims[0].label, 'Declination')
+        self.assertEqual(ds.kdims[1].label, 'Right Ascension')
+        self.assertEqual(ds.kdims[2].label, 'luminosity')
+        self.assertEqual(ds.kdims[2].unit, 'lm')
+        
+    def test_table_infer_dimension_params_from_xarray_attrs(self):
+        table = self.xarr_with_attrs.hvplot.dataset()
+        self.assertEqual(table.kdims[0].label, 'Declination')
+        self.assertEqual(table.kdims[1].label, 'Right Ascension')
+        self.assertEqual(table.kdims[2].label, 'luminosity')
+        self.assertEqual(table.kdims[2].unit, 'lm')
