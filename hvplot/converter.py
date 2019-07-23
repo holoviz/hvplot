@@ -166,7 +166,7 @@ class HoloViewsConverter(object):
         Declares a minimum sampling density beyond.
     """
 
-    _gridded_types = ['image', 'contour', 'contourf', 'quadmesh', 'rgb']
+    _gridded_types = ['image', 'contour', 'contourf', 'quadmesh', 'rgb', 'points']
 
     _geom_types = ['paths', 'polygons']
 
@@ -408,13 +408,14 @@ class HoloViewsConverter(object):
                               if k in OverlayPlot.params()}
         options = Store.options(backend='bokeh')
         el_type = self._kind_mapping[self.kind].__name__
-        style = options[el_type].groups['style']
-        cycled_opts = [k for k, v in style.kwargs.items() if isinstance(v, Cycle)]
-        for opt in cycled_opts:
-            color = style_opts.get('color', None)
-            if color is None:
-                color = process_cmap(colormap or 'Category10', categorical=True)
-            style_opts[opt] = Cycle(values=color) if isinstance(color, list) else color
+        if el_type in options:
+            style = options[el_type].groups['style']
+            cycled_opts = [k for k, v in style.kwargs.items() if isinstance(v, Cycle)]
+            for opt in cycled_opts:
+                color = style_opts.get('color', None)
+                if color is None:
+                    color = process_cmap(colormap or 'Category10', categorical=True)
+                style_opts[opt] = Cycle(values=color) if isinstance(color, list) else color
         self._style_opts = style_opts
         self._norm_opts = {'framewise': framewise, 'axiswise': not shared_axes}
         self.kwds = kwds
@@ -625,6 +626,8 @@ class HoloViewsConverter(object):
                 labels = {}
                 units = {}
                 for var_name, var_attrs in var_tuples:
+                    if var_name is None:
+                        var_name = 'value'
                     if 'long_name' in var_attrs:
                         labels[var_name] = var_attrs['long_name']
                     if 'units' in var_attrs:
@@ -712,6 +715,8 @@ class HoloViewsConverter(object):
         eltype = self._kind_mapping[kind]
         if eltype in Store.registry['bokeh']:
             valid_opts = Store.registry['bokeh'][eltype].style_opts
+        else:
+            valid_opts = []
         ds_opts = ['max_px', 'threshold']
         mismatches = sorted([k for k in kwds if k not in kind_opts+ds_opts+valid_opts])
         if not mismatches:
@@ -760,9 +765,9 @@ class HoloViewsConverter(object):
             if self.datatype == 'geopandas':
                 columns = [c for c in data.columns if c != 'geometry']
                 shape_dims = ['Longitude', 'Latitude'] if self.geo else ['x', 'y']
-                dataset = Dataset(data, kdims=shape_dims+columns)
+                dataset = Dataset(data, kdims=shape_dims+columns).redim(**self._redim)
             else:
-                dataset = Dataset(data)
+                dataset = Dataset(data).redim(**self._redim)
             if groups:
                 dataset = dataset.groupby(groups, dynamic=self.dynamic)
                 if len(zs) > 1:
@@ -1389,7 +1394,9 @@ class HoloViewsConverter(object):
         if hasattr(data, 'geom_type') and not (x and y):
             x, y = 'Longitude', 'Latitude'
         elif not (x and y):
-            x, y = data.columns[:2]
+            x, y = self.variables[:2]
+            if self.gridded:
+                x, y = y, x
 
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
         redim = self._merge_redim({self._color_dim: self._dim_ranges['c']} if self._color_dim else {})
