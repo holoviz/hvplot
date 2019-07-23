@@ -249,7 +249,7 @@ class HoloViewsConverter(object):
                  clabel=None, xformatter=None, yformatter=None, tools=[],
                  padding=None, responsive=False, min_width=None,
                  min_height=None, max_height=None, max_width=None,
-                 attr_labels=True, **kwds):
+                 attr_labels=True, coastline=False, tiles=False, **kwds):
 
         # Process data and related options
         self._redim = fields
@@ -263,6 +263,8 @@ class HoloViewsConverter(object):
         self.geo = geo or crs or global_extent or projection or project
         self.crs = self._process_crs(data, crs) if self.geo else None
         self.project = project
+        self.coastline = coastline
+        self.tiles = tiles
         self.row = row
         self.col = col
 
@@ -809,7 +811,7 @@ class HoloViewsConverter(object):
             obj = project(obj, projection=projection)
 
         if not (self.datashade or self.rasterize):
-            return obj
+            return self._apply_layers(obj)
 
         try:
             from holoviews.operation.datashader import datashade, rasterize, dynspread
@@ -861,7 +863,18 @@ class HoloViewsConverter(object):
             else:
                 param.main.warning('dynspread may only be applied on datashaded plots, '
                                    'use datashade=True instead of rasterize=True.')
-        return processed.opts({eltype: {'plot': self._plot_opts, 'style': style}})
+        return self._apply_layers(processed).opts({eltype: {'plot': self._plot_opts, 'style': style}})
+
+    def _apply_layers(self, obj):
+        if self.coastline:
+            import geoviews as gv
+            obj = obj * gv.feature.coastline()
+        if self.tiles:
+            if self.tiles in hv.element.tile_sources:
+                obj = hv.element.tile_sources[self.tiles]() * obj
+            elif self.tiles is True:
+                obj = hv.element.tiles.Wikipedia() * obj
+        return obj
 
     def _merge_redim(self, ranges, attr='range'):
         redim = dict(self._redim)
