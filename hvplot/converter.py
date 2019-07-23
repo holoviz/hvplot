@@ -166,7 +166,7 @@ class HoloViewsConverter(object):
         Declares a minimum sampling density beyond.
     """
 
-    _gridded_types = ['image', 'contour', 'contourf', 'quadmesh', 'rgb', 'points']
+    _gridded_types = ['image', 'contour', 'contourf', 'quadmesh', 'rgb']
 
     _geom_types = ['paths', 'polygons']
 
@@ -451,7 +451,7 @@ class HoloViewsConverter(object):
     def _process_data(self, kind, data, x, y, by, groupby, row, col,
                       use_dask, persist, backlog, label, value_label,
                       hover_cols, attr_labels, kwds):
-        gridded = kind in self._gridded_types
+        gridded = kind in self._gridded_types or kind == 'points'
         gridded_data = False
         da = None
 
