@@ -1,4 +1,4 @@
-from unittest import SkipTest
+from unittest import SkipTest, expectedFailure
 
 from parameterized import parameterized
 
@@ -125,3 +125,44 @@ class TestOptions(ComparisonTestCase):
         self.assertEqual(opts.kwargs['show_grid'], True)
         self.assertEqual(opts.kwargs['height'], 400)
         self.assertEqual(opts.kwargs['width'], 300)
+
+    def test_holoviews_defined_default_opts_are_not_mutable(self):
+        hv.opts.defaults(hv.opts.Scatter(tools=['tap']))
+        plot = self.df.hvplot.scatter('x', 'y', c='category')
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['tools'], ['tap', 'hover'])
+        default_opts = Store.options(backend='bokeh')['Scatter'].groups['plot'].options
+        self.assertEqual(default_opts['tools'], ['tap'])
+
+    def test_axis_set_to_visible_by_default(self):
+        plot = self.df.hvplot.scatter('x', 'y', c='category')
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        assert 'xaxis' not in opts.kwargs
+        assert 'yaxis' not in opts.kwargs
+
+    def test_axis_set_to_none(self):
+        plot = self.df.hvplot.scatter('x', 'y', c='category', xaxis=None, yaxis=None)
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['xaxis'], None)
+        self.assertEqual(opts.kwargs['yaxis'], None)
+
+    def test_axis_set_to_false(self):
+        plot = self.df.hvplot.scatter('x', 'y', c='category', xaxis=False, yaxis=False)
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['xaxis'], None)
+        self.assertEqual(opts.kwargs['yaxis'], None)
+
+    def test_axis_set_to_none_in_holoviews_opts_default(self):
+        hv.opts.defaults(hv.opts.Scatter(xaxis=None, yaxis=None))
+        plot = self.df.hvplot.scatter('x', 'y', c='category')
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['xaxis'], None)
+        self.assertEqual(opts.kwargs['yaxis'], None)
+
+    @expectedFailure
+    def test_axis_set_to_none_in_holoviews_opts_default_overwrite_in_call(self):
+        hv.opts.defaults(hv.opts.Scatter(xaxis=None, yaxis=None))
+        plot = self.df.hvplot.scatter('x', 'y', c='category', xaxis=True, yaxis=True)
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        assert 'xaxis' not in opts.kwargs
+        assert 'yaxis' not in opts.kwargs

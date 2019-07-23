@@ -267,7 +267,7 @@ class HoloViewsConverter(object):
                  stacked=False, colorbar=None, fontsize=None,
                  colormap=None, datashade=False, rasterize=False,
                  row=None, col=None, figsize=None, debug=False,
-                 xaxis=True, yaxis=True, framewise=True, aggregator=None,
+                 framewise=True, aggregator=None,
                  projection=None, global_extent=None, geo=False,
                  precompute=False, flip_xaxis=None, flip_yaxis=None,
                  dynspread=False, hover_cols=[], x_sampling=None,
@@ -377,14 +377,20 @@ class HoloViewsConverter(object):
             if plotwd in kwds:
                 plot_opts[plotwd] = kwds.pop(plotwd)
 
-        if not xaxis:
-            plot_opts['xaxis'] = None
-        elif xaxis != True:
-            plot_opts['xaxis'] = xaxis
-        if not yaxis:
-            plot_opts['yaxis'] = None
-        elif yaxis != True:
-            plot_opts['yaxis'] = yaxis
+        for axis_name in ['xaxis', 'yaxis']:
+            print(plot_opts.get(axis_name))
+            if axis_name in kwds:
+                axis = kwds.pop(axis_name)
+                if not axis:
+                    print('not axis')
+                    plot_opts[axis_name] = None
+                elif axis != True:
+                    print('not True')
+                    plot_opts[axis_name] = axis
+                else:
+                    print('in plot_opts')
+                    plot_opts[axis_name] = axis
+            print(plot_opts.get(axis_name))
 
         if flip_xaxis:
             plot_opts['invert_xaxis'] = True
