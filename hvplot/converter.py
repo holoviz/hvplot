@@ -406,7 +406,7 @@ class HoloViewsConverter(object):
             axis = 'yrotation' if invert else 'xrotation'
             plot_opts[axis] = rot
 
-        tools = list(tools) or plot_opts.get('tools', [])
+        tools = list(tools) or list(plot_opts.get('tools', []))
         if hover and not any(t for t in tools if isinstance(t, HoverTool)
                              or t == 'hover'):
             tools.append('hover')

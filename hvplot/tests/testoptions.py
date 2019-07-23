@@ -3,8 +3,10 @@ from unittest import SkipTest
 from parameterized import parameterized
 
 from holoviews import Store
+from holoviews.core.options import Options, OptionTree
 from holoviews.element.comparison import ComparisonTestCase
 from hvplot import patch
+import holoviews as hv
 
 
 class TestOptions(ComparisonTestCase):
@@ -14,9 +16,19 @@ class TestOptions(ComparisonTestCase):
             import pandas as pd
         except:
             raise SkipTest('Pandas not available')
+        self.backend = 'bokeh'
+        hv.extension(self.backend)
+        Store.current_backend = self.backend
+        self.store_copy = OptionTree(sorted(Store.options().items()),
+                                     groups=Options._option_groups)
         patch('pandas')
         self.df = pd.DataFrame([[1, 2, 'A', 0.1], [3, 4, 'B', 0.2], [5, 6, 'C', 0.3]],
                                columns=['x', 'y', 'category', 'number'])
+
+    def tearDown(self):
+        Store.options(val=self.store_copy)
+        Store._custom_options = {k:{} for k in Store._custom_options.keys()}
+        super(TestOptions, self).tearDown()
 
     def test_scatter_legend_position(self):
         plot = self.df.hvplot.scatter('x', 'y', c='category', legend='left')
@@ -88,3 +100,28 @@ class TestOptions(ComparisonTestCase):
         self.assertEqual(opts.kwargs['alpha'], 'number')
         self.assertIn('number', plot.last.vdims)
 
+    def test_hvplot_defaults(self):
+        plot = self.df.hvplot.scatter('x', 'y', c='category')
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['legend_position'], 'right')
+        self.assertEqual(opts.kwargs['show_grid'], False)
+        self.assertEqual(opts.kwargs['height'], 300)
+        self.assertEqual(opts.kwargs['width'], 700)
+
+    def test_hvoloviews_defined_default_opts(self):
+        hv.opts.defaults(hv.opts.Scatter( height=400, width=900 ,show_grid=True))
+        plot = self.df.hvplot.scatter('x', 'y', c='category')
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['legend_position'], 'right')
+        self.assertEqual(opts.kwargs['show_grid'], True)
+        self.assertEqual(opts.kwargs['height'], 400)
+        self.assertEqual(opts.kwargs['width'], 900)
+
+    def test_hvoloviews_defined_default_opts_overwritten_in_call(self):
+        hv.opts.defaults(hv.opts.Scatter(height=400, width=900, show_grid=True))
+        plot = self.df.hvplot.scatter('x', 'y', c='category', width=300, legend='left')
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['legend_position'], 'left')
+        self.assertEqual(opts.kwargs['show_grid'], True)
+        self.assertEqual(opts.kwargs['height'], 400)
+        self.assertEqual(opts.kwargs['width'], 300)
