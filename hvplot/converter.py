@@ -836,7 +836,7 @@ class HoloViewsConverter(object):
 
         try:
             from holoviews.operation.datashader import datashade, rasterize, dynspread
-            from datashader import count_cat, mean
+            from datashader import reductions
         except:
             raise ImportError('Datashading is not available')
 
@@ -851,11 +851,14 @@ class HoloViewsConverter(object):
                 opts['cmap'] = process_cmap(cmap, levels)
 
         if self.by:
-            opts['aggregator'] = count_cat(self.by[0])
-        if self._color_dim:
-            opts['aggregator'] = mean(self._color_dim)
+            opts['aggregator'] = reductions.count_cat(self.by[0])
         if self.aggregator:
-            opts['aggregator'] = self.aggregator
+            agg = self.aggregator
+            if isinstance(agg, basestring) and self._color_dim:
+                agg = getattr(reductions, agg)(self._color_dim)
+            opts['aggregator'] = agg
+        elif self._color_dim:
+            opts['aggregator'] = reductions.mean(self._color_dim)
         if self.precompute:
             opts['precompute'] = self.precompute
         if self.x_sampling:
