@@ -52,6 +52,10 @@ class TestChart1D(ComparisonTestCase):
                                    columns=['x', 'y', 'category'])
         self.cat_only_df = pd.DataFrame([['A', 'a'], ['B', 'b'], ['C', 'c']],
                                         columns=['upper', 'lower'])
+        self.time_df = pd.DataFrame({
+            'time': pd.date_range('1/1/2000', periods=10, tz='UTC'),
+            'A': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            'B': 'abcdefghij'})
 
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
     def test_wide_chart(self, kind, element):
@@ -152,6 +156,33 @@ class TestChart1D(ComparisonTestCase):
                          'lower': element(self.cat_only_df, 'index', 'lower').redim(lower='value'),
                         }, 'Variable')
         self.assertEqual(plot, obj)
+
+    def test_time_df_sorts_on_plot(self):
+        scrambled = self.time_df.sample(frac=1)
+        plot = scrambled.hvplot(x='time')
+        assert (plot.data == self.time_df).all().all()
+        assert (plot.data.time.diff()[1:].astype('int') > 0).all()
+
+    def test_time_df_does_not_sort_on_plot_if_sort_date_off(self):
+        scrambled = self.time_df.sample(frac=1)
+        plot = scrambled.hvplot(x='time', sort_date=False)
+        assert (plot.data == scrambled).all().all()
+        assert not (plot.data.time.diff()[1:].astype('int') > 0).all()
+
+    def test_time_df_sorts_on_plot_using_index_as_x(self):
+        df = self.time_df.set_index('time')
+        scrambled = df.sample(frac=1)
+        plot = scrambled.hvplot()
+        assert (plot.data['time'] == df.index).all()
+        assert (plot.data.time.diff()[1:].astype('int') > 0).all()
+
+    def test_time_df_does_not_sort_on_plot_if_sort_date_off_using_index_as_x(self):
+        df = self.time_df.set_index('time')
+        scrambled = df.sample(frac=1)
+        plot = scrambled.hvplot(sort_date=False)
+        assert (plot.data.time == scrambled.index).all().all()
+        assert not (plot.data.time.diff()[1:].astype('int') > 0).all()
+
 
 class TestChart1DDask(TestChart1D):
 

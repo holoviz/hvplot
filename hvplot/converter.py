@@ -1010,7 +1010,7 @@ class HoloViewsConverter(object):
         elif not x:
             raise ValueError('Could not determine what to plot. Expected '
                              'x to be declared or use_index to be enabled.')
-        if self.sort_date:
+        if self.sort_date and self.datatype == 'pandas':
             from pandas.api.types import is_datetime64_any_dtype as is_datetime
             if x in self.indexes:
                 index = self.indexes.index(x)
