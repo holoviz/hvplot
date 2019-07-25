@@ -118,7 +118,7 @@ class HoloViewsConverter(object):
     rot: number
         Rotates the axis ticks along the x-axis by the specified
         number of degrees.
-    shared_axes (default=False): boolean
+    shared_axes (default=True): boolean
         Whether to link axes between plots
     title (default=''): str
         Title for the plot
@@ -208,7 +208,7 @@ class HoloViewsConverter(object):
                      'yaxis', 'xformatter', 'yformatter', 'xlabel', 'ylabel',
                      'clabel', 'padding']
 
-    _style_options = ['color', 'alpha', 'colormap', 'fontsize', 'c']
+    _style_options = ['color', 'alpha', 'colormap', 'fontsize', 'c', 'cmap']
 
     _op_options = ['datashade', 'rasterize', 'x_sampling', 'y_sampling',
                    'aggregator']
@@ -256,6 +256,13 @@ class HoloViewsConverter(object):
         'logx': False, 'logy': False, 'show_legend': True, 'legend_position': 'right',
         'show_grid': False, 'responsive': False, 'shared_axes': True}
 
+    _default_cmaps = {
+        'linear': 'kbc_r',
+        'categorical': 'Category10',
+        'cyclic': 'colorwheel',
+        'diverging': 'coolwarm'
+    }
+
     def __init__(self, data, x, y, kind=None, by=None, use_index=True,
                  group_label='Variable', value_label='value',
                  backlog=1000, persist=False, use_dask=False,
@@ -265,7 +272,7 @@ class HoloViewsConverter(object):
                  logx=None, logy=None, loglog=None, hover=True,
                  subplots=False, label=None, invert=False,
                  stacked=False, colorbar=None, fontsize=None,
-                 colormap=None, datashade=False, rasterize=False,
+                 datashade=False, rasterize=False,
                  row=None, col=None, figsize=None, debug=False,
                  framewise=True, aggregator=None,
                  projection=None, global_extent=None, geo=False,
@@ -337,7 +344,7 @@ class HoloViewsConverter(object):
 
         # Process options
         self.stacked = stacked
-        self._style_opts, kwds = self._process_style(colormap, kwds)
+        self._style_opts, kwds = self._process_style(kwds)
 
         plot_opts = {**self._default_plot_opts,
                      **self._process_plot(self._style_opts.get('color'))}
@@ -665,7 +672,7 @@ class HoloViewsConverter(object):
 
         return plot_opts
 
-    def _process_style(self, colormap, kwds):
+    def _process_style(self, kwds):
         kind = self.kind
         eltype = self._kind_mapping[kind]
         registry =  Store.registry['bokeh']
@@ -676,25 +683,23 @@ class HoloViewsConverter(object):
             valid_opts = []
 
         for opt in valid_opts:
-            if opt not in kwds or not isinstance(kwds[opt], list) or opt == 'cmap':
+            if opt not in kwds or not isinstance(kwds[opt], list) or opt in ['cmap', 'colormap']:
                 continue
             kwds[opt] = Cycle(kwds[opt])
 
+        # Process style options
         options = Store.options(backend='bokeh')
         elname = eltype.__name__
         style = options[elname].groups['style'].kwargs if elname in options else {}
-        style_opts = {k: v for k, v in style.items() if not isinstance(v, Cycle)}
+        style_opts = {k: v for k, v in style.items() if not isinstance(v, Cycle) and k != 'cmap'}
         style_opts.update(**{k: v for k, v in kwds.items() if k in valid_opts})
 
-        # Process style options
-        if 'cmap' in kwds and colormap:
-            raise TypeError("Only specify one of `cmap` and `colormap`.")
-        elif 'cmap' in kwds:
-            style_opts['cmap'] = kwds.pop('cmap')
-        else:
-            style_opts['cmap'] = colormap
-
         # Color
+        if 'cmap' in kwds and 'colormap' in kwds:
+            raise TypeError("Only specify one of `cmap` and `colormap`.")
+
+        cmap = kwds.pop('cmap', kwds.pop('colormap', None))
+
         if 'color' in kwds or 'c' in kwds:
             color = kwds.pop('color', kwds.pop('c', None))
             if isinstance(color, (np.ndarray, pd.Series)):
@@ -706,10 +711,17 @@ class HoloViewsConverter(object):
                 style_opts['color'] = color
                 if 'c' in self._kind_options.get(kind, []) and (color in self.variables):
                     if self.data[color].dtype.kind in 'OSU':
-                        if 'cmap' not in style_opts:
-                            style_opts['cmap'] = 'Category10'
+                        cmap = cmap or self._default_cmaps['categorical']
+                    else:
+                        cmap = cmap or self._default_cmaps['linear']
 
-        color = style_opts.get('color', process_cmap(colormap or 'Category10', categorical=True))
+        if cmap in self._default_cmaps:
+            cmap = self._default_cmaps[cmap]
+
+        if cmap is not None:
+            style_opts['cmap'] = cmap
+
+        color = style_opts.get('color', process_cmap(cmap or self._default_cmaps['categorical'], categorical=True))
         for k, v in style.items():
             if isinstance(v, Cycle):
                 style_opts[k] = Cycle(values=color) if isinstance(color, list) else color
@@ -730,10 +742,6 @@ class HoloViewsConverter(object):
         # Marker
         if 'marker' in kwds and 'marker' in self._kind_options[self.kind]:
             style_opts['marker'] = kwds.pop('marker')
-
-        # Alpha
-        if 'marker' in kwds:
-            style_opts['alpha'] = kwds.pop('alpha')
 
         return style_opts, kwds
 
