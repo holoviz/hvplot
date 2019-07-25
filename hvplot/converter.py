@@ -638,7 +638,10 @@ class HoloViewsConverter(object):
         if da is not None and attr_labels:
             try:
                 var_tuples = [(var, da[var].attrs) for var in da.coords]
-                var_tuples.append((da.name, da.attrs))
+                if isinstance(da, xr.Dataset):
+                    var_tuples.extend([(var, da[var].attrs) for var in da.data_vars])
+                else:
+                    var_tuples.append((da.name, da.attrs))
                 labels = {}
                 units = {}
                 for var_name, var_attrs in var_tuples:
