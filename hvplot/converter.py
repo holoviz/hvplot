@@ -139,8 +139,11 @@ class HoloViewsConverter(object):
         ticks positions, or list of tuples of the tick positions and labels
     width (default=800)/height (default=300): int
         The width and height of the plot in pixels
-    attr_labels (default=True): bool
-        Whether to use an xarray object's attributes as labels
+    attr_labels (default=None): bool
+        Whether to use an xarray object's attributes as labels, defaults to
+        None to allow best effort without throwing a warning. Set to True
+        to see warning if the attrs can't be found, set to False to disable
+        the behavior.
     sort_date (default=True): bool
         Whether to sort the x-axis by date before plotting
 
@@ -279,7 +282,7 @@ class HoloViewsConverter(object):
                  precompute=False, flip_xaxis=None, flip_yaxis=None,
                  dynspread=False, hover_cols=[], x_sampling=None,
                  y_sampling=None, project=False, tools=[],
-                 attr_labels=True, coastline=False, tiles=False,
+                 attr_labels=None, coastline=False, tiles=False,
                  sort_date=True, **kwds):
 
         # Process data and related options
@@ -635,7 +638,7 @@ class HoloViewsConverter(object):
         self.streaming = streaming
         self.hover_cols = hover_cols
 
-        if da is not None and attr_labels:
+        if da is not None and attr_labels is True or attr_labels is None:
             try:
                 var_tuples = [(var, da[var].attrs) for var in da.coords]
                 if isinstance(da, xr.Dataset):
@@ -654,9 +657,9 @@ class HoloViewsConverter(object):
                 self._redim = self._merge_redim(labels, 'label')
                 self._redim = self._merge_redim(units, 'unit')
             except Exception as e:
-                param.main.warning('Unable to auto label using xarray attrs '
-                                   'because {e}; suppress this warning '
-                                   'with attr_labels=False.'.format(e=e))
+                if attr_labels is True:
+                    param.main.warning('Unable to auto label using xarray attrs '
+                                       'because {e}'.format(e=e))
 
     def _process_plot(self, color):
         kind = self.kind
