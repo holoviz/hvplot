@@ -34,6 +34,8 @@ class TestGridPlots(ComparisonTestCase):
         self.xarr_with_attrs.x.attrs['long_name'] = 'Declination'
         self.xarr_with_attrs.y.attrs['long_name'] = 'Right Ascension'
 
+        self.xds_with_attrs = xr.Dataset({'light': self.xarr_with_attrs })
+
     def test_rgb_dataarray_no_args(self):
         rgb = self.da_rgb.hvplot()
         self.assertEqual(rgb, RGB(([0, 1], [0, 1])+tuple(self.da_rgb.values)))
@@ -88,6 +90,13 @@ class TestGridPlots(ComparisonTestCase):
         self.assertEqual(img.vdims[0].unit, 'lm')
         self.assertEqual(img.vdims[0].range, (0, 2))
 
+    def test_table_infer_dimension_params_from_xarray_ds_attrs(self):
+        table = self.xds_with_attrs.hvplot.dataset()
+        self.assertEqual(table.kdims[0].label, 'Declination')
+        self.assertEqual(table.kdims[1].label, 'Right Ascension')
+        self.assertEqual(table.kdims[2].label, 'luminosity')
+        self.assertEqual(table.kdims[2].unit, 'lm')
+
     def test_points_infer_dimension_params_from_xarray_attrs(self):
         points = self.xarr_with_attrs.hvplot.points(c='value', clim=(0, 2))
         self.assertEqual(points.kdims[0].label, 'Declination')
@@ -95,14 +104,14 @@ class TestGridPlots(ComparisonTestCase):
         self.assertEqual(points.vdims[0].label, 'luminosity')
         self.assertEqual(points.vdims[0].unit, 'lm')
         self.assertEqual(points.vdims[0].range, (0, 2))
-        
+
     def test_dataset_infer_dimension_params_from_xarray_attrs(self):
         ds = self.xarr_with_attrs.hvplot.dataset()
         self.assertEqual(ds.kdims[0].label, 'Declination')
         self.assertEqual(ds.kdims[1].label, 'Right Ascension')
         self.assertEqual(ds.kdims[2].label, 'luminosity')
         self.assertEqual(ds.kdims[2].unit, 'lm')
-        
+
     def test_table_infer_dimension_params_from_xarray_attrs(self):
         table = self.xarr_with_attrs.hvplot.dataset()
         self.assertEqual(table.kdims[0].label, 'Declination')
