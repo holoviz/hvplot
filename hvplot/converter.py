@@ -141,6 +141,8 @@ class HoloViewsConverter(object):
         The width and height of the plot in pixels
     attr_labels (default=True): bool
         Whether to use an xarray object's attributes as labels
+    sort_date (default=True): bool
+        Whether to sort the x-axis by date before plotting
 
     Datashader options
     ------------------
@@ -270,7 +272,8 @@ class HoloViewsConverter(object):
                  clabel=None, xformatter=None, yformatter=None, tools=[],
                  padding=None, responsive=False, min_width=None,
                  min_height=None, max_height=None, max_width=None,
-                 attr_labels=True, coastline=False, tiles=False, **kwds):
+                 attr_labels=True, coastline=False, tiles=False,
+                 sort_date=True, **kwds):
 
         # Process data and related options
         self._redim = fields
@@ -288,6 +291,7 @@ class HoloViewsConverter(object):
         self.tiles = tiles
         self.row = row
         self.col = col
+        self.sort_date = sort_date
 
         # Import geoviews if geo-features requested
         if self.geo or self.datatype == 'geopandas':
@@ -1006,6 +1010,14 @@ class HoloViewsConverter(object):
         elif not x:
             raise ValueError('Could not determine what to plot. Expected '
                              'x to be declared or use_index to be enabled.')
+        if self.sort_date and self.datatype == 'pandas':
+            from pandas.api.types import is_datetime64_any_dtype as is_datetime
+            if x in self.indexes:
+                index = self.indexes.index(x)
+                if is_datetime(data.axes[index]):
+                    data = data.sort_index(axis=self.indexes.index(x))
+            elif is_datetime(data[x]):
+                data = data.sort_values(x)
 
         y = y or self.y
         if not y:
