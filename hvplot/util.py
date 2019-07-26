@@ -226,6 +226,12 @@ def is_xarray(data):
     from xarray import DataArray, Dataset
     return isinstance(data, (DataArray, Dataset))
 
+def is_xarray_groupby(data):
+    if not check_library(data, 'xarray'):
+        return False
+    from xarray.core.groupby import DataArrayGroupBy, DatasetGroupBy
+    return isinstance(data, (DataArrayGroupBy, DatasetGroupBy))
+
 
 def process_intake(data, use_dask):
     if data.container not in ('dataframe', 'xarray'):
@@ -255,6 +261,15 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, v
     ignore = (by or []) + (groupby or [])
     dims = [c for c in dataset.coords if dataset[c].shape != () and c not in ignore][::-1]
     index_dims = [d for d in dims if d in dataset.indexes]
+    all_vars = other_dims or []
+    for var in [x, y, by, groupby]:
+        if isinstance(var, list):
+            all_vars.extend(var)
+        elif isinstance(var, str):
+            all_vars.append(var)
+
+    not_found = [var for var in all_vars if var not in data_vars + list(dataset.coords) + index_dims]
+    _, extra_vars = process_derived_datetime(dataset, not_found)
 
     if gridded:
         data = dataset
@@ -277,6 +292,7 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, v
             dims = list(data.coords[x].dims) + list(data.coords[y].dims)
             groupby = [d for d in index_dims if d not in (x, y) and d not in dims and d not in other_dims]
     else:
+        dataset = dataset.assign(**{var: dataset[var] for var in extra_vars})
         if use_dask:
             data = dataset.to_dask_dataframe()
             data = data.persist() if persist else data
@@ -299,3 +315,13 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, v
         if groupby is None:
             groupby = [c for c in dims if c not in by+[x, y]]
     return data, x, y, by, groupby
+
+
+def process_derived_datetime(data, not_found):
+    from pandas.api.types import is_datetime64_any_dtype as isdate
+    extra_vars = []
+    for var in not_found:
+        if '.' in var and isdate(data[var.split('.')[0]]):
+            not_found.remove(var)
+            extra_vars.append(var)
+    return not_found, extra_vars

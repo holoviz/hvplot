@@ -29,7 +29,8 @@ from holoviews.util.transform import dim
 
 from .util import (
     is_series, is_dask, is_intake, is_streamz, is_xarray, process_crs,
-    process_intake, process_xarray, check_library, is_geopandas
+    process_intake, process_xarray, check_library, is_geopandas,
+    process_derived_datetime,
 )
 
 renderer = hv.renderer('bokeh')
@@ -574,6 +575,7 @@ class HoloViewsConverter(object):
 
         if gridded_data:
             not_found = [g for g in groupby if g not in data.coords]
+            not_found, _ = process_derived_datetime(data, not_found)
             data_vars = list(data.data_vars) if isinstance(data, xr.Dataset) else [data.name]
             indexes = list(data.coords)
             self.variables = list(data.coords) + data_vars
