@@ -261,6 +261,13 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, v
         if len(dims) < 2:
             dims += [dim for dim in list(data.dims)[::-1] if dim not in dims]
         if not (x or y):
+            for c in dataset.coords:
+                axis = dataset[c].attrs.get('axis', '')
+                if axis.lower() == 'x':
+                    x = c
+                elif axis.lower() == 'y':
+                    y = c
+        if not (x or y):
             x, y = index_dims[:2] if len(index_dims) > 1 else dims[:2]
         elif x and not y:
             y = [d for d in dims if d != x][0]
