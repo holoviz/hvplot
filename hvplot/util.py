@@ -312,6 +312,12 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, v
         elif not x and not y:
             x, y = dims[0], data_vars
 
+        for var in [x, y]:
+            if isinstance(var, list):
+                all_vars.extend(var)
+            elif isinstance(var, str):
+                all_vars.append(var)
+
         covered_dims = []
         for var in all_vars:
             if var in dataset.coords:
