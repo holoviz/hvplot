@@ -555,6 +555,7 @@ class HoloViewsConverter(object):
             else:
                 other_dims = []
             da = data
+            print('processing')
             data, x, y, by_new, groupby_new = process_xarray(
                 data, x, y, by, groupby, use_dask, persist, gridded,
                 label, value_label, other_dims)
@@ -575,7 +576,7 @@ class HoloViewsConverter(object):
 
         if gridded_data:
             not_found = [g for g in groupby if g not in data.coords]
-            not_found, _ = process_derived_datetime(data, not_found)
+            not_found, *_ = process_derived_datetime(data, not_found)
             data_vars = list(data.data_vars) if isinstance(data, xr.Dataset) else [data.name]
             indexes = list(data.coords)
             self.variables = list(data.coords) + data_vars
@@ -1050,6 +1051,7 @@ class HoloViewsConverter(object):
     def chart(self, element, x, y, data=None):
         "Helper method for simple x vs. y charts"
         data, x, y = self._process_args(data, x, y)
+        print(data.head(), x, y)
         if x and y and not isinstance(y, (list, tuple)):
             return self.single_chart(element, x, y, data)
         elif x and y and len(y) == 1:
