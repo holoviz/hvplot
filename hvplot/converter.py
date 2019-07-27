@@ -465,7 +465,6 @@ class HoloViewsConverter(object):
         # Process dimensions and labels
         self.label = label
         self._relabel = {'label': label} if label else {}
-
         self._dim_ranges = {'c': clim or (None, None)}
 
         # High-level options
