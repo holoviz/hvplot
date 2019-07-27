@@ -41,8 +41,8 @@ class TestProcessXarray(TestCase):
         assert isinstance(data, pd.DataFrame)
         assert x == 'index'
         assert y == ['value']
-        assert by == []
-        assert groupby == []
+        assert not by
+        assert not groupby
 
     def test_process_1d_xarray_dataarray_with_coords(self):
         import xarray as xr
@@ -57,8 +57,8 @@ class TestProcessXarray(TestCase):
         assert isinstance(data, pd.DataFrame)
         assert x == 'day'
         assert y == ['value']
-        assert by == []
-        assert groupby == []
+        assert not by
+        assert not groupby
 
     def test_process_1d_xarray_dataarray_with_coords_and_name(self):
         import xarray as xr
@@ -74,8 +74,8 @@ class TestProcessXarray(TestCase):
         assert isinstance(data, pd.DataFrame)
         assert x == 'day'
         assert y == ['temp']
-        assert by == []
-        assert groupby == []
+        assert not by
+        assert not groupby
 
     def test_process_2d_xarray_dataarray_with_no_coords(self):
         import xarray as xr
@@ -87,8 +87,8 @@ class TestProcessXarray(TestCase):
         assert isinstance(data, pd.DataFrame)
         assert x == 'index'
         assert y == ['value']
-        assert by == []
-        assert groupby == []
+        assert not by
+        assert not groupby
 
     def test_process_2d_xarray_dataarray_with_no_coords_as_gridded(self):
         import xarray as xr
@@ -103,8 +103,8 @@ class TestProcessXarray(TestCase):
         assert list(data.data_vars.keys()) == ['value']
         assert x == 'dim_1'
         assert y == 'dim_0'
-        assert by is None
-        assert groupby is None
+        assert not by
+        assert not groupby
 
     def test_process_2d_xarray_dataarray_with_coords_as_gridded(self):
         import xarray as xr
@@ -122,8 +122,8 @@ class TestProcessXarray(TestCase):
         assert list(data.data_vars.keys()) == ['value']
         assert x == 'y'
         assert y == 'x'
-        assert by is None
-        assert groupby is None
+        assert not by
+        assert not groupby
 
     def test_process_3d_xarray_dataset_with_coords(self):
         import pandas as pd
@@ -132,7 +132,7 @@ class TestProcessXarray(TestCase):
         assert isinstance(data, pd.DataFrame)
         assert x == 'time'
         assert y == ['air']
-        assert by == []
+        assert not by
         assert groupby == ['lon', 'lat']
 
     def test_process_3d_xarray_dataset_with_coords_as_gridded(self):
@@ -160,5 +160,33 @@ class TestProcessXarray(TestCase):
         assert list(data.data_vars.keys()) == ['air']
         assert x == 'lon'
         assert y == 'lat'
-        assert by is None
+        assert not by
         assert groupby == ['time']
+
+    def test_process_xarray_dataset_with_by_as_derived_datetime(self):
+        import pandas as pd
+
+        data = self.ds.mean(dim=['lat', 'lon'])
+        kwargs = self.default_kwargs
+        kwargs.update(gridded=False, y='air', by=['time.hour'])
+
+        data, x, y, by, groupby = process_xarray(data=data, **kwargs)
+        assert isinstance(data, pd.DataFrame)
+        assert x == 'time'
+        assert y == 'air'
+        assert by == ['time.hour']
+        assert not groupby
+
+    def test_process_xarray_dataset_with_x_as_derived_datetime(self):
+        import pandas as pd
+
+        data = self.ds.mean(dim=['lat', 'lon'])
+        kwargs = self.default_kwargs
+        kwargs.update(gridded=False, y='air', x='time.dayofyear')
+
+        data, x, y, by, groupby = process_xarray(data=data, **kwargs)
+        assert isinstance(data, pd.DataFrame)
+        assert x == 'time.dayofyear'
+        assert y == 'air'
+        assert not by
+        assert not groupby
