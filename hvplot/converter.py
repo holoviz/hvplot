@@ -488,7 +488,8 @@ class HoloViewsConverter(object):
             divergent = cmin < 0 and cmax > 0
             if divergent:
                 symmetric = True
-            # TODO: add cmap from hv.config
+            else:
+                symmetric = False
 
         return symmetric
 
