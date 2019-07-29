@@ -218,12 +218,17 @@ class TestOptions(ComparisonTestCase):
         opts = Store.lookup_options('bokeh', plot, 'style')
         self.assertEqual(opts.kwargs['cmap'], 'coolwarm')
 
-    def test_cmap_opts_in_call(self):
+    def test_cmap_opts_by_name(self):
         plot = self.df.hvplot.scatter('x', 'y', c='number', cmap='fire')
         opts = Store.lookup_options('bokeh', plot, 'style')
         self.assertEqual(opts.kwargs['cmap'], 'fire')
 
-    def test_colormap_opts_in_call(self):
+    def test_colormap_opts_by_name(self):
         plot = self.df.hvplot.scatter('x', 'y', c='number', colormap='fire')
         opts = Store.lookup_options('bokeh', plot, 'style')
         self.assertEqual(opts.kwargs['cmap'], 'fire')
+
+    def test_cmap_opts_as_a_list(self):
+        plot = self.df.hvplot.scatter('x', 'y', c='number', cmap=['red', 'blue', 'green'])
+        opts = Store.lookup_options('bokeh', plot, 'style')
+        self.assertEqual(opts.kwargs['cmap'], ['red', 'blue', 'green'])
