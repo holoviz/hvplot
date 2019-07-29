@@ -723,7 +723,7 @@ class HoloViewsConverter(object):
                     else:
                         cmap = cmap or self._default_cmaps['linear']
 
-        if cmap in self._default_cmaps:
+        if isinstance(cmap, str) and cmap in self._default_cmaps:
             cmap = self._default_cmaps[cmap]
 
         if cmap is not None:
