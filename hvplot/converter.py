@@ -476,20 +476,26 @@ class HoloViewsConverter(object):
                                'y: {y}, by: {by}, groupby: {groupby}'.format(**kwds))
 
     def _process_symmetric(self, clim, symmetric, kwds):
-        if clim is None and symmetric is None:
-            if is_xarray(self.data):
-                data = self.data[list(self.data.data_vars)[0]]
-            else:
-                data = self.data[kwds['C']]
+        if clim is not None and symmetric is not None:
+            return symmetric
 
-            cmin = np.nanquantile(data, 0.05)
-            cmax = np.nanquantile(data, 0.95)
-            clim = (cmin, cmax)
-            divergent = cmin < 0 and cmax > 0
-            if divergent:
-                symmetric = True
-            else:
-                symmetric = False
+        if is_xarray(self.data):
+            # chunks mean it's lazily loaded; nanquantile will eagerly load
+            if self.data.chunks:
+                return False
+            z = kwds.get('z', list(self.data.data_vars)[0])
+            data = self.data[z]
+        else:
+            data = self.data[kwds['C']]
+
+        cmin = np.nanquantile(data, 0.05)
+        cmax = np.nanquantile(data, 0.95)
+        clim = (cmin, cmax)
+        divergent = cmin < 0 and cmax > 0
+        if divergent:
+            symmetric = True
+        else:
+            symmetric = False
 
         return symmetric
 
