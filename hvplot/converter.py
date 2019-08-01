@@ -740,7 +740,10 @@ class HoloViewsConverter(object):
         if cmap is not None:
             style_opts['cmap'] = cmap
 
-        color = style_opts.get('color', process_cmap(cmap or self._default_cmaps['categorical'], categorical=True))
+        if not isinstance(cmap, dict):
+            color = style_opts.get('color', process_cmap(cmap or self._default_cmaps['categorical'], categorical=True))
+        else:
+            color = style_opts.get('color')
         for k, v in style.items():
             if isinstance(v, Cycle):
                 style_opts[k] = Cycle(values=color) if isinstance(color, list) else color
