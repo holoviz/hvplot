@@ -204,7 +204,9 @@ class HoloViewsConverter(object):
 
     _data_options = ['x', 'y', 'kind', 'by', 'use_index', 'use_dask',
                      'dynamic', 'crs', 'value_label', 'group_label',
-                     'backlog', 'persist']
+                     'backlog', 'persist', 'sort_date']
+
+    _geo_options = ['geo', 'crs', 'project', 'coastline', 'tiles']
 
     _axis_options = ['width', 'height', 'shared_axes', 'grid', 'legend',
                      'rot', 'xlim', 'ylim', 'xticks', 'yticks', 'colorbar',
@@ -383,7 +385,7 @@ class HoloViewsConverter(object):
                    'padding', 'xformatter', 'yformatter',
                    'height', 'width',
                    'min_width', 'min_height', 'max_width', 'max_height',
-                   'fontsize', 'responsive', 'shared_axes']
+                   'fontsize', 'responsive', 'shared_axes', 'aspect', 'data_aspect']
         for plotwd in plotwds:
             if plotwd in kwds:
                 plot_opts[plotwd] = kwds.pop(plotwd)
@@ -402,7 +404,13 @@ class HoloViewsConverter(object):
             plot_opts['invert_xaxis'] = True
         if flip_yaxis:
             plot_opts['invert_yaxis'] = True
-        if not plot_opts.get('responsive', True):
+
+        if self.geo and not plot_opts.get('aspect') \
+            and not plot_opts.get('data_aspect'):
+            plot_opts['data_aspect'] = 1
+
+        if not plot_opts.get('responsive') and not plot_opts.get('aspect') \
+            and not plot_opts.get('data_aspect') and not geo:
             plot_opts['width'] = plot_opts.get('width', 700)
             plot_opts['height'] = plot_opts.get('height', 300)
 
@@ -781,8 +789,8 @@ class HoloViewsConverter(object):
                                'individually using the width and height options.')
 
         combined_opts = (self._data_options + self._axis_options +
-                         self._style_options + self._op_options + kind_opts +
-                         valid_opts)
+                         self._style_options + self._op_options +
+                         self._geo_options + kind_opts + valid_opts)
         for mismatch in mismatches:
             suggestions = difflib.get_close_matches(mismatch, combined_opts)
             param.main.warning('%s option not found for %s plot; similar options '
