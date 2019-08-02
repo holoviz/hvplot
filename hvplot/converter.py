@@ -409,16 +409,29 @@ class HoloViewsConverter(object):
             and not plot_opts.get('data_aspect'):
             plot_opts['data_aspect'] = 1
 
-        if (self.datashade or self.rasterize) and plot_opts.get('aspect'):
-            aspect = plot_opts['aspect'] if plot_opts['aspect'] != 'equal' else 1
-            plot_opts['frame_height'] = plot_opts.get('height', 300) - 50
-            plot_opts['frame_width'] = plot_opts['frame_height'] * aspect
-            plot_opts.pop('aspect')
-
-        if (self.datashade or self.rasterize) and plot_opts.get('data_aspect'):
-            plot_opts['width'] = plot_opts.get('width', 700)
-            plot_opts['height'] = plot_opts.get('height', 300)
-
+        if (self.datashade or self.rasterize):
+            if plot_opts.get('aspect') == 'equal':
+                plot_opts['data_aspect'] = 1
+                plot_opts.pop('aspect')
+            if plot_opts.get('data_aspect'):
+                plot_opts['width'] = plot_opts.get('width', 700)
+                plot_opts['height'] = plot_opts.get('height', 300)
+            elif plot_opts.get('aspect'):
+                aspect = plot_opts['aspect']
+                if plot_opts.get('height') and plot_opts.get('width'):
+                    param.main.warning(
+                        'aspect value was ignored because absolute width and '
+                        'height values were provided. Either supply explicit '
+                        'frame_width and frame_height to achieve desired '
+                        'aspect OR supply a combination of width or height '
+                        'and an aspect value.')
+                elif plot_opts.get('width'):
+                    plot_opts['frame_width'] = plot_opts['width']
+                    plot_opts['frame_height'] = plot_opts['frame_width'] / aspect
+                else:
+                    plot_opts['frame_height'] = plot_opts.get('height', 300) - 50
+                    plot_opts['frame_width'] = plot_opts['frame_height'] * aspect
+                plot_opts.pop('aspect')
         if not any(plot_opts.get(opt) for opt in ['responsive', 'aspect', 'data_aspect']):
             plot_opts['width'] = plot_opts.get('width', 700)
             plot_opts['height'] = plot_opts.get('height', 300)
