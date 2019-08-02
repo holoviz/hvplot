@@ -408,14 +408,7 @@ class HoloViewsConverter(object):
         if self.geo and not plot_opts.get('data_aspect'):
             plot_opts['data_aspect'] = 1
 
-        ds_opts = {}
-        if any(plot_opts.get(opt) for opt in ['responsive', 'aspect', 'data_aspect']):
-            if self.rasterize or self.datashade:
-                if 'width' in plot_opts:
-                    ds_opts['width'] = plot_opts.pop('width')
-                if 'height' in plot_opts:
-                    ds_opts['height'] = plot_opts.pop('height')
-        else:
+        if not any(plot_opts.get(opt) for opt in ['responsive', 'aspect', 'data_aspect']):
             plot_opts['width'] = plot_opts.get('width', 700)
             plot_opts['height'] = plot_opts.get('height', 300)
 
@@ -444,7 +437,6 @@ class HoloViewsConverter(object):
         if title is not None:
             plot_opts['title_format'] = title
 
-        self._ds_opts = ds_opts
         self._plot_opts = plot_opts
         self._overlay_opts = {k: v for k, v in self._plot_opts.items()
                               if k in OverlayPlot.params()}
@@ -873,7 +865,7 @@ class HoloViewsConverter(object):
         except:
             raise ImportError('Datashading is not available')
 
-        opts = dict(dynamic=self.dynamic, **self._ds_opts)
+        opts = dict(dynamic=self.dynamic)
         if self._plot_opts.get('width') is not None:
             opts['width'] = self._plot_opts['width']
         if self._plot_opts.get('height') is not None:
