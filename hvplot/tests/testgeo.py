@@ -110,3 +110,16 @@ class TestGeoElements(TestCase):
     def test_geo_points(self):
         points = self.df.hvplot.points('x', 'y', geo=True)
         self.assertEqual(points.crs, self.crs)
+
+    def test_geo_opts(self):
+        points = self.df.hvplot.points('x', 'y', geo=True)
+        opts = hv.Store.lookup_options('bokeh', points, 'plot').kwargs
+        self.assertEqual(opts.get('data_aspect'), 1)
+        self.assertEqual(opts.get('width'), None)
+
+    def test_geo_opts_with_width(self):
+        points = self.df.hvplot.points('x', 'y', geo=True, width=200)
+        opts = hv.Store.lookup_options('bokeh', points, 'plot').kwargs
+        self.assertEqual(opts.get('data_aspect'), 1)
+        self.assertEqual(opts.get('width'), 200)
+        self.assertEqual(opts.get('height'), None)

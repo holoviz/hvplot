@@ -238,11 +238,13 @@ class TestOptions(ComparisonTestCase):
         plot = self.df.hvplot(x='x', y='y', **{opt: 2})
         opts = Store.lookup_options('bokeh', plot, 'plot').kwargs
         self.assertEqual(opts[opt], 2)
+        self.assertEqual(opts.get('width'), None)
         self.assertEqual(opts.get('height'), None)
 
     @parameterized.expand([('aspect',), ('data_aspect',)])
-    def test_aspect_and_width(self):
-        plot = self.df.hvplot(x='x', y='y', aspect=2, **{opt: 2})
+    def test_aspect_and_width(self, opt):
+        plot = self.df.hvplot(x='x', y='y', width=150, **{opt: 2})
         opts = hv.Store.lookup_options('bokeh', plot, 'plot').kwargs
         self.assertEqual(opts[opt], 2)
-        self.assertEqual(opts.get('height'), 150)
+        self.assertEqual(opts.get('width'), 150)
+        self.assertEqual(opts.get('height'), None)
