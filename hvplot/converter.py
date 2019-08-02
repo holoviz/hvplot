@@ -91,6 +91,8 @@ class HoloViewsConverter(object):
         Additional columns to add to the hover tool
     invert (default=False): boolean
         Swaps x- and y-axis
+    frame_width/frame_height: int
+        The width and height of the data area of the plot
     legend (default=True): boolean or str
         Whether to show a legend, or a legend position
         ('top', 'bottom', 'left', 'right')
@@ -138,7 +140,7 @@ class HoloViewsConverter(object):
     xticks/yticks (default=None): int or list
         Ticks along x- and y-axis specified as an integer, list of
         ticks positions, or list of tuples of the tick positions and labels
-    width (default=800)/height (default=300): int
+    width (default=700)/height (default=300): int
         The width and height of the plot in pixels
     attr_labels (default=None): bool
         Whether to use an xarray object's attributes as labels, defaults to
@@ -212,7 +214,9 @@ class HoloViewsConverter(object):
                      'rot', 'xlim', 'ylim', 'xticks', 'yticks', 'colorbar',
                      'invert', 'title', 'logx', 'logy', 'loglog', 'xaxis',
                      'yaxis', 'xformatter', 'yformatter', 'xlabel', 'ylabel',
-                     'clabel', 'padding']
+                     'clabel', 'padding', 'responsive', 'max_height', 'max_width',
+                     'min_height', 'min_width', 'frame_height', 'frame_width',
+                     'aspect', 'data_aspect']
 
     _style_options = ['color', 'alpha', 'colormap', 'fontsize', 'c', 'cmap']
 
@@ -383,7 +387,7 @@ class HoloViewsConverter(object):
 
         plotwds = ['xticks', 'yticks', 'xlabel', 'ylabel', 'clabel',
                    'padding', 'xformatter', 'yformatter',
-                   'height', 'width',
+                   'height', 'width', 'frame_height', 'frame_width',
                    'min_width', 'min_height', 'max_width', 'max_height',
                    'fontsize', 'responsive', 'shared_axes', 'aspect', 'data_aspect']
         for plotwd in plotwds:
@@ -408,7 +412,8 @@ class HoloViewsConverter(object):
         if self.geo and not plot_opts.get('data_aspect'):
             plot_opts['data_aspect'] = 1
 
-        if not any(plot_opts.get(opt) for opt in ['responsive', 'aspect', 'data_aspect']):
+        ignore_opts = ['responsive', 'aspect', 'data_aspect', 'frame_height', 'frame_width']
+        if not any(plot_opts.get(opt) for opt in ignore_opts):
             plot_opts['width'] = plot_opts.get('width', 700)
             plot_opts['height'] = plot_opts.get('height', 300)
 
