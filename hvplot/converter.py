@@ -409,8 +409,17 @@ class HoloViewsConverter(object):
             and not plot_opts.get('data_aspect'):
             plot_opts['data_aspect'] = 1
 
-        if not plot_opts.get('responsive') and not plot_opts.get('aspect') \
-            and not plot_opts.get('data_aspect') and not geo:
+        if (self.datashade or self.rasterize) and plot_opts.get('aspect'):
+            aspect = plot_opts['aspect'] if plot_opts['aspect'] != 'equal' else 1
+            plot_opts['frame_height'] = plot_opts.get('height', 300) - 50
+            plot_opts['frame_width'] = plot_opts['frame_height'] * aspect
+            plot_opts.pop('aspect')
+
+        if (self.datashade or self.rasterize) and plot_opts.get('data_aspect'):
+            plot_opts['width'] = plot_opts.get('width', 700)
+            plot_opts['height'] = plot_opts.get('height', 300)
+
+        if not any(plot_opts.get(opt) for opt in ['responsive', 'aspect', 'data_aspect']):
             plot_opts['width'] = plot_opts.get('width', 700)
             plot_opts['height'] = plot_opts.get('height', 300)
 
@@ -867,7 +876,7 @@ class HoloViewsConverter(object):
         except:
             raise ImportError('Datashading is not available')
 
-        opts = dict(width=self._plot_opts['width'], height=self._plot_opts['height'],
+        opts = dict(width=self._plot_opts.get('width'), height=self._plot_opts.get('height'),
                     dynamic=self.dynamic)
         if 'cmap' in self._style_opts and self.datashade:
             levels = self._plot_opts.get('color_levels')
