@@ -4,9 +4,9 @@ from parameterized import parameterized
 import numpy as np
 import pandas as pd
 
+from holoviews import Store
 from holoviews.element import Image, QuadMesh
 from holoviews.element.comparison import ComparisonTestCase
-
 
 
 class TestDatashader(ComparisonTestCase):
@@ -40,6 +40,40 @@ class TestDatashader(ComparisonTestCase):
         agg = dmap.callback.inputs[0].callback.operation.p.aggregator
         self.assertIsInstance(agg, sum)
         self.assertEqual(agg.column, 'number')
+
+    @parameterized.expand([('aspect',), ('data_aspect',)])
+    def test_aspect_with_datashade(self, opt):
+        plot = self.df.hvplot(x='x', y='y', datashade=True, **{opt: 2})
+        opts = Store.lookup_options('bokeh', plot[0], 'plot').kwargs
+        self.assertEqual(opts[opt], 2)
+        self.assertEqual(opts.get('height'), None)
+        self.assertEqual(opts.get('frame_height'), None)
+
+    @parameterized.expand([('aspect',), ('data_aspect',)])
+    def test_aspect_with_datashade_and_dynamic_is_false(self, opt):
+        plot = self.df.hvplot(x='x', y='y', datashade=True, dynamic=False, **{opt: 2})
+        opts = Store.lookup_options('bokeh', plot[0], 'plot').kwargs
+        self.assertEqual(opts[opt], 2)
+        self.assertEqual(opts.get('height'), None)
+        self.assertEqual(opts.get('frame_height'), None)
+
+    @parameterized.expand([('aspect',), ('data_aspect',)])
+    def test_aspect_and_frame_height_with_datashade(self, opt):
+        plot = self.df.hvplot(x='x', y='y', frame_height=150, datashade=True, **{opt: 2})
+        opts = Store.lookup_options('bokeh', plot[0], 'plot').kwargs
+        self.assertEqual(opts[opt], 2)
+        self.assertEqual(opts.get('frame_height'), 150)
+        self.assertEqual(opts.get('height'), None)
+        self.assertEqual(opts.get('frame_width'), None)
+
+    @parameterized.expand([('aspect',), ('data_aspect',)])
+    def test_aspect_and_frame_height_with_datashade_and_dynamic_is_false(self, opt):
+        plot = self.df.hvplot(x='x', y='y', frame_height=150, datashade=True, dynamic=False, **{opt: 2})
+        opts = Store.lookup_options('bokeh', plot[0], 'plot').kwargs
+        self.assertEqual(opts[opt], 2)
+        self.assertEqual(opts.get('frame_height'), 150)
+        self.assertEqual(opts.get('height'), None)
+        self.assertEqual(opts.get('frame_width'), None)
 
 
 class TestChart2D(ComparisonTestCase):

@@ -91,6 +91,8 @@ class HoloViewsConverter(object):
         Additional columns to add to the hover tool
     invert (default=False): boolean
         Swaps x- and y-axis
+    frame_width/frame_height: int
+        The width and height of the data area of the plot
     legend (default=True): boolean or str
         Whether to show a legend, or a legend position
         ('top', 'bottom', 'left', 'right')
@@ -138,7 +140,7 @@ class HoloViewsConverter(object):
     xticks/yticks (default=None): int or list
         Ticks along x- and y-axis specified as an integer, list of
         ticks positions, or list of tuples of the tick positions and labels
-    width (default=800)/height (default=300): int
+    width (default=700)/height (default=300): int
         The width and height of the plot in pixels
     attr_labels (default=None): bool
         Whether to use an xarray object's attributes as labels, defaults to
@@ -204,13 +206,17 @@ class HoloViewsConverter(object):
 
     _data_options = ['x', 'y', 'kind', 'by', 'use_index', 'use_dask',
                      'dynamic', 'crs', 'value_label', 'group_label',
-                     'backlog', 'persist']
+                     'backlog', 'persist', 'sort_date']
+
+    _geo_options = ['geo', 'crs', 'project', 'coastline', 'tiles']
 
     _axis_options = ['width', 'height', 'shared_axes', 'grid', 'legend',
                      'rot', 'xlim', 'ylim', 'xticks', 'yticks', 'colorbar',
                      'invert', 'title', 'logx', 'logy', 'loglog', 'xaxis',
                      'yaxis', 'xformatter', 'yformatter', 'xlabel', 'ylabel',
-                     'clabel', 'padding']
+                     'clabel', 'padding', 'responsive', 'max_height', 'max_width',
+                     'min_height', 'min_width', 'frame_height', 'frame_width',
+                     'aspect', 'data_aspect']
 
     _style_options = ['color', 'alpha', 'colormap', 'fontsize', 'c', 'cmap']
 
@@ -381,9 +387,9 @@ class HoloViewsConverter(object):
 
         plotwds = ['xticks', 'yticks', 'xlabel', 'ylabel', 'clabel',
                    'padding', 'xformatter', 'yformatter',
-                   'height', 'width',
+                   'height', 'width', 'frame_height', 'frame_width',
                    'min_width', 'min_height', 'max_width', 'max_height',
-                   'fontsize', 'responsive', 'shared_axes']
+                   'fontsize', 'responsive', 'shared_axes', 'aspect', 'data_aspect']
         for plotwd in plotwds:
             if plotwd in kwds:
                 plot_opts[plotwd] = kwds.pop(plotwd)
@@ -402,7 +408,12 @@ class HoloViewsConverter(object):
             plot_opts['invert_xaxis'] = True
         if flip_yaxis:
             plot_opts['invert_yaxis'] = True
-        if not plot_opts.get('responsive', True):
+
+        if self.geo and not plot_opts.get('data_aspect'):
+            plot_opts['data_aspect'] = 1
+
+        ignore_opts = ['responsive', 'aspect', 'data_aspect', 'frame_height', 'frame_width']
+        if not any(plot_opts.get(opt) for opt in ignore_opts):
             plot_opts['width'] = plot_opts.get('width', 700)
             plot_opts['height'] = plot_opts.get('height', 300)
 
@@ -781,8 +792,8 @@ class HoloViewsConverter(object):
                                'individually using the width and height options.')
 
         combined_opts = (self._data_options + self._axis_options +
-                         self._style_options + self._op_options + kind_opts +
-                         valid_opts)
+                         self._style_options + self._op_options +
+                         self._geo_options + kind_opts + valid_opts)
         for mismatch in mismatches:
             suggestions = difflib.get_close_matches(mismatch, combined_opts)
             param.main.warning('%s option not found for %s plot; similar options '
@@ -859,8 +870,12 @@ class HoloViewsConverter(object):
         except:
             raise ImportError('Datashading is not available')
 
-        opts = dict(width=self._plot_opts['width'], height=self._plot_opts['height'],
-                    dynamic=self.dynamic)
+        opts = dict(dynamic=self.dynamic)
+        if self._plot_opts.get('width') is not None:
+            opts['width'] = self._plot_opts['width']
+        if self._plot_opts.get('height') is not None:
+            opts['height'] = self._plot_opts['height']
+
         if 'cmap' in self._style_opts and self.datashade:
             levels = self._plot_opts.get('color_levels')
             cmap = self._style_opts['cmap']
