@@ -85,8 +85,9 @@ class HoloViewsConverter(object):
         Whether to flip the axis left to right or up and down respectively
     grid (default=False): boolean
         Whether to show a grid
-    hover (default=True): boolean
-        Whether to show hover tooltips
+    hover : boolean
+        Whether to show hover tooltips, default is True unless datashade is
+        True in which case hover is False by default
     hover_cols (default=[]): list
         Additional columns to add to the hover tool
     invert (default=False): boolean
@@ -279,7 +280,7 @@ class HoloViewsConverter(object):
                  crs=None, fields={}, groupby=None, dynamic=True,
                  grid=None, legend=None, rot=None, title=None,
                  xlim=None, ylim=None, clim=None,
-                 logx=None, logy=None, loglog=None, hover=True,
+                 logx=None, logy=None, loglog=None, hover=None,
                  subplots=False, label=None, invert=False,
                  stacked=False, colorbar=None, fontsize=None,
                  datashade=False, rasterize=False,
@@ -430,6 +431,8 @@ class HoloViewsConverter(object):
             plot_opts[axis] = rot
 
         tools = list(tools) or list(plot_opts.get('tools', []))
+        if hover is None:
+            hover = not self.datashade
         if hover and not any(t for t in tools if isinstance(t, HoverTool)
                              or t == 'hover'):
             tools.append('hover')
