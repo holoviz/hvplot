@@ -644,8 +644,9 @@ class HoloViewsConverter(object):
         self.use_dask = use_dask
         self.indexes = indexes
         if isinstance(by, (np.ndarray, pd.Series)):
-            self.data['by'] = by
-            self.by = ['by']
+            self.data = self.data.assign(_by=by)
+            self.by = ['_by']
+            self.variables.append('_by')
         elif not by:
             self.by = []
         else:
@@ -724,9 +725,11 @@ class HoloViewsConverter(object):
 
         if 'color' in kwds or 'c' in kwds:
             color = kwds.pop('color', kwds.pop('c', None))
-            if isinstance(color, (np.ndarray, pd.Series)):
-                self.data['_color'] = color
+            if isinstance(color, (np.ndarray, pd.Series)) or \
+                (self.datashade or self.rasterize and color in [self.x, self.y]):
+                self.data = self.data.assign(_color=self.data[color])
                 style_opts['color'] = '_color'
+                self.variables.append('_color')
             elif isinstance(color, list):
                 style_opts['color'] = color
             else:
@@ -754,9 +757,11 @@ class HoloViewsConverter(object):
         # Size
         if 'size' in kwds or 's' in kwds:
             size = kwds.pop('size', kwds.pop('s', None))
-            if isinstance(size, (np.ndarray, pd.Series)):
-                self.data['_size'] = np.sqrt(size)
+            if isinstance(size, (np.ndarray, pd.Series)) or \
+                (self.datashade or self.rasterize and size in [self.x, self.y]):
+                self.data = self.data.assign('_size', np.sqrt(size))
                 style_opts['size'] = '_size'
+                self.variables.append('_size')
             elif isinstance(size, basestring):
                 style_opts['size'] = np.sqrt(dim(size)*kwds.get('scale', 1))
             elif not isinstance(size, dim):
