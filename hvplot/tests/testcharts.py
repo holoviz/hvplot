@@ -122,6 +122,26 @@ class TestChart1D(ComparisonTestCase):
         self.assertEqual(opts['xlim'], (0, 3))
         self.assertEqual(opts['ylim'], (5, 10))
 
+    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    def test_tidy_chart_with_hover_cols(self, kind, element):
+        plot = self.df.hvplot(x='x', y='y', kind=kind, hover_cols=['index'])
+        if is_dask(self.df):
+            index = self.df.index.compute()
+        else:
+            index = self.df.index
+        altered_df = self.df.assign(index=index)
+        self.assertEqual(plot, element(altered_df, 'x', ['y', 'index']))
+
+    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    def test_tidy_chart_with_index_in_hover_cols(self, kind, element):
+        plot = self.df.hvplot(x='x', y='y', kind=kind, hover_cols=['index'])
+        if is_dask(self.df):
+            index = self.df.index.compute()
+        else:
+            index = self.df.index
+        altered_df = self.df.assign(index=index)
+        self.assertEqual(plot, element(altered_df, 'x', ['y', 'index']))
+
     def test_area_stacked(self):
         plot = self.df.hvplot.area(stacked=True)
         obj = NdOverlay({'x': Area(self.df, 'index', 'x').redim(x='value'),
