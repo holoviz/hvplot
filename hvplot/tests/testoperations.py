@@ -46,10 +46,12 @@ class TestDatashader(ComparisonTestCase):
     @parameterized.expand([('rasterize',), ('datashade',)])
     def test_color_dim_also_an_axis(self, operation):
         from datashader.reductions import mean
+        original_data = self.df.copy(deep=True)
         dmap = self.df.hvplot.scatter('x', 'y', c='y', **{operation: True})
         agg = dmap.callback.inputs[0].callback.operation.p.aggregator
         self.assertIsInstance(agg, mean)
         self.assertEqual(agg.column, '_color')
+        assert original_data.equals(self.df)
 
     def test_rasterize_color_dim_with_new_column_gets_default_cmap(self):
         plot = self.df.hvplot.scatter('x', 'y', c='y', dynamic=False, rasterize=True)
