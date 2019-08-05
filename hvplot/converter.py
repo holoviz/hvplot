@@ -644,8 +644,9 @@ class HoloViewsConverter(object):
         self.use_dask = use_dask
         self.indexes = indexes
         if isinstance(by, (np.ndarray, pd.Series)):
-            self.data['by'] = by
-            self.by = ['by']
+            self.data = self.data.assign(_by=by)
+            self.by = ['_by']
+            self.variables.append('_by')
         elif not by:
             self.by = []
         else:
@@ -724,24 +725,31 @@ class HoloViewsConverter(object):
 
         if 'color' in kwds or 'c' in kwds:
             color = kwds.pop('color', kwds.pop('c', None))
-            if isinstance(color, (np.ndarray, pd.Series)):
-                self.data['_color'] = color
-                style_opts['color'] = '_color'
-            elif isinstance(color, list):
-                style_opts['color'] = color
+            if (self.datashade or self.rasterize) and color in [self.x, self.y]:
+                self.data = self.data.assign(_color=self.data[color])
+                style_opts['color'] = color = '_color'
+                self.variables.append('_color')
+            elif isinstance(color, (np.ndarray, pd.Series)):
+                self.data = self.data.assign(_color=color)
+                style_opts['color'] = color = '_color'
+                self.variables.append('_color')
             else:
                 style_opts['color'] = color
-                if 'c' in self._kind_options.get(kind, []) and (color in self.variables):
-                    if self.data[color].dtype.kind in 'OSU':
-                        cmap = cmap or self._default_cmaps['categorical']
-                    else:
-                        cmap = cmap or self._default_cmaps['linear']
+
+            if not isinstance(color, list) and color in self.variables and \
+                'c' in self._kind_options.get(kind, []):
+                if self.data[color].dtype.kind in 'OSU':
+                    cmap = cmap or self._default_cmaps['categorical']
+                else:
+                    cmap = cmap or self._default_cmaps['linear']
 
         if isinstance(cmap, str) and cmap in self._default_cmaps:
             cmap = self._default_cmaps[cmap]
 
         if cmap is not None:
             style_opts['cmap'] = cmap
+        elif self.rasterize or self.datashade:
+            style_opts['cmap'] = self._default_cmaps['linear']
 
         if not isinstance(cmap, dict):
             color = style_opts.get('color', process_cmap(cmap or self._default_cmaps['categorical'], categorical=True))
@@ -754,13 +762,21 @@ class HoloViewsConverter(object):
         # Size
         if 'size' in kwds or 's' in kwds:
             size = kwds.pop('size', kwds.pop('s', None))
+            scale = kwds.get('scale', 1)
+            if (self.datashade or self.rasterize):
+                param.main.warning(
+                    'There is no reasonable way to use size (or s) with '
+                    'rasterize or datashade. To aggregate along a third '
+                    'dimension, set color (or c) to the desired dimension.')
             if isinstance(size, (np.ndarray, pd.Series)):
-                self.data['_size'] = np.sqrt(size)
+                size = np.sqrt(size) * scale
+                self.data = self.data.assign(_size=size)
                 style_opts['size'] = '_size'
+                self.variables.append('_size')
             elif isinstance(size, basestring):
-                style_opts['size'] = np.sqrt(dim(size)*kwds.get('scale', 1))
+                style_opts['size'] = np.sqrt(dim(size)) * scale
             elif not isinstance(size, dim):
-                style_opts['size'] = np.sqrt(size)
+                style_opts['size'] = np.sqrt(size) * scale
         elif 'size' in valid_opts:
             style_opts['size'] = np.sqrt(30)
 

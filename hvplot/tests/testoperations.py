@@ -27,19 +27,41 @@ class TestDatashader(ComparisonTestCase):
         self.assertIsInstance(agg, count_cat)
         self.assertEqual(agg.column, 'category')
 
-    def test_rasterize_color_dim(self):
+    @parameterized.expand([('rasterize',), ('datashade',)])
+    def test_color_dim_with_default_agg(self, operation):
         from datashader.reductions import mean
-        dmap = self.df.hvplot.scatter('x', 'y', c='number', rasterize=True)
+        dmap = self.df.hvplot.scatter('x', 'y', c='number', **{operation: True})
         agg = dmap.callback.inputs[0].callback.operation.p.aggregator
         self.assertIsInstance(agg, mean)
         self.assertEqual(agg.column, 'number')
 
-    def test_rasterize_color_dim_with_string_agg(self):
+    @parameterized.expand([('rasterize',), ('datashade',)])
+    def test_color_dim_with_string_agg(self, operation):
         from datashader.reductions import sum
-        dmap = self.df.hvplot.scatter('x', 'y', c='number', rasterize=True, aggregator='sum')
+        dmap = self.df.hvplot.scatter('x', 'y', c='number', aggregator='sum', **{operation: True})
         agg = dmap.callback.inputs[0].callback.operation.p.aggregator
         self.assertIsInstance(agg, sum)
         self.assertEqual(agg.column, 'number')
+
+    @parameterized.expand([('rasterize',), ('datashade',)])
+    def test_color_dim_also_an_axis(self, operation):
+        from datashader.reductions import mean
+        original_data = self.df.copy(deep=True)
+        dmap = self.df.hvplot.scatter('x', 'y', c='y', **{operation: True})
+        agg = dmap.callback.inputs[0].callback.operation.p.aggregator
+        self.assertIsInstance(agg, mean)
+        self.assertEqual(agg.column, '_color')
+        assert original_data.equals(self.df)
+
+    def test_rasterize_color_dim_with_new_column_gets_default_cmap(self):
+        plot = self.df.hvplot.scatter('x', 'y', c='y', dynamic=False, rasterize=True)
+        opts = Store.lookup_options('bokeh', plot, 'style').kwargs
+        self.assertEqual(opts.get('cmap'), 'kbc_r')
+
+    def test_rasterize_default_cmap(self):
+        plot = self.df.hvplot.scatter('x', 'y', dynamic=False, rasterize=True)
+        opts = Store.lookup_options('bokeh', plot, 'style').kwargs
+        self.assertEqual(opts.get('cmap'), 'kbc_r')
 
     @parameterized.expand([('aspect',), ('data_aspect',)])
     def test_aspect_with_datashade(self, opt):

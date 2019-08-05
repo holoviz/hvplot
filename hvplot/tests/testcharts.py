@@ -5,6 +5,8 @@ from holoviews import NdOverlay, Store
 from holoviews.element import Curve, Area, Scatter, Points, HeatMap
 from holoviews.element.comparison import ComparisonTestCase
 from hvplot import patch
+from ..util import is_dask
+
 
 class TestChart2D(ComparisonTestCase):
     def setUp(self):
@@ -125,6 +127,26 @@ class TestChart1D(ComparisonTestCase):
         obj = NdOverlay({'x': Area(self.df, 'index', 'x').redim(x='value'),
                          'y': Area(self.df, 'index', 'y').redim(y='value')}, 'Variable')
         self.assertEqual(plot, Area.stack(obj))
+
+    def test_scatter_color_set_to_series(self):
+        if is_dask(self.df['y']):
+            y = self.df['y'].compute()
+        else:
+            y = self.df['y']
+        actual = self.df.hvplot.scatter('x', 'y', c=y)
+        altered_df = self.df.assign(_color=y)
+        expected = altered_df.hvplot.scatter('x', 'y', c='_color')
+        self.assertEqual(actual, expected)
+
+    def test_scatter_size_set_to_series(self):
+        if is_dask(self.df['y']):
+            y = self.df['y'].compute()
+        else:
+            y = self.df['y']
+        plot = self.df.hvplot.scatter('x', 'y', s=y)
+        opts = Store.lookup_options('bokeh', plot, 'style')
+        assert '_size' in plot.data.columns
+        self.assertEqual(opts.kwargs['size'], '_size')
 
     def test_scatter_color_by_legend_position(self):
         plot = self.cat_df.hvplot('x', 'y', c='category', legend='left')
