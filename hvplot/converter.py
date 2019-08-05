@@ -1005,10 +1005,10 @@ class HoloViewsConverter(object):
                 continue
             elif dimension not in dimensions:
                 vdims.append(dimension)
-        for c in self.hover_cols:
+        for dimension in self.hover_cols:
             if (isinstance(dimension, basestring) and dimension in self.variables
                 and dimension not in dimensions):
-                vdims.append(c)
+                vdims.append(dimension)
         return kdims, vdims
 
     ##########################
@@ -1081,6 +1081,12 @@ class HoloViewsConverter(object):
                 if len(num_ys) >= 1:
                     ys = num_ys
             y = ys[0] if len(ys) == 1 else ys
+
+        if self.use_index and self.hover_cols:
+            for col in self.hover_cols:
+                if col not in data:
+                    if col == 'index' or col == data.index.name:
+                        data = data.assign(**{col: data.index})
 
         return data, x, y
 
