@@ -75,6 +75,10 @@ class TestDatashader(ComparisonTestCase):
         self.assertEqual(opts.get('height'), None)
         self.assertEqual(opts.get('frame_width'), None)
 
+    def test_cmap_can_be_color_key(self):
+        color_key = {'A': '#ff0000', 'B': '#00ff00', 'C': '#0000ff'}
+        self.df.hvplot.points(x='x', y='y', by='category', cmap=color_key, datashade=True)
+
 
 class TestChart2D(ComparisonTestCase):
 
