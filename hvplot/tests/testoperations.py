@@ -58,6 +58,11 @@ class TestDatashader(ComparisonTestCase):
         opts = Store.lookup_options('bokeh', plot, 'style').kwargs
         self.assertEqual(opts.get('cmap'), 'kbc_r')
 
+    def test_rasterize_default_cmap(self):
+        plot = self.df.hvplot.scatter('x', 'y', dynamic=False, rasterize=True)
+        opts = Store.lookup_options('bokeh', plot, 'style').kwargs
+        self.assertEqual(opts.get('cmap'), 'kbc_r')
+
     @parameterized.expand([('aspect',), ('data_aspect',)])
     def test_aspect_with_datashade(self, opt):
         plot = self.df.hvplot(x='x', y='y', datashade=True, **{opt: 2})
