@@ -734,11 +734,12 @@ class HoloViewsConverter(object):
                 style_opts['color'] = color
             else:
                 style_opts['color'] = color
-                if 'c' in self._kind_options.get(kind, []) and (color in self.variables):
-                    if self.data[color].dtype.kind in 'OSU':
-                        cmap = cmap or self._default_cmaps['categorical']
-                    else:
-                        cmap = cmap or self._default_cmaps['linear']
+
+            if 'c' in self._kind_options.get(kind, []) and (color in self.variables):
+                if self.data[color].dtype.kind in 'OSU':
+                    cmap = cmap or self._default_cmaps['categorical']
+                else:
+                    cmap = cmap or self._default_cmaps['linear']
 
         if isinstance(cmap, str) and cmap in self._default_cmaps:
             cmap = self._default_cmaps[cmap]
