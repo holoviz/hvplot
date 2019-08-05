@@ -79,6 +79,16 @@ class TestDatashader(ComparisonTestCase):
         color_key = {'A': '#ff0000', 'B': '#00ff00', 'C': '#0000ff'}
         self.df.hvplot.points(x='x', y='y', by='category', cmap=color_key, datashade=True)
 
+    def test_when_datashade_is_true_set_hover_to_false_by_default(self):
+        plot = self.df.hvplot(x='x', y='y', datashade=True)
+        opts = Store.lookup_options('bokeh', plot[0], 'plot').kwargs
+        assert 'hover' not in opts.get('tools')
+
+    def test_when_datashade_is_true_hover_can_still_be_true(self):
+        plot = self.df.hvplot(x='x', y='y', datashade=True, hover=True)
+        opts = Store.lookup_options('bokeh', plot[0], 'plot').kwargs
+        assert 'hover' in opts.get('tools')
+
 
 class TestChart2D(ComparisonTestCase):
 
