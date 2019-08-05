@@ -726,7 +726,7 @@ class HoloViewsConverter(object):
         if 'color' in kwds or 'c' in kwds:
             color = kwds.pop('color', kwds.pop('c', None))
             if isinstance(color, (np.ndarray, pd.Series)) or \
-                (self.datashade or self.rasterize and color in [self.x, self.y]):
+                ((self.datashade or self.rasterize) and color in [self.x, self.y]):
                 self.data = self.data.assign(_color=self.data[color])
                 style_opts['color'] = '_color'
                 self.variables.append('_color')
@@ -758,7 +758,7 @@ class HoloViewsConverter(object):
         if 'size' in kwds or 's' in kwds:
             size = kwds.pop('size', kwds.pop('s', None))
             if isinstance(size, (np.ndarray, pd.Series)) or \
-                (self.datashade or self.rasterize and size in [self.x, self.y]):
+                ((self.datashade or self.rasterize) and size in [self.x, self.y]):
                 self.data = self.data.assign('_size', np.sqrt(size))
                 style_opts['size'] = '_size'
                 self.variables.append('_size')
