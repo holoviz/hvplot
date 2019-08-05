@@ -248,7 +248,7 @@ class hvPlot(object):
         -------
         HoloViews object: Object representing the requested visualization
         """
-        return self(x, y, kind='step', **kwds)
+        return self(x, y, kind='step', where=where, **kwds)
 
     def scatter(self, x=None, y=None, **kwds):
         """
