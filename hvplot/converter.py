@@ -1054,7 +1054,7 @@ class HoloViewsConverter(object):
             chart = element(data, kdims, vdims).relabel(**self._relabel)
         return chart.redim(**self._redim).opts(opts)
 
-    def _process_args(self, data, x, y):
+    def _process_chart_args(self, data, x, y):
         data = (self.data if data is None else data)
         x = x or self.x
         if not x and self.use_index:
@@ -1091,7 +1091,7 @@ class HoloViewsConverter(object):
 
     def chart(self, element, x, y, data=None):
         "Helper method for simple x vs. y charts"
-        data, x, y = self._process_args(data, x, y)
+        data, x, y = self._process_chart_args(data, x, y)
         if x and y and not isinstance(y, (list, tuple)):
             return self.single_chart(element, x, y, data)
         elif x and y and len(y) == 1:
@@ -1177,7 +1177,7 @@ class HoloViewsConverter(object):
                 .relabel(**self._relabel).opts(**opts))
 
     def bar(self, x, y, data=None):
-        data, x, y = self._process_args(data, x, y)
+        data, x, y = self._process_chart_args(data, x, y)
         if x and y and (self.by or not isinstance(y, (list, tuple) or len(y) == 1)):
             y = y[0] if isinstance(y, (list, tuple)) else y
             return self.single_chart(Bars, x, y, data)
@@ -1194,7 +1194,7 @@ class HoloViewsConverter(object):
         """
         Helper method to generate element from indexed dataframe.
         """
-        data, x, y = self._process_args(data, None, y)
+        data, x, y = self._process_chart_args(data, None, y)
 
         opts = {'plot': dict(self._plot_opts), 'norm': self._norm_opts,
                 'style': self._style_opts}
@@ -1238,7 +1238,7 @@ class HoloViewsConverter(object):
         return self._stats_plot(Violin, y, data).redim(**self._redim)
 
     def hist(self, x, y, data=None):
-        data, x, y = self._process_args(data, x, y)
+        data, x, y = self._process_chart_args(data, x, y)
 
         labelled = ['y'] if self.invert else ['x']
 
@@ -1295,7 +1295,7 @@ class HoloViewsConverter(object):
         return (self._by_type(hists, sort=False).redim(**self._redim).opts(opts))
 
     def kde(self, x, y, data=None):
-        data, x, y = self._process_args(data, x, y)
+        data, x, y = self._process_chart_args(data, x, y)
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
         opts = {'Distribution': opts, 'Area': opts,
                 'NdOverlay': {'plot': dict(self._overlay_opts, legend_limit=0)}}
