@@ -1082,11 +1082,10 @@ class HoloViewsConverter(object):
                     ys = num_ys
             y = ys[0] if len(ys) == 1 else ys
 
-        if self.use_index and self.hover_cols:
-            for col in self.hover_cols:
-                if col not in data:
-                    if col == 'index' or col == data.index.name:
-                        data = data.assign(**{col: data.index})
+        if self.use_index and any(c for c in self.hover_cols if
+                                  c in self.indexes and
+                                  c not in data.columns):
+            data = data.reset_index()
 
         return data, x, y
 

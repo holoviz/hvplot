@@ -124,22 +124,13 @@ class TestChart1D(ComparisonTestCase):
 
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
     def test_tidy_chart_with_hover_cols(self, kind, element):
-        plot = self.df.hvplot(x='x', y='y', kind=kind, hover_cols=['index'])
-        if is_dask(self.df):
-            index = self.df.index.compute()
-        else:
-            index = self.df.index
-        altered_df = self.df.assign(index=index)
-        self.assertEqual(plot, element(altered_df, 'x', ['y', 'index']))
+        plot = self.cat_df.hvplot(x='x', y='y', kind=kind, hover_cols=['category'])
+        self.assertEqual(plot, element(self.cat_df, 'x', ['y', 'category']))
 
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
     def test_tidy_chart_with_index_in_hover_cols(self, kind, element):
         plot = self.df.hvplot(x='x', y='y', kind=kind, hover_cols=['index'])
-        if is_dask(self.df):
-            index = self.df.index.compute()
-        else:
-            index = self.df.index
-        altered_df = self.df.assign(index=index)
+        altered_df = self.df.reset_index()
         self.assertEqual(plot, element(altered_df, 'x', ['y', 'index']))
 
     def test_area_stacked(self):
