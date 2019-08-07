@@ -1,4 +1,4 @@
-from unittest import TestCase, SkipTest
+from unittest import TestCase, SkipTest, expectedFailure
 
 import numpy as np
 import pandas as pd
@@ -123,3 +123,50 @@ class TestGeoElements(TestCase):
         self.assertEqual(opts.get('data_aspect'), 1)
         self.assertEqual(opts.get('width'), 200)
         self.assertEqual(opts.get('height'), None)
+
+
+class TestGeoPandas(TestCase):
+
+    def setUp(self):
+        try:
+            import geopandas as gpd  # noqa
+            import geoviews  # noqa
+            import cartopy.crs as ccrs # noqa
+        except:
+            raise SkipTest('geopandas, geoviews, or cartopy not available')
+        import hvplot.pandas  # noqa
+
+        self.cities = gpd.read_file(gpd.datasets.get_path('naturalearth_cities'))
+
+    def test_points_hover_cols_is_empty_by_default(self):
+        points = self.cities.hvplot()
+        assert points.kdims == ['x', 'y']
+        assert points.vdims == []
+
+    def test_points_hover_cols_does_not_include_geometry_when_all(self):
+        points = self.cities.hvplot(x='x', y='y', hover_cols='all')
+        assert points.kdims == ['x', 'y']
+        assert points.vdims == ['index', 'name']
+
+    def test_points_hover_cols_when_all_and_use_columns_is_false(self):
+        points = self.cities.hvplot(x='x', hover_cols='all', use_index=False)
+        assert points.kdims == ['x', 'y']
+        assert points.vdims == ['name']
+
+    def test_points_hover_cols_index_in_list(self):
+        points = self.cities.hvplot(y='y', hover_cols=['index'])
+        assert points.kdims == ['x', 'y']
+        assert points.vdims == ['index']
+
+    def test_points_hover_cols_with_c_set_to_name(self):
+        points = self.cities.hvplot(c='name')
+        assert points.kdims == ['x', 'y']
+        assert points.vdims == ['name']
+        opts = hv.Store.lookup_options('bokeh', points, 'style').kwargs
+        assert opts['color'] == 'name'
+
+    @expectedFailure
+    def test_points_hover_cols_with_by_set_to_name(self):
+        points = self.cities.hvplot(by='name')
+        assert points.kdims == ['x', 'y']
+        assert points.vdims == ['name']

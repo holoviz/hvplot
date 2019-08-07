@@ -28,8 +28,8 @@ from holoviews.streams import Buffer, Pipe
 from holoviews.util.transform import dim
 
 from .util import (
-    is_series, is_dask, is_intake, is_streamz, is_xarray, process_crs,
-    process_intake, process_xarray, check_library, is_geopandas,
+    is_tabular, is_series, is_dask, is_intake, is_streamz, is_xarray,
+    process_crs, process_intake, process_xarray, check_library, is_geopandas,
     process_derived_datetime,
 )
 
@@ -88,8 +88,9 @@ class HoloViewsConverter(object):
     hover : boolean
         Whether to show hover tooltips, default is True unless datashade is
         True in which case hover is False by default
-    hover_cols (default=[]): list
-        Additional columns to add to the hover tool
+    hover_cols (default=[]): list or str
+        Additional columns to add to the hover tool or 'all' which will
+        includes all columns (including indexes if use_index is True).
     invert (default=False): boolean
         Swaps x- and y-axis
     frame_width/frame_height: int
@@ -295,10 +296,11 @@ class HoloViewsConverter(object):
 
         # Process data and related options
         self._redim = fields
+        self.use_index = use_index
         self._process_data(kind, data, x, y, by, groupby, row, col,
                            use_dask, persist, backlog, label, value_label,
                            hover_cols, attr_labels, kwds)
-        self.use_index = use_index
+
         self.value_label = value_label
         self.group_label = group_label
         self.dynamic = dynamic
@@ -465,7 +467,6 @@ class HoloViewsConverter(object):
             param.main.warning('Plotting {kind} plot with parameters x: {x}, '
                                'y: {y}, by: {by}, groupby: {groupby}'.format(**kwds))
 
-
     def _process_crs(self, data, crs):
         """Given crs as proj4 string, data.attr, or cartopy.crs return cartopy.crs
         """
@@ -501,11 +502,10 @@ class HoloViewsConverter(object):
             by = [by]
 
         streaming = False
-        if isinstance(data, pd.DataFrame):
+        if is_geopandas(data):
+            datatype = 'geopandas'
             self.data = data
-            datatype = 'pandas'
-            if is_geopandas(data) and kind is None:
-                datatype = 'geopandas'
+            if kind is None:
                 geom_types = set([gt[5:] if 'Multi' in gt else gt for gt in data.geom_type])
                 if len(geom_types) > 1:
                     raise ValueError('The GeopandasInterface can only read dataframes which '
@@ -517,6 +517,9 @@ class HoloViewsConverter(object):
                     kind = 'polygons'
                 elif geom_type in ('LineString', 'LineRing'):
                     kind = 'paths'
+        elif isinstance(data, pd.DataFrame):
+            datatype = 'pandas'
+            self.data = data
         elif is_dask(data):
             datatype = 'dask'
             self.data = data.persist() if persist else data
@@ -653,7 +656,18 @@ class HoloViewsConverter(object):
             self.by = by if isinstance(by, list) else [by]
         self.groupby = groupby
         self.streaming = streaming
-        self.hover_cols = hover_cols
+
+        if not hover_cols:
+            self.hover_cols = []
+        elif isinstance(hover_cols, list):
+            self.hover_cols = hover_cols
+        elif hover_cols == 'all' and self.use_index:
+            self.hover_cols = self.variables
+        elif hover_cols == 'all' and not self.use_index:
+            self.hover_cols = [v for v in self.variables if v not in self.indexes]
+
+        if self.datatype == 'geopandas':
+            self.hover_cols = [c for c in self.hover_cols if c!= 'geometry']
 
         if da is not None and attr_labels is True or attr_labels is None:
             try:
@@ -1009,10 +1023,10 @@ class HoloViewsConverter(object):
                 continue
             elif dimension not in dimensions:
                 vdims.append(dimension)
-        for c in self.hover_cols:
+        for dimension in self.hover_cols:
             if (isinstance(dimension, basestring) and dimension in self.variables
                 and dimension not in dimensions):
-                vdims.append(c)
+                vdims.append(dimension)
         return kdims, vdims
 
     ##########################
@@ -1058,8 +1072,8 @@ class HoloViewsConverter(object):
             chart = element(data, kdims, vdims).relabel(**self._relabel)
         return chart.redim(**self._redim).opts(opts)
 
-    def _process_args(self, data, x, y):
-        data = (self.data if data is None else data)
+    def _process_chart_args(self, data, x, y):
+        data = self.data if data is None else data
         x = x or self.x
         if not x and self.use_index:
             x = self.indexes[0]
@@ -1086,11 +1100,16 @@ class HoloViewsConverter(object):
                     ys = num_ys
             y = ys[0] if len(ys) == 1 else ys
 
+        if self.use_index and any(c for c in self.hover_cols if
+                                  c in self.indexes and
+                                  c not in data.columns):
+            data = data.reset_index()
+
         return data, x, y
 
     def chart(self, element, x, y, data=None):
         "Helper method for simple x vs. y charts"
-        data, x, y = self._process_args(data, x, y)
+        data, x, y = self._process_chart_args(data, x, y)
         if x and y and not isinstance(y, (list, tuple)):
             return self.single_chart(element, x, y, data)
         elif x and y and len(y) == 1:
@@ -1176,7 +1195,7 @@ class HoloViewsConverter(object):
                 .relabel(**self._relabel).opts(**opts))
 
     def bar(self, x, y, data=None):
-        data, x, y = self._process_args(data, x, y)
+        data, x, y = self._process_chart_args(data, x, y)
         if x and y and (self.by or not isinstance(y, (list, tuple) or len(y) == 1)):
             y = y[0] if isinstance(y, (list, tuple)) else y
             return self.single_chart(Bars, x, y, data)
@@ -1193,7 +1212,7 @@ class HoloViewsConverter(object):
         """
         Helper method to generate element from indexed dataframe.
         """
-        data, x, y = self._process_args(data, None, y)
+        data, x, y = self._process_chart_args(data, None, y)
 
         opts = {'plot': dict(self._plot_opts), 'norm': self._norm_opts,
                 'style': self._style_opts}
@@ -1237,7 +1256,7 @@ class HoloViewsConverter(object):
         return self._stats_plot(Violin, y, data).redim(**self._redim)
 
     def hist(self, x, y, data=None):
-        data, x, y = self._process_args(data, x, y)
+        data, x, y = self._process_chart_args(data, x, y)
 
         labelled = ['y'] if self.invert else ['x']
 
@@ -1294,7 +1313,7 @@ class HoloViewsConverter(object):
         return (self._by_type(hists, sort=False).redim(**self._redim).opts(opts))
 
     def kde(self, x, y, data=None):
-        data, x, y = self._process_args(data, x, y)
+        data, x, y = self._process_chart_args(data, x, y)
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
         opts = {'Distribution': opts, 'Area': opts,
                 'NdOverlay': {'plot': dict(self._overlay_opts, legend_limit=0)}}
@@ -1396,6 +1415,23 @@ class HoloViewsConverter(object):
     #     Gridded plots      #
     ##########################
 
+    def _process_gridded_args(self, data, x, y, z):
+        data = self.data if data is None else data
+        x = x or self.x
+        y = y or self.y
+        z = z or self.kwds.get('z')
+
+        if is_xarray(data):
+            import xarray as xr
+            if isinstance(data, xr.DataArray):
+                data = data.to_dataset(name=data.name or 'value')
+        if is_tabular(data):
+            if self.use_index and any(c for c in self.hover_cols if
+                                      c in self.indexes and
+                                      c not in data.columns):
+                data = data.reset_index()
+        return data, x, y, z
+
     def _get_element(self, kind):
         element = self._kind_mapping[kind]
         if self.geo:
@@ -1404,16 +1440,11 @@ class HoloViewsConverter(object):
         return element
 
     def image(self, x=None, y=None, z=None, data=None):
-        import xarray as xr
-        data = self.data if data is None else data
-
-        z = z or self.kwds.get('z')
-        x = x or self.x
-        y = y or self.y
+        data, x, y, z = self._process_gridded_args(data, x, y, z)
         if not (x and y):
             x, y = list(data.dims)[::-1]
         if not z:
-            z = list(data.data_vars)[0] if isinstance(data, xr.Dataset) else data.name
+            z = list(data.data_vars)[0]
         z = [z] + self.hover_cols
 
         params = dict(self._relabel)
@@ -1424,8 +1455,8 @@ class HoloViewsConverter(object):
         if self.geo: params['crs'] = self.crs
         return element(data, [x, y], z, **params).redim(**redim).opts(**opts)
 
-    def rgb(self, x=None, y=None, data=None):
-        data = self.data if data is None else data
+    def rgb(self, x=None, y=None, z=None, data=None):
+        data, x, y, z = self._process_gridded_args(data, x, y, z)
 
         coords = [c for c in data.coords if c not in self.groupby+self.by]
         if len(coords) < 3:
@@ -1433,7 +1464,6 @@ class HoloViewsConverter(object):
         x = x or coords[2]
         y = y or coords[1]
         bands = self.kwds.get('bands', coords[0])
-        z = self.kwds.get('z')
         if z is None:
             z = list(data.data_vars)[0]
         data = data[z]
@@ -1456,16 +1486,12 @@ class HoloViewsConverter(object):
         return rgb.redim(**self._redim).opts(**opts)
 
     def quadmesh(self, x=None, y=None, z=None, data=None):
-        import xarray as xr
-        data = self.data if data is None else data
+        data, x, y, z = self._process_gridded_args(data, x, y, z)
 
-        z = z or self.kwds.get('z')
-        x = x or self.x
-        y = y or self.y
         if not (x and y):
             x, y = list([k for k, v in data.coords.items() if v.size > 1])
         if not z:
-            z = list(data.data_vars)[0] if isinstance(data, xr.Dataset) else data.name
+            z = list(data.data_vars)[0]
         z = [z] + self.hover_cols
 
         params = dict(self._relabel)
@@ -1510,37 +1536,9 @@ class HoloViewsConverter(object):
     def contourf(self, x=None, y=None, z=None, data=None):
         return self.contour(x, y, z, data, filled=True)
 
-    def points(self, x=None, y=None, data=None):
-        data = self.data if data is None else data
-        params = dict(self._relabel)
-
-        x = x if x is not None else self.x
-        y = y if y is not None else self.y
-
-        if hasattr(data, 'geom_type') and not (x and y):
-            x, y = 'Longitude', 'Latitude'
-        elif not (x and y):
-            if self.gridded_data:
-                x, y = self.variables[:2:-1]
-            else:
-                x, y = data.columns[:2]
-
-        opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
-        redim = self._merge_redim({self._color_dim: self._dim_ranges['c']} if self._color_dim else {})
-        kdims, vdims = self._get_dimensions([x, y], [])
-        element = self._get_element('points')
-        if self.geo: params['crs'] = self.crs
-        if self.by:
-            obj = Dataset(data).to(element, kdims, vdims, self.by, **params).overlay()
-        else:
-            obj = element(data, kdims, vdims, **params)
-        return obj.redim(**redim).opts({'Points': opts})
-
     def vectorfield(self, x=None, y=None, angle=None, mag=None, data=None):
-        data = self.data if data is None else data
+        data, x, y, _ = self._process_gridded_args(data, x, y, z=None)
 
-        x = x or self.x
-        y = y or self.y
         if not (x and y):
             x, y = list([k for k, v in data.coords.items() if v.size > 1])
 
@@ -1560,31 +1558,34 @@ class HoloViewsConverter(object):
     ##########################
 
     def _geom_plot(self, x=None, y=None, data=None, kind='polygons'):
-        data = self.data if data is None else data
+        data, x, y, _ = self._process_gridded_args(data, x, y, z=None)
         params = dict(self._relabel)
 
-        x = x or self.x
-        y = y or self.y
-        is_gpd = is_geopandas(data)
         if not (x and y):
-            if is_gpd:
+            if is_geopandas(data):
                 x, y = ('Longitude', 'Latitude') if self.geo else ('x', 'y')
+            elif self.gridded_data:
+                x, y = self.variables[:2:-1]
             else:
                 x, y = data.columns[:2]
 
-        plot_opts = dict(self._plot_opts)
-        ranges = {self._color_dim: self._dim_ranges['c']} if self._color_dim else {}
-        redim = self._merge_redim(ranges)
-        plot_opts['show_legend'] = False
-        opts = dict(plot=plot_opts, style=self._style_opts, norm=self._norm_opts)
-
+        opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
+        redim = self._merge_redim({self._color_dim: self._dim_ranges['c']} if self._color_dim else {})
+        kdims, vdims = self._get_dimensions([x, y], [])
         element = self._get_element(kind)
         if self.geo: params['crs'] = self.crs
-        params['vdims'] = [c for c in data.columns if c != 'geometry']
-        return element(data, [x, y], **params).redim(**redim).opts(**opts)
+        if self.by:
+            obj = Dataset(data).to(element, kdims, vdims, self.by, **params).overlay()
+        else:
+            obj = element(data, kdims, vdims, **params)
+
+        return obj.redim(**redim).opts({element.__name__: opts})
 
     def polygons(self, x=None, y=None, data=None):
         return self._geom_plot(x, y, data, kind='polygons')
 
     def paths(self, x=None, y=None, data=None):
         return self._geom_plot(x, y, data, kind='paths')
+
+    def points(self, x=None, y=None, data=None):
+        return self._geom_plot(x, y, data, kind='points')

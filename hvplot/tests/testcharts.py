@@ -1,8 +1,8 @@
-from unittest import SkipTest
+from unittest import SkipTest, expectedFailure
 from parameterized import parameterized
 
 from holoviews import NdOverlay, Store
-from holoviews.element import Curve, Area, Scatter, Points, HeatMap
+from holoviews.element import Curve, Area, Scatter, Points, Path, HeatMap
 from holoviews.element.comparison import ComparisonTestCase
 from hvplot import patch
 from ..util import is_dask
@@ -19,26 +19,64 @@ class TestChart2D(ComparisonTestCase):
         self.cat_df = pd.DataFrame([[1, 2, 'A'], [3, 4, 'B'], [5, 6, 'C']],
                                    columns=['x', 'y', 'category'])
 
-    @parameterized.expand([('points', Points)])
-    def test_tidy_chart_defaults(self, kind, element):
+    @parameterized.expand([('points', Points), ('paths', Path)])
+    def test_2d_defaults(self, kind, element):
         plot = self.df.hvplot(kind=kind)
-        self.assertEqual(plot, element(self.df))
+        self.assertEqual(plot, element(self.df, ['x', 'y']))
 
-    @parameterized.expand([('points', Points)])
-    def test_tidy_chart(self, kind, element):
+    @parameterized.expand([('points', Points), ('paths', Path)])
+    def test_2d_chart(self, kind, element):
         plot = self.df.hvplot(x='x', y='y', kind=kind)
         self.assertEqual(plot, element(self.df, ['x', 'y']))
 
-    @parameterized.expand([('points', Points)])
-    def test_tidy_chart_index_and_c(self, kind, element):
+    @parameterized.expand([('points', Points), ('paths', Path)])
+    def test_2d_index_and_c(self, kind, element):
         plot = self.df.hvplot(x='index', y='y', c='x', kind=kind)
         self.assertEqual(plot, element(self.df, ['index', 'y'], ['x']))
+
+    @parameterized.expand([('points', Points), ('paths', Path)])
+    def test_2d_set_hover_cols_to_list(self, kind, element):
+        plot = self.cat_df.hvplot(x='x', y='y', hover_cols=['category'], kind=kind)
+        self.assertEqual(plot, element(self.cat_df, ['x', 'y'], ['category']))
+
+    @parameterized.expand([('points', Points), ('paths', Path)])
+    def test_2d_set_hover_cols_including_index(self, kind, element):
+        plot = self.cat_df.hvplot(x='x', y='y', hover_cols=['index'], kind=kind)
+        assert 'index' in plot.data.columns
+        self.assertEqual(plot, element(self.cat_df.reset_index(), ['x', 'y'], ['index']))
+
+    @parameterized.expand([('points', Points), ('paths', Path)])
+    def test_2d_set_hover_cols_to_all(self, kind, element):
+        plot = self.cat_df.hvplot(x='x', y='y', hover_cols='all', kind=kind)
+        assert 'index' in plot.data.columns
+        self.assertEqual(plot, element(self.cat_df.reset_index(), ['x', 'y'], ['index', 'category']))
+
+    @parameterized.expand([('points', Points), ('paths', Path)])
+    def test_2d_set_hover_cols_to_all_with_use_index_as_false(self, kind, element):
+        plot = self.cat_df.hvplot(x='x', y='y', hover_cols='all', use_index=False, kind=kind)
+        self.assertEqual(plot, element(self.cat_df, ['x', 'y'], ['category']))
 
     def test_heatmap_2d_index_columns(self):
         plot = self.df.hvplot.heatmap()
         self.assertEqual(plot, HeatMap((['x', 'y'], [0, 1, 2], self.df.values),
                                        ['columns', 'index'], 'value'))
 
+
+class TestChart2DDask(TestChart2D):
+
+    def setUp(self):
+        super().setUp()
+        try:
+            import dask.dataframe as dd
+        except:
+            raise SkipTest('Dask not available')
+        patch('dask')
+        self.df = dd.from_pandas(self.df, npartitions=2)
+        self.cat_df = dd.from_pandas(self.cat_df, npartitions=3)
+
+    @expectedFailure
+    def test_heatmap_2d_index_columns(self):
+        self.df.hvplot.heatmap()
 
 
 class TestChart1D(ComparisonTestCase):
@@ -121,6 +159,28 @@ class TestChart1D(ComparisonTestCase):
         opts = Store.lookup_options('bokeh', plot.last, 'plot').options
         self.assertEqual(opts['xlim'], (0, 3))
         self.assertEqual(opts['ylim'], (5, 10))
+
+    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    def test_tidy_chart_with_hover_cols(self, kind, element):
+        plot = self.cat_df.hvplot(x='x', y='y', kind=kind, hover_cols=['category'])
+        self.assertEqual(plot, element(self.cat_df, 'x', ['y', 'category']))
+
+    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    def test_tidy_chart_with_index_in_hover_cols(self, kind, element):
+        plot = self.df.hvplot(x='x', y='y', kind=kind, hover_cols=['index'])
+        altered_df = self.df.reset_index()
+        self.assertEqual(plot, element(altered_df, 'x', ['y', 'index']))
+
+    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    def test_tidy_chart_with_hover_cols_as_all(self, kind, element):
+        plot = self.cat_df.hvplot(x='x', y='y', kind=kind, hover_cols='all')
+        altered_df = self.cat_df.reset_index()
+        self.assertEqual(plot, element(altered_df, 'x', ['y', 'index', 'category']))
+
+    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    def test_tidy_chart_with_hover_cols_as_all_with_use_index_as_false(self, kind, element):
+        plot = self.cat_df.hvplot(x='x', y='y', kind=kind, hover_cols='all', use_index=False)
+        self.assertEqual(plot, element(self.cat_df, 'x', ['y', 'category']))
 
     def test_area_stacked(self):
         plot = self.df.hvplot.area(stacked=True)

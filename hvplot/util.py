@@ -180,7 +180,15 @@ def process_crs(crs):
         raise ValueError("Projection must be defined as a EPSG code, proj4 string, cartopy CRS or pyproj.Proj.")
     return crs
 
-
+def is_tabular(data):
+    if check_library(data, ['dask', 'streamz', 'pandas', 'geopandas']):
+        return True
+    elif check_library(data, 'intake'):
+        from intake.source.base import DataSource
+        if isinstance(data, DataSource):
+            return data.container == 'dataframe'
+    else:
+        return False
 
 def is_series(data):
     if not check_library(data, ['dask', 'streamz', 'pandas']):
@@ -195,7 +203,6 @@ def is_series(data):
         return isinstance(data, dd.Series)
     else:
         return False
-
 
 def check_library(obj, library):
     if not isinstance(library, list):
@@ -225,12 +232,6 @@ def is_xarray(data):
         return False
     from xarray import DataArray, Dataset
     return isinstance(data, (DataArray, Dataset))
-
-def is_xarray_groupby(data):
-    if not check_library(data, 'xarray'):
-        return False
-    from xarray.core.groupby import DataArrayGroupBy, DatasetGroupBy
-    return isinstance(data, (DataArrayGroupBy, DatasetGroupBy))
 
 
 def process_intake(data, use_dask):
