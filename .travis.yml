@@ -58,19 +58,23 @@ jobs:
       <<: *default
       env: DESC="dev unit test with extra dependencies"
       install:
-        - doit env_create $CHANS_DEV --python=$PYTHON_VERSION
-        - source activate test-environment
+        - doit env_create $CHANS_DEV --python=$PYTHON_VERSION --name=extra-deps-env
+        - source activate extra-deps-env
         - doit develop_install $CHANS_DEV -o recommended -o tests -o examples
         - doit env_capture
       script: doit test_unit_all
       after_success: coveralls
 
-    - <<: *extra_default
+    - <<: *default
       env: DESC="dev test examples with extra dependencies"
+      install:
+        - doit env_create $CHANS_DEV --python=$PYTHON_VERSION
+        - source activate test-environment
+        - doit develop_install $CHANS_DEV -o recommended -o tests -o examples
+        - doit env_capture
       script:
         - bokeh sampledata
         - doit test_examples
-      after_success: true
 
     - <<: *default
       env: DESC="py2 flakes" PYTHON_VERSION=2.7
