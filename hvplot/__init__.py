@@ -4,6 +4,9 @@ import sys
 import inspect
 import textwrap
 
+from collections import defaultdict
+from types import FunctionType
+
 import param
 import numpy as _np
 import pandas as _pd
@@ -182,7 +185,13 @@ class hvPlot(object):
         -------
         HoloViews object: Object representing the requested visualization
         """
-        dynamic = {k: v for k, v in kwds.items() if isinstance(v, param.Parameter)}
+        dynamic = {}
+        fn_depends = {}
+        for k, v in kwds.items():
+            if isinstance(v, param.Parameter):
+                dynamic[k] = v
+            elif isinstance(v, FunctionType) and hasattr(v, '_dinfo'):
+                fn_depends[k] = v._dinfo['dependencies']
         if isinstance(x, param.Parameter):
             dynamic['x'] = x
         if isinstance(y, param.Parameter):
@@ -190,13 +199,25 @@ class hvPlot(object):
         if isinstance(kind, param.Parameter):
             dynamic['kind'] = kind
 
-        if dynamic:
-            @param.depends(**dynamic)
-            def callback(**dyn_kwds):
+        if dynamic or fn_depends:
+            arg_depends = []
+            arg_names = []
+            for k, v in fn_depends.items():
+                arg_depends += list(v)
+                for p in v:
+                    arg_names.append(k)
+                
+            @param.depends(*arg_depends, **dynamic)
+            def callback(*args, **dyn_kwds):
                 xd = dyn_kwds.pop('x', x)
                 yd = dyn_kwds.pop('y', y)
                 kindd = dyn_kwds.pop('kind', kind)
                 combined_kwds = dict(kwds, **dyn_kwds)
+                fn_args = defaultdict(list)
+                for name, arg in zip(arg_names, args):
+                    fn_args[(name, kwds[name])].append(arg)
+                for (name, fn), args in fn_args.items():
+                    combined_kwds[name] = fn(*args)
                 return self._get_converter(xd, yd, kindd, **combined_kwds)(kindd, xd, yd)
             return _pn.panel(callback)
         return self._get_converter(x, y, kind, **kwds)(kind, x, y)
