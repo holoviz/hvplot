@@ -1338,7 +1338,7 @@ class HoloViewsConverter(object):
                 dists = NdOverlay({0: Area([], self.value_label, vdim)},
                                   [self.group_label])
         redim = self._merge_redim(ranges)
-        return (dists.redim(redim).relabel(**self._relabel).opts(opts))
+        return (dists.redim(**redim).relabel(**self._relabel).opts(opts))
 
     ##########################
     #      Other charts      #
