@@ -88,8 +88,9 @@ class HoloViewsConverter(object):
     hover : boolean
         Whether to show hover tooltips, default is True unless datashade is
         True in which case hover is False by default
-    hover_cols (default=[]): list
-        Additional columns to add to the hover tool
+    hover_cols (default=[]): list or str
+        Additional columns to add to the hover tool or 'all' which will
+        includes all columns (including indexes if use_index is True).
     invert (default=False): boolean
         Swaps x- and y-axis
     frame_width/frame_height: int
@@ -295,10 +296,11 @@ class HoloViewsConverter(object):
 
         # Process data and related options
         self._redim = fields
+        self.use_index = use_index
         self._process_data(kind, data, x, y, by, groupby, row, col,
                            use_dask, persist, backlog, label, value_label,
                            hover_cols, attr_labels, kwds)
-        self.use_index = use_index
+
         self.value_label = value_label
         self.group_label = group_label
         self.dynamic = dynamic
@@ -465,7 +467,6 @@ class HoloViewsConverter(object):
             param.main.warning('Plotting {kind} plot with parameters x: {x}, '
                                'y: {y}, by: {by}, groupby: {groupby}'.format(**kwds))
 
-
     def _process_crs(self, data, crs):
         """Given crs as proj4 string, data.attr, or cartopy.crs return cartopy.crs
         """
@@ -516,7 +517,6 @@ class HoloViewsConverter(object):
                     kind = 'polygons'
                 elif geom_type in ('LineString', 'LineRing'):
                     kind = 'paths'
-                print(kind, )
         elif isinstance(data, pd.DataFrame):
             datatype = 'pandas'
             self.data = data
@@ -656,7 +656,18 @@ class HoloViewsConverter(object):
             self.by = by if isinstance(by, list) else [by]
         self.groupby = groupby
         self.streaming = streaming
-        self.hover_cols = hover_cols
+
+        if not hover_cols:
+            self.hover_cols = []
+        elif isinstance(hover_cols, list):
+            self.hover_cols = hover_cols
+        elif hover_cols == 'all' and self.use_index:
+            self.hover_cols = self.variables
+        elif hover_cols == 'all' and not self.use_index:
+            self.hover_cols = [v for v in self.variables if v not in self.indexes]
+
+        if self.datatype == 'geopandas':
+            self.hover_cols = [c for c in self.hover_cols if c!= 'geometry']
 
         if da is not None and attr_labels is True or attr_labels is None:
             try:
