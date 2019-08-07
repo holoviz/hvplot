@@ -54,9 +54,9 @@ jobs:
         - bokeh sampledata
         - doit test_all_recommended
 
-    - <<: *default
-      stage: test
-      env: DESC="dev test with extra dependencies"
+    - &extra_default
+      <<: *default
+      env: DESC="dev unit test with extra dependencies"
       install:
         - doit env_create $CHANS_DEV --python=$PYTHON_VERSION
         - source activate test-environment
@@ -64,6 +64,13 @@ jobs:
         - doit env_capture
       script: doit test_unit_all
       after_success: coveralls
+
+    - <<: *extra_default
+      env: DESC="dev test_all_recommended with extra dependencies"
+      script:
+        - bokeh sampledata
+        - doit test_all_recommended
+      after_success: true
 
     - <<: *default
       env: DESC="py2 flakes" PYTHON_VERSION=2.7
