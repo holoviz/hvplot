@@ -71,6 +71,7 @@ jobs:
         - doit env_create $CHANS_DEV --python=$PYTHON_VERSION --name=extra-deps-env-notebooks
         - source activate extra-deps-env-notebooks
         - doit develop_install $CHANS_DEV -o recommended -o tests -o examples
+        - pip install "fsspec==0.4.1"
         - doit env_capture
       script:
         - bokeh sampledata
