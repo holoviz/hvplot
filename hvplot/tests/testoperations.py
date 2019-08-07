@@ -111,6 +111,11 @@ class TestDatashader(ComparisonTestCase):
         opts = Store.lookup_options('bokeh', plot[0], 'plot').kwargs
         assert 'hover' in opts.get('tools')
 
+    def test_xlim_affects_x_range(self):
+        data = pd.DataFrame(np.random.randn(100).cumsum())
+        img = data.hvplot(xlim=(0, 20000), datashade=True, dynamic=False)
+        assert img.range(0) == (0, 20000)
+
 
 class TestChart2D(ComparisonTestCase):
 

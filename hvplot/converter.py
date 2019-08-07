@@ -921,6 +921,10 @@ class HoloViewsConverter(object):
             opts['x_sampling'] = self.x_sampling
         if self.y_sampling:
             opts['y_sampling'] = self.y_sampling
+        if self._plot_opts.get('xlim') is not None:
+            opts['x_range'] = self._plot_opts['xlim']
+        if self._plot_opts.get('ylim') is not None:
+            opts['y_range'] = self._plot_opts['ylim']
         if not self.dynamic:
             opts['dynamic'] = self.dynamic
 
