@@ -66,10 +66,10 @@ jobs:
       after_success: coveralls
 
     - <<: *extra_default
-      env: DESC="dev test_all_recommended with extra dependencies"
+      env: DESC="dev test examples with extra dependencies"
       script:
         - bokeh sampledata
-        - doit test_all_recommended
+        - doit test_examples
       after_success: true
 
     - <<: *default
