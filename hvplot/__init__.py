@@ -7,6 +7,7 @@ import textwrap
 import param
 import numpy as _np
 import pandas as _pd
+import panel as _pn
 import holoviews as _hv
 
 from holoviews import Store
@@ -176,10 +177,28 @@ class hvPlot(object):
         **kwds : optional
             Keyword arguments to pass on to
             :py:meth:`hvplot.converter.HoloViewsConverter`.
+
         Returns
         -------
         HoloViews object: Object representing the requested visualization
         """
+        dynamic = {k: v for k, v in kwds.items() if isinstance(v, param.Parameter)}
+        if isinstance(x, param.Parameter):
+            dynamic['x'] = x
+        if isinstance(y, param.Parameter):
+            dynamic['y'] = y
+        if isinstance(kind, param.Parameter):
+            dynamic['kind'] = kind
+
+        if dynamic:
+            @param.depends(**dynamic)
+            def callback(**dyn_kwds):
+                xd = dyn_kwds.pop('x', x)
+                yd = dyn_kwds.pop('y', y)
+                kindd = dyn_kwds.pop('kind', kind)
+                combined_kwds = dict(kwds, **dyn_kwds)
+                return self._get_converter(xd, yd, kindd, **combined_kwds)(kindd, xd, yd)
+            return _pn.panel(callback)
         return self._get_converter(x, y, kind, **kwds)(kind, x, y)
 
     def _get_converter(self, x=None, y=None, kind=None, **kwds):
