@@ -13,7 +13,7 @@ env:
   global:
     - PYENV_VERSION=3.7
     - PKG_TEST_PYTHON="--test-python=py36 --test-python=py27"
-    - CHANS_DEV="-c pyviz/label/dev -c intake"  # need conda-forge for intake
+    - CHANS_DEV="-c pyviz/label/dev -c defaults -c intake"  # need defaults before intake
     - CHANS="-c pyviz -c ioam"
     - PYTHON_VERSION=3.6
 
@@ -71,7 +71,6 @@ jobs:
         - doit env_create $CHANS_DEV --python=$PYTHON_VERSION --name=extra-deps-env-notebooks
         - source activate extra-deps-env-notebooks
         - doit develop_install $CHANS_DEV -o recommended -o tests -o examples
-        - pip install intake  # get latest intake if it isn't on defaults or intake channel
         - doit env_capture
       script:
         - bokeh sampledata
