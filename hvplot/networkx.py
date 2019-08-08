@@ -75,7 +75,7 @@ def _from_networkx(G, positions, nodes=None, cls=Graph, **kwargs):
     node_columns = defaultdict(list)
 
     # Unpack node positions
-    for idx, pos in sorted(positions.items()):
+    for idx, pos in positions.items():
         node = G.nodes.get(idx)
         if node is None:
             continue
