@@ -634,7 +634,7 @@ class HoloViewsConverter(object):
             if groupby_index:
                 self.data = self.data.reset_index(groupby_index)
             not_found = [g for g in groupby if g not in list(self.data.columns)+indexes]
-            not_found, self.data = process_derived_datetime_pandas(self.data, not_found)
+            not_found, self.data = process_derived_datetime_pandas(self.data, not_found, indexes)
             if groupby and not_found:
                 raise ValueError('The supplied groupby dimension(s) %s '
                                  'could not be found, expected one or '
@@ -1069,11 +1069,15 @@ class HoloViewsConverter(object):
             chart = element(data, kdims, vdims).relabel(**self._relabel)
         return chart.redim(**self._redim).opts(opts)
 
-    def _process_chart_args(self, data, x, y):
+    def _process_chart_args(self, data, x, y, single_y=False):
         data = self.data if data is None else data
+
         x = x or self.x
-        if not x and self.use_index:
-            x = self.indexes[0]
+        if x is None:
+            if self.use_index:
+                x = self.indexes[0]
+            else:
+                x = [c for c in data.columns if c not in self.by+self.groupby][0]
         elif not x:
             raise ValueError('Could not determine what to plot. Expected '
                              'x to be declared or use_index to be enabled.')
@@ -1083,19 +1087,20 @@ class HoloViewsConverter(object):
                 index = self.indexes.index(x)
                 if is_datetime(data.axes[index]):
                     data = data.sort_index(axis=self.indexes.index(x))
-            elif is_datetime(data[x]):
-                data = data.sort_values(x)
+            elif x in data.columns:
+                if is_datetime(data[x]):
+                    data = data.sort_values(x)
 
         y = y or self.y
-        if not y:
+        if y is None:
             ys = [c for c in data.columns if c not in [x]+self.by+self.groupby]
             if len(ys) > 1:
                 # if columns have different dtypes, only include numeric columns
                 from pandas.api.types import is_numeric_dtype as isnum
-                num_ys = [col for col in data.columns if isnum(data[col])]
+                num_ys = [y for y in ys if isnum(data[y])]
                 if len(num_ys) >= 1:
                     ys = num_ys
-            y = ys[0] if len(ys) == 1 else ys
+            y = ys[0] if len(ys) == 1 or single_y else ys
 
         if self.use_index and any(c for c in self.hover_cols if
                                   c in self.indexes and
@@ -1105,10 +1110,11 @@ class HoloViewsConverter(object):
         # calculate any derived time
         dims = []
         for dim in [x, y, self.by, self.hover_cols]:
-            dims.extend(dim if isinstance(dim, list) else [dim])
+            if dim is not None:
+                dims.extend(dim if isinstance(dim, list) else [dim])
 
-        not_found = [dim for dim in dims if dim not in data.columns]
-        _, data = process_derived_datetime_pandas(data, not_found)
+        not_found = [dim for dim in dims if dim not in self.variables]
+        _, data = process_derived_datetime_pandas(data, not_found, self.indexes)
 
         return data, x, y
 
@@ -1355,17 +1361,18 @@ class HoloViewsConverter(object):
 
     def heatmap(self, x, y, data=None):
         data = self.data if data is None else data
-        opts = dict(plot=self._plot_opts, norm=self._norm_opts, style=self._style_opts)
         if not (x or y) or (x == 'columns' and y in ('index', data.index.name)):
             opts['plot']['labelled'] = []
             x, y = 'columns', 'index'
             data = (data.columns, data.index, data.values)
             z = ['value']
         else:
-            if not x: x = self.x or data.columns[0]
-            if not y: y = self.y or data.columns[1]
             z = self.kwds.get('C', [c for c in data.columns if c not in (x, y)][0])
             z = [z] + self.hover_cols
+            self.use_index = False
+
+        data, x, y = self._process_chart_args(data, x, y, single_y=True)
+        opts = dict(plot=self._plot_opts, norm=self._norm_opts, style=self._style_opts)
         redim = self._merge_redim({z[0]: self._dim_ranges['c']})
         hmap = HeatMap(data, [x, y], z, **self._relabel)
         if 'reduce_function' in self.kwds:
@@ -1373,9 +1380,9 @@ class HoloViewsConverter(object):
         return hmap.redim(**redim).opts(**opts)
 
     def hexbin(self, x, y, data=None):
-        data = self.data if data is None else data
-        if not x: x = data.columns[0]
-        if not y: y = data.columns[1]
+        self.use_index = False
+        data, x, y = self._process_chart_args(data, x, y, single_y=True)
+
         z = [self.kwds['C']] if self.kwds.get('C') else []
         z += self.hover_cols
 
@@ -1393,23 +1400,23 @@ class HoloViewsConverter(object):
         return element(data, [x, y], z or [], **params).redim(**redim).opts(**opts)
 
     def bivariate(self, x, y, data=None):
-        data = self.data if data is None else data
-        if not x: x = data.columns[0]
-        if not y: y = data.columns[1]
+        self.use_index = False
+        data, x, y = self._process_chart_args(data, x, y, single_y=True)
 
         opts = dict(plot=self._plot_opts, norm=self._norm_opts, style=self._style_opts)
         return (Bivariate(data, [x, y]).redim(**self._redim).opts(**opts))
 
     def table(self, x=None, y=None, data=None):
+        data = self.data if data is None else data
+
         allowed = ['width', 'height']
         opts = {k: v for k, v in self._plot_opts.items() if k in allowed}
-        data = self.data if data is None else data
         return Table(data, self.kwds.get('columns'), []).redim(**self._redim).opts(plot=opts)
 
     def labels(self, x, y, data=None):
-        data = self.data if data is None else data
-        if not x: x = self.x or data.columns[0]
-        if not y: y = self.y or data.columns[1]
+        self.use_index = False
+        data, x, y = self._process_chart_args(data, x, y, single_y=True)
+
         text = self.kwds.get('text', [c for c in data.columns if c not in (x, y)][0])
         style = self._style_opts
         kdims, vdims = self._get_dimensions([x, y], [text])
@@ -1438,10 +1445,11 @@ class HoloViewsConverter(object):
             # calculate any derived time
             dims = []
             for dim in [x, y, self.by, self.hover_cols]:
-                dims.extend(dim if isinstance(dim, list) else [dim])
+                if dim is not None:
+                    dims.extend(dim if isinstance(dim, list) else [dim])
 
-            not_found = [dim for dim in dims if dim not in data.columns]
-            _, data = process_derived_datetime_pandas(data, not_found)
+            not_found = [dim for dim in dims if dim not in self.variables]
+            _, data = process_derived_datetime_pandas(data, not_found, self.indexes)
 
         return data, x, y, z
 

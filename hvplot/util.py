@@ -348,16 +348,25 @@ def process_derived_datetime_xarray(data, not_found):
     return not_found, extra_vars, extra_coords
 
 
-def process_derived_datetime_pandas(data, not_found):
+def process_derived_datetime_pandas(data, not_found, indexes=None):
     from pandas.api.types import is_datetime64_any_dtype as isdate
+    indexes = indexes or []
     extra_cols = {}
     for var in not_found:
         if '.' in var:
             parts = var.split('.')
             base_col = parts[0]
             dt_str = parts[-1]
-            if isdate(data[base_col]):
-                extra_cols[var] = getattr(data[base_col].dt, dt_str)
+            if base_col in data.columns:
+                if isdate(data[base_col]):
+                    extra_cols[var] = getattr(data[base_col].dt, dt_str)
+            elif base_col == 'index':
+                if isdate(data.index):
+                    extra_cols[var] = getattr(data.index, dt_str)
+            elif base_col in indexes:
+                index = data.axes[indexes.index(base_col)]
+                if isdate(index):
+                    extra_cols[var] = getattr(index, dt_str)
     data = data.assign(**extra_cols)
     not_found = [var for var in not_found if var not in extra_cols.keys()]
 

@@ -11,6 +11,7 @@ from ..util import is_dask
 class TestChart2D(ComparisonTestCase):
     def setUp(self):
         try:
+            import numpy as np
             import pandas as pd
         except:
             raise SkipTest('Pandas not available')
@@ -18,6 +19,9 @@ class TestChart2D(ComparisonTestCase):
         self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
         self.cat_df = pd.DataFrame([[1, 2, 'A'], [3, 4, 'B'], [5, 6, 'C']],
                                    columns=['x', 'y', 'category'])
+        self.time_df = pd.DataFrame({
+            'time': pd.date_range('1/1/2000', periods=5*24, freq='1H', tz='UTC'),
+            'temp': np.sin(np.linspace(0, 5*2*np.pi, 5*24)).cumsum()})
 
     @parameterized.expand([('points', Points), ('paths', Path)])
     def test_2d_defaults(self, kind, element):
@@ -61,6 +65,11 @@ class TestChart2D(ComparisonTestCase):
         self.assertEqual(plot, HeatMap((['x', 'y'], [0, 1, 2], self.df.values),
                                        ['columns', 'index'], 'value'))
 
+    def test_heatmap_2d_index_columns(self):
+        plot = self.time_df.hvplot.heatmap(x='time.hour', y='time.day', C='temp')
+        assert plot.kdims == ['time.hour', 'time.day']
+        assert plot.vdims == ['temp']
+
 
 class TestChart2DDask(TestChart2D):
 
@@ -95,7 +104,7 @@ class TestChart1D(ComparisonTestCase):
         self.time_df = pd.DataFrame({
             'time': pd.date_range('1/1/2000', periods=10, tz='UTC'),
             'A': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-            'B': 'abcdefghij'})
+            'B': list('abcdefghij')})
 
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
     def test_wide_chart(self, kind, element):
@@ -142,9 +151,10 @@ class TestChart1D(ComparisonTestCase):
         self.assertEqual(opts.kwargs['legend_position'], 'left')
 
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
-    def test_use_index_disabled(self, kind, element):
-        with self.assertRaises(ValueError):
-            self.df.hvplot(use_index=False, kind=kind)
+    def test_use_index_disabled_uses_first_cols(self, kind, element):
+        plot = self.df.hvplot(use_index=False, kind=kind)
+        self.assertEqual(plot.kdims, ['x'])
+        self.assertEqual(plot.vdims, ['y'])
 
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
     def test_tidy_chart_ranges(self, kind, element):
@@ -264,6 +274,20 @@ class TestChart1D(ComparisonTestCase):
         plot = scrambled.hvplot(sort_date=False)
         assert (plot.data.time == scrambled.index).all().all()
         assert not (plot.data.time.diff()[1:].astype('int') > 0).all()
+
+    def test_time_df_with_groupby_as_derived_datetime(self):
+        plot = self.time_df.hvplot(groupby='time.dayofweek', dynamic=False)
+        assert list(plot.keys()) == [0, 1, 2, 3, 4, 5, 6]
+        assert list(plot.dimensions()) == ['time.dayofweek', 'index', 'A']
+
+    def test_time_df_with_by_as_derived_datetime(self):
+        plot = self.time_df.hvplot(by='time.month', dynamic=False)
+        assert list(plot.keys()) == [1]
+        assert list(plot.dimensions()) == ['time.month', 'index', 'A']
+
+    def test_time_df_with_x_as_derived_datetime(self):
+        plot = self.time_df.hvplot.scatter(x='time.day', dynamic=False)
+        assert list(plot.dimensions()) == ['time.day', 'A']
 
 
 class TestChart1DDask(TestChart1D):
