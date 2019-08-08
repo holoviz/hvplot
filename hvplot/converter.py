@@ -1108,10 +1108,10 @@ class HoloViewsConverter(object):
             data = data.reset_index()
 
         # calculate any derived time
-        dims = []
-        for dim in [x, y, self.by, self.hover_cols]:
-            if dim is not None:
-                dims.extend(dim if isinstance(dim, list) else [dim])
+        dimensions = []
+        for dimension in [x, y, self.by, self.hover_cols]:
+            if col is not None:
+                dimension.extend(dimension if isinstance(col, list) else [dimension])
 
         not_found = [dim for dim in dims if dim not in self.variables]
         _, data = process_derived_datetime_pandas(data, not_found, self.indexes)
@@ -1444,12 +1444,12 @@ class HoloViewsConverter(object):
                                       c not in data.columns):
                 data = data.reset_index()
             # calculate any derived time
-            dims = []
-            for dim in [x, y, self.by, self.hover_cols]:
-                if dim is not None:
-                    dims.extend(dim if isinstance(dim, list) else [dim])
+            dimensions = []
+            for dimension in [x, y, self.by, self.hover_cols]:
+                if dimension is not None:
+                    dimensions.extend(dimension if isinstance(dimension, list) else [dimension])
 
-            not_found = [dim for dim in dims if dim not in self.variables]
+            not_found = [dim for dim in dimensions if dim not in self.variables]
             _, data = process_derived_datetime_pandas(data, not_found, self.indexes)
 
         return data, x, y, z
