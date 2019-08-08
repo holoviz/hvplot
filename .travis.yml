@@ -13,7 +13,7 @@ env:
   global:
     - PYENV_VERSION=3.7
     - PKG_TEST_PYTHON="--test-python=py36 --test-python=py27"
-    - CHANS_DEV="-c pyviz/label/dev -c ioam -c intake"
+    - CHANS_DEV="-c pyviz/label/dev -c defaults -c intake"  # need defaults before intake
     - CHANS="-c pyviz -c ioam"
     - PYTHON_VERSION=3.6
 
@@ -54,16 +54,28 @@ jobs:
         - bokeh sampledata
         - doit test_all_recommended
 
-    - <<: *default
-      stage: test
-      env: DESC="dev test with extra dependencies"
+    - &extra_default
+      <<: *default
+      env: DESC="dev unit test with extra dependencies"
       install:
-        - doit env_create $CHANS_DEV --python=$PYTHON_VERSION
-        - source activate test-environment
+        - doit env_create $CHANS_DEV --python=$PYTHON_VERSION --name=extra-deps-env
+        - source activate extra-deps-env
         - doit develop_install $CHANS_DEV -o recommended -o tests -o examples
         - doit env_capture
       script: doit test_unit_all
       after_success: coveralls
+
+    - <<: *default
+      env: DESC="dev test examples with extra dependencies"
+      install:
+        - doit env_create $CHANS_DEV --python=$PYTHON_VERSION --name=extra-deps-env-notebooks
+        - source activate extra-deps-env-notebooks
+        - doit develop_install $CHANS_DEV -o recommended -o tests -o examples
+        - pip install "s3fs>=0.3.0"
+        - doit env_capture
+      script:
+        - bokeh sampledata
+        - doit test_examples
 
     - <<: *default
       env: DESC="py2 flakes" PYTHON_VERSION=2.7

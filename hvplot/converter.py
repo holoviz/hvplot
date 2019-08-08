@@ -357,10 +357,9 @@ class HoloViewsConverter(object):
 
         # Process options
         self.stacked = stacked
-        self._style_opts, kwds = self._process_style(kwds)
 
         plot_opts = {**self._default_plot_opts,
-                     **self._process_plot(self._style_opts.get('color'))}
+                     **self._process_plot()}
         if xlim is not None:
             plot_opts['xlim'] = tuple(xlim)
         if ylim is not None:
@@ -396,6 +395,8 @@ class HoloViewsConverter(object):
         for plotwd in plotwds:
             if plotwd in kwds:
                 plot_opts[plotwd] = kwds.pop(plotwd)
+
+        self._style_opts, plot_opts, kwds = self._process_style(kwds, plot_opts)
 
         for axis_name in ['xaxis', 'yaxis']:
             if axis_name in kwds:
@@ -692,7 +693,7 @@ class HoloViewsConverter(object):
                     param.main.warning('Unable to auto label using xarray attrs '
                                        'because {e}'.format(e=e))
 
-    def _process_plot(self, color):
+    def _process_plot(self):
         kind = self.kind
         options = Store.options(backend='bokeh')
         elname = self._kind_mapping[kind].__name__
@@ -701,15 +702,9 @@ class HoloViewsConverter(object):
         if kind.startswith('bar'):
             plot_opts['stacked'] = self.stacked
 
-        # Color
-        if color is not None and 'colorbar' not in plot_opts:
-            if 'c' in self._kind_options.get(kind, []) and (color in self.variables):
-                if self.data[color].dtype.kind not in 'OSU':
-                    plot_opts['colorbar'] = True
-
         return plot_opts
 
-    def _process_style(self, kwds):
+    def _process_style(self, kwds, plot_opts):
         kind = self.kind
         eltype = self._kind_mapping[kind]
         registry =  Store.registry['bokeh']
@@ -756,6 +751,7 @@ class HoloViewsConverter(object):
                     cmap = cmap or self._default_cmaps['categorical']
                 else:
                     cmap = cmap or self._default_cmaps['linear']
+                    plot_opts['colorbar'] = plot_opts.get('colorbar', True)
 
         if isinstance(cmap, str) and cmap in self._default_cmaps:
             cmap = self._default_cmaps[cmap]
@@ -798,7 +794,7 @@ class HoloViewsConverter(object):
         if 'marker' in kwds and 'marker' in self._kind_options[self.kind]:
             style_opts['marker'] = kwds.pop('marker')
 
-        return style_opts, kwds
+        return style_opts, plot_opts, kwds
 
     def _validate_kwds(self, kwds):
         kind_opts = self._kind_options.get(self.kind, [])
@@ -1338,7 +1334,7 @@ class HoloViewsConverter(object):
                 dists = NdOverlay({0: Area([], self.value_label, vdim)},
                                   [self.group_label])
         redim = self._merge_redim(ranges)
-        return (dists.redim(redim).relabel(**self._relabel).opts(opts))
+        return (dists.redim(**redim).relabel(**self._relabel).opts(opts))
 
     ##########################
     #      Other charts      #
