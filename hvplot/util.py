@@ -267,7 +267,7 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, v
 
     if not gridded:
         not_found = [var for var in all_vars if var not in list(dataset.data_vars) + list(dataset.coords)]
-        _, extra_vars, extra_coords = process_derived_datetime(dataset, not_found)
+        _, extra_vars, extra_coords = process_derived_datetime_xarray(dataset, not_found)
         dataset = dataset.assign_coords(**{var: dataset[var] for var in extra_coords})
         dataset = dataset.assign(**{var: dataset[var] for var in extra_vars})
 
@@ -332,7 +332,7 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, v
     return data, x, y, by, groupby
 
 
-def process_derived_datetime(data, not_found):
+def process_derived_datetime_xarray(data, not_found):
     from pandas.api.types import is_datetime64_any_dtype as isdate
     extra_vars = []
     extra_coords = []
@@ -346,3 +346,19 @@ def process_derived_datetime(data, not_found):
                     extra_vars.append(var)
     not_found = [var for var in not_found if var not in extra_vars + extra_coords]
     return not_found, extra_vars, extra_coords
+
+
+def process_derived_datetime_pandas(data, not_found):
+    from pandas.api.types import is_datetime64_any_dtype as isdate
+    extra_cols = {}
+    for var in not_found:
+        if '.' in var:
+            parts = var.split('.')
+            base_col = parts[0]
+            dt_str = parts[-1]
+            if isdate(data[base_col]):
+                extra_cols[var] = getattr(data[base_col].dt, dt_str)
+    data = data.assign(**extra_cols)
+    not_found = [var for var in not_found if var not in extra_cols.keys()]
+
+    return not_found, data

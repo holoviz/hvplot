@@ -30,7 +30,7 @@ from holoviews.util.transform import dim
 from .util import (
     is_tabular, is_series, is_dask, is_intake, is_streamz, is_xarray,
     process_crs, process_intake, process_xarray, check_library, is_geopandas,
-    process_derived_datetime,
+    process_derived_datetime_xarray, process_derived_datetime_pandas
 )
 
 renderer = hv.renderer('bokeh')
@@ -593,7 +593,7 @@ class HoloViewsConverter(object):
 
         if gridded_data:
             not_found = [g for g in groupby if g not in data.coords]
-            not_found, *_ = process_derived_datetime(data, not_found)
+            not_found, _, _ = process_derived_datetime_xarray(data, not_found)
             data_vars = list(data.data_vars) if isinstance(data, xr.Dataset) else [data.name]
             indexes = list(data.coords)
             self.variables = list(data.coords) + data_vars
@@ -634,6 +634,7 @@ class HoloViewsConverter(object):
             if groupby_index:
                 self.data = self.data.reset_index(groupby_index)
             not_found = [g for g in groupby if g not in list(self.data.columns)+indexes]
+            not_found, self.data = process_derived_datetime_pandas(self.data, not_found)
             if groupby and not_found:
                 raise ValueError('The supplied groupby dimension(s) %s '
                                  'could not be found, expected one or '
@@ -1101,6 +1102,14 @@ class HoloViewsConverter(object):
                                   c not in data.columns):
             data = data.reset_index()
 
+        # calculate any derived time
+        dims = []
+        for dim in [x, y, self.by, self.hover_cols]:
+            dims.extend(dim if isinstance(dim, list) else [dim])
+
+        not_found = [dim for dim in dims if dim not in data.columns]
+        _, data = process_derived_datetime_pandas(data, not_found)
+
         return data, x, y
 
     def chart(self, element, x, y, data=None):
@@ -1426,6 +1435,14 @@ class HoloViewsConverter(object):
                                       c in self.indexes and
                                       c not in data.columns):
                 data = data.reset_index()
+            # calculate any derived time
+            dims = []
+            for dim in [x, y, self.by, self.hover_cols]:
+                dims.extend(dim if isinstance(dim, list) else [dim])
+
+            not_found = [dim for dim in dims if dim not in data.columns]
+            _, data = process_derived_datetime_pandas(data, not_found)
+
         return data, x, y, z
 
     def _get_element(self, kind):
