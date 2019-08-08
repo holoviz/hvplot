@@ -65,7 +65,7 @@ class TestChart2D(ComparisonTestCase):
         self.assertEqual(plot, HeatMap((['x', 'y'], [0, 1, 2], self.df.values),
                                        ['columns', 'index'], 'value'))
 
-    def test_heatmap_2d_index_columns(self):
+    def test_heatmap_2d_derived_x_and_y(self):
         plot = self.time_df.hvplot.heatmap(x='time.hour', y='time.day', C='temp')
         assert plot.kdims == ['time.hour', 'time.day']
         assert plot.vdims == ['temp']
@@ -288,6 +288,16 @@ class TestChart1D(ComparisonTestCase):
     def test_time_df_with_x_as_derived_datetime(self):
         plot = self.time_df.hvplot.scatter(x='time.day', dynamic=False)
         assert list(plot.dimensions()) == ['time.day', 'A']
+
+    def test_time_df_as_index_with_x_as_derived_datetime_using_name(self):
+        indexed = self.time_df.set_index('time')
+        plot = indexed.hvplot.scatter(x='time.day', dynamic=False)
+        assert list(plot.dimensions()) == ['time.day', 'A']
+
+    def test_time_df_as_index_with_x_as_derived_datetime_using_index(self):
+        indexed = self.time_df.set_index('time')
+        plot = indexed.hvplot.scatter(x='index.day', dynamic=False)
+        assert list(plot.dimensions()) == ['index.day', 'A']
 
     def test_default_y_not_in_by(self):
         plot = self.cat_df.hvplot.scatter(by='x')
