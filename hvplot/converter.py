@@ -1195,6 +1195,10 @@ class HoloViewsConverter(object):
                 .relabel(**self._relabel).opts(**opts))
 
     def bar(self, x, y, data=None):
+        # As of bokeh 1.3.0 and holoviews 1.12.4, width is valid on style but throws
+        # a param warning. Use bar_width to control width of bars.
+        self._style_opts.pop('width', None)
+
         data, x, y = self._process_chart_args(data, x, y)
         if x and y and (self.by or not isinstance(y, (list, tuple) or len(y) == 1)):
             y = y[0] if isinstance(y, (list, tuple)) else y
