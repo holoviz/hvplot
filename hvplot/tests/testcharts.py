@@ -289,6 +289,12 @@ class TestChart1D(ComparisonTestCase):
         plot = self.time_df.hvplot.scatter(x='time.day', dynamic=False)
         assert list(plot.dimensions()) == ['time.day', 'A']
 
+    def test_default_y_not_in_by(self):
+        plot = self.cat_df.hvplot.scatter(by='x')
+        assert plot.kdims == ['x']
+        assert plot[1].kdims == ['index']
+        assert plot[1].vdims == ['y']
+
 
 class TestChart1DDask(TestChart1D):
 
