@@ -357,10 +357,9 @@ class HoloViewsConverter(object):
 
         # Process options
         self.stacked = stacked
-        self._style_opts, kwds = self._process_style(kwds)
 
-        plot_opts = {**self._default_plot_opts,
-                     **self._process_plot(self._style_opts.get('color'))}
+
+        plot_opts = {**self._default_plot_opts}
         if xlim is not None:
             plot_opts['xlim'] = tuple(xlim)
         if ylim is not None:
@@ -396,6 +395,9 @@ class HoloViewsConverter(object):
         for plotwd in plotwds:
             if plotwd in kwds:
                 plot_opts[plotwd] = kwds.pop(plotwd)
+
+        self._style_opts, kwds = self._process_style(kwds)
+        plot_opts.update(**self._process_plot(self._style_opts.get('color')))
 
         for axis_name in ['xaxis', 'yaxis']:
             if axis_name in kwds:
