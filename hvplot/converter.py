@@ -208,7 +208,8 @@ class HoloViewsConverter(object):
 
     _data_options = ['x', 'y', 'kind', 'by', 'use_index', 'use_dask',
                      'dynamic', 'crs', 'value_label', 'group_label',
-                     'backlog', 'persist', 'sort_date']
+                     'backlog', 'persist', 'sort_date', 'read_partition', 
+                     'dask_sample_frac']
 
     _geo_options = ['geo', 'crs', 'project', 'coastline', 'tiles']
 
@@ -292,14 +293,16 @@ class HoloViewsConverter(object):
                  dynspread=False, hover_cols=[], x_sampling=None,
                  y_sampling=None, project=False, tools=[],
                  attr_labels=None, coastline=False, tiles=False,
-                 sort_date=True, **kwds):
+                 sort_date=True, read_partition=None, dask_sample_frac=None, 
+                 **kwds):
 
         # Process data and related options
         self._redim = fields
         self.use_index = use_index
         self._process_data(kind, data, x, y, by, groupby, row, col,
                            use_dask, persist, backlog, label, value_label,
-                           hover_cols, attr_labels, kwds)
+                           hover_cols, attr_labels, read_partition, dask_sample_frac, 
+                           kwds)
 
         self.value_label = value_label
         self.group_label = group_label
@@ -484,7 +487,7 @@ class HoloViewsConverter(object):
 
     def _process_data(self, kind, data, x, y, by, groupby, row, col,
                       use_dask, persist, backlog, label, value_label,
-                      hover_cols, attr_labels, kwds):
+                      hover_cols, attr_labels, read_partition, dask_sample_frac, kwds):
         gridded = kind in self._gridded_types
         gridded_data = False
         da = None
@@ -495,7 +498,8 @@ class HoloViewsConverter(object):
         if self.is_series:
             data = data.to_frame()
         if is_intake(data):
-            data = process_intake(data, use_dask or persist)
+            data = process_intake(data, use_dask or persist,
+                                  read_partition, dask_sample_frac)
 
         if groupby is not None and not isinstance(groupby, list):
             groupby = [groupby]

@@ -234,13 +234,21 @@ def is_xarray(data):
     return isinstance(data, (DataArray, Dataset))
 
 
-def process_intake(data, use_dask):
+def process_intake(data, use_dask, read_partition, dask_sample_frac):
     if data.container not in ('dataframe', 'xarray'):
         raise NotImplementedError('Plotting interface currently only '
                                   'supports DataSource objects declaring '
                                   'a dataframe or xarray container.')
-    if use_dask:
+    if read_partition is not None and (dask_sample_frac is not None or use_dask):
+        raise ValueError("Cannot specify both read_partition"
+                         " and dask_sample_frac or use_dask.")
+
+    if dask_sample_frac:
+        data = data.to_dask().sample(frac=float(dask_sample_frac), replace=True) 
+    elif use_dask:
         data = data.to_dask()
+    elif read_partition:
+        data = data.read_partition(read_partition)
     else:
         data = data.read()
     return data
