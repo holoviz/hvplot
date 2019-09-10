@@ -1109,11 +1109,11 @@ class HoloViewsConverter(object):
 
         # calculate any derived time
         dimensions = []
-        for dimension in [x, y, self.by, self.hover_cols]:
+        for col in [x, y, self.by, self.hover_cols]:
             if col is not None:
-                dimension.extend(dimension if isinstance(col, list) else [dimension])
+                dimensions.extend(col if isinstance(col, list) else [col])
 
-        not_found = [dim for dim in dims if dim not in self.variables]
+        not_found = [dim for dim in dimensions if dim not in self.variables]
         _, data = process_derived_datetime_pandas(data, not_found, self.indexes)
 
         return data, x, y
