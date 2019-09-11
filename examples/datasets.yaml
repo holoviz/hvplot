@@ -22,3 +22,20 @@ sources:
           kind: line
           y: ['Robbery', 'Burglary']
           x: 'Year'
+
+  stocks:
+    driver: csv
+    args:
+      urlpath:
+        - 'wfcached://sampledata.bokeh.org/AAPL.csv'
+        - 'wfcached://sampledata.bokeh.org/FB.csv'
+        - 'wfcached://sampledata.bokeh.org/GOOG.csv'
+        - 'wfcached://sampledata.bokeh.org/IBM.csv'
+        - 'wfcached://sampledata.bokeh.org/MSFT.csv'
+      path_as_pattern: 'sampledata.bokeh.org/{ticker}.csv'
+      csv_kwargs:
+         blocksize: null
+         parse_dates: ['Date']
+      storage_options:
+         target_protocol: http
+         cache_storage: '{{ CATALOG_DIR }}/data/cache'
