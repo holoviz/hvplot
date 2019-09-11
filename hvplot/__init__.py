@@ -710,7 +710,7 @@ class hvPlot(object):
         """
         return self(x, y, c=c, kind='polygons', **kwds)
 
-    def paths(self, **kwds):
+    def paths(self, x=None, y=None, c=None, **kwds):
         """
         LineString and LineRing plot for geopandas dataframes.
 
@@ -724,7 +724,7 @@ class hvPlot(object):
         obj : HoloViews object
             The HoloViews representation of the plot.
         """
-        return self(x=None, y=None, kind='paths', **kwds)
+        return self(x, y, c=c, kind='paths', **kwds)
 
     def labels(self, x=None, y=None, text=None, **kwds):
         """
