@@ -137,8 +137,8 @@ class HoloViewsConverter(object):
         e.g. '%.3f', and bokeh TickFormatter)
     xlabel/ylabel/clabel (default=None): str
         Axis labels for the x-axis, y-axis, and colorbar
-    xlim/ylim (default=None): tuple or list
-        Plot limits of the x- and y-axis
+    xlim/ylim/clim (default=None): tuple or list
+        Plot limits of the x- and y-axis, and colorbar
     xticks/yticks (default=None): int or list
         Ticks along x- and y-axis specified as an integer, list of
         ticks positions, or list of tuples of the tick positions and labels
@@ -280,7 +280,7 @@ class HoloViewsConverter(object):
                  backlog=1000, persist=False, use_dask=False,
                  crs=None, fields={}, groupby=None, dynamic=True,
                  grid=None, legend=None, rot=None, title=None,
-                 xlim=None, ylim=None, clim=None,
+                 xlim=None, ylim=None, clim=None, clabel=None,
                  logx=None, logy=None, loglog=None, hover=None,
                  subplots=False, label=None, invert=False,
                  stacked=False, colorbar=None, fontsize=None,
@@ -304,7 +304,7 @@ class HoloViewsConverter(object):
         self.value_label = value_label
         self.group_label = group_label
         self.dynamic = dynamic
-        self.geo = geo or crs or global_extent or projection or project
+        self.geo = any([geo, crs, global_extent, projection, project, self.datatype == 'geopandas'])
         self.crs = self._process_crs(data, crs) if self.geo else None
         self.project = project
         self.coastline = coastline
@@ -314,7 +314,7 @@ class HoloViewsConverter(object):
         self.sort_date = sort_date
 
         # Import geoviews if geo-features requested
-        if self.geo or self.datatype == 'geopandas':
+        if self.geo:
             try:
                 import geoviews # noqa
             except ImportError:
@@ -354,6 +354,7 @@ class HoloViewsConverter(object):
         # By type
         self.subplots = subplots
         self._by_type = NdLayout if subplots else NdOverlay
+        self.clabel = clabel or kwds.pop('zlabel', None)
 
         # Process options
         self.stacked = stacked
@@ -364,6 +365,8 @@ class HoloViewsConverter(object):
             plot_opts['xlim'] = tuple(xlim)
         if ylim is not None:
             plot_opts['ylim'] = tuple(ylim)
+        if clim is not None:
+            clim =  tuple(clim)
 
         self.invert = invert
         if loglog is not None:
@@ -380,6 +383,9 @@ class HoloViewsConverter(object):
         if legend is not None:
             plot_opts['show_legend'] = bool(legend)
 
+        if self.clabel is not None:
+            plot_opts['clabel'] = self.clabel
+
         if legend in self._legend_positions:
             plot_opts['legend_position'] = legend
         elif legend not in (True, False, None):
@@ -387,7 +393,7 @@ class HoloViewsConverter(object):
                              'a valid legend position (i.e. one of %s).'
                              % list(self._legend_positions))
 
-        plotwds = ['xticks', 'yticks', 'xlabel', 'ylabel', 'clabel',
+        plotwds = ['xticks', 'yticks', 'xlabel', 'ylabel',
                    'padding', 'xformatter', 'yformatter',
                    'height', 'width', 'frame_height', 'frame_width',
                    'min_width', 'min_height', 'max_width', 'max_height',
@@ -735,14 +741,15 @@ class HoloViewsConverter(object):
 
         if 'color' in kwds or 'c' in kwds:
             color = kwds.pop('color', kwds.pop('c', None))
+            clabel = self.clabel or '_color'
             if (self.datashade or self.rasterize) and color in [self.x, self.y]:
-                self.data = self.data.assign(_color=self.data[color])
-                style_opts['color'] = color = '_color'
-                self.variables.append('_color')
+                self.data = self.data.assign(**{clabel: self.data[color]})
+                style_opts['color'] = color = clabel
+                self.variables.append(clabel)
             elif isinstance(color, (np.ndarray, pd.Series)):
-                self.data = self.data.assign(_color=color)
-                style_opts['color'] = color = '_color'
-                self.variables.append('_color')
+                self.data = self.data.assign(**{clabel: color})
+                style_opts['color'] = color = clabel
+                self.variables.append(clabel)
             else:
                 style_opts['color'] = color
 
