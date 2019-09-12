@@ -236,7 +236,11 @@ def draw(G, pos=None, **kwargs):
         comparisons = []
         for edge in kwargs['edgelist']:
             comparisons.append(edges == edge)
-        g = g.iloc[np.logical_and(*np.logical_or.reduce(comparisons).T)]
+        if len(comparisons):
+            selector = np.logical_and(*np.logical_or.reduce(comparisons).T)
+            g = g.iloc[selector]
+        else:
+            g = g.iloc[:0]
 
     # Compute options
     inspection_policy = kwargs.pop('inspection_policy', 'nodes')
