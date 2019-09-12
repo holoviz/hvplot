@@ -1497,14 +1497,16 @@ class HoloViewsConverter(object):
 
         params = dict(self._relabel)
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
-        if self.geo: params['crs'] = self.crs
         xres, yres = data.attrs['res'] if 'res' in data.attrs else (1, 1)
         xs = data.coords[x][::-1] if xres < 0 else data.coords[x]
         ys = data.coords[y][::-1] if yres < 0 else data.coords[y]
         eldata = (xs, ys)
         for b in range(nbands):
             eldata += (data.isel(**{bands: b}).values,)
-        rgb = RGB(eldata, [x, y], RGB.vdims[:nbands], **params)
+
+        element = self._get_element('rgb')
+        if self.geo: params['crs'] = self.crs
+        rgb = element(eldata, [x, y], element.vdims[:nbands], **params)
         return rgb.redim(**self._redim).opts(**opts)
 
     def quadmesh(self, x=None, y=None, z=None, data=None):
