@@ -130,7 +130,7 @@ class TestGeoPandas(TestCase):
     def setUp(self):
         try:
             import geopandas as gpd  # noqa
-            import geoviews  # noqa
+            import geoviews as gv  # noqa
             import cartopy.crs as ccrs # noqa
         except:
             raise SkipTest('geopandas, geoviews, or cartopy not available')
@@ -138,9 +138,16 @@ class TestGeoPandas(TestCase):
 
         self.cities = gpd.read_file(gpd.datasets.get_path('naturalearth_cities'))
 
+    def test_geopandas_uses_geo_by_default(self):
+        import geoviews as gv
+        points = self.cities.hvplot()
+        assert type(points) == gv.Points
+        assert points.kdims == ['Longitude', 'Latitude']
+        assert points.vdims == []
+
     def test_points_hover_cols_is_empty_by_default(self):
         points = self.cities.hvplot()
-        assert points.kdims == ['x', 'y']
+        assert points.kdims == ['Longitude', 'Latitude']
         assert points.vdims == []
 
     def test_points_hover_cols_does_not_include_geometry_when_all(self):
@@ -150,23 +157,28 @@ class TestGeoPandas(TestCase):
 
     def test_points_hover_cols_when_all_and_use_columns_is_false(self):
         points = self.cities.hvplot(x='x', hover_cols='all', use_index=False)
-        assert points.kdims == ['x', 'y']
+        assert points.kdims == ['Longitude', 'Latitude']
         assert points.vdims == ['name']
 
     def test_points_hover_cols_index_in_list(self):
         points = self.cities.hvplot(y='y', hover_cols=['index'])
-        assert points.kdims == ['x', 'y']
+        assert points.kdims == ['Longitude', 'Latitude']
         assert points.vdims == ['index']
 
     def test_points_hover_cols_with_c_set_to_name(self):
         points = self.cities.hvplot(c='name')
-        assert points.kdims == ['x', 'y']
+        assert points.kdims == ['Longitude', 'Latitude']
         assert points.vdims == ['name']
         opts = hv.Store.lookup_options('bokeh', points, 'style').kwargs
         assert opts['color'] == 'name'
 
+    def test_points_hover_cols_with_c_set_to_series_with_clabel(self):
+        points = self.cities.hvplot(c=self.cities.area, clabel='area')
+        assert points.kdims == ['Longitude', 'Latitude']
+        assert points.vdims == ['area']
+        opts = hv.Store.lookup_options('bokeh', points, 'style').kwargs
+        assert opts['color'] == 'area'
+
     @expectedFailure
     def test_points_hover_cols_with_by_set_to_name(self):
         points = self.cities.hvplot(by='name')
-        assert points.kdims == ['x', 'y']
-        assert points.vdims == ['name']
