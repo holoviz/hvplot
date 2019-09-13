@@ -293,7 +293,6 @@ class HoloViewsConverter(object):
                  y_sampling=None, project=False, tools=[],
                  attr_labels=None, coastline=False, tiles=False,
                  sort_date=True, **kwds):
-
         # Process data and related options
         self._redim = fields
         self.use_index = use_index
@@ -448,12 +447,17 @@ class HoloViewsConverter(object):
         if title is not None:
             plot_opts['title_format'] = title
 
-        try:
-            if self.kind in self._colorbar_types and not use_dask:
-                plot_opts['symmetric'] = self._process_symmetric(
-                    clim, symmetric, kwds)
-        except TypeError:
-            pass
+        if (self.kind in self._colorbar_types or plot_opts.get('colorbar')) and not use_dask:
+            symmetric= self._process_symmetric(symmetric, clim)
+
+            cmap = kwds.pop('cmap', kwds.pop('colormap', None))
+            if cmap is None:
+                if symmetric:
+                    self._style_opts['cmap'] = self._default_cmaps['diverging']
+                else:
+                    self._style_opts['cmap'] = self._default_cmaps['linear']
+
+            plot_opts['symmetric'] = symmetric
 
         self._plot_opts = plot_opts
         self._overlay_opts = {k: v for k, v in self._plot_opts.items()
@@ -475,29 +479,26 @@ class HoloViewsConverter(object):
             param.main.warning('Plotting {kind} plot with parameters x: {x}, '
                                'y: {y}, by: {by}, groupby: {groupby}'.format(**kwds))
 
-    def _process_symmetric(self, clim, symmetric, kwds):
-        if clim is not None and symmetric is not None:
+    def _process_symmetric(self, symmetric, clim):
+        if symmetric is not None:
             return symmetric
+        elif clim is not None:
+            return False
 
         if is_xarray(self.data):
             # chunks mean it's lazily loaded; nanquantile will eagerly load
             if self.data.chunks:
                 return False
-            z = kwds.get('z', list(self.data.data_vars)[0])
-            data = self.data[z]
+            data = self.data[self.z]
+        elif self._color_dim:
+            data = self.data[self._color_dim]
         else:
-            data = self.data[kwds['C']]
+            return False
 
         cmin = np.nanquantile(data, 0.05)
         cmax = np.nanquantile(data, 0.95)
-        clim = (cmin, cmax)
-        divergent = cmin < 0 and cmax > 0
-        if divergent:
-            symmetric = True
-        else:
-            symmetric = False
 
-        return symmetric
+        return bool(cmin < 0 and cmax > 0)
 
     def _process_crs(self, data, crs):
         """Given crs as proj4 string, data.attr, or cartopy.crs return cartopy.crs
@@ -569,10 +570,14 @@ class HoloViewsConverter(object):
         elif is_xarray(data):
             import xarray as xr
             z = kwds.get('z')
-            if z is None and isinstance(data, xr.Dataset):
-                z = list(data.data_vars)[0]
+            if z is None:
+                if isinstance(data, xr.Dataset):
+                    z = list(data.data_vars)[0]
+                else:
+                    z = data.name or 'value'
             if gridded and isinstance(data, xr.Dataset) and not isinstance(z, list):
                 data = data[z]
+            self.z = z
 
             ignore = (groupby or []) + (by or [])
             coords = [c for c in data.coords if data[c].shape != ()
