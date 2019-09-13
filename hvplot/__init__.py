@@ -19,7 +19,11 @@ __version__ = str(param.version.Version(fpath=__file__, archive_commit="$Format:
                                         reponame="hvplot"))
 
 # Register plotting interfaces
-def _patch_plot(self):
+def _patch_plot(self, exclude=None):
+    if exclude is not None:
+        for kind in exclude:
+            if hasattr(hvPlot, kind):
+                delattr(hvPlot, kind)
     return hvPlot(self)
 
 _METHOD_DOCS = {}
@@ -103,13 +107,13 @@ def help(kind=None, docstring=True, generic=True, style=True):
     print(_get_doc(kind, docstring=docstring, generic=generic, style=style))
 
 
-def patch(library, name='hvplot', extension=None, logo=False):
+def patch(library, name='hvplot', extension=None, logo=False, exclude=None):
     """
     Patch library to support HoloViews based plotting API.
     """
     if not isinstance(library, list): library = [library]
     _patch_plot.__doc__ = hvPlot.__call__.__doc__
-    patch_property = property(_patch_plot)
+    patch_property = property(lambda x: _patch_plot(x, exclude))
     if 'streamz' in library:
         try:
             import streamz.dataframe as sdf

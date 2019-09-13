@@ -1,3 +1,4 @@
 from . import patch
 
-patch('pandas', extension='bokeh')
+patch('pandas', extension='bokeh',
+      exclude=['image', 'contour', 'contourf', 'quadmesh', 'rgb'])
