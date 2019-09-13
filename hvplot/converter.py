@@ -448,17 +448,20 @@ class HoloViewsConverter(object):
             plot_opts['title_format'] = title
 
         if (self.kind in self._colorbar_types or plot_opts.get('colorbar')):
-            if not use_dask:
-                symmetric = self._process_symmetric(symmetric, clim)
+            try:
+                if not use_dask:
+                    symmetric = self._process_symmetric(symmetric, clim)
 
-            if self._style_opts.get('cmap') is None:
-                if symmetric:
-                    self._style_opts['cmap'] = self._default_cmaps['diverging']
-                else:
-                    self._style_opts['cmap'] = self._default_cmaps['linear']
+                if self._style_opts.get('cmap') is None:
+                    if symmetric:
+                        self._style_opts['cmap'] = self._default_cmaps['diverging']
+                    else:
+                        self._style_opts['cmap'] = self._default_cmaps['linear']
 
-            if symmetric is not None:
-                plot_opts['symmetric'] = symmetric
+                if symmetric is not None:
+                    plot_opts['symmetric'] = symmetric
+            except TypeError:
+                pass
 
         self._plot_opts = plot_opts
         self._overlay_opts = {k: v for k, v in self._plot_opts.items()
