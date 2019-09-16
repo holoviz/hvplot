@@ -2,6 +2,7 @@ from unittest import SkipTest
 from collections import OrderedDict
 
 import numpy as np
+from holoviews import Store
 from holoviews.element import RGB, Image
 from holoviews.element.comparison import ComparisonTestCase
 from hvplot import patch
@@ -35,6 +36,7 @@ class TestGridPlots(ComparisonTestCase):
         self.xarr_with_attrs.y.attrs['long_name'] = 'Right Ascension'
 
         self.xds_with_attrs = xr.Dataset({'light': self.xarr_with_attrs })
+        self.da_img = xr.DataArray(np.arange(-2, 2).reshape((2, 2)), name='foo')
 
     def test_rgb_dataarray_no_args(self):
         rgb = self.da_rgb.hvplot()
@@ -118,3 +120,24 @@ class TestGridPlots(ComparisonTestCase):
         self.assertEqual(table.kdims[1].label, 'Right Ascension')
         self.assertEqual(table.kdims[2].label, 'luminosity')
         self.assertEqual(table.kdims[2].unit, 'lm')
+
+    def test_symmetric_img_deduces_symmetric(self):
+        plot = self.da_img.hvplot.image()
+        plot_opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(plot_opts.kwargs.get('symmetric'), True)
+        style_opts = Store.lookup_options('bokeh', plot, 'style')
+        self.assertEqual(style_opts.kwargs['cmap'], 'coolwarm')
+
+    def test_symmetric_img_with_symmetric_set_to_false(self):
+        plot = self.da_img.hvplot.image(symmetric=False)
+        plot_opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(plot_opts.kwargs.get('symmetric'), False)
+        style_opts = Store.lookup_options('bokeh', plot, 'style')
+        self.assertEqual(style_opts.kwargs['cmap'], 'kbc_r')
+
+    def test_symmetric_img_with_cmap_set(self):
+        plot = self.da_img.hvplot.image(cmap='fire')
+        plot_opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(plot_opts.kwargs.get('symmetric'), True)
+        style_opts = Store.lookup_options('bokeh', plot, 'style')
+        self.assertEqual(style_opts.kwargs['cmap'], 'fire')

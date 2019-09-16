@@ -280,7 +280,7 @@ class HoloViewsConverter(object):
                  backlog=1000, persist=False, use_dask=False,
                  crs=None, fields={}, groupby=None, dynamic=True,
                  grid=None, legend=None, rot=None, title=None,
-                 xlim=None, ylim=None, clim=None,
+                 xlim=None, ylim=None, clim=None, symmetric=None,
                  logx=None, logy=None, loglog=None, hover=None,
                  subplots=False, label=None, invert=False,
                  stacked=False, colorbar=None, fontsize=None,
@@ -293,7 +293,6 @@ class HoloViewsConverter(object):
                  y_sampling=None, project=False, tools=[],
                  attr_labels=None, coastline=False, tiles=False,
                  sort_date=True, **kwds):
-
         # Process data and related options
         self._redim = fields
         self.use_index = use_index
@@ -448,6 +447,22 @@ class HoloViewsConverter(object):
         if title is not None:
             plot_opts['title_format'] = title
 
+        if (self.kind in self._colorbar_types or plot_opts.get('colorbar')):
+            try:
+                if not use_dask:
+                    symmetric = self._process_symmetric(symmetric, clim)
+
+                if self._style_opts.get('cmap') is None:
+                    if symmetric:
+                        self._style_opts['cmap'] = self._default_cmaps['diverging']
+                    else:
+                        self._style_opts['cmap'] = self._default_cmaps['linear']
+
+                if symmetric is not None:
+                    plot_opts['symmetric'] = symmetric
+            except TypeError:
+                pass
+
         self._plot_opts = plot_opts
         self._overlay_opts = {k: v for k, v in self._plot_opts.items()
                               if k in OverlayPlot.params()}
@@ -467,6 +482,25 @@ class HoloViewsConverter(object):
                         groupby=self.groupby)
             param.main.warning('Plotting {kind} plot with parameters x: {x}, '
                                'y: {y}, by: {by}, groupby: {groupby}'.format(**kwds))
+
+    def _process_symmetric(self, symmetric, clim):
+        if symmetric is not None or clim is not None:
+            return symmetric
+
+        if is_xarray(self.data):
+            # chunks mean it's lazily loaded; nanquantile will eagerly load
+            if self.data.chunks:
+                return False
+            data = self.data[self.z]
+        elif self._color_dim:
+            data = self.data[self._color_dim]
+        else:
+            return
+
+        cmin = np.nanquantile(data, 0.05)
+        cmax = np.nanquantile(data, 0.95)
+
+        return bool(cmin < 0 and cmax > 0)
 
     def _process_crs(self, data, crs):
         """Given crs as proj4 string, data.attr, or cartopy.crs return cartopy.crs
@@ -538,10 +572,14 @@ class HoloViewsConverter(object):
         elif is_xarray(data):
             import xarray as xr
             z = kwds.get('z')
-            if z is None and isinstance(data, xr.Dataset):
-                z = list(data.data_vars)[0]
+            if z is None:
+                if isinstance(data, xr.Dataset):
+                    z = list(data.data_vars)[0]
+                else:
+                    z = data.name or 'value'
             if gridded and isinstance(data, xr.Dataset) and not isinstance(z, list):
                 data = data[z]
+            self.z = z
 
             ignore = (groupby or []) + (by or [])
             coords = [c for c in data.coords if data[c].shape != ()
@@ -751,7 +789,6 @@ class HoloViewsConverter(object):
                 if self.data[color].dtype.kind in 'OSU':
                     cmap = cmap or self._default_cmaps['categorical']
                 else:
-                    cmap = cmap or self._default_cmaps['linear']
                     plot_opts['colorbar'] = plot_opts.get('colorbar', True)
 
         if isinstance(cmap, str) and cmap in self._default_cmaps:
@@ -760,7 +797,7 @@ class HoloViewsConverter(object):
         if cmap is not None:
             style_opts['cmap'] = cmap
         elif self.rasterize or self.datashade:
-            style_opts['cmap'] = self._default_cmaps['linear']
+            plot_opts['colorbar'] = plot_opts.get('colorbar', True)
 
         if not isinstance(cmap, dict):
             color = style_opts.get('color', process_cmap(cmap or self._default_cmaps['categorical'], categorical=True))

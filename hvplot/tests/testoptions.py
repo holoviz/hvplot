@@ -24,6 +24,8 @@ class TestOptions(ComparisonTestCase):
         patch('pandas')
         self.df = pd.DataFrame([[1, 2, 'A', 0.1], [3, 4, 'B', 0.2], [5, 6, 'C', 0.3]],
                                columns=['x', 'y', 'category', 'number'])
+        self.symmetric_df = pd.DataFrame([[1, 2, -1], [3, 4, 0], [5, 6, 1]],
+                                          columns=['x', 'y', 'number'])
 
     def tearDown(self):
         Store.options(val=self.store_copy)
@@ -248,3 +250,41 @@ class TestOptions(ComparisonTestCase):
         self.assertEqual(opts[opt], 2)
         self.assertEqual(opts.get('width'), 150)
         self.assertEqual(opts.get('height'), None)
+
+    def test_symmetric_dataframe(self):
+        import pandas as pd
+        df = pd.DataFrame([[1, 2, -1], [3, 4, 0], [5, 6, 1]],
+                          columns=['x', 'y', 'number'])
+        plot = df.hvplot.scatter('x', 'y', c='number')
+        plot_opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(plot_opts.kwargs['symmetric'], True)
+        style_opts = Store.lookup_options('bokeh', plot, 'style')
+        self.assertEqual(style_opts.kwargs['cmap'], 'coolwarm')
+
+    def test_symmetric_is_deduced_dataframe(self):
+        plot = self.symmetric_df.hvplot.scatter('x', 'y', c='number')
+        plot_opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(plot_opts.kwargs['symmetric'], True)
+        style_opts = Store.lookup_options('bokeh', plot, 'style')
+        self.assertEqual(style_opts.kwargs['cmap'], 'coolwarm')
+
+    def test_symmetric_from_opts(self):
+        plot = self.df.hvplot.scatter('x', 'y', c='number', symmetric=True)
+        plot_opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(plot_opts.kwargs['symmetric'], True)
+        style_opts = Store.lookup_options('bokeh', plot, 'style')
+        self.assertEqual(style_opts.kwargs['cmap'], 'coolwarm')
+
+    def test_symmetric_from_opts_does_not_deduce(self):
+        plot = self.symmetric_df.hvplot.scatter('x', 'y', c='number', symmetric=False)
+        plot_opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(plot_opts.kwargs['symmetric'], False)
+        style_opts = Store.lookup_options('bokeh', plot, 'style')
+        self.assertEqual(style_opts.kwargs['cmap'], 'kbc_r')
+
+    def test_if_clim_is_set_symmetric_is_not_deduced(self):
+        plot = self.symmetric_df.hvplot.scatter('x', 'y', c='number', clim=(-1,1))
+        plot_opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(plot_opts.kwargs.get('symmetric'), None)
+        style_opts = Store.lookup_options('bokeh', plot, 'style')
+        self.assertEqual(style_opts.kwargs['cmap'], 'kbc_r')
