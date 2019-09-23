@@ -190,3 +190,20 @@ class TestProcessXarray(TestCase):
         assert y == 'air'
         assert not by
         assert not groupby
+
+
+class TestGeoUtil(TestCase):
+
+    def setUp(self):
+        try:
+            import geoviews  # noqa
+            import cartopy.crs as ccrs
+        except:
+            raise SkipTest('geoviews or cartopy not available')
+        self.ccrs = ccrs
+
+    def test_proj_to_cartopy(self):
+        from ..util import proj_to_cartopy
+        crs = proj_to_cartopy('+init=epsg:26911')
+
+        assert isinstance(crs, self.ccrs.CRS)
