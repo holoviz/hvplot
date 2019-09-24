@@ -208,7 +208,7 @@ class TestOptions(ComparisonTestCase):
     def test_hvplot_default_cat_cmap_opts(self):
         plot = self.df.hvplot.scatter('x', 'y', c='category')
         opts = Store.lookup_options('bokeh', plot, 'style')
-        self.assertEqual(opts.kwargs['cmap'], 'Category10')
+        self.assertEqual(opts.kwargs['cmap'], 'glasbey_category10')
 
     def test_hvplot_default_num_cmap_opts(self):
         plot = self.df.hvplot.scatter('x', 'y', c='number')
