@@ -1107,6 +1107,8 @@ class HoloViewsConverter(object):
         return chart.redim(**self._redim).opts(opts)
 
     def _process_chart_x(self, data, x):
+        if x is False:
+            return None
         x = x or self.x
         if x is None:
             if self.use_index:
@@ -1127,7 +1129,7 @@ class HoloViewsConverter(object):
                     data = data.sort_values(x)
         return x
 
-    def _process_chart_y(data, x, y, single_y):
+    def _process_chart_y(self, data, x, y, single_y):
         y = y or self.y
         if y is None:
             ys = [c for c in data.columns if c not in [x]+self.by+self.groupby]
@@ -1140,11 +1142,10 @@ class HoloViewsConverter(object):
             y = ys[0] if len(ys) == 1 or single_y else ys
         return y
 
-    def _process_chart_args(self, data, x, y, single_y=False, no_x=False):
+    def _process_chart_args(self, data, x, y, single_y=False):
         data = self.data if data is None else data
 
-        if no_x is False:
-            x = self._process_chart_x(data, x)
+        x = self._process_chart_x(data, x)
         y = self._process_chart_y(data, x, y, single_y)
 
         if self.use_index and any(c for c in self.hover_cols if
@@ -1268,7 +1269,7 @@ class HoloViewsConverter(object):
         """
         Helper method to generate element from indexed dataframe.
         """
-        data, x, y = self._process_chart_args(data, None, y)
+        data, x, y = self._process_chart_args(data, False, y)
 
         opts = {'plot': dict(self._plot_opts), 'norm': self._norm_opts,
                 'style': self._style_opts}
