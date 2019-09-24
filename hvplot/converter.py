@@ -26,6 +26,7 @@ from holoviews.plotting.util import process_cmap
 from holoviews.operation import histogram
 from holoviews.streams import Buffer, Pipe
 from holoviews.util.transform import dim
+from pandas import DatetimeIndex, MultiIndex
 
 from .util import (
     is_tabular, is_series, is_dask, is_intake, is_streamz, is_xarray,
@@ -1446,6 +1447,8 @@ class HoloViewsConverter(object):
 
     def table(self, x=None, y=None, data=None):
         data = self.data if data is None else data
+        if isinstance(data.index, (DatetimeIndex, MultiIndex)):
+            data = data.reset_index()
 
         allowed = ['width', 'height']
         opts = {k: v for k, v in self._plot_opts.items() if k in allowed}
