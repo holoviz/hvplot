@@ -270,7 +270,7 @@ class HoloViewsConverter(object):
 
     _default_cmaps = {
         'linear': 'kbc_r',
-        'categorical': 'Category10',
+        'categorical': 'glasbey_category10',
         'cyclic': 'colorwheel',
         'diverging': 'coolwarm'
     }
