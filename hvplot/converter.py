@@ -1106,9 +1106,7 @@ class HoloViewsConverter(object):
             chart = element(data, kdims, vdims).relabel(**self._relabel)
         return chart.redim(**self._redim).opts(opts)
 
-    def _process_chart_args(self, data, x, y, single_y=False):
-        data = self.data if data is None else data
-
+    def _process_chart_x(self, data, x):
         x = x or self.x
         if x is None:
             if self.use_index:
@@ -1117,7 +1115,7 @@ class HoloViewsConverter(object):
                 x = [c for c in data.columns if c not in self.by+self.groupby][0]
         elif not x:
             raise ValueError('Could not determine what to plot. Expected '
-                             'x to be declared or use_index to be enabled.')
+                            'x to be declared or use_index to be enabled.')
         if self.sort_date and self.datatype == 'pandas':
             from pandas.api.types import is_datetime64_any_dtype as is_datetime
             if x in self.indexes:
@@ -1127,7 +1125,9 @@ class HoloViewsConverter(object):
             elif x in data.columns:
                 if is_datetime(data[x]):
                     data = data.sort_values(x)
+        return x
 
+    def _process_chart_y(data, x, y, single_y):
         y = y or self.y
         if y is None:
             ys = [c for c in data.columns if c not in [x]+self.by+self.groupby]
@@ -1138,6 +1138,14 @@ class HoloViewsConverter(object):
                 if len(num_ys) >= 1:
                     ys = num_ys
             y = ys[0] if len(ys) == 1 or single_y else ys
+        return y
+
+    def _process_chart_args(self, data, x, y, single_y=False, no_x=False):
+        data = self.data if data is None else data
+
+        if no_x is False:
+            x = self._process_chart_x(data, x)
+        y = self._process_chart_y(data, x, y, single_y)
 
         if self.use_index and any(c for c in self.hover_cols if
                                   c in self.indexes and
