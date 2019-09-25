@@ -1198,23 +1198,23 @@ class HoloViewsConverter(object):
             charts.append((c, chart.relabel(**self._relabel)))
         return self._by_type(charts, self.group_label, sort=False).opts(opts)
 
-    def line(self, x, y, data=None):
+    def line(self, x=None, y=None, data=None):
         return self.chart(Curve, x, y, data)
 
-    def step(self, x, y, data=None):
+    def step(self, x=None, y=None, data=None):
         where = self.kwds.get('where', 'mid')
         return self.line(x, y, data).options('Curve', interpolation='steps-'+where)
 
-    def scatter(self, x, y, data=None):
+    def scatter(self, x=None, y=None, data=None):
         return self.chart(Scatter, x, y, data)
 
-    def area(self, x, y, data=None):
+    def area(self, x=None, y=None, data=None):
         areas = self.chart(Area, x, y, data)
         if self.stacked:
             areas = areas.map(Area.stack, NdOverlay)
         return areas
 
-    def errorbars(self, x, y, data=None):
+    def errorbars(self, x=None, y=None, data=None):
         return self.chart(ErrorBars, x, y, data)
 
     ##########################
@@ -1258,14 +1258,14 @@ class HoloViewsConverter(object):
         return (obj.redim(**self._redim)
                 .relabel(**self._relabel).opts(**opts))
 
-    def bar(self, x, y, data=None):
+    def bar(self, x=None, y=None, data=None):
         data, x, y = self._process_chart_args(data, x, y)
         if x and y and (self.by or not isinstance(y, (list, tuple) or len(y) == 1)):
             y = y[0] if isinstance(y, (list, tuple)) else y
             return self.single_chart(Bars, x, y, data)
         return self._category_plot(Bars, x, list(y), data)
 
-    def barh(self, x, y, data=None):
+    def barh(self, x=None, y=None, data=None):
         return self.bar(x, y, data).opts(plot={'Bars': dict(invert_axes=True)})
 
     ##########################
@@ -1309,17 +1309,17 @@ class HoloViewsConverter(object):
         return (element(df, kdims, self.value_label).redim(**redim)
                 .relabel(**self._relabel).opts(**opts))
 
-    def box(self, x, y, data=None):
+    def box(self, x=None, y=None, data=None):
         return self._stats_plot(BoxWhisker, y, data).redim(**self._redim)
 
-    def violin(self, x, y, data=None):
+    def violin(self, x=None, y=None, data=None):
         try:
             from holoviews.element import Violin
         except ImportError:
             raise ImportError('Violin plot requires HoloViews version >=1.10')
         return self._stats_plot(Violin, y, data).redim(**self._redim)
 
-    def hist(self, x, y, data=None):
+    def hist(self, x=None, y=None, data=None):
         data, x, y = self._process_chart_args(data, x, y)
 
         labelled = ['y'] if self.invert else ['x']
@@ -1376,7 +1376,7 @@ class HoloViewsConverter(object):
             hists.append((col, hist.relabel(**self._relabel)))
         return (self._by_type(hists, sort=False).redim(**self._redim).opts(opts))
 
-    def kde(self, x, y, data=None):
+    def kde(self, x=None, y=None, data=None):
         data, x, y = self._process_chart_args(data, x, y)
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
         opts = {'Distribution': opts, 'Area': opts,
@@ -1412,7 +1412,7 @@ class HoloViewsConverter(object):
         data = self.data if data is None else data
         return Dataset(data, self.kwds.get('columns'), []).redim(**self._redim)
 
-    def heatmap(self, x, y, data=None):
+    def heatmap(self, x=None, y=None, data=None):
         data = self.data if data is None else data
         opts = dict(plot=self._plot_opts, norm=self._norm_opts, style=self._style_opts)
 
@@ -1433,7 +1433,7 @@ class HoloViewsConverter(object):
             hmap = hmap.aggregate(function=self.kwds['reduce_function'])
         return hmap.redim(**redim).opts(**opts)
 
-    def hexbin(self, x, y, data=None):
+    def hexbin(self, x=None, y=None, data=None):
         self.use_index = False
         data, x, y = self._process_chart_args(data, x, y, single_y=True)
 
@@ -1453,7 +1453,7 @@ class HoloViewsConverter(object):
         if self.geo: params['crs'] = self.crs
         return element(data, [x, y], z or [], **params).redim(**redim).opts(**opts)
 
-    def bivariate(self, x, y, data=None):
+    def bivariate(self, x=None, y=None, data=None):
         self.use_index = False
         data, x, y = self._process_chart_args(data, x, y, single_y=True)
 
@@ -1467,7 +1467,7 @@ class HoloViewsConverter(object):
         opts = {k: v for k, v in self._plot_opts.items() if k in allowed}
         return Table(data, self.kwds.get('columns'), []).redim(**self._redim).opts(plot=opts)
 
-    def labels(self, x, y, data=None):
+    def labels(self, x=None, y=None, data=None):
         self.use_index = False
         data, x, y = self._process_chart_args(data, x, y, single_y=True)
 

@@ -18,6 +18,14 @@ from .utilities import save, show # noqa
 __version__ = str(param.version.Version(fpath=__file__, archive_commit="$Format:%h$",
                                         reponame="hvplot"))
 
+
+def plot(data, kind, **kwargs):
+    extension = 'bokeh'
+    logo = False
+    if extension and not getattr(_hv.extension, '_loaded', False):
+        _hv.extension(extension, logo=logo)
+    return hvPlot(data)(kind=kind, **kwargs)
+
 # Register plotting interfaces
 def _patch_plot(self):
     return hvPlot(self)

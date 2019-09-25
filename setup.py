@@ -211,7 +211,10 @@ setup_args = dict(
     entry_points={
         'console_scripts': [
             'hvplot = hvplot.__main__:main'
-        ]
+        ],
+        'pandas_plotting_backends': [
+            'holoviews = hvplot',
+        ],
     },
 )
 
