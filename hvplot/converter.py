@@ -7,6 +7,7 @@ import param
 import holoviews as hv
 import pandas as pd
 import numpy as np
+import colorcet as cc
 
 from bokeh.models import HoverTool
 from holoviews.core.dimension import Dimension
@@ -270,7 +271,7 @@ class HoloViewsConverter(object):
 
     _default_cmaps = {
         'linear': 'kbc_r',
-        'categorical': 'Category10',
+        'categorical': cc.palette['glasbey_category10'],
         'cyclic': 'colorwheel',
         'diverging': 'coolwarm'
     }
