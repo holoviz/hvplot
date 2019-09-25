@@ -771,9 +771,9 @@ class HoloViewsConverter(object):
             raise TypeError("Only specify one of `cmap` and `colormap`.")
 
         cmap = kwds.pop('cmap', kwds.pop('colormap', None))
+        color = kwds.pop('color', kwds.pop('c', None))
 
-        if 'color' in kwds or 'c' in kwds:
-            color = kwds.pop('color', kwds.pop('c', None))
+        if color is not None:
             if (self.datashade or self.rasterize) and color in [self.x, self.y]:
                 self.data = self.data.assign(_color=self.data[color])
                 style_opts['color'] = color = '_color'
@@ -809,8 +809,8 @@ class HoloViewsConverter(object):
                 style_opts[k] = Cycle(values=color) if isinstance(color, list) else color
 
         # Size
-        if 'size' in kwds or 's' in kwds:
-            size = kwds.pop('size', kwds.pop('s', None))
+        size = kwds.pop('size', kwds.pop('s', None))
+        if size is not None:
             scale = kwds.get('scale', 1)
             if (self.datashade or self.rasterize):
                 param.main.warning(
@@ -1320,7 +1320,7 @@ class HoloViewsConverter(object):
         return self._stats_plot(Violin, y, data).redim(**self._redim)
 
     def hist(self, x=None, y=None, data=None):
-        data, x, y = self._process_chart_args(data, x, y)
+        data, x, y = self._process_chart_args(data, False, y)
 
         labelled = ['y'] if self.invert else ['x']
 
