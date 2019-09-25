@@ -1107,29 +1107,23 @@ class HoloViewsConverter(object):
         return chart.redim(**self._redim).opts(opts)
 
     def _process_chart_x(self, data, x):
+        """This should happen before _process_chart_y"""
         if x is False:
             return None
+
         x = x or self.x
         if x is None:
             if self.use_index:
                 x = self.indexes[0]
             else:
                 x = [c for c in data.columns if c not in self.by+self.groupby][0]
-        elif not x:
-            raise ValueError('Could not determine what to plot. Expected '
-                            'x to be declared or use_index to be enabled.')
-        if self.sort_date and self.datatype == 'pandas':
-            from pandas.api.types import is_datetime64_any_dtype as is_datetime
-            if x in self.indexes:
-                index = self.indexes.index(x)
-                if is_datetime(data.axes[index]):
-                    data = data.sort_index(axis=self.indexes.index(x))
-            elif x in data.columns:
-                if is_datetime(data[x]):
-                    data = data.sort_values(x)
+
+        if not x:
+            raise ValueError('Could not determine what to plot. Set x explicitly')
         return x
 
     def _process_chart_y(self, data, x, y, single_y):
+        """This should happen after _process_chart_x"""
         y = y or self.y
         if y is None:
             ys = [c for c in data.columns if c not in [x]+self.by+self.groupby]
@@ -1148,6 +1142,18 @@ class HoloViewsConverter(object):
         x = self._process_chart_x(data, x)
         y = self._process_chart_y(data, x, y, single_y)
 
+        # sort by date if enabled and x is a date
+        if x is not None and self.sort_date and self.datatype == 'pandas':
+            from pandas.api.types import is_datetime64_any_dtype as is_datetime
+            if x in self.indexes:
+                index = self.indexes.index(x)
+                if is_datetime(data.axes[index]):
+                    data = data.sort_index(axis=self.indexes.index(x))
+            elif x in data.columns:
+                if is_datetime(data[x]):
+                    data = data.sort_values(x)
+
+        # set index to column if needed in hover_cols
         if self.use_index and any(c for c in self.hover_cols if
                                   c in self.indexes and
                                   c not in data.columns):
