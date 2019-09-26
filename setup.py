@@ -213,7 +213,7 @@ setup_args = dict(
             'hvplot = hvplot.__main__:main'
         ],
         'pandas_plotting_backends': [
-            'holoviews = hvplot',
+            'holoviews = hvplot:plotting',
         ],
     },
 )
