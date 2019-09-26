@@ -85,6 +85,7 @@ class hvPlotTab(hvPlot):
         'violin',
         'hist',
         'kde',
+        'density',
         'table',
         'dataset',
         'points',
@@ -384,6 +385,26 @@ class hvPlotTab(hvPlot):
         """
         return self(kind='kde', x=None, y=y, by=by, **kwds)
 
+    def density(self, y=None, by=None, **kwds):
+        """
+        alias for KDE
+
+        Parameters
+        ----------
+        y : string or sequence
+            Column in the DataFrame to compute distribution on.
+        by : string or sequence
+            Column in the DataFrame to group by.
+        kwds : optional
+            Keyword arguments to pass on to
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
+        Returns
+        -------
+        obj : HoloViews object
+            The HoloViews representation of the plot.
+        """
+        return self(kind='kde', x=None, y=y, by=by, **kwds)
+
     def table(self, columns=None, **kwds):
         """
         Table
@@ -526,6 +547,7 @@ class hvPlotGridded(hvPlotTab):
         'violin',
         'hist',
         'kde',
+        'density',
         'table',
         'dataset',
         'points',

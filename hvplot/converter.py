@@ -205,7 +205,7 @@ class HoloViewsConverter(object):
     _geo_types = sorted(_gridded_types + _geom_types + [
         'points', 'vectorfield', 'labels', 'hexbin', 'bivariate'])
 
-    _stats_types = ['hist', 'kde', 'violin', 'box']
+    _stats_types = ['hist', 'kde', 'violin', 'box', 'density']
 
     _data_options = ['x', 'y', 'kind', 'by', 'use_index', 'use_dask',
                      'dynamic', 'crs', 'value_label', 'group_label',
@@ -244,14 +244,15 @@ class HoloViewsConverter(object):
         'vectorfield': ['angle', 'mag'],
         'points'   : ['s', 'marker', 'c', 'scale', 'logz'],
         'polygons' : ['logz', 'c'],
-        'labels'   : ['text', 'c', 's']
+        'labels'   : ['text', 'c', 's'],
+        'kde'      : ['bw_method', 'ind'],
     }
 
     _kind_mapping = {
         'line': Curve, 'scatter': Scatter, 'heatmap': HeatMap,
         'bivariate': Bivariate, 'quadmesh': QuadMesh, 'hexbin': HexTiles,
         'image': Image, 'table': Table, 'hist': Histogram, 'dataset': Dataset,
-        'kde': Distribution, 'area': Area, 'box': BoxWhisker, 'violin': Violin,
+        'kde': Distribution, 'density': Distribution, 'area': Area, 'box': BoxWhisker, 'violin': Violin,
         'bar': Bars, 'barh': Bars, 'contour': Contours, 'contourf': Polygons,
         'points': Points, 'polygons': Polygons, 'paths': Path, 'step': Curve,
         'labels': Labels, 'rgb': RGB, 'errorbars': ErrorBars,
@@ -1377,6 +1378,11 @@ class HoloViewsConverter(object):
         return (self._by_type(hists, sort=False).redim(**self._redim).opts(opts))
 
     def kde(self, x=None, y=None, data=None):
+        bw_method = self.kwds.get('bw_method', None)
+        ind = self.kwds.get('ind', None)
+        if bw_method is not None or ind is not None:
+            raise ValueError('hvplot does not support bw_method and ind')
+
         data, x, y = self._process_chart_args(data, x, y)
         opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
         opts = {'Distribution': opts, 'Area': opts,
@@ -1403,6 +1409,9 @@ class HoloViewsConverter(object):
                                   [self.group_label])
         redim = self._merge_redim(ranges)
         return (dists.redim(**redim).relabel(**self._relabel).opts(opts))
+
+    def density(self, x=None, y=None, data=None):
+        return self.kde(x, y, data)
 
     ##########################
     #      Other charts      #
