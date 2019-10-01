@@ -17,7 +17,7 @@ from . import plotting
 
 andrews_curves = plotting.andrews_curves
 lag_plot = plotting.lag_plot
-paralle_coordinates = plotting.parallel_coordinates
+parallel_coordinates = plotting.parallel_coordinates
 scatter_matrix = plotting.scatter_matrix
 
 __version__ = str(param.version.Version(fpath=__file__, archive_commit="$Format:%h$",

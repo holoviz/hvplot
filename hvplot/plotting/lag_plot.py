@@ -1,11 +1,13 @@
 from __future__ import absolute_import
 
-import numpy as _np
-import pandas as _pd
+import numpy as np
+import pandas as pd
 
-from  ._core import hvPlot
+from ..util import with_hv_extension
+from .core import hvPlotTab
 
 
+@with_hv_extension
 def lag_plot(data, lag=1, **kwds):
     """Lag plot for time series.
 
@@ -27,9 +29,9 @@ def lag_plot(data, lag=1, **kwds):
     values = data.values
     y1 = 'y(t)'
     y2 = 'y(t + {0})'.format(lag)
-    lags = _pd.DataFrame({y1: values[:-lag].T.ravel(),
-                          y2: values[lag:].T.ravel()})
-    if isinstance(data, _pd.DataFrame):
-        lags['variable'] = _np.repeat(data.columns, lags.shape[0] / data.shape[1])
+    lags = pd.DataFrame({y1: values[:-lag].T.ravel(),
+                         y2: values[lag:].T.ravel()})
+    if isinstance(data, pd.DataFrame):
+        lags['variable'] = np.repeat(data.columns, lags.shape[0] / data.shape[1])
         kwds['c'] = 'variable'
-    return hvPlot(lags)(y1, y2, kind='scatter', **kwds)
+    return hvPlotTab(lags)(y1, y2, kind='scatter', **kwds)

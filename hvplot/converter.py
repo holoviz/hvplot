@@ -743,6 +743,11 @@ class HoloViewsConverter(object):
         if kind.startswith('bar'):
             plot_opts['stacked'] = self.stacked
 
+        if kind == 'hist':
+            if self.stacked:
+                param.main.warning('Stacking for histograms is not yet implemented in '
+                                   'holoviews. Use bar plots if stacking is required.')
+
         return plot_opts
 
     def _process_style(self, kwds, plot_opts):

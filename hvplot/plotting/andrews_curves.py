@@ -1,11 +1,18 @@
 from __future__ import absolute_import
 
-import numpy as _np
-import holoviews as _hv
+import numpy as np
+import pandas as pd
+
+import holoviews as hv
+import colorcet as cc
+
+from ..util import with_hv_extension
 
 
+@with_hv_extension
 def andrews_curves(data, class_column, samples=200, alpha=0.5,
-                   width=600, height=300, **kwds):
+                   width=600, height=300, cmap=None, colormap=None,
+                   **kwds):
     """
     Andrews curve plot.
 
@@ -18,6 +25,8 @@ def andrews_curves(data, class_column, samples=200, alpha=0.5,
         Number of samples to draw
     alpha: float, optional
         The transparency of the lines
+    cmap/colormap: str or colormap object
+        Colormap to use for groups
 
     Returns
     -------
@@ -28,28 +37,33 @@ def andrews_curves(data, class_column, samples=200, alpha=0.5,
     --------
     pandas.plotting.parallel_coordinates : matplotlib version of this routine
     """
-    t = _np.linspace(-_np.pi, _np.pi, samples)
+    t = np.linspace(-np.pi, np.pi, samples)
     vals = data.drop(class_column, axis=1).values.T
 
-    curves = _np.outer(vals[0], _np.ones_like(t))
+    curves = np.outer(vals[0], np.ones_like(t))
     for i in range(1, len(vals)):
         ft = ((i + 1) // 2) * t
         if i % 2 == 1:
-            curves += _np.outer(vals[i], _np.sin(ft))
+            curves += np.outer(vals[i], np.sin(ft))
         else:
-            curves += _np.outer(vals[i], _np.cos(ft))
+            curves += np.outer(vals[i], np.cos(ft))
 
-    df = _pd.DataFrame({'t': _np.tile(_np.arange(samples), curves.shape[0]),
-                       'sample': _np.repeat(_np.arange(curves.shape[0]), curves.shape[1]),
+    df = pd.DataFrame({'t': np.tile(np.arange(samples), curves.shape[0]),
+                       'sample': np.repeat(np.arange(curves.shape[0]), curves.shape[1]),
                        'value': curves.ravel(),
-                       class_column: _np.repeat(data[class_column], samples)})
+                       class_column: np.repeat(data[class_column], samples)})
 
     labelled = ['x']
-    colors = _hv.plotting.util.process_cmap('Category10', categorical=True)
     options = {'Overlay': dict(legend_limit=5000),
                'Curve': dict(kwds, labelled=labelled, alpha=alpha,
                              width=width, height=height, **kwds)}
-    dataset = _hv.Dataset(df)
-    groups = dataset.to(_hv.Curve, 't', 'value').overlay('sample').items()
-    return _hv.Overlay([curve.relabel(k).options('Curve', color=c)
-                        for c, (k, v) in zip(colors, groups) for curve in v]).options(options)
+    dataset = hv.Dataset(df)
+    groups = dataset.to(hv.Curve, 't', 'value').overlay('sample').items()
+
+    if cmap and colormap:
+        raise TypeError("Only specify one of `cmap` and `colormap`.")
+    cmap = cmap or colormap or cc.palette['glasbey_category10']
+    colors = hv.plotting.util.process_cmap(cmap, categorical=True, ncolors=len(groups))
+
+    return hv.Overlay([curve.relabel(k).options('Curve', color=c)
+                       for c, (k, v) in zip(colors, groups) for curve in v]).options(options)

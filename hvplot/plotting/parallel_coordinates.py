@@ -1,11 +1,16 @@
 from __future__ import absolute_import
 
-import holoviews as _hv
+import holoviews as hv
+import colorcet as cc
+
+from ..util import with_hv_extension
 
 
+@with_hv_extension
 def parallel_coordinates(data, class_column, cols=None, alpha=0.5,
                          width=600, height=300, var_name='variable',
-                         value_name='value', **kwds):
+                         value_name='value', cmap=None, colormap=None,
+                         **kwds):
     """
     Parallel coordinates plotting.
 
@@ -18,6 +23,8 @@ def parallel_coordinates(data, class_column, cols=None, alpha=0.5,
         A list of column names to use
     alpha: float, optional
         The transparency of the lines
+    cmap/colormap: str or colormap object
+        Colormap to use for groups
 
     Returns
     -------
@@ -43,8 +50,14 @@ def parallel_coordinates(data, class_column, cols=None, alpha=0.5,
         labelled.append('y')
     options = {'Curve': dict(kwds, labelled=labelled, alpha=alpha, width=width, height=height),
                'Overlay': dict(legend_limit=5000)}
-    colors = _hv.plotting.util.process_cmap('Category10', categorical=True)
-    dataset = _hv.Dataset(df)
-    groups = dataset.to(_hv.Curve, var_name, value_name).overlay(index).items()
-    return _hv.Overlay([curve.relabel(k).options('Curve', color=c)
-                        for c, (k, v) in zip(colors, groups) for curve in v]).options(options)
+
+    dataset = hv.Dataset(df)
+    groups = dataset.to(hv.Curve, var_name, value_name).overlay(index).items()
+
+    if cmap and colormap:
+        raise TypeError("Only specify one of `cmap` and `colormap`.")
+    cmap = cmap or colormap or cc.palette['glasbey_category10']
+    colors = hv.plotting.util.process_cmap(cmap, categorical=True, ncolors=len(groups))
+
+    return hv.Overlay([curve.relabel(k).options('Curve', color=c)
+                       for c, (k, v) in zip(colors, groups) for curve in v]).options(options)

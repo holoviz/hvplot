@@ -13,6 +13,15 @@ from holoviews.core.util import basestring
 hv_version = LooseVersion(hv.__version__)
 
 
+def with_hv_extension(func, extension='bokeh', logo=False):
+    """If hv.extension is not loaded, load before calling function"""
+    def wrapper(*args, **kwargs):
+        if extension and not getattr(hv.extension, '_loaded', False):
+            hv.extension(extension, logo=logo)
+        return func(*args, **kwargs)
+    return wrapper
+
+
 def get_ipy():
     try:
         ip = get_ipython() # noqa

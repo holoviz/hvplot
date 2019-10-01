@@ -3,8 +3,10 @@ from __future__ import absolute_import
 import holoviews as _hv
 
 from ..converter import HoloViewsConverter
+from ..util import with_hv_extension
 
 
+@with_hv_extension
 def scatter_matrix(data, c=None, chart='scatter', diagonal='hist', alpha=0.5, **kwds):
     """
     Scatter matrix of numeric columns.
