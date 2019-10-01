@@ -15,6 +15,9 @@ from .utilities import save, show # noqa
 
 from . import plotting
 
+# this is to allow the same behavior as expected for intake
+hvPlot = plotting.hvPlotGridded
+
 andrews_curves = plotting.andrews_curves
 lag_plot = plotting.lag_plot
 parallel_coordinates = plotting.parallel_coordinates
