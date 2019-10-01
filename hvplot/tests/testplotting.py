@@ -4,11 +4,11 @@ Tests pandas.options.backend setting
 from distutils.version import LooseVersion
 from unittest import TestCase, SkipTest
 import pandas as pd
-import holoviews as hv
 
 from parameterized import parameterized
 
 from ..converter import HoloViewsConverter
+
 
 no_args = ['line', 'area', 'hist', 'box', 'kde', 'density', 'bar', 'barh']
 x_y = ['scatter', 'hexbin']

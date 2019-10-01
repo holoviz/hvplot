@@ -7,7 +7,7 @@ from holoviews.element.comparison import ComparisonTestCase
 class TestOverrides(ComparisonTestCase):
 
     def setUp(self):
-        import hvplot.pandas
+        import hvplot.pandas  # noqa
         self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
 
     def test_define_default_options(self):

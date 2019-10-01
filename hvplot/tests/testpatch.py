@@ -6,13 +6,13 @@ from unittest import TestCase, SkipTest
 
 import numpy as np
 
-from hvplot.plotting import hvPlot, hvPlotTab, hvPlotGridded
+from hvplot.plotting import hvPlotTab, hvPlotGridded
 
 
 class TestPatchPandas(TestCase):
 
     def setUp(self):
-        import hvplot.pandas
+        import hvplot.pandas   # noqa
 
     def test_pandas_series_patched(self):
         import pandas as pd
@@ -32,7 +32,7 @@ class TestPatchDask(TestCase):
             import dask.dataframe as dd # noqa
         except:
             raise SkipTest('Dask not available')
-        import hvplot.dask
+        import hvplot.dask   # noqa
 
     def test_dask_series_patched(self):
         import pandas as pd
@@ -79,7 +79,7 @@ class TestPatchStreamz(TestCase):
             import streamz # noqa
         except:
             raise SkipTest('streamz not available')
-        import hvplot.streamz
+        import hvplot.streamz   # noqa
 
     def test_streamz_dataframe_patched(self):
         from streamz.dataframe import Random

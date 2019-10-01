@@ -11,7 +11,7 @@ try:
 except:
     raise SkipTest('XArray not available')
 else:
-    import hvplot.xarray
+    import hvplot.xarray   # noqa
 
 class TestGridPlots(ComparisonTestCase):
 

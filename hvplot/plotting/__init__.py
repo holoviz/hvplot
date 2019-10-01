@@ -1,12 +1,12 @@
-import holoviews as _hv
+import holoviews as hv
 from ..util import with_hv_extension
 
-from .core import hvPlot, hvPlotTab, hvPlotGridded
+from .core import hvPlot, hvPlotTab, hvPlotGridded   # noqa
 
-from .andrews_curves import andrews_curves
-from .parallel_coordinates import parallel_coordinates
-from .lag_plot import lag_plot
-from .scatter_matrix import scatter_matrix
+from .andrews_curves import andrews_curves   # noqa
+from .parallel_coordinates import parallel_coordinates   # noqa
+from .lag_plot import lag_plot   # noqa
+from .scatter_matrix import scatter_matrix   # noqa
 
 
 @with_hv_extension
@@ -44,7 +44,7 @@ def boxplot_frame(*args, **kwargs):
 def boxplot_frame_groupby(grouped, **kwargs):
     width = kwargs.pop('width', 300)
     subplots = kwargs.pop('subplots', True)
-    layout = _hv.Layout if subplots else _hv.Overlay
+    layout = hv.Layout if subplots else hv.Overlay
     plots = [plot(data=data, kind='box', title=name, width=width, **kwargs)
              for name, data in grouped]
     return layout(plots)
