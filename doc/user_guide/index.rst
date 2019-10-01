@@ -55,6 +55,9 @@ and Cartopy to display data in geographic coordinate systems.
 * `Geographic Plots <Geographic_Data.html>`_
   Using GeoViews and Cartopy to plot data in geographic coordinate systems.
 
+* `Pandas API <Pandas_API.html>`_
+  How to use pandas.plot directly by switching out the plotting backend.
+
 .. toctree::
     :titlesonly:
     :hidden:
@@ -70,3 +73,4 @@ and Cartopy to display data in geographic coordinate systems.
     Network Graphs <NetworkX>
     Statistical Plots <Statistical_Plots>
     Geographic Plots <Geographic_Data>
+    Pandas API <Pandas_API>
