@@ -1,6 +1,13 @@
 from __future__ import absolute_import
+from collections import defaultdict
+from types import FunctionType
 
 import param
+try:
+    import panel as pn
+    panel_available = True
+except:
+    panel_available = False
 
 from ..converter import HoloViewsConverter
 
@@ -31,8 +38,45 @@ class hvPlotBase(object):
         -------
         HoloViews object: Object representing the requested visualization
         """
-        if kind is not None and kind not in self.__all__:
+        if isinstance(kind, str) and kind not in self.__all__:
             raise NotImplementedError(f"kind='{kind}' for data of type {type(self._data)}")
+
+        if panel_available:
+            dynamic = {}
+            fn_depends = {}
+            for k, v in kwds.items():
+                if isinstance(v, (param.Parameter, pn.widgets.Widget)):
+                    dynamic[k] = v
+                elif isinstance(v, FunctionType) and hasattr(v, '_dinfo'):
+                    fn_depends[k] = v._dinfo['dependencies']
+            if isinstance(x, (param.Parameter, pn.widgets.Widget)):
+                dynamic['x'] = x
+            if isinstance(y, (param.Parameter, pn.widgets.Widget)):
+                dynamic['y'] = y
+            if isinstance(kind, (param.Parameter, pn.widgets.Widget)):
+                dynamic['kind'] = kind
+
+            if dynamic or fn_depends:
+                arg_depends = []
+                arg_names = []
+                for k, v in fn_depends.items():
+                    arg_depends += list(v)
+                    for p in v:
+                        arg_names.append(k)
+
+                @pn.depends(*arg_depends, **dynamic)
+                def callback(*args, **dyn_kwds):
+                    xd = dyn_kwds.pop('x', x)
+                    yd = dyn_kwds.pop('y', y)
+                    kindd = dyn_kwds.pop('kind', kind)
+                    combined_kwds = dict(kwds, **dyn_kwds)
+                    fn_args = defaultdict(list)
+                    for name, arg in zip(arg_names, args):
+                        fn_args[(name, kwds[name])].append(arg)
+                    for (name, fn), args in fn_args.items():
+                        combined_kwds[name] = fn(*args)
+                    return self._get_converter(xd, yd, kindd, **combined_kwds)(kindd, xd, yd)
+                return pn.panel(callback)
 
         return self._get_converter(x, y, kind, **kwds)(kind, x, y)
 
