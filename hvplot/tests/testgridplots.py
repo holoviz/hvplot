@@ -5,14 +5,13 @@ import numpy as np
 from holoviews import Store
 from holoviews.element import RGB, Image
 from holoviews.element.comparison import ComparisonTestCase
-from hvplot import patch
 
 try:
     import xarray as xr
 except:
     raise SkipTest('XArray not available')
 else:
-    patch('xarray')
+    import hvplot.xarray   # noqa
 
 class TestGridPlots(ComparisonTestCase):
 

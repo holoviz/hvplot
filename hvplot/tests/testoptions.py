@@ -5,7 +5,6 @@ from parameterized import parameterized
 from holoviews import Store
 from holoviews.core.options import Options, OptionTree
 from holoviews.element.comparison import ComparisonTestCase
-from hvplot import patch
 import holoviews as hv
 
 
@@ -21,7 +20,7 @@ class TestOptions(ComparisonTestCase):
         Store.current_backend = self.backend
         self.store_copy = OptionTree(sorted(Store.options().items()),
                                      groups=Options._option_groups)
-        patch('pandas')
+        import hvplot.pandas   # noqa
         self.df = pd.DataFrame([[1, 2, 'A', 0.1], [3, 4, 'B', 0.2], [5, 6, 'C', 0.3]],
                                columns=['x', 'y', 'category', 'number'])
         self.symmetric_df = pd.DataFrame([[1, 2, -1], [3, 4, 0], [5, 6, 1]],

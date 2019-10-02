@@ -4,7 +4,7 @@ from parameterized import parameterized
 from holoviews import NdOverlay, Store
 from holoviews.element import Curve, Area, Scatter, Points, Path, HeatMap
 from holoviews.element.comparison import ComparisonTestCase
-from hvplot import patch
+
 from ..util import is_dask
 
 
@@ -15,7 +15,7 @@ class TestChart2D(ComparisonTestCase):
             import pandas as pd
         except:
             raise SkipTest('Pandas not available')
-        patch('pandas')
+        import hvplot.pandas   # noqa
         self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
         self.cat_df = pd.DataFrame([[1, 2, 'A'], [3, 4, 'B'], [5, 6, 'C']],
                                    columns=['x', 'y', 'category'])
@@ -79,7 +79,7 @@ class TestChart2DDask(TestChart2D):
             import dask.dataframe as dd
         except:
             raise SkipTest('Dask not available')
-        patch('dask')
+        import hvplot.dask   # noqa
         self.df = dd.from_pandas(self.df, npartitions=2)
         self.cat_df = dd.from_pandas(self.cat_df, npartitions=3)
 
@@ -95,7 +95,7 @@ class TestChart1D(ComparisonTestCase):
             import pandas as pd
         except:
             raise SkipTest('Pandas not available')
-        patch('pandas')
+        import hvplot.pandas   # noqa
         self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
         self.cat_df = pd.DataFrame([[1, 2, 'A'], [3, 4, 'B'], [5, 6, 'C']],
                                    columns=['x', 'y', 'category'])
@@ -314,7 +314,7 @@ class TestChart1DDask(TestChart1D):
             import dask.dataframe as dd
         except:
             raise SkipTest('Dask not available')
-        patch('dask')
+        import hvplot.dask   # noqa
         self.df = dd.from_pandas(self.df, npartitions=2)
         self.cat_df = dd.from_pandas(self.cat_df, npartitions=3)
         self.cat_only_df = dd.from_pandas(self.cat_only_df, npartitions=1)
