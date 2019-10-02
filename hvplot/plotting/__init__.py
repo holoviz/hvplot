@@ -1,7 +1,7 @@
 import holoviews as hv
 from ..util import with_hv_extension
 
-from .core import hvPlot, hvPlotTab, hvPlotGridded   # noqa
+from .core import hvPlot, hvPlotTabular   # noqa
 
 from .andrews_curves import andrews_curves   # noqa
 from .parallel_coordinates import parallel_coordinates   # noqa
@@ -30,7 +30,7 @@ def plot(data, kind, **kwargs):
         if v is not None:
             no_none_kwargs[k] = v
 
-    return hvPlotTab(data)(kind=kind, **no_none_kwargs)
+    return hvPlotTabular(data)(kind=kind, **no_none_kwargs)
 
 
 def boxplot_series(*args, **kwargs):

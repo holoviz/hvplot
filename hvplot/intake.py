@@ -1,18 +1,17 @@
 from distutils.version import LooseVersion
 
-from . import post_patch
+from . import hvPlot, post_patch
+
 
 def patch(name='hvplot', extension='bokeh', logo=False):
-    from . import plotting
-
     try:
         import intake
     except:
         raise ImportError('Could not patch plotting API onto intake. '
-                            'intake could not be imported.')
+                          'intake could not be imported.')
 
-    _patch_plot = lambda self: plotting.hvPlotGridded(self)
-    _patch_plot.__doc__ = plotting.hvPlotGridded.__call__.__doc__
+    _patch_plot = lambda self: hvPlot(self)
+    _patch_plot.__doc__ = hvPlot.__call__.__doc__
     patch_property = property(_patch_plot)
     setattr(intake.source.base.DataSource, name, patch_property)
     post_patch(extension, logo)

@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 from ..util import with_hv_extension
-from .core import hvPlotTab
+from .core import hvPlotTabular
 
 
 @with_hv_extension
@@ -34,4 +34,4 @@ def lag_plot(data, lag=1, **kwds):
     if isinstance(data, pd.DataFrame):
         lags['variable'] = np.repeat(data.columns, lags.shape[0] / data.shape[1])
         kwds['c'] = 'variable'
-    return hvPlotTab(lags)(y1, y2, kind='scatter', **kwds)
+    return hvPlotTabular(lags)(y1, y2, kind='scatter', **kwds)

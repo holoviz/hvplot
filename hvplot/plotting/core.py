@@ -5,7 +5,7 @@ import param
 from ..converter import HoloViewsConverter
 
 
-class hvPlot(object):
+class hvPlotBase(object):
     __all__ = []
 
     def __init__(self, data, custom_plots={}, **metadata):
@@ -49,7 +49,7 @@ class hvPlot(object):
         """
         List default attributes and custom defined plots.
         """
-        dirs = super(hvPlot, self).__dir__()
+        dirs = super(hvPlotBase, self).__dir__()
         return sorted(list(dirs)+list(self._plots))
 
     def __getattribute__(self, name):
@@ -65,11 +65,11 @@ class hvPlot(object):
                                    "was unexpectedly customized with kind=%r."
                                    % (plot_opts['kind'], name))
                 plot_opts['kind'] = name
-            return hvPlot(self._data, **dict(self._metadata, **plot_opts))
-        return super(hvPlot, self).__getattribute__(name)
+            return hvPlotBase(self._data, **dict(self._metadata, **plot_opts))
+        return super(hvPlotBase, self).__getattribute__(name)
 
 
-class hvPlotTab(hvPlot):
+class hvPlotTabular(hvPlotBase):
     __all__ = [
         'line',
         'step',
@@ -531,7 +531,7 @@ class hvPlotTab(hvPlot):
         """
         return self(x, y, text=text, kind='labels', **kwds)
 
-class hvPlotGridded(hvPlotTab):
+class hvPlot(hvPlotTabular):
     __all__ = [
         'line',
         'step',

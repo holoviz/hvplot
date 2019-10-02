@@ -12,16 +12,9 @@ from holoviews import Store
 from .converter import HoloViewsConverter
 from .util import get_ipy
 from .utilities import save, show # noqa
-
-from . import plotting
-
-# this is to allow the same behavior as expected for intake
-hvPlot = plotting.hvPlotGridded
-
-andrews_curves = plotting.andrews_curves
-lag_plot = plotting.lag_plot
-parallel_coordinates = plotting.parallel_coordinates
-scatter_matrix = plotting.scatter_matrix
+from .plotting import (hvPlot, hvPlotTabular,  # noqa
+                       andrews_curves, lag_plot,
+                       parallel_coordinates, scatter_matrix)
 
 __version__ = str(param.version.Version(fpath=__file__, archive_commit="$Format:%h$",
                                         reponame="hvplot"))
@@ -95,7 +88,7 @@ def help(kind=None, docstring=True, generic=True, style=True):
     style: boolean (default=True)
         Whether to provide list of style options
     """
-    print(_get_doc(cls=plotting.hvPlotGridded, kind=kind, docstring=docstring, generic=generic, style=style))
+    print(_get_doc(cls=hvPlot, kind=kind, docstring=docstring, generic=generic, style=style))
 
 
 def post_patch(extension='bokeh', logo=False):
@@ -113,7 +106,7 @@ def _patch_doc(cls, kind):
 
 
 # Patch docstrings
-for cls in [plotting.hvPlot, plotting.hvPlotTab, plotting.hvPlotGridded]:
+for cls in [hvPlot, hvPlotTabular]:
     for _kind in HoloViewsConverter._kind_mapping:
         if hasattr(cls, _kind):
             _patch_doc(cls, _kind)
