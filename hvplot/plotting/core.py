@@ -1,6 +1,5 @@
 from __future__ import absolute_import
 from collections import defaultdict
-from types import FunctionType
 
 import param
 try:
@@ -10,6 +9,7 @@ except:
     panel_available = False
 
 from ..converter import HoloViewsConverter
+from ..util import process_dynamic_args
 
 
 class hvPlotBase(object):
@@ -39,36 +39,20 @@ class hvPlotBase(object):
         HoloViews object: Object representing the requested visualization
         """
         if isinstance(kind, str) and kind not in self.__all__:
-            raise NotImplementedError(f"kind='{kind}' for data of type {type(self._data)}")
+            raise NotImplementedError("kind='{kind}' for data of type {type}".format(
+                kind=kind, type=type(self._data)))
 
         if panel_available:
-            dynamic = {}
-            fn_depends = {}
-            for k, v in kwds.items():
-                if isinstance(v, (param.Parameter, pn.widgets.Widget)):
-                    dynamic[k] = v
-                elif isinstance(v, FunctionType) and hasattr(v, '_dinfo'):
-                    fn_depends[k] = v._dinfo['dependencies']
-            if isinstance(x, (param.Parameter, pn.widgets.Widget)):
-                dynamic['x'] = x
-            if isinstance(y, (param.Parameter, pn.widgets.Widget)):
-                dynamic['y'] = y
-            if isinstance(kind, (param.Parameter, pn.widgets.Widget)):
-                dynamic['kind'] = kind
-
-            if dynamic or fn_depends:
-                arg_depends = []
-                arg_names = []
-                for k, v in fn_depends.items():
-                    arg_depends += list(v)
-                    for p in v:
-                        arg_names.append(k)
-
-                @pn.depends(*arg_depends, **dynamic)
+            dynamic , arg_deps, arg_names = process_dynamic_args(x, y, kind, **kwds)
+            if dynamic or arg_deps:
+                if kwds.get('groupby', None):
+                    raise ValueError('Groupby is not yet supported when using explicit widgets')
+                @pn.depends(*arg_deps, **dynamic)
                 def callback(*args, **dyn_kwds):
                     xd = dyn_kwds.pop('x', x)
                     yd = dyn_kwds.pop('y', y)
                     kindd = dyn_kwds.pop('kind', kind)
+
                     combined_kwds = dict(kwds, **dyn_kwds)
                     fn_args = defaultdict(list)
                     for name, arg in zip(arg_names, args):
@@ -76,7 +60,16 @@ class hvPlotBase(object):
                     for (name, fn), args in fn_args.items():
                         combined_kwds[name] = fn(*args)
                     return self._get_converter(xd, yd, kindd, **combined_kwds)(kindd, xd, yd)
+
                 return pn.panel(callback)
+            elif 'widgets' in kwds:
+                widgets = kwds.pop('widgets')
+                for w in  widgets.values():
+                    if not issubclass(w, pn.widgets.Widget):
+                        raise ValueError('Expected widgets to be dict of form dim: '
+                                         'pn.widgets.Widget Got type {}'.format(w))
+                plot = self._get_converter(x, y, kind, **kwds)(kind, x, y)
+                return pn.panel(plot, widgets=widgets)
 
         return self._get_converter(x, y, kind, **kwds)(kind, x, y)
 

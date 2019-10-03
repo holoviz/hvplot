@@ -4,9 +4,16 @@ Provides utilities to convert data and projections
 from __future__ import absolute_import
 
 from distutils.version import LooseVersion
+from types import FunctionType
 
 import pandas as pd
 import holoviews as hv
+import param
+try:
+    import panel as pn
+    panel_available = True
+except:
+    panel_available = False
 
 from holoviews.core.util import basestring
 
@@ -384,3 +391,26 @@ def process_derived_datetime_pandas(data, not_found, indexes=None):
     not_found = [var for var in not_found if var not in extra_cols.keys()]
 
     return not_found, data
+
+
+def process_dynamic_args(x, y, kind, **kwds):
+    dynamic = {}
+    arg_deps = []
+    arg_names = []
+
+    for k, v in list(kwds.items()) + [('x', x), ('y', y), ('kind', kind)]:
+        if isinstance(v, param.Parameter):
+            dynamic[k] = v
+        elif panel_available and isinstance(v, pn.widgets.Widget):
+            if LooseVersion(pn.__version__) < '0.6.4':
+                dynamic[k] = v.param.value
+            else:
+                dynamic[k] = v
+
+    for k, v in kwds.items():
+        if k not in dynamic and isinstance(v, FunctionType) and hasattr(v, '_dinfo'):
+            deps = v._dinfo['dependencies']
+            arg_deps += list(deps)
+            arg_names += list(k) * len(deps)
+
+    return dynamic, arg_deps, arg_names
