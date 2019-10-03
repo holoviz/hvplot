@@ -130,6 +130,7 @@ install_requires = [
 
 _examples_extra = [
     'geoviews >=1.6.0',
+    'panel',
     'geopandas',
     'xarray',
     'networkx',
