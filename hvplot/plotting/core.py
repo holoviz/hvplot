@@ -1,8 +1,15 @@
 from __future__ import absolute_import
+from collections import defaultdict
 
 import param
+try:
+    import panel as pn
+    panel_available = True
+except:
+    panel_available = False
 
 from ..converter import HoloViewsConverter
+from ..util import process_dynamic_args
 
 
 class hvPlotBase(object):
@@ -31,8 +38,38 @@ class hvPlotBase(object):
         -------
         HoloViews object: Object representing the requested visualization
         """
-        if kind is not None and kind not in self.__all__:
-            raise NotImplementedError(f"kind='{kind}' for data of type {type(self._data)}")
+        if isinstance(kind, str) and kind not in self.__all__:
+            raise NotImplementedError("kind='{kind}' for data of type {type}".format(
+                kind=kind, type=type(self._data)))
+
+        if panel_available:
+            dynamic , arg_deps, arg_names = process_dynamic_args(x, y, kind, **kwds)
+            if dynamic or arg_deps:
+                if kwds.get('groupby', None):
+                    raise ValueError('Groupby is not yet supported when using explicit widgets')
+                @pn.depends(*arg_deps, **dynamic)
+                def callback(*args, **dyn_kwds):
+                    xd = dyn_kwds.pop('x', x)
+                    yd = dyn_kwds.pop('y', y)
+                    kindd = dyn_kwds.pop('kind', kind)
+
+                    combined_kwds = dict(kwds, **dyn_kwds)
+                    fn_args = defaultdict(list)
+                    for name, arg in zip(arg_names, args):
+                        fn_args[(name, kwds[name])].append(arg)
+                    for (name, fn), args in fn_args.items():
+                        combined_kwds[name] = fn(*args)
+                    return self._get_converter(xd, yd, kindd, **combined_kwds)(kindd, xd, yd)
+
+                return pn.panel(callback)
+            elif 'widgets' in kwds:
+                widgets = kwds.pop('widgets')
+                for w in  widgets.values():
+                    if not issubclass(w, pn.widgets.Widget):
+                        raise ValueError('Expected widgets to be dict of form dim: '
+                                         'pn.widgets.Widget Got type {}'.format(w))
+                plot = self._get_converter(x, y, kind, **kwds)(kind, x, y)
+                return pn.panel(plot, widgets=widgets)
 
         return self._get_converter(x, y, kind, **kwds)(kind, x, y)
 
