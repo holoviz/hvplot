@@ -1358,11 +1358,16 @@ class HoloViewsConverter(object):
                     ymin, ymax = ymin.compute(), ymax.compute()
                 hist_opts['bin_range'] = ymin, ymax
 
-            ds = Dataset(data, self.by, y)
-            hist = hists = histogram(ds.to(Dataset, [], y, self.by), **hist_opts)
+            ds = Dataset(data, self.by)
             if self.by:
+                hist = hists = histogram(
+                    ds.groupby(self.by), dimension=y, **hist_opts
+                )
                 hist = hists.last
                 hists = hists.layout() if self.subplots else hists.overlay()
+            else:
+                hists = histogram(ds, dimension=y, **hist_opts)
+
             return hists.opts(opts).redim(**self._redim)
 
         ranges = []
