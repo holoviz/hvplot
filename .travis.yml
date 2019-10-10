@@ -68,7 +68,7 @@ jobs:
       after_success: true
 
     - <<: *default
-      env: DESC="py2 flakes" PYTHON_VERSION=2.7 CHANS=$CHANS_REL
+      env: DESC="test flake on code and notebooks" CHANS=$CHANS
       script: doit test_flakes
 
     ########## DOCS ##########
