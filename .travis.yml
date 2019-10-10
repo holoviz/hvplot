@@ -118,7 +118,7 @@ jobs:
       install: doit package_build $CHANS $PKG_TEST_PYTHON --test-group=unit
       script: doit package_upload --token=$CONDA_UPLOAD_TOKEN $LABELS
 
-    - <<: conda_pkg
+    - <<: *conda_pkg
       stage: package
       env: DESC="Building conda package" CHANS=$CHANS_REL TRAVIS_NOCACHE=$TRAVIS_JOB_ID LABELS=$LABELS_REL
 
