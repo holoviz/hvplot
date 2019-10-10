@@ -358,8 +358,8 @@ class HoloViewsConverter(object):
         # Process options
         self.stacked = stacked
 
-        plot_opts = {**self._default_plot_opts,
-                     **self._process_plot()}
+        plot_opts = dict(self._default_plot_opts,
+                         **self._process_plot())
         if xlim is not None:
             plot_opts['xlim'] = tuple(xlim)
         if ylim is not None:
