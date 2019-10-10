@@ -24,7 +24,7 @@ _NAV =  (
     ('Getting Started', 'getting_started/index'),
     ('User Guide', 'user_guide/index'),
     ('Developer Guide', 'developer_guide/index'),
-    ('Github Source', '//github.com/pyviz/hvplot')
+    ('Github Source', '//github.com/pyviz/hvplot'),
     ('About', 'about')
 )
 
