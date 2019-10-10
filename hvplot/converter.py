@@ -358,8 +358,8 @@ class HoloViewsConverter(object):
         # Process options
         self.stacked = stacked
 
-        plot_opts = {**self._default_plot_opts,
-                     **self._process_plot()}
+        plot_opts = dict(self._default_plot_opts,
+                         **self._process_plot())
         if xlim is not None:
             plot_opts['xlim'] = tuple(xlim)
         if ylim is not None:
@@ -447,8 +447,7 @@ class HoloViewsConverter(object):
             plot_opts['projection'] = process_crs(projection)
         if title is not None:
             plot_opts['title_format'] = title
-
-        if (self.kind in self._colorbar_types or plot_opts.get('colorbar')):
+        if (self.kind in self._colorbar_types or self.rasterize or self.datashade or self._color_dim):
             try:
                 if not use_dask:
                     symmetric = self._process_symmetric(symmetric, clim)
@@ -1136,7 +1135,7 @@ class HoloViewsConverter(object):
             if len(ys) > 1:
                 # if columns have different dtypes, only include numeric columns
                 from pandas.api.types import is_numeric_dtype as isnum
-                num_ys = [y for y in ys if isnum(data[y])]
+                num_ys = [dim for dim in ys if isnum(data[dim])]
                 if len(num_ys) >= 1:
                     ys = num_ys
             y = ys[0] if len(ys) == 1 or single_y else ys

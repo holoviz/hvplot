@@ -13,8 +13,10 @@ env:
   global:
     - PYENV_VERSION=3.7
     - PKG_TEST_PYTHON="--test-python=py36 --test-python=py27"
-    - CHANS_DEV="-c pyviz/label/dev -c defaults -c intake"  # need defaults before intake
-    - CHANS="-c pyviz -c ioam"
+    - CHANS_DEV="-c pyviz/label/dev"
+    - CHANS_REL="-c pyviz"
+    - LABELS_DEV="--label dev"
+    - LABELS_REL="--label dev --label main"
     - PYTHON_VERSION=3.6
 
 stages:
@@ -22,16 +24,11 @@ stages:
   - name: docs
     if: tag =~ ^v(\d+|\.)*[^a-z]\d*$
   - name: docs_dev
+    if: tag =~ ^v(\d+|\.)*[a-z]\d*$ OR commit_message =~ /^.*(website_dev).*$/
+  - name: dev_package
     if: tag =~ ^v(\d+|\.)*[a-z]\d*$
-  - name: conda_dev_package
-    if: tag =~ ^v(\d+|\.)*[a-z]\d*$
-  - name: pip_dev_package
-    if: tag =~ ^v(\d+|\.)*[a-z]\d*$
-  - name: conda_package
+  - name: package
     if: tag =~ ^v(\d+|\.)*[^a-z]\d*$
-  - name: pip_package
-    if: tag =~ ^v(\d+|\.)*[^a-z]\d*$
-
 
 jobs:
   include:
@@ -39,46 +36,39 @@ jobs:
 
     - &default
       stage: test
-      env: DESC="dev test_all_recommended"
+      env: DESC="unit test with basic deps" CHANS=$CHANS_REL
       before_install:
         - pip install pyctdev && doit miniconda_install && pip uninstall -y doit pyctdev
         - export PATH="$HOME/miniconda/bin:$PATH" && hash -r
         - conda config --set always_yes True
         - conda install -c pyviz "pyctdev>=0.5" && doit ecosystem_setup
       install:
-        - doit env_create $CHANS_DEV --python=$PYTHON_VERSION
+        - doit env_create $CHANS --python=$PYTHON_VERSION
         - source activate test-environment
-        - doit develop_install $CHANS_DEV -o recommended
+        - doit develop_install $CHANS -o tests
         - doit env_capture
-      script:
-        - bokeh sampledata
-        - doit test_all_recommended
+      script: doit test_unit
 
     - &extra_default
       <<: *default
-      env: DESC="dev unit test with extra dependencies"
+      env: DESC="unit test with extra dependencies" CHANS=$CHANS_REL NAME="extra-deps-env"
       install:
-        - doit env_create $CHANS_DEV --python=$PYTHON_VERSION --name=extra-deps-env
-        - source activate extra-deps-env
-        - doit develop_install $CHANS_DEV -o recommended -o tests -o examples
+        - doit env_create $CHANS --python=$PYTHON_VERSION --name=$NAME
+        - source activate $NAME
+        - doit develop_install $CHANS -o tests -o examples
         - doit env_capture
-      script: doit test_unit_all
+      script: doit test_unit
       after_success: coveralls
 
-    - <<: *default
-      env: DESC="dev test examples with extra dependencies"
-      install:
-        - doit env_create $CHANS_DEV --python=$PYTHON_VERSION --name=extra-deps-env-notebooks
-        - source activate extra-deps-env-notebooks
-        - doit develop_install $CHANS_DEV -o recommended -o tests -o examples
-        - pip install "s3fs>=0.3.0"
-        - doit env_capture
+    - <<: *extra_default
+      env: DESC="test examples with extra dependencies" CHANS=$CHANS_REL NAME="extra-deps-env-notebooks"
       script:
         - bokeh sampledata
         - doit test_examples
+      after_success: true
 
     - <<: *default
-      env: DESC="py2 flakes" PYTHON_VERSION=2.7
+      env: DESC="test flake on code and notebooks" CHANS=$CHANS
       script: doit test_flakes
 
     ########## DOCS ##########
@@ -86,13 +76,16 @@ jobs:
     - &doc_build
       <<: *default
       stage: docs
-      env: HV_DOC_HTML="true" DESC="docs" CHANS_DEV="-c pyviz/label/dev -c pyviz -c ioam -c intake"
+      env: DESC="docs" HV_DOC_HTML="true" CHANS=$CHANS_REL
+      install:
+        - doit env_create $CHANS --python=$PYTHON_VERSION
+        - source activate test-environment
+        - doit develop_install $CHANS -o examples -o doc
+        - doit env_capture
       script:
-        - doit develop_install $CHANS_DEV -o doc
         - bokeh sampledata
-        - nbsite generate-rst --org pyviz --project-name hvplot --offset 0 --skip '^.*Streaming.*$' --skip '^.*homepage.*$'
+        - nbsite generate-rst --org pyviz --project-name hvplot --skip '^.*homepage.*$'
         - nbsite build --what=html --output=builtdocs
-        - touch ./builtdocs/.nojekyll
       deploy:
         provider: pages
         skip_cleanup: true
@@ -112,47 +105,40 @@ jobs:
         local_dir: ./builtdocs
         repo: pyviz-dev/hvplot
         on:
-          tags: true
           all_branches: true
 
     ########## END-USER PACKAGES ##########
 
     ### CONDA ####
 
-    - <<: *default
-      stage: conda_dev_package
-      env: DESC="" TRAVIS_NOCACHE=$TRAVIS_JOB_ID
-      install:
-        - doit package_build $CHANS_DEV $PKG_TEST_PYTHON --test-group=unit
-      script:
-        - doit package_upload --token=$CONDA_UPLOAD_TOKEN --label=dev
+    - &conda_pkg
+      <<: *default
+      stage: dev_package
+      env: DESC="Building conda dev package" CHANS=$CHANS_REL TRAVIS_NOCACHE=$TRAVIS_JOB_ID LABELS=$LABELS_DEV
+      install: doit package_build $CHANS $PKG_TEST_PYTHON --test-group=unit
+      script: doit package_upload --token=$CONDA_UPLOAD_TOKEN $LABELS
 
-    - <<: *default
-      stage: conda_package
-      env: DESC="" TRAVIS_NOCACHE=$TRAVIS_JOB_ID
-      install:
-        - doit package_build $CHANS $PKG_TEST_PYTHON --test-group=unit
-      script:
-        - doit package_upload --token=$CONDA_UPLOAD_TOKEN --label=dev --label=main
+    - <<: *conda_pkg
+      stage: package
+      env: DESC="Building conda package" CHANS=$CHANS_REL TRAVIS_NOCACHE=$TRAVIS_JOB_ID LABELS=$LABELS_REL
 
     ### PyPI ###
 
-    - <<: *default
-      stage: pip_dev_package
-      env: PYPI="https://test.pypi.org/legacy/" TRAVIS_NOCACHE=$TRAVIS_JOB_ID
+    - &pip_pkg
+      <<: *default
+      stage: dev_package
+      env: DESC="Building pip dev package" CHANS=$CHANS_REL PYPI=testpypi TRAVIS_NOCACHE=$TRAVIS_JOB_ID
       install:
-        - doit develop_install $CHANS_DEV -o tests && pip uninstall -y hvplot
+        - doit env_create $CHANS --python=$PYTHON_VERSION
+        - source activate test-environment
+        - doit develop_install $CHANS -o tests && pip uninstall -y hvplot
         - doit pip_on_conda
         - doit ecosystem=pip package_build --test-python=py36 --test-group=unit
       script: doit ecosystem=pip package_upload -u $TPPU -p $TPPP -r ${PYPI}
 
-    - <<: *default
-      stage: pip_package
-      env: PYPI="https://upload.pypi.org/legacy/" TRAVIS_NOCACHE=$TRAVIS_JOB_ID
-      install:
-        - doit develop_install $CHANS_DEV -o tests && pip uninstall -y hvplot
-        - doit pip_on_conda
-        - doit ecosystem=pip package_build --test-python=py36 --test-group=unit
+    - <<: *pip_pkg
+      stage: package
+      env: DESC="Building pip package" CHANS=$CHANS_REL PYPI=pypi TRAVIS_NOCACHE=$TRAVIS_JOB_ID
       script: doit ecosystem=pip package_upload -u $PPU -p $PPP -r ${PYPI}
 
 
