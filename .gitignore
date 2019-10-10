@@ -108,3 +108,12 @@ doc/**/*.ipynb
 doc/**/*.json
 # this dir contains the whole website and should not be checked in on master
 builtdocs/
+
+# pip
+pip-wheel-metadata/
+
+# autover
+hvplot/.version
+
+# doit
+.doit.db
