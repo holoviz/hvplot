@@ -447,8 +447,7 @@ class HoloViewsConverter(object):
             plot_opts['projection'] = process_crs(projection)
         if title is not None:
             plot_opts['title_format'] = title
-
-        if (self.kind in self._colorbar_types or plot_opts.get('colorbar')):
+        if (self.kind in self._colorbar_types or self.rasterize or self.datashade):
             try:
                 if not use_dask:
                     symmetric = self._process_symmetric(symmetric, clim)

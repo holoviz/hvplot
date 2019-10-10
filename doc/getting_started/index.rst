@@ -4,8 +4,6 @@ Getting Started
 
 Welcome to hvPlot!
 
-This section will get you set up with hvPlot and provide a basic overview of the features and strengths of hvPlot. The `announcement blog <http://blog.pyviz.org/hvplot_announcement.html>`_ is another great resource to learn about the features of hvPlot and get an idea of what it can do.
-
 Installation
 ------------
 
@@ -38,7 +36,9 @@ Support for classic Jupyter Notebook is included with hvPlot. If you want to wor
 .. _License: https://github.com/pyviz/hvplot/blob/master/LICENSE.txt
 
 
-Using hvPlot
------------
+Usage
+-----
 
-.. notebook:: hvplot ../../examples/user_guide/Introduction.ipynb
+For information on using hvPlot, take a look at the `User Guide <../user_guide>`_.
+The `announcement blog <http://blog.pyviz.org/hvplot_announcement.html>`_ is another great
+resource to learn about the features of hvPlot and get an idea of what it can do.

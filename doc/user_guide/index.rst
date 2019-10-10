@@ -9,7 +9,7 @@ you will learn to use the API for tabular data and get an overview of
 the `types of plots <Plotting.html>`_ you can generate and how to
 `customize <Customization.html>`_ them; including how to customize
 interactivity using `widgets <Widgets.html>`_. Next is an overview on how to
-`display and save plots <Display_and_Saving.html>`_  in the notebook, on the
+`display and save plots <Viewing.html>`_  in the notebook, on the
 commandline, and from a script. Another section will introduce you to
 generating `subplots <Subplots.html>`_ from your data.
 
