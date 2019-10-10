@@ -134,12 +134,12 @@ jobs:
         - doit develop_install $CHANS -o tests && pip uninstall -y hvplot
         - doit pip_on_conda
         - doit ecosystem=pip package_build --test-python=py36 --test-group=unit
-      script: doit ecosystem=pip package_upload -u $TPPU -p $TPPP -r ${PYPI}
+      script: doit ecosystem=pip package_upload -u $TPPU -p $TPPP --pypi ${PYPI}
 
     - <<: *pip_pkg
       stage: package
       env: DESC="Building pip package" CHANS=$CHANS_REL PYPI=pypi TRAVIS_NOCACHE=$TRAVIS_JOB_ID
-      script: doit ecosystem=pip package_upload -u $PPU -p $PPP -r ${PYPI}
+      script: doit ecosystem=pip package_upload -u $PPU -p $PPP --pypi ${PYPI}
 
 
 notifications:
