@@ -1,57 +1,44 @@
 ***************
-Getting started
+Getting Started
 ***************
+
+Welcome to hvPlot!
+
+This section will get you set up with hvPlot and provide a basic overview of the features and strengths of hvPlot. The `announcement blog <http://blog.pyviz.org/hvplot_announcement.html>`_ is another great resource to learn about the features of hvPlot and get an idea of what it can do.
 
 Installation
 ------------
 
-hvPlot supports Python 2.7, 3.5, 3.6 and 3.7 on Linux, Windows, or Mac and can be installed with conda::
+|CondaPyViz|_ |CondaDefaults|_ |PyPI|_ |License|_
 
-    conda install -c pyviz hvplot
+hvPlot works with `Python 2.7 and Python 3 <https://travis-ci.org/pyviz/hvplot>`_ on Linux, Windows, or Mac.  The recommended way to install hvPlot is using the `conda <http://conda.pydata.org/docs/>`_ command provided by `Anaconda <http://docs.continuum.io/anaconda/install>`_ or `Miniconda <http://conda.pydata.org/miniconda.html>`_::
 
-or with pip::
+  conda install -c pyviz hvplot
 
-    pip install hvplot
+or using PyPI::
 
-Usage
------
+  pip install hvplot
 
-Once you've installed hvPlot as above and have fetched the examples
-shown on the website you can run them using `Jupyter
-<http://jupyter.org>`_::
+Support for classic Jupyter Notebook is included with hvPlot. If you want to work with JupyterLab, you will also need to install the optional PyViz JupyterLab extension::
 
-    jupyter notebook
-
-To work with JupyterLab you will also need the PyViz JupyterLab
-extension::
-
-    conda install -c conda-forge jupyterlab
-    jupyter labextension install @pyviz/jupyterlab_pyviz
-
-Once you have installed JupyterLab and the extension launch it with::
-
-    jupyter lab
-
-If you have any questions, please refer to http://holoviews.org/FAQ.html
-and if that doesn't help, feel free to post an issue on GitHub, question on
-stackoverflow, or discuss on Gitter.
+  conda install jupyterlab
+  jupyter labextension install @pyviz/jupyterlab_pyviz
 
 
-Developer Instructions
-----------------------
+.. |CondaPyViz| image:: https://img.shields.io/conda/v/pyviz/hvplot.svg
+.. _CondaPyViz: https://anaconda.org/pyviz/hvplot
 
-1. Install Python 3 `miniconda <http://conda.pydata.org/miniconda.html>`_ or `anaconda <http://docs.continuum.io/anaconda/install>`_, if you don't already have it on your system.
+.. |CondaDefaults| image:: https://img.shields.io/conda/v/anaconda/hvplot.svg?label=conda%7Cdefaults
+.. _CondaDefaults: https://anaconda.org/anaconda/hvplot
 
-2. Clone the hvplot git repository if you do not already have it::
+.. |PyPI| image:: https://img.shields.io/pypi/v/hvplot.svg
+.. _PyPI: https://pypi.python.org/pypi/hvplot
 
-    git clone git://github.com/pyviz/hvplot.git
+.. |License| image:: https://img.shields.io/pypi/l/hvplot.svg
+.. _License: https://github.com/pyviz/hvplot/blob/master/LICENSE.txt
 
-3. Set up an environment with all of the dependencies needed to run the examples::
 
-    cd hvplot
-    conda env create --quiet --force -n hvplot -f ./environment.yml
-    source activate hvplot
+Using hvPlot
+-----------
 
-4. Put the `hvplot` directory into the Python path in this environment::
-
-    pip install -e .
+.. notebook:: hvplot ../../examples/user_guide/Introduction.ipynb

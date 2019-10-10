@@ -23,6 +23,8 @@ html_theme_options = {
 _NAV =  (
     ('Getting Started', 'getting_started/index'),
     ('User Guide', 'user_guide/index'),
+    ('Developer Guide', 'developer_guide/index'),
+    ('Github Source', '//github.com/pyviz/hvplot')
     ('About', 'about')
 )
 
@@ -33,7 +35,7 @@ html_context.update({
     'DESCRIPTION': description,
     'AUTHOR': authors,
     # will work without this - for canonical (so can ignore when building locally or test deploying)
-    'WEBSITE_SERVER': 'https://pyviz.github.io/hvplot',
+    'WEBSITE_SERVER': 'https://hvplot.pyviz.org',
     'VERSION': version,
     'NAV': _NAV,
     'LINKS': _NAV,

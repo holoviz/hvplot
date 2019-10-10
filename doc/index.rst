@@ -12,4 +12,5 @@
    Introduction <self>
    Getting Started <getting_started/index>
    User Guide <user_guide/index>
+   Developer Guide <developer_guide/index>
    About <about>
