@@ -13,4 +13,5 @@
    Getting Started <getting_started/index>
    User Guide <user_guide/index>
    Developer Guide <developer_guide/index>
+   Github Source <https://github.com/pyviz/hvplot>
    About <about>

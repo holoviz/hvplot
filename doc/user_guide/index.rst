@@ -78,6 +78,7 @@ rather than Matplotlib.
     Introduction <Introduction>
     Plotting <Plotting>
     Customization <Customization>
+    Widgets <Widgets>
     Viewing <Viewing>
     Subplots <Subplots>
     Streaming <Streaming>
