@@ -161,7 +161,7 @@ extras_require = {
     'examples': _examples_extra,
     'doc': _examples_extra + [
         'nbsite >=0.5.1',
-        'sphinx_ioam_theme',
+        'sphinx_pyviz_theme',
         'tornado <6.0'
     ]
 }
