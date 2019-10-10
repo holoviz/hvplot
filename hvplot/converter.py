@@ -311,8 +311,6 @@ class HoloViewsConverter(object):
         self.project = project
         self.coastline = coastline
         self.tiles = tiles
-        self.row = row
-        self.col = col
         self.sort_date = sort_date
 
         # Import geoviews if geo-features requested
@@ -482,9 +480,9 @@ class HoloViewsConverter(object):
         self._validate_kwds(kwds)
         if debug:
             kwds = dict(x=self.x, y=self.y, by=self.by, kind=self.kind,
-                        groupby=self.groupby)
+                        groupby=self.groupby, grid=self.grid)
             param.main.warning('Plotting {kind} plot with parameters x: {x}, '
-                               'y: {y}, by: {by}, groupby: {groupby}'.format(**kwds))
+                               'y: {y}, by: {by}, groupby: {groupby}, row/col: {grid}'.format(**kwds))
 
     def _process_symmetric(self, symmetric, clim):
         if symmetric is not None or clim is not None:
@@ -538,7 +536,9 @@ class HoloViewsConverter(object):
             groupby = [groupby]
         if by is not None and not isinstance(by, list):
             by = [by]
-
+        grid = []
+        if row is not None: grid.append(row)
+        if col is not None: grid.append(col)
         streaming = False
         if is_geopandas(data):
             datatype = 'geopandas'
@@ -584,7 +584,7 @@ class HoloViewsConverter(object):
                 data = data[z]
             self.z = z
 
-            ignore = (groupby or []) + (by or [])
+            ignore = (groupby or []) + (by or []) + grid
             coords = [c for c in data.coords if data[c].shape != ()
                       and c not in ignore]
             dims = [c for c in data.dims if data[c].shape != ()
@@ -623,7 +623,7 @@ class HoloViewsConverter(object):
                 if groupby is None: groupby = groupby_new
 
             if groupby:
-                groupby = [g for g in groupby if g not in (row, col)]
+                groupby = [g for g in groupby if g not in grid]
             self.data = data
         else:
             raise ValueError('Supplied data type %s not understood' % type(data).__name__)
@@ -698,6 +698,7 @@ class HoloViewsConverter(object):
         else:
             self.by = by if isinstance(by, list) else [by]
         self.groupby = groupby
+        self.grid = grid
         self.streaming = streaming
 
         if not hover_cols:
@@ -884,10 +885,7 @@ class HoloViewsConverter(object):
         groups = self.groupby
         zs = self.kwds.get('z', [])
         if not isinstance(zs, list): zs = [zs]
-        grid = []
-        if self.row: grid.append(self.row)
-        if self.col: grid.append(self.col)
-        groups += grid
+        groups += self.grid
         if groups or len(zs) > 1:
             if self.streaming:
                 raise NotImplementedError("Streaming and groupby not yet implemented")
@@ -922,8 +920,8 @@ class HoloViewsConverter(object):
                                       kdims=[self.group_label])
             else:
                 obj = getattr(self, kind)(x, y, data=dataset.data)
-            if grid:
-                obj = obj.grid(grid).options(shared_xaxis=True, shared_yaxis=True)
+            if self.grid:
+                obj = obj.grid(self.grid).opts(shared_xaxis=True, shared_yaxis=True)
         else:
             if self.streaming:
                 cbcallable = StreamingCallable(partial(method, x, y),
@@ -1124,7 +1122,7 @@ class HoloViewsConverter(object):
             if self.use_index:
                 x = self.indexes[0]
             else:
-                x = [c for c in data.columns if c not in self.by+self.groupby][0]
+                x = [c for c in data.columns if c not in self.by+self.groupby+self.grid][0]
 
         if not x:
             raise ValueError('Could not determine what to plot. Set x explicitly')
@@ -1134,7 +1132,7 @@ class HoloViewsConverter(object):
         """This should happen after _process_chart_x"""
         y = y or self.y
         if y is None:
-            ys = [c for c in data.columns if c not in [x]+self.by+self.groupby]
+            ys = [c for c in data.columns if c not in [x]+self.by+self.groupby+self.grid]
             if len(ys) > 1:
                 # if columns have different dtypes, only include numeric columns
                 from pandas.api.types import is_numeric_dtype as isnum
@@ -1555,7 +1553,7 @@ class HoloViewsConverter(object):
     def rgb(self, x=None, y=None, z=None, data=None):
         data, x, y, z = self._process_gridded_args(data, x, y, z)
 
-        coords = [c for c in data.coords if c not in self.groupby+self.by]
+        coords = [c for c in data.coords if c not in self.by+self.groupby+self.grid]
         if len(coords) < 3:
             raise ValueError('Data must be 3D array to be converted to RGB.')
         x = x or coords[2]
