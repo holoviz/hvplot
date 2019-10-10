@@ -1136,7 +1136,7 @@ class HoloViewsConverter(object):
             if len(ys) > 1:
                 # if columns have different dtypes, only include numeric columns
                 from pandas.api.types import is_numeric_dtype as isnum
-                num_ys = [y for y in ys if isnum(data[y])]
+                num_ys = [dim for dim in ys if isnum(data[dim])]
                 if len(num_ys) >= 1:
                     ys = num_ys
             y = ys[0] if len(ys) == 1 or single_y else ys
