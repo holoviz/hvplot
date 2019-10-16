@@ -903,22 +903,22 @@ class HoloViewsConverter(object):
                 if len(zs) > 1:
                     dimensions = [Dimension(self.group_label, values=zs)]+dataset.kdims
                     if self.dynamic:
-                        obj = DynamicMap(lambda *args: getattr(self, kind)(x, y, args[0], dataset[args[1:]].data),
+                        obj = DynamicMap(lambda *args: method(x, y, args[0], dataset[args[1:]].data),
                                          kdims=dimensions)
                     else:
-                        obj = HoloMap({(z,)+k: getattr(self, kind)(x, y, z, dataset[k])
+                        obj = HoloMap({(z,)+k: method(x, y, z, dataset[k])
                                        for k, v in dataset.data.items() for z in zs}, kdims=dimensions)
                 else:
-                    obj = dataset.map(lambda ds: getattr(self, kind)(x, y, data=ds.data), Dataset)
+                    obj = dataset.map(lambda ds: method(x, y, data=ds.data), Dataset)
             elif len(zs) > 1:
                 if self.dynamic:
-                    dataset = DynamicMap(lambda z: getattr(self, kind)(x, y, z, data=dataset.data),
+                    dataset = DynamicMap(lambda z: method(x, y, z, data=dataset.data),
                                          kdims=[Dimension(self.group_label, values=zs)])
                 else:
-                    dataset = HoloMap({z: getattr(self, kind)(x, y, z, data=dataset.data) for z in zs},
+                    dataset = HoloMap({z: method(x, y, z, data=dataset.data) for z in zs},
                                       kdims=[self.group_label])
             else:
-                obj = getattr(self, kind)(x, y, data=dataset.data)
+                obj = method(x, y, data=dataset.data)
             if self.grid:
                 obj = obj.grid(self.grid).opts(shared_xaxis=True, shared_yaxis=True)
         else:
@@ -1613,7 +1613,7 @@ class HoloViewsConverter(object):
         qmesh = self.quadmesh(x, y, z, data)
 
         if self.geo:
-            # Apply projection before rasterizing
+            # Apply projection before contouring
             import cartopy.crs as ccrs
             from geoviews import project
             projection = self._plot_opts.get('projection', ccrs.GOOGLE_MERCATOR)
