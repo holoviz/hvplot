@@ -968,7 +968,7 @@ class HoloViewsConverter(object):
             else:
                 opts['cmap'] = process_cmap(cmap, levels)
 
-        if self.by:
+        if self.by and not self.subplots:
             opts['aggregator'] = reductions.count_cat(self.by[0])
         if self.aggregator:
             agg = self.aggregator
