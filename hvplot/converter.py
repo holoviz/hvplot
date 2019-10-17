@@ -923,12 +923,13 @@ class HoloViewsConverter(object):
                 else:
                     obj = dataset.map(lambda ds: method(x, y, data=ds.data), Dataset)
             elif len(zs) > 1:
+                dimensions = [Dimension(self.group_label, values=zs)]
                 if self.dynamic:
                     obj = DynamicMap(lambda z: method(x, y, z, data=dataset.data),
-                                     kdims=[Dimension(self.group_label, values=zs)])
+                                     kdims=dimensions)
                 else:
                     obj = HoloMap({z: method(x, y, z, data=dataset.data) for z in zs},
-                                   kdims=[self.group_label])
+                                  kdims=dimensions)
             else:
                 obj = method(x, y, data=dataset.data)
             if self.grid:
