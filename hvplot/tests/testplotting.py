@@ -19,7 +19,7 @@ x_y_mapping = [(kind, el) for kind, el in HoloViewsConverter._kind_mapping.items
                if kind in x_y]
 
 
-class TestPandasPlotting(TestCase):
+class TestPandasHoloviewsPlotting(TestCase):
 
     def setUp(self):
         if LooseVersion(pd.__version__) < '0.25.1':
@@ -49,3 +49,12 @@ class TestPandasPlotting(TestCase):
         df = pd.DataFrame({'a': [0, 1, 2], 'b': [5, 7, 2]})
         with self.assertRaisesRegex(NotImplementedError, "pie"):
             df.plot.pie(y='a')
+
+
+class TestPandasHvplotPlotting(TestPandasHoloviewsPlotting):
+
+    def setUp(self):
+        if LooseVersion(pd.__version__) < '0.25.1':
+            raise SkipTest('entrypoints for plotting.backends was added '
+                           'in pandas 0.25.1')
+        pd.options.plotting.backend = 'hvplot'

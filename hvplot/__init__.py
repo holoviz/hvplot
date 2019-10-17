@@ -14,7 +14,7 @@ from .util import get_ipy
 from .utilities import save, show # noqa
 from .plotting import (hvPlot, hvPlotTabular,  # noqa
                        andrews_curves, lag_plot,
-                       parallel_coordinates, scatter_matrix)
+                       parallel_coordinates, scatter_matrix, plot)
 
 __version__ = str(param.version.Version(fpath=__file__, archive_commit="$Format:%h$",
                                         reponame="hvplot"))
