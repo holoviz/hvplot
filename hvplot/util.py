@@ -253,6 +253,12 @@ def is_xarray(data):
     from xarray import DataArray, Dataset
     return isinstance(data, (DataArray, Dataset))
 
+def is_xarray_dataarray(data):
+    if not check_library(data, 'xarray'):
+        return False
+    from xarray import DataArray
+    return isinstance(data, DataArray)
+
 
 def process_intake(data, use_dask):
     if data.container not in ('dataframe', 'xarray'):

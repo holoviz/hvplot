@@ -38,6 +38,11 @@ class TestGridPlots(ComparisonTestCase):
         self.da_img = xr.DataArray(np.arange(-2, 2).reshape((2, 2)), name='foo')
         self.big_img = xr.DataArray(np.arange(-1e6, 1e6).reshape(1000, 2000))
 
+        self.ds = xr.Dataset({
+            'temp': (('lon', 'lat'), 15 + 8 * np.random.randn(2, 2)),
+            'precip': (('lon', 'lat'), 10 * np.random.rand(2, 2))},
+            coords={'lon': [-99.83, -99.32],'lat': [42.25, 42.21]})
+
     def test_rgb_dataarray_no_args(self):
         rgb = self.da_rgb.hvplot()
         self.assertEqual(rgb, RGB(([0, 1], [0, 1])+tuple(self.da_rgb.values)))
@@ -155,3 +160,10 @@ class TestGridPlots(ComparisonTestCase):
         self.assertEqual(plot_opts.kwargs.get('symmetric'), True)
         style_opts = Store.lookup_options('bokeh', plot, 'style')
         self.assertEqual(style_opts.kwargs['cmap'], 'coolwarm')
+
+    def test_multiple_zs(self):
+        plot = self.ds.hvplot(x='lat', y='lon', z=['temp', 'precip'], dynamic=False)
+        assert 'temp' in plot.keys()
+        assert 'precip' in plot.keys()
+        assert plot['temp'].kdims == ['lat', 'lon']
+        assert plot['precip'].kdims == ['lat', 'lon']
