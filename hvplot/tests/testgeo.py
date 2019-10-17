@@ -73,6 +73,13 @@ class TestGeoAnnotation(TestCase):
         coastline = plot.get(1)
         self.assertIsInstance(coastline, gv.Feature)
 
+    def test_plot_with_coastline_sets_geo_by_default(self):
+        import geoviews as gv
+        plot = self.df.hvplot.points('x', 'y', coastline=True)
+        self.assertEqual(len(plot), 2)
+        coastline = plot.get(1)
+        self.assertIsInstance(coastline, gv.Feature)
+
     def test_plot_with_coastline_scale(self):
         plot = self.df.hvplot.points('x', 'y', geo=True, coastline='10m')
         opts = plot.get(1).opts.get('plot')

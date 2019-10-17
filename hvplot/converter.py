@@ -312,7 +312,7 @@ class HoloViewsConverter(object):
         self.value_label = value_label
         self.group_label = group_label
         self.dynamic = dynamic
-        self.geo = geo or crs or global_extent or projection or project
+        self.geo = any([geo, crs, global_extent, projection, project, coastline])
         self.crs = self._process_crs(data, crs) if self.geo else None
         self.project = project
         self.coastline = coastline
