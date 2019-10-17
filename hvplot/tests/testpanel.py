@@ -59,11 +59,11 @@ class TestPanelObjects(TestCase):
 
         assert len(look_for_class(pane, pn.widgets.DiscreteSlider)) == 1
 
-    def test_using_explicit_widgets_with_groupby_raises_error(self):
+    def test_using_explicit_widgets_with_groupby_does_not_raise_error(self):
         import panel as pn
 
         x = pn.widgets.Select(name='x', value='sepal_length', options=self.cols)
         y = pn.widgets.Select(name='y', value='sepal_width', options=self.cols)
 
-        with self.assertRaisesRegex(ValueError, "Groupby is not yet"):
-            self.flowers.hvplot(x, y, groupby='species')
+        pane = self.flowers.hvplot(x, y, groupby='species')
+        assert isinstance(pane, pn.param.ParamFunction)

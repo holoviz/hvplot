@@ -43,11 +43,13 @@ class hvPlotBase(object):
                 kind=kind, type=type(self._data)))
 
         if panel_available:
-            dynamic , arg_deps, arg_names = process_dynamic_args(x, y, kind, **kwds)
+            panel_args = ['widgets', 'widget_location', 'widget_layout', 'widget_type']
+            panel_dict = {}
+            for k in panel_args:
+                if k in kwds:
+                    panel_dict[k] = kwds.pop(k)
+            dynamic, arg_deps, arg_names = process_dynamic_args(x, y, kind, **kwds)
             if dynamic or arg_deps:
-                if kwds.get('groupby', None):
-                    raise ValueError('Groupby is not yet supported when using explicit '
-                                     'widgets. Try using the `widgets` kwarg instead')
                 @pn.depends(*arg_deps, **dynamic)
                 def callback(*args, **dyn_kwds):
                     xd = dyn_kwds.pop('x', x)
@@ -60,13 +62,9 @@ class hvPlotBase(object):
                         fn_args[(name, kwds[name])].append(arg)
                     for (name, fn), args in fn_args.items():
                         combined_kwds[name] = fn(*args)
-                    return self._get_converter(xd, yd, kindd, **combined_kwds)(kindd, xd, yd)
+                    plot = self._get_converter(xd, yd, kindd, **combined_kwds)(kindd, xd, yd)
+                    return pn.panel(plot, **panel_dict)
                 return pn.panel(callback)
-            panel_args = ['widgets', 'widget_location', 'widget_type']
-            panel_dict = {}
-            for k in panel_args:
-                if k in kwds:
-                    panel_dict[k] = kwds.pop(k)
             if panel_dict:
                 plot = self._get_converter(x, y, kind, **kwds)(kind, x, y)
                 return pn.panel(plot, **panel_dict)
