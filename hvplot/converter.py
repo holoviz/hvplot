@@ -1040,8 +1040,8 @@ class HoloViewsConverter(object):
             elif isinstance(tile_source, hv.element.tiles.Tiles):
                 tiles = tile_source
             elif self.geo:
-                from geoviews.element import WTMS
-                if isinstance(tile_source, gv.element.WMTS):
+                from geoviews.element import WMTS
+                if isinstance(tile_source, WMTS):
                     tiles = tile_source
                 else:
                     param.main.warning(warning)
