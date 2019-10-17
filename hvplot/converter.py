@@ -202,7 +202,8 @@ class HoloViewsConverter(object):
         updated).
     tiles (default=False):
         Whether to overlay the plot on a tile source. Tiles sources
-        can be selected by name, the default is 'Wikipedia'.
+        can be selected by name or a tiles object or class can be passed,
+        the default is 'Wikipedia'.
     """
 
     _gridded_types = ['image', 'contour', 'contourf', 'quadmesh', 'rgb', 'points']
@@ -1028,14 +1029,24 @@ class HoloViewsConverter(object):
             obj = obj * coastline
         if self.tiles:
             tile_source = 'EsriImagery' if self.tiles == 'ESRI' else self.tiles
-            if tile_source in hv.element.tile_sources:
-                tiles = hv.element.tile_sources[tile_source]()
-            else:
+            warning = ("%s tiles not recognized, must be one of: %s or a tile object" %
+                       (tile_source, sorted(hv.element.tile_sources)))
+            if tile_source is True:
                 tiles = hv.element.tiles.Wikipedia()
-                if tile_source is not True:
-                    param.main.warning(
-                        "%s tiles not recognized, must be one of: %s" %
-                        (tile_source, sorted(hv.element.tile_sources)))
+            elif tile_source in hv.element.tile_sources.keys():
+                tiles = hv.element.tile_sources[tile_source]()
+            elif tile_source in hv.element.tile_sources.values():
+                tiles = tile_source()
+            elif isinstance(tile_source, hv.element.tiles.Tiles):
+                tiles = tile_source
+            elif self.geo:
+                from geoviews.element import WMTS
+                if isinstance(tile_source, WMTS):
+                    tiles = tile_source
+                else:
+                    param.main.warning(warning)
+            else:
+                param.main.warning(warning)
             obj = tiles * obj
         return obj
 

@@ -97,6 +97,24 @@ class TestGeoAnnotation(TestCase):
         self.assertIsInstance(plot.get(0), hv.Tiles)
         self.assertIn('ArcGIS', plot.get(0).data)
 
+    def test_plot_with_specific_tile_class(self):
+        plot = self.df.hvplot.points('x', 'y', geo=True, tiles=hv.element.tiles.EsriImagery)
+        self.assertEqual(len(plot), 2)
+        self.assertIsInstance(plot.get(0), hv.Tiles)
+        self.assertIn('ArcGIS', plot.get(0).data)
+
+    def test_plot_with_specific_tile_obj(self):
+        plot = self.df.hvplot.points('x', 'y', geo=True, tiles=hv.element.tiles.EsriImagery())
+        self.assertEqual(len(plot), 2)
+        self.assertIsInstance(plot.get(0), hv.Tiles)
+        self.assertIn('ArcGIS', plot.get(0).data)
+
+    def test_plot_with_specific_gv_tile_obj(self):
+        import geoviews as gv
+        plot = self.df.hvplot.points('x', 'y', geo=True, tiles=gv.tile_sources.CartoDark)
+        self.assertEqual(len(plot), 2)
+        self.assertIsInstance(plot.get(0), gv.element.WMTS)
+
 
 class TestGeoElements(TestCase):
 
