@@ -36,6 +36,7 @@ class TestGridPlots(ComparisonTestCase):
 
         self.xds_with_attrs = xr.Dataset({'light': self.xarr_with_attrs })
         self.da_img = xr.DataArray(np.arange(-2, 2).reshape((2, 2)), name='foo')
+        self.big_img = xr.DataArray(np.arange(-1e6, 1e6).reshape(1000, 2000))
 
     def test_rgb_dataarray_no_args(self):
         rgb = self.da_rgb.hvplot()
@@ -140,3 +141,17 @@ class TestGridPlots(ComparisonTestCase):
         self.assertEqual(plot_opts.kwargs.get('symmetric'), True)
         style_opts = Store.lookup_options('bokeh', plot, 'style')
         self.assertEqual(style_opts.kwargs['cmap'], 'fire')
+
+    def test_symmetric_with_big_img_sets_symmetric_to_false_without_calculating(self):
+        plot = self.big_img.hvplot.image()
+        plot_opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(plot_opts.kwargs.get('symmetric'), False)
+        style_opts = Store.lookup_options('bokeh', plot, 'style')
+        self.assertEqual(style_opts.kwargs['cmap'], 'kbc_r')
+
+    def test_symmetric_with_big_img_and_check_symmetric_max_calculates_symmetric(self):
+        plot = self.big_img.hvplot.image(check_symmetric_max=int(1e7))
+        plot_opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(plot_opts.kwargs.get('symmetric'), True)
+        style_opts = Store.lookup_options('bokeh', plot, 'style')
+        self.assertEqual(style_opts.kwargs['cmap'], 'coolwarm')
