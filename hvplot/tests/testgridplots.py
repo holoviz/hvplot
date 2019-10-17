@@ -162,7 +162,7 @@ class TestGridPlots(ComparisonTestCase):
         self.assertEqual(style_opts.kwargs['cmap'], 'coolwarm')
 
     def test_multiple_zs(self):
-        plot = self.ds.hvplot(x='lat', y='lon', z=['temp', 'precip'])
+        plot = self.ds.hvplot(x='lat', y='lon', z=['temp', 'precip'], dynamic=False)
         assert 'temp' in plot.keys()
         assert 'precip' in plot.keys()
         assert plot['temp'].kdims == ['lat', 'lon']
