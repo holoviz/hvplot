@@ -65,4 +65,5 @@ class TestPanelObjects(TestCase):
         x = pn.widgets.Select(name='x', value='sepal_length', options=self.cols)
         y = pn.widgets.Select(name='y', value='sepal_width', options=self.cols)
 
-        self.flowers.hvplot(x, y, groupby='species')
+        pane = self.flowers.hvplot(x, y, groupby='species')
+        assert isinstance(pane, pn.param.ParamFunction)
