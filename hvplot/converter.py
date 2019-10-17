@@ -30,7 +30,7 @@ from holoviews.util.transform import dim
 from pandas import DatetimeIndex, MultiIndex
 
 from .util import (
-    is_tabular, is_series, is_dask, is_intake, is_streamz, is_xarray,
+    is_tabular, is_series, is_dask, is_intake, is_streamz, is_xarray, is_xarray_dataarray,
     process_crs, process_intake, process_xarray, check_library, is_geopandas,
     process_derived_datetime_xarray, process_derived_datetime_pandas
 )
@@ -498,7 +498,10 @@ class HoloViewsConverter(object):
             if self.data.chunks:
                 return False
             data = self.data[self.z]
-            if data.size > check_symmetric_max:
+            if is_xarray_dataarray(data):
+                if data.size > check_symmetric_max:
+                    return False
+            else:
                 return False
 
         elif self._color_dim:
@@ -921,11 +924,11 @@ class HoloViewsConverter(object):
                     obj = dataset.map(lambda ds: method(x, y, data=ds.data), Dataset)
             elif len(zs) > 1:
                 if self.dynamic:
-                    dataset = DynamicMap(lambda z: method(x, y, z, data=dataset.data),
-                                         kdims=[Dimension(self.group_label, values=zs)])
+                    obj = DynamicMap(lambda z: method(x, y, z, data=dataset.data),
+                                     kdims=[Dimension(self.group_label, values=zs)])
                 else:
-                    dataset = HoloMap({z: method(x, y, z, data=dataset.data) for z in zs},
-                                      kdims=[self.group_label])
+                    obj = HoloMap({z: method(x, y, z, data=dataset.data) for z in zs},
+                                   kdims=[self.group_label])
             else:
                 obj = method(x, y, data=dataset.data)
             if self.grid:
