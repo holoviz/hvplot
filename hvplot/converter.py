@@ -153,6 +153,12 @@ class HoloViewsConverter(object):
         the behavior.
     sort_date (default=True): bool
         Whether to sort the x-axis by date before plotting
+    symmetric (default=None): bool
+        Whether the data are symmetric around zero. If left unset, the data
+        will be checked for symmetry as long as the size is less than
+        ``check_symmetric_max``.
+    check_symmetric_max (default=1000000):
+        Size above which to stop checking for symmetry by default on the data.
 
     Datashader options
     ------------------
@@ -295,7 +301,7 @@ class HoloViewsConverter(object):
                  dynspread=False, hover_cols=[], x_sampling=None,
                  y_sampling=None, project=False, tools=[],
                  attr_labels=None, coastline=False, tiles=False,
-                 sort_date=True, **kwds):
+                 sort_date=True, check_symmetric_max=1000000, **kwds):
         # Process data and related options
         self._redim = fields
         self.use_index = use_index
@@ -450,7 +456,7 @@ class HoloViewsConverter(object):
         if (self.kind in self._colorbar_types or self.rasterize or self.datashade or self._color_dim):
             try:
                 if not use_dask:
-                    symmetric = self._process_symmetric(symmetric, clim)
+                    symmetric = self._process_symmetric(symmetric, clim, check_symmetric_max)
 
                 if self._style_opts.get('cmap') is None:
                     if symmetric:
@@ -483,7 +489,7 @@ class HoloViewsConverter(object):
             param.main.warning('Plotting {kind} plot with parameters x: {x}, '
                                'y: {y}, by: {by}, groupby: {groupby}, row/col: {grid}'.format(**kwds))
 
-    def _process_symmetric(self, symmetric, clim):
+    def _process_symmetric(self, symmetric, clim, check_symmetric_max):
         if symmetric is not None or clim is not None:
             return symmetric
 
@@ -492,6 +498,9 @@ class HoloViewsConverter(object):
             if self.data.chunks:
                 return False
             data = self.data[self.z]
+            if data.size > check_symmetric_max:
+                return False
+
         elif self._color_dim:
             data = self.data[self._color_dim]
         else:
