@@ -38,6 +38,9 @@ nbsite_gallery_conf = {
     'galleries': {
         'reference': {
             'title': 'Reference Gallery',
+            'intro': (
+                'Incomplete Reference Gallery containing some small '
+                'examples of different plot types.'),
             'sections': [
                 'pandas',
                 'geopandas',
