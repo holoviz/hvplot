@@ -25,9 +25,28 @@ html_theme_options = {
 _NAV =  (
     ('Getting Started', 'getting_started/index'),
     ('User Guide', 'user_guide/index'),
+    ('Reference Gallery', 'reference/index'),
     ('Developer Guide', 'developer_guide/index'),
     ('About', 'about')
 )
+
+extensions += ['nbsite.gallery']
+
+nbsite_gallery_conf = {
+    'github_org': 'pyviz',
+    'github_project': 'hvplot',
+    'galleries': {
+        'reference': {
+            'title': 'Reference Gallery',
+            'sections': [
+                'pandas',
+                'geopandas',
+                'xarray',
+            ]
+        }
+    },
+}
+
 
 html_context.update({
     'PROJECT': project,
