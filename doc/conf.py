@@ -13,7 +13,7 @@ version = release = hvplot.__version__
 nbbuild_cell_timeout = 600
 
 html_static_path += ['_static']
-html_theme = 'sphinx_pyviz_theme'
+html_theme = 'sphinx_holoviz_theme'
 html_theme_options = {
     'logo': 'hvplot-logo.png',
     'favicon': 'favicon.ico',
