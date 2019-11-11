@@ -128,13 +128,12 @@ install_requires = [
     'pandas'
 ]
 
-_examples_extra = [
+_examples = [
     'geoviews >=1.6.0',
     'panel',
     'geopandas',
     'xarray',
     'networkx',
-    'pygraphviz',
     'streamz >=0.3.0',
     'intake',
     'intake-parquet',
@@ -149,6 +148,10 @@ _examples_extra = [
     'phantomjs',
 ]
 
+_examples_extra = _examples + [
+    'pygraphviz',
+]
+
 extras_require = {
     'tests': [
         'coveralls',
@@ -158,7 +161,8 @@ extras_require = {
         'pytest',
         'nbsmoke >=0.2.0',
     ],
-    'examples': _examples_extra,
+    'examples': _examples,
+    'examples_extra': _examples_extra,
     'doc': _examples_extra + [
         'nbsite >=0.5.1',
         'sphinx_holoviz_theme',

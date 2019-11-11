@@ -80,7 +80,7 @@ jobs:
       install:
         - doit env_create $CHANS --python=$PYTHON_VERSION
         - source activate test-environment
-        - doit develop_install $CHANS -o examples -o doc
+        - doit develop_install $CHANS -o doc
         - doit env_capture
       script:
         - bokeh sampledata
