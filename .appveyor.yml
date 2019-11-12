@@ -5,8 +5,6 @@ environment:
   matrix:
     - PY: "3.6"
       CONDA: "C:\\Miniconda36-x64"
-    - PY: "3.7"
-      CONDA: "C:\\Miniconda37-x64"
 
 install:
   - "SET PATH=%CONDA%;%CONDA%\\Scripts;%PATH%"
@@ -23,4 +21,5 @@ skip_tags: true
 
 test_script:
   - "bokeh sampledata"
-  - "doit test_all"
+  - "doit test_flakes"
+  - "doit test_examples"
