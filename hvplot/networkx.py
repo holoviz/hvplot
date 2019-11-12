@@ -225,11 +225,7 @@ def draw(G, pos=None, **kwargs):
     g = _from_networkx(G, pos, **params)
 
     if 'nodelist' in kwargs:
-        nodelist = list(kwargs['nodelist'])
-        inds = g.nodes.dimension_values(2)
-        node_alpha = [1 if i in nodelist else 0 for i in inds]
-        g = g.clone((g.data, g.nodes.add_dimension('node_alpha', len(g.nodes.vdims), node_alpha, True)))
-        kwargs['node_alpha'] = 'node_alpha'
+        g.nodes.data = g.nodes.data.iloc[list(kwargs['nodelist'])]
 
     if 'edgelist' in kwargs:
         edges = g.array([0, 1])
