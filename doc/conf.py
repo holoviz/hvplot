@@ -25,6 +25,7 @@ html_theme_options = {
 _NAV =  (
     ('Getting Started', 'getting_started/index'),
     ('User Guide', 'user_guide/index'),
+    ('Topics',  'topics'),
     ('Developer Guide', 'developer_guide/index'),
     ('About', 'about')
 )
