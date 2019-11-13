@@ -337,6 +337,22 @@ class HoloViewsConverter(object):
                     "following plot types: %r" % (self.kind, self._geo_types))
             from cartopy import crs as ccrs
             from geoviews.util import project_extents
+
+            if isinstance(projection, basestring):
+                all_crs = [proj for proj in dir(ccrs) if
+                           callable(getattr(ccrs, proj)) and
+                           proj not in ['ABCMeta', 'CRS'] and
+                           proj[0].isupper() or
+                           proj == 'GOOGLE_MERCATOR']
+                if projection in all_crs and projection != 'GOOGLE_MERCATOR':
+                    projection = getattr(ccrs, projection)()
+                elif projection == 'GOOGLE_MERCATOR':
+                    projection = getattr(ccrs, projection)
+                else:
+                    raise ValueError(
+                        "Projection must be defined as cartopy CRS or "
+                        "one of the following CRS string:\n {0}".format(all_crs))
+
             proj_crs = projection or ccrs.GOOGLE_MERCATOR
             if self.crs != proj_crs:
                 px0, py0, px1, py1 = ccrs.GOOGLE_MERCATOR.boundary.bounds
