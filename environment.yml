@@ -49,3 +49,4 @@ dependencies:
   - intake::intake
   - intake::intake-parquet
   - boto3=1.4.7
+  - colorcet>=2
