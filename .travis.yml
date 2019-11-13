@@ -62,9 +62,14 @@ jobs:
 
     - <<: *extra_default
       env: DESC="test examples with extra dependencies" CHANS=$CHANS_REL NAME="extra-deps-env-notebooks"
+      install:
+        - doit env_create $CHANS --python=$PYTHON_VERSION --name=$NAME
+        - source activate $NAME
+        - doit develop_install $CHANS -o tests -o examples_extra
+        - doit env_capture
       script:
         - bokeh sampledata
-        - doit test_examples
+        - doit test_examples_extra
       after_success: true
 
     - <<: *default
@@ -80,7 +85,7 @@ jobs:
       install:
         - doit env_create $CHANS --python=$PYTHON_VERSION
         - source activate test-environment
-        - doit develop_install $CHANS -o examples -o doc
+        - doit develop_install $CHANS -o doc
         - doit env_capture
       script:
         - bokeh sampledata
