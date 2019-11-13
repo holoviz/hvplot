@@ -12,8 +12,6 @@ install:
   - "doit env_create %CHANS_REL% --name=test --python=%PY%"
   - "activate test"
   - "doit develop_install %CHANS_REL% -o examples -o tests"
-  - "conda install -y python-graphviz"
-  - "pip install pygraphviz"
   - "doit env_capture"
 
 build: off
