@@ -10,7 +10,6 @@ class TestGeo(TestCase):
     def setUp(self):
         try:
             import xarray as xr
-            import rasterio  # noqa
             import geoviews  # noqa
             import cartopy.crs as ccrs
         except:
@@ -27,7 +26,7 @@ class TestGeo(TestCase):
 
     def assert_projection(self, plot, proj):
         opts = hv.Store.lookup_options('bokeh', plot, 'plot')
-        assert opts.kwargs['projection'].proj4_params == proj
+        assert opts.kwargs['projection'].proj4_params['proj'] == proj
 
     def test_plot_with_crs_as_object(self):
         plot = self.da.hvplot.image('x', 'y', crs=self.crs)
