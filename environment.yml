@@ -4,21 +4,21 @@ channels:
   - intake
   - defaults
 dependencies:
-  # 
-  # Versions for pyviz-maintained packages pinned to ensure mutual compatibility
-  # 
+  #
+  # Versions for holoviz packages pinned to ensure mutual compatibility
+  #
   - bokeh::bokeh=0.13.0
   - pyviz::holoviews=1.10.6
   - datashader=0.6.6
   - param=1.6.1
-  # 
+  #
   # Direct dependencies for package installation
-  # 
+  #
   - yaml
   - requests
-  # 
+  #
   # Direct dependencies of most or all the tutorials
-  # 
+  #
   - python>=3.6,<3.7 # Pinned in case of unknown future or past compatibility issues
   - ipython=5        # Pinned to avoid tab-completion issue in ipython=6
   - numpy=1.13       # Pinned to avoid warnings with numpy=1.14 and bokeh=1.12.14
@@ -28,13 +28,13 @@ dependencies:
   - pandas
   - xarray
   - scipy
-  # 
+  #
   # Directly imported dependencies of certain specialized tutorials
   #
   - streamz=0.3.0
-  # 
+  #
   # Indirect dependencies of our direct dependencies
-  # 
+  #
   - conda-forge::selenium=3.3.1   # Required for exporting Bokeh plots to PNG
   - phantomjs=2.1.1  # Required for exporting Bokeh plots to PNG
   - netcdf4          # Required for reading .nc files
