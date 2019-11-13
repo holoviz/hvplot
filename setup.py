@@ -123,7 +123,7 @@ def package_assets(example_path):
 
 install_requires = [
     'bokeh >=1.0.0',
-    'colorcet',
+    'colorcet >=2',
     'holoviews >=1.11.0',
     'pandas'
 ]
