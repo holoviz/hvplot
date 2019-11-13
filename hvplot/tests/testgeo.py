@@ -10,6 +10,7 @@ class TestGeo(TestCase):
     def setUp(self):
         try:
             import xarray as xr
+            import rasterio  # noqa
             import geoviews  # noqa
             import cartopy.crs as ccrs
         except:
