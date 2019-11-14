@@ -3,7 +3,7 @@
 from nbsite.shared_conf import *
 
 project = u'hvPlot'
-authors = u'PyViz developers'
+authors = u'HoloViz developers'
 copyright = u'2018 ' + authors
 description = 'A high-level plotting API for the PyData ecosystem built on HoloViews'
 
@@ -25,6 +25,7 @@ html_theme_options = {
 _NAV =  (
     ('Getting Started', 'getting_started/index'),
     ('User Guide', 'user_guide/index'),
+    ('Topics',  'topics'),
     ('Developer Guide', 'developer_guide/index'),
     ('About', 'about')
 )
@@ -40,6 +41,6 @@ html_context.update({
     'LINKS': _NAV,
     'SOCIAL': (
         ('Gitter', '//gitter.im/pyviz/pyviz'),
-        ('Github', '//github.com/pyviz/hvplot'),
+        ('Github', '//github.com/holoviz/hvplot'),
     )
 })
