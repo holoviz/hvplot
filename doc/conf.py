@@ -15,7 +15,8 @@ nbbuild_cell_timeout = 600
 html_static_path += ['_static']
 html_theme = 'sphinx_holoviz_theme'
 html_theme_options = {
-    'logo': 'hvplot-logo.png',
+    'logo': 'logo_horizontal.svg',
+    'include_logo_text': False,
     'favicon': 'favicon.ico',
     'primary_color': '#266498',
     'primary_color_dark': '#1b486e',
