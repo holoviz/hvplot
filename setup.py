@@ -138,6 +138,7 @@ _examples_extra = [
     'streamz >=0.3.0',
     'intake',
     'intake-parquet',
+    'intake-xarray',
     'dask',
     'datashader >=0.6.5',
     'notebook >=5.4',
