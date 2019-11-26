@@ -22,3 +22,24 @@ sources:
           kind: line
           y: ['Robbery', 'Burglary']
           x: 'Year'
+
+  landuse:
+    description: Image matching given landuse and id from UCMerced_LandUse/Image.
+    origin: http://weegee.vision.ucmerced.edu/datasets/landuse.html
+    driver: xarray_image
+    cache:
+      - argkey: urlpath
+        regex: 'earth-data/UCMerced_LandUse'
+        type: file
+    parameters:
+      landuse:
+        description: which landuse to collect
+        type: str
+        default: airplane
+      id:
+        description: which id to collect
+        type: int
+        default: 0
+    args:
+      urlpath: "s3://earth-data/UCMerced_LandUse/Images/{{ landuse }}/{{ landuse }}{{ '%02d' % id }}.tif"
+      storage_options: {'anon': True}

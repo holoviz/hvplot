@@ -21,15 +21,38 @@ html_theme_options = {
     'primary_color': '#266498',
     'primary_color_dark': '#1b486e',
     'second_nav': True,
+    'custom_css': 'custom.css',
 }
 
 _NAV =  (
     ('Getting Started', 'getting_started/index'),
     ('User Guide', 'user_guide/index'),
+    ('Reference Gallery', 'reference/index'),
     ('Topics',  'topics'),
     ('Developer Guide', 'developer_guide/index'),
     ('About', 'about')
 )
+
+extensions += ['nbsite.gallery']
+
+nbsite_gallery_conf = {
+    'github_org': 'pyviz',
+    'github_project': 'hvplot',
+    'galleries': {
+        'reference': {
+            'title': 'Reference Gallery',
+            'intro': (
+                'Incomplete Reference Gallery containing some small '
+                'examples of different plot types.'),
+            'sections': [
+                'pandas',
+                'geopandas',
+                'xarray',
+            ]
+        }
+    },
+}
+
 
 html_context.update({
     'PROJECT': project,
