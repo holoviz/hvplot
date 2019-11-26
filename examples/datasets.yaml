@@ -27,18 +27,15 @@ sources:
     driver: csv
     args:
       urlpath:
-        - 'filecache://sampledata.bokeh.org/AAPL.csv'
-        - 'filecache://sampledata.bokeh.org/FB.csv'
-        - 'filecache://sampledata.bokeh.org/GOOG.csv'
-        - 'filecache://sampledata.bokeh.org/IBM.csv'
-        - 'filecache://sampledata.bokeh.org/MSFT.csv'
+        - 'http://sampledata.bokeh.org/AAPL.csv'
+        - 'http://sampledata.bokeh.org/FB.csv'
+        - 'http://sampledata.bokeh.org/GOOG.csv'
+        - 'http://sampledata.bokeh.org/IBM.csv'
+        - 'http://sampledata.bokeh.org/MSFT.csv'
       path_as_pattern: 'sampledata.bokeh.org/{ticker}.csv'
       csv_kwargs:
          blocksize: null
          parse_dates: ['Date']
-      storage_options:
-         target_protocol: http
-         cache_storage: '{{ CATALOG_DIR }}/data/cache'
 
   landuse:
     description: Image matching given landuse and id from UCMerced_LandUse/Image.
