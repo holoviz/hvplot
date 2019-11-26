@@ -20,6 +20,7 @@ html_theme_options = {
     'primary_color': '#266498',
     'primary_color_dark': '#1b486e',
     'second_nav': True,
+    'custom_css': 'custom.css',
 }
 
 _NAV =  (
