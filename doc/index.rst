@@ -15,5 +15,5 @@
    Reference Gallery <reference/index>
    Topics <topics>
    Developer Guide <developer_guide/index>
-   Github Source <https://github.com/pyviz/hvplot>
+   Github Source <https://github.com/holoviz/hvplot>
    About <about>
