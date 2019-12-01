@@ -33,7 +33,7 @@ Support for classic Jupyter Notebook is included with hvPlot. If you want to wor
 .. _PyPI: https://pypi.python.org/pypi/hvplot
 
 .. |License| image:: https://img.shields.io/pypi/l/hvplot.svg
-.. _License: https://github.com/pyviz/hvplot/blob/master/LICENSE.txt
+.. _License: https://github.com/holoviz/holoviz/blob/master/LICENSE.txt
 
 
 Usage

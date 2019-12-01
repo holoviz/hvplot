@@ -51,7 +51,7 @@ source repository, issue the following command:
 
 .. code-block:: sh
 
-    git clone https://github.com/pyviz/hvplot.git
+    git clone https://github.com/holoviz/hvplot.git
 
 This will create a ``hvplot`` directory at your file system
 location. This ``hvplot`` directory is referred to as the *source
