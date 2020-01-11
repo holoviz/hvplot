@@ -86,6 +86,9 @@ class HoloViewsConverter(object):
     fontscale: number
         Scales the size of all fonts by the same amount, e.g. fontscale=1.5
         enlarges all fonts (title, xticks, labels etc.) by 50%
+    fontsize: number or dict
+        Set title, label and legend text to the same fontsize. Finer control
+        by using a dict: {'title': '15pt', 'ylabel': '5px', 'ticks': 20}
     flip_xaxis/flip_yaxis: boolean
         Whether to flip the axis left to right or up and down respectively
     grid (default=False): boolean
@@ -296,7 +299,7 @@ class HoloViewsConverter(object):
                  xlim=None, ylim=None, clim=None, symmetric=None,
                  logx=None, logy=None, loglog=None, hover=None,
                  subplots=False, label=None, invert=False,
-                 stacked=False, colorbar=None, fontsize=None,
+                 stacked=False, colorbar=None,
                  datashade=False, rasterize=False,
                  row=None, col=None, figsize=None, debug=False,
                  framewise=True, aggregator=None,
