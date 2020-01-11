@@ -230,10 +230,9 @@ class HoloViewsConverter(object):
                      'yaxis', 'xformatter', 'yformatter', 'xlabel', 'ylabel',
                      'clabel', 'padding', 'responsive', 'max_height', 'max_width',
                      'min_height', 'min_width', 'frame_height', 'frame_width',
-                     'aspect', 'data_aspect']
+                     'aspect', 'data_aspect', 'fontscale']
 
-    _style_options = ['color', 'alpha', 'colormap', 'fontsize', 'c', 'cmap',
-                      'fontscale']
+    _style_options = ['color', 'alpha', 'colormap', 'fontsize', 'c', 'cmap']
 
     _op_options = ['datashade', 'rasterize', 'x_sampling', 'y_sampling',
                    'aggregator']
