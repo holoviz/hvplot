@@ -8,7 +8,7 @@ sources:
         type: file
     args:
       urlpath: 's3://assets.holoviews.org/data/airline_flights.parq'
-      storage_options: {'anon': True}
+      storage_options: {'anon': True, 'region_name':'eu-west-1'}
 
   us_crime:
     description: US Crime data
