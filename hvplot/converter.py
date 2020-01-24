@@ -51,7 +51,7 @@ class StreamingCallable(Callable):
         Allows making a copy of the Callable optionally overriding
         the callable and other parameters.
         """
-        old = {k: v for k, v in self.get_param_values()
+        old = {k: v for k, v in self.param.get_param_values()
                if k not in ['callable', 'name']}
         params = dict(old, **overrides)
         callable = self.callable if callable is None else callable
@@ -472,7 +472,7 @@ class HoloViewsConverter(object):
 
         self._plot_opts = plot_opts
         self._overlay_opts = {k: v for k, v in self._plot_opts.items()
-                              if k in OverlayPlot.params()}
+                              if k in OverlayPlot.param.params()}
 
         self._norm_opts = {'framewise': framewise, 'axiswise': not plot_opts.get('shared_axes')}
         self.kwds = kwds
