@@ -83,6 +83,12 @@ class HoloViewsConverter(object):
     ---------------
     colorbar (default=False): boolean
         Enables colorbar
+    fontscale: number
+        Scales the size of all fonts by the same amount, e.g. fontscale=1.5
+        enlarges all fonts (title, xticks, labels etc.) by 50%
+    fontsize: number or dict
+        Set title, label and legend text to the same fontsize. Finer control
+        by using a dict: {'title': '15pt', 'ylabel': '5px', 'ticks': 20}
     flip_xaxis/flip_yaxis: boolean
         Whether to flip the axis left to right or up and down respectively
     grid (default=False): boolean
@@ -227,7 +233,7 @@ class HoloViewsConverter(object):
                      'yaxis', 'xformatter', 'yformatter', 'xlabel', 'ylabel',
                      'clabel', 'padding', 'responsive', 'max_height', 'max_width',
                      'min_height', 'min_width', 'frame_height', 'frame_width',
-                     'aspect', 'data_aspect']
+                     'aspect', 'data_aspect', 'fontscale']
 
     _style_options = ['color', 'alpha', 'colormap', 'fontsize', 'c', 'cmap']
 
@@ -293,7 +299,7 @@ class HoloViewsConverter(object):
                  xlim=None, ylim=None, clim=None, symmetric=None,
                  logx=None, logy=None, loglog=None, hover=None,
                  subplots=False, label=None, invert=False,
-                 stacked=False, colorbar=None, fontsize=None,
+                 stacked=False, colorbar=None,
                  datashade=False, rasterize=False,
                  row=None, col=None, figsize=None, debug=False,
                  framewise=True, aggregator=None,
@@ -398,7 +404,8 @@ class HoloViewsConverter(object):
                    'padding', 'xformatter', 'yformatter',
                    'height', 'width', 'frame_height', 'frame_width',
                    'min_width', 'min_height', 'max_width', 'max_height',
-                   'fontsize', 'responsive', 'shared_axes', 'aspect', 'data_aspect']
+                   'fontsize', 'fontscale', 'responsive', 'shared_axes', 
+                   'aspect', 'data_aspect']
         for plotwd in plotwds:
             if plotwd in kwds:
                 plot_opts[plotwd] = kwds.pop(plotwd)
