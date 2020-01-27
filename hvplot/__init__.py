@@ -21,7 +21,7 @@ __version__ = str(param.version.Version(fpath=__file__, archive_commit="$Format:
 
 _METHOD_DOCS = {}
 
-def _get_doc(cls, kind, completions=False, docstring=True, generic=True, style=True):
+def _get_doc_and_signature(cls, kind, completions=False, docstring=True, generic=True, style=True):
     converter = HoloViewsConverter
     method = getattr(cls, kind)
     kind_opts = converter._kind_options.get(kind, [])
@@ -67,9 +67,10 @@ def _get_doc(cls, kind, completions=False, docstring=True, generic=True, style=T
     options = textwrap.dedent(converter.__doc__)
     method_doc = _METHOD_DOCS.get(kind, method.__doc__)
     _METHOD_DOCS[kind] = method_doc
-    return formatter.format(
+    docstring = formatter.format(
         kind=kind, completions=completions, docstring=textwrap.dedent(method_doc),
         options=options, style=style_opts)
+    return docstring, None
 
 
 def help(kind=None, docstring=True, generic=True, style=True):
@@ -88,7 +89,9 @@ def help(kind=None, docstring=True, generic=True, style=True):
     style: boolean (default=True)
         Whether to provide list of style options
     """
-    print(_get_doc(cls=hvPlot, kind=kind, docstring=docstring, generic=generic, style=style))
+    doc, sig = _get_doc_and_signature(cls=hvPlot, kind=kind,
+                                      docstring=docstring, generic=generic, style=style)
+    print(doc)
 
 
 def post_patch(extension='bokeh', logo=False):
@@ -98,11 +101,13 @@ def post_patch(extension='bokeh', logo=False):
 
 def _patch_doc(cls, kind):
     method = getattr(cls, kind)
-    docstring = _get_doc(cls, kind, get_ipy())
     if sys.version_info.major == 2:
+        docstring, signature = _get_doc_and_signature(cls, kind, get_ipy())
         method.__func__.__doc__ = docstring
     else:
+        docstring, signature = _get_doc_and_signature(cls, kind, False)
         method.__doc__ = docstring
+        method.__signature__ = signature
 
 
 # Patch docstrings
