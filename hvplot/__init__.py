@@ -55,11 +55,25 @@ def _get_doc_and_signature(cls, kind, completions=False, docstring=True, generic
         defaults = argspec.defaults or [None]*len(args)
         for arg, dflt in zip(args, defaults):
             parameters.append((arg, dflt))
+        signature = None
     else:
         sig = inspect.signature(method)
         for name, p in list(sig.parameters.items())[1:]:
             if p.kind == 1:
                 parameters.append((name, p.default))
+
+        extra_kwargs = _hv.core.util.unique_iterator(valid_opts + kind_opts
+                                                     + converter._axis_options
+                                                     + converter._op_options)
+        filtered_signature = [p for p in sig.parameters.values()
+                              if p.kind != inspect.Parameter.VAR_KEYWORD]
+        extra_params = [inspect.Parameter(k, inspect.Parameter.KEYWORD_ONLY)
+                        for k in extra_kwargs
+                        if k not in [p.name for p in filtered_signature]]
+        all_params = (filtered_signature + extra_params
+                      + [inspect.Parameter('kwargs', inspect.Parameter.VAR_KEYWORD)])
+        signature = inspect.Signature(all_params)
+
     parameters += [(o, None) for o in
                    valid_opts+kind_opts+converter._axis_options+converter._op_options]
 
@@ -70,7 +84,7 @@ def _get_doc_and_signature(cls, kind, completions=False, docstring=True, generic
     docstring = formatter.format(
         kind=kind, completions=completions, docstring=textwrap.dedent(method_doc),
         options=options, style=style_opts)
-    return docstring, None
+    return docstring, signature
 
 
 def help(kind=None, docstring=True, generic=True, style=True):
