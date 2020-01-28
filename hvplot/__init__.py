@@ -49,6 +49,10 @@ def _get_doc_and_signature(cls, kind, completions=False, docstring=True, generic
     style_opts = 'Style options\n-------------\n\n' + '\n'.join(sorted(valid_opts))
 
     parameters = []
+    extra_kwargs = _hv.core.util.unique_iterator(
+        valid_opts + kind_opts + converter._axis_options + converter._op_options
+    )
+
     if sys.version_info.major < 3:
         argspec = inspect.getargspec(method)
         args = argspec.args[1:]
@@ -62,9 +66,6 @@ def _get_doc_and_signature(cls, kind, completions=False, docstring=True, generic
             if p.kind == 1:
                 parameters.append((name, p.default))
 
-        extra_kwargs = _hv.core.util.unique_iterator(valid_opts + kind_opts
-                                                     + converter._axis_options
-                                                     + converter._op_options)
         filtered_signature = [p for p in sig.parameters.values()
                               if p.kind != inspect.Parameter.VAR_KEYWORD]
         extra_params = [inspect.Parameter(k, inspect.Parameter.KEYWORD_ONLY)
@@ -74,9 +75,7 @@ def _get_doc_and_signature(cls, kind, completions=False, docstring=True, generic
                       + [inspect.Parameter('kwargs', inspect.Parameter.VAR_KEYWORD)])
         signature = inspect.Signature(all_params)
 
-    parameters += [(o, None) for o in
-                   valid_opts+kind_opts+converter._axis_options+converter._op_options]
-
+    parameters += [(o, None) for o in extra_kwargs]
     completions = ', '.join(['%s=%s' % (n, v) for n, v in parameters])
     options = textwrap.dedent(converter.__doc__)
     method_doc = _METHOD_DOCS.get(kind, method.__doc__)
