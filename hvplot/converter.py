@@ -460,7 +460,7 @@ class HoloViewsConverter(object):
         if projection:
             plot_opts['projection'] = process_crs(projection)
         if title is not None:
-            plot_opts['title_format'] = title
+            plot_opts['title'] = title
         if (self.kind in self._colorbar_types or self.rasterize or self.datashade or self._color_dim):
             try:
                 if not use_dask:
