@@ -53,11 +53,3 @@ For JupyterLab support, the ``jupyterlab_pyviz`` extension is also required:
 ```
 jupyter labextension install @pyviz/jupyterlab_pyviz
 ```
-
-
-## About HoloViz
-
-hvPlot is part of the HoloViz ecosystem, which strives to make browser-based data
-visualization in Python easier to use, easier to learn, and more powerful.
-See [holoviz.org](http://holoviz.org) for related packages that you can use with hvPlot and
-[status.pyviz.org](http://status.pyviz.org) for the current status of projects.
