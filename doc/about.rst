@@ -7,4 +7,4 @@ hvPlot is part of the `HoloViz <https://holoviz.org>`_ family of tools. The `hol
 
 If you have any questions or usage issues visit the `hvPlot Discourse <https://hvplot.holoviz.org/developer_guide/index.html>`_ to set up your development environment.
 
-If you like hvPlot and have built something you want to share, tweet a link or screenshot of your latest creation at @hvPlot_org, along with any other library you used (@HoloViews, @Datashader, @BokehPlots, @Matplotlib, etc.). Thanks!
+If you like hvPlot and have built something you want to share, tweet a link or screenshot of your latest creation at @HoloViews, along with any other library you used (@HoloViz_org, @Datashader, @BokehPlots, @Matplotlib, etc.). Thanks!
