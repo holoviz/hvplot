@@ -1,5 +1,5 @@
-About Us
-========
+About
+=====
 
 hvPlot is completely open source, available under a BSD license freely for both commercial and non-commercial use. hvPlot was originally developed with the support of `Anaconda Inc. <https://anaconda.com>`_, and is now maintained by Anaconda developers and community contributors.
 
