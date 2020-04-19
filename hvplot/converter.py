@@ -235,7 +235,8 @@ class HoloViewsConverter(object):
                      'min_height', 'min_width', 'frame_height', 'frame_width',
                      'aspect', 'data_aspect', 'fontscale']
 
-    _style_options = ['color', 'alpha', 'colormap', 'fontsize', 'c', 'cmap']
+    _style_options = ['color', 'alpha', 'colormap', 'fontsize', 'c', 'cmap',
+                      'color_key']
 
     _op_options = ['datashade', 'rasterize', 'x_sampling', 'y_sampling',
                    'aggregator']
@@ -794,10 +795,12 @@ class HoloViewsConverter(object):
         style_opts.update(**{k: v for k, v in kwds.items() if k in valid_opts})
 
         # Color
-        if 'cmap' in kwds and 'colormap' in kwds:
-            raise TypeError("Only specify one of `cmap` and `colormap`.")
+        cmap_kwds = {'cmap', 'colormap', 'color_key'}.intersection(kwds)
+        if len(cmap_kwds) > 1:
+            raise TypeError('Specify at most one of `cmap`, `colormap`, or '
+                            '`color_key`.')
 
-        cmap = kwds.pop('cmap', kwds.pop('colormap', None))
+        cmap = kwds[cmap_kwds.pop()] if cmap_kwds else None
         color = kwds.pop('color', kwds.pop('c', None))
 
         if color is not None:
