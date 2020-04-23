@@ -66,6 +66,7 @@ jobs:
         - doit env_create $CHANS --python=$PYTHON_VERSION --name=$NAME
         - source activate $NAME
         - doit develop_install $CHANS -o tests -o examples_extra
+        - conda install -c conda-forge firefox geckodriver
         - doit env_capture
       script:
         - bokeh sampledata
