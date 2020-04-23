@@ -61,6 +61,7 @@ html_context.update({
     # will work without this - for canonical (so can ignore when building locally or test deploying)
     'WEBSITE_SERVER': 'https://hvplot.pyviz.org',
     'VERSION': version,
+    'GOOGLE_ANALYTICS_UA': 'UA-154795830-5',
     'NAV': _NAV,
     'LINKS': _NAV,
     'SOCIAL': (
