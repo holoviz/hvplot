@@ -66,7 +66,7 @@ class TestDatashader(ComparisonTestCase):
     @parameterized.expand([('aspect',), ('data_aspect',)])
     def test_aspect_with_datashade(self, opt):
         plot = self.df.hvplot(x='x', y='y', datashade=True, **{opt: 2})
-        opts = Store.lookup_options('bokeh', plot[0], 'plot').kwargs
+        opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
         self.assertEqual(opts[opt], 2)
         self.assertEqual(opts.get('height'), None)
         self.assertEqual(opts.get('frame_height'), None)
@@ -74,7 +74,7 @@ class TestDatashader(ComparisonTestCase):
     @parameterized.expand([('aspect',), ('data_aspect',)])
     def test_aspect_with_datashade_and_dynamic_is_false(self, opt):
         plot = self.df.hvplot(x='x', y='y', datashade=True, dynamic=False, **{opt: 2})
-        opts = Store.lookup_options('bokeh', plot[0], 'plot').kwargs
+        opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
         self.assertEqual(opts[opt], 2)
         self.assertEqual(opts.get('height'), None)
         self.assertEqual(opts.get('frame_height'), None)
@@ -82,7 +82,7 @@ class TestDatashader(ComparisonTestCase):
     @parameterized.expand([('aspect',), ('data_aspect',)])
     def test_aspect_and_frame_height_with_datashade(self, opt):
         plot = self.df.hvplot(x='x', y='y', frame_height=150, datashade=True, **{opt: 2})
-        opts = Store.lookup_options('bokeh', plot[0], 'plot').kwargs
+        opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
         self.assertEqual(opts[opt], 2)
         self.assertEqual(opts.get('frame_height'), 150)
         self.assertEqual(opts.get('height'), None)
@@ -91,7 +91,7 @@ class TestDatashader(ComparisonTestCase):
     @parameterized.expand([('aspect',), ('data_aspect',)])
     def test_aspect_and_frame_height_with_datashade_and_dynamic_is_false(self, opt):
         plot = self.df.hvplot(x='x', y='y', frame_height=150, datashade=True, dynamic=False, **{opt: 2})
-        opts = Store.lookup_options('bokeh', plot[0], 'plot').kwargs
+        opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
         self.assertEqual(opts[opt], 2)
         self.assertEqual(opts.get('frame_height'), 150)
         self.assertEqual(opts.get('height'), None)
@@ -103,12 +103,13 @@ class TestDatashader(ComparisonTestCase):
 
     def test_when_datashade_is_true_set_hover_to_false_by_default(self):
         plot = self.df.hvplot(x='x', y='y', datashade=True)
-        opts = Store.lookup_options('bokeh', plot[0], 'plot').kwargs
+        opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
         assert 'hover' not in opts.get('tools')
 
     def test_when_datashade_is_true_hover_can_still_be_true(self):
         plot = self.df.hvplot(x='x', y='y', datashade=True, hover=True)
-        opts = Store.lookup_options('bokeh', plot[0], 'plot').kwargs
+        print(plot)
+        opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
         assert 'hover' in opts.get('tools')
 
     def test_xlim_affects_x_range(self):
