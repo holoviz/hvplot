@@ -934,18 +934,29 @@ class HoloViewsConverter(object):
             else:
                 dataset = Dataset(data)
             dataset = dataset.redim(**self._redim)
+
             if groups:
-                dataset = dataset.groupby(groups, dynamic=self.dynamic)
+                datasets = dataset.groupby(groups, dynamic=self.dynamic)
                 if len(zs) > 1:
-                    dimensions = [Dimension(self.group_label, values=zs)]+dataset.kdims
+                    dimensions = [Dimension(self.group_label, values=zs)]+datasets.kdims
                     if self.dynamic:
-                        obj = DynamicMap(lambda *args: method(x, y, args[0], dataset[args[1:]].data),
-                                         kdims=dimensions)
+                        def method_wrapper(ds, x, y, z):
+                            el = method(x, y, z, ds.data)
+                            el._transforms = dataset._transforms
+                            el._dataset = ds
+                            return el
+                        obj = datasets.apply(method, x, y, per_element=True, link_inputs=False)
                     else:
                         obj = HoloMap({(z,)+k: method(x, y, z, dataset[k])
-                                       for k, v in dataset.data.items() for z in zs}, kdims=dimensions)
+                                       for k, v in datasets.data.items() for z in zs}, kdims=dimensions)
                 else:
-                    obj = dataset.map(lambda ds: method(x, y, data=ds.data), Dataset)
+                    def method_wrapper(ds, x, y):
+                        el = method(x, y, data=ds.data)
+                        el._transforms = dataset._transforms
+                        el._dataset = ds
+                        return el
+                    obj = datasets.apply(method_wrapper, x=x, y=y, per_element=True,
+                                         link_inputs=False)
             elif len(zs) > 1:
                 dimensions = [Dimension(self.group_label, values=zs)]
                 if self.dynamic:
