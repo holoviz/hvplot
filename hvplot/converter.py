@@ -655,7 +655,20 @@ class HoloViewsConverter(object):
             not_found = [g for g in groupby if g not in data.coords]
             not_found, _, _ = process_derived_datetime_xarray(data, not_found)
             data_vars = list(data.data_vars) if isinstance(data, xr.Dataset) else [data.name]
-            indexes = list(data.coords)
+            indexes = list(data.coords.indexes)
+            # Handle undeclared indexes
+            if x is not None and x not in indexes:
+                indexes.append(x)
+            if y is not None and y not in indexes:
+                indexes.append(y)
+            for data_dim in data.dims:
+                if not any(data_dim in data[c].dims for c in indexes):
+                    for coord in data.coords:
+                        if coord not in indexes and {data_dim} == set(data[coord].dims):
+                            indexes.append(data_dim)
+                            self.data = self.data.set_index({data_dim: coord})
+                            if coord not in groupby+by:
+                                groupby.append(data_dim)
             self.variables = list(data.coords) + data_vars
             if groupby and not_found:
                 raise ValueError('The supplied groupby dimension(s) %s '
@@ -915,9 +928,12 @@ class HoloViewsConverter(object):
             if self.datatype == 'geopandas':
                 columns = [c for c in data.columns if c != 'geometry']
                 shape_dims = ['Longitude', 'Latitude'] if self.geo else ['x', 'y']
-                dataset = Dataset(data, kdims=shape_dims+columns).redim(**self._redim)
+                dataset = Dataset(data, kdims=shape_dims+columns)
+            elif self.datatype == 'xarray':
+                dataset = Dataset(data, self.indexes)
             else:
-                dataset = Dataset(data).redim(**self._redim)
+                dataset = Dataset(data)
+            dataset = dataset.redim(**self._redim)
             if groups:
                 dataset = dataset.groupby(groups, dynamic=self.dynamic)
                 if len(zs) > 1:
