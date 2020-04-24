@@ -46,13 +46,15 @@ class TestChart2D(ComparisonTestCase):
     @parameterized.expand([('points', Points), ('paths', Path)])
     def test_2d_set_hover_cols_including_index(self, kind, element):
         plot = self.cat_df.hvplot(x='x', y='y', hover_cols=['index'], kind=kind)
-        assert 'index' in plot.data.columns
+        data = plot.data[0] if kind == 'paths' else plot.data
+        assert 'index' in data.columns
         self.assertEqual(plot, element(self.cat_df.reset_index(), ['x', 'y'], ['index']))
 
     @parameterized.expand([('points', Points), ('paths', Path)])
     def test_2d_set_hover_cols_to_all(self, kind, element):
         plot = self.cat_df.hvplot(x='x', y='y', hover_cols='all', kind=kind)
-        assert 'index' in plot.data.columns
+        data = plot.data[0] if kind == 'paths' else plot.data
+        assert 'index' in data.columns
         self.assertEqual(plot, element(self.cat_df.reset_index(), ['x', 'y'], ['index', 'category']))
 
     @parameterized.expand([('points', Points), ('paths', Path)])
