@@ -30,8 +30,9 @@ from holoviews.util.transform import dim
 from pandas import DatetimeIndex, MultiIndex
 
 from .util import (
-    is_tabular, is_series, is_dask, is_intake, is_streamz, is_xarray, is_xarray_dataarray,
-    process_crs, process_intake, process_xarray, check_library, is_geopandas,
+    filter_opts, is_tabular, is_series, is_dask, is_intake,
+    is_streamz, is_xarray, is_xarray_dataarray, process_crs,
+    process_intake, process_xarray, check_library, is_geopandas,
     process_derived_datetime_xarray, process_derived_datetime_pandas
 )
 
@@ -259,7 +260,8 @@ class HoloViewsConverter(object):
         'points'   : ['s', 'marker', 'c', 'scale', 'logz'],
         'polygons' : ['logz', 'c'],
         'labels'   : ['text', 'c', 's'],
-        'kde'      : ['bw_method', 'ind'],
+        'kde'      : ['bw_method', 'ind', 'bandwidth', 'cut', 'filled'],
+        'bivariate': ['bandwidth', 'cut', 'filled', 'levels']
     }
 
     _kind_mapping = {
@@ -1011,6 +1013,8 @@ class HoloViewsConverter(object):
             eltype = 'Image'
             if 'cmap' in self._style_opts:
                 style['cmap'] = self._style_opts['cmap']
+            if self._dim_ranges.get('c', (None, None)) != (None, None):
+                style['clim'] = self._dim_ranges['c']
 
         processed = operation(obj, **opts)
 
@@ -1021,7 +1025,8 @@ class HoloViewsConverter(object):
             else:
                 param.main.warning('dynspread may only be applied on datashaded plots, '
                                    'use datashade=True instead of rasterize=True.')
-        return self._apply_layers(processed).opts({eltype: {'plot': self._plot_opts, 'style': style}})
+        opts = filter_opts(eltype, dict(self._plot_opts, **style))
+        return self._apply_layers(processed).opts(eltype, **opts)
 
     def _apply_layers(self, obj):
         if self.coastline:
@@ -1269,9 +1274,8 @@ class HoloViewsConverter(object):
         if 'ylabel' in self._plot_opts and 'y' not in labelled:
             labelled.append('y')
 
-        opts = {'plot': dict(self._plot_opts, labelled=labelled),
-                'style': dict(self._style_opts),
-                'norm': self._norm_opts}
+        opts = dict(self._plot_opts, labelled=labelled,
+                    **dict(self._style_opts, **self._norm_opts))
 
         id_vars = [x]
         if any(v in self.indexes for v in id_vars):
@@ -1290,8 +1294,7 @@ class HoloViewsConverter(object):
             obj = Dataset(df, kdims, vdims).to(element, x).layout()
         else:
             obj = element(df, kdims, vdims)
-        return (obj.redim(**self._redim)
-                .relabel(**self._relabel).opts(**opts))
+        return obj.redim(**self._redim).relabel(**self._relabel).opts(**opts)
 
     def bar(self, x=None, y=None, data=None):
         data, x, y = self._process_chart_args(data, x, y)
@@ -1301,7 +1304,7 @@ class HoloViewsConverter(object):
         return self._category_plot(Bars, x, list(y), data)
 
     def barh(self, x=None, y=None, data=None):
-        return self.bar(x, y, data).opts(plot={'Bars': dict(invert_axes=True)})
+        return self.bar(x, y, data).opts('Bars', invert_axes=True)
 
     ##########################
     #   Statistical charts   #
@@ -1313,8 +1316,7 @@ class HoloViewsConverter(object):
         """
         data, x, y = self._process_chart_args(data, False, y)
 
-        opts = {'plot': dict(self._plot_opts), 'norm': self._norm_opts,
-                'style': self._style_opts}
+        opts = dict(self._plot_opts, **dict(self._style_opts, **self._norm_opts))
 
         ylim = self._plot_opts.get('ylim', (None, None))
         if not isinstance(y, (list, tuple)):
@@ -1331,7 +1333,7 @@ class HoloViewsConverter(object):
         if 'ylabel' in self._plot_opts and 'y' not in labelled:
             labelled.append('y')
 
-        opts['plot']['labelled'] = labelled
+        opts['labelled'] = labelled
 
         kdims = [self.group_label]
         data = data[list(y)]
@@ -1417,15 +1419,17 @@ class HoloViewsConverter(object):
         return (self._by_type(hists, sort=False).redim(**self._redim).opts(opts))
 
     def kde(self, x=None, y=None, data=None):
-        bw_method = self.kwds.get('bw_method', None)
-        ind = self.kwds.get('ind', None)
+        bw_method = self.kwds.pop('bw_method', None)
+        ind = self.kwds.pop('ind', None)
         if bw_method is not None or ind is not None:
             raise ValueError('hvplot does not support bw_method and ind')
 
+        dist_opts = dict(self.kwds)
         data, x, y = self._process_chart_args(data, x, y)
-        opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
-        opts = {'Distribution': opts, 'Area': opts,
-                'NdOverlay': {'plot': dict(self._overlay_opts, legend_limit=0)}}
+        opts = dict(self._plot_opts, **dict(self._style_opts, **self._norm_opts))
+        opts = filter_opts('Distribution', opts)
+        opts = {'Distribution': dict(opts, **dist_opts), 'Area': opts,
+                'NdOverlay': dict(self._overlay_opts, legend_limit=0)}
 
         xlim = self._plot_opts.get('xlim', (None, None))
         if not isinstance(y, (list, tuple)):
@@ -1447,7 +1451,7 @@ class HoloViewsConverter(object):
                 dists = NdOverlay({0: Area([], self.value_label, vdim)},
                                   [self.group_label])
         redim = self._merge_redim(ranges)
-        return (dists.redim(**redim).relabel(**self._relabel).opts(opts))
+        return dists.redim(**redim).relabel(**self._relabel).opts(opts)
 
     def density(self, x=None, y=None, data=None):
         return self.kde(x, y, data)
@@ -1505,7 +1509,9 @@ class HoloViewsConverter(object):
         self.use_index = False
         data, x, y = self._process_chart_args(data, x, y, single_y=True)
 
-        opts = dict(plot=self._plot_opts, norm=self._norm_opts, style=self._style_opts)
+        opts = dict(self._plot_opts, **self.kwds)
+        opts.update(self._style_opts)
+        opts.update(self._norm_opts)
         return (Bivariate(data, [x, y]).redim(**self._redim).opts(**opts))
 
     def table(self, x=None, y=None, data=None):

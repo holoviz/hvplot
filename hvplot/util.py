@@ -420,3 +420,10 @@ def process_dynamic_args(x, y, kind, **kwds):
             arg_names += list(k) * len(deps)
 
     return dynamic, arg_deps, arg_names
+
+
+def filter_opts(eltype, options, backend='bokeh'):
+    opts = getattr(hv.Store.options(backend), eltype)
+    allowed = [k for g in opts.groups.values()
+               for k in list(g.allowed_keywords)]
+    return {k: v for k, v in options.items() if k in allowed}
