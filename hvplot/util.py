@@ -349,12 +349,11 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, v
         for var in all_vars:
             if var in dataset.coords:
                 covered_dims.extend(dataset[var].dims)
-        leftover_dims = [dim for dim in dims if dim not in covered_dims + all_vars]
+        leftover_dims = [dim for dim in index_dims
+                         if dim not in covered_dims + all_vars]
 
-        if by is None:
-            by = leftover_dims if len(leftover_dims) == 1 else []
         if groupby is None:
-            groupby = [c for c in leftover_dims if c not in by]
+            groupby = [c for c in leftover_dims if c not in (by or [])]
     return data, x, y, by, groupby
 
 
