@@ -1,9 +1,6 @@
 import panel as _pn
 import holoviews as _hv
 
-from bokeh.io import export_png as _export_png, show as _show, save as _save
-from bokeh.resources import CDN as _CDN
-
 renderer = _hv.renderer('bokeh')
 
 save = _hv.save
