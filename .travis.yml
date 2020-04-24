@@ -43,9 +43,9 @@ jobs:
         - conda config --set always_yes True
         - conda install -c pyviz "pyctdev>=0.5" && doit ecosystem_setup
       install:
-        - doit env_create $CHANS --python=$PYTHON_VERSION
+        - doit env_create $CHANS_DEV --python=$PYTHON_VERSION
         - source activate test-environment
-        - doit develop_install $CHANS -o tests
+        - doit develop_install $CHANS_DEV -o tests
         - doit env_capture
       script: doit test_unit
 
@@ -53,9 +53,9 @@ jobs:
       <<: *default
       env: DESC="unit test with extra dependencies" CHANS=$CHANS_REL NAME="extra-deps-env"
       install:
-        - doit env_create $CHANS --python=$PYTHON_VERSION --name=$NAME
+        - doit env_create $CHANS_DEV --python=$PYTHON_VERSION --name=$NAME
         - source activate $NAME
-        - doit develop_install $CHANS -o tests -o examples
+        - doit develop_install $CHANS_DEV -o tests -o examples
         - doit env_capture
       script: doit test_unit
       after_success: coveralls
@@ -63,9 +63,9 @@ jobs:
     - <<: *extra_default
       env: DESC="test examples with extra dependencies" CHANS=$CHANS_REL NAME="extra-deps-env-notebooks"
       install:
-        - doit env_create $CHANS --python=$PYTHON_VERSION --name=$NAME
+        - doit env_create $CHANS_DEV --python=$PYTHON_VERSION --name=$NAME
         - source activate $NAME
-        - doit develop_install $CHANS -o tests -o examples_extra
+        - doit develop_install $CHANS_DEV -o tests -o examples_extra
         - conda install -c conda-forge firefox geckodriver
         - doit env_capture
       script:
