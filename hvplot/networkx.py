@@ -302,11 +302,13 @@ def draw(G, pos=None, **kwargs):
             dimension.range = lims
 
     if inspection_policy == 'nodes':
-        tooltip_dims = g.nodes.kdims[2:] + g.nodes.vdims
+        tooltip_dims = [(d.label, 'index_hover' if d in g.nodes.kdims else d.name)
+                        for d in g.nodes.kdims[2:] + g.nodes.vdims]
     else:
-        tooltip_dims = g.kdims + g.vdims
-    tooltips = [(d.label, '@{%s}' % dimension_sanitizer(d.name)) for d in tooltip_dims
-                if d not in node_styles + edge_styles]
+        tooltip_dims = [(d.label, d.name+'_values' if d in g.kdims else d.name)
+                        for d in g.kdims + g.vdims]
+    tooltips = [(label, '@{%s}' % dimension_sanitizer(name))
+                for label, name in tooltip_dims if name not in node_styles + edge_styles]
     opts['tools'] = [HoverTool(tooltips=tooltips), 'tap']
 
     g.opts(**opts)
