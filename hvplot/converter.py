@@ -634,8 +634,8 @@ class HoloViewsConverter(object):
                 other_dims = []
             da = data
             data, x, y, by_new, groupby_new = process_xarray(
-                kind, data, x, y, by, groupby, use_dask, persist, gridded,
-                label, value_label, other_dims)
+                data, x, y, by, groupby, use_dask, persist, gridded,
+                label, value_label, other_dims, kind=kind)
 
             if kind not in self._stats_types:
                 if by is None: by = by_new

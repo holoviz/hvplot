@@ -276,8 +276,8 @@ def is_geopandas(data):
     return isinstance(data, pd.DataFrame) and hasattr(data, 'geom_type') and hasattr(data, 'geometry')
 
 
-def process_xarray(kind, data, x, y, by, groupby, use_dask, persist,
-                   gridded, label, value_label, other_dims):
+def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded,
+                   label, value_label, other_dims, kind=None):
     import xarray as xr
     if isinstance(data, xr.Dataset):
         dataset = data
