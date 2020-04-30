@@ -802,8 +802,10 @@ class HoloViewsConverter(object):
         else:
             valid_opts = []
 
+        cmap_opts = ('cmap', 'colormap', 'color_key')
         for opt in valid_opts:
-            if opt not in kwds or not isinstance(kwds[opt], list) or opt in ['cmap', 'colormap']:
+            if (opt not in kwds or not isinstance(kwds[opt], list) or
+                opt in cmap_opts):
                 continue
             kwds[opt] = Cycle(kwds[opt])
 
@@ -811,16 +813,16 @@ class HoloViewsConverter(object):
         options = Store.options(backend='bokeh')
         elname = eltype.__name__
         style = options[elname].groups['style'].kwargs if elname in options else {}
-        style_opts = {k: v for k, v in style.items() if not isinstance(v, Cycle) and k != 'cmap'}
+        style_opts = {k: v for k, v in style.items() if not isinstance(v, Cycle) and k not in cmap_opts}
         style_opts.update(**{k: v for k, v in kwds.items() if k in valid_opts})
 
         # Color
-        cmap_kwds = {'cmap', 'colormap', 'color_key'}.intersection(kwds)
+        cmap_kwds = set(cmap_opts).intersection(kwds)
         if len(cmap_kwds) > 1:
             raise TypeError('Specify at most one of `cmap`, `colormap`, or '
                             '`color_key`.')
 
-        cmap = kwds[cmap_kwds.pop()] if cmap_kwds else None
+        cmap = kwds.pop(cmap_kwds.pop()) if cmap_kwds else None
         color = kwds.pop('color', kwds.pop('c', None))
 
         if color is not None:
