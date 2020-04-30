@@ -32,7 +32,7 @@ from pandas import DatetimeIndex, MultiIndex
 from .util import (
     filter_opts, is_tabular, is_series, is_dask, is_intake,
     is_streamz, is_xarray, is_xarray_dataarray, process_crs,
-    process_intake, process_xarray, check_library, is_geopandas,
+    process_intake, process_xarray, check_library, is_geodataframe,
     process_derived_datetime_xarray, process_derived_datetime_pandas
 )
 
@@ -562,11 +562,14 @@ class HoloViewsConverter(object):
         if row is not None: grid.append(row)
         if col is not None: grid.append(col)
         streaming = False
-        if is_geopandas(data):
-            datatype = 'geopandas'
+        if is_geodataframe(data):
+            datatype = 'geopandas' if hasattr(data, 'geom_type') else 'spatialpandas'
             self.data = data
             if kind is None:
-                geom_types = set([gt[5:] if 'Multi' in gt else gt for gt in data.geom_type])
+                if datatype == 'geopandas':
+                    geom_types = set([gt[5:] if 'Multi' in gt else gt for gt in data.geom_type])
+                else:
+                    geom_types = [type(data.geometry.dtype).__name__.replace('Multi', '').replace('Dtype', '')]
                 if len(geom_types) > 1:
                     raise ValueError('The GeopandasInterface can only read dataframes which '
                                      'share a common geometry type')
@@ -575,7 +578,7 @@ class HoloViewsConverter(object):
                     kind = 'points'
                 elif geom_type == 'Polygon':
                     kind = 'polygons'
-                elif geom_type in ('LineString', 'LineRing'):
+                elif geom_type in ('LineString', 'LineRing', 'Line'):
                     kind = 'paths'
         elif isinstance(data, pd.DataFrame):
             datatype = 'pandas'
@@ -720,6 +723,7 @@ class HoloViewsConverter(object):
                 raise ValueError('The supplied groupby dimension(s) %s '
                                  'could not be found, expected one or '
                                  'more of: %s' % (not_found, list(self.data.columns)))
+
         # Set data-level options
         self.x = x
         self.y = y
@@ -750,7 +754,7 @@ class HoloViewsConverter(object):
         elif hover_cols == 'all' and not self.use_index:
             self.hover_cols = [v for v in self.variables if v not in self.indexes]
 
-        if self.datatype == 'geopandas':
+        if self.datatype in ('geopandas', 'spatialpandas'):
             self.hover_cols = [c for c in self.hover_cols if c!= 'geometry']
 
         if da is not None and attr_labels is True or attr_labels is None:
@@ -937,7 +941,7 @@ class HoloViewsConverter(object):
             if not self.gridded and any(g in self.indexes for g in groups):
                 data = data.reset_index()
 
-            if self.datatype == 'geopandas':
+            if self.datatype in ('geopandas', 'spatialpandas'):
                 columns = [c for c in data.columns if c != 'geometry']
                 shape_dims = ['Longitude', 'Latitude'] if self.geo else ['x', 'y']
                 dataset = Dataset(data, kdims=shape_dims+columns)
@@ -1733,7 +1737,7 @@ class HoloViewsConverter(object):
         params = dict(self._relabel)
 
         if not (x and y):
-            if is_geopandas(data):
+            if is_geodataframe(data):
                 x, y = ('Longitude', 'Latitude') if self.geo else ('x', 'y')
             elif self.gridded_data:
                 x, y = self.variables[:2:-1]
