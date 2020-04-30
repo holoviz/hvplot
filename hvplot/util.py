@@ -3,6 +3,8 @@ Provides utilities to convert data and projections
 """
 from __future__ import absolute_import
 
+import sys
+
 from distutils.version import LooseVersion
 from types import FunctionType
 
@@ -272,7 +274,11 @@ def process_intake(data, use_dask):
     return data
 
 
-def is_geopandas(data):
+def is_geodataframe(data):
+    if 'spatialpandas' in sys.modules:
+        import spatialpandas as spd
+        if isinstance(data, spd.GeoDataFrame):
+            return True
     return isinstance(data, pd.DataFrame) and hasattr(data, 'geom_type') and hasattr(data, 'geometry')
 
 
