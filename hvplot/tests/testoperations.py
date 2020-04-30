@@ -63,6 +63,11 @@ class TestDatashader(ComparisonTestCase):
         opts = Store.lookup_options('bokeh', plot, 'style').kwargs
         self.assertEqual(opts.get('cmap'), 'kbc_r')
 
+    def test_rasterize_set_clim(self):
+        plot = self.df.hvplot.scatter('x', 'y', dynamic=False, rasterize=True, clim=(1, 4))
+        opts = Store.lookup_options('bokeh', plot, 'plot').kwargs
+        self.assertEqual(opts.get('clim'), (1, 4))
+
     @parameterized.expand([('aspect',), ('data_aspect',)])
     def test_aspect_with_datashade(self, opt):
         plot = self.df.hvplot(x='x', y='y', datashade=True, **{opt: 2})
@@ -108,7 +113,6 @@ class TestDatashader(ComparisonTestCase):
 
     def test_when_datashade_is_true_hover_can_still_be_true(self):
         plot = self.df.hvplot(x='x', y='y', datashade=True, hover=True)
-        print(plot)
         opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
         assert 'hover' in opts.get('tools')
 
