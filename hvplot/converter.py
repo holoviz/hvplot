@@ -261,7 +261,8 @@ class HoloViewsConverter(object):
         'polygons' : ['logz', 'c'],
         'labels'   : ['text', 'c', 's'],
         'kde'      : ['bw_method', 'ind', 'bandwidth', 'cut', 'filled'],
-        'bivariate': ['bandwidth', 'cut', 'filled', 'levels']
+        'bivariate': ['bandwidth', 'cut', 'filled', 'levels'],
+        'labels'   : ['xoffset', 'yoffset', 'text_font', 'text_font_size']
     }
 
     _kind_mapping = {
@@ -401,12 +402,11 @@ class HoloViewsConverter(object):
             raise ValueError('The legend option should be a boolean or '
                              'a valid legend position (i.e. one of %s).'
                              % list(self._legend_positions))
-
         plotwds = ['xticks', 'yticks', 'xlabel', 'ylabel', 'clabel',
                    'padding', 'xformatter', 'yformatter',
                    'height', 'width', 'frame_height', 'frame_width',
                    'min_width', 'min_height', 'max_width', 'max_height',
-                   'fontsize', 'fontscale', 'responsive', 'shared_axes', 
+                   'fontsize', 'fontscale', 'responsive', 'shared_axes',
                    'aspect', 'data_aspect']
         for plotwd in plotwds:
             if plotwd in kwds:
@@ -1367,7 +1367,7 @@ class HoloViewsConverter(object):
             labelled.append('y')
 
         opts = {'Histogram': self._get_opts('Histogram', labelled=labelled),
-                'NdOverlay': dict(plot=self._overlay_opts)}
+                'NdOverlay': self._overlay_opts}
         hist_opts = {'bin_range': self.kwds.get('bin_range', None),
                      'normed': self.kwds.get('normed', False),
                      'cumulative': self.kwds.get('cumulative', False)}
@@ -1396,7 +1396,7 @@ class HoloViewsConverter(object):
             else:
                 hists = histogram(ds, dimension=y, **hist_opts)
 
-            return hists.opts(opts).redim(**self._redim)
+            return hists.redim(**self._redim).opts(opts)
 
         ranges = []
         for col in y:
@@ -1414,7 +1414,7 @@ class HoloViewsConverter(object):
         for col in y:
             hist = histogram(ds, dimension=col, **hist_opts)
             hists.append((col, hist.relabel(**self._relabel)))
-        return (self._by_type(hists, sort=False).redim(**self._redim).opts(opts))
+        return self._by_type(hists, sort=False).redim(**self._redim).opts(opts)
 
     def kde(self, x=None, y=None, data=None):
         bw_method = self.kwds.pop('bw_method', None)

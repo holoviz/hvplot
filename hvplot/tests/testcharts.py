@@ -221,17 +221,12 @@ class TestChart1D(ComparisonTestCase):
         self.assertEqual(opts.kwargs['size'], '_size')
 
     def test_scatter_color_by_legend_position(self):
-        plot = self.cat_df.hvplot('x', 'y', c='category', legend='left')
+        plot = self.cat_df.hvplot.scatter('x', 'y', c='category', legend='left')
         opts = Store.lookup_options('bokeh', plot, 'plot')
         self.assertEqual(opts.kwargs['legend_position'], 'left')
 
     def test_histogram_by_category_legend_position(self):
         plot = self.cat_df.hvplot.hist('y', by='category', legend='left')
-        opts = Store.lookup_options('bokeh', plot, 'plot')
-        self.assertEqual(opts.kwargs['legend_position'], 'left')
-
-    def test_histogram_legend_position(self):
-        plot = self.cat_df.hvplot.hist('y', legend='left')
         opts = Store.lookup_options('bokeh', plot, 'plot')
         self.assertEqual(opts.kwargs['legend_position'], 'left')
 
