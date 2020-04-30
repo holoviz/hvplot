@@ -259,10 +259,9 @@ class HoloViewsConverter(object):
         'vectorfield': ['angle', 'mag'],
         'points'   : ['s', 'marker', 'c', 'scale', 'logz'],
         'polygons' : ['logz', 'c'],
-        'labels'   : ['text', 'c', 's'],
+        'labels'   : ['text', 'c', 'xoffset', 'yoffset', 'text_font', 'text_font_size'],
         'kde'      : ['bw_method', 'ind', 'bandwidth', 'cut', 'filled'],
-        'bivariate': ['bandwidth', 'cut', 'filled', 'levels'],
-        'labels'   : ['xoffset', 'yoffset', 'text_font', 'text_font_size']
+        'bivariate': ['bandwidth', 'cut', 'filled', 'levels']
     }
 
     _kind_mapping = {
@@ -303,24 +302,25 @@ class HoloViewsConverter(object):
                  logx=None, logy=None, loglog=None, hover=None,
                  subplots=False, label=None, invert=False,
                  stacked=False, colorbar=None,
-                 datashade=False, rasterize=False,
-                 row=None, col=None, figsize=None, debug=False,
-                 framewise=True, aggregator=None,
-                 projection=None, global_extent=None, geo=False,
-                 precompute=False, flip_xaxis=None, flip_yaxis=None,
-                 dynspread=False, hover_cols=[], x_sampling=None,
-                 y_sampling=None, project=False, tools=[],
-                 attr_labels=None, coastline=False, tiles=False,
-                 sort_date=True, check_symmetric_max=1000000, **kwds):
+                 datashade=False, rasterize=False, row=None, col=None,
+                 figsize=None, debug=False, framewise=True,
+                 aggregator=None, projection=None, global_extent=None,
+                 geo=False, precompute=False, flip_xaxis=None,
+                 flip_yaxis=None, dynspread=False, hover_cols=[],
+                 x_sampling=None, y_sampling=None, project=False,
+                 tools=[], attr_labels=None, coastline=False,
+                 tiles=False, sort_date=True, check_symmetric_max=1000000,
+                 **kwds):
+
         # Process data and related options
         self._redim = fields
         self.use_index = use_index
+        self.value_label = value_label
+        self.group_label = group_label
         self._process_data(kind, data, x, y, by, groupby, row, col,
                            use_dask, persist, backlog, label, value_label,
                            hover_cols, attr_labels, kwds)
 
-        self.value_label = value_label
-        self.group_label = group_label
         self.dynamic = dynamic
         self.geo = any([geo, crs, global_extent, projection, project, coastline])
         self.crs = self._process_crs(data, crs) if self.geo else None
@@ -668,6 +668,11 @@ class HoloViewsConverter(object):
                 raise ValueError('%s plot type requires gridded data, '
                                  'e.g. a NumPy array or xarray Dataset, '
                                  'found %s type' % (kind, type(self.data).__name__))
+
+            if isinstance(data.columns, pd.MultiIndex) and x in (None, 'index') and y is None and not by:
+                self.data = data.stack().reset_index(1).rename(columns={'level_1': self.group_label})
+                by = self.group_label
+                x = 'index'
 
             # Determine valid indexes
             if isinstance(self.data, pd.DataFrame):
@@ -1139,7 +1144,9 @@ class HoloViewsConverter(object):
 
         if self.by:
             if element is Bars and not self.subplots:
-                return (element(data, [x]+self.by, ys)
+                if any(y in self.indexes for y in ys):
+                    data = data.reset_index()
+                return (element(data, ([x] if x else [])+self.by, ys)
                         .relabel(**self._relabel)
                         .redim(**self._redim)
                         .opts(opts))
@@ -1150,19 +1157,21 @@ class HoloViewsConverter(object):
             chart = element(data, kdims, vdims).relabel(**self._relabel)
         return chart.redim(**self._redim).opts(opts)
 
-    def _process_chart_x(self, data, x):
+    def _process_chart_x(self, data, x, y, single_y, categories=None):
         """This should happen before _process_chart_y"""
         if x is False:
             return None
 
-        x = x or self.x
+        x = x or (self.x if self.x != y else None)
         if x is None:
             if self.use_index:
-                x = self.indexes[0]
+                xs = self.indexes
             else:
-                x = [c for c in data.columns if c not in self.by+self.groupby+self.grid][0]
+                xs = list(data.columns)
+            xs = [c for c in xs if c not in self.by+self.groupby+self.grid+[y]]
+            x = xs[0] if len(xs) else None
 
-        if not x:
+        if not x and not categories:
             raise ValueError('Could not determine what to plot. Set x explicitly')
         return x
 
@@ -1180,10 +1189,10 @@ class HoloViewsConverter(object):
             y = ys[0] if len(ys) == 1 or single_y else ys
         return y
 
-    def _process_chart_args(self, data, x, y, single_y=False):
+    def _process_chart_args(self, data, x, y, single_y=False, categories=None):
         data = self.data if data is None else data
 
-        x = self._process_chart_x(data, x)
+        x = self._process_chart_x(data, x, y, single_y, categories=categories)
         y = self._process_chart_y(data, x, y, single_y)
 
         # sort by date if enabled and x is a date
@@ -1298,8 +1307,8 @@ class HoloViewsConverter(object):
         return obj.redim(**self._redim).relabel(**self._relabel).opts(**opts)
 
     def bar(self, x=None, y=None, data=None):
-        data, x, y = self._process_chart_args(data, x, y)
-        if x and y and (self.by or not isinstance(y, (list, tuple) or len(y) == 1)):
+        data, x, y = self._process_chart_args(data, x, y, categories=self.by)
+        if (x or self.by) and y and (self.by or not isinstance(y, (list, tuple) or len(y) == 1)):
             y = y[0] if isinstance(y, (list, tuple)) else y
             return self.single_chart(Bars, x, y, data)
         return self._category_plot(Bars, x, list(y), data)
