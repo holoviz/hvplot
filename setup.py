@@ -146,7 +146,8 @@ _examples = [
     's3fs',
     'scipy',
     'pillow',
-    'selenium'
+    'selenium',
+    'spatialpandas'
 ]
 
 _examples_extra = _examples + [
