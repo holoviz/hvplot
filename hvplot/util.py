@@ -276,7 +276,8 @@ def is_geopandas(data):
     return isinstance(data, pd.DataFrame) and hasattr(data, 'geom_type') and hasattr(data, 'geometry')
 
 
-def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, value_label, other_dims):
+def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded,
+                   label, value_label, other_dims, kind=None):
     import xarray as xr
     if isinstance(data, xr.Dataset):
         dataset = data
@@ -319,7 +320,7 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, v
             y = [d for d in dims if d != x][0]
         elif y and not x:
             x = [d for d in dims if d != y][0]
-        if len(dims) > 2 and not groupby:
+        if (len(dims) > 2 and kind not in ('table', 'dataset') and not groupby):
             dims = list(data.coords[x].dims) + list(data.coords[y].dims)
             groupby = [d for d in index_dims if d not in (x, y) and d not in dims and d not in other_dims]
     else:
@@ -349,12 +350,11 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, v
         for var in all_vars:
             if var in dataset.coords:
                 covered_dims.extend(dataset[var].dims)
-        leftover_dims = [dim for dim in dims if dim not in covered_dims + all_vars]
+        leftover_dims = [dim for dim in index_dims
+                         if dim not in covered_dims + all_vars]
 
-        if by is None:
-            by = leftover_dims if len(leftover_dims) == 1 else []
         if groupby is None:
-            groupby = [c for c in leftover_dims if c not in by]
+            groupby = [c for c in leftover_dims if c not in (by or [])]
     return data, x, y, by, groupby
 
 

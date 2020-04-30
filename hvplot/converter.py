@@ -213,7 +213,7 @@ class HoloViewsConverter(object):
         the default is 'Wikipedia'.
     """
 
-    _gridded_types = ['image', 'contour', 'contourf', 'quadmesh', 'rgb', 'points']
+    _gridded_types = ['image', 'contour', 'contourf', 'quadmesh', 'rgb', 'points', 'dataset']
 
     _geom_types = ['paths', 'polygons']
 
@@ -637,7 +637,7 @@ class HoloViewsConverter(object):
             da = data
             data, x, y, by_new, groupby_new = process_xarray(
                 data, x, y, by, groupby, use_dask, persist, gridded,
-                label, value_label, other_dims)
+                label, value_label, other_dims, kind=kind)
 
             if kind not in self._stats_types:
                 if by is None: by = by_new
@@ -677,7 +677,7 @@ class HoloViewsConverter(object):
                                  'could not be found, expected one or '
                                  'more of: %s' % (not_found, list(data.coords)))
         else:
-            if gridded and not kind == 'points':
+            if gridded and kind not in ('points', 'dataset'):
                 raise ValueError('%s plot type requires gridded data, '
                                  'e.g. a NumPy array or xarray Dataset, '
                                  'found %s type' % (kind, type(self.data).__name__))
@@ -1495,7 +1495,11 @@ class HoloViewsConverter(object):
 
     def dataset(self, x=None, y=None, data=None):
         data = self.data if data is None else data
-        return Dataset(data, self.kwds.get('columns'), []).redim(**self._redim)
+        if self.gridded:
+            kdims = [self.x, self.y] if len(self.indexes) == 2 else None
+            return Dataset(data, kdims=kdims).redim(**self._redim)
+        else:
+            return Dataset(data, self.kwds.get('columns')).redim(**self._redim)
 
     def heatmap(self, x=None, y=None, data=None):
         data = self.data if data is None else data

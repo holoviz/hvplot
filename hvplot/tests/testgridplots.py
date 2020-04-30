@@ -114,8 +114,8 @@ class TestGridPlots(ComparisonTestCase):
         table = self.xds_with_attrs.hvplot.dataset()
         self.assertEqual(table.kdims[0].label, 'Declination')
         self.assertEqual(table.kdims[1].label, 'Right Ascension')
-        self.assertEqual(table.kdims[2].label, 'luminosity')
-        self.assertEqual(table.kdims[2].unit, 'lm')
+        self.assertEqual(table.vdims[0].label, 'luminosity')
+        self.assertEqual(table.vdims[0].unit, 'lm')
 
     def test_points_infer_dimension_params_from_xarray_attrs(self):
         points = self.xarr_with_attrs.hvplot.points(c='value', clim=(0, 2))
@@ -129,15 +129,15 @@ class TestGridPlots(ComparisonTestCase):
         ds = self.xarr_with_attrs.hvplot.dataset()
         self.assertEqual(ds.kdims[0].label, 'Declination')
         self.assertEqual(ds.kdims[1].label, 'Right Ascension')
-        self.assertEqual(ds.kdims[2].label, 'luminosity')
-        self.assertEqual(ds.kdims[2].unit, 'lm')
+        self.assertEqual(ds.vdims[0].label, 'luminosity')
+        self.assertEqual(ds.vdims[0].unit, 'lm')
 
     def test_table_infer_dimension_params_from_xarray_attrs(self):
         table = self.xarr_with_attrs.hvplot.dataset()
         self.assertEqual(table.kdims[0].label, 'Declination')
         self.assertEqual(table.kdims[1].label, 'Right Ascension')
-        self.assertEqual(table.kdims[2].label, 'luminosity')
-        self.assertEqual(table.kdims[2].unit, 'lm')
+        self.assertEqual(table.vdims[0].label, 'luminosity')
+        self.assertEqual(table.vdims[0].unit, 'lm')
 
     def test_symmetric_img_deduces_symmetric(self):
         plot = self.da_img.hvplot.image()
