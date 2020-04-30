@@ -1144,6 +1144,12 @@ class HoloViewsConverter(object):
                 continue
             elif dimension not in dimensions:
                 vdims.append(dimension)
+                dimensions.append(dimension)
+        agg_col = getattr(self.aggregator, 'column', None)
+        if agg_col is not None:
+            if agg_col not in dimensions:
+                vdims.append(agg_col)
+                dimensions.append(agg_col)
         for dimension in self.hover_cols:
             if (isinstance(dimension, basestring) and dimension in self.variables
                 and dimension not in dimensions):
