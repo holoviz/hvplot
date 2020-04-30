@@ -276,7 +276,8 @@ def is_geopandas(data):
     return isinstance(data, pd.DataFrame) and hasattr(data, 'geom_type') and hasattr(data, 'geometry')
 
 
-def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, value_label, other_dims):
+def process_xarray(kind, data, x, y, by, groupby, use_dask, persist,
+                   gridded, label, value_label, other_dims):
     import xarray as xr
     if isinstance(data, xr.Dataset):
         dataset = data
@@ -319,7 +320,7 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, v
             y = [d for d in dims if d != x][0]
         elif y and not x:
             x = [d for d in dims if d != y][0]
-        if len(dims) > 2 and not groupby:
+        if (len(dims) > 2 and kind not in ('table', 'dataset') and not groupby):
             dims = list(data.coords[x].dims) + list(data.coords[y].dims)
             groupby = [d for d in index_dims if d not in (x, y) and d not in dims and d not in other_dims]
     else:
