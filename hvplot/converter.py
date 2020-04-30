@@ -1028,6 +1028,11 @@ class HoloViewsConverter(object):
         opts = filter_opts(eltype, dict(self._plot_opts, **style))
         return self._apply_layers(processed).opts(eltype, **opts)
 
+    def _get_opts(self, eltype, **custom):
+        opts = dict(self._plot_opts, **dict(self._style_opts, **self._norm_opts))
+        opts.update(custom)
+        return filter_opts(eltype, opts)
+
     def _apply_layers(self, obj):
         if self.coastline:
             import geoviews as gv
@@ -1120,10 +1125,8 @@ class HoloViewsConverter(object):
         if 'ylabel' in self._plot_opts and 'y' not in labelled:
             labelled.append('y')
 
-        opts = {element.__name__: dict(
-            plot=dict(self._plot_opts, labelled=labelled),
-            norm=self._norm_opts, style=self._style_opts),
-            'NdOverlay': dict(plot=dict(self._overlay_opts, batched=False))}
+        opts = {element.name: self._get_opts(element.name, labelled=labelled),
+                'NdOverlay': dict(self._overlay_opts, batched=False)}
 
         ys = [y]
         if element is Area and self.kwds.get('y2'):
@@ -1228,9 +1231,8 @@ class HoloViewsConverter(object):
         if 'ylabel' in self._plot_opts and 'y' not in labelled:
             labelled.append('y')
 
-        opts = {element.__name__: dict(plot=dict(self._plot_opts, labelled=labelled),
-                                       norm=self._norm_opts, style=self._style_opts),
-                'NdOverlay': dict(plot=dict(self._overlay_opts, batched=False))}
+        opts = {element.name: self._get_opts(element.name, labelled=labelled),
+                'NdOverlay': dict(self._overlay_opts, batched=False)}
         charts = []
         for c in y:
             kdims, vdims = self._get_dimensions([x], [c])
@@ -1274,8 +1276,7 @@ class HoloViewsConverter(object):
         if 'ylabel' in self._plot_opts and 'y' not in labelled:
             labelled.append('y')
 
-        opts = dict(self._plot_opts, labelled=labelled,
-                    **dict(self._style_opts, **self._norm_opts))
+        opts = self._get_opts(element.name, labelled=labelled)
 
         id_vars = [x]
         if any(v in self.indexes for v in id_vars):
@@ -1316,8 +1317,7 @@ class HoloViewsConverter(object):
         """
         data, x, y = self._process_chart_args(data, False, y)
 
-        opts = dict(self._plot_opts, **dict(self._style_opts, **self._norm_opts))
-
+        opts = self._get_opts(element.name)
         ylim = self._plot_opts.get('ylim', (None, None))
         if not isinstance(y, (list, tuple)):
             ranges = {y: ylim}
@@ -1366,9 +1366,7 @@ class HoloViewsConverter(object):
         if 'ylabel' in self._plot_opts and 'y' not in labelled:
             labelled.append('y')
 
-        plot_opts = dict(self._plot_opts, labelled=labelled)
-        opts = {'Histogram': dict(
-            plot=plot_opts, style=self._style_opts, norm=self._norm_opts),
+        opts = {'Histogram': self._get_opts('Histogram', labelled=labelled),
                 'NdOverlay': dict(plot=self._overlay_opts)}
         hist_opts = {'bin_range': self.kwds.get('bin_range', None),
                      'normed': self.kwds.get('normed', False),
@@ -1426,8 +1424,7 @@ class HoloViewsConverter(object):
 
         dist_opts = dict(self.kwds)
         data, x, y = self._process_chart_args(data, x, y)
-        opts = dict(self._plot_opts, **dict(self._style_opts, **self._norm_opts))
-        opts = filter_opts('Distribution', opts)
+        opts = self._get_opts('Distribution')
         opts = {'Distribution': dict(opts, **dist_opts), 'Area': opts,
                 'NdOverlay': dict(self._overlay_opts, legend_limit=0)}
 
@@ -1466,10 +1463,10 @@ class HoloViewsConverter(object):
 
     def heatmap(self, x=None, y=None, data=None):
         data = self.data if data is None else data
-        opts = dict(plot=self._plot_opts, norm=self._norm_opts, style=self._style_opts)
+        opts = self._get_opts('HeatMap')
 
         if not (x or y) or (x == 'columns' and y in ('index', data.index.name)):
-            opts['plot']['labelled'] = []
+            opts['labelled'] = []
             x, y = 'columns', 'index'
             data = (data.columns, data.index, data.values)
             z = ['value']
@@ -1492,13 +1489,13 @@ class HoloViewsConverter(object):
         z = [self.kwds['C']] if self.kwds.get('C') else []
         z += self.hover_cols
 
-        opts = dict(plot=self._plot_opts, norm=self._norm_opts, style=self._style_opts)
+        opts = self._get_opts('HexTiles')
         if 'reduce_function' in self.kwds:
-            opts['plot']['aggregator'] = self.kwds['reduce_function']
+            opts['aggregator'] = self.kwds['reduce_function']
         if 'gridsize' in self.kwds:
-            opts['plot']['gridsize'] = self.kwds['gridsize']
+            opts['gridsize'] = self.kwds['gridsize']
         if 'min_count' in self.kwds:
-            opts['plot']['min_count'] = self.kwds['min_count']
+            opts['min_count'] = self.kwds['min_count']
         redim = self._merge_redim({(z[0] if z else 'Count'): self._dim_ranges['c']})
         element = self._get_element('hexbin')
         params = dict(self._relabel)
@@ -1509,28 +1506,24 @@ class HoloViewsConverter(object):
         self.use_index = False
         data, x, y = self._process_chart_args(data, x, y, single_y=True)
 
-        opts = dict(self._plot_opts, **self.kwds)
-        opts.update(self._style_opts)
-        opts.update(self._norm_opts)
-        return (Bivariate(data, [x, y]).redim(**self._redim).opts(**opts))
+        opts = self._get_opts('Bivariate', **self.kwds)
+        return Bivariate(data, [x, y]).redim(**self._redim).opts(**opts)
 
     def table(self, x=None, y=None, data=None):
         data = self.data if data is None else data
         if isinstance(data.index, (DatetimeIndex, MultiIndex)):
             data = data.reset_index()
 
-        allowed = ['width', 'height']
-        opts = {k: v for k, v in self._plot_opts.items() if k in allowed}
-        return Table(data, self.kwds.get('columns'), []).redim(**self._redim).opts(plot=opts)
+        opts = filter_opts('Table', self._plot_opts)
+        return Table(data, self.kwds.get('columns'), []).redim(**self._redim).opts(**opts)
 
     def labels(self, x=None, y=None, data=None):
         self.use_index = False
         data, x, y = self._process_chart_args(data, x, y, single_y=True)
 
         text = self.kwds.get('text', [c for c in data.columns if c not in (x, y)][0])
-        style = self._style_opts
         kdims, vdims = self._get_dimensions([x, y], [text])
-        opts = dict(plot=self._plot_opts, norm=self._norm_opts, style=style)
+        opts = self._get_opts('Labels')
         return Labels(data, kdims, vdims).redim(**self._redim).opts(**opts)
 
     ##########################
@@ -1579,7 +1572,7 @@ class HoloViewsConverter(object):
         z = [z] + self.hover_cols
 
         params = dict(self._relabel)
-        opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
+        opts = self._get_opts('Image')
         redim = self._merge_redim({z[0]: self._dim_ranges['c']})
 
         element = self._get_element('image')
@@ -1605,7 +1598,6 @@ class HoloViewsConverter(object):
                              (bands, nbands))
 
         params = dict(self._relabel)
-        opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
         xres, yres = data.attrs['res'] if 'res' in data.attrs else (1, 1)
         xs = data.coords[x][::-1] if xres < 0 else data.coords[x]
         ys = data.coords[y][::-1] if yres < 0 else data.coords[y]
@@ -1614,6 +1606,7 @@ class HoloViewsConverter(object):
             eldata += (data.isel(**{bands: b}).values,)
 
         element = self._get_element('rgb')
+        opts = self._get_opts('RGB')
         if self.geo: params['crs'] = self.crs
         rgb = element(eldata, [x, y], element.vdims[:nbands], **params)
         return rgb.redim(**self._redim).opts(**opts)
@@ -1628,10 +1621,10 @@ class HoloViewsConverter(object):
         z = [z] + self.hover_cols
 
         params = dict(self._relabel)
-        opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
         redim = self._merge_redim({z[0]: self._dim_ranges['c']})
 
         element = self._get_element('quadmesh')
+        opts = self._get_opts('QuadMesh')
         if self.geo: params['crs'] = self.crs
         return element(data, [x, y], z, **params).redim(**redim).opts(**opts)
 
@@ -1646,7 +1639,7 @@ class HoloViewsConverter(object):
                                  ' Spherical contouring is not supported - '
                                  ' consider using PlateCarree/RotatedPole.')
 
-        opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
+        opts = self._get_opts('Contours')
         qmesh = self.quadmesh(x, y, z, data)
 
         if self.geo:
@@ -1657,13 +1650,13 @@ class HoloViewsConverter(object):
             qmesh = project(qmesh, projection=projection)
 
         if filled:
-            opts['style']['line_alpha'] = 0
+            opts['line_alpha'] = 0
 
-        if opts['plot']['colorbar']:
-            opts['plot']['show_legend'] = False
+        if opts['colorbar']:
+            opts['show_legend'] = False
         levels = self.kwds.get('levels', 5)
         if isinstance(levels, int):
-            opts['plot']['color_levels'] = levels
+            opts['color_levels'] = levels
         return contours(qmesh, filled=filled, levels=levels).opts(**opts)
 
     def contourf(self, x=None, y=None, z=None, data=None):
@@ -1680,9 +1673,9 @@ class HoloViewsConverter(object):
         z = [angle, mag] + self.hover_cols
         redim = self._merge_redim({z[1]: self._dim_ranges['c']})
         params = dict(self._relabel)
-        opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
 
         element = self._get_element('vectorfield')
+        opts = self._get_opts('VectorField')
         if self.geo: params['crs'] = self.crs
         return element(data, [x, y], z, **params).redim(**redim).opts(**opts)
 
@@ -1702,17 +1695,17 @@ class HoloViewsConverter(object):
             else:
                 x, y = data.columns[:2]
 
-        opts = dict(plot=self._plot_opts, style=self._style_opts, norm=self._norm_opts)
         redim = self._merge_redim({self._color_dim: self._dim_ranges['c']} if self._color_dim else {})
         kdims, vdims = self._get_dimensions([x, y], [])
         element = self._get_element(kind)
+        opts = self._get_opts(element.name)
         if self.geo: params['crs'] = self.crs
         if self.by:
             obj = Dataset(data).to(element, kdims, vdims, self.by, **params).overlay()
         else:
             obj = element(data, kdims, vdims, **params)
 
-        return obj.redim(**redim).opts({element.__name__: opts})
+        return obj.redim(**redim).opts({element.name: opts})
 
     def polygons(self, x=None, y=None, data=None):
         return self._geom_plot(x, y, data, kind='polygons')
