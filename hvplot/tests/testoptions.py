@@ -41,11 +41,6 @@ class TestOptions(ComparisonTestCase):
         opts = Store.lookup_options('bokeh', plot, 'plot')
         self.assertEqual(opts.kwargs['legend_position'], 'left')
 
-    def test_histogram_legend_position(self):
-        plot = self.df.hvplot.hist('y', legend='left')
-        opts = Store.lookup_options('bokeh', plot, 'plot')
-        self.assertEqual(opts.kwargs['legend_position'], 'left')
-
     @parameterized.expand(['scatter', 'points'])
     def test_logz(self, kind):
         plot = self.df.hvplot('x', 'y', c='x', logz=True, kind=kind)
