@@ -519,8 +519,14 @@ class HoloViewsConverter(object):
         else:
             return
 
-        cmin = np.nanquantile(data, 0.05)
-        cmax = np.nanquantile(data, 0.95)
+        if hasattr(data, 'isna'):
+            finite = data[~data.isna()]
+        elif self.gridded_data:
+            finite = data.flat[np.isfinite(data.flat)]
+        else:
+            finite = data[np.isfinite(data)]
+        cmin = np.quantile(finite, 0.05)
+        cmax = np.quantile(finite, 0.95)
 
         return bool(cmin < 0 and cmax > 0)
 
