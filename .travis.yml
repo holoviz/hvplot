@@ -89,6 +89,7 @@ jobs:
         - doit develop_install $CHANS -o doc
         - doit env_capture
       script:
+        - conda install -c conda-forge firefox geckodriver 
         - bokeh sampledata
         - nbsite generate-rst --org holoviz --project-name hvplot --skip '^.*homepage.*$'
         - nbsite build --what=html --output=builtdocs
