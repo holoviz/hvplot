@@ -934,7 +934,7 @@ class HoloViewsConverter(object):
         zs = self.kwds.get('z', [])
         if not isinstance(zs, list): zs = [zs]
         groups += self.grid
-        if self.gridded:
+        if self.gridded and not kind == 'points':
             groups += self.by
         if groups or len(zs) > 1:
             if self.streaming:
@@ -986,7 +986,7 @@ class HoloViewsConverter(object):
             else:
                 obj = method(x, y, data=dataset.data)
 
-            if self.gridded:
+            if self.gridded and self.by and not kind == 'points':
                 obj = obj.layout(self.by) if self.subplots else obj.overlay(self.by) 
             if self.grid:
                 obj = obj.grid(self.grid).opts(shared_xaxis=True, shared_yaxis=True)
