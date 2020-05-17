@@ -399,7 +399,8 @@ def process_derived_datetime_pandas(data, not_found, indexes=None):
                 index = data.axes[indexes.index(base_col)]
                 if isdate(index):
                     extra_cols[var] = getattr(index, dt_str)
-    data = data.assign(**extra_cols)
+    if extra_cols:
+        data = data.assign(**extra_cols)
     not_found = [var for var in not_found if var not in extra_cols.keys()]
 
     return not_found, data
