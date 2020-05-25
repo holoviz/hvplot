@@ -36,6 +36,12 @@ from .util import (
     process_derived_datetime_xarray, process_derived_datetime_pandas
 )
 
+import sys
+def is_cudf(data):
+    if 'cudf' in sys.modules:
+        from cudf import DataFrame, Series
+        return isinstance(data, (DataFrame, Series))
+
 renderer = hv.renderer('bokeh')
 
 
@@ -586,6 +592,9 @@ class HoloViewsConverter(object):
         elif is_dask(data):
             datatype = 'dask'
             self.data = data.persist() if persist else data
+        elif is_cudf(data):
+            datatype = 'cudf'
+            self.data = data
         elif is_streamz(data):
             datatype = 'streamz'
             self.data = data.example
@@ -996,7 +1005,18 @@ class HoloViewsConverter(object):
                                                periodic=self.cb)
                 obj = DynamicMap(cbcallable, streams=[self.stream])
             else:
+                data = self.data_source
+                if self.datatype in ('geopandas', 'spatialpandas'):
+                    columns = [c for c in data.columns if c != 'geometry']
+                    shape_dims = ['Longitude', 'Latitude'] if self.geo else ['x', 'y']
+                    dataset = Dataset(data, kdims=shape_dims+columns)
+                elif self.datatype == 'xarray':
+                    dataset = Dataset(data, self.indexes)
+                else:
+                    dataset = Dataset(data)
+                    dataset = dataset.redim(**self._redim)
                 obj = method(x, y)
+                obj._dataset = dataset
 
         if self.crs and self.project:
             # Apply projection before rasterizing
