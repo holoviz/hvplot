@@ -554,6 +554,7 @@ class HoloViewsConverter(object):
             data = data.to_frame()
         if is_intake(data):
             data = process_intake(data, use_dask or persist)
+        self.source_data = data
 
         if groupby is not None and not isinstance(groupby, list):
             groupby = [groupby]
@@ -1005,7 +1006,7 @@ class HoloViewsConverter(object):
                                                periodic=self.cb)
                 obj = DynamicMap(cbcallable, streams=[self.stream])
             else:
-                data = self.data_source
+                data = self.source_data
                 if self.datatype in ('geopandas', 'spatialpandas'):
                     columns = [c for c in data.columns if c != 'geometry']
                     shape_dims = ['Longitude', 'Latitude'] if self.geo else ['x', 'y']
