@@ -30,10 +30,10 @@ from holoviews.util.transform import dim
 from pandas import DatetimeIndex, MultiIndex
 
 from .util import (
-    filter_opts, is_tabular, is_series, is_dask, is_intake,
+    filter_opts, is_tabular, is_series, is_dask, is_intake, is_cudf,
     is_streamz, is_xarray, is_xarray_dataarray, process_crs,
     process_intake, process_xarray, check_library, is_geodataframe,
-    process_derived_datetime_xarray, process_derived_datetime_pandas
+    process_derived_datetime_xarray, process_derived_datetime_pandas,
 )
 
 renderer = hv.renderer('bokeh')
@@ -318,6 +318,7 @@ class HoloViewsConverter(object):
         self.use_index = use_index
         self.value_label = value_label
         self.group_label = group_label
+        self.label = label
         self._process_data(kind, data, x, y, by, groupby, row, col,
                            use_dask, persist, backlog, label, value_label,
                            hover_cols, attr_labels, kwds)
@@ -586,6 +587,9 @@ class HoloViewsConverter(object):
         elif is_dask(data):
             datatype = 'dask'
             self.data = data.persist() if persist else data
+        elif is_cudf(data):
+            datatype = 'cudf'
+            self.data = data
         elif is_streamz(data):
             datatype = 'streamz'
             self.data = data.example
@@ -948,7 +952,12 @@ class HoloViewsConverter(object):
                 shape_dims = ['Longitude', 'Latitude'] if self.geo else ['x', 'y']
                 dataset = Dataset(data, kdims=shape_dims+columns)
             elif self.datatype == 'xarray':
-                dataset = Dataset(data, self.indexes)
+                import xarray as xr
+                if isinstance(data, xr.Dataset):
+                    dataset = Dataset(data, self.indexes)
+                else:
+                    name = data.name or self.label or self.value_label
+                    dataset = Dataset(data, self.indexes, name)
             else:
                 dataset = Dataset(data)
             dataset = dataset.redim(**self._redim)
@@ -987,7 +996,7 @@ class HoloViewsConverter(object):
                 obj = method(x, y, data=dataset.data)
 
             if self.gridded and self.by and not kind == 'points':
-                obj = obj.layout(self.by) if self.subplots else obj.overlay(self.by) 
+                obj = obj.layout(self.by) if self.subplots else obj.overlay(self.by)
             if self.grid:
                 obj = obj.grid(self.grid).opts(shared_xaxis=True, shared_yaxis=True)
         else:
@@ -996,7 +1005,23 @@ class HoloViewsConverter(object):
                                                periodic=self.cb)
                 obj = DynamicMap(cbcallable, streams=[self.stream])
             else:
+                data = self.data_source
+                if self.datatype in ('geopandas', 'spatialpandas'):
+                    columns = [c for c in data.columns if c != 'geometry']
+                    shape_dims = ['Longitude', 'Latitude'] if self.geo else ['x', 'y']
+                    dataset = Dataset(data, kdims=shape_dims+columns)
+                elif self.datatype == 'xarray':
+                    import xarray as xr
+                    if isinstance(data, xr.Dataset):
+                        dataset = Dataset(data, self.indexes)
+                    else:
+                        name = data.name or self.label or self.value_label
+                        dataset = Dataset(data, self.indexes, name)
+                else:
+                    dataset = Dataset(data)
+                    dataset = dataset.redim(**self._redim)
                 obj = method(x, y)
+                obj._dataset = dataset
 
         if self.crs and self.project:
             # Apply projection before rasterizing
