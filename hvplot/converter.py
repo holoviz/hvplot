@@ -30,17 +30,11 @@ from holoviews.util.transform import dim
 from pandas import DatetimeIndex, MultiIndex
 
 from .util import (
-    filter_opts, is_tabular, is_series, is_dask, is_intake,
+    filter_opts, is_tabular, is_series, is_dask, is_intake, is_cudf,
     is_streamz, is_xarray, is_xarray_dataarray, process_crs,
     process_intake, process_xarray, check_library, is_geodataframe,
-    process_derived_datetime_xarray, process_derived_datetime_pandas
+    process_derived_datetime_xarray, process_derived_datetime_pandas,
 )
-
-import sys
-def is_cudf(data):
-    if 'cudf' in sys.modules:
-        from cudf import DataFrame, Series
-        return isinstance(data, (DataFrame, Series))
 
 renderer = hv.renderer('bokeh')
 

@@ -231,6 +231,11 @@ def check_library(obj, library):
         library = [library]
     return any([obj.__module__.split('.')[0].startswith(l) for l in library])
 
+def is_cudf(data):
+    if 'cudf' in sys.modules:
+        from cudf import DataFrame, Series
+        return isinstance(data, (DataFrame, Series))
+
 def is_dask(data):
     if not check_library(data, 'dask'):
         return False
