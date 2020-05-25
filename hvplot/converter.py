@@ -318,6 +318,7 @@ class HoloViewsConverter(object):
         self.use_index = use_index
         self.value_label = value_label
         self.group_label = group_label
+        self.label = label
         self._process_data(kind, data, x, y, by, groupby, row, col,
                            use_dask, persist, backlog, label, value_label,
                            hover_cols, attr_labels, kwds)
@@ -951,7 +952,12 @@ class HoloViewsConverter(object):
                 shape_dims = ['Longitude', 'Latitude'] if self.geo else ['x', 'y']
                 dataset = Dataset(data, kdims=shape_dims+columns)
             elif self.datatype == 'xarray':
-                dataset = Dataset(data, self.indexes)
+                import xarray as xr
+                if isinstance(data, xr.Dataset):
+                    dataset = Dataset(data, self.indexes)
+                else:
+                    name = data.name or self.label or self.value_label
+                    dataset = Dataset(data, self.indexes, name)
             else:
                 dataset = Dataset(data)
             dataset = dataset.redim(**self._redim)
@@ -990,7 +996,7 @@ class HoloViewsConverter(object):
                 obj = method(x, y, data=dataset.data)
 
             if self.gridded and self.by and not kind == 'points':
-                obj = obj.layout(self.by) if self.subplots else obj.overlay(self.by) 
+                obj = obj.layout(self.by) if self.subplots else obj.overlay(self.by)
             if self.grid:
                 obj = obj.grid(self.grid).opts(shared_xaxis=True, shared_yaxis=True)
         else:
@@ -1005,7 +1011,12 @@ class HoloViewsConverter(object):
                     shape_dims = ['Longitude', 'Latitude'] if self.geo else ['x', 'y']
                     dataset = Dataset(data, kdims=shape_dims+columns)
                 elif self.datatype == 'xarray':
-                    dataset = Dataset(data, self.indexes)
+                    import xarray as xr
+                    if isinstance(data, xr.Dataset):
+                        dataset = Dataset(data, self.indexes)
+                    else:
+                        name = data.name or self.label or self.value_label
+                        dataset = Dataset(data, self.indexes, name)
                 else:
                     dataset = Dataset(data)
                     dataset = dataset.redim(**self._redim)
