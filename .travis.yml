@@ -82,7 +82,7 @@ jobs:
     - &doc_build
       <<: *default
       stage: docs
-      env: DESC="docs" HV_DOC_HTML="true" CHANS=$CHANS_REL
+      env: DESC="docs" HV_DOC_HTML="true" CHANS=$CHANS_DEV
       install:
         - doit env_create $CHANS --python=$PYTHON_VERSION
         - source activate test-environment
