@@ -143,15 +143,14 @@ def draw(G, pos=None, **kwargs):
     node_size : scalar or array, optional (default=300)
        Size of nodes.  If an array is specified it must be the
        same length as nodelist.
-    node_color : color string, or array of floats, (default='r')
-       Node color. Can be a single color format string,
-       or a  sequence of colors with the same length as nodelist.
-       If numeric values are specified they will be mapped to
-       colors using the cmap and vmin,vmax parameters.  See
-       matplotlib.scatter for more details.
+    node_color : color string, node attribute, or array of floats, (default='r')
+       Can be a single color, the name of an attribute on the nodes or
+       sequence of colors with the same length as nodelist.  If the
+       node_color references an attribute on the nodes or is a list of
+       values they will be colormapped using the cmap and vmin, vmax
+       parameters.
     node_shape :  string, optional (default='o')
-       The shape of the node.  Specification is as matplotlib.scatter
-       marker, one of 'so^>v<dph8'.
+       The shape of the node. Specification is as valid bokeh marker.
     alpha : float, optional (default=1.0)
        The node and edge transparency
     cmap : Colormap, optional (default=None)
@@ -163,10 +162,11 @@ def draw(G, pos=None, **kwargs):
     edge_width : float, optional (default=1.0)
        Line width of edges
     edge_color : color string, or array of floats (default='r')
-       Edge color. Can be a single color format string,
-       or a sequence of colors with the same length as edgelist.
-       If numeric values are specified they will be mapped to
-       colors using the edge_cmap and edge_vmin,edge_vmax parameters.
+       Can be a single color, the name of an attribute on the edges or
+       sequence of colors with the same length as the edges.  If the
+       edge_color references an attribute on the edges or is a list of
+       values they will be colormapped using the edge_cmap and
+       edge_vmin, edge_vmax parameters.
     edge_cmap : Matplotlib colormap, optional (default=None)
        Colormap for mapping intensities of edges
     edge_vmin,edge_vmax : floats, optional (default=None)
