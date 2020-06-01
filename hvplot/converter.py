@@ -1514,7 +1514,7 @@ class HoloViewsConverter(object):
         if not isinstance(y, (list, tuple)):
             ranges = {y: xlim}
             if self.by:
-                dists = Dataset(data, self.by, y).groupby(self.by, group_type=Distribution)
+                dists = Dataset(data).to(Distribution, y, [], self.by)
                 dists = dists.layout() if self.subplots else dists.overlay(sort=False)
             else:
                 dists = Distribution(data, y, [])
