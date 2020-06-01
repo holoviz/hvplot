@@ -1524,7 +1524,8 @@ class HoloViewsConverter(object):
             df = pd.melt(data, var_name=self.group_label, value_name=self.value_label)
             ds = Dataset(df)
             if len(df):
-                dists = ds.to(Distribution, self.value_label).overlay(sort=False)
+                dists = ds.to(Distribution, self.value_label)
+                dists = dists.layout() if self.subplots else dists.overlay(sort=False)
             else:
                 vdim = self.value_label + ' Density'
                 dists = NdOverlay({0: Area([], self.value_label, vdim)},
