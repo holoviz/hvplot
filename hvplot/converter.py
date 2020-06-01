@@ -1225,7 +1225,7 @@ class HoloViewsConverter(object):
                         .opts(opts))
             chart = Dataset(data, self.by+kdims, vdims).to(
                 element, kdims, vdims, self.by).relabel(**self._relabel)
-            chart = chart.layout() if self.subplots else chart.overlay()
+            chart = chart.layout() if self.subplots else chart.overlay(sort=False)
         else:
             chart = element(data, kdims, vdims).relabel(**self._relabel)
         return chart.redim(**self._redim).opts(opts)
@@ -1474,7 +1474,7 @@ class HoloViewsConverter(object):
                     ds.groupby(self.by), dimension=y, **hist_opts
                 )
                 hist = hists.last
-                hists = hists.layout() if self.subplots else hists.overlay()
+                hists = hists.layout() if self.subplots else hists.overlay(sort=False)
             else:
                 hists = histogram(ds, dimension=y, **hist_opts)
 
@@ -1515,7 +1515,7 @@ class HoloViewsConverter(object):
             ranges = {y: xlim}
             if self.by:
                 dists = Dataset(data).to(Distribution, y, [], self.by)
-                dists = dists.layout() if self.subplots else dists.overlay()
+                dists = dists.layout() if self.subplots else dists.overlay(sort=False)
             else:
                 dists = Distribution(data, y, [])
         else:
@@ -1524,7 +1524,8 @@ class HoloViewsConverter(object):
             df = pd.melt(data, var_name=self.group_label, value_name=self.value_label)
             ds = Dataset(df)
             if len(df):
-                dists = ds.to(Distribution, self.value_label).overlay()
+                dists = ds.to(Distribution, self.value_label)
+                dists = dists.layout() if self.subplots else dists.overlay(sort=False)
             else:
                 vdim = self.value_label + ' Density'
                 dists = NdOverlay({0: Area([], self.value_label, vdim)},
@@ -1787,7 +1788,7 @@ class HoloViewsConverter(object):
         opts = self._get_opts(element.name)
         if self.geo: params['crs'] = self.crs
         if self.by:
-            obj = Dataset(data).to(element, kdims, vdims, self.by, **params).overlay()
+            obj = Dataset(data).to(element, kdims, vdims, self.by, **params).overlay(sort=False)
         else:
             obj = element(data, kdims, vdims, **params)
 
