@@ -147,7 +147,8 @@ _examples = [
     'scipy',
     'pillow',
     'selenium',
-    'spatialpandas'
+    'spatialpandas',
+    'scikit-image'
 ]
 
 _examples_extra = _examples + [
