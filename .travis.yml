@@ -21,10 +21,10 @@ env:
 
 stages:
   - test
-  - name: docs
-    if: tag =~ ^v(\d+|\.)*[^a-z]\d*$ OR tag = website
-  - name: docs_dev
-    if: tag =~ ^v(\d+|\.)*[a-z]\d*$ OR tag = website_dev OR commit_message =~ /^.*(website_dev).*$/
+  - name: website_dev
+    if: tag =~ ^v(\d+|\.)+[a-z]\d+$ OR tag = website_dev
+  - name: website_release
+    if: tag =~ ^v(\d+|\.)+[^a-z]\d+$ OR tag = website
   - name: dev_package
     if: tag =~ ^v(\d+|\.)*[a-z]\d*$
   - name: package
@@ -80,7 +80,7 @@ jobs:
 
     - &doc_build
       <<: *default
-      stage: docs
+      stage: website_release
       env: DESC="docs" HV_DOC_HTML="true" CHANS=$CHANS_REL
       install:
         - doit env_create $CHANS --python=$PYTHON_VERSION
@@ -102,7 +102,7 @@ jobs:
           all_branches: true
 
     - <<: *doc_build
-      stage: docs_dev
+      stage: website_dev
       deploy:
         provider: pages
         skip_cleanup: true
