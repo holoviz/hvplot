@@ -4,7 +4,7 @@ from nbsite.shared_conf import *
 
 project = u'hvPlot'
 authors = u'HoloViz developers'
-copyright = u'2018 ' + authors
+copyright = u'2018-2020 ' + authors
 description = 'A high-level plotting API for the PyData ecosystem built on HoloViews'
 
 import hvplot
@@ -61,6 +61,7 @@ html_context.update({
     # will work without this - for canonical (so can ignore when building locally or test deploying)
     'WEBSITE_SERVER': 'https://hvplot.pyviz.org',
     'VERSION': version,
+    'GOOGLE_ANALYTICS_UA': 'UA-154795830-5',
     'NAV': _NAV,
     'LINKS': _NAV,
     'SOCIAL': (

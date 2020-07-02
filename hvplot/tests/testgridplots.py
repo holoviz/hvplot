@@ -43,6 +43,19 @@ class TestGridPlots(ComparisonTestCase):
             'precip': (('lon', 'lat'), 10 * np.random.rand(2, 2))},
             coords={'lon': [-99.83, -99.32],'lat': [42.25, 42.21]})
 
+        xs = np.linspace(0, 10, 5)
+        lon = xs*xs[np.newaxis, :].T
+        lat = xs+xs[:, np.newaxis]
+        coords = {
+            'lon': (('ny', 'nx'), lon),
+            'lat': (('ny', 'nx'), lat),
+            'time': [1, 2, 3],
+            'samples': ('nsamples', [0, 1, 2, 3])
+        }
+        self.ds_unindexed = xr.DataArray(
+            np.random.rand(5, 5, 3, 4), coords=coords, dims=('nx', 'ny', 'time', 'nsamples')
+        )
+
     def test_rgb_dataarray_no_args(self):
         rgb = self.da_rgb.hvplot()
         self.assertEqual(rgb, RGB(([0, 1], [0, 1])+tuple(self.da_rgb.values)))
@@ -101,8 +114,8 @@ class TestGridPlots(ComparisonTestCase):
         table = self.xds_with_attrs.hvplot.dataset()
         self.assertEqual(table.kdims[0].label, 'Declination')
         self.assertEqual(table.kdims[1].label, 'Right Ascension')
-        self.assertEqual(table.kdims[2].label, 'luminosity')
-        self.assertEqual(table.kdims[2].unit, 'lm')
+        self.assertEqual(table.vdims[0].label, 'luminosity')
+        self.assertEqual(table.vdims[0].unit, 'lm')
 
     def test_points_infer_dimension_params_from_xarray_attrs(self):
         points = self.xarr_with_attrs.hvplot.points(c='value', clim=(0, 2))
@@ -116,15 +129,15 @@ class TestGridPlots(ComparisonTestCase):
         ds = self.xarr_with_attrs.hvplot.dataset()
         self.assertEqual(ds.kdims[0].label, 'Declination')
         self.assertEqual(ds.kdims[1].label, 'Right Ascension')
-        self.assertEqual(ds.kdims[2].label, 'luminosity')
-        self.assertEqual(ds.kdims[2].unit, 'lm')
+        self.assertEqual(ds.vdims[0].label, 'luminosity')
+        self.assertEqual(ds.vdims[0].unit, 'lm')
 
     def test_table_infer_dimension_params_from_xarray_attrs(self):
         table = self.xarr_with_attrs.hvplot.dataset()
         self.assertEqual(table.kdims[0].label, 'Declination')
         self.assertEqual(table.kdims[1].label, 'Right Ascension')
-        self.assertEqual(table.kdims[2].label, 'luminosity')
-        self.assertEqual(table.kdims[2].unit, 'lm')
+        self.assertEqual(table.vdims[0].label, 'luminosity')
+        self.assertEqual(table.vdims[0].unit, 'lm')
 
     def test_symmetric_img_deduces_symmetric(self):
         plot = self.da_img.hvplot.image()
@@ -167,3 +180,14 @@ class TestGridPlots(ComparisonTestCase):
         assert 'precip' in plot.keys()
         assert plot['temp'].kdims == ['lat', 'lon']
         assert plot['precip'].kdims == ['lat', 'lon']
+
+    def test_unindexed_quadmesh(self):
+        plot = self.ds_unindexed.hvplot.quadmesh(x='lon', y='lat')
+        assert len(plot.kdims) == 2
+        assert plot.kdims[0].name == 'time'
+        assert plot.kdims[1].name == 'nsamples'
+        p = plot[1, 0]
+        assert len(p.kdims) == 2
+        assert p.kdims[0].name == 'lon'
+        assert p.kdims[1].name == 'lat'
+

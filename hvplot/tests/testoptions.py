@@ -41,11 +41,6 @@ class TestOptions(ComparisonTestCase):
         opts = Store.lookup_options('bokeh', plot, 'plot')
         self.assertEqual(opts.kwargs['legend_position'], 'left')
 
-    def test_histogram_legend_position(self):
-        plot = self.df.hvplot.hist('y', legend='left')
-        opts = Store.lookup_options('bokeh', plot, 'plot')
-        self.assertEqual(opts.kwargs['legend_position'], 'left')
-
     @parameterized.expand(['scatter', 'points'])
     def test_logz(self, kind):
         plot = self.df.hvplot('x', 'y', c='x', logz=True, kind=kind)
@@ -288,3 +283,18 @@ class TestOptions(ComparisonTestCase):
         self.assertEqual(plot_opts.kwargs.get('symmetric'), None)
         style_opts = Store.lookup_options('bokeh', plot, 'style')
         self.assertEqual(style_opts.kwargs['cmap'], 'kbc_r')
+
+    def test_bivariate_opts(self):
+        plot = self.df.hvplot.bivariate('x', 'y', bandwidth=0.2, cut=1, levels=5, filled=True)
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['bandwidth'], 0.2)
+        self.assertEqual(opts.kwargs['cut'], 1)
+        self.assertEqual(opts.kwargs['levels'], 5)
+        self.assertEqual(opts.kwargs['filled'], True)
+
+    def test_kde_opts(self):
+        plot = self.df.hvplot.kde('x', bandwidth=0.2, cut=1, filled=True)
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['bandwidth'], 0.2)
+        self.assertEqual(opts.kwargs['cut'], 1)
+        self.assertEqual(opts.kwargs['filled'], True)

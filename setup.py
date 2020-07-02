@@ -125,7 +125,8 @@ install_requires = [
     'bokeh >=1.0.0',
     'colorcet >=2',
     'holoviews >=1.11.0',
-    'pandas'
+    'pandas',
+    'numpy>=1.15'
 ]
 
 _examples = [
@@ -146,7 +147,8 @@ _examples = [
     'scipy',
     'pillow',
     'selenium',
-    'phantomjs',
+    'spatialpandas',
+    'scikit-image'
 ]
 
 _examples_extra = _examples + [

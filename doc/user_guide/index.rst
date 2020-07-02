@@ -59,7 +59,7 @@ rather than Matplotlib.
   How to use hvPlot for plotting NetworkX graphs.
 
 * `Geographic Data <Geographic_Data.html>`_
-  Using GeoViews and Cartopy to plot data in geographic coordinate systems.
+  Using GeoViews, Cartopy, GeoPandas and spatialpandas to plot data in geographic coordinate systems.
 
 * `Timeseries Data <Timeseries_Data.html>`_
   Using hvPlot when working with timeseries data.
