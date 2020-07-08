@@ -3,6 +3,8 @@ Provides utilities to convert data and projections
 """
 from __future__ import absolute_import
 
+import sys
+
 from distutils.version import LooseVersion
 from types import FunctionType
 
@@ -229,6 +231,11 @@ def check_library(obj, library):
         library = [library]
     return any([obj.__module__.split('.')[0].startswith(l) for l in library])
 
+def is_cudf(data):
+    if 'cudf' in sys.modules:
+        from cudf import DataFrame, Series
+        return isinstance(data, (DataFrame, Series))
+
 def is_dask(data):
     if not check_library(data, 'dask'):
         return False
@@ -272,11 +279,16 @@ def process_intake(data, use_dask):
     return data
 
 
-def is_geopandas(data):
+def is_geodataframe(data):
+    if 'spatialpandas' in sys.modules:
+        import spatialpandas as spd
+        if isinstance(data, spd.GeoDataFrame):
+            return True
     return isinstance(data, pd.DataFrame) and hasattr(data, 'geom_type') and hasattr(data, 'geometry')
 
 
-def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, value_label, other_dims):
+def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded,
+                   label, value_label, other_dims, kind=None):
     import xarray as xr
     if isinstance(data, xr.Dataset):
         dataset = data
@@ -319,7 +331,7 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, v
             y = [d for d in dims if d != x][0]
         elif y and not x:
             x = [d for d in dims if d != y][0]
-        if len(dims) > 2 and not groupby:
+        if (len(dims) > 2 and kind not in ('table', 'dataset') and not groupby):
             dims = list(data.coords[x].dims) + list(data.coords[y].dims)
             groupby = [d for d in index_dims if d not in (x, y) and d not in dims and d not in other_dims]
     else:
@@ -349,12 +361,11 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded, label, v
         for var in all_vars:
             if var in dataset.coords:
                 covered_dims.extend(dataset[var].dims)
-        leftover_dims = [dim for dim in dims if dim not in covered_dims + all_vars]
+        leftover_dims = [dim for dim in index_dims
+                         if dim not in covered_dims + all_vars]
 
-        if by is None:
-            by = leftover_dims if len(leftover_dims) == 1 else []
         if groupby is None:
-            groupby = [c for c in leftover_dims if c not in by]
+            groupby = [c for c in leftover_dims if c not in (by or [])]
     return data, x, y, by, groupby
 
 
@@ -393,7 +404,8 @@ def process_derived_datetime_pandas(data, not_found, indexes=None):
                 index = data.axes[indexes.index(base_col)]
                 if isdate(index):
                     extra_cols[var] = getattr(index, dt_str)
-    data = data.assign(**extra_cols)
+    if extra_cols:
+        data = data.assign(**extra_cols)
     not_found = [var for var in not_found if var not in extra_cols.keys()]
 
     return not_found, data
@@ -420,3 +432,10 @@ def process_dynamic_args(x, y, kind, **kwds):
             arg_names += list(k) * len(deps)
 
     return dynamic, arg_deps, arg_names
+
+
+def filter_opts(eltype, options, backend='bokeh'):
+    opts = getattr(hv.Store.options(backend), eltype)
+    allowed = [k for g in opts.groups.values()
+               for k in list(g.allowed_keywords)]
+    return {k: v for k, v in options.items() if k in allowed}
