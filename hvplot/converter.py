@@ -455,8 +455,11 @@ class HoloViewsConverter(object):
         if hover is None:
             hover = not self.datashade
         if hover and not any(t for t in tools if isinstance(t, HoverTool)
-                             or t == 'hover'):
-            tools.append('hover')
+                             or t in ['hover', 'vline', 'hline']):
+            if hover in ['vline', 'hline']:
+                tools.append(hover)
+            else:
+                tools.append('hover')
         plot_opts['tools'] = tools
 
         if self.crs and global_extent:
