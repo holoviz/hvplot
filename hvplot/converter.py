@@ -1747,7 +1747,6 @@ class HoloViewsConverter(object):
         levels = self.kwds.get('levels', 5)
         if isinstance(levels, int):
             opts['color_levels'] = levels
-
         return contours(qmesh, filled=filled, levels=levels).opts(**opts)
 
     def contourf(self, x=None, y=None, z=None, data=None):
