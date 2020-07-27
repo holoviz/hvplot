@@ -217,9 +217,7 @@ setup_args = dict(
     extras_require=extras_require,
     tests_require=extras_require['tests'],
     entry_points={
-        'console_scripts': [
-            'hvplot = hvplot.__main__:main'
-        ],
+        'console_scripts': [],
         'pandas_plotting_backends': [
             'holoviews = hvplot:plotting',
         ],
