@@ -1220,7 +1220,6 @@ class HoloViewsConverter(object):
             if element is Bars and not self.subplots:
                 if any(y in self.indexes for y in ys):
                     data = data.reset_index()
-                print(data)
                 return (element(data, ([x] if x else [])+self.by, ys)
                         .relabel(**self._relabel)
                         .redim(**self._redim)
