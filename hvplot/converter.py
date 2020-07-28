@@ -262,7 +262,7 @@ class HoloViewsConverter(object):
         'polygons' : ['logz', 'c'],
         'labels'   : ['text', 'c', 'xoffset', 'yoffset', 'text_font', 'text_font_size'],
         'kde'      : ['bw_method', 'ind', 'bandwidth', 'cut', 'filled'],
-        'bivariate': ['bandwidth', 'cut', 'filled', 'levels']
+        'bivariate': ['bandwidth', 'cut', 'filled', 'levels'],
     }
 
     _kind_mapping = {
@@ -311,7 +311,7 @@ class HoloViewsConverter(object):
                  x_sampling=None, y_sampling=None, project=False,
                  tools=[], attr_labels=None, coastline=False,
                  tiles=False, sort_date=True, check_symmetric_max=1000000,
-                 **kwds):
+                 value_labels=False, **kwds):
 
         # Process data and related options
         self._redim = fields
@@ -375,6 +375,7 @@ class HoloViewsConverter(object):
 
         # Process options
         self.stacked = stacked
+        self.value_labels = value_labels
 
         plot_opts = dict(self._default_plot_opts,
                          **self._process_plot())
@@ -1219,6 +1220,7 @@ class HoloViewsConverter(object):
             if element is Bars and not self.subplots:
                 if any(y in self.indexes for y in ys):
                     data = data.reset_index()
+                print(data)
                 return (element(data, ([x] if x else [])+self.by, ys)
                         .relabel(**self._relabel)
                         .redim(**self._redim)
@@ -1269,7 +1271,7 @@ class HoloViewsConverter(object):
         y = self._process_chart_y(data, x, y, single_y)
 
         # sort by date if enabled and x is a date
-        if x is not None and self.sort_date and self.datatype == 'pandas':
+        if x is not None and not isinstance(x, list) and self.sort_date and self.datatype == 'pandas':
             from pandas.api.types import is_datetime64_any_dtype as is_datetime
             if x in self.indexes:
                 index = self.indexes.index(x)
@@ -1383,11 +1385,15 @@ class HoloViewsConverter(object):
         data, x, y = self._process_chart_args(data, x, y, categories=self.by)
         if (x or self.by) and y and (self.by or not isinstance(y, (list, tuple) or len(y) == 1)):
             y = y[0] if isinstance(y, (list, tuple)) else y
-            return self.single_chart(Bars, x, y, data)
+            obj = self.single_chart(Bars, x, y, data)
+            if self.value_labels:
+                labels = Labels(obj.data, obj.kdims + obj.vdims, obj.vdims).opts(text_baseline="bottom")
+                return obj * labels
+            return obj
         return self._category_plot(Bars, x, list(y), data)
 
     def barh(self, x=None, y=None, data=None):
-        return self.bar(x, y, data).opts('Bars', invert_axes=True)
+        return self.bar(x, y, data).opts('Bars', invert_axes=True).opts("Labels", text_align="left", text_baseline="middle")
 
     ##########################
     #   Statistical charts   #
@@ -1608,7 +1614,14 @@ class HoloViewsConverter(object):
         self.use_index = False
         data, x, y = self._process_chart_args(data, x, y, single_y=True)
 
-        text = self.kwds.get('text', [c for c in data.columns if c not in (x, y)][0])
+        text = self.kwds.get('text', None)
+        if text is None:
+            unused_cols = [c for c in data.columns if c not in (x, y)]
+            if len(unused_cols) > 0:
+                text = unused_cols[0]
+            else:
+                text = y
+
         kdims, vdims = self._get_dimensions([x, y], [text])
         opts = self._get_opts('Labels')
         return Labels(data, kdims, vdims).redim(**self._redim).opts(**opts)
