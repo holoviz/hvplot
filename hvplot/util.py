@@ -248,6 +248,12 @@ def is_intake(data):
     from intake.source.base import DataSource
     return isinstance(data, DataSource)
 
+def is_ibis(data):
+    if not check_library(data, 'ibis'):
+        return False
+    import ibis
+    return isinstance(data, ibis.Expr)
+
 def is_streamz(data):
     if not check_library(data, 'streamz'):
         return False
