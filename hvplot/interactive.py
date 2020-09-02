@@ -16,7 +16,7 @@ from panel.widgets.base import Widget
 
 class Interactive():
     """
-    Interactive is a wrapper around and object that lets users create
+    Interactive is a wrapper around a Python object that lets users create
     interactive pipelines by calling existing APIs on an object with
     dynamic parameters or widgets.
     """
@@ -267,7 +267,7 @@ class Interactive():
     def layout(self):
         """
         Returns a layout of the widgets and output arranged according
-        to the center and and widget location specified in the
+        to the center and widget location specified in the
         interactive call.
         """
         widget_box = self.widgets
