@@ -758,6 +758,8 @@ class HoloViewsConverter(object):
             self.hover_cols = self.variables
         elif hover_cols == 'all' and not self.use_index:
             self.hover_cols = [v for v in self.variables if v not in self.indexes]
+        elif hover_cols !='all' and isinstance(hover_cols,str):
+            self.hover_cols = [hover_cols]
 
         if self.datatype in ('geopandas', 'spatialpandas'):
             self.hover_cols = [c for c in self.hover_cols if c!= 'geometry']
