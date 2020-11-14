@@ -26,11 +26,16 @@ class Interactive():
     _fig = None
 
     def __init__(self, obj, transform=None, plot=False, depth=0,
-                 loc='top_left', center=False, dmap=False, **kwargs):
+                 loc='top_left', center=False, dmap=False, inherit_kwargs={},
+                 **kwargs):
         self._obj = obj
         self._method = None
         if transform is None:
-            self._transform = hv.dim('*')
+            import xarray as xr
+            if isinstance(obj, xr.DataArray):
+                self._transform = hv.dim(obj.name)
+            else:
+                self._transform = hv.dim('*')
         else:
             self._transform = transform
         self._plot = plot
@@ -38,6 +43,7 @@ class Interactive():
         self._loc = loc
         self._center = center
         self._dmap = dmap
+        self._inherit_kwargs = inherit_kwargs
         self._kwargs = kwargs
         ds = hv.Dataset(self._obj)
         self._current = self._transform.apply(ds, keep_index=True, compute=False)
@@ -59,37 +65,66 @@ class Interactive():
         return evaluate
 
     def _clone(self, transform=None, plot=None, loc=None, center=None,
-              dmap=None, **kwargs):
+               dmap=None, **kwargs):
         plot = self._plot or plot
         transform = transform or self._transform
         loc = self._loc if loc is None else loc
         center = self._center if center is None else center
         dmap = self._dmap if dmap is None else dmap
         depth = self._depth+1
-        kwargs = dict(self._kwargs, **kwargs)
+        kwargs = dict(self._inherit_kwargs, **dict(self._kwargs, **kwargs))
         return type(self)(self._obj, transform, plot, depth,
-                           loc, center, dmap, **kwargs)
+                          loc, center, dmap, **kwargs)
 
     def _repr_mimebundle_(self, include=[], exclude=[]):
         return self.layout._repr_mimebundle_()
 
     def __dir__(self):
-        return [d for d in dir(self._current) if d[0] != '_']
+        current = self._current
+        if self._method:
+            current = getattr(current, self._method)
+        return [d for d in dir(current) if d[0] != '_']
 
     def __getattr__(self, name):
         if name in dir(self):
-            self._method = name
-            self.__doc__ = getattr(self._obj, name).__doc__
-            return self
+            if self._method:
+                transform = hv.dim(self._transform, self._method, accessor=True)
+                inherit_kwargs = {}
+                if self._method == 'plot':
+                    inherit_kwargs['ax'] = self._get_ax_fn()
+                new = self._clone(transform, inherit_kwargs=inherit_kwargs)
+            else:
+                new = self
+            new._method = name
+            try:
+                new.__doc__ = getattr(new, name).__doc__
+            except Exception:
+                pass
+            return new
         raise AttributeError(name)
+
+    @staticmethod
+    def _get_ax_fn():
+        @pn.depends()
+        def get_ax():
+            from matplotlib.backends.backend_agg import FigureCanvas
+            from matplotlib.pyplot import Figure
+            Interactive._fig = fig = Figure()
+            FigureCanvas(fig)
+            return fig.subplots()
+        return get_ax
 
     def __call__(self, *args, **kwargs):
         if self._method is None:
             if self._depth == 0:
                 return self._clone(*args, **kwargs)
             raise AttributeError
-        method = type(self._transform)(self._transform, self._method, accessor=True)
-        return self._clone(method(*args, **kwargs))
+        elif self._method == 'plot':
+            kwargs['ax'] = self._get_ax_fn()
+        method = type(self._transform)(self._transform, self._method,
+                                       accessor=True)
+        kwargs = dict(self._inherit_kwargs, **kwargs)
+        return self._clone(method(*args, **kwargs), plot=self._method == 'plot')
 
     #----------------------------------------------------------------
     # Interactive pipeline APIs
@@ -242,7 +277,7 @@ class Interactive():
         transform = type(self._transform)(self._transform, operator.truediv, other, reverse=True)
         return self._clone(transform)
 
-    def plot(self, *args, **kwargs):
+    def _plot(self, *args, **kwargs):
         @pn.depends()
         def get_ax():
             from matplotlib.backends.backend_agg import FigureCanvas
