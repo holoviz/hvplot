@@ -25,6 +25,10 @@ class TestGeo(TestCase):
     def assertCRS(self, plot, proj='utm'):
         assert plot.crs.proj4_params['proj'] == proj
 
+    def assert_projection(self, plot, proj):
+        opts = hv.Store.lookup_options('bokeh', plot, 'plot')
+        assert opts.kwargs['projection'].proj4_params['proj'] == proj
+
     def test_plot_with_crs_as_object(self):
         plot = self.da.hvplot.image('x', 'y', crs=self.crs)
         self.assertCRS(plot)
@@ -52,6 +56,20 @@ class TestGeo(TestCase):
         da.attrs = {'bar': self.crs}
         plot = da.hvplot.image('x', 'y', geo=True)
         self.assertCRS(plot, 'eqc')
+
+    def test_plot_with_projection_as_string(self):
+        da = self.da.copy()
+        plot = da.hvplot.image('x', 'y', projection='Robinson')
+        assert_projection(plot, 'robin')
+
+    def test_plot_with_projection_as_string_google_mercator(self):
+        da = self.da.copy()
+        plot = da.hvplot.image('x', 'y', projection='GOOGLE_MERCATOR')
+        assert_projection(plot, 'merc')
+
+    def test_plot_with_projection_as_invalid_string(self):
+        with self.assertRaisesRegex(ValueError, "Projection must be defined"):
+            self.da.hvplot.image('x', 'y', projection='foo')
 
 
 class TestGeoAnnotation(TestCase):
