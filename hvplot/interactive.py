@@ -134,9 +134,10 @@ class Interactive():
     def __abs__(self):
         transform = type(self._transform)(self._transform, abs)
         return self._clone(transform)
+
     def __round__(self, ndigits=None):
         args = () if ndigits is None else (ndigits,)
-        transform = type(self._transform)(self._transform, round_, *args)
+        transform = type(self._transform)(self._transform, round, *args)
         return self._clone(transform)
 
     # Unary operators
@@ -379,7 +380,7 @@ class Interactive():
                     if isinstance(op_arg, IPyWidget):
                         widgets.append(op_arg)
                 if (isinstance(op_arg, param.Parameter) and
-                    isinstance(op_arg.owner, Widget)):
+                    isinstance(op_arg.owner, pn.widgets.Widget)):
                     widget.append(op_arg.owner)
         return pn.Column(*widgets)
 
