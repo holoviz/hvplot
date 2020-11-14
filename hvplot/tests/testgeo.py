@@ -60,12 +60,12 @@ class TestGeo(TestCase):
     def test_plot_with_projection_as_string(self):
         da = self.da.copy()
         plot = da.hvplot.image('x', 'y', projection='Robinson')
-        assert_projection(plot, 'robin')
+        self.assert_projection(plot, 'robin')
 
     def test_plot_with_projection_as_string_google_mercator(self):
         da = self.da.copy()
         plot = da.hvplot.image('x', 'y', projection='GOOGLE_MERCATOR')
-        assert_projection(plot, 'merc')
+        self.assert_projection(plot, 'merc')
 
     def test_plot_with_projection_as_invalid_string(self):
         with self.assertRaisesRegex(ValueError, "Projection must be defined"):
