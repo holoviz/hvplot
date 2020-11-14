@@ -381,7 +381,7 @@ class Interactive():
                         widgets.append(op_arg)
                 if (isinstance(op_arg, param.Parameter) and
                     isinstance(op_arg.owner, pn.widgets.Widget)):
-                    widget.append(op_arg.owner)
+                    widgets.append(op_arg.owner)
         return pn.Column(*widgets)
 
     def dmap(self):
