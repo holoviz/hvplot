@@ -19,8 +19,8 @@ def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=Fals
     _patch_interactive = lambda self: Interactive(self)
     _patch_interactive.__doc__ = Interactive.__call__.__doc__
     interactive_prop = property(_patch_interactive)
-    setattr(cudf.DataFrame, name, interactive_prop)
-    setattr(cudf.Series, name, interactive_prop)
+    setattr(cudf.DataFrame, interactive, interactive_prop)
+    setattr(cudf.Series, interactive, interactive_prop)
 
     post_patch(extension, logo)
 
