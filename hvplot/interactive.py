@@ -14,6 +14,29 @@ from panel.layout import Column, Row, VSpacer, HSpacer
 from panel.widgets.base import Widget
 
 
+def _find_widgets(op):
+    widgets = []
+    op_args = list(op['args'])+list(op['kwargs'].values())
+    for op_arg in op_args:
+        if 'panel' in sys.modules:
+            if isinstance(op_arg, Widget) and op_arg not in widgets:
+                widgets.append(op_arg)
+        if isinstance(op_arg, hv.dim):
+            for nested_op in op_arg.ops:
+                for widget in _find_widgets(nested_op):
+                    if widget not in widgets:
+                        widgets.append(widget)
+        if 'ipywidgets' in sys.modules:
+            from ipywidgets import Widget as IPyWidget
+            if isinstance(op_arg, IPyWidget) and op_arg not in widgets:
+                widgets.append(op_arg)
+        if (isinstance(op_arg, param.Parameter) and
+            isinstance(op_arg.owner, pn.widgets.Widget) and
+            op_arg.owner not in widgets):
+            widgets.append(op_arg.owner)
+    return widgets
+
+
 class Interactive():
     """
     Interactive is a wrapper around a Python object that lets users create
@@ -278,6 +301,11 @@ class Interactive():
         transform = type(self._transform)(self._transform, operator.truediv, other, reverse=True)
         return self._clone(transform)
 
+    def __getitem__(self, other):
+        other = other._transform if isinstance(other, Interactive) else other
+        transform = type(self._transform)(self._transform, operator.getitem, other)
+        return self._clone(transform)
+
     def _plot(self, *args, **kwargs):
         @pn.depends()
         def get_ax():
@@ -370,18 +398,9 @@ class Interactive():
         """
         widgets = []
         for op in self._transform.ops:
-            op_args = list(op['args'])+list(op['kwargs'].values())
-            for op_arg in op_args:
-                if 'panel' in sys.modules:
-                    if isinstance(op_arg, Widget):
-                        widgets.append(op_arg)
-                if 'ipywidgets' in sys.modules:
-                    from ipywidgets import Widget as IPyWidget
-                    if isinstance(op_arg, IPyWidget):
-                        widgets.append(op_arg)
-                if (isinstance(op_arg, param.Parameter) and
-                    isinstance(op_arg.owner, pn.widgets.Widget)):
-                    widgets.append(op_arg.owner)
+            for w in _find_widgets(op):
+                if w not in widgets:
+                    widgets.append(w)
         return pn.Column(*widgets)
 
     def dmap(self):
