@@ -13,6 +13,9 @@ class XArrayInteractive(Interactive):
         processed = {}
         for k, v in kwargs.items():
             if isinstance(v, type) and issubclass(v, Widget):
+                if hasattr(v, 'end'):
+                    values = self._current[k].values
+                    v = v(name=k, start=values.min(), end=values.max())
                 if hasattr(v, 'options'):
                     v = v(name=k, options={str(v): v for v in self._current[k].values})
             processed[k] = v
