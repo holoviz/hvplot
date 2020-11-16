@@ -2,7 +2,14 @@ from __future__ import absolute_import
 
 from .interactive import Interactive
 
-def patch(name='hvplot', extension='bokeh', logo=False):
+class DaskInteractive(Interactive):
+
+    def compute(self):
+        self._method = 'compute'
+        return self.__call__()
+
+
+def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=False):
     from . import hvPlotTabular, post_patch
 
     try:
@@ -16,11 +23,11 @@ def patch(name='hvplot', extension='bokeh', logo=False):
     setattr(dd.DataFrame, name, plot_prop)
     setattr(dd.Series, name, plot_prop)
 
-    _patch_interactive = lambda self: Interactive(self)
-    _patch_interactive.__doc__ = Interactive.__call__.__doc__
-    interactive_prop = property(_patch_plot)
-    setattr(dd.DataFrame, name, interactive_prop)
-    setattr(dd.Series, name, interactive_prop)
+    _patch_interactive = lambda self: DaskInteractive(self)
+    _patch_interactive.__doc__ = DaskInteractive.__call__.__doc__
+    interactive_prop = property(_patch_interactive)
+    setattr(dd.DataFrame, interactive, interactive_prop)
+    setattr(dd.Series, interactive, interactive_prop)
 
     post_patch(extension, logo)
 
