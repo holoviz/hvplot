@@ -134,6 +134,8 @@ class HoloViewsConverter(object):
         number of degrees.
     shared_axes (default=True): boolean
         Whether to link axes between plots
+    transforms (default={}): dict
+        A dictionary of HoloViews dim transforms to apply before plotting
     title (default=''): str
         Title for the plot
     tools (default=[]): list
