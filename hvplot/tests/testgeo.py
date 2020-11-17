@@ -48,8 +48,8 @@ class TestGeo(TestCase):
         self.assertCRS(plot)
 
     def test_plot_with_crs_as_nonexistent_attr_str(self):
-        with self.assertRaisesRegex(ValueError, "'foo' must be"):
-            self.da.hvplot.image('x', 'y', crs='foo')
+        plot = self.da.hvplot.image('x', 'y', crs='foo')
+        self.assertCRS(plot, 'eqc')
 
     def test_plot_with_geo_as_true_crs_no_crs_on_data_returns_default(self):
         da = self.da.copy()
