@@ -1097,6 +1097,8 @@ class HoloViewsConverter(object):
         style = {}
         if self.datashade:
             operation = datashade
+            if 'cmap' in opts:
+                opts['color_key'] = opts['cmap']
             eltype = 'RGB'
         else:
             operation = rasterize
