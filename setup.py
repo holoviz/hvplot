@@ -3,7 +3,6 @@ import os
 import sys
 import shutil
 
-from collections import defaultdict
 from setuptools import setup, find_packages
 
 import pyct.build
@@ -103,7 +102,7 @@ setup_args = dict(
     author_email= "developers@pyviz.org",
     maintainer="HoloViz developers",
     maintainer_email="developers@pyviz.org",
-    packages=find_packages()+packages,
+    packages=find_packages(),
     package_data={'hvplot': ['.version']},
     platforms=['Windows', 'Mac OS X', 'Linux'],
     license='BSD',
