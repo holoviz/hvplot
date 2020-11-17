@@ -100,7 +100,7 @@ class Interactive():
                           loc, center, dmap, **kwargs)
 
     def _repr_mimebundle_(self, include=[], exclude=[]):
-        return self.layout._repr_mimebundle_()
+        return self.layout()._repr_mimebundle_()
 
     def __dir__(self):
         current = self._current
@@ -327,15 +327,14 @@ class Interactive():
     # Public API
     #----------------------------------------------------------------
 
-    @property
     def layout(self):
         """
         Returns a layout of the widgets and output arranged according
         to the center and widget location specified in the
         interactive call.
         """
-        widget_box = self.widgets
-        panel = self.output
+        widget_box = self.widgets()
+        panel = self.output()
         loc = self._loc
         if loc in ('left', 'right'):
             widgets = Column(VSpacer(), widget_box, VSpacer())
