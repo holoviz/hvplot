@@ -34,7 +34,7 @@ class TestGeo(TestCase):
         assert opts.kwargs['projection'].proj4_params['proj'] == proj
 
 
-class TestCRSInference(TestCase):
+class TestCRSInference(TestGeo):
 
     def setUp(self):
         if sys.platform == "win32":
