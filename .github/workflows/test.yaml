@@ -55,7 +55,7 @@ jobs:
           eval "$(conda shell.bash hook)"
           conda activate test-environment
           conda list
-          doit develop_install ${{ env.CHANS_DEV}} -o examples -o tests
+          doit develop_install ${{ env.CHANS_DEV}} -o examples_extra -o tests
       - name: doit env_capture
         run: |
           eval "$(conda shell.bash hook)"
