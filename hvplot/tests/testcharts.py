@@ -250,27 +250,27 @@ class TestChart1D(ComparisonTestCase):
         scrambled = self.time_df.sample(frac=1)
         plot = scrambled.hvplot(x='time')
         assert (plot.data == self.time_df).all().all()
-        assert (plot.data.time.diff()[1:].astype('int') > 0).all()
+        assert len(plot.data.time.unique()) == len(plot.data.time)
 
     def test_time_df_does_not_sort_on_plot_if_sort_date_off(self):
         scrambled = self.time_df.sample(frac=1)
         plot = scrambled.hvplot(x='time', sort_date=False)
         assert (plot.data == scrambled).all().all()
-        assert not (plot.data.time.diff()[1:].astype('int') > 0).all()
+        assert len(plot.data.time.unique()) == len(plot.data.time)
 
     def test_time_df_sorts_on_plot_using_index_as_x(self):
         df = self.time_df.set_index('time')
         scrambled = df.sample(frac=1)
         plot = scrambled.hvplot()
         assert (plot.data['time'] == df.index).all()
-        assert (plot.data.time.diff()[1:].astype('int') > 0).all()
+        assert len(plot.data.time.unique()) == len(plot.data.time)
 
     def test_time_df_does_not_sort_on_plot_if_sort_date_off_using_index_as_x(self):
         df = self.time_df.set_index('time')
         scrambled = df.sample(frac=1)
         plot = scrambled.hvplot(sort_date=False)
         assert (plot.data.time == scrambled.index).all().all()
-        assert not (plot.data.time.diff()[1:].astype('int') > 0).all()
+        assert len(plot.data.time.unique()) == len(plot.data.time)
 
     def test_time_df_with_groupby_as_derived_datetime(self):
         plot = self.time_df.hvplot(groupby='time.dayofweek', dynamic=False)
