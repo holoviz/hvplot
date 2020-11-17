@@ -311,7 +311,7 @@ class HoloViewsConverter(object):
                  x_sampling=None, y_sampling=None, project=False,
                  tools=[], attr_labels=None, coastline=False,
                  tiles=False, sort_date=True, check_symmetric_max=1000000,
-                 **kwds):
+                 transforms={}, **kwds):
 
         # Process data and related options
         self._redim = fields
@@ -321,7 +321,7 @@ class HoloViewsConverter(object):
         self.label = label
         self._process_data(kind, data, x, y, by, groupby, row, col,
                            use_dask, persist, backlog, label, value_label,
-                           hover_cols, attr_labels, kwds)
+                           hover_cols, attr_labels, transforms, kwds)
 
         self.dynamic = dynamic
         self.geo = any([geo, crs, global_extent, projection, project, coastline])
@@ -558,7 +558,7 @@ class HoloViewsConverter(object):
 
     def _process_data(self, kind, data, x, y, by, groupby, row, col,
                       use_dask, persist, backlog, label, value_label,
-                      hover_cols, attr_labels, kwds):
+                      hover_cols, attr_labels, transforms, kwds):
         gridded = kind in self._gridded_types
         gridded_data = False
         da = None
@@ -744,6 +744,9 @@ class HoloViewsConverter(object):
                 raise ValueError('The supplied groupby dimension(s) %s '
                                  'could not be found, expected one or '
                                  'more of: %s' % (not_found, list(self.data.columns)))
+
+        if transforms:
+            self.data = Dataset(self.data, indexes).transform(**transforms).data
 
         # Set data-level options
         self.x = x
