@@ -375,7 +375,6 @@ class Interactive():
                 components = [Column(panel, widgets)]
         return Row(*components)
 
-    @property
     def output(self):
         """
         Returns the output of the interactive pipeline, which is
@@ -387,7 +386,6 @@ class Interactive():
         """
         return self.dmap() if self._dmap else self.panel(**self._kwargs)
 
-    @property
     def widgets(self):
         """
         Returns a Column of widgets which control the interactive output.
