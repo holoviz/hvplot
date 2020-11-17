@@ -1037,7 +1037,7 @@ class HoloViewsConverter(object):
                         name = data.name or self.label or self.value_label
                         dataset = Dataset(data, self.indexes, name)
                 else:
-                    dataset = Dataset(data)
+                    dataset = Dataset(data, self.indexes)
                     dataset = dataset.redim(**self._redim)
                 obj = method(x, y)
                 obj._dataset = dataset
@@ -1804,6 +1804,8 @@ class HoloViewsConverter(object):
 
         redim = self._merge_redim({self._color_dim: self._dim_ranges['c']} if self._color_dim else {})
         kdims, vdims = self._get_dimensions([x, y], [])
+        if self.gridded_data:
+            vdims = Dataset(data).vdims
         element = self._get_element(kind)
         opts = self._get_opts(element.name)
         if self.geo: params['crs'] = self.crs
