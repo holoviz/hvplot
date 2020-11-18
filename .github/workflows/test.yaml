@@ -100,6 +100,9 @@ jobs:
           bokeh sampledata
           doit test_examples
       - name: codecov
+        env:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        if: startsWith(matrix.python-version, 3.)
         run: |
           eval "$(conda shell.bash hook)"
           conda activate test-environment
