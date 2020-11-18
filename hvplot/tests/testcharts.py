@@ -9,6 +9,7 @@ from ..util import is_dask
 
 
 class TestChart2D(ComparisonTestCase):
+
     def setUp(self):
         try:
             import numpy as np
@@ -76,7 +77,7 @@ class TestChart2D(ComparisonTestCase):
 class TestChart2DDask(TestChart2D):
 
     def setUp(self):
-        super().setUp()
+        super(TestChart2DDask, self).setUp()
         try:
             import dask.dataframe as dd
         except:
@@ -306,7 +307,7 @@ class TestChart1D(ComparisonTestCase):
 class TestChart1DDask(TestChart1D):
 
     def setUp(self):
-        super().setUp()
+        super(TestChart1DDask, self).setUp()
         try:
             import dask.dataframe as dd
         except:
