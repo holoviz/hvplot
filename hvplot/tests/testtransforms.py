@@ -25,13 +25,13 @@ class TestPandasTransforms(ComparisonTestCase):
 class TestXArrayTransforms(ComparisonTestCase):
 
     def setUp(self):
-        
+
         try:
-            import xarray as xr
+            import xarray as xr # noqa
         except:
             raise SkipTest('xarray not available')
         import hvplot.xarray # noqa
-        
+
     def test_xarray_transform(self):
         import xarray as xr
         data = np.arange(0, 60).reshape(6, 10)
@@ -42,6 +42,3 @@ class TestXArrayTransforms(ComparisonTestCase):
             transforms=dict(value=hv.dim('value')*10)
         )
         self.assertEqual(img.data.value.data, da.data*10)
-        
-        
-        

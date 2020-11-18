@@ -19,7 +19,8 @@ env:
     - PYTHON_VERSION=3.6
 
 stages:
-  - test
+  - name: test
+    if: tag =~ ^v(\d+|\.)+([a-z]|rc)?\d?$
   - name: docs
     if: tag =~ ^v(\d+|\.)*[^a-z]\d*$ OR tag = website
   - name: docs_dev

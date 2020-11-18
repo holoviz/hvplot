@@ -1,0 +1,109 @@
+name: tests
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+    - '*'
+
+jobs:
+  test_suite:
+    name: Pytest on ${{ matrix.os }} with Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-latest', 'windows-latest']
+        python-version: [2.7, 3.6, 3.7]
+        exclude:
+          - os: windows-latest
+            python-version: 2.7
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash -l {0} 
+    env:
+      DESC: "Python ${{ matrix.python-version }} tests"
+      HV_REQUIREMENTS: "unit_tests"
+      PYTHON_VERSION: ${{ matrix.python-version }}
+      CHANS_DEV: "-c pyviz/label/dev"
+      CHANS: "-c pyviz"
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "100"
+      - uses: actions/setup-python@v2
+        with:
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniconda-version: "latest"
+      - name: Fetch unshallow
+        run: git fetch --prune --tags --unshallow
+      - name: conda setup
+        run: |
+          conda config --set always_yes True
+          conda install -c pyviz "pyctdev>=0.5"
+          doit ecosystem_setup
+          conda install nodejs
+          doit env_create ${{ env.CHANS_DEV}} --python=${{ matrix.python-version }}
+      - name: doit develop_install py2
+        if: startsWith(matrix.python-version, 2.)
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda activate test-environment
+          conda list
+          doit develop_install -c pyviz/label/dev -o tests
+      - name: doit develop_install py3
+        if: startsWith(matrix.python-version, 3.)
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda activate test-environment
+          conda list
+          doit develop_install ${{ env.CHANS_DEV}} -o examples -o tests
+      - name: pygraphviz
+        if: contains(matrix.os, 'ubuntu')
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda activate test-environment
+          conda install -c conda-forge pygraphviz
+      - name: doit env_capture
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda activate test-environment
+          doit env_capture
+      - name: doit test_flakes
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda activate test-environment
+          doit test_flakes
+      - name: doit test_unit
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda activate test-environment
+          doit test_unit
+      - name: test examples ubuntu
+        if: contains(matrix.os, 'ubuntu') && startsWith(matrix.python-version, 3.)
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda activate test-environment
+          bokeh sampledata
+          doit test_examples_extra
+      - name: test examples windows
+        if: contains(matrix.os, 'windows')
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda activate test-environment
+          bokeh sampledata
+          doit test_examples
+      - name: codecov
+        env:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        if: startsWith(matrix.python-version, 3.)
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda activate test-environment
+          coveralls

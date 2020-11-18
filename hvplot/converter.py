@@ -1042,7 +1042,10 @@ class HoloViewsConverter(object):
                         name = data.name or self.label or self.value_label
                         dataset = Dataset(data, self.indexes, name)
                 else:
-                    dataset = Dataset(data, self.indexes)
+                    try:
+                        dataset = Dataset(data, self.indexes)
+                    except Exception:
+                        dataset = Dataset(data)
                     dataset = dataset.redim(**self._redim)
                 obj = method(x, y)
                 obj._dataset = dataset
