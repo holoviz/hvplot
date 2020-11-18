@@ -805,7 +805,7 @@ class HoloViewsConverter(object):
                 self._redim = self._merge_redim(units, 'unit')
             except Exception as e:
                 if attr_labels is True:
-                    param.main.warning('Unable to auto label using xarray attrs '
+                    param.main.param.warning('Unable to auto label using xarray attrs '
                                        'because {e}'.format(e=e))
 
     def _process_plot(self):
@@ -819,7 +819,7 @@ class HoloViewsConverter(object):
 
         if kind == 'hist':
             if self.stacked:
-                param.main.warning('Stacking for histograms is not yet implemented in '
+                param.main.param.warning('Stacking for histograms is not yet implemented in '
                                    'holoviews. Use bar plots if stacking is required.')
 
         return plot_opts
@@ -897,7 +897,7 @@ class HoloViewsConverter(object):
         if size is not None:
             scale = kwds.get('scale', 1)
             if (self.datashade or self.rasterize):
-                param.main.warning(
+                param.main.param.warning(
                     'There is no reasonable way to use size (or s) with '
                     'rasterize or datashade. To aggregate along a third '
                     'dimension, set color (or c) to the desired dimension.')
@@ -934,14 +934,14 @@ class HoloViewsConverter(object):
 
         if 'ax' in mismatches:
             mismatches.pop(mismatches.index('ax'))
-            param.main.warning('hvPlot does not have the concept of axes, '
+            param.main.param.warning('hvPlot does not have the concept of axes, '
                                'and the ax keyword will be ignored. Compose '
                                'plots with the * operator to overlay plots or the '
                                '+ operator to lay out plots beside each other '
                                'instead.')
         if 'figsize' in mismatches:
             mismatches.pop(mismatches.index('figsize'))
-            param.main.warning('hvPlot does not have the concept of a figure, '
+            param.main.param.warning('hvPlot does not have the concept of a figure, '
                                'and the figsize keyword will be ignored. The '
                                'size of each subplot in a layout is set '
                                'individually using the width and height options.')
@@ -951,7 +951,7 @@ class HoloViewsConverter(object):
                          self._geo_options + kind_opts + valid_opts)
         for mismatch in mismatches:
             suggestions = difflib.get_close_matches(mismatch, combined_opts)
-            param.main.warning('%s option not found for %s plot; similar options '
+            param.main.param.warning('%s option not found for %s plot; similar options '
                                'include: %r' % (mismatch, self.kind, suggestions))
 
     def __call__(self, kind, x, y):
@@ -1120,7 +1120,7 @@ class HoloViewsConverter(object):
                 processed = dynspread(processed, max_px=self.kwds.get('max_px', 3),
                                       threshold=self.kwds.get('threshold', 0.5))
             else:
-                param.main.warning('dynspread may only be applied on datashaded plots, '
+                param.main.param.warning('dynspread may only be applied on datashaded plots, '
                                    'use datashade=True instead of rasterize=True.')
         opts = filter_opts(eltype, dict(self._plot_opts, **style))
         return self._apply_layers(processed).opts(eltype, **opts)
@@ -1137,7 +1137,7 @@ class HoloViewsConverter(object):
             if self.coastline in ['10m', '50m', '110m']:
                 coastline = coastline.opts(scale=self.coastline)
             elif self.coastline is not True:
-                param.main.warning("coastline scale of %s not recognized, "
+                param.main.param.warning("coastline scale of %s not recognized, "
                                    "must be one of '10m', '50m' or '110m'." %
                                    self.coastline)
             obj = obj * coastline
@@ -1158,9 +1158,9 @@ class HoloViewsConverter(object):
                 if isinstance(tile_source, WMTS):
                     tiles = tile_source
                 else:
-                    param.main.warning(warning)
+                    param.main.param.warning(warning)
             else:
-                param.main.warning(warning)
+                param.main.param.warning(warning)
             obj = tiles * obj
         return obj
 
