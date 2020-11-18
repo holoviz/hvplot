@@ -52,13 +52,11 @@ jobs:
           doit env_create ${{ env.CHANS_DEV}} --python=${{ matrix.python-version }}
       - name: doit develop_install py2
         if: startsWith(matrix.python-version, 2.)
-        env:
-          CHANS_DEV: "-c pyviz/label/dev -c conda-forge"
         run: |
           eval "$(conda shell.bash hook)"
           conda activate test-environment
           conda list
-          doit develop_install ${{ env.CHANS_DEV}} -o examples -o tests
+          doit develop_install -c pyviz/label/dev -c conda-forge -o examples -o tests
       - name: doit develop_install py3
         if: startsWith(matrix.python-version, 3.)
         run: |
