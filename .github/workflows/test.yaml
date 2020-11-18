@@ -50,7 +50,17 @@ jobs:
           doit ecosystem_setup
           conda install nodejs
           doit env_create ${{ env.CHANS_DEV}} --python=${{ matrix.python-version }}
-      - name: doit develop_install
+      - name: doit develop_install py2
+        if: startsWith(matrix.python-version, 2.)
+        env:
+          CHANS_DEV: "-c pyviz/label/dev -c conda-forge"
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda activate test-environment
+          conda list
+          doit develop_install ${{ env.CHANS_DEV}} -o examples -o tests
+      - name: doit develop_install py3
+        if: startsWith(matrix.python-version, 3.)
         run: |
           eval "$(conda shell.bash hook)"
           conda activate test-environment
@@ -77,12 +87,20 @@ jobs:
           eval "$(conda shell.bash hook)"
           conda activate test-environment
           doit test_unit
-      - name: test examples
+      - name: test examples ubuntu
+        if: contains(matrix.os, 'ubuntu')
         run: |
           eval "$(conda shell.bash hook)"
           conda activate test-environment
           bokeh sampledata
           doit test_examples_extra
+      - name: test examples windows
+        if: contains(matrix.os, 'windows')
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda activate test-environment
+          bokeh sampledata
+          doit test_examples
       - name: codecov
         run: |
           eval "$(conda shell.bash hook)"
