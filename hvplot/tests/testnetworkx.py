@@ -12,7 +12,7 @@ class TestOptions(TestCase):
     def setUp(self):
         # Create nodes (1-10) in unsorted order
         nodes = np.array([1, 4, 5, 10, 8, 9, 3, 7, 2, 6])
-        edges = [*zip(nodes[:-1], nodes[1:])]
+        edges = list(zip(nodes[:-1], nodes[1:]))
 
         g = nx.Graph()
         g.add_nodes_from(nodes)
