@@ -56,6 +56,9 @@ jobs:
           conda activate test-environment
           conda list
           doit develop_install ${{ env.CHANS_DEV}} -o examples -o tests
+      - name: pygraphviz
+        if: !contains(matrix.os, 'windows')
+        run: |
           conda install -c conda-forge pygraphviz
       - name: doit env_capture
         run: |
