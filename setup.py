@@ -85,6 +85,7 @@ extras_require = {
 # doesn't work well with pip)
 extras_require['build'] = [
     'param >=1.6.1',
+    'pyct >=0.4.4',
     'setuptools' # should make this pip now
 ]
 
