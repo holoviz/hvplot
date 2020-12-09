@@ -1,3 +1,5 @@
+import sys
+
 from unittest import TestCase, SkipTest, expectedFailure
 
 import numpy as np
@@ -8,6 +10,8 @@ import holoviews as hv
 class TestGeo(TestCase):
 
     def setUp(self):
+        if sys.platform == "win32":
+            raise SkipTest("Skip geo tests on windows for now")
         try:
             import xarray as xr
             import rasterio  # noqa
@@ -25,16 +29,31 @@ class TestGeo(TestCase):
     def assertCRS(self, plot, proj='utm'):
         assert plot.crs.proj4_params['proj'] == proj
 
-    def test_plot_with_crs_as_object(self):
-        plot = self.da.hvplot.image('x', 'y', crs=self.crs)
-        self.assertCRS(plot)
+    def assert_projection(self, plot, proj):
+        opts = hv.Store.lookup_options('bokeh', plot, 'plot')
+        assert opts.kwargs['projection'].proj4_params['proj'] == proj
 
+
+class TestCRSInference(TestGeo):
+
+    def setUp(self):
+        if sys.platform == "win32":
+            raise SkipTest("Skip CRS inference on Windows")
+        super(TestCRSInference, self).setUp()
+        
     def test_plot_with_crs_as_proj_string(self):
         plot = self.da.hvplot.image('x', 'y', crs=self.da.crs)
         self.assertCRS(plot)
 
     def test_plot_with_geo_as_true_crs_undefined(self):
         plot = self.da.hvplot.image('x', 'y', geo=True)
+        self.assertCRS(plot)
+
+
+class TestProjections(TestGeo):
+
+    def test_plot_with_crs_as_object(self):
+        plot = self.da.hvplot.image('x', 'y', crs=self.crs)
         self.assertCRS(plot)
 
     def test_plot_with_crs_as_attr_str(self):
@@ -52,6 +71,20 @@ class TestGeo(TestCase):
         da.attrs = {'bar': self.crs}
         plot = da.hvplot.image('x', 'y', geo=True)
         self.assertCRS(plot, 'eqc')
+
+    def test_plot_with_projection_as_string(self):
+        da = self.da.copy()
+        plot = da.hvplot.image('x', 'y', crs=self.crs, projection='Robinson')
+        self.assert_projection(plot, 'robin')
+
+    def test_plot_with_projection_as_string_google_mercator(self):
+        da = self.da.copy()
+        plot = da.hvplot.image('x', 'y', crs=self.crs, projection='GOOGLE_MERCATOR')
+        self.assert_projection(plot, 'merc')
+
+    def test_plot_with_projection_as_invalid_string(self):
+        with self.assertRaisesRegex(ValueError, "Projection must be defined"):
+            self.da.hvplot.image('x', 'y', projection='foo')
 
 
 class TestGeoAnnotation(TestCase):

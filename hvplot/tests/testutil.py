@@ -1,6 +1,8 @@
 """
 Tests  utilities to convert data and projections
 """
+import sys
+
 import numpy as np
 
 from unittest import TestCase, SkipTest
@@ -195,6 +197,8 @@ class TestProcessXarray(TestCase):
 class TestGeoUtil(TestCase):
 
     def setUp(self):
+        if sys.platform == "win32":
+            raise SkipTest("Skip geo tests on windows for now")
         try:
             import geoviews  # noqa
             import cartopy.crs as ccrs

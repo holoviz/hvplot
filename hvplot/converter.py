@@ -134,6 +134,8 @@ class HoloViewsConverter(object):
         number of degrees.
     shared_axes (default=True): boolean
         Whether to link axes between plots
+    transforms (default={}): dict
+        A dictionary of HoloViews dim transforms to apply before plotting
     title (default=''): str
         Title for the plot
     tools (default=[]): list
@@ -311,7 +313,7 @@ class HoloViewsConverter(object):
                  x_sampling=None, y_sampling=None, project=False,
                  tools=[], attr_labels=None, coastline=False,
                  tiles=False, sort_date=True, check_symmetric_max=1000000,
-                 **kwds):
+                 transforms={}, **kwds):
 
         # Process data and related options
         self._redim = fields
@@ -321,7 +323,7 @@ class HoloViewsConverter(object):
         self.label = label
         self._process_data(kind, data, x, y, by, groupby, row, col,
                            use_dask, persist, backlog, label, value_label,
-                           hover_cols, attr_labels, kwds)
+                           hover_cols, attr_labels, transforms, kwds)
 
         self.dynamic = dynamic
         self.geo = any([geo, crs, global_extent, projection, project, coastline])
@@ -348,6 +350,22 @@ class HoloViewsConverter(object):
                     "following plot types: %r" % (self.kind, self._geo_types))
             from cartopy import crs as ccrs
             from geoviews.util import project_extents
+
+            if isinstance(projection, basestring):
+                all_crs = [proj for proj in dir(ccrs) if
+                           callable(getattr(ccrs, proj)) and
+                           proj not in ['ABCMeta', 'CRS'] and
+                           proj[0].isupper() or
+                           proj == 'GOOGLE_MERCATOR']
+                if projection in all_crs and projection != 'GOOGLE_MERCATOR':
+                    projection = getattr(ccrs, projection)()
+                elif projection == 'GOOGLE_MERCATOR':
+                    projection = getattr(ccrs, projection)
+                else:
+                    raise ValueError(
+                        "Projection must be defined as cartopy CRS or "
+                        "one of the following CRS string:\n {0}".format(all_crs))
+
             proj_crs = projection or ccrs.GOOGLE_MERCATOR
             if self.crs != proj_crs:
                 px0, py0, px1, py1 = ccrs.GOOGLE_MERCATOR.boundary.bounds
@@ -542,7 +560,7 @@ class HoloViewsConverter(object):
 
     def _process_data(self, kind, data, x, y, by, groupby, row, col,
                       use_dask, persist, backlog, label, value_label,
-                      hover_cols, attr_labels, kwds):
+                      hover_cols, attr_labels, transforms, kwds):
         gridded = kind in self._gridded_types
         gridded_data = False
         da = None
@@ -735,6 +753,9 @@ class HoloViewsConverter(object):
                                  'could not be found, expected one or '
                                  'more of: %s' % (not_found, list(self.data.columns)))
 
+        if transforms:
+            self.data = Dataset(self.data, indexes).transform(**transforms).data
+
         # Set data-level options
         self.x = x
         self.y = y
@@ -790,7 +811,7 @@ class HoloViewsConverter(object):
                 self._redim = self._merge_redim(units, 'unit')
             except Exception as e:
                 if attr_labels is True:
-                    param.main.warning('Unable to auto label using xarray attrs '
+                    param.main.param.warning('Unable to auto label using xarray attrs '
                                        'because {e}'.format(e=e))
 
     def _process_plot(self):
@@ -804,7 +825,7 @@ class HoloViewsConverter(object):
 
         if kind == 'hist':
             if self.stacked:
-                param.main.warning('Stacking for histograms is not yet implemented in '
+                param.main.param.warning('Stacking for histograms is not yet implemented in '
                                    'holoviews. Use bar plots if stacking is required.')
 
         return plot_opts
@@ -882,7 +903,7 @@ class HoloViewsConverter(object):
         if size is not None:
             scale = kwds.get('scale', 1)
             if (self.datashade or self.rasterize):
-                param.main.warning(
+                param.main.param.warning(
                     'There is no reasonable way to use size (or s) with '
                     'rasterize or datashade. To aggregate along a third '
                     'dimension, set color (or c) to the desired dimension.')
@@ -919,14 +940,14 @@ class HoloViewsConverter(object):
 
         if 'ax' in mismatches:
             mismatches.pop(mismatches.index('ax'))
-            param.main.warning('hvPlot does not have the concept of axes, '
+            param.main.param.warning('hvPlot does not have the concept of axes, '
                                'and the ax keyword will be ignored. Compose '
                                'plots with the * operator to overlay plots or the '
                                '+ operator to lay out plots beside each other '
                                'instead.')
         if 'figsize' in mismatches:
             mismatches.pop(mismatches.index('figsize'))
-            param.main.warning('hvPlot does not have the concept of a figure, '
+            param.main.param.warning('hvPlot does not have the concept of a figure, '
                                'and the figsize keyword will be ignored. The '
                                'size of each subplot in a layout is set '
                                'individually using the width and height options.')
@@ -936,7 +957,7 @@ class HoloViewsConverter(object):
                          self._geo_options + kind_opts + valid_opts)
         for mismatch in mismatches:
             suggestions = difflib.get_close_matches(mismatch, combined_opts)
-            param.main.warning('%s option not found for %s plot; similar options '
+            param.main.param.warning('%s option not found for %s plot; similar options '
                                'include: %r' % (mismatch, self.kind, suggestions))
 
     def __call__(self, kind, x, y):
@@ -1027,7 +1048,10 @@ class HoloViewsConverter(object):
                         name = data.name or self.label or self.value_label
                         dataset = Dataset(data, self.indexes, name)
                 else:
-                    dataset = Dataset(data)
+                    try:
+                        dataset = Dataset(data, self.indexes)
+                    except Exception:
+                        dataset = Dataset(data)
                     dataset = dataset.redim(**self._redim)
                 obj = method(x, y)
                 obj._dataset = dataset
@@ -1087,6 +1111,8 @@ class HoloViewsConverter(object):
         style = {}
         if self.datashade:
             operation = datashade
+            if 'cmap' in opts and not 'color_key' in opts:
+                opts['color_key'] = opts['cmap']
             eltype = 'RGB'
         else:
             operation = rasterize
@@ -1103,7 +1129,7 @@ class HoloViewsConverter(object):
                 processed = dynspread(processed, max_px=self.kwds.get('max_px', 3),
                                       threshold=self.kwds.get('threshold', 0.5))
             else:
-                param.main.warning('dynspread may only be applied on datashaded plots, '
+                param.main.param.warning('dynspread may only be applied on datashaded plots, '
                                    'use datashade=True instead of rasterize=True.')
         opts = filter_opts(eltype, dict(self._plot_opts, **style))
         return self._apply_layers(processed).opts(eltype, **opts)
@@ -1120,7 +1146,7 @@ class HoloViewsConverter(object):
             if self.coastline in ['10m', '50m', '110m']:
                 coastline = coastline.opts(scale=self.coastline)
             elif self.coastline is not True:
-                param.main.warning("coastline scale of %s not recognized, "
+                param.main.param.warning("coastline scale of %s not recognized, "
                                    "must be one of '10m', '50m' or '110m'." %
                                    self.coastline)
             obj = obj * coastline
@@ -1141,9 +1167,9 @@ class HoloViewsConverter(object):
                 if isinstance(tile_source, WMTS):
                     tiles = tile_source
                 else:
-                    param.main.warning(warning)
+                    param.main.param.warning(warning)
             else:
-                param.main.warning(warning)
+                param.main.param.warning(warning)
             obj = tiles * obj
         return obj
 
@@ -1792,6 +1818,8 @@ class HoloViewsConverter(object):
 
         redim = self._merge_redim({self._color_dim: self._dim_ranges['c']} if self._color_dim else {})
         kdims, vdims = self._get_dimensions([x, y], [])
+        if self.gridded_data:
+            vdims = Dataset(data).vdims
         element = self._get_element(kind)
         opts = self._get_opts(element.name)
         if self.geo: params['crs'] = self.crs
