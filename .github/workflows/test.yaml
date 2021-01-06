@@ -27,7 +27,7 @@ jobs:
       DESC: "Python ${{ matrix.python-version }} tests"
       HV_REQUIREMENTS: "unit_tests"
       PYTHON_VERSION: ${{ matrix.python-version }}
-      CHANS_DEV: "-c pyviz/label/dev -c conda-forge"
+      CHANS_DEV: "-c pyviz/label/dev"
       CHANS: "-c pyviz"
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -64,6 +64,7 @@ jobs:
           conda activate test-environment
           conda list
           doit develop_install ${{ env.CHANS_DEV}} -o examples -o tests
+          conda install -c conda-forge fsspec
       - name: pygraphviz
         if: contains(matrix.os, 'ubuntu')
         run: |
