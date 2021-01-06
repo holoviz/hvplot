@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ['ubuntu-latest', 'windows-latest']
-        python-version: [2.7, 3.6, 3.7]
+        python-version: [2.7, 3.7]
         exclude:
           - os: windows-latest
             python-version: 2.7
@@ -64,6 +64,7 @@ jobs:
           conda activate test-environment
           conda list
           doit develop_install ${{ env.CHANS_DEV}} -o examples -o tests
+          conda install -c conda-forge fsspec
       - name: pygraphviz
         if: contains(matrix.os, 'ubuntu')
         run: |

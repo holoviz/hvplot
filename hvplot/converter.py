@@ -313,7 +313,7 @@ class HoloViewsConverter(object):
                  x_sampling=None, y_sampling=None, project=False,
                  tools=[], attr_labels=None, coastline=False,
                  tiles=False, sort_date=True, check_symmetric_max=1000000,
-                 transforms={}, **kwds):
+                 transforms={}, stream=None, **kwds):
 
         # Process data and related options
         self._redim = fields
@@ -323,7 +323,7 @@ class HoloViewsConverter(object):
         self.label = label
         self._process_data(kind, data, x, y, by, groupby, row, col,
                            use_dask, persist, backlog, label, value_label,
-                           hover_cols, attr_labels, transforms, kwds)
+                           hover_cols, attr_labels, transforms, stream, kwds)
 
         self.dynamic = dynamic
         self.geo = any([geo, crs, global_extent, projection, project, coastline])
@@ -560,7 +560,7 @@ class HoloViewsConverter(object):
 
     def _process_data(self, kind, data, x, y, by, groupby, row, col,
                       use_dask, persist, backlog, label, value_label,
-                      hover_cols, attr_labels, transforms, kwds):
+                      hover_cols, attr_labels, transforms, stream, kwds):
         gridded = kind in self._gridded_types
         gridded_data = False
         da = None
@@ -675,6 +675,19 @@ class HoloViewsConverter(object):
             self.data = data
         else:
             raise ValueError('Supplied data type %s not understood' % type(data).__name__)
+
+        if stream is not None:
+            if streaming:
+                raise ValueError("Cannot supply streamz.DataFrame and stream argument.")
+            self.stream = stream
+            self.cb = None
+            if isinstance(stream, Pipe):
+                self.stream_type = 'updating'
+            elif isinstance(stream, Buffer):
+                self.stream_type = 'streaming'
+            else:
+                raise ValueError("Stream of type %s not recognized." % type(stream))
+            streaming = True
 
         # Validate data and arguments
         if by is None: by = []
@@ -1025,8 +1038,11 @@ class HoloViewsConverter(object):
                 obj = obj.grid(self.grid).opts(shared_xaxis=True, shared_yaxis=True)
         else:
             if self.streaming:
-                cbcallable = StreamingCallable(partial(method, x, y),
-                                               periodic=self.cb)
+                cb = partial(method, x, y)
+                if self.cb is None:
+                    cbcallable = cb
+                else:
+                    cbcallable = StreamingCallable(cb, periodic=self.cb)
                 obj = DynamicMap(cbcallable, streams=[self.stream])
             else:
                 data = self.source_data
