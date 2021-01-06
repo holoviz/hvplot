@@ -4,8 +4,6 @@ import pandas as pd
 
 from holoviews.streams import Buffer, Pipe
 
-from hvplot.converter import HoloViewsConverter
-
 
 class TestExplicitStreamPlotting(TestCase):
     
