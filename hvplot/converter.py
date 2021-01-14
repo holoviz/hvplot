@@ -913,7 +913,7 @@ class HoloViewsConverter(object):
             color = style_opts.get('color')
 
         for k, v in style.items():
-            if isinstance(v, Cycle):
+            if isinstance(v, Cycle) and isinstance(v, basestring):
                 if color == cmap:
                     if color not in Palette.colormaps and color.title() in Palette.colormaps:
                         color = color.title()
