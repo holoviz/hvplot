@@ -13,7 +13,7 @@ from bokeh.models import HoverTool
 from holoviews.core.dimension import Dimension
 from holoviews.core.spaces import DynamicMap, HoloMap, Callable
 from holoviews.core.overlay import NdOverlay
-from holoviews.core.options import Store, Cycle
+from holoviews.core.options import Store, Cycle, Palette
 from holoviews.core.layout import NdLayout
 from holoviews.core.util import max_range, basestring
 from holoviews.element import (
@@ -22,7 +22,7 @@ from holoviews.element import (
     Violin, Contours, Polygons, Points, Path, Labels, RGB, ErrorBars,
     VectorField
 )
-from holoviews.plotting.bokeh import OverlayPlot
+from holoviews.plotting.bokeh import OverlayPlot, colormap_generator
 from holoviews.plotting.util import process_cmap
 from holoviews.operation import histogram
 from holoviews.streams import Buffer, Pipe
@@ -851,6 +851,8 @@ class HoloViewsConverter(object):
             valid_opts = []
 
         cmap_opts = ('cmap', 'colormap', 'color_key')
+        categories = ['accent', 'category', 'dark', 'colorblind', 'pastel',
+                      'set1', 'set2', 'set3', 'paired', 'glasbey']
         for opt in valid_opts:
             if (opt not in kwds or not isinstance(kwds[opt], list) or
                 opt in cmap_opts):
@@ -900,13 +902,28 @@ class HoloViewsConverter(object):
         elif self.rasterize or self.datashade:
             plot_opts['colorbar'] = plot_opts.get('colorbar', True)
 
-        if not isinstance(cmap, dict):
-            color = style_opts.get('color', process_cmap(cmap or self._default_cmaps['categorical'], categorical=True))
+        if 'color' in style_opts:
+            color = style_opts['color']
+        elif not isinstance(cmap, dict):
+            if cmap and any(c in cmap for c in categories):
+                color = process_cmap(cmap or self._default_cmaps['categorical'], categorical=True)
+            else:
+                color = cmap
         else:
             color = style_opts.get('color')
+
         for k, v in style.items():
-            if isinstance(v, Cycle):
-                style_opts[k] = Cycle(values=color) if isinstance(color, list) else color
+            if isinstance(v, Cycle) and isinstance(v, basestring):
+                if color == cmap:
+                    if color not in Palette.colormaps and color.title() in Palette.colormaps:
+                        color = color.title()
+                    else:
+                        Palette.colormaps[color] = colormap_generator(process_cmap(color))
+                    style_opts[k] = Palette(color)
+                elif isinstance(color, list):
+                    style_opts[k] = Cycle(values=color)
+                else:
+                    style_opts[k] = color
 
         # Size
         size = kwds.pop('size', kwds.pop('s', None))
