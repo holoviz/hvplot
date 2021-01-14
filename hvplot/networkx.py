@@ -85,7 +85,7 @@ def _from_networkx(G, positions, nodes=None, cls=Graph, **kwargs):
         node_columns[xdim.name].append(x)
         node_columns[ydim.name].append(y)
         for attr, value in node.items():
-            if isinstance(value, (list, dict)):
+            if isinstance(value, (list, dict, tuple)):
                 continue
             node_columns[attr].append(value)
         for i, col in enumerate(info_cols):
