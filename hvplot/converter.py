@@ -31,7 +31,7 @@ from pandas import DatetimeIndex, MultiIndex
 
 from .util import (
     filter_opts, is_tabular, is_series, is_dask, is_intake, is_cudf,
-    is_streamz, is_xarray, is_xarray_dataarray, process_crs,
+    is_streamz, is_ibis, is_xarray, is_xarray_dataarray, process_crs,
     process_intake, process_xarray, check_library, is_geodataframe,
     process_derived_datetime_xarray, process_derived_datetime_pandas,
 )
@@ -612,6 +612,9 @@ class HoloViewsConverter(object):
         elif is_cudf(data):
             datatype = 'cudf'
             self.data = data
+        elif is_ibis(data):
+            datatype = 'ibis'
+            self.data = data
         elif is_streamz(data):
             datatype = 'streamz'
             self.data = data.example
@@ -736,8 +739,11 @@ class HoloViewsConverter(object):
                     indexes = [self.data.index.name or 'index']
                 else:
                     indexes = list(self.data.index.names)
-            else:
+            elif hasattr(self.data, 'reset_index'):
                 indexes = [c for c in self.data.reset_index().columns
+                           if c not in self.data.columns]
+            else:
+                indexes = [c for c in self.data.columns
                            if c not in self.data.columns]
 
             if len(indexes) == 2 and not (x or y or by):
