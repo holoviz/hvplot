@@ -1499,6 +1499,8 @@ class HoloViewsConverter(object):
         else:
             melt = pd.melt
         df = melt(data, var_name=self.group_label, value_name=self.value_label)
+        if list(y) and df[self.value_label].dtype is not data[y[0]].dtype:
+            df[self.value_label] = df[self.value_label].astype(data[y[0]].dtype)
         redim = self._merge_redim({self.value_label: ylim})
         return (element(df, kdims, self.value_label).redim(**redim)
                 .relabel(**self._relabel).opts(**opts))
