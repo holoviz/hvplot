@@ -1,3 +1,5 @@
+import numpy as np
+
 from unittest import SkipTest, expectedFailure
 from parameterized import parameterized
 
@@ -12,7 +14,6 @@ class TestChart2D(ComparisonTestCase):
 
     def setUp(self):
         try:
-            import numpy as np
             import pandas as pd
         except:
             raise SkipTest('Pandas not available')
@@ -100,6 +101,7 @@ class TestChart1D(ComparisonTestCase):
             raise SkipTest('Pandas not available')
         import hvplot.pandas   # noqa
         self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
+        self.dt_df = pd.DataFrame(np.random.rand(90), index=pd.date_range('2019-01-01', '2019-03-31'))
         self.cat_df = pd.DataFrame([[1, 2, 'A'], [3, 4, 'B'], [5, 6, 'C']],
                                    columns=['x', 'y', 'category'])
         self.cat_only_df = pd.DataFrame([['A', 'a'], ['B', 'b'], ['C', 'c']],
@@ -114,6 +116,12 @@ class TestChart1D(ComparisonTestCase):
         plot = self.df.hvplot(kind=kind)
         obj = NdOverlay({'x': element(self.df, 'index', 'x').redim(x='value'),
                          'y': element(self.df, 'index', 'y').redim(y='value')}, 'Variable')
+        self.assertEqual(plot, obj)
+
+    def test_by_datetime_accessor(self):
+        plot = self.dt_df.hvplot.line('index.dt.day', '0', by='index.dt.month')
+        obj = NdOverlay({m: Curve((g.index.day, g[0]), 'index.dt.day', '0')
+                         for m, g in self.dt_df.groupby(self.dt_df.index.month)}, 'index.dt.month') 
         self.assertEqual(plot, obj)
 
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
@@ -314,5 +322,9 @@ class TestChart1DDask(TestChart1D):
             raise SkipTest('Dask not available')
         import hvplot.dask   # noqa
         self.df = dd.from_pandas(self.df, npartitions=2)
+        self.dt_df = dd.from_pandas(self.dt_df, npartitions=3)
         self.cat_df = dd.from_pandas(self.cat_df, npartitions=3)
         self.cat_only_df = dd.from_pandas(self.cat_only_df, npartitions=1)
+
+    def test_by_datetime_accessor(self):
+        raise SkipTest("Can't expand dt accessor columns when using dask")
