@@ -762,7 +762,12 @@ class HoloViewsConverter(object):
             groupby_index = [g for g in groupby if g in indexes]
             if groupby_index:
                 self.data = self.data.reset_index(groupby_index)
-            not_found = [g for g in groupby+by if g not in list(self.data.columns)+indexes]
+
+            if isinstance(by, (np.ndarray, pd.Series)):
+                by_cols = []
+            else:
+                by_cols = by if isinstance(by, list) else [by]
+            not_found = [g for g in groupby+by_cols if g not in list(self.data.columns)+indexes]
             not_found, self.data = process_derived_datetime_pandas(self.data, not_found, indexes)
             if groupby and not_found:
                 raise ValueError('The supplied groupby dimension(s) %s '
