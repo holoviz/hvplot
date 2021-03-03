@@ -39,7 +39,7 @@ _examples = [
     'geoviews >=1.6.0',
     'panel',
     'geopandas',
-    'xarray',
+    'xarray <0.17.0',
     'networkx',
     'streamz >=0.3.0',
     'intake',
