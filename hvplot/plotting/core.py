@@ -13,9 +13,16 @@ from ..util import process_dynamic_args
 
 
 class hvPlotBase(object):
+
     __all__ = []
 
     def __init__(self, data, custom_plots={}, **metadata):
+        if 'query' in metadata:
+            data = data.query(metadata.pop('query'))
+        if 'sel' in metadata:
+            data = data.sel(**metadata.pop('sel'))
+        if 'isel' in metadata:
+            data = data.isel(**metadata.pop('isel'))
         self._data = data
         self._plots = custom_plots
         self._metadata = metadata

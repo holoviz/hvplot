@@ -1,7 +1,17 @@
+from collections import OrderedDict
+from unittest import SkipTest
+
+import numpy as np
 import pandas as pd
-from hvplot.plotting import hvPlotTabular
+
+from hvplot.plotting import hvPlot, hvPlotTabular
 from holoviews import Store, Scatter
 from holoviews.element.comparison import ComparisonTestCase
+
+try:
+    import xarray as xr
+except:
+    xr = None
 
 
 class TestOverrides(ComparisonTestCase):
@@ -42,3 +52,31 @@ class TestOverrides(ComparisonTestCase):
     def test_attempt_to_override_kind_on_method(self):
         hvplot = hvPlotTabular(self.df, {'scatter': {'kind': 'line'}})
         self.assertIsInstance(hvplot.scatter(y='y'), Scatter)
+
+    def test_pandas_query_metadata(self):
+        hvplot = hvPlotTabular(self.df, query='x>2')
+        assert len(hvplot._data) == 2
+
+
+class TestXArrayOverrides(ComparisonTestCase):
+
+    def setUp(self):
+        if xr is None:
+            raise SkipTest('XArray not available')
+        coords = OrderedDict([('time', [0, 1]), ('lat', [0, 1]), ('lon', [0, 1])])
+        self.da_img_by_time = xr.DataArray(np.arange(8).reshape((2, 2, 2)),
+                                           coords, ['time', 'lat', 'lon']).assign_coords(
+                                               lat1=xr.DataArray([2,3], dims=['lat']))
+
+    def test_xarray_isel_scalar_metadata(self):
+        hvplot = hvPlot(self.da_img_by_time, isel={'time': 1})
+        assert hvplot._data.ndim == 2
+
+    def test_xarray_isel_nonscalar_metadata(self):
+        hvplot = hvPlot(self.da_img_by_time, isel={'time': [1]})
+        assert hvplot._data.ndim == 3
+        assert len(hvplot._data.time) == 1
+
+    def test_xarray_sel_metadata(self):
+        hvplot = hvPlot(self.da_img_by_time, sel={'time': 1})
+        assert hvplot._data.ndim == 2

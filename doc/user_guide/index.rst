@@ -21,6 +21,13 @@ and `timeseries data <Timeseries_Data.html>`_. These sections are not meant
 to be read in a particular order; you should take a look at any that seem
 relevant to your data.
 
+The `interactive <Interactive.html>`_ user guide introduces you to the
+ability to use the APIs of your favorite data analysis libraries
+interactively by allowing you to pass in widgets in place of constant
+arguments. This will provide you with an invaluable tool to perform
+exploratory analyses quickly but also build powerful and complex data
+analysis pipelines using APIs you are already familiar with.
+
 Lastly the `statistical plots <Statistical_Plots.html>`_ section will
 take you through a number of specialized plot types modelled on the
 pandas.plotting module and the `pandas API <Pandas_API.html>`_ section mimics
@@ -39,6 +46,9 @@ rather than Matplotlib.
 
 * `Customization <Customization.html>`_
   Listing of available options to customize plots.
+
+* `Interactive <Interactive.html>`_
+  Interactive APIs for data exploration.
 
 * `Widgets <Widgets.html>`_
   Adding and customizing interactivity using Panel widgets.
@@ -78,6 +88,7 @@ rather than Matplotlib.
     Introduction <Introduction>
     Plotting <Plotting>
     Customization <Customization>
+    Interactive <Interactive>
     Widgets <Widgets>
     Viewing <Viewing>
     Subplots <Subplots>

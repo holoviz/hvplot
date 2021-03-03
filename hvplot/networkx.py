@@ -6,8 +6,10 @@ import holoviews as _hv
 
 from bokeh.models import HoverTool
 from holoviews import Graph, Labels, dim
+from holoviews.core.options import Store
 from holoviews.core.util import dimension_sanitizer
 from holoviews.plotting.bokeh import GraphPlot, LabelsPlot
+from holoviews.plotting.bokeh.styles import markers
 
 from .util import process_crs
 from .utilities import save, show # noqa
@@ -83,7 +85,7 @@ def _from_networkx(G, positions, nodes=None, cls=Graph, **kwargs):
         node_columns[xdim.name].append(x)
         node_columns[ydim.name].append(y)
         for attr, value in node.items():
-            if isinstance(value, (list, dict)):
+            if isinstance(value, (list, dict, tuple)):
                 continue
             node_columns[attr].append(value)
         for i, col in enumerate(info_cols):
@@ -265,7 +267,14 @@ def draw(G, pos=None, **kwargs):
     if 'edge_color' in opts:
         opts['edge_line_color'] = opts.pop('edge_color')
     if 'node_shape' in kwargs:
-        opts['node_marker'] = opts.pop('node_shape')
+        marker = kwargs.pop('node_shape')
+        if marker in markers:
+            marker_opts = markers[marker]
+            marker = marker_opts['marker']
+            if 'angle' in marker_opts:
+                Store.add_style_opts(Graph, ['node_angle'], 'bokeh')
+                opts['node_angle'] = marker_opts['angle']
+        opts['node_marker'] = marker
     if 'alpha' in kwargs:
         alpha = kwargs.pop('alpha')
         opts['node_alpha'] = alpha

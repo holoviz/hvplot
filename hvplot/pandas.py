@@ -1,6 +1,8 @@
 from __future__ import absolute_import
 
-def patch(name='hvplot', extension='bokeh', logo=False):
+from .interactive  import Interactive
+
+def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=False):
     from . import hvPlotTabular, post_patch
 
     try:
@@ -10,9 +12,15 @@ def patch(name='hvplot', extension='bokeh', logo=False):
                           'Pandas could not be imported.')
     _patch_plot = lambda self: hvPlotTabular(self)
     _patch_plot.__doc__ = hvPlotTabular.__call__.__doc__
-    patch_property = property(_patch_plot)
-    setattr(pd.DataFrame, name, patch_property)
-    setattr(pd.Series, name, patch_property)
+    plot_prop = property(_patch_plot)
+    setattr(pd.DataFrame, name, plot_prop)
+    setattr(pd.Series, name, plot_prop)
+
+    _patch_interactive = lambda self: Interactive(self)
+    _patch_interactive.__doc__ = Interactive.__call__.__doc__
+    interactive_prop = property(_patch_interactive)
+    setattr(pd.DataFrame, interactive, interactive_prop)
+    setattr(pd.Series, interactive, interactive_prop)
 
     post_patch(extension, logo)
 
