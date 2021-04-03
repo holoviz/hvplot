@@ -89,6 +89,7 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
             ds_kwds['aggregator'] = kwds.pop('aggregator')
         
     #remove dynspread kwds
+    sp_kwds={}
     if dynspread:
         if datashade == False and rasterize == False:
             warnings.warn(
@@ -96,23 +97,21 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
                 "Dynspread will not be applied to plots."
                 )
 
-        dn_kwds = {}
         if 'max_px' in kwds:
-            dn_kwds['max_px'] = kwds.pop('max_px')
+            sp_kwds['max_px'] = kwds.pop('max_px')
         if 'threshold' in kwds:
-            dn_kwds['threshold'] = kwds.pop('threshold')
+            sp_kwds['threshold'] = kwds.pop('threshold')
         if 'how' in kwds:
-            dn_kwds['how'] = kwds.pop('how')
+            sp_kwds['how'] = kwds.pop('how')
         if 'mask' in kwds:
-            dn_kwds['mask'] = kwds.pop('mask')
-
+            sp_kwds['mask'] = kwds.pop('mask')
+            
     if spread:
         if datashade == False and rasterize == False:
             warnings.warn(
                 "Datashade or Rasterize must be specified to use spread. " 
                 "Spread will not be applied to plots."
                 )
-        sp_kwds = {}
         if 'px' in kwds:
             sp_kwds['px'] = kwds.pop('px')
         if 'shape' in kwds:
@@ -128,8 +127,7 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
     if c:
         #change colors for scatter matrix
         chart_opts['color_index'] = c
-        # not entirely sure what the next line is doing, but its helping
-        # with the coloring.
+        # Add color vdim to each plot.
         grid = grid.map(lambda x: x.clone(vdims=x.vdims+[c]), 'Scatter')
         # create a new scatter matrix with groups for each catetory, so now the histogram will
         # show separate colors for each group.
@@ -154,19 +152,9 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
     
     # Perform datashade options after all the coloring is finished.
     if datashade or rasterize:
-        if dynspread:
-            grid = grid.map(lambda x: x.apply(hd.datashade if datashade 
-                                            else hd.rasterize, **ds_kwds)
-                                        .apply(hd.dynspread, **dn_kwds)
-                                        if isinstance(x, chart) else x)
-        elif spread:
-            grid = grid.map(lambda x: x.apply(hd.datashade if datashade 
-                                            else hd.rasterize, **ds_kwds)
-                                        .apply(hd.spread, **sp_kwds)
-                                        if isinstance(x, chart) else x)
-        else:
-            grid = grid.map(lambda x: x.apply(hd.datashade if datashade 
-                                            else hd.rasterize, **ds_kwds) 
-                            if isinstance(x, chart) else x)
-   
+        aggregatefn = hd.datashade if datashade else hd.rasterize
+        spreadfn    = hd.dynspread if dynspread else (hd.spread if spread else lambda z, **_: z)
+    
+        grid = grid.map(lambda x: x.apply(aggregatefn, **ds_kwds).apply(spreadfn, **sp_kwds) if isinstance(x, chart) else x)
+
     return grid
