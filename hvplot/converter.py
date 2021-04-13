@@ -190,7 +190,7 @@ class HoloViewsConverter(object):
         Whether to apply rasterization using the datashader library
         returning an aggregated Image
     x_sampling/y_sampling (default=None):
-        Declares a minimum sampling density beyond.
+        Specifies the smallest allowed sampling interval along the x/y axis.
 
     Geographic options
     ------------------
