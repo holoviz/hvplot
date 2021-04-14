@@ -31,6 +31,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           miniconda-version: "latest"
+          python-version: 3.8
       - name: Fetch unshallow
         run: git fetch --prune --tags --unshallow -f
       - name: Set output
@@ -50,7 +51,7 @@ jobs:
         if: (!(contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc')))
         run: doit package_upload --token=$CONDA_UPLOAD_TOKEN --label=dev --label=main
   pip_build:
-    name: Build PyPI Packages
+    name: Build PyPI Packagesl
     runs-on: 'ubuntu-latest'
     defaults:
       run:
