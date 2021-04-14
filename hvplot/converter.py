@@ -84,6 +84,8 @@ class HoloViewsConverter(object):
     ---------------
     colorbar (default=False): boolean
         Enables colorbar
+    cnorm (default='linear'): str
+        Color scaling which must be one of 'linear', 'log' or 'eq_hist'
     fontscale: number
         Scales the size of all fonts by the same amount, e.g. fontscale=1.5
         enlarges all fonts (title, xticks, labels etc.) by 50%
@@ -239,7 +241,7 @@ class HoloViewsConverter(object):
                      'aspect', 'data_aspect', 'fontscale']
 
     _style_options = ['color', 'alpha', 'colormap', 'fontsize', 'c', 'cmap',
-                      'color_key']
+                      'color_key', 'cnorm']
 
     _op_options = ['datashade', 'rasterize', 'x_sampling', 'y_sampling',
                    'aggregator']
@@ -313,7 +315,7 @@ class HoloViewsConverter(object):
                  x_sampling=None, y_sampling=None, project=False,
                  tools=[], attr_labels=None, coastline=False,
                  tiles=False, sort_date=True, check_symmetric_max=1000000,
-                 transforms={}, stream=None, **kwds):
+                 transforms={}, stream=None, cnorm=None, **kwds):
 
         # Process data and related options
         self._redim = fields
@@ -501,6 +503,8 @@ class HoloViewsConverter(object):
                     plot_opts['symmetric'] = symmetric
             except TypeError:
                 pass
+        if cnorm is not None:
+            plot_opts['cnorm'] = cnorm
 
         self._plot_opts = plot_opts
         self._overlay_opts = {k: v for k, v in self._plot_opts.items()
