@@ -1,11 +1,11 @@
 from __future__ import absolute_import
 
+import warnings
+
 import holoviews as _hv
 
 from ..converter import HoloViewsConverter
 from ..util import with_hv_extension
-import holoviews.operation.datashader as hd 
-import warnings
 
 
 @with_hv_extension
@@ -84,10 +84,14 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
                                     'rasterize with dynspread or spread')
     #remove datashade kwds
     if datashade or rasterize:
+        import holoviews.operation.datashader as hd 
+
         ds_kwds = {}
         if 'aggregator' in kwds:
             ds_kwds['aggregator'] = kwds.pop('aggregator')
-        
+    else:
+        spread = dynspread = False
+
     #remove dynspread kwds
     sp_kwds={}
     if dynspread:
@@ -105,7 +109,6 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
             sp_kwds['how'] = kwds.pop('how')
         if 'mask' in kwds:
             sp_kwds['mask'] = kwds.pop('mask')
-            
     if spread:
         if datashade == False and rasterize == False:
             warnings.warn(
@@ -126,7 +129,7 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
 
     if c:
         #change colors for scatter matrix
-        chart_opts['color_index'] = c
+        chart_opts['color'] = c
         # Add color vdim to each plot.
         grid = grid.map(lambda x: x.clone(vdims=x.vdims+[c]), 'Scatter')
         # create a new scatter matrix with groups for each catetory, so now the histogram will
@@ -153,8 +156,9 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
     # Perform datashade options after all the coloring is finished.
     if datashade or rasterize:
         aggregatefn = hd.datashade if datashade else hd.rasterize
-        spreadfn    = hd.dynspread if dynspread else (hd.spread if spread else lambda z, **_: z)
-    
-        grid = grid.map(lambda x: x.apply(aggregatefn, **ds_kwds).apply(spreadfn, **sp_kwds) if isinstance(x, chart) else x)
+        grid = aggregatefn(grid, **ds_kwds)
+        if spread or dynspread:
+            spreadfn = hd.dynspread if dynspread else (hd.spread if spread else lambda z, **_: z)
+            grid = spreadfn(grid, **sp_kwds)
 
     return grid
