@@ -6,6 +6,7 @@ from __future__ import absolute_import
 import sys
 
 from distutils.version import LooseVersion
+from functools import wraps
 from types import FunctionType
 
 import pandas as pd
@@ -24,6 +25,7 @@ hv_version = LooseVersion(hv.__version__)
 
 def with_hv_extension(func, extension='bokeh', logo=False):
     """If hv.extension is not loaded, load before calling function"""
+    @wraps(func)
     def wrapper(*args, **kwargs):
         if extension and not getattr(hv.extension, '_loaded', False):
             hv.extension(extension, logo=logo)
