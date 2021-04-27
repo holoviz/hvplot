@@ -7,7 +7,8 @@ from ..util import with_hv_extension
 
 
 @with_hv_extension
-def scatter_matrix(data, c=None, chart='scatter', diagonal='hist', alpha=0.5, **kwds):
+def scatter_matrix(data, c=None, chart='scatter', diagonal='hist', alpha=0.5,
+                   diagonal_kwds=None, **kwds):
     """
     Scatter matrix of numeric columns.
 
@@ -17,10 +18,12 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist', alpha=0.5, **
     c: str, optional
         Column to color by
     chart: str, optional
-        Chart type (one of 'scatter', 'bivariate', 'hexbin')
+        Chart type for the off-diagonal plots (one of 'scatter', 'bivariate', 'hexbin')
     diagonal: str, optional
-        Chart type for the diagonal (one of 'hist', 'kde')
-    kwds: hvplot.scatter options, optional
+        Chart type for the diagonal plots (one of 'hist', 'kde')
+    diagonal_kwds: dict, optional
+        Keyword options for the diagonal plots
+    kwds: Keyword options for the off-diagonal plots, optional
 
     Returns:
     --------
@@ -52,5 +55,7 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist', alpha=0.5, **
         grid = (grid * groups).map(lambda x: x.get(0) if isinstance(x.get(0), chart) else x.get(1),
                                    _hv.Overlay)
 
-    diagonal_opts = {'fill_color': _hv.Cycle(values=colors)}
+    if diagonal_kwds is None:
+        diagonal_kwds = {}
+    diagonal_opts = dict(fill_color=_hv.Cycle(values=colors), **diagonal_kwds)
     return grid.options({chart.__name__: chart_opts, diagonal.__name__: diagonal_opts})
