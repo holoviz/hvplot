@@ -8,7 +8,8 @@ from ..util import with_hv_extension
 
 @with_hv_extension
 def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
-                   alpha=0.5,  cmap=None, colormap=None,
+                   alpha=0.5, nonselection_alpha=0.1,
+                   tools=None, cmap=None, colormap=None,
                    diagonal_kwds=None, hist_kwds=None, density_kwds=None,
                    **kwds):
     """
@@ -32,6 +33,11 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
         Chart type for the diagonal plots (one of 'hist', 'kde')
     alpha: float, optional
         Transparency level for the off-diagonal plots
+    nonselection_alpha: float, optional
+        Transparency level for nonselected object in the off-diagonal plots
+    tools: str or list of str, optional
+        Interaction tools to include
+        Defaults are 'box_select' and 'lasso_select'
     cmap/colormap: str or colormap object, optional
         Colormap to use for off-diagonal plots
         Default is `Category10 <https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md#category10>`.
@@ -62,8 +68,9 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
     if cmap and colormap:
         raise TypeError("Only specify one of `cmap` and `colormap`.")
     colors = cmap or colormap or _hv.plotting.util.process_cmap('Category10', categorical=True)
-    chart_opts = dict(alpha=alpha, cmap=colors, tools=['box_select', 'lasso_select'],
-                      nonselection_alpha=0.1, **kwds)
+    tools = tools or ['box_select', 'lasso_select']
+    chart_opts = dict(alpha=alpha, cmap=colors, tools=tools,
+                      nonselection_alpha=nonselection_alpha, **kwds)
 
     grid = _hv.operation.gridmatrix(data, diagonal_type=diagonal, chart_type=chart)
     if c:
