@@ -31,7 +31,7 @@ install_requires = [
     'bokeh >=1.0.0',
     'colorcet >=2',
     'holoviews >=1.11.0',
-    'pandas',
+    'pandas <=1.2.2',
     'numpy>=1.15'
 ]
 
