@@ -1200,7 +1200,7 @@ class HoloViewsConverter(object):
             warning = ("%s tiles not recognized, must be one of: %s or a tile object" %
                        (tile_source, sorted(hv.element.tile_sources)))
             if tile_source is True:
-                tiles = hv.element.tiles.Wikipedia()
+                tiles = hv.element.tiles.OSM()
             elif tile_source in hv.element.tile_sources.keys():
                 tiles = hv.element.tile_sources[tile_source]()
             elif tile_source in hv.element.tile_sources.values():
