@@ -17,7 +17,10 @@ or using PyPI::
 
   pip install hvplot
 
-Support for classic Jupyter Notebook is included with hvPlot. If you want to work with JupyterLab, you will also need to install the optional PyViz JupyterLab extension::
+For versions of `jupyterlab>=3.0` the necessary extension is
+automatically bundled in the `pyviz_comms` package, which must be
+>=2.0. However note that for version of `jupyterlab<3.0` you must also
+manually install the JupyterLab extension with::
 
   conda install jupyterlab
   jupyter labextension install @pyviz/jupyterlab_pyviz
