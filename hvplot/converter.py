@@ -1058,12 +1058,18 @@ class HoloViewsConverter(object):
                 if len(zs) > 1:
                     dimensions = [Dimension(self.group_label, values=zs)]+datasets.kdims
                     if self.dynamic:
-                        def method_wrapper(ds, x, y, z):
-                            el = method(x, y, z, ds.data)
+                        def z_wrapper(**kwargs):
+                            z = kwargs.pop(self.group_label)
+                            ds = datasets.select(**kwargs)
+                            return ds.reindex(vdims=[ds.get_dimension(z)])
+                        obj = DynamicMap(z_wrapper, kdims=dimensions)
+                        def method_wrapper(ds, x, y):
+                            z = ds.vdims[0].name
+                            el = method(x, y, z, data=ds.data)
                             el._transforms = dataset._transforms
                             el._dataset = ds
                             return el
-                        obj = datasets.apply(method, x, y, per_element=True, link_inputs=False)
+                        obj = obj.apply(method_wrapper, x=x, y=y, per_element=True, link_inputs=False)
                     else:
                         obj = HoloMap({(z,)+k: method(x, y, z, dataset[k])
                                        for k, v in datasets.data.items() for z in zs}, kdims=dimensions)
