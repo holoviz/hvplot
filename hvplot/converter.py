@@ -299,7 +299,7 @@ class HoloViewsConverter(object):
     }
 
     def __init__(self, data, x, y, kind=None, by=None, use_index=True,
-                 group_label='Variable', value_label='value',
+                 group_label=None, value_label='value',
                  backlog=1000, persist=False, use_dask=False,
                  crs=None, fields={}, groupby=None, dynamic=True,
                  grid=None, legend=None, rot=None, title=None,
@@ -321,11 +321,12 @@ class HoloViewsConverter(object):
         self._redim = fields
         self.use_index = use_index
         self.value_label = value_label
-        self.group_label = group_label
         self.label = label
-        self._process_data(kind, data, x, y, by, groupby, row, col,
-                           use_dask, persist, backlog, label, value_label,
-                           hover_cols, attr_labels, transforms, stream, kwds)
+        self._process_data(
+            kind, data, x, y, by, groupby, row, col, use_dask,
+            persist, backlog, label, group_label, value_label,
+            hover_cols, attr_labels, transforms, stream, kwds
+        )
 
         self.dynamic = dynamic
         self.geo = any([geo, crs, global_extent, projection, project, coastline])
@@ -572,8 +573,9 @@ class HoloViewsConverter(object):
         return data
 
     def _process_data(self, kind, data, x, y, by, groupby, row, col,
-                      use_dask, persist, backlog, label, value_label,
-                      hover_cols, attr_labels, transforms, stream, kwds):
+                      use_dask, persist, backlog, label, group_label,
+                      value_label, hover_cols, attr_labels, transforms,
+                      stream, kwds):
         gridded = kind in self._gridded_types
         gridded_data = False
         da = None
@@ -740,9 +742,14 @@ class HoloViewsConverter(object):
                                  'e.g. a NumPy array or xarray Dataset, '
                                  'found %s type' % (kind, type(self.data).__name__))
 
+            if hasattr(data, 'columns') and data.columns.name and not group_label:
+                group_label = data.columns.name
+            elif not group_label:
+                group_label = 'Variable'
+
             if isinstance(data.columns, pd.MultiIndex) and x in (None, 'index') and y is None and not by:
-                self.data = data.stack().reset_index(1).rename(columns={'level_1': self.group_label})
-                by = self.group_label
+                self.data = data.stack().reset_index(1).rename(columns={'level_1': group_label})
+                by = group_label
                 x = 'index'
 
             # Determine valid indexes
@@ -795,6 +802,7 @@ class HoloViewsConverter(object):
         self.gridded_data = gridded_data
         self.use_dask = use_dask
         self.indexes = indexes
+        self.group_label = group_label or 'Variable'
         if isinstance(by, (np.ndarray, pd.Series)):
             self.data = self.data.assign(_by=by)
             self.by = ['_by']
