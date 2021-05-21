@@ -1150,20 +1150,18 @@ class HoloViewsConverter(object):
         if self._plot_opts.get('height') is not None:
             opts['height'] = self._plot_opts['height']
 
-        if 'cmap' in self._style_opts and self.datashade:
-            levels = self._plot_opts.get('color_levels')
-            cmap = self._style_opts['cmap']
-            if isinstance(cmap, dict):
-                opts['color_key'] = cmap
-            else:
-                opts['cmap'] = process_cmap(cmap, levels)
-
+        categorical = False
         if self.by and not self.subplots:
             opts['aggregator'] = reductions.count_cat(self.by[0])
+            categorical = True
         if self.aggregator:
+            import datashader as ds
             agg = self.aggregator
             if isinstance(agg, basestring) and self._color_dim:
+                categorical = agg == 'count_cat'
                 agg = getattr(reductions, agg)(self._color_dim)
+            else:
+                categorical = isinstance(agg, (ds.count_cat, ds.by))
             opts['aggregator'] = agg
         elif self._color_dim:
             opts['aggregator'] = reductions.mean(self._color_dim)
@@ -1179,6 +1177,14 @@ class HoloViewsConverter(object):
             opts['y_range'] = self._plot_opts['ylim']
         if not self.dynamic:
             opts['dynamic'] = self.dynamic
+
+        if 'cmap' in self._style_opts and self.datashade:
+            levels = self._plot_opts.get('color_levels')
+            cmap = self._style_opts['cmap']
+            if isinstance(cmap, dict):
+                opts['color_key'] = cmap
+            else:
+                opts['cmap'] = process_cmap(cmap, levels, categorical=categorical)
 
         style = {}
         if self.datashade:
