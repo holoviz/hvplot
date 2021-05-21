@@ -1508,7 +1508,11 @@ class HoloViewsConverter(object):
         """
         data, x, y = self._process_chart_args(data, False, y)
 
-        opts = self._get_opts(element.name)
+        custom = {}
+        if 'color' in self._style_opts:
+            prefix = 'violin' if issubclass(element, Violin) else 'box'
+            custom[prefix+'_fill_color'] = self._style_opts['color']
+        opts = self._get_opts(element.name, **custom)
         ylim = self._plot_opts.get('ylim', (None, None))
         if not isinstance(y, (list, tuple)):
             ranges = {y: ylim}
