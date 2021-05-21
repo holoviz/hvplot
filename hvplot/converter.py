@@ -204,6 +204,11 @@ class HoloViewsConverter(object):
     crs (default=None):
         Coordinate reference system of the data specified as Cartopy
         CRS object, proj.4 string or EPSG code.
+    features (default=None): dict or list
+        A list of features or a dictionary of features and the scale
+        at which to render it. Available features include 'borders',
+        'coastline', 'lakes', 'land', 'ocean', 'rivers' and 'states'.
+        Available scales include '10m'/'50m'/'110m'.
     geo (default=False):
         Whether the plot should be treated as geographic (and assume
         PlateCarree, i.e. lat/lon coordinates).
@@ -232,7 +237,7 @@ class HoloViewsConverter(object):
                      'dynamic', 'crs', 'value_label', 'group_label',
                      'backlog', 'persist', 'sort_date']
 
-    _geo_options = ['geo', 'crs', 'project', 'coastline', 'tiles']
+    _geo_options = ['geo', 'crs', 'features', 'project', 'coastline', 'tiles']
 
     _axis_options = ['width', 'height', 'shared_axes', 'grid', 'legend',
                      'rot', 'xlim', 'ylim', 'xticks', 'yticks', 'colorbar',
@@ -317,7 +322,7 @@ class HoloViewsConverter(object):
                  x_sampling=None, y_sampling=None, project=False,
                  tools=[], attr_labels=None, coastline=False,
                  tiles=False, sort_date=True, check_symmetric_max=1000000,
-                 transforms={}, stream=None, cnorm=None, **kwds):
+                 transforms={}, stream=None, cnorm=None, features=None, **kwds):
 
         # Process data and related options
         self._redim = fields
@@ -331,10 +336,11 @@ class HoloViewsConverter(object):
         )
 
         self.dynamic = dynamic
-        self.geo = any([geo, crs, global_extent, projection, project, coastline])
+        self.geo = any([geo, crs, global_extent, projection, project, coastline, features])
         self.crs = self._process_crs(data, crs) if self.geo else None
         self.project = project
         self.coastline = coastline
+        self.features = features
         self.tiles = tiles
         self.sort_date = sort_date
 
@@ -1218,10 +1224,30 @@ class HoloViewsConverter(object):
             if self.coastline in ['10m', '50m', '110m']:
                 coastline = coastline.opts(scale=self.coastline)
             elif self.coastline is not True:
-                param.main.param.warning("coastline scale of %s not recognized, "
-                                   "must be one of '10m', '50m' or '110m'." %
-                                   self.coastline)
+                param.main.param.warning(
+                    "coastline scale of %s not recognized, must be one "
+                    "'10m', '50m' or '110m'." % self.coastline)
             obj = obj * coastline
+
+        if self.features:
+            import geoviews as gv
+            for feature in self.features:
+                feature_cls = getattr(gv.feature, feature)
+                if feature_cls is None:
+                    raise ValueError(
+                        "Feature %r was not recognized, must be one of "
+                        "'borders', 'coastline', 'lakes', 'land', 'ocean', "
+                        "'rivers' and 'states'." % feature)
+                feature_obj = feature_cls()
+                if isinstance(self.features, dict):
+                    scale = self.features[feature]
+                    if scale not in ['10m', '50m', '110m']:
+                        param.main.param.warning(
+                            "Feature scale of %r not recognized, "
+                            "must be one of '10m', '50m' or '110m'." %
+                        scale)
+                obj = feature_obj * obj
+
         if self.tiles:
             tile_source = 'EsriImagery' if self.tiles == 'ESRI' else self.tiles
             warning = ("%s tiles not recognized, must be one of: %s or a tile object" %
