@@ -628,6 +628,8 @@ class HoloViewsConverter(object):
         elif is_streamz(data):
             datatype = 'streamz'
             self.data = data.example
+            if isinstance(self.data, pd.DataFrame):
+                self.data = self.data.iloc[:0]
             self.stream_type = data._stream_type
             streaming = True
             self.cb = data
