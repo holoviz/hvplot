@@ -23,6 +23,9 @@ jobs:
       MPLBACKEND: "Agg"
       MOZ_HEADLESS: 1
       DISPLAY: ":99.0"
+      PANEL_EMBED: "true"
+      PANEL_EMBED_JSON: "true"
+      PANEL_EMBED_JSON_PREFIX: "json"
     steps:
       - uses: actions/checkout@v2
         with:
