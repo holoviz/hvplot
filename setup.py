@@ -37,7 +37,7 @@ install_requires = [
 
 _examples = [
     'geoviews >=1.6.0',
-    'panel',
+    'numba >=0.51.0',
     'geopandas',
     'xarray <0.17.0',
     'networkx',
