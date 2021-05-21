@@ -71,6 +71,9 @@ extras_require = {
         'parameterized',
         'pytest',
         'nbsmoke >=0.2.0',
+        'twine',   # required for pip packaging
+        'rfc3986', # required by twine
+        'keyring', # required by twine
     ],
     'examples': _examples,
     'examples_extra': _examples_extra,
