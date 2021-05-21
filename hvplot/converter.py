@@ -82,10 +82,12 @@ class HoloViewsConverter(object):
     """
     Generic options
     ---------------
-    colorbar (default=False): boolean
-        Enables colorbar
+    clim: tuple
+        Lower and upper bound of the color scale
     cnorm (default='linear'): str
         Color scaling which must be one of 'linear', 'log' or 'eq_hist'
+    colorbar (default=False): boolean
+        Enables a colorbar
     fontscale: number
         Scales the size of all fonts by the same amount, e.g. fontscale=1.5
         enlarges all fonts (title, xticks, labels etc.) by 50%
