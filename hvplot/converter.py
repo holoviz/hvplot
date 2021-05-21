@@ -1029,6 +1029,12 @@ class HoloViewsConverter(object):
             elif self.datatype == 'xarray':
                 import xarray as xr
                 if isinstance(data, xr.Dataset):
+                    if kind == 'image':
+                        dims_with_coords = set(data.coords.keys())
+                        missing_coords =  set(self.indexes) - dims_with_coords
+                        new_coords = {coord: np.arange(data[coord].shape[0])
+                                      for coord in missing_coords}
+                        data = data.assign_coords(**new_coords)
                     dataset = Dataset(data, self.indexes)
                 else:
                     name = data.name or self.label or self.value_label
