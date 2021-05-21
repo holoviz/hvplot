@@ -565,6 +565,12 @@ class HoloViewsConverter(object):
                     "'{}' must be either a valid crs or an reference to "
                     "a `data.attr` containing a valid crs.".format(crs))
 
+    def _transform_columnar_data(self, data):
+        renamed = {c: str(c) for c in data.columns if not isinstance(c, basestring)}
+        if renamed:
+            data = data.rename(columns=renamed)
+        return data
+
     def _process_data(self, kind, data, x, y, by, groupby, row, col,
                       use_dask, persist, backlog, label, value_label,
                       hover_cols, attr_labels, transforms, stream, kwds):
@@ -756,10 +762,7 @@ class HoloViewsConverter(object):
                 elif kind in ('bar', 'barh'):
                     x, by = indexes
 
-            # Rename non-string columns
-            renamed = {c: str(c) for c in data.columns if not isinstance(c, basestring)}
-            if renamed:
-                self.data = self.data.rename(columns=renamed)
+            self.data = self._transform_columnar_data(self.data)
             self.variables = indexes + list(self.data.columns)
 
             # Reset groupby dimensions
@@ -1342,7 +1345,10 @@ class HoloViewsConverter(object):
         return y
 
     def _process_chart_args(self, data, x, y, single_y=False, categories=None):
-        data = self.data if data is None else data
+        if data is None:
+            data = self.data
+        elif not self.gridded_data:
+            data = self._transform_columnar_data(data)
 
         x = self._process_chart_x(data, x, y, single_y, categories=categories)
         y = self._process_chart_y(data, x, y, single_y)
