@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
+import param
+
+param.parameterized.docstring_signature = False
+param.parameterized.docstring_describe_params = False
 
 from nbsite.shared_conf import *
 
 project = u'hvPlot'
 authors = u'HoloViz developers'
-copyright = u'2018-2020 ' + authors
+copyright = u'2018-2021 ' + authors
 description = 'A high-level plotting API for the PyData ecosystem built on HoloViews'
 
 import hvplot
@@ -13,27 +17,35 @@ version = release = hvplot.__version__
 nbbuild_cell_timeout = 600
 
 html_static_path += ['_static']
-html_theme = 'sphinx_holoviz_theme'
+templates_path = ['_templates']
+
+html_css_files = [
+    'nbsite.css',
+    'custom.css'
+]
+
 html_theme_options = {
-    'logo': 'logo_horizontal.svg',
-    'include_logo_text': False,
-    'favicon': 'favicon.ico',
-    'primary_color': '#266498',
-    'primary_color_dark': '#1b486e',
-    'second_nav': True,
-    'custom_css': 'custom.css',
+    "github_url": "https://github.com/holoviz/hvplot",
+    "icon_links": [
+        {
+            "name": "Twitter",
+            "url": "https://twitter.com/HoloViews",
+            "icon": "fab fa-twitter-square",
+        },
+        {
+            "name": "Discourse",
+            "url": "https://discourse.holoviz.org/",
+            "icon": "fab fa-discourse",
+        },
+    ]
 }
 
-_NAV =  (
-    ('Getting Started', 'getting_started/index'),
-    ('User Guide', 'user_guide/index'),
-    ('Reference Gallery', 'reference/index'),
-    ('Topics',  'topics'),
-    ('Developer Guide', 'developer_guide/index'),
-    ('About', 'about')
-)
+html_theme = "pydata_sphinx_theme"
+html_logo = "_static/logo_horizontal.svg"
+html_favicon = "_static/favicon.ico"
 
-extensions += ['nbsite.gallery']
+extensions += ['sphinx.ext.napoleon', 'nbsite.gallery']
+napoleon_numpy_docstring = True
 
 nbsite_gallery_conf = {
     'github_org': 'holoviz',
@@ -53,19 +65,8 @@ nbsite_gallery_conf = {
     },
 }
 
-
 html_context.update({
-    'PROJECT': project,
-    'DESCRIPTION': description,
-    'AUTHOR': authors,
-    # canonical URL (for search engines); can ignore for local builds
-    'WEBSITE_SERVER': 'https://hvplot.holoviz.org',
-    'VERSION': version,
-    'GOOGLE_ANALYTICS_UA': 'UA-154795830-5',
-    'NAV': _NAV,
-    'LINKS': _NAV,
-    'SOCIAL': (
-        ('Gitter', '//gitter.im/pyviz/pyviz'),
-        ('Github', '//github.com/holoviz/hvplot'),
-    )
+    "github_user": "holoviz",
+    "github_repo": "panel",
+    "google_analytics_id": "UA-154795830-5",
 })

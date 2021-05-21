@@ -37,7 +37,7 @@ install_requires = [
 
 _examples = [
     'geoviews >=1.6.0',
-    'panel',
+    'numba >=0.51.0',
     'geopandas',
     'xarray <0.17.0',
     'networkx',
@@ -71,13 +71,15 @@ extras_require = {
         'parameterized',
         'pytest',
         'nbsmoke >=0.2.0',
+        'twine',   # required for pip packaging
+        'rfc3986', # required by twine
+        'keyring', # required by twine
+        'numpy >=1.7,<1.20' # Numba ABI incompatibility
     ],
     'examples': _examples,
     'examples_extra': _examples_extra,
     'doc': _examples_extra + [
         'nbsite >=0.5.1',
-        'sphinx_holoviz_theme',
-        'tornado <6.0'
     ]
 }
 

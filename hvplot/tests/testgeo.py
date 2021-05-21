@@ -122,7 +122,7 @@ class TestGeoAnnotation(TestCase):
         plot = self.df.hvplot.points('x', 'y', geo=True, tiles=True)
         self.assertEqual(len(plot), 2)
         self.assertIsInstance(plot.get(0), hv.Tiles)
-        self.assertIn('wikimedia', plot.get(0).data)
+        self.assertIn('openstreetmap', plot.get(0).data)
 
     def test_plot_with_specific_tiles(self):
         plot = self.df.hvplot.points('x', 'y', geo=True, tiles='ESRI')
