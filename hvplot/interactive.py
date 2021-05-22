@@ -327,7 +327,7 @@ class Interactive():
     # Public API
     #----------------------------------------------------------------
 
-    def layout(self):
+    def layout(self, **kwargs):
         """
         Returns a layout of the widgets and output arranged according
         to the center and widget location specified in the
@@ -372,7 +372,7 @@ class Interactive():
                 components = [Column(widgets, panel)]
             elif loc.startswith('bottom'):
                 components = [Column(panel, widgets)]
-        return Row(*components)
+        return Row(*components, **kwargs)
 
     def output(self):
         """
