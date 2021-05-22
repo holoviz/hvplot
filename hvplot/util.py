@@ -205,7 +205,7 @@ def process_crs(crs):
     return crs
 
 def is_tabular(data):
-    if check_library(data, ['dask', 'streamz', 'pandas', 'geopandas']):
+    if check_library(data, ['dask', 'streamz', 'pandas', 'geopandas', 'cudf']):
         return True
     elif check_library(data, 'intake'):
         from intake.source.base import DataSource
@@ -215,7 +215,7 @@ def is_tabular(data):
         return False
 
 def is_series(data):
-    if not check_library(data, ['dask', 'streamz', 'pandas']):
+    if not check_library(data, ['dask', 'streamz', 'pandas', 'cudf']):
         return False
     elif isinstance(data, pd.Series):
         return True
@@ -225,6 +225,9 @@ def is_series(data):
     elif check_library(data, 'dask'):
         import dask.dataframe as dd
         return isinstance(data, dd.Series)
+    elif check_library(data, 'cudf'):
+        import cudf
+        return isinstance(data, cudf.Series)
     else:
         return False
 
