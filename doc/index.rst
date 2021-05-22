@@ -1,10 +1,12 @@
-.. raw:: html
-
-  <h1><img src="assets/hvplot-wm.png" width="125"></h1>
+|logo|
+======
 
 .. notebook:: hvplot ../examples/homepage.ipynb
    :offset: 0
    :disable_interactivity_warning:
+
+.. |logo| image:: assets/hvplot-wm.png
+   :width: 125 px
 
 .. toctree::
    :hidden:
