@@ -1237,7 +1237,7 @@ class HoloViewsConverter(object):
 
         if self.features:
             import geoviews as gv
-            for feature in self.features:
+            for feature in reversed(self.features):
                 feature_cls = getattr(gv.feature, feature)
                 if feature_cls is None:
                     raise ValueError(
