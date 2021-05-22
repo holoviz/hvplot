@@ -118,6 +118,7 @@ class hvPlotTabular(hvPlotBase):
         'scatter',
         'area',
         'errorbars',
+        'ohlc',
         'heatmap',
         'hexbin',
         'bivariate',
@@ -241,6 +242,26 @@ class hvPlotTabular(hvPlotBase):
         """
         return self(x, y, kind='errorbars',
                     yerr1=yerr1, yerr2=yerr2, **kwds)
+
+    def ohlc(self, x=None, y=None, **kwds):
+        """
+        OHLC
+
+        Parameters
+        ----------
+        x: string, optional
+            Field name to draw x coordinates from.
+        y: list or tuple, optional
+            Field names of the OHLC columns
+        **kwds : optional
+            Keyword arguments to pass on to
+            :py:meth:`hvplot.converter.HoloViewsConverter`.
+        Returns
+        -------
+        obj : HoloViews object
+            The HoloViews representation of the plot.
+        """
+        return self(kind='ohlc', x=x, y=y, **kwds)
 
     def heatmap(self, x=None, y=None, C=None, colorbar=True, **kwds):
         """
