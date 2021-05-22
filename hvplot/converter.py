@@ -1765,8 +1765,11 @@ class HoloViewsConverter(object):
         if ds.data[x].dtype.kind in 'SUO':
             rects = Rectangles(ds, [x, o, x, c])
         else:
-            sampling = np.min(np.diff(ds[x])) * width/2.
-            ds = ds.transform(lbound=dim(x)-sampling, ubound=dim(x)+sampling)
+            if len(ds):
+                sampling = np.min(np.diff(ds[x])) * width/2.
+                ds = ds.transform(lbound=dim(x)-sampling, ubound=dim(x)+sampling)
+            else:
+                ds = ds.transform(lbound=dim(x), ubound=dim(x))
             rects = Rectangles(ds, ['lbound', o, 'ubound', c])
         segments = Segments(ds, [x, l, x, h])
         rect_opts = self._get_opts('Rectangles')
