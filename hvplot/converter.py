@@ -1773,6 +1773,13 @@ class HoloViewsConverter(object):
         rect_opts.pop('tools')
         rect_opts['color'] = color_exp
         seg_opts = self._get_opts('Segments')
+        tools = seg_opts.pop('tools', [])
+        if 'hover' in tools:
+            tools[tools.index('hover')] = HoverTool(tooltips=[
+                (x, '@{%s}' % x), ('Open', '@{%s}' % o), ('High', '@{%s}' % h),
+                ('Low', '@{%s}' % l), ('Close', '@{%s}' % c)
+            ])
+        seg_opts['tools'] = tools
         seg_opts ['color'] = self.kwds.get('line_color', 'black')
         if 'xlabel' not in seg_opts:
             seg_opts['xlabel'] = '' if x == 'index' else x
