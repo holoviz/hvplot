@@ -20,7 +20,7 @@ from holoviews.element import (
     Curve, Scatter, Area, Bars, BoxWhisker, Dataset, Distribution,
     Table, HeatMap, Image, HexTiles, QuadMesh, Bivariate, Histogram,
     Violin, Contours, Polygons, Points, Path, Labels, RGB, ErrorBars,
-    VectorField
+    VectorField, Rectangles, Segments
 )
 from holoviews.plotting.bokeh import OverlayPlot, colormap_generator
 from holoviews.plotting.util import process_cmap
@@ -224,7 +224,9 @@ class HoloViewsConverter(object):
         the default is 'Wikipedia'.
     """
 
-    _gridded_types = ['image', 'contour', 'contourf', 'quadmesh', 'rgb', 'points', 'dataset']
+    _gridded_types = [
+        'image', 'contour', 'contourf', 'quadmesh', 'rgb', 'points', 'dataset'
+    ]
 
     _geom_types = ['paths', 'polygons']
 
@@ -258,6 +260,7 @@ class HoloViewsConverter(object):
         'step'     : ['where'],
         'area'     : ['y2'],
         'errorbars': ['yerr1', 'yerr2'],
+        'ohlc'     : ['bar_width', 'pos_color', 'neg_color', 'line_color'],
         'hist'     : ['bins', 'bin_range', 'normed', 'cumulative'],
         'heatmap'  : ['C', 'reduce_function', 'logz'],
         'hexbin'   : ['C', 'reduce_function', 'gridsize', 'logz', 'min_count'],
@@ -284,7 +287,7 @@ class HoloViewsConverter(object):
         'bar': Bars, 'barh': Bars, 'contour': Contours, 'contourf': Polygons,
         'points': Points, 'polygons': Polygons, 'paths': Path, 'step': Curve,
         'labels': Labels, 'rgb': RGB, 'errorbars': ErrorBars,
-        'vectorfield': VectorField,
+        'vectorfield': VectorField, 'ohlc': Rectangles
     }
 
     _colorbar_types = ['image', 'hexbin', 'heatmap', 'quadmesh', 'bivariate',
@@ -1742,6 +1745,51 @@ class HoloViewsConverter(object):
 
         opts = self._get_opts('Bivariate', **self.kwds)
         return Bivariate(data, [x, y]).redim(**self._redim).opts(**opts)
+
+    def ohlc(self, x=None, y=None, data=None):
+        data = self.data if data is None else data
+        if x is None:
+            variables = [var for var in self.variables if var not in self.indexes]
+            if data[variables[0]].dtype.kind == 'M':
+                x = variables[0]
+            else:
+                x = self.indexes[0]
+        width = self.kwds.get('bar_width', 0.5)
+        if y is None:
+            o, h, l, c = [col for col in data.columns if col != x][:4]
+        else:
+            o, h, l, c = y
+        neg, pos = self.kwds.get('neg_color', 'red'), self.kwds.get('pos_color', 'green')
+        color_exp = (dim(o)>dim(c)).categorize({True: neg, False: pos})
+        ds = Dataset(data, [x], [o, h, l, c])
+        if ds.data[x].dtype.kind in 'SUO':
+            rects = Rectangles(ds, [x, o, x, c])
+        else:
+            if len(ds):
+                sampling = np.min(np.diff(ds[x])) * width/2.
+                ds = ds.transform(lbound=dim(x)-sampling, ubound=dim(x)+sampling)
+            else:
+                ds = ds.transform(lbound=dim(x), ubound=dim(x))
+            rects = Rectangles(ds, ['lbound', o, 'ubound', c])
+        segments = Segments(ds, [x, l, x, h])
+        rect_opts = self._get_opts('Rectangles')
+        rect_opts.pop('tools')
+        rect_opts['color'] = color_exp
+        seg_opts = self._get_opts('Segments')
+        tools = seg_opts.pop('tools', [])
+        if 'hover' in tools:
+            tools[tools.index('hover')] = HoverTool(tooltips=[
+                (x, '@{%s}' % x), ('Open', '@{%s}' % o), ('High', '@{%s}' % h),
+                ('Low', '@{%s}' % l), ('Close', '@{%s}' % c)
+            ])
+        seg_opts['tools'] = tools
+        seg_opts ['color'] = self.kwds.get('line_color', 'black')
+        if 'xlabel' not in seg_opts:
+            seg_opts['xlabel'] = '' if x == 'index' else x
+        if 'ylabel' not in seg_opts:
+            seg_opts['ylabel'] = ''
+        return (segments.redim(**self._redim).opts(**seg_opts) *
+                rects.redim(**self._redim).opts(**rect_opts))
 
     def table(self, x=None, y=None, data=None):
         data = self.data if data is None else data
