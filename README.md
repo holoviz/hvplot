@@ -13,7 +13,6 @@ hvPlot <img src="/doc/_static/logo.png" width="50" height="50">
 | Docs | [![gh-pages](https://img.shields.io/github/last-commit/holoviz/hvplot/gh-pages.svg)](https://github.com/holoviz/hvplot/tree/gh-pages) [![site](https://img.shields.io/website-up-down-green-red/http/hvplot.holoviz.org.svg)](http://hvplot.holoviz.org) |
 
 
-
 ## What is it?
 
 The PyData ecosystem has a number of core Python data containers that allow users to work with a wide array of datatypes, including:

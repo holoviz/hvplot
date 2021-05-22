@@ -11,7 +11,6 @@
    :maxdepth: 2
 
    Introduction <self>
-   Getting Started <getting_started/index>
    User Guide <user_guide/index>
    Reference Gallery <reference/index>
    Topics <topics>
