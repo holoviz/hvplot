@@ -1760,7 +1760,7 @@ class HoloViewsConverter(object):
         else:
             o, h, l, c = y
         neg, pos = self.kwds.get('neg_color', 'red'), self.kwds.get('pos_color', 'green')
-        color_exp = (dim(o)>dim(c)).categorize({True: pos, False: neg})
+        color_exp = (dim(o)>dim(c)).categorize({True: neg, False: pos})
         ds = Dataset(data, [x], [o, h, l, c])
         if ds.data[x].dtype.kind in 'SUO':
             rects = Rectangles(ds, [x, o, x, c])
