@@ -13,6 +13,8 @@ import param
 from panel.layout import Column, Row, VSpacer, HSpacer
 from panel.widgets.base import Widget
 
+from .util import is_tabular, is_xarray, is_xarray_dataarray
+
 
 def _find_widgets(op):
     widgets = []
@@ -51,14 +53,19 @@ class Interactive():
     def __init__(self, obj, transform=None, plot=False, depth=0,
                  loc='top_left', center=False, dmap=False, inherit_kwargs={},
                  **kwargs):
+        self._init = False
         self._obj = obj
         self._method = None
         if transform is None:
-            import xarray as xr
-            if isinstance(obj, xr.DataArray):
-                self._transform = hv.dim(obj.name)
-            else:
-                self._transform = hv.dim('*')
+            dim = '*'
+            transform = hv.util.transform.dim
+            if is_xarray(obj):
+                transform = hv.util.transform.xr_dim
+                if is_xarray_dataarray(obj):
+                    dim = obj.name
+            elif is_tabular(obj):
+                transform = hv.util.transform.pd_dim
+            self._transform = transform(dim)
         else:
             self._transform = transform
         self._plot = plot
@@ -70,6 +77,7 @@ class Interactive():
         self._kwargs = kwargs
         ds = hv.Dataset(self._obj)
         self._current = self._transform.apply(ds, keep_index=True, compute=False)
+        self._init = True
 
     @property
     def _params(self):
@@ -106,10 +114,23 @@ class Interactive():
         current = self._current
         if self._method:
             current = getattr(current, self._method)
-        return [d for d in dir(current) if d[0] != '_']
+        extras = {attr for attr in dir(current) if not attr.startswith('_')}
+        try:
+            return sorted(set(super(Interactive, self).__dir__()) | extras)
+        except Exception:
+            return sorted(set(dir(type(self))) | set(self.__dict__) | extras)
 
-    def __getattr__(self, name):
-        if name in dir(self):
+    def __getattribute__(self, name):
+        self_dict = super(Interactive, self).__getattribute__('__dict__')
+        if not self_dict.get('_init'):
+            return super(Interactive, self).__getattribute__(name)
+
+        current = self_dict['_current']
+        method = self_dict['_method']
+        if method:
+            current = getattr(current, method)
+        extras = [d for d in dir(current) if not d.startswith('_')]
+        if name in extras and name not in super(Interactive, self).__dir__():
             if self._method:
                 transform = hv.dim(self._transform, self._method, accessor=True)
                 inherit_kwargs = {}
@@ -124,7 +145,7 @@ class Interactive():
             except Exception:
                 pass
             return new
-        raise AttributeError(name)
+        return super(Interactive, self).__getattribute__(name)
 
     @staticmethod
     def _get_ax_fn():
@@ -147,7 +168,9 @@ class Interactive():
         method = type(self._transform)(self._transform, self._method,
                                        accessor=True)
         kwargs = dict(self._inherit_kwargs, **kwargs)
-        return self._clone(method(*args, **kwargs), plot=self._method == 'plot')
+        clone = self._clone(method(*args, **kwargs), plot=self._method == 'plot')
+        self._method = None
+        return clone
 
     #----------------------------------------------------------------
     # Interactive pipeline APIs
@@ -302,6 +325,8 @@ class Interactive():
         return self._clone(transform)
 
     def __getitem__(self, other):
+        if self._method:
+            self._method = None
         other = other._transform if isinstance(other, Interactive) else other
         transform = type(self._transform)(self._transform, operator.getitem, other)
         return self._clone(transform)
