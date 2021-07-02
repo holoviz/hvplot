@@ -64,7 +64,7 @@ class Interactive():
                 if is_xarray_dataarray(obj):
                     dim = obj.name
             elif is_tabular(obj):
-                transform = hv.util.transform.pd_dim
+                transform = hv.util.transform.df_dim
             self._transform = transform(dim)
         else:
             self._transform = transform
@@ -168,8 +168,10 @@ class Interactive():
         method = type(self._transform)(self._transform, self._method,
                                        accessor=True)
         kwargs = dict(self._inherit_kwargs, **kwargs)
-        clone = self._clone(method(*args, **kwargs), plot=self._method == 'plot')
-        self._method = None
+        try:
+            clone = self._clone(method(*args, **kwargs), plot=self._method == 'plot')
+        finally:
+            self._method = None
         return clone
 
     #----------------------------------------------------------------
