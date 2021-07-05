@@ -136,7 +136,10 @@ class Interactive():
                 inherit_kwargs = {}
                 if self._method == 'plot':
                     inherit_kwargs['ax'] = self._get_ax_fn()
-                new = self._clone(transform, inherit_kwargs=inherit_kwargs)
+                try:
+                    new = self._clone(transform, inherit_kwargs=inherit_kwargs)
+                finally:
+                    self._method = None
             else:
                 new = self
             new._method = name
@@ -165,10 +168,10 @@ class Interactive():
             raise AttributeError
         elif self._method == 'plot':
             kwargs['ax'] = self._get_ax_fn()
-        method = type(self._transform)(self._transform, self._method,
-                                       accessor=True)
-        kwargs = dict(self._inherit_kwargs, **kwargs)
         try:
+            method = type(self._transform)(self._transform, self._method,
+                                       accessor=True)
+            kwargs = dict(self._inherit_kwargs, **kwargs)
             clone = self._clone(method(*args, **kwargs), plot=self._method == 'plot')
         finally:
             self._method = None
@@ -328,10 +331,13 @@ class Interactive():
 
     def __getitem__(self, other):
         if self._method:
+            transform = type(self._transform)(self._transform, self._method, accessor=True)
             self._method = None
+        else:
+            transform = self._transform
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.getitem, other)
-        return self._clone(transform)
+        new_transform = type(transform)(transform, operator.getitem, other)
+        return self._clone(new_transform)
 
     def _plot(self, *args, **kwargs):
         @pn.depends()
