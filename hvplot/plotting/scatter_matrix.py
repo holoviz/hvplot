@@ -67,7 +67,9 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
 
     if cmap and colormap:
         raise TypeError("Only specify one of `cmap` and `colormap`.")
-    colors = cmap or colormap or _hv.plotting.util.process_cmap('Category10', categorical=True)
+    colors = _hv.plotting.util.process_cmap(cmap) or \
+        _hv.plotting.util.process_cmap(colormap) or \
+        _hv.plotting.util.process_cmap('Category10', categorical=True)
     tools = tools or ['box_select', 'lasso_select']
     chart_opts = dict(alpha=alpha, cmap=colors, tools=tools,
                       nonselection_alpha=nonselection_alpha, **kwds)
