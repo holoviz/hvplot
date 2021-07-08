@@ -89,6 +89,8 @@ class Interactive():
         def evaluate(*args, **kwargs):
             ds = hv.Dataset(self._obj)
             obj = self._transform.apply(ds, keep_index=True, compute=False)
+            if self._method:
+                obj = getattr(obj, self._method, obj)
             if self._plot:
                 return Interactive._fig
             else:
@@ -180,6 +182,10 @@ class Interactive():
     #----------------------------------------------------------------
     # Interactive pipeline APIs
     #----------------------------------------------------------------
+
+    def __array_ufunc__(self, *args, **kwargs):
+        transform = args[0](self._transform, *args[3:], **kwargs)
+        return self._clone(transform)
 
     # Builtin functions
     def __abs__(self):
@@ -360,6 +366,23 @@ class Interactive():
     # Public API
     #----------------------------------------------------------------
 
+    def dmap(self):
+        """
+        Wraps the output in a DynamicMap. Only valid if the output
+        is a HoloViews object.
+        """
+        return hv.DynamicMap(self._callback)
+
+    def eval(self):
+        """
+        Returns the currrent state of the interactive expression. The
+        returned object is no longer interactive.
+        """
+        obj = self._current
+        if self._method:
+            return getattr(obj, self._method, obj)
+        return obj
+
     def layout(self, **kwargs):
         """
         Returns a layout of the widgets and output arranged according
@@ -407,6 +430,14 @@ class Interactive():
                 components = [Column(panel, widgets)]
         return Row(*components, **kwargs)
 
+    def holoviews(self):
+        """
+        Returns a HoloViews object to render the output of this
+        pipeline. Only works if the output of this pipeline is a
+        HoloViews object, e.g. from an .hvplot call.
+        """
+        return hv.DynamicMap(self._callback)
+
     def output(self):
         """
         Returns the output of the interactive pipeline, which is
@@ -417,6 +448,12 @@ class Interactive():
         DynamicMap or Panel object wrapping the interactive output.
         """
         return self.holoviews() if self._dmap else self.panel(**self._kwargs)
+
+    def panel(self, **kwargs):
+        """
+        Wraps the output in a Panel component.
+        """
+        return pn.panel(self._callback, **kwargs)
 
     def widgets(self):
         """
@@ -432,24 +469,3 @@ class Interactive():
                 if w not in widgets:
                     widgets.append(w)
         return pn.Column(*widgets)
-
-    def dmap(self):
-        """
-        Wraps the output in a DynamicMap. Only valid if the output
-        is a HoloViews object.
-        """
-        return hv.DynamicMap(self._callback)
-
-    def holoviews(self):
-        """
-        Returns a HoloViews object to render the output of this
-        pipeline. Only works if the output of this pipeline is a
-        HoloViews object, e.g. from an .hvplot call.
-        """
-        return hv.DynamicMap(self._callback)
-
-    def panel(self, **kwargs):
-        """
-        Wraps the output in a Panel component.
-        """
-        return pn.panel(self._callback, **kwargs)
