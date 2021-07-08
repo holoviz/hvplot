@@ -380,7 +380,7 @@ class Interactive():
         """
         obj = self._current
         if self._method:
-            return gettattr(obj, self._method)
+            return getattr(obj, self._method, obj)
         return obj
 
     def layout(self, **kwargs):
