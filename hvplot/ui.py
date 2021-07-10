@@ -138,7 +138,7 @@ class hvPlotExplorer(Viewer):
             if pname == 'kind':
                 continue
             p = self.param[pname]
-            if isinstance(p, param.ObjectSelector):
+            if isinstance(p, param.Selector):
                 p.objects = columns
 
     def _disable(self, event):
