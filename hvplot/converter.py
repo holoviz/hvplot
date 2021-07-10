@@ -188,8 +188,8 @@ class HoloViewsConverter(object):
         Whether to apply rasterization and shading using datashader
         library returning an RGB object
     dynspread (default=False):
-        Allows plots generated with datashade=True to increase the point
-        size to make sparse regions more visible
+        Allows plots generated with datashade=True or rasterize=True 
+        to increase the point size to make sparse regions more visible
     rasterize (default=False):
         Whether to apply rasterization using the datashader library
         returning an aggregated Image
@@ -1212,12 +1212,9 @@ class HoloViewsConverter(object):
         processed = operation(obj, **opts)
 
         if self.dynspread:
-            if self.datashade:
-                processed = dynspread(processed, max_px=self.kwds.get('max_px', 3),
-                                      threshold=self.kwds.get('threshold', 0.5))
-            else:
-                param.main.param.warning('dynspread may only be applied on datashaded plots, '
-                                   'use datashade=True instead of rasterize=True.')
+            processed = dynspread(processed, max_px=self.kwds.get('max_px', 3),
+                                  threshold=self.kwds.get('threshold', 0.5))
+        
         opts = filter_opts(eltype, dict(self._plot_opts, **style))
         return self._apply_layers(processed).opts(eltype, **opts)
 
