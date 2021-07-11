@@ -7,6 +7,7 @@ import operator
 import sys
 
 import holoviews as hv
+import pandas as pd
 import panel as pn
 import param
 
@@ -52,7 +53,7 @@ class Interactive():
 
     def __init__(self, obj, transform=None, plot=False, depth=0,
                  loc='top_left', center=False, dmap=False, inherit_kwargs={},
-                 **kwargs):
+                 max_rows=100, **kwargs):
         self._init = False
         self._obj = obj
         self._method = None
@@ -63,6 +64,11 @@ class Interactive():
                 transform = hv.util.transform.xr_dim
                 if is_xarray_dataarray(obj):
                     dim = obj.name
+                if dim is None:
+                    raise ValueError(
+                        "Cannot use interactive API on DataArray without name."
+                        "Assign a name to the DataArray and try again."
+                    )
             elif is_tabular(obj):
                 transform = hv.util.transform.df_dim
             self._transform = transform(dim)
@@ -74,6 +80,7 @@ class Interactive():
         self._center = center
         self._dmap = dmap
         self._inherit_kwargs = inherit_kwargs
+        self._max_rows = max_rows
         self._kwargs = kwargs
         ds = hv.Dataset(self._obj)
         self._current = self._transform.apply(ds, keep_index=True, compute=False)
@@ -91,6 +98,8 @@ class Interactive():
             obj = self._transform.apply(ds, keep_index=True, compute=False)
             if self._plot:
                 return Interactive._fig
+            elif isinstance(obj, pd.DataFrame):
+                return pn.pane.DataFrame(obj, max_rows=self._max_rows)
             else:
                 return obj
         return evaluate
@@ -115,6 +124,8 @@ class Interactive():
         if self._method:
             current = getattr(current, self._method)
         extras = {attr for attr in dir(current) if not attr.startswith('_')}
+        if is_tabular(currrent) and hasattr(current, 'columns'):
+            extras |= set(current.columns)
         try:
             return sorted(set(super(Interactive, self).__dir__()) | extras)
         except Exception:
