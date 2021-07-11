@@ -10,6 +10,7 @@ from .converter import HoloViewsConverter as hvConverter
 
 kinds = set(hvConverter._kind_mapping) - set(hvConverter._gridded_types)
 COLORMAPS = [cm for cm in list_cmaps() if not cm.endswith('_r_r')]
+MAX_ROWS = 10_000
 
 
 class Controls(Viewer):
@@ -169,7 +170,10 @@ class hvPlotExplorer(Viewer):
         kwargs.update(self.labels.kwargs)
         kwargs.update(self.operations.kwargs)
         kwargs['min_height'] = 300
-        self._hv_pane.object = self._df.hvplot(
+        df = self._df
+        if len(df) > MAX_ROWS and not (self.kind in ('hist', 'kde', 'boxwhisker', 'violin') or kwargs.get('rasterize') or kwargs.get('datashade')):
+            df = df.sample(n=MAX_ROWS)
+        self._hv_pane.object = df.hvplot(
             kind=self.kind, x=self.x, y=y, by=self.by, groupby=self.groupby, **kwargs
         )
 
