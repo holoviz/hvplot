@@ -7,6 +7,7 @@ import operator
 import sys
 
 import holoviews as hv
+import pandas as pd
 import panel as pn
 import param
 
@@ -52,7 +53,7 @@ class Interactive():
 
     def __init__(self, obj, transform=None, plot=False, depth=0,
                  loc='top_left', center=False, dmap=False, inherit_kwargs={},
-                 **kwargs):
+                 max_rows=100, **kwargs):
         self._init = False
         self._obj = obj
         self._method = None
@@ -74,6 +75,7 @@ class Interactive():
         self._center = center
         self._dmap = dmap
         self._inherit_kwargs = inherit_kwargs
+        self._max_rows = max_rows
         self._kwargs = kwargs
         ds = hv.Dataset(self._obj)
         self._current = self._transform.apply(ds, keep_index=True, compute=False)
@@ -93,6 +95,8 @@ class Interactive():
                 obj = getattr(obj, self._method, obj)
             if self._plot:
                 return Interactive._fig
+            elif isinstance(obj, pd.DataFrame):
+                return pn.pane.DataFrame(obj, max_rows=self._max_rows)
             else:
                 return obj
         return evaluate
