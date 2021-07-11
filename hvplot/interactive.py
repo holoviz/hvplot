@@ -64,6 +64,11 @@ class Interactive():
                 transform = hv.util.transform.xr_dim
                 if is_xarray_dataarray(obj):
                     dim = obj.name
+                if dim is None:
+                    raise ValueError(
+                        "Cannot use interactive API on DataArray without name."
+                        "Assign a name to the DataArray and try again."
+                    )
             elif is_tabular(obj):
                 transform = hv.util.transform.df_dim
             self._transform = transform(dim)
