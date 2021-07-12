@@ -126,7 +126,7 @@ class Interactive():
         if self._method:
             current = getattr(current, self._method)
         extras = {attr for attr in dir(current) if not attr.startswith('_')}
-        if is_tabular(currrent) and hasattr(current, 'columns'):
+        if is_tabular(current) and hasattr(current, 'columns'):
             extras |= set(current.columns)
         try:
             return sorted(set(super(Interactive, self).__dir__()) | extras)
