@@ -145,7 +145,7 @@ class Interactive():
         extras = [d for d in dir(current) if not d.startswith('_')]
         if name in extras and name not in super(Interactive, self).__dir__():
             if self._method:
-                transform = hv.dim(self._transform, self._method, accessor=True)
+                transform = type(self._transform)(self._transform, self._method, accessor=True)
                 inherit_kwargs = {}
                 if self._method == 'plot':
                     inherit_kwargs['ax'] = self._get_ax_fn()
@@ -365,7 +365,7 @@ class Interactive():
             FigureCanvas(fig)
             return fig.subplots()
         kwargs['ax'] = get_ax
-        transform = hv.dim(self._transform, 'plot', accessor=True)
+        transform = type(self._transform)(self._transform, 'plot', accessor=True)
         return self._clone(transform(*args, **kwargs), plot=True)
 
     def hvplot(self, *args, **kwargs):
