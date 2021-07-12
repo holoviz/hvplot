@@ -124,7 +124,7 @@ class Interactive():
         if self._method:
             current = getattr(current, self._method)
         extras = {attr for attr in dir(current) if not attr.startswith('_')}
-        if is_tabular(currrent) and hasattr(current, 'columns'):
+        if is_tabular(current) and hasattr(current, 'columns'):
             extras |= set(current.columns)
         try:
             return sorted(set(super(Interactive, self).__dir__()) | extras)
@@ -144,6 +144,7 @@ class Interactive():
         if name in extras and name not in super(Interactive, self).__dir__():
             if self._method:
                 transform = type(self._transform)(self._transform, self._method, accessor=True)
+                transform._ns = self._current
                 inherit_kwargs = {}
                 if self._method == 'plot':
                     inherit_kwargs['ax'] = self._get_ax_fn()
@@ -192,163 +193,139 @@ class Interactive():
     # Interactive pipeline APIs
     #----------------------------------------------------------------
 
+    def __array_ufunc__(self, *args, **kwargs):
+        transform = self._transform
+        if self._method:
+            transform = type(transform)(transform, self._method, accessor=True)
+            transform._ns = self._current
+            self._method = None
+        transform = args[0](transform, *args[3:], **kwargs)
+        return self._clone(transform)
+
+    def _apply_operator(self, operator, *args, **kwargs):
+        transform = self._transform
+        if self._method:
+            transform = type(transform)(transform, self._method, accessor=True)
+            transform._ns = self._current
+            self._method = None
+        transform = type(transform)(transform, operator, *args)
+        return self._clone(transform)
+
     # Builtin functions
     def __abs__(self):
-        transform = type(self._transform)(self._transform, abs)
-        return self._clone(transform)
+        return self._apply_operator(abs)
 
     def __round__(self, ndigits=None):
         args = () if ndigits is None else (ndigits,)
-        transform = type(self._transform)(self._transform, round, *args)
-        return self._clone(transform)
+        return self._apply_operator(round, *args)
 
     # Unary operators
     def __neg__(self):
-        transform = type(self._transform)(self._transform, operator.neg)
-        return self._clone(transform)
+        return self._apply_operator(operator.neg)
     def __not__(self):
-        transform = type(self._transform)(self._transform, operator.not_)
-        return self._clone(transform)
+        return self._apply_operator(operator.not_)
     def __invert__(self):
-        transform = type(self._transform)(self._transform, operator.inv)
-        return self._clone(transform)
+        return self._apply_operator(operator.inv)
     def __pos__(self):
-        transform = type(self._transform)(self._transform, operator.pos)
-        return self._clone(transform)
+        return self._apply_operator(operator.pos)
 
     # Binary operators
     def __add__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.add, other)
-        return self._clone(transform)
+        return self._apply_operator(operator.add, other)
     def __and__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.and_, other)
-        return self._clone(transform)
+        return self._apply_operator(operator.and_, other)
     def __div__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.div, other)
-        return self._clone(transform)
+        return self._apply_operator(operator.div, other)
     def __eq__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.eq, other)
-        return self._clone(transform)
+        return self._apply_operator(operator.eq, other)
     def __floordiv__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.floordiv, other)
-        return self._clone(transform)
+        return self._apply_operator(operator.floordiv, other)
     def __ge__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.ge, other)
-        return self._clone(transform)
+        return self._apply_operator(operator.ge, other)
     def __gt__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.gt, other)
-        return self._clone(transform)
+        return self._apply_operator(operator.gt, other)
     def __le__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.le, other)
-        return self._clone(transform)
+        return self._apply_operator(operator.le, other)
     def __lt__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.lt, other)
-        return self._clone(transform)
+        return self._apply_operator(operator.lt, other)
     def __lshift__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.lshift, other)
-        return self._clone(transform)
+        return self._apply_operator(operator.lshift, other)
     def __mod__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.mod, other)
-        return self._clone(transform)
+        return self._apply_operator(operator.mod, other)
     def __mul__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.mul, other)
-        return self._clone(transform)
+        return self._apply_operator(operator.mul, other)
     def __ne__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.ne, other)
-        return self._clone(transform)
+        return self._apply_operator(operator.ne, other)
     def __or__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.or_, other)
-        return self._clone(transform)
+        return self._apply_operator(operator.or_, other)
     def __rshift__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.rshift, other)
-        return self._clone(transform)
+        return self._apply_operator(operator.rshift, other)
     def __pow__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.pow, other)
-        return self._clone(transform)
+        return self._apply_operator(operator.pow, other)
     def __sub__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.sub, other)
-        return self._clone(transform)
+        return self._apply_operator(operator.sub, other)
     def __truediv__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.truediv, other)
-        return self._clone(transform)
+        return self._apply_operator(operator.truediv, other)
 
     # Reverse binary operators
     def __radd__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.add, other, reverse=True)
-        return self._clone(transform)
+        return self._apply_operator(operator.div, other, reverse=True)
     def __rand__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.and_, other)
-        return self._clone(transform)
+        return self._apply_operator(operator.and_, other, reverse=True)
     def __rdiv__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.div, other, reverse=True)
-        return self._clone(transform)
+        return self._apply_operator(operator.div, other, reverse=True)
     def __rfloordiv__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.floordiv, other, reverse=True)
-        return self._clone(transform)
+        return self._apply_operator(operator.floordiv, other, reverse=True)
     def __rlshift__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.rlshift, other)
-        return self._clone(transform)
+        return self._apply_operator(operator.rlshift, other)
     def __rmod__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.mod, other, reverse=True)
-        return self._clone(transform)
+        return self._apply_operator(operator.mod, other, reverse=True)
     def __rmul__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.mul, other, reverse=True)
-        return self._clone(transform)
+        return self._apply_operator(operator.mul, other, reverse=True)
     def __ror__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.or_, other, reverse=True)
-        return self._clone(transform)
+        return self._apply_operator(operator.or_, other, reverse=True)
     def __rpow__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.pow, other, reverse=True)
-        return self._clone(transform)
+        return self._apply_operator(operator.pow, other, reverse=True)
     def __rrshift__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.rrshift, other)
-        return self._clone(transform)
+        return self._apply_operator(operator.rrshift, other)
     def __rsub__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.sub, other, reverse=True)
-        return self._clone(transform)
+        return self._apply_operator(operator.sub, other, reverse=True)
     def __rtruediv__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        transform = type(self._transform)(self._transform, operator.truediv, other, reverse=True)
-        return self._clone(transform)
+        return self._apply_operator(operator.truediv, other, reverse=True)
 
     def __getitem__(self, other):
-        if self._method:
-            transform = type(self._transform)(self._transform, self._method, accessor=True)
-            self._method = None
-        else:
-            transform = self._transform
         other = other._transform if isinstance(other, Interactive) else other
-        new_transform = type(transform)(transform, operator.getitem, other)
-        return self._clone(new_transform)
+        return self._apply_operator(operator.getitem, other)
 
     def _plot(self, *args, **kwargs):
         @pn.depends()
@@ -359,11 +336,21 @@ class Interactive():
             FigureCanvas(fig)
             return fig.subplots()
         kwargs['ax'] = get_ax
-        transform = type(self._transform)(self._transform, 'plot', accessor=True)
+        transform = self._transform
+        if self._method:
+            transform = type(transform)(transform, self._method, accessor=True)
+            transform._ns = self._current
+            self._method = None
+        transform = type(transform)(transform, 'plot', accessor=True)
         return self._clone(transform(*args, **kwargs), plot=True)
 
     def hvplot(self, *args, **kwargs):
-        transform = type(self._transform)(self._transform, 'hvplot', accessor=True)
+        transform = self._transform
+        if self._method:
+            transform = type(transform)(transform, self._method, accessor=True)
+            transform._ns = self._current
+            self._method = None
+        transform = type(transform)(transform, 'hvplot', accessor=True)
         dmap = 'kind' not in kwargs
         return self._clone(transform(*args, **kwargs), dmap=dmap)
 
