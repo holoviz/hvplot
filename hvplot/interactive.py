@@ -199,8 +199,8 @@ class Interactive():
         transform = self._transform
         if self._method:
             transform = type(transform)(transform, self._method, accessor=True)
-            self._method = None
             transform._ns = self._current
+            self._method = None
         transform = args[0](transform, *args[3:], **kwargs)
         return self._clone(transform)
 
@@ -209,6 +209,7 @@ class Interactive():
         if self._method:
             transform = type(transform)(transform, self._method, accessor=True)
             transform._ns = self._current
+            self._method = None
         transform = type(transform)(transform, operator, *args)
         return self._clone(transform)
 
