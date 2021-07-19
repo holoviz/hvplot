@@ -1,4 +1,5 @@
-## Version 0.7.2
+## Version 0.7.2<br>
+## May 22, 2021
 
 This is  a minor release with a number of bug fixes and enhancements.
 Many thanks to @StefanBrand, @loicduffar, @brl0, @michaelaye,
@@ -39,6 +40,7 @@ Documentation:
 - Update available options in customization docs ([#620](https://github.com/holoviz/hvplot/pull/620))
 
 ## Version 0.7.1
+## March 3, 2021
 
 Major new features:
 
@@ -57,7 +59,7 @@ Bug fixes:
 - Cast types after applying melt to data ([#566](https://github.com/holoviz/hvplot/pull/566))
 
 ## Version 0.7.0
-
+## November 18, 2020
 Thanks to @philippjfr for managing this release and implementing most
 of the features, and to @jbednar, @ahuang11, and @AurelienSciarra for
 contributions.
@@ -83,7 +85,7 @@ Bug fixes:
 - Handle ``node_shape`` for networkx ([#527](https://github.com/holoviz/hvplot/pull/527))
 
 ## Version 0.6.0
-
+## June 1, 2020
 This release includes major contributions from @philippjfr (overall
 maintenance and bugfixes) and @jsignell (reference gallery), plus
 additional contributions from @slamer59 (environment), @anitagraser
@@ -120,7 +122,7 @@ Documentation:
 - Fix networkx documentation ([#476](https://github.com/holoviz/hvplot/pull/476))
 
 ## Version 0.5.2
-
+## October 17, 2020
 This release mostly includes contributions from @jsignell.
 
 - Allow tile sources to be objects as well as strings ([#345](https://github.com/holoviz/hvplot/pull/345))
@@ -130,11 +132,11 @@ This release mostly includes contributions from @jsignell.
 - Misc bug fixes ([#341](https://github.com/holoviz/hvplot/pull/341), [#343](https://github.com/holoviz/hvplot/pull/343), [#346](https://github.com/holoviz/hvplot/pull/346))
 
 ## Version 0.5.1
-
+## October 13, 2019
 Minor release with updates to continuous integration setup (from @jsignell).
 
 ## Version 0.5.0
-
+## October 10, 2019
 This is a major release that includes bug fixes, changes to default behavior, and enhancements.
 
 Features:
@@ -147,7 +149,7 @@ Features:
  - Allow use of strings as aggregators for datashader ([#257](https://github.com/holoviz/hvplot/pull/257))
 
 ## Version 0.4.0
-
+## January 28, 2019
 This is a major release which includes the addition of a networkx
 plotting API and a number of important bug fixes.
 
@@ -163,7 +165,7 @@ Fixes:
 - Fixes for setting the axis positions ([#145](https://github.com/holoviz/hvplot/pull/145))
 
 ## Version 0.3.0
-
+## January 7, 2019
 This release includes a number of major improvements to the documentation and core functionality as well as a variety of bug fixes.
 
 - Added improved docstrings including all available options ([#103](https://github.com/pyviz/hvplot/pull/103), [#134](https://github.com/pyviz/hvplot/pull/134))
