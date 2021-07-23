@@ -39,7 +39,7 @@ _examples = [
     'geoviews >=1.6.0',
     'numba >=0.51.0',
     'geopandas',
-    'xarray <0.17.0',
+    'xarray',
     'networkx',
     'streamz >=0.3.0',
     'intake',
@@ -74,7 +74,7 @@ extras_require = {
         'twine',   # required for pip packaging
         'rfc3986', # required by twine
         'keyring', # required by twine
-        'numpy >=1.7,<1.20' # Numba ABI incompatibility
+        'numpy >=1.7' # Numba ABI incompatibility
     ],
     'examples': _examples,
     'examples_extra': _examples_extra,
@@ -119,6 +119,7 @@ setup_args = dict(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Operating System :: OS Independent",
         "Intended Audience :: Science/Research",
         "Intended Audience :: Developers",
