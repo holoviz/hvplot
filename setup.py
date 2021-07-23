@@ -59,10 +59,6 @@ _examples = [
     'pyepsg'
 ]
 
-_examples_extra = _examples + [
-    'pygraphviz',
-]
-
 extras_require = {
     'tests': [
         'coveralls',
@@ -77,8 +73,7 @@ extras_require = {
         'numpy >=1.7' # Numba ABI incompatibility
     ],
     'examples': _examples,
-    'examples_extra': _examples_extra,
-    'doc': _examples_extra + [
+    'doc': _examples + [
         'nbsite >=0.5.1',
     ]
 }

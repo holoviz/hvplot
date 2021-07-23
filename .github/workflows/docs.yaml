@@ -49,7 +49,8 @@ jobs:
           eval "$(conda shell.bash hook)"
           conda activate test-environment
           conda list
-          doit develop_install ${{ env.CHANS_DEV}} -o doc -o examples
+          doit develop_install ${{ env.CHANS_DEV}} -o doc
+          conda install pygraphviz
           pip install sphinxcontrib-napoleon pydata_sphinx_theme
       - name: bokeh sampledata
         run: |
