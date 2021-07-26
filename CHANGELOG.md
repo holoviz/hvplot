@@ -8,23 +8,20 @@ API for flexibly building simple apps using widget controls. Thanks to
 
 Features:
 
-- Greatly expanded support for the .interactive() API:
-- Limit number of rows displayed by UI at once
-  ([#639](https://github.com/holoviz/hvplot/pull/639))
 - Improved Dataframe support: max_rows display, column access
   ([#640](https://github.com/holoviz/hvplot/pull/640))
 - Improved accesssor and attribute behavior
   ([#633](https://github.com/holoviz/hvplot/pull/633),
+  [#635](https://github.com/holoviz/hvplot/pull/635),
   [#641](https://github.com/holoviz/hvplot/pull/641),
   [#642](https://github.com/holoviz/hvplot/pull/642))
-- Allow attribute access on ufuncs
-  ([#635](https://github.com/holoviz/hvplot/pull/635))
-- Add .holoviews() terminal method
-- Add kwargs to interactive.layout
-- Misc interactive fixes
+- Add `.holoviews()` terminal method to interactive pipelines
+- Add support for kwargs to `interactive.layout`
+- Misc interactive fixes to interactive API
 ([#630](https://github.com/holoviz/hvplot/pull/630),
 [#632](https://github.com/holoviz/hvplot/pull/632))
-- Allow dynspread=True to be used with rasterize=True (now that Datashader supports it)
+- Allow `dynspread=True` to be used with `rasterize=True` (now that
+  Datashader supports it)
 
 ## Version 0.7.2
 
