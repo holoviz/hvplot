@@ -1,3 +1,31 @@
+## Version 0.7.3
+
+This is a minor release focusing on greatly improving the
+[.interactive()](https://hvplot.holoviz.org/user_guide/Interactive.html)
+API for flexibly building simple apps using widget controls. Thanks to
+@jbednar and @jlstevens for a few small fixes and many thanks to
+@philippjfr for all the rest!
+
+Features:
+
+- Greatly expanded support for the .interactive() API:
+- Limit number of rows displayed by UI at once
+  ([#639](https://github.com/holoviz/hvplot/pull/639))
+- Improved Dataframe support: max_rows display, column access
+  ([#640](https://github.com/holoviz/hvplot/pull/640))
+- Improved accesssor and attribute behavior
+  ([#633](https://github.com/holoviz/hvplot/pull/633),
+  [#641](https://github.com/holoviz/hvplot/pull/641),
+  [#642](https://github.com/holoviz/hvplot/pull/642))
+- Allow attribute access on ufuncs
+  ([#635](https://github.com/holoviz/hvplot/pull/635))
+- Add .holoviews() terminal method
+- Add kwargs to interactive.layout
+- Misc interactive fixes
+([#630](https://github.com/holoviz/hvplot/pull/630),
+[#632](https://github.com/holoviz/hvplot/pull/632))
+- Allow dynspread=True to be used with rasterize=True (now that Datashader supports it)
+
 ## Version 0.7.2
 
 This is  a minor release with a number of bug fixes and enhancements.
@@ -172,4 +200,3 @@ This release includes a number of major improvements to the documentation and co
 - Exposed bokeh styling options for all plot types ([#134](https://github.com/pyviz/hvplot/pull/134))
 - Compatibility with latest HoloViews/GeoViews releases ([#113](https://github.com/pyviz/hvplot/pull/113), [#118](https://github.com/pyviz/hvplot/pull/118), [#134](https://github.com/pyviz/hvplot/pull/134))
 - Added control over tools ([#120](https://github.com/pyviz/hvplot/pull/120)) and legend position ([#119](https://github.com/pyviz/hvplot/pull/119))
-
