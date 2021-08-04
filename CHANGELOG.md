@@ -1,3 +1,28 @@
+## Version 0.7.3
+
+This is a minor release focusing on greatly improving the
+[`.interactive()`](https://hvplot.holoviz.org/user_guide/Interactive.html)
+API for flexibly building simple apps using widget controls. Thanks to
+@jbednar and @jlstevens for a few small fixes and many thanks to
+@philippjfr for all the rest!
+
+Features:
+
+- Improved `.interactive` Dataframe support: max_rows display, column
+  access ([#640](https://github.com/holoviz/hvplot/pull/640))
+- Improved accesssor and attribute behavior for `.interactive`
+  ([#633](https://github.com/holoviz/hvplot/pull/633),
+  [#635](https://github.com/holoviz/hvplot/pull/635),
+  [#641](https://github.com/holoviz/hvplot/pull/641),
+  [#642](https://github.com/holoviz/hvplot/pull/642))
+- Add `.holoviews()` terminal method to `.interactive` pipelines
+- Add support for kwargs to `.interactive.layout`
+- Misc fixes to `.interactive` API
+([#630](https://github.com/holoviz/hvplot/pull/630),
+[#632](https://github.com/holoviz/hvplot/pull/632))
+- Allow `dynspread=True` to be used with `rasterize=True` (now that
+  Datashader supports it)
+
 ## Version 0.7.2
 
 This is  a minor release with a number of bug fixes and enhancements.
@@ -139,7 +164,7 @@ This is a major release that includes bug fixes, changes to default behavior, an
 
 Features:
  - Widget handling capabilities to facilitate interactivity ([#323](https://github.com/holoviz/hvplot/pull/323), [#331](https://github.com/holoviz/hvplot/pull/331))
- - New default colormaps ([#258](https://github.com/holoviz/hvplot/pull/258), [#316](https://github.com/holoviz/hvplot/pull/316), [#206](https://github.com/holoviz/hvplot/pull/206)) 
+ - New default colormaps ([#258](https://github.com/holoviz/hvplot/pull/258), [#316](https://github.com/holoviz/hvplot/pull/316), [#206](https://github.com/holoviz/hvplot/pull/206))
  - long_name(units) used to label xarray objects ([#173](https://github.com/holoviz/hvplot/pull/173))
  - Derived datetime accessor handlind ([#263](https://github.com/holoviz/hvplot/pull/263), [#286](https://github.com/holoviz/hvplot/pull/286))
  - `coastline` and `tiles` options for easy geo plots.
@@ -172,4 +197,3 @@ This release includes a number of major improvements to the documentation and co
 - Exposed bokeh styling options for all plot types ([#134](https://github.com/pyviz/hvplot/pull/134))
 - Compatibility with latest HoloViews/GeoViews releases ([#113](https://github.com/pyviz/hvplot/pull/113), [#118](https://github.com/pyviz/hvplot/pull/118), [#134](https://github.com/pyviz/hvplot/pull/134))
 - Added control over tools ([#120](https://github.com/pyviz/hvplot/pull/120)) and legend position ([#119](https://github.com/pyviz/hvplot/pull/119))
-
