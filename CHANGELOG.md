@@ -1,5 +1,7 @@
 ## Version 0.7.3
 
+**August 4, 2021**
+
 This is a minor release focusing on greatly improving the
 [`.interactive()`](https://hvplot.holoviz.org/user_guide/Interactive.html)
 API for flexibly building simple apps using widget controls. Thanks to
