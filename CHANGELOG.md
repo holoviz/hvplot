@@ -1,5 +1,7 @@
 ## Version 0.7.3
 
+**August 4, 2021**
+
 This is a minor release focusing on greatly improving the
 [`.interactive()`](https://hvplot.holoviz.org/user_guide/Interactive.html)
 API for flexibly building simple apps using widget controls. Thanks to
@@ -24,6 +26,8 @@ Features:
   Datashader supports it)
 
 ## Version 0.7.2
+
+**May 22, 2021**
 
 This is  a minor release with a number of bug fixes and enhancements.
 Many thanks to @StefanBrand, @loicduffar, @brl0, @michaelaye,
@@ -65,6 +69,8 @@ Documentation:
 
 ## Version 0.7.1
 
+**March 3, 2021**
+
 Major new features:
 
 - Add Ibis backend, providing hvPlot features for lazy SQL queries ([#507](https://github.com/holoviz/hvplot/pull/507))
@@ -82,6 +88,8 @@ Bug fixes:
 - Cast types after applying melt to data ([#566](https://github.com/holoviz/hvplot/pull/566))
 
 ## Version 0.7.0
+
+**November 18, 2020**
 
 Thanks to @philippjfr for managing this release and implementing most
 of the features, and to @jbednar, @ahuang11, and @AurelienSciarra for
@@ -108,6 +116,8 @@ Bug fixes:
 - Handle ``node_shape`` for networkx ([#527](https://github.com/holoviz/hvplot/pull/527))
 
 ## Version 0.6.0
+
+**June 1, 2020**
 
 This release includes major contributions from @philippjfr (overall
 maintenance and bugfixes) and @jsignell (reference gallery), plus
@@ -146,6 +156,9 @@ Documentation:
 
 ## Version 0.5.2
 
+
+**October 17, 2020**
+
 This release mostly includes contributions from @jsignell.
 
 - Allow tile sources to be objects as well as strings ([#345](https://github.com/holoviz/hvplot/pull/345))
@@ -156,9 +169,13 @@ This release mostly includes contributions from @jsignell.
 
 ## Version 0.5.1
 
+**October 13, 2019**
+
 Minor release with updates to continuous integration setup (from @jsignell).
 
 ## Version 0.5.0
+
+**October 10, 2019**
 
 This is a major release that includes bug fixes, changes to default behavior, and enhancements.
 
@@ -172,6 +189,8 @@ Features:
  - Allow use of strings as aggregators for datashader ([#257](https://github.com/holoviz/hvplot/pull/257))
 
 ## Version 0.4.0
+
+**January 28, 2019**
 
 This is a major release which includes the addition of a networkx
 plotting API and a number of important bug fixes.
@@ -188,6 +207,8 @@ Fixes:
 - Fixes for setting the axis positions ([#145](https://github.com/holoviz/hvplot/pull/145))
 
 ## Version 0.3.0
+
+**January 7, 2019**
 
 This release includes a number of major improvements to the documentation and core functionality as well as a variety of bug fixes.
 
