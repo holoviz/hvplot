@@ -1,5 +1,5 @@
-Version 0.7.2
-==============
+## Version 0.7.2
+
 **May 22, 2021**
 
 This is  a minor release with a number of bug fixes and enhancements.
@@ -40,8 +40,8 @@ Documentation:
 - Switch to pydata sphinx theme ([#613](https://github.com/holoviz/hvplot/pull/613))
 - Update available options in customization docs ([#620](https://github.com/holoviz/hvplot/pull/620))
 
-Version 0.7.1
-==============
+## Version 0.7.1
+
 **March 3, 2021**
 
 Major new features:
@@ -60,8 +60,8 @@ Bug fixes:
 - Drop tuple NetworkX attributes to avoid errors ([#549](https://github.com/holoviz/hvplot/pull/549))
 - Cast types after applying melt to data ([#566](https://github.com/holoviz/hvplot/pull/566))
 
-Version 0.7.0
-==============
+## Version 0.7.0
+
 **November 18, 2020**
 
 Thanks to @philippjfr for managing this release and implementing most
@@ -88,8 +88,8 @@ Bug fixes:
 - Misc doc fixes, including to Streaming.ipynb ([#481](https://github.com/holoviz/hvplot/pull/481), [#511](https://github.com/holoviz/hvplot/pull/511))
 - Handle ``node_shape`` for networkx ([#527](https://github.com/holoviz/hvplot/pull/527))
 
-Version 0.6.0
-==============
+## Version 0.6.0
+
 **June 1, 2020**
 
 This release includes major contributions from @philippjfr (overall
@@ -127,8 +127,8 @@ Documentation:
 - Removed references to pyviz ([#373](https://github.com/holoviz/hvplot/pull/373))
 - Fix networkx documentation ([#476](https://github.com/holoviz/hvplot/pull/476))
 
-Version 0.5.2
-==============
+## Version 0.5.2
+
 
 **October 17, 2020**
 
@@ -140,14 +140,14 @@ This release mostly includes contributions from @jsignell.
 - Expose plot at top level, to support `pd.options.plotting.backend = 'hvplot'` ([#347](https://github.com/holoviz/hvplot/pull/347))
 - Misc bug fixes ([#341](https://github.com/holoviz/hvplot/pull/341), [#343](https://github.com/holoviz/hvplot/pull/343), [#346](https://github.com/holoviz/hvplot/pull/346))
 
-Version 0.5.1
-==============
+## Version 0.5.1
+
 **October 13, 2019**
 
 Minor release with updates to continuous integration setup (from @jsignell).
 
-Version 0.5.0
-==============
+## Version 0.5.0
+
 **October 10, 2019**
 
 This is a major release that includes bug fixes, changes to default behavior, and enhancements.
@@ -161,8 +161,8 @@ Features:
  - Automatic date sorting ([#259](https://github.com/holoviz/hvplot/pull/259))
  - Allow use of strings as aggregators for datashader ([#257](https://github.com/holoviz/hvplot/pull/257))
 
-Version 0.4.0
-==============
+## Version 0.4.0
+
 **January 28, 2019**
 
 This is a major release which includes the addition of a networkx
@@ -179,8 +179,8 @@ Fixes:
 - Allow setting axis position ([#149](https://github.com/holoviz/hvplot/pull/149))
 - Fixes for setting the axis positions ([#145](https://github.com/holoviz/hvplot/pull/145))
 
-Version 0.3.0
-==============
+## Version 0.3.0
+
 **January 7, 2019**
 
 This release includes a number of major improvements to the documentation and core functionality as well as a variety of bug fixes.
