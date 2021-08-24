@@ -1,7 +1,8 @@
 from __future__ import absolute_import
 
-from functools import partial
 import difflib
+
+from functools import partial
 
 import param
 import holoviews as hv
@@ -12,7 +13,7 @@ import colorcet as cc
 from bokeh.models import HoverTool
 from holoviews.core.dimension import Dimension
 from holoviews.core.spaces import DynamicMap, HoloMap, Callable
-from holoviews.core.overlay import NdOverlay
+from holoviews.core.overlay import CompositeOverlay, NdOverlay
 from holoviews.core.options import Store, Cycle, Palette
 from holoviews.core.layout import NdLayout
 from holoviews.core.util import max_range, basestring
@@ -23,7 +24,7 @@ from holoviews.element import (
     VectorField, Rectangles, Segments
 )
 from holoviews.plotting.bokeh import OverlayPlot, colormap_generator
-from holoviews.plotting.util import process_cmap
+from holoviews.plotting.util import COLOR_ALIASES, process_cmap
 from holoviews.operation import histogram
 from holoviews.streams import Buffer, Pipe
 from holoviews.util.transform import dim
@@ -37,6 +38,35 @@ from .util import (
 )
 
 renderer = hv.renderer('bokeh')
+
+UNSET = type('UNSET', (), {})
+
+BACKEND_TRANSFORMS = {
+    'matplotlib': {
+        'plot': {
+            'height': UNSET,
+            'width': UNSET,
+            'sizing_mode': UNSET,
+            'responsive': UNSET,
+            'shared_axes': UNSET
+        },
+        'style': {
+            'height': UNSET,
+            'line_width': lambda k, v: ('linewidth', v),
+            'nonselection_alpha': UNSET
+        },
+    },
+    'plotly': {
+        'plot': {
+            'batched': UNSET,
+            'legend_limit': UNSET
+        },
+        'style': {
+            'color': lambda k, v: (k, COLOR_ALIASES.get(v, v))
+        }
+    }
+}
+
 
 
 class StreamingCallable(Callable):
@@ -582,6 +612,48 @@ class HoloViewsConverter(object):
         if renamed:
             data = data.rename(columns=renamed)
         return data
+
+    def _transform_size(self, width, height, aspect):
+        opts = {}
+        if width and height:
+            opts = {'aspect': width/height, 'fig_size': (width/300.)*100}
+        elif aspect and width:
+            opts = {'aspect': aspect, 'fig_size': (width/300.)*100}
+        elif aspect and height:
+            opts = {'aspect': aspect, 'fig_size': (height/300.)*100}
+        elif width:
+            opts = {'fig_size': (width/300.)*100}
+        elif height:
+            opts = {'fig_size': (height/300.)*100}
+        return opts
+            
+    def _transfer_opts(self, element):
+        elname = type(element).__name__
+        backend = Store.current_backend
+        if backend == 'bokeh':
+            return element
+        options = Store.options(backend=backend)
+        transforms = BACKEND_TRANSFORMS[backend]
+        if isinstance(element, CompositeOverlay):
+            element = element.apply(self._transfer_opts, per_element=True)
+        new_opts = {}
+        el_options = element.opts.get(backend='bokeh').kwargs
+        for grp, el_opts in options[elname].groups.items():
+            for opt, val in el_options.items():
+                transform = transforms.get(grp, {}).get(opt, None)
+                if transform is UNSET:
+                    continue
+                elif transform:
+                    opt, val = transform(opt, val)
+                if opt not in el_opts.allowed_keywords:
+                    continue
+                new_opts[opt] = val
+        if backend == 'matplotlib':
+            new_opts = self._transform_size(
+                el_options.get('width'), el_options.get('height'),
+                el_options.get('aspect')
+            )
+        return element.opts(**new_opts, backend=backend)
 
     def _process_data(self, kind, data, x, y, by, groupby, row, col,
                       use_dask, persist, backlog, label, group_label,
@@ -1145,7 +1217,7 @@ class HoloViewsConverter(object):
             obj = project(obj, projection=projection)
 
         if not (self.datashade or self.rasterize):
-            return self._apply_layers(obj)
+            return self._apply_layers(obj).apply(self._transfer_opts)
 
         try:
             from holoviews.operation.datashader import datashade, rasterize, dynspread
@@ -1216,7 +1288,7 @@ class HoloViewsConverter(object):
                                   threshold=self.kwds.get('threshold', 0.5))
         
         opts = filter_opts(eltype, dict(self._plot_opts, **style))
-        return self._apply_layers(processed).opts(eltype, **opts)
+        return self._apply_layers(processed).opts(eltype, **opts, backend='bokeh').apply(self._transfer_opts)
 
     def _get_opts(self, eltype, **custom):
         opts = dict(self._plot_opts, **dict(self._style_opts, **self._norm_opts))
@@ -1360,13 +1432,13 @@ class HoloViewsConverter(object):
                 return (element(data, ([x] if x else [])+self.by, ys)
                         .relabel(**self._relabel)
                         .redim(**self._redim)
-                        .opts(opts))
+                        .opts(opts, backend='bokeh'))
             chart = Dataset(data, self.by+kdims, vdims).to(
                 element, kdims, vdims, self.by).relabel(**self._relabel)
             chart = chart.layout() if self.subplots else chart.overlay(sort=False)
         else:
             chart = element(data, kdims, vdims).relabel(**self._relabel)
-        return chart.redim(**self._redim).opts(opts)
+        return chart.redim(**self._redim).opts(opts, backend='bokeh')
 
     def _process_chart_x(self, data, x, y, single_y, categories=None):
         """This should happen before _process_chart_y"""
@@ -1461,7 +1533,7 @@ class HoloViewsConverter(object):
             kdims, vdims = self._get_dimensions([x], [c])
             chart = element(data, kdims, vdims).redim(**{c: self.value_label})
             charts.append((c, chart.relabel(**self._relabel)))
-        return self._by_type(charts, self.group_label, sort=False).opts(opts)
+        return self._by_type(charts, self.group_label, sort=False).opts(opts, backend='bokeh')
 
     def line(self, x=None, y=None, data=None):
         return self.chart(Curve, x, y, data)
@@ -1518,7 +1590,7 @@ class HoloViewsConverter(object):
             obj = Dataset(df, kdims, vdims).to(element, x).layout()
         else:
             obj = element(df, kdims, vdims)
-        return obj.redim(**self._redim).relabel(**self._relabel).opts(**opts)
+        return obj.redim(**self._redim).relabel(**self._relabel).opts(**opts, backend='bokeh')
 
     def bar(self, x=None, y=None, data=None):
         data, x, y = self._process_chart_args(data, x, y, categories=self.by)
@@ -1549,7 +1621,7 @@ class HoloViewsConverter(object):
         if not isinstance(y, (list, tuple)):
             ranges = {y: ylim}
             return (element(data, self.by, y).redim.range(**ranges)
-                    .relabel(**self._relabel).opts(**opts))
+                    .relabel(**self._relabel).opts(**opts, backend='bokeh'))
 
         labelled = ['y' if self.invert else 'x'] if self.group_label != 'Group' else []
         if self.value_label != 'value':
@@ -1573,7 +1645,7 @@ class HoloViewsConverter(object):
             df[self.value_label] = df[self.value_label].astype(data[y[0]].dtype)
         redim = self._merge_redim({self.value_label: ylim})
         return (element(df, kdims, self.value_label).redim(**redim)
-                .relabel(**self._relabel).opts(**opts))
+                .relabel(**self._relabel).opts(**opts, backend='bokeh'))
 
     def box(self, x=None, y=None, data=None):
         return self._stats_plot(BoxWhisker, y, data).redim(**self._redim)
@@ -1625,7 +1697,7 @@ class HoloViewsConverter(object):
             else:
                 hists = histogram(ds, dimension=y, **hist_opts)
 
-            return hists.redim(**self._redim).opts(opts)
+            return hists.redim(**self._redim).opts(opts, backend='bokeh')
 
         ranges = []
         for col in y:
@@ -1643,7 +1715,7 @@ class HoloViewsConverter(object):
         for col in y:
             hist = histogram(ds, dimension=col, **hist_opts)
             hists.append((col, hist.relabel(**self._relabel)))
-        return self._by_type(hists, sort=False).redim(**self._redim).opts(opts)
+        return self._by_type(hists, sort=False).redim(**self._redim).opts(opts, backend='bokeh')
 
     def kde(self, x=None, y=None, data=None):
         bw_method = self.kwds.pop('bw_method', None)
@@ -1678,7 +1750,7 @@ class HoloViewsConverter(object):
                 dists = NdOverlay({0: Area([], self.value_label, vdim)},
                                   [self.group_label])
         redim = self._merge_redim(ranges)
-        return dists.redim(**redim).relabel(**self._relabel).opts(opts)
+        return dists.redim(**redim).relabel(**self._relabel).opts(opts, backend='bokeh')
 
     def density(self, x=None, y=None, data=None):
         return self.kde(x, y, data)
@@ -1714,7 +1786,7 @@ class HoloViewsConverter(object):
         hmap = HeatMap(data, [x, y], z, **self._relabel)
         if 'reduce_function' in self.kwds:
             hmap = hmap.aggregate(function=self.kwds['reduce_function'])
-        return hmap.redim(**redim).opts(**opts)
+        return hmap.redim(**redim).opts(**opts, backend='bokeh')
 
     def hexbin(self, x=None, y=None, data=None):
         self.use_index = False
@@ -1734,14 +1806,14 @@ class HoloViewsConverter(object):
         element = self._get_element('hexbin')
         params = dict(self._relabel)
         if self.geo: params['crs'] = self.crs
-        return element(data, [x, y], z or [], **params).redim(**redim).opts(**opts)
+        return element(data, [x, y], z or [], **params).redim(**redim).opts(**opts, backend='bokeh')
 
     def bivariate(self, x=None, y=None, data=None):
         self.use_index = False
         data, x, y = self._process_chart_args(data, x, y, single_y=True)
 
         opts = self._get_opts('Bivariate', **self.kwds)
-        return Bivariate(data, [x, y]).redim(**self._redim).opts(**opts)
+        return Bivariate(data, [x, y]).redim(**self._redim).opts(**opts, backend='bokeh')
 
     def ohlc(self, x=None, y=None, data=None):
         data = self.data if data is None else data
@@ -1785,8 +1857,8 @@ class HoloViewsConverter(object):
             seg_opts['xlabel'] = '' if x == 'index' else x
         if 'ylabel' not in seg_opts:
             seg_opts['ylabel'] = ''
-        return (segments.redim(**self._redim).opts(**seg_opts) *
-                rects.redim(**self._redim).opts(**rect_opts))
+        return (segments.redim(**self._redim).opts(**seg_opts, backend='bokeh') *
+                rects.redim(**self._redim).opts(**rect_opts, backend='bokeh'))
 
     def table(self, x=None, y=None, data=None):
         data = self.data if data is None else data
@@ -1794,7 +1866,7 @@ class HoloViewsConverter(object):
             data = data.reset_index()
 
         opts = filter_opts('Table', self._plot_opts)
-        return Table(data, self.kwds.get('columns'), []).redim(**self._redim).opts(**opts)
+        return Table(data, self.kwds.get('columns'), []).redim(**self._redim).opts(**opts, backend='bokeh')
 
     def labels(self, x=None, y=None, data=None):
         self.use_index = False
@@ -1803,7 +1875,7 @@ class HoloViewsConverter(object):
         text = self.kwds.get('text', [c for c in data.columns if c not in (x, y)][0])
         kdims, vdims = self._get_dimensions([x, y], [text])
         opts = self._get_opts('Labels')
-        return Labels(data, kdims, vdims).redim(**self._redim).opts(**opts)
+        return Labels(data, kdims, vdims).redim(**self._redim).opts(**opts, backend='bokeh')
 
     ##########################
     #     Gridded plots      #
@@ -1856,7 +1928,7 @@ class HoloViewsConverter(object):
 
         element = self._get_element('image')
         if self.geo: params['crs'] = self.crs
-        return element(data, [x, y], z, **params).redim(**redim).opts(**opts)
+        return element(data, [x, y], z, **params).redim(**redim).opts(**opts, backend='bokeh')
 
     def rgb(self, x=None, y=None, z=None, data=None):
         data, x, y, z = self._process_gridded_args(data, x, y, z)
@@ -1888,7 +1960,7 @@ class HoloViewsConverter(object):
         opts = self._get_opts('RGB')
         if self.geo: params['crs'] = self.crs
         rgb = element(eldata, [x, y], element.vdims[:nbands], **params)
-        return rgb.redim(**self._redim).opts(**opts)
+        return rgb.redim(**self._redim).opts(**opts, backend='bokeh')
 
     def quadmesh(self, x=None, y=None, z=None, data=None):
         data, x, y, z = self._process_gridded_args(data, x, y, z)
@@ -1905,7 +1977,7 @@ class HoloViewsConverter(object):
         element = self._get_element('quadmesh')
         opts = self._get_opts('QuadMesh')
         if self.geo: params['crs'] = self.crs
-        return element(data, [x, y], z, **params).redim(**redim).opts(**opts)
+        return element(data, [x, y], z, **params).redim(**redim).opts(**opts, backend='bokeh')
 
     def contour(self, x=None, y=None, z=None, data=None, filled=False):
         from holoviews.operation import contours
@@ -1937,7 +2009,7 @@ class HoloViewsConverter(object):
         if isinstance(levels, int):
             opts['color_levels'] = levels
         opts['clim'] = self._dim_ranges['c']
-        return contours(qmesh, filled=filled, levels=levels).opts(**opts)
+        return contours(qmesh, filled=filled, levels=levels).opts(**opts, backend='bokeh')
 
     def contourf(self, x=None, y=None, z=None, data=None):
         return self.contour(x, y, z, data, filled=True)
@@ -1957,7 +2029,7 @@ class HoloViewsConverter(object):
         element = self._get_element('vectorfield')
         opts = self._get_opts('VectorField')
         if self.geo: params['crs'] = self.crs
-        return element(data, [x, y], z, **params).redim(**redim).opts(**opts)
+        return element(data, [x, y], z, **params).redim(**redim).opts(**opts, backend='bokeh')
 
     ##########################
     #    Geometry plots      #
@@ -1987,7 +2059,7 @@ class HoloViewsConverter(object):
         else:
             obj = element(data, kdims, vdims, **params)
 
-        return obj.redim(**redim).opts({element.name: opts})
+        return obj.redim(**redim).opts({element.name: opts}, backend='bokeh')
 
     def polygons(self, x=None, y=None, data=None):
         return self._geom_plot(x, y, data, kind='polygons')
