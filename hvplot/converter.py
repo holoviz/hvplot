@@ -41,28 +41,47 @@ renderer = hv.renderer('bokeh')
 
 UNSET = type('UNSET', (), {})
 
+
 BACKEND_TRANSFORMS = {
     'matplotlib': {
         'plot': {
             'height': UNSET,
             'width': UNSET,
+            'min_height': UNSET,
+            'min_width': UNSET,
+            'max_height': UNSET,
+            'max_width': UNSET,
+            'frame_width': UNSET,
+            'frame_height': UNSET,
             'sizing_mode': UNSET,
             'responsive': UNSET,
-            'shared_axes': UNSET
+            'shared_axes': UNSET,
+            'tools': UNSET
         },
         'style': {
-            'height': UNSET,
+            'fill_color': lambda k, v: ('facecolors', v),
             'line_width': lambda k, v: ('linewidth', v),
-            'nonselection_alpha': UNSET
+            'line_color': lambda k, v: ('edgecolors', v),
+            'nonselection_alpha': UNSET,
         },
     },
     'plotly': {
         'plot': {
+            'min_height': UNSET,
+            'min_width': UNSET,
+            'max_height': UNSET,
+            'max_width': UNSET,
+            'frame_width': UNSET,
+            'frame_height': UNSET,
             'batched': UNSET,
-            'legend_limit': UNSET
+            'legend_limit': UNSET,
+            'tools': UNSET
         },
         'style': {
-            'color': lambda k, v: (k, COLOR_ALIASES.get(v, v))
+            'alpha': lambda k, v: ('opacity', v),
+            'color': lambda k, v: (k, COLOR_ALIASES.get(v, v)),
+            'fill_color': lambda k, v: ('fillcolor', COLOR_ALIASES.get(v, v)),
+            'line_color': lambda k, v: (k, COLOR_ALIASES.get(v, v)),
         }
     }
 }
@@ -436,6 +455,13 @@ class HoloViewsConverter(object):
         self._by_type = NdLayout if subplots else NdOverlay
 
         # Process options
+        if backends is None:
+            if Store.current_backend == 'bokeh':
+                self.backends = []
+            else:
+                self.backends = [Store.current_backend]
+        else:
+            self.backends = backends
         self.stacked = stacked
 
         plot_opts = dict(self._default_plot_opts,
@@ -626,16 +652,15 @@ class HoloViewsConverter(object):
         elif height:
             opts = {'fig_size': (height/300.)*100}
         return opts
-            
-    def _transfer_opts(self, element):
+
+    def _transfer_opts(self, element, backend):
         elname = type(element).__name__
-        backend = Store.current_backend
-        if backend == 'bokeh':
-            return element
         options = Store.options(backend=backend)
         transforms = BACKEND_TRANSFORMS[backend]
         if isinstance(element, CompositeOverlay):
-            element = element.apply(self._transfer_opts, per_element=True)
+            element = element.apply(
+                self._transfer_opts, backend=backend, per_element=True
+            )
         new_opts = {}
         el_options = element.opts.get(backend='bokeh').kwargs
         for grp, el_opts in options[elname].groups.items():
@@ -1217,8 +1242,10 @@ class HoloViewsConverter(object):
             obj = project(obj, projection=projection)
 
         if not (self.datashade or self.rasterize):
-            return self._apply_layers(obj).apply(self._transfer_opts)
-
+            layers = self._apply_layers(obj)
+            for backend in self.backends:
+                layers = layers.apply(self._transfer_opts, backend=backend)
+            return layers
         try:
             from holoviews.operation.datashader import datashade, rasterize, dynspread
             from datashader import reductions
@@ -1288,7 +1315,10 @@ class HoloViewsConverter(object):
                                   threshold=self.kwds.get('threshold', 0.5))
         
         opts = filter_opts(eltype, dict(self._plot_opts, **style))
-        return self._apply_layers(processed).opts(eltype, **opts, backend='bokeh').apply(self._transfer_opts)
+        layers = self._apply_layers(processed).opts(eltype, **opts, backend='bokeh')
+        for backend in self.backends:
+            layers = layers.apply(self._transfer_opts, backend=backend)
+        return layers
 
     def _get_opts(self, eltype, **custom):
         opts = dict(self._plot_opts, **dict(self._style_opts, **self._norm_opts))
