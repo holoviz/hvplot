@@ -374,7 +374,9 @@ class HoloViewsConverter(object):
                  x_sampling=None, y_sampling=None, project=False,
                  tools=[], attr_labels=None, coastline=False,
                  tiles=False, sort_date=True, check_symmetric_max=1000000,
-                 transforms={}, stream=None, cnorm=None, features=None, **kwds):
+                 transforms={}, stream=None, cnorm=None, features=None,
+                 backends=None, **kwds):
+
 
         # Process data and related options
         self._redim = fields
