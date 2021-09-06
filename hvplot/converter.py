@@ -676,10 +676,11 @@ class HoloViewsConverter(object):
                     continue
                 new_opts[opt] = val
         if backend == 'matplotlib':
-            new_opts = self._transform_size(
+            size_opts = self._transform_size(
                 el_options.get('width'), el_options.get('height'),
                 el_options.get('aspect')
             )
+            new_opts.update(size_opts)
         return element.opts(**new_opts, backend=backend)
 
     def _process_data(self, kind, data, x, y, by, groupby, row, col,
