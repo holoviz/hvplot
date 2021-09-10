@@ -498,7 +498,7 @@ class HoloViewsConverter(object):
             plot_opts['global_extent'] = global_extent
         if projection:
             plot_opts['projection'] = process_crs(projection)
-        title = title if title else getattr(self, '_title', None)
+        title = title if title is not None else getattr(self, '_title', None)
         if title is not None:
             plot_opts['title'] = title
         if (self.kind in self._colorbar_types or self.rasterize or self.datashade or self._color_dim):
