@@ -67,7 +67,7 @@ class TestProjections(TestGeo):
         # by PROJ (projinfo) which matches a geographic projection named
         # 'Amersfoort'
         with self.assertRaisesRegex(ValueError, "'name_of_some_invalid_projection' must be"):
-            self.da.hvplot.image('x', 'y', crs='wrong')
+            self.da.hvplot.image('x', 'y', crs='name_of_some_invalid_projection')
 
     def test_plot_with_geo_as_true_crs_no_crs_on_data_returns_default(self):
         da = self.da.copy()
