@@ -498,6 +498,7 @@ class HoloViewsConverter(object):
             plot_opts['global_extent'] = global_extent
         if projection:
             plot_opts['projection'] = process_crs(projection)
+        title = title if title else getattr(self, '_title', None)
         if title is not None:
             plot_opts['title'] = title
         if (self.kind in self._colorbar_types or self.rasterize or self.datashade or self._color_dim):
@@ -703,6 +704,15 @@ class HoloViewsConverter(object):
 
             if groupby:
                 groupby = [g for g in groupby if g not in grid]
+
+            if not groupby and not grid:
+                # Set a title for coords of size 1 (e.g. da.isel(lon=0).hvplot())
+                if isinstance(da, xr.DataArray):
+                    self._title = da._title_for_slice()
+                elif isinstance(da, xr.Dataset):
+                    one_var = list(da.data_vars)[0]
+                    self._title = da[one_var]._title_for_slice()
+
             self.data = data
         else:
             raise ValueError('Supplied data type %s not understood' % type(data).__name__)
