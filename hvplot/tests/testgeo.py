@@ -66,7 +66,7 @@ class TestProjections(TestGeo):
         # Used to test crs='foo' but this is parsed under-the-hood
         # by PROJ (projinfo) which matches a geographic projection named
         # 'Amersfoort'
-        with self.assertRaisesRegex(ValueError, "'wrong' must be"):
+        with self.assertRaisesRegex(ValueError, "'name_of_some_invalid_projection' must be"):
             self.da.hvplot.image('x', 'y', crs='wrong')
 
     def test_plot_with_geo_as_true_crs_no_crs_on_data_returns_default(self):
