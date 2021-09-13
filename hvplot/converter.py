@@ -655,6 +655,9 @@ class HoloViewsConverter(object):
         elif is_xarray(data):
             import xarray as xr
             z = kwds.get('z')
+            if isinstance(data, xr.Dataset):
+                if len(data.data_vars) == 0:
+                    raise ValueError("Cannot plot an empty xarray.Dataset object.")
             if z is None:
                 if isinstance(data, xr.Dataset):
                     z = list(data.data_vars)[0]
