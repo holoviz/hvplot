@@ -708,14 +708,14 @@ class HoloViewsConverter(object):
             if groupby:
                 groupby = [g for g in groupby if g not in grid]
 
+            # Add a title to hvplot.xarray plots that displays scalar coords values,
+            # as done by xarray.plot()  
             if not groupby and not grid:
-                # Set a title for coords of size 1 (e.g. da.isel(lon=0).hvplot())
                 if isinstance(da, xr.DataArray):
                     self._title = da._title_for_slice()
                 elif isinstance(da, xr.Dataset):
-                    one_var = list(da.data_vars)[0]
-                    self._title = da[one_var]._title_for_slice()
-
+                    self._title = partial(xr.DataArray._title_for_slice, da)()
+                        
             self.data = data
         else:
             raise ValueError('Supplied data type %s not understood' % type(data).__name__)
