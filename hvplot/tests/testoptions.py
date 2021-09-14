@@ -1,5 +1,7 @@
 from unittest import SkipTest, expectedFailure
 
+import numpy as np
+
 from parameterized import parameterized
 
 from holoviews import Store
@@ -298,3 +300,87 @@ class TestOptions(ComparisonTestCase):
         self.assertEqual(opts.kwargs['bandwidth'], 0.2)
         self.assertEqual(opts.kwargs['cut'], 1)
         self.assertEqual(opts.kwargs['filled'], True)
+
+class TestXarrayTitle(ComparisonTestCase):
+
+    def setUp(self):
+        try:
+            import xarray as xr
+        except:
+            raise SkipTest('Xarray not available')
+        self.backend = 'bokeh'
+        hv.extension(self.backend)
+        Store.current_backend = self.backend
+        self.store_copy = OptionTree(sorted(Store.options().items()),
+                                     groups=Options._option_groups)
+        import hvplot.xarray   # noqa
+        self.da = xr.DataArray(
+            data=np.arange(16).reshape((2, 2, 2, 2)),
+            coords={'time': [0, 1], 'y': [0, 1], 'x': [0, 1], 'band': [0, 1]},
+            dims=['time', 'y', 'x', 'band'],
+            name='test',
+        )
+        da2 = xr.DataArray(
+            data=np.arange(27).reshape((3, 3, 3)),
+            coords={'y': [0, 1, 2], 'x': [0, 1, 2]},
+            dims=['y', 'x', 'other'],
+            name='test2'
+        )
+        self.ds1 = xr.Dataset(dict(foo=self.da))
+        self.ds2 = xr.Dataset(dict(foo=self.da, bar=da2))
+
+    def tearDown(self):
+        Store.options(val=self.store_copy)
+        Store._custom_options = {k:{} for k in Store._custom_options.keys()}
+        super(TestXarrayTitle, self).tearDown()
+
+    def test_dataarray_2d_with_title(self):
+        da_sel = self.da.sel(time=0, band=0)
+        plot = da_sel.hvplot()  # Image plot
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['title'], 'time = 0, band = 0')
+
+    def test_dataarray_1d_with_title(self):
+        da_sel = self.da.sel(time=0, band=0, x=0)
+        plot = da_sel.hvplot()  # Line plot
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['title'], 'time = 0, x = 0, band = 0')
+
+    def test_dataarray_1d_and_by_with_title(self):
+        da_sel = self.da.sel(time=0, band=0, x=[0, 1])
+        plot = da_sel.hvplot(by='x')  # Line plot with hue/by
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['title'], 'time = 0, band = 0')
+
+    def test_override_title(self):
+        da_sel = self.da.sel(time=0, band=0)
+        plot = da_sel.hvplot(title='title')  # Imege plot
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['title'], 'title')
+
+    def test_dataarray_4d_line_no_title(self):
+        plot = self.da.hvplot.line(dynamic=False)  # Line plot with widgets
+        opts = Store.lookup_options('bokeh', plot.last, 'plot')
+        self.assertNotIn('title', opts.kwargs)
+
+    def test_dataarray_3d_histogram_with_title(self):
+        da_sel = self.da.sel(time=0)
+        plot = da_sel.hvplot()  # Histogram and no widgets
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['title'], 'time = 0')
+
+    def test_dataset_empty_raises(self):
+        with self.assertRaisesRegex(ValueError, 'empty xarray.Dataset'):
+            self.ds1.drop('foo').hvplot()
+
+    def test_dataset_one_var_behaves_like_dataarray(self):
+        ds_sel = self.ds1.sel(time=0, band=0)
+        plot = ds_sel.hvplot()  # Image plot
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['title'], 'time = 0, band = 0')
+
+    def test_dataset_scatter_with_title(self):
+        ds_sel = self.ds2.sel(time=0, band=0, x=0, y=0)
+        plot = ds_sel.hvplot.scatter(x='foo', y='bar')  # Image plot
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['title'], 'y = 0, x = 0, time = 0, band = 0')

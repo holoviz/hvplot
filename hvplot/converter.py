@@ -498,6 +498,7 @@ class HoloViewsConverter(object):
             plot_opts['global_extent'] = global_extent
         if projection:
             plot_opts['projection'] = process_crs(projection)
+        title = title if title is not None else getattr(self, '_title', None)
         if title is not None:
             plot_opts['title'] = title
         if (self.kind in self._colorbar_types or self.rasterize or self.datashade or self._color_dim):
@@ -654,6 +655,9 @@ class HoloViewsConverter(object):
         elif is_xarray(data):
             import xarray as xr
             z = kwds.get('z')
+            if isinstance(data, xr.Dataset):
+                if len(data.data_vars) == 0:
+                    raise ValueError("Cannot plot an empty xarray.Dataset object.")
             if z is None:
                 if isinstance(data, xr.Dataset):
                     z = list(data.data_vars)[0]
@@ -703,6 +707,15 @@ class HoloViewsConverter(object):
 
             if groupby:
                 groupby = [g for g in groupby if g not in grid]
+
+            # Add a title to hvplot.xarray plots that displays scalar coords values,
+            # as done by xarray.plot()  
+            if not groupby and not grid:
+                if isinstance(da, xr.DataArray):
+                    self._title = da._title_for_slice()
+                elif isinstance(da, xr.Dataset):
+                    self._title = partial(xr.DataArray._title_for_slice, da)()
+                        
             self.data = data
         else:
             raise ValueError('Supplied data type %s not understood' % type(data).__name__)
