@@ -29,7 +29,7 @@ Several of these libraries have the concept of a high-level plotting API that le
 
 hvPlot provides a high-level plotting API built on HoloViews that provides a general and consistent API for plotting data in all the abovementioned formats. hvPlot can integrate neatly with the individual libraries if an extension mechanism for the native plot APIs is offered, or it can be used as a standalone component.
 
-To start using hvplot have a look at the [Getting Started Guide](https://hvplot.holoviz.org/getting_started/index.html) and check out the current functionality in the [User Guide.](https://hvplot.holoviz.org/user_guide/index.html)
+To start using hvplot have a look at the [installation instructions](https://hvplot.holoviz.org/index.html#installation) and check out the current functionality in the [User Guide.](https://hvplot.holoviz.org/user_guide/index.html)
 
 <img src="http://blog.holoviz.org/images/hvplot_collage.png">
 
