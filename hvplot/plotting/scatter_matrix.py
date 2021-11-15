@@ -46,7 +46,22 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
         Default is `Category10 <https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md#category10>`.
     diagonal_kwds/hist_kwds/density_kwds: dict, optional
         Keyword options for the diagonal plots
-    kwds: Keyword options for the off-diagonal plots, optional
+    datashade (default=False):
+        Whether to apply rasterization and shading using datashader
+        library returning an RGB object
+    rasterize (default=False):
+        Whether to apply rasterization using the datashader library
+        returning an aggregated Image
+    dynspread (default=False):
+        Allows plots generated with datashade=True or rasterize=True 
+        to increase the point size to make sparse regions more visible.
+        kwds supported include ``max_px``, ``threshold``, ``how`` and ``mask``.
+    spread (default=False):
+        Allows plots generated with datashade=True or rasterize=True 
+        to increase the point size to make sparse regions more visible, by
+        applying a fixed spreading of a certain number of cells/pixels. kwds
+        supported include: ``px``, ``shape``, ``how`` and ``mask``.
+    kwds: Keyword options for the off-diagonal plots and datashader's spreading , optional
 
     Returns:
     --------
@@ -68,13 +83,6 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
                          (supported, chart))
     diagonal = HoloViewsConverter._kind_mapping[diagonal]
     chart = HoloViewsConverter._kind_mapping[chart]
-
-    if cmap and colormap:
-        raise TypeError("Only specify one of `cmap` and `colormap`.")
-    colors = cmap or colormap or _hv.plotting.util.process_cmap('Category10', categorical=True)
-    tools = tools or ['box_select', 'lasso_select']
-    chart_opts = dict(alpha=alpha, cmap=colors, tools=tools,
-                      nonselection_alpha=nonselection_alpha, **kwds)
 
     if rasterize:
         import holoviews.operation.datashader as hd 
