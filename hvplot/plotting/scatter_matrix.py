@@ -126,6 +126,13 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
         if 'mask' in kwds:
             sp_kwds['mask'] = kwds.pop('mask')
 
+    if cmap and colormap:
+        raise TypeError("Only specify one of `cmap` and `colormap`.")
+    colors = cmap or colormap or _hv.plotting.util.process_cmap('Category10', categorical=True)
+    tools = tools or ['box_select', 'lasso_select']
+    chart_opts = dict(alpha=alpha, cmap=colors, tools=tools,
+                      nonselection_alpha=nonselection_alpha, **kwds)
+
     #get initial scatter matrix.  No color.
     grid = _hv.operation.gridmatrix(data, diagonal_type=diagonal, chart_type=chart)
 
