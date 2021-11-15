@@ -77,11 +77,13 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
                       nonselection_alpha=nonselection_alpha, **kwds)
 
     if rasterize:
+        import holoviews.operation.datashader as hd 
         if dynspread or spread:
             if hd.ds_version < '0.12.0':
-                raise RuntimeError('Any version of datashader ' +
-                                    'less than 0.12.0 does not support ' + 
-                                    'rasterize with dynspread or spread')
+                raise RuntimeError(
+                    'Any version of datashader less than 0.12.0 does '
+                    'not support rasterize with dynspread or spread.')
+
     #remove datashade kwds
     if datashade or rasterize:
         import holoviews.operation.datashader as hd 
@@ -93,7 +95,7 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
         spread = dynspread = False
 
     #remove dynspread kwds
-    sp_kwds={}
+    sp_kwds = {}
     if dynspread:
         if datashade == False and rasterize == False:
             warnings.warn(
@@ -114,7 +116,7 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
             warnings.warn(
                 "Datashade or Rasterize must be specified to use spread. " 
                 "Spread will not be applied to plots."
-                )
+            )
         if 'px' in kwds:
             sp_kwds['px'] = kwds.pop('px')
         if 'shape' in kwds:
@@ -156,9 +158,10 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
     # Perform datashade options after all the coloring is finished.
     if datashade or rasterize:
         aggregatefn = hd.datashade if datashade else hd.rasterize
-        grid = aggregatefn(grid, **ds_kwds)
+        grid = grid.map(aggregatefn, specs=chart, **ds_kwds)
         if spread or dynspread:
             spreadfn = hd.dynspread if dynspread else (hd.spread if spread else lambda z, **_: z)
-            grid = spreadfn(grid, **sp_kwds)
+            eltype = _hv.RGB if datashade else _hv.Image
+            grid = grid.map(spreadfn, specs=eltype, **sp_kwds)
 
     return grid
