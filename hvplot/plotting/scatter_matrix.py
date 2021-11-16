@@ -84,6 +84,13 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
     diagonal = HoloViewsConverter._kind_mapping[diagonal]
     chart = HoloViewsConverter._kind_mapping[chart]
 
+    if rasterize or datashade:
+        try:
+            import datashader  # noqa
+        except ImportError:
+            raise ImportError("rasterize or datashade require "
+                              "datashader to be installed.")
+
     if rasterize:
         import holoviews.operation.datashader as hd 
         if dynspread or spread:
