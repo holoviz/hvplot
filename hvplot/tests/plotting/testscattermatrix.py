@@ -116,11 +116,11 @@ class TestDatashader(TestCase):
     @parameterized.expand([('spread',), ('dynspread',)])
     def test_spread_rasterize(self, operation):
         # TODO: How to check that dynspread or spread is taken into account?
-        sm = scatter_matrix(self.df, rasterize=True, **{operation: True})
-        sm = scatter_matrix(self.df, datashade=True, **{operation: True})
+        scatter_matrix(self.df, rasterize=True, **{operation: True})
+        scatter_matrix(self.df, datashade=True, **{operation: True})
 
     @parameterized.expand([('rasterize',), ('datashade',)])
     def test_datashade_aggregator(self, operation):
         # TODO: How to check that the aggragetor is taken into account?
-        sm = scatter_matrix(self.df, aggregator='mean', **{operation: True})
+        scatter_matrix(self.df, aggregator='mean', **{operation: True})
 
