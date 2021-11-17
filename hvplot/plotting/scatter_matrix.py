@@ -54,7 +54,7 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
     dynspread (default=False):
         Allows plots generated with datashade=True or rasterize=True 
         to increase the point size to make sparse regions more visible.
-        kwds supported include ``max_px``, ``threshold``, ``how`` and ``mask``.
+        kwds supported include ``max_px``, ``threshold``,  ``shape``, ``how`` and ``mask``.
     spread (default=False):
         Allows plots generated with datashade=True or rasterize=True 
         to increase the point size to make sparse regions more visible, by
@@ -121,6 +121,8 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
             sp_kwds['max_px'] = kwds.pop('max_px')
         if 'threshold' in kwds:
             sp_kwds['threshold'] = kwds.pop('threshold')
+        if 'shape' in kwds:
+            sp_kwds['shape'] = kwds.pop('shape')
         if 'how' in kwds:
             sp_kwds['how'] = kwds.pop('how')
         if 'mask' in kwds:
