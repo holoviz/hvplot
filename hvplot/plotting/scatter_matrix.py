@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+from functools import partial
 
 import holoviews as _hv
 
@@ -173,10 +174,10 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
     # Perform datashade options after all the coloring is finished.
     if datashade or rasterize:
         aggregatefn = hd.datashade if datashade else hd.rasterize
-        grid = grid.map(aggregatefn, specs=chart, **ds_kwds)
+        grid = grid.map(partial(aggregatefn, **ds_kwds), specs=chart)
         if spread or dynspread:
             spreadfn = hd.dynspread if dynspread else (hd.spread if spread else lambda z, **_: z)
             eltype = _hv.RGB if datashade else _hv.Image
-            grid = grid.map(spreadfn, specs=eltype, **sp_kwds)
+            grid = grid.map(partial(spreadfn, **sp_kwds), specs=eltype)
 
     return grid
