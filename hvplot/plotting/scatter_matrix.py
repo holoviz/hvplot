@@ -1,7 +1,5 @@
 from __future__ import absolute_import
 
-import warnings
-
 import holoviews as _hv
 
 from ..converter import HoloViewsConverter
@@ -90,9 +88,17 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
         except ImportError:
             raise ImportError("rasterize or datashade require "
                               "datashader to be installed.")
+    
+    if rasterize and datashade:
+        raise ValueError("Choose to either rasterize or "
+                         "datashade the scatter matrix.")
+
+    if not rasterize and not datashade and (spread or dynspread):
+        raise ValueError("dynspread or spread need rasterize "
+                         "or datashade to be set to True.")
 
     if rasterize:
-        import holoviews.operation.datashader as hd 
+        import holoviews.operation.datashader as hd
         if dynspread or spread:
             if hd.ds_version < '0.12.0':
                 raise RuntimeError(
@@ -106,18 +112,10 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
         ds_kwds = {}
         if 'aggregator' in kwds:
             ds_kwds['aggregator'] = kwds.pop('aggregator')
-    else:
-        spread = dynspread = False
 
     #remove dynspread kwds
     sp_kwds = {}
     if dynspread:
-        if datashade == False and rasterize == False:
-            warnings.warn(
-                "Datashade or Rasterize must be specified to use dynspread. " 
-                "Dynspread will not be applied to plots."
-                )
-
         if 'max_px' in kwds:
             sp_kwds['max_px'] = kwds.pop('max_px')
         if 'threshold' in kwds:
@@ -127,11 +125,6 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
         if 'mask' in kwds:
             sp_kwds['mask'] = kwds.pop('mask')
     if spread:
-        if datashade == False and rasterize == False:
-            warnings.warn(
-                "Datashade or Rasterize must be specified to use spread. " 
-                "Spread will not be applied to plots."
-            )
         if 'px' in kwds:
             sp_kwds['px'] = kwds.pop('px')
         if 'shape' in kwds:
