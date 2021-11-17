@@ -112,15 +112,33 @@ class TestDatashader(TestCase):
         sm = scatter_matrix(self.df, **{operation: True})
         dm = sm['a', 'b']
         self.assertEqual(dm.callback.operation.name, operation)
-
-    @parameterized.expand([('spread',), ('dynspread',)])
-    def test_spread_rasterize(self, operation):
-        # TODO: How to check that dynspread or spread is taken into account?
-        scatter_matrix(self.df, rasterize=True, **{operation: True})
-        scatter_matrix(self.df, datashade=True, **{operation: True})
+        dm[()]
+        self.assertEqual(len(dm.last.pipeline.operations), 3)
 
     @parameterized.expand([('rasterize',), ('datashade',)])
     def test_datashade_aggregator(self, operation):
-        # TODO: How to check that the aggragetor is taken into account?
-        scatter_matrix(self.df, aggregator='mean', **{operation: True})
+        sm = scatter_matrix(self.df, aggregator='mean', **{operation: True})
+        dm = sm['a', 'b']
+        dm[()]
+        self.assertEqual(dm.last.pipeline.operations[-1].aggregator, 'mean')
 
+    @parameterized.expand([('spread',), ('dynspread',)])
+    def test_spread_rasterize(self, operation):
+        sm = scatter_matrix(self.df, rasterize=True, **{operation: True})
+        dm = sm['a', 'b']
+        dm[()]
+        self.assertEqual(len(dm.last.pipeline.operations), 4)
+
+    @parameterized.expand([('spread',), ('dynspread',)])
+    def test_spread_datashade(self, operation):
+        sm = scatter_matrix(self.df, datashade=True, **{operation: True})
+        dm = sm['a', 'b']
+        dm[()]
+        self.assertEqual(len(dm.last.pipeline.operations), 4)
+
+    @parameterized.expand([('spread',), ('dynspread',)])
+    def test_spread_kwargs(self, operation):
+        sm = scatter_matrix(self.df, datashade=True, **{operation: True, 'shape': 'circle'})
+        dm = sm['a', 'b']
+        dm[()]
+        self.assertEqual(dm.last.pipeline.operations[-1].args[0].keywords['shape'], 'circle')
