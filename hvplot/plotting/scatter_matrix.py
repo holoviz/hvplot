@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 from functools import partial
+import warnings
 
 import holoviews as _hv
 
@@ -89,6 +90,13 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
         except ImportError:
             raise ImportError("rasterize or datashade require "
                               "datashader to be installed.")
+        from ..util import hv_version
+        if hv_version <= '1.14.6':
+            warnings.warn(
+                "Versions of holoviews before 1.14.7 did not suppport "
+                "dynamic update of rasterized/datashaded scatter matrix. "
+                "Update holoviews to a newer version."
+            )
     
     if rasterize and datashade:
         raise ValueError("Choose to either rasterize or "
