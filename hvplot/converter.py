@@ -191,7 +191,7 @@ class HoloViewsConverter(object):
     dynspread (default=False):
         For plots generated with datashade=True or rasterize=True, 
         automatically increase the point size when the data is sparse
-        so that individual points become more visible.
+        so that individual points become more visible
     rasterize (default=False):
         Whether to apply rasterization using the Datashader library,
         returning an aggregated Image (to be colormapped by the 
