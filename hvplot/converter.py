@@ -185,14 +185,17 @@ class HoloViewsConverter(object):
         (warning: for large groupby operations embedded data can become
         very large if dynamic=False)
     datashade (default=False):
-        Whether to apply rasterization and shading using datashader
-        library returning an RGB object
+        Whether to apply rasterization and shading (colormapping) using
+        the Datashader library, returning an RGB object instead of 
+        individual points
     dynspread (default=False):
-        Allows plots generated with datashade=True or rasterize=True 
-        to increase the point size to make sparse regions more visible
+        For plots generated with datashade=True or rasterize=True, 
+        automatically increase the point size when the data is sparse
+        so that individual points become more visible.
     rasterize (default=False):
-        Whether to apply rasterization using the datashader library
-        returning an aggregated Image
+        Whether to apply rasterization using the Datashader library,
+        returning an aggregated Image (to be colormapped by the 
+        plotting backend) instead of individual points
     x_sampling/y_sampling (default=None):
         Specifies the smallest allowed sampling interval along the x/y axis.
 
