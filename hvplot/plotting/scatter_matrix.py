@@ -47,18 +47,21 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
     diagonal_kwds/hist_kwds/density_kwds: dict, optional
         Keyword options for the diagonal plots
     datashade (default=False):
-        Whether to apply rasterization and shading using datashader
-        library returning an RGB object
+        Whether to apply rasterization and shading (colormapping) using
+        the Datashader library, returning an RGB object instead of 
+        individual points
     rasterize (default=False):
-        Whether to apply rasterization using the datashader library
-        returning an aggregated Image
+        Whether to apply rasterization using the Datashader library,
+        returning an aggregated Image (to be colormapped by the 
+        plotting backend) instead of individual points
     dynspread (default=False):
-        Allows plots generated with datashade=True or rasterize=True 
-        to increase the point size to make sparse regions more visible.
+        For plots generated with datashade=True or rasterize=True, 
+        automatically increase the point size when the data is sparse
+        so that individual points become more visible.
         kwds supported include ``max_px``, ``threshold``,  ``shape``, ``how`` and ``mask``.
     spread (default=False):
-        Allows plots generated with datashade=True or rasterize=True 
-        to increase the point size to make sparse regions more visible, by
+        Make plots generated with datashade=True or rasterize=True 
+        increase the point size to make points more visible, by
         applying a fixed spreading of a certain number of cells/pixels. kwds
         supported include: ``px``, ``shape``, ``how`` and ``mask``.
     kwds: Keyword options for the off-diagonal plots and datashader's spreading , optional
@@ -88,7 +91,7 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
         try:
             import datashader  # noqa
         except ImportError:
-            raise ImportError("rasterize or datashade require "
+            raise ImportError("rasterize and datashade require "
                               "datashader to be installed.")
         from ..util import hv_version
         if hv_version <= '1.14.6':
@@ -100,7 +103,7 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
     
     if rasterize and datashade:
         raise ValueError("Choose to either rasterize or "
-                         "datashade the scatter matrix.")
+                         "datashade the scatter matrix, not both.")
 
     if not rasterize and not datashade and (spread or dynspread):
         raise ValueError("dynspread or spread need rasterize "

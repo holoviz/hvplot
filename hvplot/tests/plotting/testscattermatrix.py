@@ -4,11 +4,6 @@ import sys
 from parameterized import parameterized
 import numpy as np
 import pandas as pd
-# try:
-#     import numpy as np
-#     import hvplot.networkx as hvnx
-# except:
-#     raise SkipTest('NetworkX not available')
 
 from holoviews.core import GridMatrix, NdOverlay
 from holoviews.element import (
@@ -92,7 +87,7 @@ class TestDatashader(TestCase):
         except:
             raise SkipTest('Datashader not available')
         if sys.maxsize < 2**32:
-            raise SkipTest('Datashader does not work on 32-bit systems')
+            raise SkipTest('Datashader does not support 32-bit systems')
         self.df = pd.DataFrame(np.random.randn(1000, 3), columns=['a', 'b', 'c'])
 
     def test_rasterize_datashade_mutually_exclusive(self):
