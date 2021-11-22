@@ -559,6 +559,9 @@ class HoloViewsConverter(object):
         else:
             return
 
+        if data.size == 0:
+            return False
+        
         cmin = np.nanquantile(data, 0.05)
         cmax = np.nanquantile(data, 0.95)
 
