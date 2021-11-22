@@ -529,7 +529,7 @@ class HoloViewsConverter(object):
         # Process dimensions and labels
         self.label = label
         self._relabel = {'label': label} if label else {}
-        self._dim_ranges = {'c': clim or (np.nan, np.nan)}
+        self._dim_ranges = {'c': clim or (None, None)}
 
         # High-level options
         self._validate_kwds(kwds)
