@@ -10,7 +10,7 @@ from .converter import HoloViewsConverter as hvConverter
 
 kinds = set(hvConverter._kind_mapping) - set(hvConverter._gridded_types)
 COLORMAPS = [cm for cm in list_cmaps() if not cm.endswith('_r_r')]
-MAX_ROWS = 10_000
+MAX_ROWS = 10000
 
 
 class Controls(Viewer):

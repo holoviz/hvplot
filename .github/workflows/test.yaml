@@ -19,7 +19,7 @@ jobs:
         exclude:
           - os: windows-latest
             python-version: 2.7
-    timeout-minutes: 30
+    timeout-minutes: 60
     defaults:
       run:
         shell: bash -l {0} 
@@ -57,6 +57,12 @@ jobs:
           conda activate test-environment
           conda list
           doit develop_install -c pyviz/label/dev -o tests
+      - name: Handling the decorator package on ubuntu and python 2.7
+        if: matrix.os == 'ubuntu-latest' && startsWith(matrix.python-version, 2.)
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda activate test-environment
+          conda install -c pyviz/label/dev 'decorator=4.4.2'
       - name: doit develop_install py3
         if: startsWith(matrix.python-version, 3.)
         run: |
