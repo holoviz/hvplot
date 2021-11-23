@@ -19,7 +19,7 @@ class TestDatashader(ComparisonTestCase):
         except:
             raise SkipTest('Datashader not available')
         if sys.maxsize < 2**32:
-            raise SkipTest('Datashader does not work on 32-bit systems')
+            raise SkipTest('Datashader does not support 32-bit systems')
         import hvplot.pandas # noqa
         self.df = pd.DataFrame([[1, 2, 'A', 0.1], [3, 4, 'B', 0.2], [5, 6, 'C', 0.3]],
                                columns=['x', 'y', 'category', 'number'])
@@ -138,7 +138,7 @@ class TestChart2D(ComparisonTestCase):
         except:
             raise SkipTest('xarray or datashader not available')
         if sys.maxsize < 2**32:
-            raise SkipTest('Datashader does not work on 32-bit systems')
+            raise SkipTest('Datashader does not support 32-bit systems')
         import hvplot.xarray  # noqa
         data = np.arange(0, 60).reshape(6, 10)
         x = np.arange(10)
