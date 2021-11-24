@@ -1949,12 +1949,20 @@ class HoloViewsConverter(object):
         levels = self.kwds.get('levels', 5)
         if isinstance(levels, int):
             opts['color_levels'] = levels
-        if self._dim_ranges['c'] != (None, None):
-            opts['clim'] = self._dim_ranges['c']
         return contours(qmesh, filled=filled, levels=levels).opts(**opts)
 
     def contourf(self, x=None, y=None, z=None, data=None):
-        return self.contour(x, y, z, data, filled=True)
+        contourf = self.contour(x, y, z, data, filled=True)
+        # The holoviews contours operation used in self.contour adapts
+        # the value dim range, so we need to redimension it if the user
+        # has asked for it by setting `clim`. Internally an unset `clim`
+        # is identified by `(None, None)`.
+        if self._dim_ranges['c'] != (None, None):
+            z_name = contourf.vdims[0].name
+            redim = {z_name: self._dim_ranges['c']}
+        else:
+            redim = {}
+        return contourf.redim.range(**redim)
 
     def vectorfield(self, x=None, y=None, angle=None, mag=None, data=None):
         data, x, y, _ = self._process_gridded_args(data, x, y, z=None)
