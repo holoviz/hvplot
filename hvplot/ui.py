@@ -3,6 +3,7 @@ import panel as pn
 import param
 
 from holoviews.core.util import max_range
+from holoviews.element import tile_sources
 from holoviews.plotting.util import list_cmaps
 from panel.viewable import Viewer
 
@@ -21,6 +22,8 @@ GEO_FEATURES = [
     'borders', 'coastline', 'land', 'lakes', 'ocean', 'rivers',
     'states', 'grid'
 ]
+GEO_TILES = list(tile_sources)
+AGGREGATORS = [None, 'count', 'min', 'max', 'mean', 'sum', 'any']
 MAX_ROWS = 10_000
 
 
@@ -101,7 +104,7 @@ class Colormapping(Controls):
 
 
 class Style(Controls):
-    
+
     alpha = param.Magnitude(default=1)
 
     marker = param.Selector()
@@ -143,34 +146,86 @@ class Axes(Controls):
 
 class Labels(Controls):
 
-    rot = param.Integer(default=0, bounds=(0, 360))
-
     title = param.String()
 
     xlabel = param.String()
 
     ylabel = param.String()
 
+    rot = param.Integer(default=0, bounds=(0, 360))
+
+
 class Geo(Controls):
 
-    features = param.ListSelector(default=[], objects=GEO_FEATURES)
+    geo = param.Boolean(default=False, doc="""
+        Whether the plot should be treated as geographic (and assume
+        PlateCarree, i.e. lat/lon coordinates).""")
 
-    geo = param.Boolean(default=False)
+    crs = param.Selector(default=None, doc="""
+        Coordinate reference system of the data specified as Cartopy
+        CRS object, proj.4 string or EPSG code.""")
 
-    project = param.Boolean(default=False)
-    
-    tiles = param.Selector()
+    crs_kwargs = param.Dict(default={}, doc="""
+        Keyword arguments to pass to selected CRS.""")
+
+    global_extent = param.Boolean(default=False, doc="""
+        Whether to expand the plot extent to span the whole globe.""")
+
+    project = param.Boolean(default=False, doc="""
+        Whether to project the data before plotting (adds initial
+        overhead but avoids projecting data when plot is dynamically
+        updated).""")
+
+    features = param.ListSelector(default=[], objects=GEO_FEATURES, doc="""
+        A list of features or a dictionary of features and the scale
+        at which to render it. Available features include 'borders',
+        'coastline', 'lakes', 'land', 'ocean', 'rivers' and 'states'.""")
+
+    tiles = param.ObjectSelector(default=None, objects=GEO_TILES, doc="""
+        Whether to overlay the plot on a tile source. Tiles sources
+        can be selected by name or a tiles object or class can be passed,
+        the default is 'Wikipedia'.""")
+
+    @param.depends('geo', 'project', 'features', watch=True, on_init=True)
+    def _update_crs(self):
+        enabled = bool(self.geo or self.project or self.features)
+        self.param.crs.constant = not enabled
+        self.param.crs_kwargs.constant = not enabled
+        self.geo = enabled
+        if not enabled:
+            return
+        from cartopy.crs import CRS, GOOGLE_MERCATOR
+        crs = {
+            k: v for k, v in param.concrete_descendents(CRS).items()
+            if not k.startswith('_') and k != 'CRS'
+        }
+        crs['WebMercator'] = GOOGLE_MERCATOR
+        self.param.crs.objects = crs
+
 
 
 class Operations(Controls):
 
-    aggregator = param.Selector(default=None, objects=[None, 'count', 'min', 'max', 'mean', 'sum', 'any'])
+    datashade = param.Boolean(default=False, doc="""
+        Whether to apply rasterization and shading using datashader
+        library returning an RGB object.""")
 
-    datashade = param.Boolean(default=False)
+    rasterize = param.Boolean(default=False, doc="""
+        Whether to apply rasterization using the datashader library
+        returning an aggregated Image.""")
 
-    dynspread = param.Boolean(default=False)
+    aggregator = param.Selector(default=None, objects=AGGREGATORS, doc="""
+        Aggregator to use when applying rasterize or datashade operation.""")
 
-    rasterize = param.Boolean(default=False)
+    dynspread = param.Boolean(default=False, doc="""
+        Allows plots generated with datashade=True or rasterize=True
+        to increase the point size to make sparse regions more visible.""")
+
+    x_sampling = param.Number(default=None, doc="""
+        Specifies the smallest allowed sampling interval along the x-axis.""")
+
+    y_sampling = param.Number(default=None, doc="""
+        Specifies the smallest allowed sampling interval along the y-axis.""")
 
     @param.depends('datashade', watch=True)
     def _toggle_rasterize(self):
@@ -181,6 +236,14 @@ class Operations(Controls):
     def _toggle_datashade(self):
         if self.rasterize:
             self.datashade = False
+
+    @param.depends('rasterize', 'datashade', watch=True, on_init=True)
+    def _update_options(self):
+        enabled = self.rasterize or self.datashade
+        self.param.dynspread.constant = not enabled
+        self.param.x_sampling.constant = not enabled
+        self.param.y_sampling.constant = not enabled
+        self.param.aggregator.constant = not enabled
 
 
 class hvPlotExplorer(Viewer):
@@ -220,7 +283,7 @@ class hvPlotExplorer(Viewer):
 
     def __panel__(self):
         return self._layout
-    
+
     def __init__(self, df, **params):
         x, y = params.get('x'), params.get('y')
         if 'y' in params:
@@ -273,8 +336,9 @@ class hvPlotExplorer(Viewer):
             p = self.param[pname]
             if isinstance(p, param.Selector):
                 p.objects = variables
-    
+
     def _plot(self, *events):
+        self._layout.loading = True
         y = self.y_multi if 'y_multi' in self._controls.parameters else self.y
         if isinstance(y, list) and len(y) == 1:
             y = y[0]
@@ -282,6 +346,13 @@ class hvPlotExplorer(Viewer):
         for p, v in self.param.get_param_values():
             if isinstance(v, Controls):
                 kwargs.update(v.kwargs)
+
+        # Initialize CRS
+        crs_kwargs = kwargs.pop('crs_kwargs', {})
+        if 'crs' in kwargs:
+            if isinstance(kwargs['crs'], type):
+                kwargs['crs'] = kwargs['crs'](**crs_kwargs)
+
         kwargs['min_height'] = 300
         df = self._data
         if len(df) > MAX_ROWS and not (self.kind in STATS_KINDS or kwargs.get('rasterize') or kwargs.get('datashade')):
@@ -289,6 +360,7 @@ class hvPlotExplorer(Viewer):
         self._hv_pane.object = df.hvplot(
             kind=self.kind, x=self.x, y=y, by=self.by, groupby=self.groupby, **kwargs
         )
+        self._layout.loading = False
 
     @property
     def _single_y(self):
@@ -315,8 +387,13 @@ class hvPlotExplorer(Viewer):
         tabs = [('Fields', self._controls)]
         if visible:
             tabs += [
-                ('Axes', self.axes),
-                ('Labels', self.labels),
+                ('Axes', pn.Param(self.axes, widgets={
+                    'xlim': {'throttled': True},
+                    'ylim': {'throttled': True}
+                })),
+                ('Labels', pn.Param(self.labels, widgets={
+                    'rot': {'throttled': True}
+                })),
                 ('Style', self.style),
                 ('Operations', self.operations),
                 ('Geo', self.geo)
@@ -348,16 +425,15 @@ class hvGeomExplorer(hvPlotExplorer):
     @property
     def _x(self):
         return None
-    
+
     @property
     def _y(self):
         return None
 
-    
     @param.depends('x')
     def xlim(self):
         pass
-    
+
     @param.depends('y')
     def ylim(self):
         pass
@@ -369,7 +445,7 @@ class hvGridExplorer(hvPlotExplorer):
 
     def __new__(cls, data, **params):
         return super(hvPlotExplorer, cls).__new__(cls)
-            
+
 
 class hvDataFrameExplorer(hvPlotExplorer):
 
