@@ -38,6 +38,10 @@ html_theme_options = {
             "icon": "fab fa-discourse",
         },
     ],
+    "footer_items": [
+        "copyright",
+        "last-updated",
+    ],
     "google_analytics_id": "UA-154795830-5",
 }
 
@@ -73,3 +77,6 @@ html_context.update({
     "github_user": "holoviz",
     "github_repo": "panel",
 })
+
+# Format of the last updated section in the footer
+html_last_updated_fmt = '%Y-%m-%d'
