@@ -12,7 +12,7 @@ copyright = u'2018-2022 ' + authors
 description = 'A high-level plotting API for the PyData ecosystem built on HoloViews'
 
 import hvplot
-version = release = hvplot.__version__
+version = release = base_version(hvplot.__version__)
 
 nbbuild_cell_timeout = 600
 
@@ -78,5 +78,7 @@ html_context.update({
     "github_repo": "panel",
 })
 
+# Override the Sphinx default title that appends `documentation`
+html_title = f'{project} v{version}'
 # Format of the last updated section in the footer
 html_last_updated_fmt = '%Y-%m-%d'
