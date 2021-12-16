@@ -53,7 +53,6 @@ extensions += [
     'nbsite.gallery',
     'sphinx_copybutton',
 ]
-napoleon_numpy_docstring = True
 
 nbsite_gallery_conf = {
     'github_org': 'holoviz',
@@ -72,11 +71,6 @@ nbsite_gallery_conf = {
         }
     },
 }
-
-html_context.update({
-    "github_user": "holoviz",
-    "github_repo": "panel",
-})
 
 # Override the Sphinx default title that appends `documentation`
 html_title = f'{project} v{version}'
