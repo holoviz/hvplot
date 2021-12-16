@@ -37,7 +37,8 @@ html_theme_options = {
             "url": "https://discourse.holoviz.org/",
             "icon": "fab fa-discourse",
         },
-    ]
+    ],
+    "google_analytics_id": "UA-154795830-5",
 }
 
 html_theme = "pydata_sphinx_theme"
@@ -71,5 +72,4 @@ nbsite_gallery_conf = {
 html_context.update({
     "github_user": "holoviz",
     "github_repo": "panel",
-    "google_analytics_id": "UA-154795830-5",
 })
