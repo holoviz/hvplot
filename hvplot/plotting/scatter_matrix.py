@@ -38,7 +38,7 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
         Transparency level for the off-diagonal plots
     nonselection_alpha: float, optional
         Transparency level for nonselected object in the off-diagonal plots
-    tools: str or list of str, optional
+    tools: list of str, optional
         Interaction tools to include
         Defaults are 'box_select' and 'lasso_select'
     cmap/colormap: str or colormap object, optional
