@@ -44,7 +44,10 @@ html_theme = "pydata_sphinx_theme"
 html_logo = "_static/logo_horizontal.svg"
 html_favicon = "_static/favicon.ico"
 
-extensions += ['nbsite.gallery']
+extensions += [
+    'nbsite.gallery',
+    'sphinx_copybutton',
+]
 napoleon_numpy_docstring = True
 
 nbsite_gallery_conf = {
