@@ -17,8 +17,6 @@ jobs:
   build_docs:
     name: Documentation
     runs-on: 'ubuntu-latest'
-    strategy:
-      fail-fast: false
     timeout-minutes: 120
     defaults:
       run:
@@ -56,7 +54,7 @@ jobs:
           conda activate test-environment
           conda list
           doit develop_install ${{ env.CHANS_DEV}} -o doc -o examples
-          pip install sphinxcontrib-napoleon pydata_sphinx_theme
+          pip install sphinxcontrib-napoleon
       - name: bokeh sampledata
         run: |
           eval "$(conda shell.bash hook)"
