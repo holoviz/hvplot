@@ -6,9 +6,9 @@ import os
 
 try:
     from intake import open_catalog
-    import intake_parquet
-    import intake_xarray
-    import s3fs
+    import intake_parquet  # noqa
+    import intake_xarray   # noqa
+    import s3fs  # noqa
 except:
     raise ImportError(
         """Loading hvPlot sample data requires:
