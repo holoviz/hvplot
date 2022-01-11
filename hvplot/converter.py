@@ -1171,7 +1171,7 @@ class HoloViewsConverter(object):
             from datashader import reductions
         except ImportError:
             raise ImportError('In order to use datashading features '
-                    'the Datahasder library must be available. '
+                    'the Datashader library must be available. '
                     'It can be installed with:\n  conda '
                     'install -c pyviz datashader')
 
