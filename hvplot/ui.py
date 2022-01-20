@@ -2,7 +2,7 @@ import numpy as np
 import panel as pn
 import param
 
-from holoviews.core.util import max_range
+from holoviews.core.util import is_number, max_range
 from holoviews.element import tile_sources
 from holoviews.plotting.util import list_cmaps
 from panel.viewable import Viewer
@@ -130,6 +130,10 @@ class Axes(Controls):
 
     ylim = param.Range()
 
+    logx = param.Boolean(default=False)
+
+    logy = param.Boolean(default=False)
+
     def __init__(self, data, **params):
         super().__init__(data, **params)
         self._update_ranges()
@@ -137,22 +141,36 @@ class Axes(Controls):
     @param.depends('explorer.xlim', 'explorer.ylim',  watch=True)
     def _update_ranges(self):
         xlim = self.explorer.xlim()
-        if xlim is not None:
+        if xlim is not None and is_number(xlim[0]) and is_number(xlim[1]):
+            self.param.xlim.precedence = 0
             self.param.xlim.bounds = xlim
+        else:
+            self.param.xlim.precedence = -1
         ylim = self.explorer.ylim()
-        if ylim is not None:
+        if ylim is not None and is_number(ylim[0]) and is_number(ylim[1]):
+            self.param.ylim.precedence = 0
             self.param.ylim.bounds = ylim
+        else:
+            self.param.ylim.precedence = -1
 
 
 class Labels(Controls):
 
-    title = param.String()
+    title = param.String(doc="Title for the plot")
 
-    xlabel = param.String()
+    xlabel = param.String(doc="Axis labels for the x-axis.")
 
-    ylabel = param.String()
+    ylabel = param.String(doc="Axis labels for the y-axis.")
 
-    rot = param.Integer(default=0, bounds=(0, 360))
+    clabel = param.String(doc="Axis labels for the colorbar.")
+
+    fontscale = param.Number(default=1, doc="""
+        Scales the size of all fonts by the same amount, e.g. fontscale=1.5
+        enlarges all fonts (title, xticks, labels etc.) by 50%.""")
+
+    rot = param.Integer(default=0, bounds=(0, 360), doc="""
+        Rotates the axis ticks along the x-axis by the specified
+        number of degrees.""")
 
 
 class Geo(Controls):
@@ -302,7 +320,7 @@ class hvPlotExplorer(Viewer):
             self.param, parameters=['kind', 'x', 'y', 'by', 'groupby'],
             sizing_mode='stretch_width', max_width=300
         )
-        self._hv_pane = pn.pane.HoloViews(sizing_mode='stretch_width')
+        self._hv_pane = pn.pane.HoloViews(sizing_mode='stretch_width', margin=(0, 0, 0, 50))
         self.param.watch(self._toggle_controls, 'kind')
         self.param.watch(self._check_y, 'y_multi')
         self.param.watch(self._check_by, 'by')
@@ -320,12 +338,17 @@ class hvPlotExplorer(Viewer):
         self.param.watch(self._plot, list(self.param))
         for controller in controllers.values():
             controller.param.watch(self._plot, list(controller.param))
-        self._plot()
-        self._layout = pn.Row(
-            self._tabs,
-            self._hv_pane.layout,
+        self._alert = pn.pane.Alert(alert_type='danger', visible=False)
+        self._layout = pn.Column(
+            self._alert,
+            pn.Row(
+                self._tabs,
+                self._hv_pane.layout,
+                sizing_mode='stretch_width'
+            ),
             sizing_mode='stretch_width'
         )
+        self._plot()
         self.param.trigger('kind')
 
     def _populate(self):
@@ -357,10 +380,18 @@ class hvPlotExplorer(Viewer):
         df = self._data
         if len(df) > MAX_ROWS and not (self.kind in STATS_KINDS or kwargs.get('rasterize') or kwargs.get('datashade')):
             df = df.sample(n=MAX_ROWS)
-        self._hv_pane.object = df.hvplot(
-            kind=self.kind, x=self.x, y=y, by=self.by, groupby=self.groupby, **kwargs
-        )
-        self._layout.loading = False
+        try:
+            self._hv_pane.object = df.hvplot(
+                kind=self.kind, x=self.x, y=y, by=self.by, groupby=self.groupby, **kwargs
+            )
+            self._alert.visible = False
+        except Exception as e:
+            self._alert.param.set_param(
+                object=f'**Rendering failed with following error**: {e}',
+                visible=True
+            )
+        finally:
+            self._layout.loading = False
 
     @property
     def _single_y(self):
@@ -484,7 +515,10 @@ class hvDataFrameExplorer(hvPlotExplorer):
         if self._x == 'index':
             values = self._data.index.values
         else:
-            values = self._data[self._x]
+            try:
+                values = self._data[self._x]
+            except:
+                return 0, 1
         if values.dtype.kind in 'OSU':
             return None
         return (np.nanmin(values), np.nanmax(values))
