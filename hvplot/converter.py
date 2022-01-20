@@ -228,7 +228,8 @@ class HoloViewsConverter(object):
     """
 
     _gridded_types = [
-        'image', 'contour', 'contourf', 'quadmesh', 'rgb', 'points', 'dataset'
+        'image', 'contour', 'contourf', 'quadmesh', 'rgb', 'points',
+        'dataset'
     ]
 
     _geom_types = ['paths', 'polygons']
@@ -238,98 +239,139 @@ class HoloViewsConverter(object):
 
     _stats_types = ['hist', 'kde', 'violin', 'box', 'density']
 
-    _data_options = ['x', 'y', 'kind', 'by', 'use_index', 'use_dask',
-                     'dynamic', 'crs', 'value_label', 'group_label',
-                     'backlog', 'persist', 'sort_date']
+    _data_options = [
+        'x', 'y', 'kind', 'by', 'use_index', 'use_dask', 'dynamic',
+        'crs', 'value_label', 'group_label', 'backlog', 'persist',
+        'sort_date'
+    ]
 
-    _geo_options = ['geo', 'crs', 'features', 'project', 'coastline', 'tiles']
+    _geo_options = [
+        'geo', 'crs', 'features', 'project', 'coastline', 'tiles'
+    ]
 
-    _axis_options = ['width', 'height', 'shared_axes', 'grid', 'legend',
-                     'rot', 'xlim', 'ylim', 'xticks', 'yticks', 'colorbar',
-                     'invert', 'title', 'logx', 'logy', 'loglog', 'xaxis',
-                     'yaxis', 'xformatter', 'yformatter', 'xlabel', 'ylabel',
-                     'clabel', 'padding', 'responsive', 'max_height', 'max_width',
-                     'min_height', 'min_width', 'frame_height', 'frame_width',
-                     'aspect', 'data_aspect', 'fontscale']
+    _axis_options = [
+        'width', 'height', 'shared_axes', 'grid', 'legend',
+        'rot', 'xlim', 'ylim', 'xticks', 'yticks', 'colorbar',
+        'invert', 'title', 'logx', 'logy', 'loglog', 'xaxis',
+        'yaxis', 'xformatter', 'yformatter', 'xlabel', 'ylabel',
+        'clabel', 'padding', 'responsive', 'max_height', 'max_width',
+        'min_height', 'min_width', 'frame_height', 'frame_width',
+        'aspect', 'data_aspect', 'fontscale'
+    ]
 
-    _style_options = ['color', 'alpha', 'colormap', 'fontsize', 'c', 'cmap',
-                      'color_key', 'cnorm']
+    _style_options = [
+        'color', 'alpha', 'colormap', 'fontsize', 'c', 'cmap',
+        'color_key', 'cnorm'
+    ]
 
-    _op_options = ['datashade', 'rasterize', 'x_sampling', 'y_sampling',
-                   'aggregator']
+    _op_options = [
+        'datashade', 'rasterize', 'x_sampling', 'y_sampling',
+        'aggregator'
+    ]
 
+    # Options specific to a particular plot type
     _kind_options = {
-        'scatter'  : ['s', 'c', 'scale', 'logz', 'marker'],
-        'step'     : ['where'],
         'area'     : ['y2'],
         'errorbars': ['yerr1', 'yerr2'],
-        'ohlc'     : ['bar_width', 'pos_color', 'neg_color', 'line_color'],
-        'hist'     : ['bins', 'bin_range', 'normed', 'cumulative'],
-        'heatmap'  : ['C', 'reduce_function', 'logz'],
-        'hexbin'   : ['C', 'reduce_function', 'gridsize', 'logz', 'min_count'],
-        'dataset'  : ['columns'],
-        'table'    : ['columns'],
-        'image'    : ['z', 'logz'],
-        'rgb'      : ['z', 'bands'],
-        'quadmesh' : ['z', 'logz'],
+        'bivariate': ['bandwidth', 'cut', 'filled', 'levels'],
         'contour'  : ['z', 'levels', 'logz'],
         'contourf' : ['z', 'levels', 'logz'],
-        'vectorfield': ['angle', 'mag'],
+        'dataset'  : ['columns'],
+        'heatmap'  : ['C', 'reduce_function', 'logz'],
+        'hexbin'   : ['C', 'reduce_function', 'gridsize', 'logz', 'min_count'],
+        'hist'     : ['bins', 'bin_range', 'normed', 'cumulative'],
+        'image'    : ['z', 'logz'],
+        'kde'      : ['bw_method', 'ind', 'bandwidth', 'cut', 'filled'],
+        'labels'   : ['text', 'c', 'xoffset', 'yoffset', 'text_font', 'text_font_size'],
+        'ohlc'     : ['bar_width', 'pos_color', 'neg_color', 'line_color'],
         'points'   : ['s', 'marker', 'c', 'scale', 'logz'],
         'polygons' : ['logz', 'c'],
-        'labels'   : ['text', 'c', 'xoffset', 'yoffset', 'text_font', 'text_font_size'],
-        'kde'      : ['bw_method', 'ind', 'bandwidth', 'cut', 'filled'],
-        'bivariate': ['bandwidth', 'cut', 'filled', 'levels']
+        'rgb'      : ['z', 'bands'],
+        'scatter'  : ['s', 'c', 'scale', 'logz', 'marker'],
+        'step'     : ['where'],
+        'table'    : ['columns'],
+        'quadmesh' : ['z', 'logz'],
+        'vectorfield': ['angle', 'mag'],
     }
 
+    # Mapping from kind to HoloViews element type
     _kind_mapping = {
-        'line': Curve, 'scatter': Scatter, 'heatmap': HeatMap,
-        'bivariate': Bivariate, 'quadmesh': QuadMesh, 'hexbin': HexTiles,
-        'image': Image, 'table': Table, 'hist': Histogram, 'dataset': Dataset,
-        'kde': Distribution, 'density': Distribution, 'area': Area, 'box': BoxWhisker, 'violin': Violin,
-        'bar': Bars, 'barh': Bars, 'contour': Contours, 'contourf': Polygons,
-        'points': Points, 'polygons': Polygons, 'paths': Path, 'step': Curve,
-        'labels': Labels, 'rgb': RGB, 'errorbars': ErrorBars,
-        'vectorfield': VectorField, 'ohlc': Rectangles
+        'area': Area,
+        'bar': Bars,
+        'barh': Bars,
+        'bivariate': Bivariate,
+        'box': BoxWhisker,
+        'contour': Contours,
+        'contourf': Polygons,
+        'dataset': Dataset,
+        'density': Distribution,
+        'errorbars': ErrorBars,
+        'hist': Histogram,
+        'image': Image,
+        'kde': Distribution,
+        'labels': Labels,
+        'line': Curve,
+        'scatter': Scatter,
+        'heatmap': HeatMap,
+        'hexbin': HexTiles,
+        'ohlc': Rectangles,
+        'paths': Path,
+        'points': Points,
+        'polygons': Polygons,
+        'quadmesh': QuadMesh,
+        'rgb': RGB,
+        'step': Curve,
+        'table': Table,
+        'vectorfield': VectorField,
+        'violin': Violin
     }
 
-    _colorbar_types = ['image', 'hexbin', 'heatmap', 'quadmesh', 'bivariate',
-                       'contour', 'contourf', 'polygons']
+    # Types which have a colorbar by default
+    _colorbar_types = [
+        'bivariate', 'contour', 'contourf', 'heatmap', 'image',
+        'hexbin', 'quadmesh', 'polygons'
+    ]
 
-    _legend_positions = ("top_right", "top_left", "bottom_left",
-                         "bottom_right", "right", "left", "top",
-                         "bottom")
+    _legend_positions = (
+        "top_right", "top_left", "bottom_left", "bottom_right",
+        "right", "left", "top", "bottom"
+    )
 
     _default_plot_opts = {
-        'logx': False, 'logy': False, 'show_legend': True, 'legend_position': 'right',
-        'show_grid': False, 'responsive': False, 'shared_axes': True}
+        'logx': False,
+        'logy': False,
+        'show_legend': True,
+        'legend_position': 'right',
+        'show_grid': False,
+        'responsive': False,
+        'shared_axes': True
+    }
 
     _default_cmaps = {
         'linear': 'kbc_r',
         'categorical': cc.palette['glasbey_category10'],
         'cyclic': 'colorwheel',
         'diverging': 'coolwarm'
-    }
+    }    
 
-    def __init__(self, data, x, y, kind=None, by=None, use_index=True,
-                 group_label=None, value_label='value',
-                 backlog=1000, persist=False, use_dask=False,
-                 crs=None, fields={}, groupby=None, dynamic=True,
-                 grid=None, legend=None, rot=None, title=None,
-                 xlim=None, ylim=None, clim=None, symmetric=None,
-                 logx=None, logy=None, loglog=None, hover=None,
-                 subplots=False, label=None, invert=False,
-                 stacked=False, colorbar=None,
-                 datashade=False, rasterize=False, row=None, col=None,
-                 figsize=None, debug=False, framewise=True,
-                 aggregator=None, projection=None, global_extent=None,
-                 geo=False, precompute=False, flip_xaxis=None,
-                 flip_yaxis=None, dynspread=False, hover_cols=[],
-                 x_sampling=None, y_sampling=None, project=False,
-                 tools=[], attr_labels=None, coastline=False,
-                 tiles=False, sort_date=True, check_symmetric_max=1000000,
-                 transforms={}, stream=None, cnorm=None, features=None, **kwds):
-
+    def __init__(
+        self, data, x, y, kind=None, by=None, use_index=True,
+        group_label=None, value_label='value', backlog=1000,
+        persist=False, use_dask=False, crs=None, fields={},
+        groupby=None, dynamic=True, grid=None, legend=None, rot=None,
+        title=None, xlim=None, ylim=None, clim=None, symmetric=None,
+        logx=None, logy=None, loglog=None, hover=None, subplots=False,
+        label=None, invert=False, stacked=False, colorbar=None,
+        datashade=False, rasterize=False, row=None, col=None,
+        figsize=None, debug=False, framewise=True, aggregator=None,
+        projection=None, global_extent=None, geo=False,
+        precompute=False, flip_xaxis=None, flip_yaxis=None,
+        dynspread=False, hover_cols=[], x_sampling=None,
+        y_sampling=None, project=False, tools=[], attr_labels=None,
+        coastline=False, tiles=False, sort_date=True,
+        check_symmetric_max=1000000, transforms={}, stream=None,
+        cnorm=None, features=None, **kwds
+    ):
         # Process data and related options
         self._redim = fields
         self.use_index = use_index
