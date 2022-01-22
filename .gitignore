@@ -117,3 +117,6 @@ hvplot/.version
 
 # doit
 .doit.db
+
+# vscode
+.vscode
