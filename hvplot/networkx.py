@@ -582,3 +582,22 @@ def draw_spring(G, **kwargs):
        Graph element or Graph and Labels
     """
     return draw(G, nx.spring_layout, **kwargs)
+
+def draw_planar(G, **kwargs):
+    """Draw networkx graph with planar layout.
+
+    Parameters
+    ----------
+    G : graph
+       A networkx graph
+    kwargs : optional keywords
+       See hvplot.networkx.draw() for a description of optional
+       keywords, with the exception of the pos parameter which is not
+       used by this function.
+
+    Returns
+    -------
+    graph : holoviews.Graph or holoviews.Overlay
+       Graph element or Graph and Labels
+    """
+    return draw(G, nx.planar_layout, **kwargs)
