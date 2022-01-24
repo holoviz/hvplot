@@ -24,7 +24,7 @@ GEO_FEATURES = [
 ]
 GEO_TILES = list(tile_sources)
 AGGREGATORS = [None, 'count', 'min', 'max', 'mean', 'sum', 'any']
-MAX_ROWS = 10_000
+MAX_ROWS = 10000
 
 
 class Controls(Viewer):
