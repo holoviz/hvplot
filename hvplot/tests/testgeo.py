@@ -39,7 +39,7 @@ class TestCRSInference(TestGeo):
     def setUp(self):
         if sys.platform == "win32":
             raise SkipTest("Skip CRS inference on Windows")
-        super(TestCRSInference, self).setUp()
+        super().setUp()
         
     def test_plot_with_crs_as_proj_string(self):
         plot = self.da.hvplot.image('x', 'y', crs=self.da.crs)
