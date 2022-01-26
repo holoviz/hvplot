@@ -70,9 +70,6 @@ extras_require = {
         'parameterized',
         'pytest',
         'nbsmoke >=0.2.0',
-        'twine',   # required for pip packaging
-        'rfc3986', # required by twine
-        'keyring', # required by twine
         'numpy >=1.7,<1.20' # Numba ABI incompatibility
     ],
     'examples': _examples,
