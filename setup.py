@@ -49,7 +49,7 @@ _examples = [
     'dask',
     'datashader >=0.6.5',
     'notebook >=5.4',
-    'rasterio',
+    # 'rasterio',
     's3fs',
     'scipy',
     'pillow',
