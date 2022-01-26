@@ -38,6 +38,7 @@ install_requires = [
 _examples = [
     'geoviews >=1.6.0',
     'numba >=0.51.0',
+    # On conda geopandas-base is installed, see setup.cfg
     'geopandas',
     'xarray <0.17.0',
     'networkx',
