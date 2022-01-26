@@ -197,7 +197,13 @@ class TestGeoPandas(TestCase):
             raise SkipTest('geopandas, geoviews, or cartopy not available')
         import hvplot.pandas  # noqa
 
-        self.cities = gpd.read_file(gpd.datasets.get_path('naturalearth_cities'))
+        geometry = gpd.points_from_xy(
+            x=[12.45339, 12.44177, 9.51667, 6.13000, 158.14997],
+            y=[41.90328, 43.93610, 47.13372, 49.61166, 6.91664],
+            crs='EPSG:4326'
+        )
+        names = ['Vatican City', 'San Marino', 'Vaduz', 'Luxembourg', 'Palikir']
+        self.cities = gpd.GeoDataFrame(dict(name=names), geometry=geometry)
 
     def test_points_hover_cols_is_empty_by_default(self):
         points = self.cities.hvplot()
