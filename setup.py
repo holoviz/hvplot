@@ -57,7 +57,6 @@ _examples = [
     'spatialpandas',
     'scikit-image',
     'python-snappy',
-    'pyepsg'
 ]
 
 _examples_extra = _examples + [
