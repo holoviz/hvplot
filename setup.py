@@ -69,6 +69,7 @@ extras_require = {
         'flake8',
         'parameterized',
         'pytest',
+        'pytest-cov',
         'nbsmoke >=0.2.0',
         'numpy >=1.7,<1.20' # Numba ABI incompatibility
     ],
