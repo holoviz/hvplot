@@ -51,7 +51,7 @@ _examples = [
     'notebook ==6.4.8',
     'rasterio ==1.2.0',
     'cartopy ==0.20.0',
-    'pyproj ==3.3.0',
+    'pyproj',
     's3fs ==2022.1.0',
     'scipy ==1.7.0',
     'pillow ==8.4.0',
