@@ -59,6 +59,7 @@ _examples = [
     'spatialpandas ==0.4.3',
     'scikit-image ==0.19.0',
     'python-snappy ==0.6.0',
+    'pooch ==1.6.0',
 ]
 
 _examples_extra = _examples + [
