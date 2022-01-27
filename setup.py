@@ -36,27 +36,29 @@ install_requires = [
 ]
 
 _examples = [
-    'geoviews >=1.6.0',
-    'numba >=0.51.0',
+    'geoviews ==1.9.3',
+    'numba ==0.53.1',
     # On conda geopandas-base is installed, see setup.cfg
-    'geopandas',
-    'xarray <0.17.0',
-    'networkx',
-    'streamz >=0.3.0',
-    'intake',
-    'intake-parquet',
-    'intake-xarray',
-    'dask',
-    'datashader >=0.6.5',
-    'notebook >=5.4',
-    'rasterio',
-    's3fs',
-    'scipy',
-    'pillow',
-    'selenium',
-    'spatialpandas',
-    'scikit-image',
-    'python-snappy',
+    'geopandas ==0.10.2',
+    'xarray ==0.20.2',
+    'networkx ==2.6.3',
+    'streamz ==0.6.3',
+    'intake ==0.6.5',
+    'intake-parquet ==0.2.3',
+    'intake-xarray ==0.5.0',
+    'dask ==2022.1.0',
+    'datashader ==0.13.0',
+    'notebook ==6.4.8',
+    'rasterio ==1.2.0',
+    'cartopy ==0.20.0',
+    'pyproj ==3.3.0',
+    's3fs ==2022.1.0',
+    'scipy ==1.7.0',
+    'pillow ==8.4.0',
+    'selenium ==4.1',
+    'spatialpandas ==0.4.3',
+    'scikit-image ==0.19.0',
+    'python-snappy ==0.6.0',
 ]
 
 _examples_extra = _examples + [
@@ -71,7 +73,7 @@ extras_require = {
         'pytest',
         'pytest-cov',
         'nbsmoke >=0.2.0',
-        'numpy >=1.7,<1.20' # Numba ABI incompatibility
+        'numpy >=1.7'
     ],
     'examples': _examples,
     'examples_extra': _examples_extra,
