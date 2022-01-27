@@ -27,7 +27,7 @@ class TestGeo(TestCase):
         self.crs = ccrs.epsg(self.da.crs.split('epsg:')[1])
 
     def assertCRS(self, plot, proj='utm'):
-        assert plot.crs.proj4_params['proj'] == proj
+        assert plot.crs.to_dict()['proj'] == proj
 
     def assert_projection(self, plot, proj):
         opts = hv.Store.lookup_options('bokeh', plot, 'plot')

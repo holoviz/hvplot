@@ -45,11 +45,11 @@ def check_crs(crs):
     """
     Checks if the crs represents a valid grid, projection or ESPG string.
 
-    (Code copied from https://github.com/fmaussion/salem)
+    (Code copied and adapted from https://github.com/fmaussion/salem)
 
     Examples
     --------
-    >>> p = check_crs('+units=m +init=epsg:26915')
+    >>> p = check_crs('epsg:26915 +units=m')
     >>> p.srs
     '+proj=utm +zone=15 +datum=NAD83 +units=m +no_defs'
     >>> p = check_crs('wrong')
@@ -61,19 +61,41 @@ def check_crs(crs):
     A valid crs if possible, otherwise None
     """
     import pyproj
+
+    try:
+        crs_type = pyproj.crs.CRS
+    except AttributeError:
+        class Dummy():
+            pass
+        crs_type = Dummy
+
     if isinstance(crs, pyproj.Proj):
         out = crs
+    elif isinstance(crs, crs_type):
+        out = pyproj.Proj(crs.to_wkt(), preserve_units=True)
     elif isinstance(crs, dict) or isinstance(crs, basestring):
+        if isinstance(crs, basestring):
+            # quick fix for https://github.com/pyproj4/pyproj/issues/345
+            crs = crs.replace(' ', '').replace('+', ' +')
         try:
-            out = pyproj.Proj(crs)
+            out = pyproj.Proj(crs, preserve_units=True)
         except RuntimeError:
             try:
-                out = pyproj.Proj(init=crs)
+                out = pyproj.Proj(init=crs, preserve_units=True)
             except RuntimeError:
                 out = None
     else:
         out = None
     return out
+
+
+def proj_is_latlong(proj):
+    """Shortcut function because of deprecation."""
+
+    try:
+        return proj.is_latlong()
+    except AttributeError:
+        return proj.crs.is_geographic
 
 
 def proj_to_cartopy(proj):
@@ -91,6 +113,7 @@ def proj_to_cartopy(proj):
     a cartopy.crs.Projection object
     """
 
+    import cartopy
     import cartopy.crs as ccrs
     try:
         from osgeo import osr
@@ -100,10 +123,7 @@ def proj_to_cartopy(proj):
 
     proj = check_crs(proj)
 
-    if hasattr(proj, 'crs'):
-        if proj.crs.is_geographic:
-            return ccrs.PlateCarree()
-    elif proj.is_latlong():  # pyproj<2.0
+    if proj_is_latlong(proj):
         return ccrs.PlateCarree()
 
     srs = proj.srs
@@ -111,12 +131,16 @@ def proj_to_cartopy(proj):
         # this is more robust, as srs could be anything (espg, etc.)
         s1 = osr.SpatialReference()
         s1.ImportFromProj4(proj.srs)
-        srs = s1.ExportToProj4()
+        if s1.ExportToProj4():
+            srs = s1.ExportToProj4()
 
     km_proj = {'lon_0': 'central_longitude',
                'lat_0': 'central_latitude',
                'x_0': 'false_easting',
                'y_0': 'false_northing',
+               'lat_ts': 'latitude_true_scale',
+               'o_lon_p': 'central_rotated_longitude',
+               'o_lat_p': 'pole_latitude',
                'k': 'scale_factor',
                'zone': 'zone',
                }
@@ -142,13 +166,20 @@ def proj_to_cartopy(proj):
         if k == 'proj':
             if v == 'tmerc':
                 cl = ccrs.TransverseMercator
+                kw_proj['approx'] = True
             if v == 'lcc':
                 cl = ccrs.LambertConformal
             if v == 'merc':
                 cl = ccrs.Mercator
             if v == 'utm':
                 cl = ccrs.UTM
+            if v == 'stere':
+                cl = ccrs.Stereographic
+            if v == 'ob_tran':
+                cl = ccrs.RotatedPole
         if k in km_proj:
+            if k == 'zone':
+                v = int(v)
             kw_proj[km_proj[k]] = v
         if k in km_globe:
             kw_globe[km_globe[k]] = v
@@ -157,7 +188,7 @@ def proj_to_cartopy(proj):
 
     globe = None
     if kw_globe:
-        globe = ccrs.Globe(**kw_globe)
+        globe = ccrs.Globe(ellipse='sphere', **kw_globe)
     if kw_std:
         kw_proj['standard_parallels'] = (kw_std['lat_1'], kw_std['lat_2'])
 
@@ -165,6 +196,24 @@ def proj_to_cartopy(proj):
     if cl.__name__ == 'Mercator':
         kw_proj.pop('false_easting', None)
         kw_proj.pop('false_northing', None)
+        if LooseVersion(cartopy.__version__) < LooseVersion('0.15'):
+            kw_proj.pop('latitude_true_scale', None)
+    elif cl.__name__ == 'Stereographic':
+        kw_proj.pop('scale_factor', None)
+        if 'latitude_true_scale' in kw_proj:
+            kw_proj['true_scale_latitude'] = kw_proj['latitude_true_scale']
+            kw_proj.pop('latitude_true_scale', None)
+    elif cl.__name__ == 'RotatedPole':
+        if 'central_longitude' in kw_proj:
+            kw_proj['pole_longitude'] = kw_proj['central_longitude'] - 180
+            kw_proj.pop('central_longitude', None)
+    else:
+        kw_proj.pop('latitude_true_scale', None)
+
+    try:
+        return cl(globe=globe, **kw_proj)
+    except TypeError:
+        del kw_proj['approx']
 
     return cl(globe=globe, **kw_proj)
 
