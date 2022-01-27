@@ -76,7 +76,6 @@ jobs:
           conda activate test-environment
           conda list
           doit develop_install ${{ env.CHANS_DEV}} -o examples -o tests
-          conda install -c conda-forge fsspec
       - name: pygraphviz
         if: contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos')
         run: |
