@@ -65,7 +65,7 @@ _examples_extra = _examples + [
 
 extras_require = {
     'tests': [
-        'coveralls',
+        'codecov',
         'flake8',
         'parameterized',
         'pytest',
