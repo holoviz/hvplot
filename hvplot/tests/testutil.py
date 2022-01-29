@@ -4,6 +4,7 @@ Tests  utilities to convert data and projections
 import sys
 
 import numpy as np
+import pytest
 
 from unittest import TestCase, SkipTest
 
@@ -269,6 +270,7 @@ class TestDynamicArgs(TestCase):
 
 
 def test_check_crs():
+    pytest.importorskip("pyproj")
     p = check_crs('epsg:26915 +units=m')
     assert p.srs == '+proj=utm +zone=15 +datum=NAD83 +units=m +no_defs'
     p = check_crs('wrong')
