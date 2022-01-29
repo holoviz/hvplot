@@ -31,7 +31,8 @@ jobs:
       DESC: "Python ${{ matrix.python-version }} tests"
       HV_REQUIREMENTS: "unit_tests"
       PYTHON_VERSION: ${{ matrix.python-version }}
-      CHANS_DEV: "-c pyviz/label/dev -c conda-forge -c nodefaults"
+      CHANS_DEV: "-c pyviz/label/dev -c conda-forge"
+      # CHANS_DEV: "-c pyviz/label/dev -c conda-forge -c nodefaults"
       CHANS: "-c pyviz"
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -54,10 +55,10 @@ jobs:
           doit ecosystem_setup
           conda install nodejs
           doit env_create ${{ env.CHANS_DEV}} --python=${{ matrix.python-version }}
-      - name: conda priority
-        run: |
-          eval "$(conda shell.bash hook)"
-          conda config --set channel_priority strict
+      # - name: conda priority
+      #   run: |
+      #     eval "$(conda shell.bash hook)"
+      #     conda config --set channel_priority strict
       - name: doit develop_install py2
         if: startsWith(matrix.python-version, 2.)
         run: |
