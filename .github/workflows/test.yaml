@@ -54,10 +54,10 @@ jobs:
           doit ecosystem_setup
           conda install nodejs
           doit env_create ${{ env.CHANS_DEV}} --python=${{ matrix.python-version }}
-      # - name: conda priority
-      #   run: |
-      #     eval "$(conda shell.bash hook)"
-      #     conda config --set channel_priority strict
+      - name: conda priority
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda config --set channel_priority strict
       - name: doit develop_install py2
         if: startsWith(matrix.python-version, 2.)
         run: |
@@ -77,7 +77,7 @@ jobs:
           eval "$(conda shell.bash hook)"
           conda activate test-environment
           conda list
-          doit develop_install ${{ env.CHANS_DEV}} -o examples
+          doit develop_install ${{ env.CHANS_DEV}} -o tests
           # doit develop_install ${{ env.CHANS_DEV}} -o examples -o tests
       - name: pygraphviz
         if: contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos')
