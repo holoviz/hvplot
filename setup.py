@@ -39,9 +39,9 @@ _examples = [
     'geoviews ==1.9.3',
     'numba ==0.53.1',
     # On conda geopandas-base is installed, see setup.cfg
-    # 'geopandas ==0.10.2',
-    # 'xarray ==0.20.2',
-    # 'networkx ==2.6.3',
+    'geopandas ==0.10.2',
+    'xarray ==0.20.2',
+    'networkx ==2.6.3',
     # 'streamz ==0.6.3',
     # 'intake ==0.6.5',
     # 'intake-parquet ==0.2.3',
