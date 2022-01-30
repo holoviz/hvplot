@@ -48,10 +48,13 @@ jobs:
           miniconda-version: "latest"
           channel-priority: strict
           channels: pyviz/label/dev,conda-forge,nodefaults
+          mamba-version: "*"
       - name: Fetch unshallow
         run: git fetch --prune --tags --unshallow
       - name: conda setup
         run: |
+          shopt -s expand_aliases
+          alias conda="mamba"
           conda install "pyctdev>=0.5"
           conda install nodejs
           doit env_create --python=${{ matrix.python-version }}
