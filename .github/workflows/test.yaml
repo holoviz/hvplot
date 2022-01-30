@@ -21,7 +21,7 @@ jobs:
             python-version: 2.7
           - os: macos-latest
             python-version: 2.7
-    timeout-minutes: 60
+    timeout-minutes: 90
     defaults:
       run:
         shell: bash -l {0} 
