@@ -14,10 +14,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['macos-latest']
-        # os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
-        python-version: [3.7]
-        # python-version: [2.7, 3.7, 3.8, 3.9]
+        os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
+        python-version: [2.7, 3.7, 3.8, 3.9]
         exclude:
           - os: windows-latest
             python-version: 2.7
@@ -41,22 +39,18 @@ jobs:
           fetch-depth: "100"
       - uses: actions/setup-python@v2
         with:
-          auto-update-conda: true
           python-version: ${{ matrix.python-version }}
       - uses: conda-incubator/setup-miniconda@v2
         with:
+          auto-update-conda: true
           miniconda-version: "latest"
           channel-priority: strict
           channels: pyviz/label/dev,conda-forge,nodefaults
-          mamba-version: "*"
       - name: Fetch unshallow
         run: git fetch --prune --tags --unshallow
       - name: conda setup
         run: |
-          shopt -s expand_aliases
-          alias conda="mamba"
           conda install "pyctdev>=0.5"
-          conda install nodejs
           doit env_create --python=${{ matrix.python-version }}
       - name: doit develop_install py2
         if: startsWith(matrix.python-version, 2.)
@@ -64,13 +58,13 @@ jobs:
           eval "$(conda shell.bash hook)"
           conda activate test-environment
           conda list
-          doit develop_install ${{ env.CHANS_DEV}} -o tests
+          doit develop_install -o tests
       - name: Handling the decorator package on ubuntu and python 2.7
         if: matrix.os == 'ubuntu-latest' && startsWith(matrix.python-version, 2.)
         run: |
           eval "$(conda shell.bash hook)"
           conda activate test-environment
-          conda install ${{ env.CHANS_DEV}}' decorator=4.4.2'
+          conda install 'decorator=4.4.2'
       - name: doit develop_install py3
         if: startsWith(matrix.python-version, 3.)
         run: |
@@ -78,7 +72,6 @@ jobs:
           conda activate test-environment
           conda list
           doit develop_install -o examples -o tests
-          # doit develop_install ${{ env.CHANS_DEV}} -o examples -o tests
       - name: pygraphviz
         if: contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos')
         run: |
