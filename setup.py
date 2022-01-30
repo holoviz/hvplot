@@ -36,9 +36,10 @@ install_requires = [
 ]
 
 _examples = [
-    'geoviews >=1.9.3',
+    'geoviews >=1.9.1',
     'numba >=0.53.1',
-    'geopandas >=0.9.0',
+    # geopandas-base will be installed with conda, see setup.cfg
+    'geopandas',
     'xarray >=0.17',
     'networkx >=2.6.3',
     'streamz >=0.6.3',
@@ -48,10 +49,10 @@ _examples = [
     'dask >=2021.3.0',
     'datashader >=0.13.0',
     'notebook >=6.4.3',
-    'rasterio >=1.2.0',
-    'cartopy >=0.19.0',
-    'pyproj >=3.0.1',
-    's3fs =>2022.1.0',
+    'rasterio',
+    'cartopy',
+    'pyproj',
+    's3fs >=2022.1.0',
     'scipy >=1.5.3',
     'pillow >=8.3.2',
     'selenium >=3.141.0',
@@ -59,7 +60,7 @@ _examples = [
     'scikit-image >=0.17.2',
     'python-snappy >=0.6.0',
     'pooch >=1.6.0',
-    'fiona >=1.8.18',
+    'fiona',
 ]
 
 _examples_extra = _examples + [
