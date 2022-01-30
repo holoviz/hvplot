@@ -47,11 +47,14 @@ jobs:
         with:
           miniconda-version: "latest"
           channel-priority: strict
+          mamba-version: "*"
       - name: Fetch unshallow
         run: git fetch --prune --tags --unshallow
       - name: conda setup
         run: |
           conda config --set always_yes True
+          shopt -s expand_aliases
+          alias conda="mamba"
           conda install -c pyviz "pyctdev>=0.5"
           doit ecosystem_setup
           conda install nodejs
