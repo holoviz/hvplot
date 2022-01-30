@@ -45,6 +45,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           miniconda-version: "latest"
+          channel-priority: strict
       - name: Fetch unshallow
         run: git fetch --prune --tags --unshallow
       - name: conda setup
@@ -53,7 +54,6 @@ jobs:
           conda install -c pyviz "pyctdev>=0.5"
           doit ecosystem_setup
           conda install nodejs
-          conda config --set channel_priority strict
           doit env_create ${{ env.CHANS_DEV}} --python=${{ matrix.python-version }}
       # - name: conda priority
       #   run: |
