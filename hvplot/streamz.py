@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 def patch(name='hvplot', extension='bokeh', logo=False):
     from . import hvPlotTabular, post_patch
 

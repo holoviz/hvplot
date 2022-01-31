@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import sys
 import inspect
 import textwrap
@@ -77,7 +75,7 @@ def _get_doc_and_signature(cls, kind, completions=False, docstring=True, generic
         signature = inspect.Signature(all_params)
 
     parameters += [(o, None) for o in extra_kwargs]
-    completions = ', '.join(['%s=%s' % (n, v) for n, v in parameters])
+    completions = ', '.join([f'{n}={v}' for n, v in parameters])
     options = textwrap.dedent(converter.__doc__)
     method_doc = _METHOD_DOCS.get(kind, method.__doc__)
     _METHOD_DOCS[kind] = method_doc

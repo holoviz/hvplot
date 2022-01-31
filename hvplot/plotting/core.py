@@ -1,4 +1,3 @@
-from __future__ import absolute_import
 from collections import defaultdict
 
 import param
@@ -12,7 +11,7 @@ from ..converter import HoloViewsConverter
 from ..util import process_dynamic_args
 
 
-class hvPlotBase(object):
+class hvPlotBase:
 
     __all__ = []
 
@@ -91,7 +90,7 @@ class hvPlotBase(object):
         """
         List default attributes and custom defined plots.
         """
-        dirs = super(hvPlotBase, self).__dir__()
+        dirs = super().__dir__()
         return sorted(list(dirs)+list(self._plots))
 
     def __getattribute__(self, name):
@@ -108,7 +107,7 @@ class hvPlotBase(object):
                                    % (plot_opts['kind'], name))
                 plot_opts['kind'] = name
             return hvPlotBase(self._data, **dict(self._metadata, **plot_opts))
-        return super(hvPlotBase, self).__getattribute__(name)
+        return super().__getattribute__(name)
 
 
 class hvPlotTabular(hvPlotBase):

@@ -35,7 +35,7 @@ To start using hvplot have a look at the [installation instructions](https://hvp
 
 ## Installation
 
-hvPlot supports Python 2.7, 3.5, 3.6 and 3.7 on Linux, Windows, or Mac and can be installed with ``conda``:
+hvPlot supports Python 3.6 and 3.7 on Linux, Windows, or Mac and can be installed with ``conda``:
 
 ```
 conda install -c pyviz hvplot

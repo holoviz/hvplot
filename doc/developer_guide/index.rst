@@ -79,7 +79,7 @@ more consistent and general.
     conda create -n hvplot_dev -c pyviz pyctdev python=3.6
 
 Specify the desired Python version, currently hvPlot officially
-supports Python 2.7, 3.5, 3.6 and 3.7. Once the environment has been
+supports Python 3.6 and 3.7. Once the environment has been
 created you can activate it with:
 
 .. code-block:: sh
