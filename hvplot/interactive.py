@@ -129,21 +129,21 @@ class Interactive():
         if is_tabular(current) and hasattr(current, 'columns'):
             extras |= set(current.columns)
         try:
-            return sorted(set(super(Interactive, self).__dir__()) | extras)
+            return sorted(set(super().__dir__()) | extras)
         except Exception:
             return sorted(set(dir(type(self))) | set(self.__dict__) | extras)
 
     def __getattribute__(self, name):
-        self_dict = super(Interactive, self).__getattribute__('__dict__')
+        self_dict = super().__getattribute__('__dict__')
         if not self_dict.get('_init'):
-            return super(Interactive, self).__getattribute__(name)
+            return super().__getattribute__(name)
 
         current = self_dict['_current']
         method = self_dict['_method']
         if method:
             current = getattr(current, method)
         extras = [d for d in dir(current) if not d.startswith('_')]
-        if name in extras and name not in super(Interactive, self).__dir__():
+        if name in extras and name not in super().__dir__():
             if self._method:
                 transform = type(self._transform)(self._transform, self._method, accessor=True)
                 transform._ns = self._current
@@ -162,7 +162,7 @@ class Interactive():
             except Exception:
                 pass
             return new
-        return super(Interactive, self).__getattribute__(name)
+        return super().__getattribute__(name)
 
     @staticmethod
     def _get_ax_fn():

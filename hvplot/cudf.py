@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from .interactive import Interactive
 
 def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=False):

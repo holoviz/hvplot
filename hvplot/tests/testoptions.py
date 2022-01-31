@@ -31,7 +31,7 @@ class TestOptions(ComparisonTestCase):
     def tearDown(self):
         Store.options(val=self.store_copy)
         Store._custom_options = {k:{} for k in Store._custom_options.keys()}
-        super(TestOptions, self).tearDown()
+        super().tearDown()
 
     def test_scatter_legend_position(self):
         plot = self.df.hvplot.scatter('x', 'y', c='category', legend='left')
@@ -332,7 +332,7 @@ class TestXarrayTitle(ComparisonTestCase):
     def tearDown(self):
         Store.options(val=self.store_copy)
         Store._custom_options = {k:{} for k in Store._custom_options.keys()}
-        super(TestXarrayTitle, self).tearDown()
+        super().tearDown()
 
     def test_dataarray_2d_with_title(self):
         da_sel = self.da.sel(time=0, band=0)

@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import xarray as xr
 
 from panel.widgets import Widget

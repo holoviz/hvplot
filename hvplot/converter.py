@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from functools import partial
 import difflib
 
@@ -78,7 +76,7 @@ class StreamingCallable(Callable):
 
 
 
-class HoloViewsConverter(object):
+class HoloViewsConverter:
     """
     Generic options
     ---------------
@@ -423,7 +421,7 @@ class HoloViewsConverter(object):
                 else:
                     raise ValueError(
                         "Projection must be defined as cartopy CRS or "
-                        "one of the following CRS string:\n {0}".format(all_crs))
+                        "one of the following CRS string:\n {}".format(all_crs))
 
             proj_crs = projection or ccrs.GOOGLE_MERCATOR
             if self.crs != proj_crs:
@@ -662,7 +660,7 @@ class HoloViewsConverter(object):
             self.data = data
             if kind is None:
                 if datatype == 'geopandas':
-                    geom_types = set([gt[5:] if 'Multi' in gt else gt for gt in data.geom_type])
+                    geom_types = {gt[5:] if 'Multi' in gt else gt for gt in data.geom_type}
                 else:
                     geom_types = [type(data.geometry.dtype).__name__.replace('Multi', '').replace('Dtype', '')]
                 if len(geom_types) > 1:
@@ -1061,7 +1059,7 @@ class HoloViewsConverter(object):
         else:
             valid_opts = []
         ds_opts = ['max_px', 'threshold']
-        mismatches = sorted([k for k in kwds if k not in kind_opts+ds_opts+valid_opts])
+        mismatches = sorted(k for k in kwds if k not in kind_opts+ds_opts+valid_opts)
         if not mismatches:
             return
 
@@ -1955,7 +1953,7 @@ class HoloViewsConverter(object):
         data, x, y, z = self._process_gridded_args(data, x, y, z)
 
         if not (x and y):
-            x, y = list([k for k, v in data.coords.items() if v.size > 1])
+            x, y = list(k for k, v in data.coords.items() if v.size > 1)
         if not z:
             z = list(data.data_vars)[0]
         z = [z] + self.hover_cols
@@ -2016,7 +2014,7 @@ class HoloViewsConverter(object):
         data, x, y, _ = self._process_gridded_args(data, x, y, z=None)
 
         if not (x and y):
-            x, y = list([k for k, v in data.coords.items() if v.size > 1])
+            x, y = list(k for k, v in data.coords.items() if v.size > 1)
 
         angle = self.kwds.get('angle')
         mag = self.kwds.get('mag')

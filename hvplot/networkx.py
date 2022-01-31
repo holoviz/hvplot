@@ -59,8 +59,8 @@ def _from_networkx(G, positions, nodes=None, cls=Graph, **kwargs):
             end = str(end)
         edges['start'].append(start)
         edges['end'].append(end)
-    edge_cols = sorted([k for k in edges if k not in ('start', 'end')
-                        and len(edges[k]) == len(edges['start'])])
+    edge_cols = sorted(k for k in edges if k not in ('start', 'end')
+                        and len(edges[k]) == len(edges['start']))
     edge_vdims = [str(col) if isinstance(col, int) else col for col in edge_cols]
     edge_data = tuple(edges[col] for col in ['start', 'end']+edge_cols)
 
@@ -93,8 +93,8 @@ def _from_networkx(G, positions, nodes=None, cls=Graph, **kwargs):
         if isinstance(idx, tuple):
             idx = str(idx) # Tuple node indexes handled as strings
         node_columns[idim.name].append(idx)
-    node_cols = sorted([k for k in node_columns if k not in cls.node_type.kdims
-                        and len(node_columns[k]) == len(node_columns[xdim.name])])
+    node_cols = sorted(k for k in node_columns if k not in cls.node_type.kdims
+                        and len(node_columns[k]) == len(node_columns[xdim.name]))
     columns = [xdim.name, ydim.name, idim.name]+node_cols+list(info_cols)
     node_data = tuple(node_columns[col] for col in columns)
 
