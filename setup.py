@@ -113,6 +113,7 @@ setup_args = dict(
     classifiers = [
         "License :: OSI Approved :: BSD License",
         "Development Status :: 5 - Production/Stable",
+        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Operating System :: OS Independent",
@@ -121,7 +122,7 @@ setup_args = dict(
         "Natural Language :: English",
         "Topic :: Scientific/Engineering",
         "Topic :: Software Development :: Libraries"],
-    python_requires=">=3.7",
+    python_requires=">=3.6",
     install_requires=install_requires,
     extras_require=extras_require,
     tests_require=extras_require['tests'],
