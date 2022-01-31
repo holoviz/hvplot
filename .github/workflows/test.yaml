@@ -69,6 +69,7 @@ jobs:
           eval "$(conda shell.bash hook)"
           conda activate test-environment
           conda list
+          mamba install "pip <22"
           mamba install "param >=1.7.0" "pyct >=0.4.4" "setuptools >=30.3.0"
           mamba install "bokeh >=1.0.0" "colorcet >=2" "holoviews >=1.11.0" "pandas" "numpy >=1.15" "geoviews >=1.6.0" "numba >=0.51.0" "geopandas" "xarray" "networkx" "streamz >=0.3.0" "intake" "intake-parquet" "intake-xarray" "dask" "datashader >=0.6.5" "notebook >=5.4" "rasterio" "cartopy" "pyproj" "s3fs" "scipy" "pillow" "selenium" "spatialpandas" "scikit-image" "python-snappy" "pooch" "fiona" "pyepsg" "codecov" "flake8" "parameterized" "pytest" "pytest-cov" "nbsmoke >=0.2.0" "numpy >=1.7"
           pip install --no-deps --no-build-isolation -e .
