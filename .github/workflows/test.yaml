@@ -43,7 +43,6 @@ jobs:
           miniconda-version: "latest"
           channel-priority: strict
           channels: pyviz/label/dev,conda-forge,nodefaults
-          mamba-version: "*"
       - name: Fetch unshallow
         run: git fetch --prune --tags --unshallow
       - name: conda setup
@@ -64,31 +63,30 @@ jobs:
           conda activate test-environment
           conda install 'decorator=4.4.2'
       - name: doit develop_install py3
-        if: startsWith(matrix.python-version, 3.)
+        if: startsWith(matrix.python-version, 3.) && matrix.python-version != '3.6'
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda activate test-environment
+          conda list
+          doit develop_install -o examples -o tests
+      - name: doit develop_install py36
+        if: matrix.python-version == '3.6'
         run: |
           eval "$(conda shell.bash hook)"
           conda activate test-environment
           conda list
           conda install "pip <22"
-          # mamba install "param >=1.7.0" "pyct >=0.4.4" "setuptools >=30.3.0"
-          # mamba install "bokeh >=1.0.0" "colorcet >=2" "holoviews >=1.11.0" "pandas" "numpy >=1.15" "geoviews >=1.6.0" "numba >=0.51.0" "geopandas" "xarray" "networkx" "streamz >=0.3.0" "intake" "intake-parquet" "intake-xarray" "dask" "datashader >=0.6.5" "notebook >=5.4" "rasterio" "cartopy" "pyproj" "s3fs" "scipy" "pillow" "selenium" "spatialpandas" "scikit-image" "python-snappy" "pooch" "fiona" "pyepsg" "codecov" "flake8" "parameterized" "pytest" "pytest-cov" "nbsmoke >=0.2.0" "numpy >=1.7"
-          # pip install --no-deps --no-build-isolation -e .
-          doit develop_install -o examples -o tests
+          doit develop_install -o tests
+          # Pin panel on Python 3.6 because one or more dev releases on the 0.13.* series
+          # can be installed on Python 3.6 but are actually not compatible with Python 3.6
+          # Panel 0.13 will support Python >= 3.7 only so the pin here can stay indefinitely.
+          conda install "panel=0.12"
       - name: pygraphviz
-        if: contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos')
+        if: (contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos'))  && matrix.python-version != '3.6'
         run: |
           eval "$(conda shell.bash hook)"
           conda activate test-environment
           conda install pygraphviz
-      # Pin panel on Python 3.6 because one or more dev releases on the 0.13.* series
-      # can be installed on Python 3.6 but are actually not compatible with Python 3.6
-      # Panel 0.13 will support Python >= 3.7 only so the pin here can stay indefinitely.
-      - name: Pin panel on py36
-        if: matrix.python-version == '3.6' && startsWith(matrix.python-version, 3.)
-        run: |
-          eval "$(conda shell.bash hook)"
-          conda activate test-environment
-          conda install "panel=0.12"
       - name: doit env_capture
         run: |
           eval "$(conda shell.bash hook)"
