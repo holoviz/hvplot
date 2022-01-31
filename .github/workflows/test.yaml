@@ -82,6 +82,15 @@ jobs:
           eval "$(conda shell.bash hook)"
           conda activate test-environment
           conda install pygraphviz
+      # Pin panel on Python 3.6 because one or more dev releases on the 0.13.* series
+      # can be installed on Python 3.6 but are actually not compatible with Python 3.6
+      # Panel 0.13 will support Python >= 3.7 only so the pin here can stay indefinitely.
+      - name: Pin panel on py36
+        if: matrix.python-version == '3.6' && startsWith(matrix.python-version, 3.)
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda activate test-environment
+          conda install "panel=0.12"
       - name: doit env_capture
         run: |
           eval "$(conda shell.bash hook)"
