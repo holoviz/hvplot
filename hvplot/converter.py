@@ -1209,8 +1209,11 @@ class HoloViewsConverter:
         try:
             from holoviews.operation.datashader import datashade, rasterize, dynspread
             from datashader import reductions
-        except:
-            raise ImportError('Datashading is not available')
+        except ImportError:
+            raise ImportError('In order to use datashading features '
+                    'the Datashader library must be available. '
+                    'It can be installed with:\n  conda '
+                    'install -c pyviz datashader')
 
         opts = dict(dynamic=self.dynamic)
         if self._plot_opts.get('width') is not None:
