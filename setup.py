@@ -61,6 +61,8 @@ _examples = [
     'python-snappy >=0.6.0',
     'pooch >=1.6.0',
     'fiona',
+    # Extra dependency of cartopy on Python 3.6 only
+    'pyepsg',
 ]
 
 _examples_extra = _examples + [
