@@ -48,7 +48,7 @@ _examples = [
     'intake-xarray >=0.5.0',
     'dask >=2021.3.0',
     'datashader >=0.13.0',
-    'notebook >=6.4.3',
+    'notebook >=6.3',
     'rasterio',
     'cartopy',
     'pyproj',
