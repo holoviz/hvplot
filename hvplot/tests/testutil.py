@@ -4,10 +4,11 @@ Tests  utilities to convert data and projections
 import sys
 
 import numpy as np
+import pytest
 
 from unittest import TestCase, SkipTest
 
-from hvplot.util import process_xarray  # noqa
+from hvplot.util import check_crs, process_xarray
 
 
 class TestProcessXarray(TestCase):
@@ -266,3 +267,11 @@ class TestDynamicArgs(TestCase):
         assert dynamic == {}
         assert arg_names == ['c', 'c']
         assert len(arg_deps) == 2
+
+
+def test_check_crs():
+    pytest.importorskip("pyproj")
+    p = check_crs('epsg:26915 +units=m')
+    assert p.srs == '+proj=utm +zone=15 +datum=NAD83 +units=m +no_defs'
+    p = check_crs('wrong')
+    assert p is None

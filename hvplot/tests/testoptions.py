@@ -371,7 +371,7 @@ class TestXarrayTitle(ComparisonTestCase):
 
     def test_dataset_empty_raises(self):
         with self.assertRaisesRegex(ValueError, 'empty xarray.Dataset'):
-            self.ds1.drop('foo').hvplot()
+            self.ds1.drop_vars('foo').hvplot()
 
     def test_dataset_one_var_behaves_like_dataarray(self):
         ds_sel = self.ds1.sel(time=0, band=0)
