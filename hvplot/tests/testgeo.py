@@ -2,6 +2,7 @@ import sys
 
 from unittest import TestCase, SkipTest, expectedFailure
 
+from distutils.version import LooseVersion
 import numpy as np
 import pandas as pd
 import holoviews as hv
@@ -27,7 +28,11 @@ class TestGeo(TestCase):
         self.crs = ccrs.epsg(self.da.crs.split('epsg:')[1])
 
     def assertCRS(self, plot, proj='utm'):
-        assert plot.crs.to_dict()['proj'] == proj
+        import cartopy
+        if LooseVersion(cartopy.__version__) < LooseVersion('0.20'):
+            assert plot.crs.proj4_params['proj'] == proj
+        else:
+            assert plot.crs.to_dict()['proj'] == proj
 
     def assert_projection(self, plot, proj):
         opts = hv.Store.lookup_options('bokeh', plot, 'plot')
