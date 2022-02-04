@@ -30,6 +30,7 @@ def is_interactive_opt(bk_opt: str) -> bool:
     True
     """
     interactive_flags = [
+        'hover',
         'muted',
         'nonselection',
         'selection',
