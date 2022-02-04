@@ -22,7 +22,7 @@ _text_baseline_bk_mpl_mapping = {
     'ideographic': UNSET,
 }
 
-def is_interactive_opt(bk_opt: str) -> bool:
+def is_interactive_opt(bk_opt):
     """
     >>> is_interactive_opt('height')
     False
