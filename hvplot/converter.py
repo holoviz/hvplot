@@ -1,7 +1,4 @@
-from __future__ import absolute_import
-
 import difflib
-
 from functools import partial
 
 import param
@@ -418,7 +415,7 @@ class StreamingCallable(Callable):
 
 
 
-class HoloViewsConverter(object):
+class HoloViewsConverter:
     """
     Generic options
     ---------------
@@ -525,14 +522,17 @@ class HoloViewsConverter(object):
         (warning: for large groupby operations embedded data can become
         very large if dynamic=False)
     datashade (default=False):
-        Whether to apply rasterization and shading using datashader
-        library returning an RGB object
+        Whether to apply rasterization and shading (colormapping) using
+        the Datashader library, returning an RGB object instead of 
+        individual points
     dynspread (default=False):
-        Allows plots generated with datashade=True or rasterize=True 
-        to increase the point size to make sparse regions more visible
+        For plots generated with datashade=True or rasterize=True, 
+        automatically increase the point size when the data is sparse
+        so that individual points become more visible
     rasterize (default=False):
-        Whether to apply rasterization using the datashader library
-        returning an aggregated Image
+        Whether to apply rasterization using the Datashader library,
+        returning an aggregated Image (to be colormapped by the 
+        plotting backend) instead of individual points
     x_sampling/y_sampling (default=None):
         Specifies the smallest allowed sampling interval along the x/y axis.
 
@@ -565,7 +565,8 @@ class HoloViewsConverter(object):
     """
 
     _gridded_types = [
-        'image', 'contour', 'contourf', 'quadmesh', 'rgb', 'points', 'dataset'
+        'image', 'contour', 'contourf', 'quadmesh', 'rgb', 'points',
+        'dataset'
     ]
 
     _geom_types = ['paths', 'polygons']
@@ -575,71 +576,113 @@ class HoloViewsConverter(object):
 
     _stats_types = ['hist', 'kde', 'violin', 'box', 'density']
 
-    _data_options = ['x', 'y', 'kind', 'by', 'use_index', 'use_dask',
-                     'dynamic', 'crs', 'value_label', 'group_label',
-                     'backlog', 'persist', 'sort_date']
+    _data_options = [
+        'x', 'y', 'kind', 'by', 'use_index', 'use_dask', 'dynamic',
+        'crs', 'value_label', 'group_label', 'backlog', 'persist',
+        'sort_date'
+    ]
 
-    _geo_options = ['geo', 'crs', 'features', 'project', 'coastline', 'tiles']
+    _geo_options = [
+        'geo', 'crs', 'features', 'project', 'coastline', 'tiles'
+    ]
 
-    _axis_options = ['width', 'height', 'shared_axes', 'grid', 'legend',
-                     'rot', 'xlim', 'ylim', 'xticks', 'yticks', 'colorbar',
-                     'invert', 'title', 'logx', 'logy', 'loglog', 'xaxis',
-                     'yaxis', 'xformatter', 'yformatter', 'xlabel', 'ylabel',
-                     'clabel', 'padding', 'responsive', 'max_height', 'max_width',
-                     'min_height', 'min_width', 'frame_height', 'frame_width',
-                     'aspect', 'data_aspect', 'fontscale']
+    _axis_options = [
+        'width', 'height', 'shared_axes', 'grid', 'legend',
+        'rot', 'xlim', 'ylim', 'xticks', 'yticks', 'colorbar',
+        'invert', 'title', 'logx', 'logy', 'loglog', 'xaxis',
+        'yaxis', 'xformatter', 'yformatter', 'xlabel', 'ylabel',
+        'clabel', 'padding', 'responsive', 'max_height', 'max_width',
+        'min_height', 'min_width', 'frame_height', 'frame_width',
+        'aspect', 'data_aspect', 'fontscale'
+    ]
 
-    _style_options = ['color', 'alpha', 'colormap', 'fontsize', 'c', 'cmap',
-                      'color_key', 'cnorm']
+    _style_options = [
+        'color', 'alpha', 'colormap', 'fontsize', 'c', 'cmap',
+        'color_key', 'cnorm'
+    ]
 
-    _op_options = ['datashade', 'rasterize', 'x_sampling', 'y_sampling',
-                   'aggregator']
+    _op_options = [
+        'datashade', 'rasterize', 'x_sampling', 'y_sampling',
+        'aggregator'
+    ]
 
+    # Options specific to a particular plot type
     _kind_options = {
-        'scatter'  : ['s', 'c', 'scale', 'logz', 'marker'],
-        'step'     : ['where'],
         'area'     : ['y2'],
         'errorbars': ['yerr1', 'yerr2'],
-        'ohlc'     : ['bar_width', 'pos_color', 'neg_color', 'line_color'],
-        'hist'     : ['bins', 'bin_range', 'normed', 'cumulative'],
-        'heatmap'  : ['C', 'reduce_function', 'logz'],
-        'hexbin'   : ['C', 'reduce_function', 'gridsize', 'logz', 'min_count'],
-        'dataset'  : ['columns'],
-        'table'    : ['columns'],
-        'image'    : ['z', 'logz'],
-        'rgb'      : ['z', 'bands'],
-        'quadmesh' : ['z', 'logz'],
+        'bivariate': ['bandwidth', 'cut', 'filled', 'levels'],
         'contour'  : ['z', 'levels', 'logz'],
         'contourf' : ['z', 'levels', 'logz'],
-        'vectorfield': ['angle', 'mag'],
+        'dataset'  : ['columns'],
+        'heatmap'  : ['C', 'reduce_function', 'logz'],
+        'hexbin'   : ['C', 'reduce_function', 'gridsize', 'logz', 'min_count'],
+        'hist'     : ['bins', 'bin_range', 'normed', 'cumulative'],
+        'image'    : ['z', 'logz'],
+        'kde'      : ['bw_method', 'ind', 'bandwidth', 'cut', 'filled'],
+        'labels'   : ['text', 'c', 'xoffset', 'yoffset', 'text_font', 'text_font_size'],
+        'ohlc'     : ['bar_width', 'pos_color', 'neg_color', 'line_color'],
         'points'   : ['s', 'marker', 'c', 'scale', 'logz'],
         'polygons' : ['logz', 'c'],
-        'labels'   : ['text', 'c', 'xoffset', 'yoffset', 'text_font', 'text_font_size'],
-        'kde'      : ['bw_method', 'ind', 'bandwidth', 'cut', 'filled'],
-        'bivariate': ['bandwidth', 'cut', 'filled', 'levels']
+        'rgb'      : ['z', 'bands'],
+        'scatter'  : ['s', 'c', 'scale', 'logz', 'marker'],
+        'step'     : ['where'],
+        'table'    : ['columns'],
+        'quadmesh' : ['z', 'logz'],
+        'vectorfield': ['angle', 'mag'],
     }
 
+    # Mapping from kind to HoloViews element type
     _kind_mapping = {
-        'line': Curve, 'scatter': Scatter, 'heatmap': HeatMap,
-        'bivariate': Bivariate, 'quadmesh': QuadMesh, 'hexbin': HexTiles,
-        'image': Image, 'table': Table, 'hist': Histogram, 'dataset': Dataset,
-        'kde': Distribution, 'density': Distribution, 'area': Area, 'box': BoxWhisker, 'violin': Violin,
-        'bar': Bars, 'barh': Bars, 'contour': Contours, 'contourf': Polygons,
-        'points': Points, 'polygons': Polygons, 'paths': Path, 'step': Curve,
-        'labels': Labels, 'rgb': RGB, 'errorbars': ErrorBars,
-        'vectorfield': VectorField, 'ohlc': Rectangles
+        'area': Area,
+        'bar': Bars,
+        'barh': Bars,
+        'bivariate': Bivariate,
+        'box': BoxWhisker,
+        'contour': Contours,
+        'contourf': Polygons,
+        'dataset': Dataset,
+        'density': Distribution,
+        'errorbars': ErrorBars,
+        'hist': Histogram,
+        'image': Image,
+        'kde': Distribution,
+        'labels': Labels,
+        'line': Curve,
+        'scatter': Scatter,
+        'heatmap': HeatMap,
+        'hexbin': HexTiles,
+        'ohlc': Rectangles,
+        'paths': Path,
+        'points': Points,
+        'polygons': Polygons,
+        'quadmesh': QuadMesh,
+        'rgb': RGB,
+        'step': Curve,
+        'table': Table,
+        'vectorfield': VectorField,
+        'violin': Violin
     }
 
-    _colorbar_types = ['image', 'hexbin', 'heatmap', 'quadmesh', 'bivariate',
-                       'contour', 'contourf', 'polygons']
+    # Types which have a colorbar by default
+    _colorbar_types = [
+        'bivariate', 'contour', 'contourf', 'heatmap', 'image',
+        'hexbin', 'quadmesh', 'polygons'
+    ]
 
-    _legend_positions = ("top_right", "top_left", "bottom_left",
-                         "bottom_right", "right", "left", "top",
-                         "bottom")
+    _legend_positions = (
+        "top_right", "top_left", "bottom_left", "bottom_right",
+        "right", "left", "top", "bottom"
+    )
 
     _default_plot_opts = {
-        'logx': False, 'logy': False, 'show_legend': True, 'legend_position': 'right',
-        'show_grid': False, 'responsive': False, 'shared_axes': True}
+        'logx': False,
+        'logy': False,
+        'show_legend': True,
+        'legend_position': 'right',
+        'show_grid': False,
+        'responsive': False,
+        'shared_axes': True
+    }
 
     _default_cmaps = {
         'linear': 'kbc_r',
@@ -648,27 +691,24 @@ class HoloViewsConverter(object):
         'diverging': 'coolwarm'
     }
 
-    def __init__(self, data, x, y, kind=None, by=None, use_index=True,
-                 group_label=None, value_label='value',
-                 backlog=1000, persist=False, use_dask=False,
-                 crs=None, fields={}, groupby=None, dynamic=True,
-                 grid=None, legend=None, rot=None, title=None,
-                 xlim=None, ylim=None, clim=None, symmetric=None,
-                 logx=None, logy=None, loglog=None, hover=None,
-                 subplots=False, label=None, invert=False,
-                 stacked=False, colorbar=None,
-                 datashade=False, rasterize=False, row=None, col=None,
-                 figsize=None, debug=False, framewise=True,
-                 aggregator=None, projection=None, global_extent=None,
-                 geo=False, precompute=False, flip_xaxis=None,
-                 flip_yaxis=None, dynspread=False, hover_cols=[],
-                 x_sampling=None, y_sampling=None, project=False,
-                 tools=[], attr_labels=None, coastline=False,
-                 tiles=False, sort_date=True, check_symmetric_max=1000000,
-                 transforms={}, stream=None, cnorm=None, features=None,
-                 backends=None, **kwds):
-
-
+    def __init__(
+        self, data, x, y, kind=None, by=None, use_index=True,
+        group_label=None, value_label='value', backlog=1000,
+        persist=False, use_dask=False, crs=None, fields={},
+        groupby=None, dynamic=True, grid=None, legend=None, rot=None,
+        title=None, xlim=None, ylim=None, clim=None, symmetric=None,
+        logx=None, logy=None, loglog=None, hover=None, subplots=False,
+        label=None, invert=False, stacked=False, colorbar=None,
+        datashade=False, rasterize=False, row=None, col=None,
+        figsize=None, debug=False, framewise=True, aggregator=None,
+        projection=None, global_extent=None, geo=False,
+        precompute=False, flip_xaxis=None, flip_yaxis=None,
+        dynspread=False, hover_cols=[], x_sampling=None,
+        y_sampling=None, project=False, tools=[], attr_labels=None,
+        coastline=False, tiles=False, sort_date=True,
+        check_symmetric_max=1000000, transforms={}, stream=None,
+        cnorm=None, features=None, backends=None, **kwds
+    ):
         # Process data and related options
         self._redim = fields
         self.use_index = use_index
@@ -720,7 +760,7 @@ class HoloViewsConverter(object):
                 else:
                     raise ValueError(
                         "Projection must be defined as cartopy CRS or "
-                        "one of the following CRS string:\n {0}".format(all_crs))
+                        "one of the following CRS string:\n {}".format(all_crs))
 
             proj_crs = projection or ccrs.GOOGLE_MERCATOR
             if self.crs != proj_crs:
@@ -847,6 +887,7 @@ class HoloViewsConverter(object):
             plot_opts['global_extent'] = global_extent
         if projection:
             plot_opts['projection'] = process_crs(projection)
+        title = title if title is not None else getattr(self, '_title', None)
         if title is not None:
             plot_opts['title'] = title
         if (self.kind in self._colorbar_types or self.rasterize or self.datashade or self._color_dim):
@@ -907,6 +948,9 @@ class HoloViewsConverter(object):
         else:
             return
 
+        if data.size == 0:
+            return False
+        
         cmin = np.nanquantile(data, 0.05)
         cmax = np.nanquantile(data, 0.95)
 
@@ -1006,7 +1050,7 @@ class HoloViewsConverter(object):
             self.data = data
             if kind is None:
                 if datatype == 'geopandas':
-                    geom_types = set([gt[5:] if 'Multi' in gt else gt for gt in data.geom_type])
+                    geom_types = {gt[5:] if 'Multi' in gt else gt for gt in data.geom_type}
                 else:
                     geom_types = [type(data.geometry.dtype).__name__.replace('Multi', '').replace('Dtype', '')]
                 if len(geom_types) > 1:
@@ -1047,6 +1091,9 @@ class HoloViewsConverter(object):
         elif is_xarray(data):
             import xarray as xr
             z = kwds.get('z')
+            if isinstance(data, xr.Dataset):
+                if len(data.data_vars) == 0:
+                    raise ValueError("Cannot plot an empty xarray.Dataset object.")
             if z is None:
                 if isinstance(data, xr.Dataset):
                     z = list(data.data_vars)[0]
@@ -1096,6 +1143,15 @@ class HoloViewsConverter(object):
 
             if groupby:
                 groupby = [g for g in groupby if g not in grid]
+
+            # Add a title to hvplot.xarray plots that displays scalar coords values,
+            # as done by xarray.plot()  
+            if not groupby and not grid:
+                if isinstance(da, xr.DataArray):
+                    self._title = da._title_for_slice()
+                elif isinstance(da, xr.Dataset):
+                    self._title = partial(xr.DataArray._title_for_slice, da)()
+                        
             self.data = data
         else:
             raise ValueError('Supplied data type %s not understood' % type(data).__name__)
@@ -1393,7 +1449,7 @@ class HoloViewsConverter(object):
         else:
             valid_opts = []
         ds_opts = ['max_px', 'threshold']
-        mismatches = sorted([k for k in kwds if k not in kind_opts+ds_opts+valid_opts])
+        mismatches = sorted(k for k in kwds if k not in kind_opts+ds_opts+valid_opts)
         if not mismatches:
             return
 
@@ -1545,8 +1601,11 @@ class HoloViewsConverter(object):
         try:
             from holoviews.operation.datashader import datashade, rasterize, dynspread
             from datashader import reductions
-        except:
-            raise ImportError('Datashading is not available')
+        except ImportError:
+            raise ImportError('In order to use datashading features '
+                    'the Datashader library must be available. '
+                    'It can be installed with:\n  conda '
+                    'install -c pyviz datashader')
 
         opts = dict(dynamic=self.dynamic)
         if self._plot_opts.get('width') is not None:
@@ -2292,7 +2351,7 @@ class HoloViewsConverter(object):
         data, x, y, z = self._process_gridded_args(data, x, y, z)
 
         if not (x and y):
-            x, y = list([k for k, v in data.coords.items() if v.size > 1])
+            x, y = list(k for k, v in data.coords.items() if v.size > 1)
         if not z:
             z = list(data.data_vars)[0]
         z = [z] + self.hover_cols
@@ -2334,17 +2393,26 @@ class HoloViewsConverter(object):
         levels = self.kwds.get('levels', 5)
         if isinstance(levels, int):
             opts['color_levels'] = levels
-        opts['clim'] = self._dim_ranges['c']
         return contours(qmesh, filled=filled, levels=levels).opts(**opts, backend='bokeh')
 
     def contourf(self, x=None, y=None, z=None, data=None):
-        return self.contour(x, y, z, data, filled=True)
+        contourf = self.contour(x, y, z, data, filled=True)
+        # The holoviews contours operation used in self.contour adapts
+        # the value dim range, so we need to redimension it if the user
+        # has asked for it by setting `clim`. Internally an unset `clim`
+        # is identified by `(None, None)`.
+        if self._dim_ranges['c'] != (None, None):
+            z_name = contourf.vdims[0].name
+            redim = {z_name: self._dim_ranges['c']}
+        else:
+            redim = {}
+        return contourf.redim.range(**redim)
 
     def vectorfield(self, x=None, y=None, angle=None, mag=None, data=None):
         data, x, y, _ = self._process_gridded_args(data, x, y, z=None)
 
         if not (x and y):
-            x, y = list([k for k, v in data.coords.items() if v.size > 1])
+            x, y = list(k for k, v in data.coords.items() if v.size > 1)
 
         angle = self.kwds.get('angle')
         mag = self.kwds.get('mag')

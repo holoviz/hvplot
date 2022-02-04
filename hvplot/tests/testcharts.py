@@ -78,7 +78,7 @@ class TestChart2D(ComparisonTestCase):
 class TestChart2DDask(TestChart2D):
 
     def setUp(self):
-        super(TestChart2DDask, self).setUp()
+        super().setUp()
         try:
             import dask.dataframe as dd
         except:
@@ -320,7 +320,7 @@ class TestChart1D(ComparisonTestCase):
 class TestChart1DDask(TestChart1D):
 
     def setUp(self):
-        super(TestChart1DDask, self).setUp()
+        super().setUp()
         try:
             import dask.dataframe as dd
         except:

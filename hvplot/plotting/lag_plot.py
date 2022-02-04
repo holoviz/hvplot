@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import numpy as np
 import pandas as pd
 
@@ -28,7 +26,7 @@ def lag_plot(data, lag=1, **kwds):
 
     values = data.values
     y1 = 'y(t)'
-    y2 = 'y(t + {0})'.format(lag)
+    y2 = f'y(t + {lag})'
     lags = pd.DataFrame({y1: values[:-lag].T.ravel(),
                          y2: values[lag:].T.ravel()})
     if isinstance(data, pd.DataFrame):

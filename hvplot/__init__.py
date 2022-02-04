@@ -1,10 +1,9 @@
-from __future__ import absolute_import
-
 import sys
 import inspect
 import textwrap
 
 import param
+import panel as _pn
 import holoviews as _hv
 
 from holoviews import Store
@@ -76,7 +75,7 @@ def _get_doc_and_signature(cls, kind, completions=False, docstring=True, generic
         signature = inspect.Signature(all_params)
 
     parameters += [(o, None) for o in extra_kwargs]
-    completions = ', '.join(['%s=%s' % (n, v) for n, v in parameters])
+    completions = ', '.join([f'{n}={v}' for n, v in parameters])
     options = textwrap.dedent(converter.__doc__)
     method_doc = _METHOD_DOCS.get(kind, method.__doc__)
     _METHOD_DOCS[kind] = method_doc
@@ -109,7 +108,12 @@ def help(kind=None, docstring=True, generic=True, style=True):
 
 def post_patch(extension='bokeh', logo=False):
     if extension and not getattr(_hv.extension, '_loaded', False):
-        _hv.extension(extension, logo=logo)
+        if getattr(_pn.extension, '_loaded', False):
+            ext = _hv.extension._backends[extension]
+            __import__('holoviews.plotting.%s' % ext)
+            _hv.Store.set_current_backend(extension)
+        else:
+            _hv.extension(extension, logo=logo)
 
 
 def _patch_doc(cls, kind):
