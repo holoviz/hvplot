@@ -75,8 +75,9 @@ extras_require = {
         'parameterized',
         'pytest',
         'pytest-cov',
-        'nbsmoke >=0.2.0',
-        'numpy >=1.7'
+        'numpy >=1.7',
+        'nbqa',
+        'nbval',
     ],
     'examples': _examples,
     'examples_extra': _examples_extra,
