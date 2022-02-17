@@ -8,6 +8,7 @@ from holoviews.plotting.util import COLOR_ALIASES
 
 UNSET = type('UNSET', (), {})
 
+
 def _transform_size(width, height, aspect):
     opts = {}
     if width and height:
@@ -22,7 +23,12 @@ def _transform_size(width, height, aspect):
         opts = {'fig_size': (height/300.)*100}
     return opts
 
+
 def _transfer_opts(element, backend):
+    """
+    Transfer the options of an element to another backend
+    based on an internal mapping of option transforms.
+    """
     elname = type(element).__name__
     options = Store.options(backend=backend)
     transforms = BACKEND_TRANSFORMS[backend]
@@ -31,16 +37,18 @@ def _transfer_opts(element, backend):
             _transfer_opts, backend=backend, per_element=True
         )
     new_opts = {}
-    # print(new_opts)
     el_options = element.opts.get(backend='bokeh', defaults=False).kwargs
     print('el_options\n', el_options)
     for grp, el_opts in options[elname].groups.items():
         print(grp, 'el_options allowed_keywords\n', el_opts.allowed_keywords)
         for opt, val in el_options.items():
-            if backend == 'matplotlib' and is_interactive_opt(opt):
-                transform = UNSET
             # print('    < before', opt, val)
             transform = transforms.get(grp, {}).get(opt, None)
+            # This condition could be applied to matplotlib only
+            # but is applied to plotly too since there seems to be
+            # no interactive options available like for the bokeh backend
+            if transform is None and _is_interactive_opt(opt):
+                transform = UNSET
             if transform is UNSET:
                 print(f'Element: {elname: <10} | {backend: <10} | {grp: <6} | {opt: <20}: UNSET')
                 continue
@@ -56,9 +64,7 @@ def _transfer_opts(element, backend):
                 else:
                     print(f'Element: {elname: <10} | {backend: <10} | {grp: <6} | {opt: <20}: Not supported at all')
                 continue
-            # print('    > after   ', opt, val)
             new_opts[opt] = val
-    # print(new_opts)
     if backend == 'matplotlib':
         size_opts = _transform_size(
             el_options.get('width'), el_options.get('height'),
@@ -66,9 +72,27 @@ def _transfer_opts(element, backend):
         )
         new_opts.update(size_opts)
     print(new_opts)
-    new_element = element.opts(**new_opts, backend=backend)
-    # breakpoint()
-    return new_element
+    return element.opts(**new_opts, backend=backend)
+
+
+def _is_interactive_opt(bk_opt):
+    """
+    Heuristics to detect if a bokeh option is about interactivity, like
+    'selection_alpha'.
+
+    >>> is_interactive_opt('height')
+    False
+    >>> is_interactive_opt('annular_muted_alpha')
+    True
+    """
+    interactive_flags = [
+        'hover',
+        'muted',
+        'nonselection',
+        'selection',
+    ]
+    return any(part in interactive_flags for part in bk_opt.split('_'))
+
 
 # Matplotlib transforms
 
@@ -85,22 +109,6 @@ _text_baseline_bk_mpl_mapping = {
     'hanging': UNSET,
     'ideographic': UNSET,
 }
-
-def is_interactive_opt(bk_opt):
-    """
-    >>> is_interactive_opt('height')
-    False
-    >>> is_interactive_opt('annular_muted_alpha')
-    True
-    """
-    interactive_flags = [
-        'hover',
-        'muted',
-        'nonselection',
-        'selection',
-    ]
-    return any(part in interactive_flags for part in bk_opt.split('_'))
-
 
 MATPLOTLIB_TRANSFORMS = {
     'plot': {
@@ -143,59 +151,18 @@ MATPLOTLIB_TRANSFORMS = {
         'line_dash': lambda k, v: ('linestyle', v),
         'line_join': lambda k, v: ('joinstyle', v),
         'line_width': lambda k, v: ('linewidth', v),
-        'nonselection_alpha': UNSET,
-        'nonselection_color': UNSET,
-        'nonselection_line_alpha': UNSET,
-        'nonselection_line_color': UNSET,
-        'selection_alpha': UNSET,
-        'selection_color': UNSET,
-        'selection_line_alpha': UNSET,
-        'selection_line_color': UNSET,
-        'hover_alpha': UNSET,
-        'hover_color': UNSET,
-        'hover_line_alpha': UNSET,
-        'hover_line_color': UNSET,
-        'muted': UNSET,
-        'muted_alpha': UNSET,
-        'muted_color': UNSET,
-        'muted_line_alpha': UNSET,
-        'muted_line_color': UNSET,
+        'palette': UNSET,
         'click_policy': UNSET,
         'annular_alpha': UNSET,
         'annular_color': UNSET,
         'annular_fill_alpha': UNSET,
         'annular_fill_color': UNSET,
-        'annular_hover_alpha': UNSET,
-        'annular_hover_color': UNSET,
-        'annular_hover_fill_alpha': UNSET,
-        'annular_hover_fill_color': UNSET,
-        'annular_hover_line_alpha': UNSET,
-        'annular_hover_line_color': UNSET,
         'annular_line_alpha': UNSET,
         'annular_line_cap': UNSET,
         'annular_line_color': lambda k, v: ('annular_edgecolors', v),
         'annular_line_dash': UNSET,
         'annular_line_join': UNSET,
         'annular_line_width': lambda k, v: ('annular_linewidth', v),
-        'annular_muted': UNSET,
-        'annular_muted_alpha': UNSET,
-        'annular_muted_color': UNSET,
-        'annular_muted_fill_alpha': UNSET,
-        'annular_muted_fill_color': UNSET,
-        'annular_muted_line_alpha': UNSET,
-        'annular_muted_line_color': UNSET,
-        'annular_nonselection_alpha': UNSET,
-        'annular_nonselection_color': UNSET,
-        'annular_nonselection_fill_alpha': UNSET,
-        'annular_nonselection_fill_color': UNSET,
-        'annular_nonselection_line_alpha': UNSET,
-        'annular_nonselection_line_color': UNSET,
-        'annular_selection_alpha': UNSET,
-        'annular_selection_color': UNSET,
-        'annular_selection_fill_alpha': UNSET,
-        'annular_selection_fill_color': UNSET,
-        'annular_selection_line_alpha': UNSET,
-        'annular_selection_line_color': UNSET,
         'annular_visible': UNSET,
         'dilate': UNSET,
         'ticks_text_align': UNSET,
@@ -207,55 +174,21 @@ MATPLOTLIB_TRANSFORMS = {
         'ticks_text_font_style': UNSET,
         'xmarks_alpha': UNSET,
         'xmarks_color': UNSET,
-        'xmarks_hover_alpha': UNSET,
-        'xmarks_hover_color': UNSET,
-        'xmarks_hover_line_alpha': UNSET,
-        'xmarks_hover_line_color': UNSET,
         'xmarks_line_alpha': UNSET,
         'xmarks_line_cap': UNSET,
         'xmarks_line_color': lambda k, v: ('xmarks_edgecolor', v),
         'xmarks_line_dash': UNSET,
         'xmarks_line_join': UNSET,
         'xmarks_line_width': lambda k, v: ('xmarks_linewidth', v),
-        'xmarks_muted': UNSET,
-        'xmarks_muted_alpha': UNSET,
-        'xmarks_muted_color': UNSET,
-        'xmarks_muted_line_alpha': UNSET,
-        'xmarks_muted_line_color': UNSET,
-        'xmarks_nonselection_alpha': UNSET,
-        'xmarks_nonselection_color': UNSET,
-        'xmarks_nonselection_line_alpha': UNSET,
-        'xmarks_nonselection_line_color': UNSET,
-        'xmarks_selection_alpha': UNSET,
-        'xmarks_selection_color': UNSET,
-        'xmarks_selection_line_alpha': UNSET,
-        'xmarks_selection_line_color': UNSET,
         'xmarks_visible': UNSET,
         'ymarks_alpha': UNSET,
         'ymarks_color': UNSET,
-        'ymarks_hover_alpha': UNSET,
-        'ymarks_hover_color': UNSET,
-        'ymarks_hover_line_alpha': UNSET,
-        'ymarks_hover_line_color': UNSET,
         'ymarks_line_alpha': UNSET,
         'ymarks_line_cap': UNSET,
         'ymarks_line_color': lambda k, v: ('ymarks_edgecolor', v),
         'ymarks_line_dash': UNSET,
         'ymarks_line_join': UNSET,
         'ymarks_line_width': lambda k, v: ('ymarks_linewidth', v),
-        'ymarks_muted': UNSET,
-        'ymarks_muted_alpha': UNSET,
-        'ymarks_muted_color': UNSET,
-        'ymarks_muted_line_alpha': UNSET,
-        'ymarks_muted_line_color': UNSET,
-        'ymarks_nonselection_alpha': UNSET,
-        'ymarks_nonselection_color': UNSET,
-        'ymarks_nonselection_line_alpha': UNSET,
-        'ymarks_nonselection_line_color': UNSET,
-        'ymarks_selection_alpha': UNSET,
-        'ymarks_selection_color': UNSET,
-        'ymarks_selection_line_alpha': UNSET,
-        'ymarks_selection_line_color': UNSET,
         'ymarks_visible': UNSET,
         'lower_head': lambda k, v: ('lolims', v),
         'upper_head': lambda k, v: ('uplims', v),
@@ -272,127 +205,43 @@ MATPLOTLIB_TRANSFORMS = {
         'box_cmap': UNSET,
         'box_fill_alpha': UNSET,
         'box_fill_color': UNSET,
-        'box_hover_alpha': UNSET,
-        'box_hover_color': UNSET,
-        'box_hover_fill_alpha': UNSET,
-        'box_hover_fill_color': UNSET,
-        'box_hover_line_alpha': UNSET,
-        'box_hover_line_color': UNSET,
         'box_line_alpha': UNSET,
         'box_line_cap': UNSET,
         'box_line_color': UNSET,
         'box_line_dash': UNSET,
         'box_line_join': UNSET,
         'box_line_width': UNSET,
-        'box_muted': UNSET,
-        'box_muted_alpha': UNSET,
-        'box_muted_color': UNSET,
-        'box_muted_fill_alpha': UNSET,
-        'box_muted_fill_color': UNSET,
-        'box_muted_line_alpha': UNSET,
-        'box_muted_line_color': UNSET,
-        'box_nonselection_alpha': UNSET,
-        'box_nonselection_color': UNSET,
-        'box_nonselection_fill_alpha': UNSET,
-        'box_nonselection_fill_color': UNSET,
-        'box_nonselection_line_alpha': UNSET,
-        'box_nonselection_line_color': UNSET,
-        'box_selection_alpha': UNSET,
-        'box_selection_color': UNSET,
-        'box_selection_fill_alpha': UNSET,
-        'box_selection_fill_color': UNSET,
-        'box_selection_line_alpha': UNSET,
-        'box_selection_line_color': UNSET,
         'box_visible': UNSET,
         'median_alpha': UNSET,
         'median_color': UNSET,
         'outline_alpha': UNSET,
         'outline_color': UNSET,
-        'outline_hover_alpha': UNSET,
-        'outline_hover_color': UNSET,
-        'outline_hover_line_alpha': UNSET,
-        'outline_hover_line_color': UNSET,
         'outline_line_alpha': UNSET,
         'outline_line_cap': UNSET,
         'outline_line_color': UNSET,
         'outline_line_dash': UNSET,
         'outline_line_join': UNSET,
         'outline_line_width': UNSET,
-        'outline_muted': UNSET,
-        'outline_muted_alpha': UNSET,
-        'outline_muted_color': UNSET,
-        'outline_muted_line_alpha': UNSET,
-        'outline_muted_line_color': UNSET,
-        'outline_nonselection_alpha': UNSET,
-        'outline_nonselection_color': UNSET,
-        'outline_nonselection_line_alpha': UNSET,
-        'outline_nonselection_line_color': UNSET,
-        'outline_selection_alpha': UNSET,
-        'outline_selection_color': UNSET,
-        'outline_selection_line_alpha': UNSET,
-        'outline_selection_line_color': UNSET,
         'outline_visible': UNSET,
         'stats_alpha': UNSET,
-        'stats_hover_alpha': UNSET,
-        'stats_hover_color': UNSET,
-        'stats_hover_line_alpha': UNSET,
-        'stats_hover_line_color': UNSET,
         'stats_line_alpha': UNSET,
         'stats_line_cap': UNSET,
         'stats_line_color': UNSET,
         'stats_line_dash': UNSET,
         'stats_line_join': UNSET,
         'stats_line_width': UNSET,
-        'stats_muted': UNSET,
-        'stats_muted_alpha': UNSET,
-        'stats_muted_color': UNSET,
-        'stats_muted_line_alpha': UNSET,
-        'stats_muted_line_color': UNSET,
-        'stats_nonselection_alpha': UNSET,
-        'stats_nonselection_color': UNSET,
-        'stats_nonselection_line_alpha': UNSET,
-        'stats_nonselection_line_color': UNSET,
-        'stats_selection_alpha': UNSET,
-        'stats_selection_color': UNSET,
-        'stats_selection_line_alpha': UNSET,
-        'stats_selection_line_color': UNSET,
         'stats_visible': UNSET,
         'violin_alpha': UNSET,
         'violin_cmap': UNSET,
         'violin_color': UNSET,
         'violin_fill_alpha': UNSET,
         'violin_fill_color': UNSET,
-        'violin_hover_alpha': UNSET,
-        'violin_hover_color': UNSET,
-        'violin_hover_fill_alpha': UNSET,
-        'violin_hover_fill_color': UNSET,
-        'violin_hover_line_alpha': UNSET,
-        'violin_hover_line_color': UNSET,
         'violin_line_alpha': UNSET,
         'violin_line_cap': UNSET,
         'violin_line_color': UNSET,
         'violin_line_dash': UNSET,
         'violin_line_join': UNSET,
         'violin_line_width': UNSET,
-        'violin_muted': UNSET,
-        'violin_muted_alpha': UNSET,
-        'violin_muted_color': UNSET,
-        'violin_muted_fill_alpha': UNSET,
-        'violin_muted_fill_color': UNSET,
-        'violin_muted_line_alpha': UNSET,
-        'violin_muted_line_color': UNSET,
-        'violin_nonselection_alpha': UNSET,
-        'violin_nonselection_color': UNSET,
-        'violin_nonselection_fill_alpha': UNSET,
-        'violin_nonselection_fill_color': UNSET,
-        'violin_nonselection_line_alpha': UNSET,
-        'violin_nonselection_line_color': UNSET,
-        'violin_selection_alpha': UNSET,
-        'violin_selection_color': UNSET,
-        'violin_selection_fill_alpha': UNSET,
-        'violin_selection_fill_color': UNSET,
-        'violin_selection_line_alpha': UNSET,
-        'violin_selection_line_color': UNSET,
         'violin_visible': UNSET,
         'editable': UNSET,
         'fit_columns': UNSET,
@@ -406,8 +255,17 @@ MATPLOTLIB_TRANSFORMS = {
 
 # Plotly transforms
 
+_line_dash_bk_plotly_mapping = {
+    'solid': 'solid',
+    'dashed': 'dash',
+    'dotted': 'dot',
+    'dotdash': UNSET,
+    'dashdot': 'dashdot',
+}
+
 PLOTLY_TRANSFORMS = {
     'plot': {
+        'alpha': lambda k, v: ('opacity', v),
         'min_height': UNSET,
         'min_width': UNSET,
         'max_height': UNSET,
@@ -416,14 +274,19 @@ PLOTLY_TRANSFORMS = {
         'frame_height': UNSET,
         'batched': UNSET,
         'legend_limit': UNSET,
-        'tools': UNSET
+        'tools': UNSET,
+        'shared_xaxis': UNSET,
+        'shared_yaxis': UNSET,
     },
     'style': {
         'alpha': lambda k, v: ('opacity', v),
         'color': lambda k, v: (k, COLOR_ALIASES.get(v, v)),
         'fill_color': lambda k, v: ('fillcolor', COLOR_ALIASES.get(v, v)),
         'line_color': lambda k, v: (k, COLOR_ALIASES.get(v, v)),
+        'line_dash': lambda k, v: ('dash', _line_dash_bk_plotly_mapping.get(v, v)),
+        'line_width': lambda k, v: ('line_width', v),
         'muted_alpha': UNSET,
+        'palette': UNSET,
     }
 }
 

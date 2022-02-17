@@ -5,7 +5,7 @@ from holoviews.element import Area, Curve
 from hvplot.backend_transforms import (
     _transfer_opts,
     _transform_size,
-    is_interactive_opt,
+    _is_interactive_opt,
 )
 
 
@@ -52,4 +52,4 @@ def test_transfer_opts(element, opt, val, backend, opt_kind, transf_opt, transf_
     )
 )
 def test_is_interactive_opt(bk_option, expected):
-    assert is_interactive_opt(bk_option) == expected
+    assert _is_interactive_opt(bk_option) == expected
