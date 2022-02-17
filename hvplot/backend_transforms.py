@@ -1,10 +1,74 @@
 """
 Set of transforms to go from a Bokeh option to another backend's option.
 """
+from holoviews.core.overlay import CompositeOverlay
+from holoviews.core.options import Store
 from holoviews.plotting.util import COLOR_ALIASES
 
 
 UNSET = type('UNSET', (), {})
+
+def _transform_size(width, height, aspect):
+    opts = {}
+    if width and height:
+        opts = {'aspect': width/height, 'fig_size': (width/300.)*100}
+    elif aspect and width:
+        opts = {'aspect': aspect, 'fig_size': (width/300.)*100}
+    elif aspect and height:
+        opts = {'aspect': aspect, 'fig_size': (height/300.)*100}
+    elif width:
+        opts = {'fig_size': (width/300.)*100}
+    elif height:
+        opts = {'fig_size': (height/300.)*100}
+    return opts
+
+def _transfer_opts(element, backend):
+    elname = type(element).__name__
+    options = Store.options(backend=backend)
+    transforms = BACKEND_TRANSFORMS[backend]
+    if isinstance(element, CompositeOverlay):
+        element = element.apply(
+            _transfer_opts, backend=backend, per_element=True
+        )
+    new_opts = {}
+    # print(new_opts)
+    el_options = element.opts.get(backend='bokeh', defaults=False).kwargs
+    print('el_options\n', el_options)
+    for grp, el_opts in options[elname].groups.items():
+        print(grp, 'el_options allowed_keywords\n', el_opts.allowed_keywords)
+        for opt, val in el_options.items():
+            if backend == 'matplotlib' and is_interactive_opt(opt):
+                transform = UNSET
+            # print('    < before', opt, val)
+            transform = transforms.get(grp, {}).get(opt, None)
+            if transform is UNSET:
+                print(f'Element: {elname: <10} | {backend: <10} | {grp: <6} | {opt: <20}: UNSET')
+                continue
+            elif transform:
+                opt, val = transform(opt, val)
+                if val is UNSET:
+                    print(f'Element: {elname: <10} | {backend: <10} | {grp: <6} | {opt: <20}: UNSET')
+                    continue
+                print(f'Element: {elname: <10} | {backend: <10} | {grp: <6} | {opt: <20}: Transformed')
+            if opt not in el_opts.allowed_keywords:
+                if transform:
+                    print(f'Element: {elname: <10} | {backend: <10} | {grp: <6} | {opt: <20}: Transformed but not supported by this element')
+                else:
+                    print(f'Element: {elname: <10} | {backend: <10} | {grp: <6} | {opt: <20}: Not supported at all')
+                continue
+            # print('    > after   ', opt, val)
+            new_opts[opt] = val
+    # print(new_opts)
+    if backend == 'matplotlib':
+        size_opts = _transform_size(
+            el_options.get('width'), el_options.get('height'),
+            el_options.get('aspect')
+        )
+        new_opts.update(size_opts)
+    print(new_opts)
+    new_element = element.opts(**new_opts, backend=backend)
+    # breakpoint()
+    return new_element
 
 # Matplotlib transforms
 

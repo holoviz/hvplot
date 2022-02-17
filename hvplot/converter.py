@@ -10,7 +10,7 @@ import colorcet as cc
 from bokeh.models import HoverTool
 from holoviews.core.dimension import Dimension
 from holoviews.core.spaces import DynamicMap, HoloMap, Callable
-from holoviews.core.overlay import CompositeOverlay, NdOverlay
+from holoviews.core.overlay import NdOverlay
 from holoviews.core.options import Store, Cycle, Palette
 from holoviews.core.layout import NdLayout
 from holoviews.core.util import max_range, basestring
@@ -27,7 +27,7 @@ from holoviews.streams import Buffer, Pipe
 from holoviews.util.transform import dim
 from pandas import DatetimeIndex, MultiIndex
 
-from .backend_transforms import is_interactive_opt, BACKEND_TRANSFORMS, UNSET
+from .backend_transforms import _transfer_opts
 from .util import (
     filter_opts, is_tabular, is_series, is_dask, is_intake, is_cudf,
     is_streamz, is_ibis, is_xarray, is_xarray_dataarray, process_crs,
@@ -638,52 +638,6 @@ class HoloViewsConverter:
             data = data.rename(columns=renamed)
         return data
 
-    def _transform_size(self, width, height, aspect):
-        opts = {}
-        if width and height:
-            opts = {'aspect': width/height, 'fig_size': (width/300.)*100}
-        elif aspect and width:
-            opts = {'aspect': aspect, 'fig_size': (width/300.)*100}
-        elif aspect and height:
-            opts = {'aspect': aspect, 'fig_size': (height/300.)*100}
-        elif width:
-            opts = {'fig_size': (width/300.)*100}
-        elif height:
-            opts = {'fig_size': (height/300.)*100}
-        return opts
-
-    def _transfer_opts(self, element, backend):
-        elname = type(element).__name__
-        options = Store.options(backend=backend)
-        transforms = BACKEND_TRANSFORMS[backend]
-        if isinstance(element, CompositeOverlay):
-            element = element.apply(
-                self._transfer_opts, backend=backend, per_element=True
-            )
-        new_opts = {}
-        el_options = element.opts.get(backend='bokeh').kwargs
-        for grp, el_opts in options[elname].groups.items():
-            for opt, val in el_options.items():
-                if backend == 'matplotlib' and is_interactive_opt(opt):
-                    transform = UNSET
-                transform = transforms.get(grp, {}).get(opt, None)
-                if transform is UNSET:
-                    continue
-                elif transform:
-                    opt, val = transform(opt, val)
-                    if val is UNSET:
-                        continue
-                if opt not in el_opts.allowed_keywords:
-                    continue
-                new_opts[opt] = val
-        if backend == 'matplotlib':
-            size_opts = self._transform_size(
-                el_options.get('width'), el_options.get('height'),
-                el_options.get('aspect')
-            )
-            new_opts.update(size_opts)
-        return element.opts(**new_opts, backend=backend)
-
     def _process_data(self, kind, data, x, y, by, groupby, row, col,
                       use_dask, persist, backlog, label, group_label,
                       value_label, hover_cols, attr_labels, transforms,
@@ -1260,7 +1214,7 @@ class HoloViewsConverter:
         if not (self.datashade or self.rasterize):
             layers = self._apply_layers(obj)
             for backend in self.backends:
-                layers = layers.apply(self._transfer_opts, backend=backend)
+                layers = layers.apply(_transfer_opts, backend=backend)
             return layers
         try:
             from holoviews.operation.datashader import datashade, rasterize, dynspread
@@ -1336,7 +1290,7 @@ class HoloViewsConverter:
         opts = filter_opts(eltype, dict(self._plot_opts, **style))
         layers = self._apply_layers(processed).opts(eltype, **opts, backend='bokeh')
         for backend in self.backends:
-            layers = layers.apply(self._transfer_opts, backend=backend)
+            layers = layers.apply(_transfer_opts, backend=backend)
         return layers
 
     def _get_opts(self, eltype, **custom):
