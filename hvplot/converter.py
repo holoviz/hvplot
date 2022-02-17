@@ -1446,6 +1446,16 @@ class HoloViewsConverter:
                 vdims.append(dimension)
         return kdims, vdims
 
+    def _error_if_unavailable(self, kind, element=None):
+        """
+        Raise an error if the element is not available with the current backend.
+        """
+        if not element:
+            element = self._kind_mapping[kind]
+        backend = Store.current_backend
+        if element not in Store.registry[backend]:
+            raise NotImplementedError(f'{kind!r} plot not supported by the {backend!r} backend.')
+
     ##########################
     #     Simple charts      #
     ##########################
@@ -1585,6 +1595,7 @@ class HoloViewsConverter:
         return self._by_type(charts, self.group_label, sort=False).opts(opts, backend='bokeh')
 
     def line(self, x=None, y=None, data=None):
+        self._error_if_unavailable('line')
         return self.chart(Curve, x, y, data)
 
     def step(self, x=None, y=None, data=None):
@@ -1592,15 +1603,18 @@ class HoloViewsConverter:
         return self.line(x, y, data).options('Curve', interpolation='steps-'+where)
 
     def scatter(self, x=None, y=None, data=None):
+        self._error_if_unavailable('scatter')
         return self.chart(Scatter, x, y, data)
 
     def area(self, x=None, y=None, data=None):
+        self._error_if_unavailable('area')
         areas = self.chart(Area, x, y, data)
         if self.stacked:
             areas = areas.map(Area.stack, NdOverlay)
         return areas
 
     def errorbars(self, x=None, y=None, data=None):
+        self._error_if_unavailable('errorbars')
         return self.chart(ErrorBars, x, y, data)
 
     ##########################
@@ -1642,6 +1656,7 @@ class HoloViewsConverter:
         return obj.redim(**self._redim).relabel(**self._relabel).opts(**opts, backend='bokeh')
 
     def bar(self, x=None, y=None, data=None):
+        self._error_if_unavailable('bar')
         data, x, y = self._process_chart_args(data, x, y, categories=self.by)
         if (x or self.by) and y and (self.by or not isinstance(y, (list, tuple) or len(y) == 1)):
             y = y[0] if isinstance(y, (list, tuple)) else y
@@ -1697,9 +1712,11 @@ class HoloViewsConverter:
                 .relabel(**self._relabel).opts(**opts, backend='bokeh'))
 
     def box(self, x=None, y=None, data=None):
+        self._error_if_unavailable('box')
         return self._stats_plot(BoxWhisker, y, data).redim(**self._redim)
 
     def violin(self, x=None, y=None, data=None):
+        self._error_if_unavailable('violin')
         try:
             from holoviews.element import Violin
         except ImportError:
@@ -1707,6 +1724,7 @@ class HoloViewsConverter:
         return self._stats_plot(Violin, y, data).redim(**self._redim)
 
     def hist(self, x=None, y=None, data=None):
+        self._error_if_unavailable('hist')
         data, x, y = self._process_chart_args(data, False, y)
 
         labelled = ['y'] if self.invert else ['x']
@@ -1767,6 +1785,7 @@ class HoloViewsConverter:
         return self._by_type(hists, sort=False).redim(**self._redim).opts(opts, backend='bokeh')
 
     def kde(self, x=None, y=None, data=None):
+        self._error_if_unavailable('kde')
         bw_method = self.kwds.pop('bw_method', None)
         ind = self.kwds.pop('ind', None)
         if bw_method is not None or ind is not None:
@@ -1809,6 +1828,7 @@ class HoloViewsConverter:
     ##########################
 
     def dataset(self, x=None, y=None, data=None):
+        self._error_if_unavailable('dataset')
         data = self.data if data is None else data
         if self.gridded:
             kdims = [self.x, self.y] if len(self.indexes) == 2 else None
@@ -1817,6 +1837,7 @@ class HoloViewsConverter:
             return Dataset(data, self.kwds.get('columns')).redim(**self._redim)
 
     def heatmap(self, x=None, y=None, data=None):
+        self._error_if_unavailable('heatmap')
         data = self.data if data is None else data
         opts = self._get_opts('HeatMap')
 
@@ -1838,6 +1859,7 @@ class HoloViewsConverter:
         return hmap.redim(**redim).opts(**opts, backend='bokeh')
 
     def hexbin(self, x=None, y=None, data=None):
+        self._error_if_unavailable('hexbin')
         self.use_index = False
         data, x, y = self._process_chart_args(data, x, y, single_y=True)
 
@@ -1858,13 +1880,17 @@ class HoloViewsConverter:
         return element(data, [x, y], z or [], **params).redim(**redim).opts(**opts, backend='bokeh')
 
     def bivariate(self, x=None, y=None, data=None):
+        self._error_if_unavailable('bivariate')
         self.use_index = False
         data, x, y = self._process_chart_args(data, x, y, single_y=True)
 
         opts = self._get_opts('Bivariate', **self.kwds)
-        return Bivariate(data, [x, y]).redim(**self._redim).opts(**opts, backend='bokeh')
+        element = self._get_element('bivariate')
+        return element(data, [x, y]).redim(**self._redim).opts(**opts, backend='bokeh')
 
     def ohlc(self, x=None, y=None, data=None):
+        self._error_if_unavailable('ohlc', Rectangles)
+        self._error_if_unavailable('ohlc', Segments)
         data = self.data if data is None else data
         if x is None:
             variables = [var for var in self.variables if var not in self.indexes]
@@ -1910,21 +1936,25 @@ class HoloViewsConverter:
                 rects.redim(**self._redim).opts(**rect_opts, backend='bokeh'))
 
     def table(self, x=None, y=None, data=None):
+        self._error_if_unavailable('table')
         data = self.data if data is None else data
         if isinstance(data.index, (DatetimeIndex, MultiIndex)):
             data = data.reset_index()
 
         opts = filter_opts('Table', self._plot_opts)
-        return Table(data, self.kwds.get('columns'), []).redim(**self._redim).opts(**opts, backend='bokeh')
+        element = self._get_element('table')
+        return element(data, self.kwds.get('columns'), []).redim(**self._redim).opts(**opts, backend='bokeh')
 
     def labels(self, x=None, y=None, data=None):
+        self._error_if_unavailable('labels')
         self.use_index = False
         data, x, y = self._process_chart_args(data, x, y, single_y=True)
 
         text = self.kwds.get('text', [c for c in data.columns if c not in (x, y)][0])
         kdims, vdims = self._get_dimensions([x, y], [text])
         opts = self._get_opts('Labels')
-        return Labels(data, kdims, vdims).redim(**self._redim).opts(**opts, backend='bokeh')
+        element = self._get_element('labels')
+        return element(data, kdims, vdims).redim(**self._redim).opts(**opts, backend='bokeh')
 
     ##########################
     #     Gridded plots      #
@@ -1964,6 +1994,7 @@ class HoloViewsConverter:
         return element
 
     def image(self, x=None, y=None, z=None, data=None):
+        self._error_if_unavailable('image')
         data, x, y, z = self._process_gridded_args(data, x, y, z)
         if not (x and y):
             x, y = list(data.dims)[::-1]
@@ -1980,6 +2011,7 @@ class HoloViewsConverter:
         return element(data, [x, y], z, **params).redim(**redim).opts(**opts, backend='bokeh')
 
     def rgb(self, x=None, y=None, z=None, data=None):
+        self._error_if_unavailable('rgb')
         data, x, y, z = self._process_gridded_args(data, x, y, z)
 
         coords = [c for c in data.coords if c not in self.by+self.groupby+self.grid]
@@ -2012,6 +2044,7 @@ class HoloViewsConverter:
         return rgb.redim(**self._redim).opts(**opts, backend='bokeh')
 
     def quadmesh(self, x=None, y=None, z=None, data=None):
+        self._error_if_unavailable('quadmesh')
         data, x, y, z = self._process_gridded_args(data, x, y, z)
 
         if not (x and y):
@@ -2029,6 +2062,7 @@ class HoloViewsConverter:
         return element(data, [x, y], z, **params).redim(**redim).opts(**opts, backend='bokeh')
 
     def contour(self, x=None, y=None, z=None, data=None, filled=False):
+        self._error_if_unavailable('contour')
         from holoviews.operation import contours
 
         if 'projection' in self._plot_opts:
@@ -2060,6 +2094,7 @@ class HoloViewsConverter:
         return contours(qmesh, filled=filled, levels=levels).opts(**opts, backend='bokeh')
 
     def contourf(self, x=None, y=None, z=None, data=None):
+        self._error_if_unavailable('contourf')
         contourf = self.contour(x, y, z, data, filled=True)
         # The holoviews contours operation used in self.contour adapts
         # the value dim range, so we need to redimension it if the user
@@ -2073,6 +2108,7 @@ class HoloViewsConverter:
         return contourf.redim.range(**redim)
 
     def vectorfield(self, x=None, y=None, angle=None, mag=None, data=None):
+        self._error_if_unavailable('vectorfield')
         data, x, y, _ = self._process_gridded_args(data, x, y, z=None)
 
         if not (x and y):
@@ -2120,10 +2156,13 @@ class HoloViewsConverter:
         return obj.redim(**redim).opts({element.name: opts}, backend='bokeh')
 
     def polygons(self, x=None, y=None, data=None):
+        self._error_if_unavailable('polygons')
         return self._geom_plot(x, y, data, kind='polygons')
 
     def paths(self, x=None, y=None, data=None):
+        self._error_if_unavailable('paths')
         return self._geom_plot(x, y, data, kind='paths')
 
     def points(self, x=None, y=None, data=None):
+        self._error_if_unavailable('points')
         return self._geom_plot(x, y, data, kind='points')
