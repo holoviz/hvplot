@@ -1219,7 +1219,7 @@ class HoloViewsConverter:
             if self.gridded and self.by and not kind == 'points':
                 obj = obj.layout(self.by) if self.subplots else obj.overlay(self.by)
             if self.grid:
-                obj = obj.grid(self.grid).opts(shared_xaxis=True, shared_yaxis=True)
+                obj = obj.grid(self.grid).opts(shared_xaxis=True, shared_yaxis=True, backend='bokeh')
         else:
             if self.streaming:
                 cb = partial(method, x, y)
