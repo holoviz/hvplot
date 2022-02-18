@@ -7,7 +7,7 @@ hvPlot <img src="/doc/_static/logo.png" width="50" height="50">
 |    |    |
 | --- | --- |
 | Build Status | [![Build Status](https://github.com/holoviz/hvplot/workflows/tests/badge.svg?query=branch%3Amaster)](https://github.com/holoviz/hvplot/actions?query=workflow%3Atests+branch%3Amaster) |
-| Coverage | [![codecov](https://codecov.io/gh/hvplot/panel/branch/master/graph/badge.svg)](https://codecov.io/gh/holoviz/hvplot) |
+| Coverage | [![codecov](https://codecov.io/gh/holoviz/hvplot/branch/master/graph/badge.svg)](https://codecov.io/gh/holoviz/hvplot) |
 | Latest dev release | [![Github tag](https://img.shields.io/github/tag/holoviz/hvplot.svg?label=tag&colorB=11ccbb)](https://github.com/holoviz/hvplot/tags) |
 | Latest release | [![Github release](https://img.shields.io/github/release/holoviz/hvplot.svg?label=tag&colorB=11ccbb)](https://github.com/holoviz/hvplot/releases) [![PyPI version](https://img.shields.io/pypi/v/hvplot.svg?colorB=cc77dd)](https://pypi.python.org/pypi/hvplot) [![hvplot version](https://img.shields.io/conda/v/pyviz/hvplot.svg?colorB=4488ff&style=flat)](https://anaconda.org/pyviz/hvplot) [![conda-forge version](https://img.shields.io/conda/v/conda-forge/hvplot.svg?label=conda%7Cconda-forge&colorB=4488ff)](https://anaconda.org/conda-forge/hvplot) [![defaults version](https://img.shields.io/conda/v/anaconda/hvplot.svg?label=conda%7Cdefaults&style=flat&colorB=4488ff)](https://anaconda.org/anaconda/hvplot) |
 | Python | [![Python support](https://img.shields.io/pypi/pyversions/hvplot.svg)](https://pypi.org/project/hvplot/) |
