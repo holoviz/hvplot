@@ -6,10 +6,18 @@ import os
 
 try:
     from intake import open_catalog
+    import intake_parquet  # noqa
+    import intake_xarray   # noqa
+    import s3fs  # noqa
 except:
-    raise ImportError('Loading hvPlot sample data requires intake '
-                      'and intake-parquet. Install it using conda or '
-                      'pip before loading data.')
+    raise ImportError(
+        """Loading hvPlot sample data requires:
+                * intake
+                * intake-parquet
+                * intake-xarray
+                * s3fs
+             Install these using conda or pip before loading data."""
+    )
 
 _file_path = os.path.dirname(__file__)
 if os.path.isdir(os.path.join(_file_path, 'examples')):
