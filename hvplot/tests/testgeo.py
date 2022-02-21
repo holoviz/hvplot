@@ -2,7 +2,7 @@ import sys
 
 from unittest import TestCase, SkipTest, expectedFailure
 
-from distutils.version import LooseVersion
+from packaging.version import Version
 import numpy as np
 import pandas as pd
 import holoviews as hv
@@ -29,7 +29,7 @@ class TestGeo(TestCase):
 
     def assertCRS(self, plot, proj='utm'):
         import cartopy
-        if LooseVersion(cartopy.__version__) < LooseVersion('0.20'):
+        if Version(cartopy.__version__) < Version('0.20'):
             assert plot.crs.proj4_params['proj'] == proj
         else:
             assert plot.crs.to_dict()['proj'] == proj
