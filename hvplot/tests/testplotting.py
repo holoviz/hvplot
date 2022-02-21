@@ -1,7 +1,7 @@
 """
 Tests pandas.options.backend setting
 """
-from distutils.version import LooseVersion
+from packaging.version import Version
 from unittest import TestCase, SkipTest
 import pandas as pd
 
@@ -22,7 +22,7 @@ x_y_mapping = [(kind, el) for kind, el in HoloViewsConverter._kind_mapping.items
 class TestPandasHoloviewsPlotting(TestCase):
 
     def setUp(self):
-        if LooseVersion(pd.__version__) < '0.25.1':
+        if Version(pd.__version__) < Version('0.25.1'):
             raise SkipTest('entrypoints for plotting.backends was added '
                            'in pandas 0.25.1')
         pd.options.plotting.backend = 'holoviews'
@@ -54,7 +54,7 @@ class TestPandasHoloviewsPlotting(TestCase):
 class TestPandasHvplotPlotting(TestPandasHoloviewsPlotting):
 
     def setUp(self):
-        if LooseVersion(pd.__version__) < '0.25.1':
+        if Version(pd.__version__) < Version('0.25.1'):
             raise SkipTest('entrypoints for plotting.backends was added '
                            'in pandas 0.25.1')
         pd.options.plotting.backend = 'hvplot'
