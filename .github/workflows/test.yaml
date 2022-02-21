@@ -14,69 +14,60 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['ubuntu-latest', 'windows-latest']
-        python-version: [2.7, 3.7]
-        exclude:
-          - os: windows-latest
-            python-version: 2.7
+        os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
+        python-version: [3.6, 3.7, 3.8, 3.9]
     timeout-minutes: 60
     defaults:
       run:
         shell: bash -l {0} 
     env:
       DESC: "Python ${{ matrix.python-version }} tests"
-      HV_REQUIREMENTS: "unit_tests"
-      PYTHON_VERSION: ${{ matrix.python-version }}
-      CHANS_DEV: "-c pyviz/label/dev"
-      CHANS: "-c pyviz"
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PYCTDEV_SELF_CHANNEL: "pyviz/label/dev"
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: "100"
       - uses: actions/setup-python@v2
         with:
-          auto-update-conda: true
           python-version: ${{ matrix.python-version }}
       - uses: conda-incubator/setup-miniconda@v2
         with:
+          auto-update-conda: true
           miniconda-version: "latest"
+          channel-priority: strict
+          channels: pyviz/label/dev,conda-forge,nodefaults
       - name: Fetch unshallow
         run: git fetch --prune --tags --unshallow
       - name: conda setup
         run: |
-          conda config --set always_yes True
-          conda install -c pyviz "pyctdev>=0.5"
-          doit ecosystem_setup
-          conda install nodejs
-          doit env_create ${{ env.CHANS_DEV}} --python=${{ matrix.python-version }}
-      - name: doit develop_install py2
-        if: startsWith(matrix.python-version, 2.)
-        run: |
-          eval "$(conda shell.bash hook)"
-          conda activate test-environment
-          conda list
-          doit develop_install -c pyviz/label/dev -o tests
-      - name: Handling the decorator package on ubuntu and python 2.7
-        if: matrix.os == 'ubuntu-latest' && startsWith(matrix.python-version, 2.)
-        run: |
-          eval "$(conda shell.bash hook)"
-          conda activate test-environment
-          conda install -c pyviz/label/dev 'decorator=4.4.2'
+          conda install "pyctdev>=0.5"
+          doit env_create --python=${{ matrix.python-version }}
       - name: doit develop_install py3
-        if: startsWith(matrix.python-version, 3.)
+        if: matrix.python-version != '3.6'
         run: |
           eval "$(conda shell.bash hook)"
           conda activate test-environment
           conda list
-          doit develop_install ${{ env.CHANS_DEV}} -o examples -o tests
-          conda install -c conda-forge fsspec
-      - name: pygraphviz
-        if: contains(matrix.os, 'ubuntu')
+          doit develop_install -o examples -o tests
+      - name: doit develop_install py36
+        if: matrix.python-version == '3.6'
         run: |
           eval "$(conda shell.bash hook)"
           conda activate test-environment
-          conda install -c conda-forge pygraphviz
+          conda list
+          conda install "pip <22"
+          doit develop_install -o tests
+          # Pin panel on Python 3.6 because one or more dev releases on the 0.13.* series
+          # can be installed on Python 3.6 but are actually not compatible with Python 3.6
+          # Panel 0.13 will support Python >= 3.7 only so the pin here can stay indefinitely.
+          conda install "panel=0.12"
+      - name: pygraphviz
+        if: (contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos')) && matrix.python-version != '3.6'
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda activate test-environment
+          conda install pygraphviz
       - name: doit env_capture
         run: |
           eval "$(conda shell.bash hook)"
@@ -93,24 +84,22 @@ jobs:
           conda activate test-environment
           doit test_unit
       - name: test examples ubuntu
-        if: contains(matrix.os, 'ubuntu') && startsWith(matrix.python-version, 3.)
+        if: (contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos')) && matrix.python-version != '3.6'
         run: |
           eval "$(conda shell.bash hook)"
           conda activate test-environment
           bokeh sampledata
           doit test_examples_extra
       - name: test examples windows
-        if: contains(matrix.os, 'windows')
+        if: contains(matrix.os, 'windows') && matrix.python-version != '3.6'
         run: |
           eval "$(conda shell.bash hook)"
           conda activate test-environment
           bokeh sampledata
           doit test_examples
       - name: codecov
-        env:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
         if: startsWith(matrix.python-version, 3.)
         run: |
           eval "$(conda shell.bash hook)"
           conda activate test-environment
-          coveralls --service=github
+          codecov

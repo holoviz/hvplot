@@ -22,7 +22,7 @@ def get_setup_version(reponame):
         return version.Version.setup_version(basepath, reponame, archive_commit="$Format:%h$")
     else:
         print("WARNING: param>=1.6.0 unavailable. If you are installing a package, this warning can safely be ignored. If you are creating a package or otherwise operating in a git repository, you should install param>=1.6.0.")
-        return json.load(open(version_file_path, 'r'))['version_string']
+        return json.load(open(version_file_path))['version_string']
 
 
 ########## dependencies ##########
@@ -38,25 +38,30 @@ install_requires = [
 _examples = [
     'geoviews >=1.6.0',
     'numba >=0.51.0',
-    'geopandas',
-    'xarray <0.17.0',
-    'networkx',
+    'geopandas >=0.9.0',
+    'xarray >=0.18.2',
+    'networkx >=2.6.3',
     'streamz >=0.3.0',
-    'intake',
-    'intake-parquet',
-    'intake-xarray',
-    'dask',
+    'intake >=0.6.5',
+    'intake-parquet >=0.2.3',
+    'intake-xarray >=0.5.0',
+    'dask >=2021.3.0',
     'datashader >=0.6.5',
     'notebook >=5.4',
-    'rasterio',
-    's3fs',
-    'scipy',
-    'pillow',
-    'selenium',
-    'spatialpandas',
-    'scikit-image',
-    'python-snappy',
-    'pyepsg'
+    'rasterio >=1.2.6',
+    'cartopy >= 0.18.0',
+    'pyproj >=3.0.1',
+    's3fs >=2022.1.0',
+    'scipy >=1.5.3',
+    'pillow >=8.2.0',
+    'selenium >=3.141.0',
+    'spatialpandas >=0.4.3',
+    'scikit-image >=0.17.2',
+    'python-snappy >=0.6.0',
+    'pooch >=1.6.0',
+    'fiona >=1.8.18',
+    # Extra dependency of cartopy on Python 3.6 only
+    'pyepsg >=0.4.0',
 ]
 
 _examples_extra = _examples + [
@@ -65,16 +70,13 @@ _examples_extra = _examples + [
 
 extras_require = {
     'tests': [
-        'coveralls',
-        'nose',
+        'codecov',
         'flake8',
         'parameterized',
         'pytest',
+        'pytest-cov',
         'nbsmoke >=0.2.0',
-        'twine',   # required for pip packaging
-        'rfc3986', # required by twine
-        'keyring', # required by twine
-        'numpy >=1.7,<1.20' # Numba ABI incompatibility
+        'numpy >=1.7'
     ],
     'examples': _examples,
     'examples_extra': _examples_extra,
@@ -115,19 +117,17 @@ setup_args = dict(
     classifiers = [
         "License :: OSI Approved :: BSD License",
         "Development Status :: 5 - Production/Stable",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Operating System :: OS Independent",
         "Intended Audience :: Science/Research",
         "Intended Audience :: Developers",
         "Natural Language :: English",
         "Topic :: Scientific/Engineering",
         "Topic :: Software Development :: Libraries"],
-    python_requires=">=2.7",
+    python_requires=">=3.6",
     install_requires=install_requires,
     extras_require=extras_require,
     tests_require=extras_require['tests'],

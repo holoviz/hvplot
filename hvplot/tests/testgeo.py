@@ -2,6 +2,7 @@ import sys
 
 from unittest import TestCase, SkipTest, expectedFailure
 
+from packaging.version import Version
 import numpy as np
 import pandas as pd
 import holoviews as hv
@@ -27,7 +28,11 @@ class TestGeo(TestCase):
         self.crs = ccrs.epsg(self.da.crs.split('epsg:')[1])
 
     def assertCRS(self, plot, proj='utm'):
-        assert plot.crs.proj4_params['proj'] == proj
+        import cartopy
+        if Version(cartopy.__version__) < Version('0.20'):
+            assert plot.crs.proj4_params['proj'] == proj
+        else:
+            assert plot.crs.to_dict()['proj'] == proj
 
     def assert_projection(self, plot, proj):
         opts = hv.Store.lookup_options('bokeh', plot, 'plot')
@@ -39,7 +44,7 @@ class TestCRSInference(TestGeo):
     def setUp(self):
         if sys.platform == "win32":
             raise SkipTest("Skip CRS inference on Windows")
-        super(TestCRSInference, self).setUp()
+        super().setUp()
         
     def test_plot_with_crs_as_proj_string(self):
         plot = self.da.hvplot.image('x', 'y', crs=self.da.crs)
@@ -197,7 +202,13 @@ class TestGeoPandas(TestCase):
             raise SkipTest('geopandas, geoviews, or cartopy not available')
         import hvplot.pandas  # noqa
 
-        self.cities = gpd.read_file(gpd.datasets.get_path('naturalearth_cities'))
+        geometry = gpd.points_from_xy(
+            x=[12.45339, 12.44177, 9.51667, 6.13000, 158.14997],
+            y=[41.90328, 43.93610, 47.13372, 49.61166, 6.91664],
+            crs='EPSG:4326'
+        )
+        names = ['Vatican City', 'San Marino', 'Vaduz', 'Luxembourg', 'Palikir']
+        self.cities = gpd.GeoDataFrame(dict(name=names), geometry=geometry)
 
     def test_points_hover_cols_is_empty_by_default(self):
         points = self.cities.hvplot()

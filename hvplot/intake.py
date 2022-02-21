@@ -1,6 +1,4 @@
-from __future__ import absolute_import
-
-from distutils.version import LooseVersion
+from packaging.version import Version
 
 from . import hvPlot, post_patch
 
@@ -23,7 +21,7 @@ try:
     patch()
 except:
     import intake
-    if LooseVersion(intake.__version__) <= '0.1.5':
+    if Version(intake.__version__) <= Version('0.1.5'):
         patch()
         patch(name='plot')
     else:

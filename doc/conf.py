@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import param
 
 param.parameterized.docstring_signature = False
@@ -6,9 +5,9 @@ param.parameterized.docstring_describe_params = False
 
 from nbsite.shared_conf import *
 
-project = u'hvPlot'
-authors = u'HoloViz developers'
-copyright = u'2018-2022 ' + authors
+project = 'hvPlot'
+authors = 'HoloViz developers'
+copyright = '2018-2022 ' + authors
 description = 'A high-level plotting API for the PyData ecosystem built on HoloViews'
 
 import hvplot
