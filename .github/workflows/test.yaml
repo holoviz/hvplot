@@ -47,16 +47,15 @@ jobs:
       - name: Fetch unshallow
         run: git fetch --prune --tags --unshallow
       - name: Get Today's date for cache
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+        run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
       - name: conda cache
         uses: actions/cache@v2
         with:
           path: ${{ matrix.path }}
-          key: ${{ runner.os }}-conda-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}-${{ steps.date.outputs.date }}
+          key: ${{ runner.os }}-conda-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}-${{ env.TODAY }}
           restore-keys: |
-           ${{ runner.os }}-conda-${{ matrix.python-version }}-${{ steps.date.outputs.date }}-
+           ${{ runner.os }}-conda-${{ matrix.python-version }}-${{ env.TODAY }}-
         id: cache
-  
       - name: conda setup
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
