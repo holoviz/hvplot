@@ -16,6 +16,13 @@ jobs:
       matrix:
         os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
         python-version: [3.6, 3.7, 3.8, 3.9]
+        include:
+        - os: ubuntu-latest
+          path: /usr/share/miniconda3/envs/test
+        - os: macos-latest
+          path: /Users/runner/miniconda3/envs/test
+        - os: windows-latest
+          path: C:\Miniconda3\envs\test
     timeout-minutes: 60
     defaults:
       run:
@@ -39,19 +46,27 @@ jobs:
           channels: pyviz/label/dev,conda-forge,nodefaults
       - name: Fetch unshallow
         run: git fetch --prune --tags --unshallow
+      - name: conda cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ matrix.path }}
+          key: ${{ runner.os }}-conda-${{ matrix.python-version }}-${{ hashFiles('environment.yml') }}
+          restore-keys: |
+           ${{ runner.os }}-conda-${{ matrix.python-version }}-
       - name: conda setup
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           conda install "pyctdev>=0.5"
           doit env_create --python=${{ matrix.python-version }}
       - name: doit develop_install py3
-        if: matrix.python-version != '3.6'
+        if: steps.cache.outputs.cache-hit != 'true' && matrix.python-version != '3.6'
         run: |
           eval "$(conda shell.bash hook)"
           conda activate test-environment
           conda list
           doit develop_install -o examples -o tests
       - name: doit develop_install py36
-        if: matrix.python-version == '3.6'
+        if: steps.cache.outputs.cache-hit != 'true' && matrix.python-version == '3.6'
         run: |
           eval "$(conda shell.bash hook)"
           conda activate test-environment
@@ -63,7 +78,7 @@ jobs:
           # Panel 0.13 will support Python >= 3.7 only so the pin here can stay indefinitely.
           conda install "panel=0.12"
       - name: pygraphviz
-        if: (contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos')) && matrix.python-version != '3.6'
+        if: steps.cache.outputs.cache-hit != 'true' && ((contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos')) && matrix.python-version != '3.6')
         run: |
           eval "$(conda shell.bash hook)"
           conda activate test-environment
