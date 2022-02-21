@@ -18,11 +18,11 @@ jobs:
         python-version: [3.6, 3.7, 3.8, 3.9]
         include:
         - os: ubuntu-latest
-          path: /usr/share/miniconda3/envs/test
+          path: /usr/share/miniconda3/envs/
         - os: macos-latest
-          path: /Users/runner/miniconda3/envs/test
+          path: /Users/runner/miniconda3/envs/
         - os: windows-latest
-          path: C:\Miniconda3\envs\test
+          path: C:\Miniconda3\envs\
     timeout-minutes: 60
     defaults:
       run:
@@ -46,13 +46,17 @@ jobs:
           channels: pyviz/label/dev,conda-forge,nodefaults
       - name: Fetch unshallow
         run: git fetch --prune --tags --unshallow
+      - name: Get Today's date for cache
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
       - name: conda cache
         uses: actions/cache@v2
         with:
           path: ${{ matrix.path }}
-          key: ${{ runner.os }}-conda-${{ matrix.python-version }}-${{ hashFiles('environment.yml') }}
+          key: ${{ runner.os }}-conda-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}-${{ steps.date.outputs.date }}
           restore-keys: |
-           ${{ runner.os }}-conda-${{ matrix.python-version }}-
+           ${{ runner.os }}-conda-${{ matrix.python-version }}-${{ steps.date.outputs.date }}-
+        id: cache
+  
       - name: conda setup
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
@@ -87,6 +91,7 @@ jobs:
         run: |
           eval "$(conda shell.bash hook)"
           conda activate test-environment
+          python -m pip install -e .
           doit env_capture
       - name: doit test_flakes
         run: |
