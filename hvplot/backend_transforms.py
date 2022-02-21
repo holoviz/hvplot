@@ -94,6 +94,17 @@ def _is_interactive_opt(bk_opt):
     return any(part in interactive_flags for part in bk_opt.split('_'))
 
 
+def _transfert_opts_backends(element, backends):
+    if backends is None:
+        if Store.current_backend == 'bokeh':
+            backends = []
+        else:
+            backends = [Store.current_backend]
+    for backend in backends:
+        element = element.apply(_transfer_opts, backend=backend)
+    return element
+
+
 # Matplotlib transforms
 
 _line_cap_bk_mpl_mapping = {
@@ -249,7 +260,34 @@ MATPLOTLIB_TRANSFORMS = {
         'row_headers': UNSET,
         'scroll_to_selection': UNSET,
         'selectable': UNSET,
-        'sortable': UNSET
+        'sortable': UNSET,
+        'edge_alpha': lambda k, v: ('edge_alpha', v),
+        'edge_cmap': lambda k, v: ('edge_cmap', v),
+        'edge_color': lambda k, v: ('edge_color', v),
+        'edge_fill_alpha': UNSET,
+        'edge_fill_color': UNSET,
+        'edge_line_alpha': UNSET,
+        'edge_line_cap': UNSET,
+        'edge_line_color': lambda k, v: ('edge_color', v),
+        'edge_line_dash': lambda k, v: ('edge_linestyle', v),
+        'edge_line_join': UNSET,
+        'edge_line_width': lambda k, v: ('edge_linewidth', v),
+        'edge_visible': UNSET,  
+        'node_alpha': lambda k, v: ('node_alpha', v), 
+        'node_cmap': lambda k, v: ('node_cmap', v), 
+        'node_color': lambda k, v: ('node_color', v), 
+        'node_fill_alpha': UNSET, 
+        'node_fill_color': lambda k, v: ('node_facecolors', v), 
+        'node_line_alpha': UNSET, 
+        'node_line_cap': UNSET, 
+        'node_line_color': lambda k, v: ('node_edgecolors', v), 
+        'node_line_dash': UNSET, 
+        'node_line_join': UNSET, 
+        'node_line_width': lambda k, v: ('node_linewidth', v), 
+        'node_marker': lambda k, v: ('node_marker', v), 
+        'node_radius': UNSET, 
+        'node_size': lambda k, v: ('node_size', v), 
+        'node_visible': lambda k, v: ('visible', v),
     },
 }
 
