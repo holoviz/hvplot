@@ -1,6 +1,7 @@
 import holoviews as hv
 import colorcet as cc
 
+from ..backend_transforms import _transfert_opts_backends
 from ..util import with_hv_extension
 
 
@@ -11,6 +12,12 @@ def parallel_coordinates(data, class_column, cols=None, alpha=0.5,
                          **kwds):
     """
     Parallel coordinates plotting.
+
+    To show a set of points in an n-dimensional space, a backdrop is drawn
+    consisting of n parallel lines. A point in n-dimensional space is
+    represented as a polyline with vertices on the parallel axes; the
+    position of the vertex on the i-th axis corresponds to the i-th coordinate
+    of the point. 
 
     Parameters
     ----------
@@ -57,5 +64,7 @@ def parallel_coordinates(data, class_column, cols=None, alpha=0.5,
     cmap = cmap or colormap or cc.palette['glasbey_category10']
     colors = hv.plotting.util.process_cmap(cmap, categorical=True, ncolors=len(groups))
 
-    return hv.Overlay([curve.relabel(k).options('Curve', color=c)
-                       for c, (k, v) in zip(colors, groups) for curve in v]).options(options)
+    el = hv.Overlay([curve.relabel(k).options('Curve', color=c, backend='bokeh')
+                       for c, (k, v) in zip(colors, groups) for curve in v]).options(options, backend='bokeh')
+    el = _transfert_opts_backends(el, kwds.pop('backends', None))
+    return el
