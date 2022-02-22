@@ -23,7 +23,6 @@ jobs:
         shell: bash -l {0}
     env:
       DESC: "Documentation build"
-      CHANS_DEV: "-c pyviz/label/dev -c bokeh -c conda-forge"
       MPLBACKEND: "Agg"
       MOZ_HEADLESS: 1
       DISPLAY: ":99.0"
@@ -37,6 +36,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           miniconda-version: "latest"
+          channels: pyviz/label/dev,conda-forge,nodefaults
       - name: Fetch unshallow
         run: git fetch --prune --tags --unshallow -f
       - name: Set output
@@ -44,16 +44,13 @@ jobs:
         run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
       - name: conda setup
         run: |
-          conda config --set always_yes True
-          conda install -c pyviz "pyctdev>=0.5"
-          doit ecosystem_setup
-          doit env_create ${{ env.CHANS_DEV}} --python=3.8
+          conda create -n test-environment python=3.8 pyctdev
       - name: doit develop_install
         run: |
           eval "$(conda shell.bash hook)"
           conda activate test-environment
           conda list
-          doit develop_install ${{ env.CHANS_DEV}} -o doc -o examples
+          doit develop_install -o doc -o examples
       - name: bokeh sampledata
         run: |
           eval "$(conda shell.bash hook)"
