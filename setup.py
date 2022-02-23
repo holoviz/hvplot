@@ -32,7 +32,8 @@ install_requires = [
     'colorcet >=2',
     'holoviews >=1.11.0',
     'pandas',
-    'numpy>=1.15'
+    'numpy>=1.15',
+    'packaging',
 ]
 
 _examples = [
@@ -62,6 +63,8 @@ _examples = [
     'fiona >=1.8.18',
     # Extra dependency of cartopy on Python 3.6 only
     'pyepsg >=0.4.0',
+    'matplotlib',
+    'plotly',
 ]
 
 _examples_extra = _examples + [
