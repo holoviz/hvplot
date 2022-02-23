@@ -1,5 +1,6 @@
-import holoviews.plotting.mpl  # noqa
+import holoviews
 import pytest
+from holoviews.core import Store
 from holoviews.element import Area, Curve
 
 from hvplot.backend_transforms import (
@@ -22,6 +23,7 @@ from hvplot.backend_transforms import (
 def test_transform_size(width, height, aspect, opts):
     assert _transform_size(width, height, aspect) == opts
 
+
 @pytest.mark.parametrize(
     ('element', 'opt', 'val', 'backend', 'opt_kind', 'transf_opt', 'transf_val'),
     (
@@ -31,13 +33,21 @@ def test_transform_size(width, height, aspect, opts):
     )
 )
 def test_transfer_opts(element, opt, val, backend, opt_kind, transf_opt, transf_val):
-    element = element.opts(backend='bokeh', **{opt: val})
-    new_element = element.apply(_transfer_opts, backend=backend)
-    new_opts = new_element.opts.get(opt_kind).kwargs
-    if transf_opt is None:
-        assert val not in new_opts.values()
-    else:
-        assert new_opts[transf_opt] == transf_val
+    current_backend = Store.current_backend
+    if backend not in Store.registry:
+        holoviews.extension(backend)
+    Store.set_current_backend(backend)
+    try:
+        element = element.opts(backend='bokeh', **{opt: val})
+        new_element = element.apply(_transfer_opts, backend=backend)
+        new_opts = new_element.opts.get(opt_kind).kwargs
+        if transf_opt is None:
+            assert val not in new_opts.values()
+        else:
+            assert transf_opt in new_opts
+            assert new_opts[transf_opt] == transf_val
+    finally:
+        Store.set_current_backend(current_backend)
 
 
 @pytest.mark.parametrize(

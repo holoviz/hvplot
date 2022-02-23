@@ -79,7 +79,9 @@ extras_require = {
         'pytest',
         'pytest-cov',
         'nbsmoke >=0.2.0',
-        'numpy >=1.7'
+        'numpy >=1.7',
+        'matplotlib',
+        'plotly',
     ],
     'examples': _examples,
     'examples_extra': _examples_extra,

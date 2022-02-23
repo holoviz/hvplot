@@ -1782,7 +1782,6 @@ class HoloViewsConverter:
     ##########################
 
     def dataset(self, x=None, y=None, data=None):
-        self._error_if_unavailable('dataset')
         data = self.data if data is None else data
         if self.gridded:
             kdims = [self.x, self.y] if len(self.indexes) == 2 else None
