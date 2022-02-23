@@ -230,7 +230,7 @@ def process_crs(crs):
         import cartopy.crs as ccrs
         import geoviews as gv # noqa
         import pyproj
-    except:
+    except ImportError:
         raise ImportError('Geographic projection support requires GeoViews and cartopy.')
 
     if crs is None:
