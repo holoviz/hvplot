@@ -102,6 +102,15 @@ _line_cap_bk_mpl_mapping = {
     'round': 'round',
     'square': 'projecting',
 }
+
+_line_dash_bk_mpl_mapping = {
+    'solid': 'solid',
+    'dashed': 'dashed',
+    'dotted': 'dotted',
+    'dotdash': UNSET,
+    'dashdot': 'dashdot',
+}
+
 _text_baseline_bk_mpl_mapping = {
     'top': 'top',
     'middle': 'center',
@@ -149,7 +158,7 @@ MATPLOTLIB_TRANSFORMS = {
         'line_alpha': UNSET,
         'line_cap': lambda k, v: ('capstyle', _line_cap_bk_mpl_mapping.get(v, v)),
         'line_color': lambda k, v: ('edgecolor', v),
-        'line_dash': lambda k, v: ('linestyle', v),
+        'line_dash': lambda k, v: ('linestyle', _line_dash_bk_mpl_mapping.get(v, v)),
         'line_join': lambda k, v: ('joinstyle', v),
         'line_width': lambda k, v: ('linewidth', v),
         'palette': UNSET,

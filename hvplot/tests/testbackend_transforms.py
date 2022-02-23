@@ -27,9 +27,10 @@ def test_transform_size(width, height, aspect, opts):
 @pytest.mark.parametrize(
     ('element', 'opt', 'val', 'backend', 'opt_kind', 'transf_opt', 'transf_val'),
     (
-        (Curve([]), 'line_dash', '-', 'matplotlib', 'style', 'linestyle', '-'),
+        (Curve([]), 'line_dash', 'dashed', 'matplotlib', 'style', 'linestyle', 'dashed'),
         (Curve([]), 'line_alpha', 0.123, 'matplotlib', 'style', None, None),
         (Area([]), 'line_cap', 'square', 'matplotlib', 'style', 'capstyle', 'projecting'),
+        (Curve([]), 'line_dash', 'dashed', 'plotly', 'style', 'dash', 'dash'),
     )
 )
 def test_transfer_opts(element, opt, val, backend, opt_kind, transf_opt, transf_val):
