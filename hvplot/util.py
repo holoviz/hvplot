@@ -4,8 +4,8 @@ Provides utilities to convert data and projections
 
 import sys
 
-from distutils.version import LooseVersion
 from functools import wraps
+from packaging.version import Version
 from types import FunctionType
 
 import pandas as pd
@@ -19,7 +19,7 @@ except:
 
 from holoviews.core.util import basestring
 
-hv_version = LooseVersion(hv.__version__)
+hv_version = Version(hv.__version__)
 
 
 def with_hv_extension(func, extension='bokeh', logo=False):
@@ -195,7 +195,7 @@ def proj_to_cartopy(proj):
     if cl.__name__ == 'Mercator':
         kw_proj.pop('false_easting', None)
         kw_proj.pop('false_northing', None)
-        if LooseVersion(cartopy.__version__) < LooseVersion('0.15'):
+        if Version(cartopy.__version__) < Version('0.15'):
             kw_proj.pop('latitude_true_scale', None)
     elif cl.__name__ == 'Stereographic':
         kw_proj.pop('scale_factor', None)
@@ -479,7 +479,7 @@ def process_dynamic_args(x, y, kind, **kwds):
         if isinstance(v, param.Parameter):
             dynamic[k] = v
         elif panel_available and isinstance(v, pn.widgets.Widget):
-            if LooseVersion(pn.__version__) < '0.6.4':
+            if Version(pn.__version__) < Version('0.6.4'):
                 dynamic[k] = v.param.value
             else:
                 dynamic[k] = v

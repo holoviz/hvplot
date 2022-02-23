@@ -1,4 +1,5 @@
 from functools import partial
+from packaging.version import Version
 import warnings
 
 import holoviews as _hv
