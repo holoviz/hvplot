@@ -2,6 +2,7 @@ from functools import partial
 import warnings
 
 import holoviews as _hv
+from packaging.version import Version
 
 from ..converter import HoloViewsConverter
 from ..util import with_hv_extension
@@ -93,7 +94,7 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
             raise ImportError("rasterize and datashade require "
                               "datashader to be installed.")
         from ..util import hv_version
-        if hv_version <= '1.14.6':
+        if hv_version <= Version('1.14.6'):
             warnings.warn(
                 "Versions of holoviews before 1.14.7 did not suppport "
                 "dynamic update of rasterized/datashaded scatter matrix. "
@@ -111,7 +112,7 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
     if rasterize:
         import holoviews.operation.datashader as hd
         if dynspread or spread:
-            if hd.ds_version < '0.12.0':
+            if hd.ds_version < Version('0.12.0'):
                 raise RuntimeError(
                     'Any version of datashader less than 0.12.0 does '
                     'not support rasterize with dynspread or spread.')
