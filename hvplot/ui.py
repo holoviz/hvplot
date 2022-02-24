@@ -53,7 +53,7 @@ class Controls(Viewer):
 
     @property
     def kwargs(self):
-        return {k: v for k, v in self.param.get_param_values()
+        return {k: v for k, v in self.param.values().items()
                 if k not in ('name', 'explorer') and v is not None and v != ''}
 
 
@@ -320,16 +320,13 @@ class hvPlotExplorer(Viewer):
             self.param, parameters=['kind', 'x', 'y', 'by', 'groupby'],
             sizing_mode='stretch_width', max_width=300
         )
-        self._hv_pane = pn.pane.HoloViews(sizing_mode='stretch_width', margin=(0, 0, 0, 50))
         self.param.watch(self._toggle_controls, 'kind')
         self.param.watch(self._check_y, 'y_multi')
         self.param.watch(self._check_by, 'by')
         self._populate()
         self._tabs = pn.Tabs(
-            tabs_location='left',
-            sizing_mode='stretch_width'
+            tabs_location='left', width=400
         )
-        self.param.trigger('kind')
         controllers = {
             cls.name.lower(): cls(df, explorer=self, **params)
             for cls, params in controller_params.items()
@@ -338,15 +335,18 @@ class hvPlotExplorer(Viewer):
         self.param.watch(self._plot, list(self.param))
         for controller in controllers.values():
             controller.param.watch(self._plot, list(controller.param))
-        self._alert = pn.pane.Alert(alert_type='danger', visible=False)
+        self._alert = pn.pane.Alert(
+            alert_type='danger', visible=False, sizing_mode='stretch_width'
+        )
         self._layout = pn.Column(
             self._alert,
             pn.Row(
                 self._tabs,
-                self._hv_pane.layout,
+                pn.layout.HSpacer(),
                 sizing_mode='stretch_width'
             ),
-            sizing_mode='stretch_width'
+            pn.layout.HSpacer(),
+            sizing_mode='stretch_both'
         )
         self._plot()
         self.param.trigger('kind')
@@ -366,7 +366,7 @@ class hvPlotExplorer(Viewer):
         if isinstance(y, list) and len(y) == 1:
             y = y[0]
         kwargs = {}
-        for p, v in self.param.get_param_values():
+        for p, v in self.param.values().items():
             if isinstance(v, Controls):
                 kwargs.update(v.kwargs)
 
@@ -381,9 +381,13 @@ class hvPlotExplorer(Viewer):
         if len(df) > MAX_ROWS and not (self.kind in STATS_KINDS or kwargs.get('rasterize') or kwargs.get('datashade')):
             df = df.sample(n=MAX_ROWS)
         try:
-            self._hv_pane.object = df.hvplot(
+            plot = df.hvplot(
                 kind=self.kind, x=self.x, y=y, by=self.by, groupby=self.groupby, **kwargs
             )
+            hvplot = pn.pane.HoloViews(
+                plot, sizing_mode='stretch_width', margin=(0, 20, 0, 20)
+            ).layout
+            self._layout[1][1] = hvplot
             self._alert.visible = False
         except Exception as e:
             self._alert.param.set_param(
@@ -476,6 +480,35 @@ class hvGridExplorer(hvPlotExplorer):
 
     def __new__(cls, data, **params):
         return super(hvPlotExplorer, cls).__new__(cls)
+
+    @property
+    def _x(self):
+        return (self._converter.x or self._converter.indexes[0]) if self.x is None else self.x
+
+    @property
+    def _y(self):
+        return (self._converter.y or self._converter.indexes[1]) if self.y is None else self.y
+
+    @param.depends('x')
+    def xlim(self):
+        if self._x == 'index':
+            values = self._data.index.values
+        else:
+            try:
+                values = self._data[self._x]
+            except:
+                return 0, 1
+        if values.dtype.kind in 'OSU':
+            return None
+        return (np.nanmin(values), np.nanmax(values))
+
+    @param.depends('y', 'y_multi')
+    def ylim(self):
+        y = self._y
+        if not isinstance(y, list):
+            y = [y]
+        values = (self._data[y] for y in y)
+        return max_range([(np.nanmin(vs), np.nanmax(vs)) for vs in values])
 
 
 class hvDataFrameExplorer(hvPlotExplorer):
