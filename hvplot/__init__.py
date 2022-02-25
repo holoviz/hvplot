@@ -6,7 +6,7 @@ import param
 import panel as _pn
 import holoviews as _hv
 
-from holoviews import Store
+from holoviews import Store, render  # noqa
 
 from .converter import HoloViewsConverter
 from .util import get_ipy
