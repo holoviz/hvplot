@@ -115,7 +115,7 @@ def _from_networkx(G, positions, nodes=None, cls=Graph, **kwargs):
     return cls((edge_data, nodes), vdims=edge_vdims)
 
 
-def draw(G, pos=None, **kwargs):
+def draw(G, pos=None, backends=None, **kwargs):
     """
     Draw the graph G using hvPlot.
 
@@ -350,7 +350,7 @@ def draw(G, pos=None, **kwargs):
         g = g.relabel(kwargs.pop('label'))
 
     # Process options
-    g = _transfert_opts_backends(g, kwargs.pop('backends', None))
+    g = _transfert_opts_backends(g, backends)
 
     return g
 

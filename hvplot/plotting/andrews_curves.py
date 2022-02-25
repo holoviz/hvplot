@@ -11,7 +11,7 @@ from ..util import with_hv_extension
 @with_hv_extension
 def andrews_curves(data, class_column, samples=200, alpha=0.5,
                    width=600, height=300, cmap=None, colormap=None,
-                   **kwds):
+                   backends=None, **kwds):
     """
     Generate a plot of Andrews curves, for visualising clusters of
     multivariate data.
@@ -77,5 +77,5 @@ def andrews_curves(data, class_column, samples=200, alpha=0.5,
 
     el = hv.Overlay([curve.relabel(k).options('Curve', color=c, backend='bokeh')
                        for c, (k, v) in zip(colors, groups) for curve in v]).options(options, backend='bokeh')
-    el = _transfert_opts_backends(el, kwds.pop('backends', None))
+    el = _transfert_opts_backends(el, backends)
     return el
