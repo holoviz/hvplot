@@ -40,7 +40,6 @@ def _transfer_opts(element, backend):
     el_options = element.opts.get(backend='bokeh', defaults=False).kwargs
     for grp, el_opts in options[elname].groups.items():
         for opt, val in el_options.items():
-            # print('    < before', opt, val)
             transform = transforms.get(grp, {}).get(opt, None)
             # This condition could be applied to matplotlib only
             # but is applied to plotly too since there seems to be
