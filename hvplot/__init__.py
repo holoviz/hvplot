@@ -132,3 +132,7 @@ for cls in [hvPlot, hvPlotTabular]:
     for _kind in HoloViewsConverter._kind_mapping:
         if hasattr(cls, _kind):
             _patch_doc(cls, _kind)
+
+class extension(_hv.extension):
+
+    logo = param.Boolean(default=False)
