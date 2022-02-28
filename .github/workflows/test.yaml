@@ -7,6 +7,9 @@ on:
     branches:
     - '*'
 
+env:
+  CACHE_VERSION: 1
+
 jobs:
   test_suite:
     name: Pytest on ${{ matrix.os }} with Python ${{ matrix.python-version }}
@@ -52,9 +55,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ matrix.path }}
-          key: ${{ runner.os }}-conda-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}-${{ env.TODAY }}
+          key: ${{ runner.os }}-conda-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}-${{ env.TODAY }}-${{ env.CACHE_VERSION }}
           restore-keys: |
-           ${{ runner.os }}-conda-${{ matrix.python-version }}-${{ env.TODAY }}-
+           ${{ runner.os }}-conda-${{ matrix.python-version }}-${{ env.TODAY }}-${{ env.CACHE_VERSION }}
         id: cache
 
       - name: conda setup
