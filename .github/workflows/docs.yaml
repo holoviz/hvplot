@@ -25,6 +25,7 @@ jobs:
       DESC: "Documentation build"
       CHANS_DEV: "-c pyviz/label/dev -c bokeh -c conda-forge"
       MPLBACKEND: "Agg"
+      PYCTDEV_SELF_CHANNEL: pyviz/label/dev
       MOZ_HEADLESS: 1
       DISPLAY: ":99.0"
     steps:
@@ -52,7 +53,7 @@ jobs:
           eval "$(conda shell.bash hook)"
           conda activate test-environment
           conda list
-          doit develop_install ${{ env.CHANS_DEV}} -o doc -o examples
+          doit develop_install ${{ env.CHANS_DEV}} -o doc -o examples --conda-mode=mamba
       - name: doit env_capture
         run: |
           eval "$(conda shell.bash hook)"
