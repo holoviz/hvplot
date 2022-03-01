@@ -54,7 +54,6 @@ jobs:
           conda activate test-environment
           conda list
           doit develop_install ${{ env.CHANS_DEV}} -o doc -o examples
-          pip install pydata_sphinx_theme
       - name: bokeh sampledata
         run: |
           eval "$(conda shell.bash hook)"
