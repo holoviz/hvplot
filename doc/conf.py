@@ -7,7 +7,8 @@ from nbsite.shared_conf import *
 
 project = 'hvPlot'
 authors = 'HoloViz developers'
-copyright = '2018-2021 ' + authors
+copyright_years['start_year'] = '2016'
+copyright = copyright_fmt.format(**copyright_years)
 description = 'A high-level plotting API for the PyData ecosystem built on HoloViews'
 
 import hvplot
