@@ -67,6 +67,7 @@ nbsite_gallery_conf = {
 }
 
 html_context.update({
+    "last_release": f"v{release}",
     "github_user": "holoviz",
     "github_repo": "panel",
 })
