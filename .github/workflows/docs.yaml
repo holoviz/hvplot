@@ -53,6 +53,11 @@ jobs:
           conda activate test-environment
           conda list
           doit develop_install ${{ env.CHANS_DEV}} -o doc -o examples
+      - name: doit env_capture
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda activate test-environment
+          doit env_capture
       - name: bokeh sampledata
         run: |
           eval "$(conda shell.bash hook)"
