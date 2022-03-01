@@ -46,7 +46,6 @@ jobs:
         run: |
           conda config --set always_yes True
           conda install -c pyviz "pyctdev>=0.5"
-          doit ecosystem_setup
           doit env_create ${{ env.CHANS_DEV}} --python=3.8
       - name: doit develop_install
         run: |
