@@ -23,21 +23,17 @@ jobs:
         shell: bash -l {0}
     env:
       DESC: "Documentation build"
-      CHANS_DEV: "-c pyviz/label/dev -c bokeh -c conda-forge"
       MPLBACKEND: "Agg"
-      PYCTDEV_SELF_CHANNEL: pyviz/label/dev
       MOZ_HEADLESS: 1
       DISPLAY: ":99.0"
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: "100"
-      - uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
       - uses: conda-incubator/setup-miniconda@v2
         with:
-          miniconda-version: "latest"
+          mamba-version: "*"
+          channels: pyviz/label/dev,bokeh,conda-forge,nodefaults
       - name: Fetch unshallow
         run: git fetch --prune --tags --unshallow -f
       - name: Set output
@@ -45,15 +41,14 @@ jobs:
         run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
       - name: conda setup
         run: |
-          conda config --set always_yes True
-          conda install -c pyviz "pyctdev>=0.5"
-          doit env_create ${{ env.CHANS_DEV}} --python=3.8
+          conda install "pyctdev>=0.5"
+          conda create -n test-environment python=3.8 pyctdev
       - name: doit develop_install
         run: |
           eval "$(conda shell.bash hook)"
           conda activate test-environment
           conda list
-          doit develop_install ${{ env.CHANS_DEV}} -o doc -o examples --conda-mode=mamba
+          doit develop_install -o doc -o examples --conda-mode=mamba
       - name: doit env_capture
         run: |
           eval "$(conda shell.bash hook)"
