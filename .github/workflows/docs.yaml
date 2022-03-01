@@ -53,9 +53,9 @@ jobs:
           (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'dev') ||
           (github.event_name == 'push' && (contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc')))
         run: echo "dev"
-      - name: debug prod
+      - name: debug main
         if: |
-          (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'prod') ||
+          (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'main') ||
           (github.event_name == 'push' && !(contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc')))
         run: echo "dev"
       # - name: conda setup
