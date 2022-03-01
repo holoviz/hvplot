@@ -9,9 +9,13 @@ on:
   workflow_dispatch:
     inputs:
       target:
-        description: 'dev or main'     
+        description: 'Site to build and deploy'   
+        type: choice
+        options:
+        - dev
+        - main  
         required: true
-        default: 'dev'
+        default: dev
 
 jobs:
   build_docs:
