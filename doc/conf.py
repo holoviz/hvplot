@@ -11,9 +11,7 @@ copyright_years['start_year'] = '2016'
 copyright = copyright_fmt.format(**copyright_years)
 description = 'A high-level plotting API for the PyData ecosystem built on HoloViews'
 
-import hvplot
-version = release = hvplot.__version__
-
+version = release  = base_version(__version__)
 nbbuild_cell_timeout = 600
 
 html_static_path += ['_static']
