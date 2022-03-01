@@ -33,7 +33,7 @@ html_theme_options = {
         },
         {
             "name": "Discourse",
-            "url": "https://discourse.holoviz.org/",
+            "url": "https://discourse.holoviz.org/c/hvplot",
             "icon": "fab fa-discourse",
         },
     ]
