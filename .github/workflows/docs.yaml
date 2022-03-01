@@ -48,6 +48,16 @@ jobs:
           echo "${{ toJSON( github.event ) }}"
           echo ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'dev') }}
           echo ${{ !(contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc')) }}
+      - name: debug dev
+        if: |
+          (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'dev') ||
+          (github.event_name == 'push' && (contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc')))
+        run: echo "dev"
+      - name: debug prod
+        if: |
+          (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'prod') ||
+          (github.event_name == 'push' && !(contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc')))
+        run: echo "dev"
       # - name: conda setup
       #   run: |
       #     conda install "pyctdev>=0.5"
