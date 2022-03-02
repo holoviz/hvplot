@@ -9,14 +9,15 @@ from packaging.version import Version
 from types import FunctionType
 
 import pandas as pd
-import holoviews as hv
 import param
+import holoviews as hv
 try:
     import panel as pn
     panel_available = True
 except:
     panel_available = False
 
+from holoviews.core import Store
 from holoviews.core.util import basestring
 
 hv_version = Version(hv.__version__)
@@ -497,4 +498,36 @@ def filter_opts(eltype, options, backend='bokeh'):
     opts = getattr(hv.Store.options(backend), eltype)
     allowed = [k for g in opts.groups.values()
                for k in list(g.allowed_keywords)]
-    return {k: v for k, v in options.items() if k in allowed}
+    opts = {k: v for k, v in options.items() if k in allowed}
+    return opts
+
+
+class hvplot_extension(hv.extension):
+
+    compatibility = param.Selector(
+        default=None, objects=['bokeh', 'matplotlib', 'plotly'],
+        allow_None=True, doc="""
+            Backend used to parse styling options.""")
+
+    logo = param.Boolean(default=False)
+
+    _compatibility = None
+
+    def __call__(self, *args, **params):
+        # importing e.g. hvplot.pandas always loads the bokeh extension.
+        # so hvplot.extension('matplotlib', compatibility='bokeh') doesn't
+        # require the user or the code to explicitely load bokeh.
+        compatibility = params.pop('compatibility', None)
+        super().__call__(*args, **params)
+        backend = Store.current_backend
+        if compatibility in ['matpliotlib', 'plotly'] and backend != compatibility:
+            param.main.param.warning(
+                f'Compatibility from {compatibility} to {backend} '
+                'not yet implemented. Defaults to bokeh.'
+            )
+            compatibility = 'bokeh'
+        # hvplot.extension('matplotlib') assumes the styling options
+        # are matplotlib options.
+        if not compatibility:
+            compatibility = backend
+        hvplot_extension._compatibility = compatibility

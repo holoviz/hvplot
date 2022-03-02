@@ -10,6 +10,7 @@ from holoviews import Store, render  # noqa
 
 from .converter import HoloViewsConverter
 from .util import get_ipy
+from .util import hvplot_extension
 from .utilities import save, show # noqa
 from .plotting import (hvPlot, hvPlotTabular,  # noqa
                        andrews_curves, lag_plot,
@@ -113,7 +114,7 @@ def post_patch(extension='bokeh', logo=False):
             __import__('holoviews.plotting.%s' % ext)
             _hv.Store.set_current_backend(extension)
         else:
-            _hv.extension(extension, logo=logo)
+            hvplot_extension(extension, logo=logo)
 
 
 def _patch_doc(cls, kind):
@@ -133,6 +134,4 @@ for cls in [hvPlot, hvPlotTabular]:
         if hasattr(cls, _kind):
             _patch_doc(cls, _kind)
 
-class extension(_hv.extension):
-
-    logo = param.Boolean(default=False)
+extension = hvplot_extension

@@ -1,7 +1,7 @@
 import holoviews as hv
 import colorcet as cc
 
-from ..backend_transforms import _transfert_opts_backends
+from ..backend_transforms import _transfer_opts_cur_backend
 from ..util import with_hv_extension
 
 
@@ -9,7 +9,7 @@ from ..util import with_hv_extension
 def parallel_coordinates(data, class_column, cols=None, alpha=0.5,
                          width=600, height=300, var_name='variable',
                          value_name='value', cmap=None, colormap=None,
-                         backends=None, **kwds):
+                         **kwds):
     """
     Parallel coordinates plotting.
 
@@ -66,5 +66,5 @@ def parallel_coordinates(data, class_column, cols=None, alpha=0.5,
 
     el = hv.Overlay([curve.relabel(k).options('Curve', color=c, backend='bokeh')
                        for c, (k, v) in zip(colors, groups) for curve in v]).options(options, backend='bokeh')
-    el = _transfert_opts_backends(el, backends)
+    el = _transfer_opts_cur_backend(el)
     return el

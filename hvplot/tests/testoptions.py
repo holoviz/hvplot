@@ -1,3 +1,4 @@
+import hvplot
 import holoviews as hv
 import numpy as np
 import pytest
@@ -31,7 +32,7 @@ def backend(request):
     backend = request.param
     backend_copy = Store.current_backend
     if backend not in Store.registry:
-        hv.extension(backend)
+        hvplot.extension(backend, compatibility='bokeh')
     Store.set_current_backend(backend)
     store_copy = OptionTree(sorted(Store.options().items()),
                                     groups=Options._option_groups)

@@ -4,7 +4,7 @@ import warnings
 import holoviews as _hv
 from packaging.version import Version
 
-from ..backend_transforms import _transfert_opts_backends
+from ..backend_transforms import _transfer_opts_cur_backend
 from ..converter import HoloViewsConverter
 from ..util import with_hv_extension
 
@@ -15,7 +15,7 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
                    tools=None, cmap=None, colormap=None,
                    diagonal_kwds=None, hist_kwds=None, density_kwds=None,
                    datashade=False, rasterize=False, dynspread=False, spread=False,
-                   backends=None, **kwds):
+                   **kwds):
     """
     Scatter matrix of numeric columns.
 
@@ -197,5 +197,5 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
             eltype = _hv.RGB if datashade else _hv.Image
             grid = grid.map(partial(spreadfn, **sp_kwds), specs=eltype)
  
-    grid = _transfert_opts_backends(grid, backends)
+    grid = _transfer_opts_cur_backend(grid)
     return grid

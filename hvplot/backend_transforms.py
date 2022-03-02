@@ -26,7 +26,7 @@ def _transform_size(width, height, aspect):
 
 def _transfer_opts(element, backend):
     """
-    Transfer the options of an element to another backend
+    Transfer the bokeh options of an element to another backend
     based on an internal mapping of option transforms.
     """
     elname = type(element).__name__
@@ -83,14 +83,9 @@ def _is_interactive_opt(bk_opt):
     return any(part in interactive_flags for part in bk_opt.split('_'))
 
 
-def _transfert_opts_backends(element, backends):
-    if backends is None:
-        if Store.current_backend == 'bokeh':
-            backends = []
-        else:
-            backends = [Store.current_backend]
-    for backend in backends:
-        element = element.apply(_transfer_opts, backend=backend)
+def _transfer_opts_cur_backend(element):
+    if Store.current_backend != 'bokeh':
+        element = element.apply(_transfer_opts, backend=Store.current_backend)
     return element
 
 

@@ -11,7 +11,7 @@ from holoviews.core.util import dimension_sanitizer
 from holoviews.plotting.bokeh import GraphPlot, LabelsPlot
 from holoviews.plotting.bokeh.styles import markers
 
-from .backend_transforms import _transfert_opts_backends
+from .backend_transforms import _transfer_opts_cur_backend
 from .util import process_crs
 from .utilities import save, show # noqa
 
@@ -115,7 +115,7 @@ def _from_networkx(G, positions, nodes=None, cls=Graph, **kwargs):
     return cls((edge_data, nodes), vdims=edge_vdims)
 
 
-def draw(G, pos=None, backends=None, **kwargs):
+def draw(G, pos=None, **kwargs):
     """
     Draw the graph G using hvPlot.
 
@@ -350,7 +350,7 @@ def draw(G, pos=None, backends=None, **kwargs):
         g = g.relabel(kwargs.pop('label'))
 
     # Process options
-    g = _transfert_opts_backends(g, backends)
+    g = _transfer_opts_cur_backend(g)
 
     return g
 

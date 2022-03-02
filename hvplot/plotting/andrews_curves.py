@@ -4,14 +4,14 @@ import pandas as pd
 import holoviews as hv
 import colorcet as cc
 
-from ..backend_transforms import _transfert_opts_backends
+from ..backend_transforms import _transfer_opts_cur_backend
 from ..util import with_hv_extension
 
 
 @with_hv_extension
 def andrews_curves(data, class_column, samples=200, alpha=0.5,
                    width=600, height=300, cmap=None, colormap=None,
-                   backends=None, **kwds):
+                   **kwds):
     """
     Generate a plot of Andrews curves, for visualising clusters of
     multivariate data.
@@ -77,5 +77,5 @@ def andrews_curves(data, class_column, samples=200, alpha=0.5,
 
     el = hv.Overlay([curve.relabel(k).options('Curve', color=c, backend='bokeh')
                        for c, (k, v) in zip(colors, groups) for curve in v]).options(options, backend='bokeh')
-    el = _transfert_opts_backends(el, backends)
+    el = _transfer_opts_cur_backend(el)
     return el
