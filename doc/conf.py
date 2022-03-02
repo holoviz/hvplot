@@ -23,7 +23,7 @@ html_css_files = [
     'custom.css'
 ]
 
-html_theme_options = {
+html_theme_options.update({
     "github_url": "https://github.com/holoviz/hvplot",
     "icon_links": [
         {
@@ -38,7 +38,7 @@ html_theme_options = {
         },
     ],
     "google_analytics_id": "UA-154795830-5",
-}
+})
 
 html_theme = "pydata_sphinx_theme"
 html_logo = "_static/logo_horizontal.svg"
