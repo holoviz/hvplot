@@ -400,7 +400,7 @@ class TestOptions:
             assert opts.get('width') == 150
             assert opts.get('height') is None
         elif backend == 'matplotlib':
-            assert pytest.approx(opts.get('fig_size'), 50.0)
+            assert opts.get('fig_size') == pytest.approx(50.0)
 
     def test_symmetric_dataframe(self, backend):
         import pandas as pd
