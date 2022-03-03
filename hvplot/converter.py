@@ -2120,16 +2120,13 @@ class HoloViewsConverter:
             projection = self._plot_opts.get('projection', ccrs.GOOGLE_MERCATOR)
             qmesh = project(qmesh, projection=projection)
 
-        opts = {}
         if filled:
-            opts['line_alpha'] = 0
-
-        if opts['colorbar']:
-            opts['show_legend'] = False
+            cur_opts['line_alpha'] = 0
+        if cur_opts['colorbar']:
+            cur_opts['show_legend'] = False
         levels = self.kwds.get('levels', 5)
         if isinstance(levels, int):
-            opts['color_levels'] = levels
-        cur_opts = {**cur_opts, **opts}
+            cur_opts['color_levels'] = levels
         return (contours(qmesh, filled=filled, levels=levels)
                 .apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts))
 
