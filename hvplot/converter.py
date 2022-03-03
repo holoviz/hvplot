@@ -1955,10 +1955,16 @@ class HoloViewsConverter:
             seg_cur_opts['xlabel'] = '' if x == 'index' else x
         if 'ylabel' not in seg_cur_opts:
             seg_cur_opts['ylabel'] = ''
-        segments = (segments.redim(**self._redim)
-                    .apply(self._set_backends_opts(seg_cur_opts, seg_compat_opts)))
-        rects = (rects.redim(**self._redim)
-                .apply(self._set_backends_opts(rect_cur_opts, rect_compat_opts)))
+        segments = (
+            segments.redim(**self._redim)
+            .apply(self._set_backends_opts,
+                   cur_opts=seg_cur_opts, compat_opts=seg_compat_opts)
+        )
+        rects = (
+            rects.redim(**self._redim)
+            .apply(self._set_backends_opts,
+                   cur_opts=rect_cur_opts, compat_opts=rect_compat_opts)
+        )
         return segments * rects
 
     def table(self, x=None, y=None, data=None):
