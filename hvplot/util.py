@@ -27,7 +27,8 @@ def with_hv_extension(func, extension='bokeh', logo=False):
     @wraps(func)
     def wrapper(*args, **kwargs):
         if extension and not getattr(hv.extension, '_loaded', False):
-            hv.extension(extension, logo=logo)
+            from . import hvplot_extension
+            hvplot_extension(extension, logo=logo)
         return func(*args, **kwargs)
     return wrapper
 
