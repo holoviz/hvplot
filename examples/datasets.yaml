@@ -4,7 +4,7 @@ sources:
     driver: parquet
     cache:
       - argkey: urlpath
-        regex: 'airline_flights'
+        regex: 'assets.holoviews.org/data/'
         type: file
     args:
       urlpath: 's3://assets.holoviews.org/data/airline_flights.parq'
