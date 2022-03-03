@@ -1,4 +1,5 @@
 import panel as _pn
+import param
 import holoviews as _hv
 
 renderer = _hv.renderer('bokeh')
@@ -24,3 +25,34 @@ def show(obj, title=None, port=0, **kwargs):
         raise ValueError('%s type object not recognized and cannot be shown.' %
                          type(obj).__name__)
     _pn.pane.HoloViews(obj).show(title, port, **kwargs)
+
+
+class hvplot_extension(_hv.extension):
+
+    compatibility = param.Selector(
+        default=None, objects=['bokeh', 'matplotlib', 'plotly'],
+        allow_None=True, doc="""
+            Backend used to parse styling options.""")
+
+    logo = param.Boolean(default=False)
+
+    _compatibility = None
+
+    def __call__(self, *args, **params):
+        # importing e.g. hvplot.pandas always loads the bokeh extension.
+        # so hvplot.extension('matplotlib', compatibility='bokeh') doesn't
+        # require the user or the code to explicitely load bokeh.
+        compatibility = params.pop('compatibility', None)
+        super().__call__(*args, **params)
+        backend = _hv.Store.current_backend
+        if compatibility in ['matpliotlib', 'plotly'] and backend != compatibility:
+            param.main.param.warning(
+                f'Compatibility from {compatibility} to {backend} '
+                'not yet implemented. Defaults to bokeh.'
+            )
+            compatibility = 'bokeh'
+        # hvplot.extension('matplotlib') assumes the styling options
+        # are matplotlib options.
+        if not compatibility:
+            compatibility = backend
+        hvplot_extension._compatibility = compatibility

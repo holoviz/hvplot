@@ -10,8 +10,7 @@ from holoviews import Store, render  # noqa
 
 from .converter import HoloViewsConverter
 from .util import get_ipy
-from .util import hvplot_extension
-from .utilities import save, show # noqa
+from .utilities import hvplot_extension, save, show # noqa
 from .plotting import (hvPlot, hvPlotTabular,  # noqa
                        andrews_curves, lag_plot,
                        parallel_coordinates, scatter_matrix, plot)

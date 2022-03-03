@@ -33,8 +33,8 @@ from .util import (
     is_streamz, is_ibis, is_xarray, is_xarray_dataarray, process_crs,
     process_intake, process_xarray, check_library, is_geodataframe,
     process_derived_datetime_xarray, process_derived_datetime_pandas,
-    hvplot_extension,
 )
+from .utilities import hvplot_extension
 
 renderer = hv.renderer('bokeh')
 
