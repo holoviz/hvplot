@@ -56,3 +56,7 @@ class hvplot_extension(_hv.extension):
         if not compatibility:
             compatibility = backend
         hvplot_extension._compatibility = compatibility
+        # Patch or re-patch the docstrings/signatures to display
+        # the right styling options.
+        from . import _patch_hvplot_docstrings
+        _patch_hvplot_docstrings()
