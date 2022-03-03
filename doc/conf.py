@@ -16,7 +16,7 @@ version = release  = base_version(hvplot.__version__)
 nbbuild_cell_timeout = 600
 
 html_static_path += ['_static']
-templates_path = ['_templates']
+templates_path += ['_templates']
 
 html_css_files = [
     'nbsite.css',
