@@ -33,8 +33,8 @@ class hvPlotBase:
 
         Parameters
         ----------
-        x, y : string, optional
-            Field name in the data to draw x- and y-positions from
+        x, y : string, list, or array-like, optional
+            Field name(s) in the data to draw x- and y-positions from
         kind : string, optional
             The kind of plot to generate, e.g. 'line', 'scatter', etc.
         **kwds : optional
@@ -44,6 +44,10 @@ class hvPlotBase:
         -------
         HoloViews object: Object representing the requested visualization
         """
+        # Convert an array-like to a list
+        x = list(x) if hasattr(x, "all") else x
+        y = list(y) if hasattr(y, "all") else y
+
         if isinstance(kind, str) and kind not in self.__all__:
             raise NotImplementedError("kind='{kind}' for data of type {type}".format(
                 kind=kind, type=type(self._data)))
