@@ -363,7 +363,7 @@ class HoloViewsConverter:
         logx=None, logy=None, loglog=None, hover=None, subplots=False,
         label=None, invert=False, stacked=False, colorbar=None,
         datashade=False, rasterize=False, row=None, col=None,
-        figsize=None, debug=False, framewise=True, aggregator=None,
+        debug=False, framewise=True, aggregator=None,
         projection=None, global_extent=None, geo=False,
         precompute=False, flip_xaxis=None, flip_yaxis=None,
         dynspread=False, hover_cols=[], x_sampling=None,
