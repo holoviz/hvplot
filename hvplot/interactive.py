@@ -20,6 +20,7 @@ from .util import is_tabular, is_xarray, is_xarray_dataarray
 def _find_widgets(op):
     widgets = []
     op_args = list(op['args'])+list(op['kwargs'].values())
+    op_args = hv.core.util.flatten(op_args)
     for op_arg in op_args:
         if 'panel' in sys.modules:
             if isinstance(op_arg, Widget) and op_arg not in widgets:

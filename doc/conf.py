@@ -7,23 +7,23 @@ from nbsite.shared_conf import *
 
 project = 'hvPlot'
 authors = 'HoloViz developers'
-copyright = '2018-2022 ' + authors
+copyright_years['start_year'] = '2016'
+copyright = copyright_fmt.format(**copyright_years)
 description = 'A high-level plotting API for the PyData ecosystem built on HoloViews'
 
 import hvplot
-version = release = base_version(hvplot.__version__)
-
+version = release  = base_version(hvplot.__version__)
 nbbuild_cell_timeout = 600
 
 html_static_path += ['_static']
-templates_path = ['_templates']
+templates_path += ['_templates']
 
 html_css_files = [
     'nbsite.css',
     'custom.css'
 ]
 
-html_theme_options = {
+html_theme_options.update({
     "github_url": "https://github.com/holoviz/hvplot",
     "icon_links": [
         {
@@ -33,16 +33,12 @@ html_theme_options = {
         },
         {
             "name": "Discourse",
-            "url": "https://discourse.holoviz.org/",
+            "url": "https://discourse.holoviz.org/c/hvplot",
             "icon": "fab fa-discourse",
         },
     ],
-    "footer_items": [
-        "copyright",
-        "last-updated",
-    ],
     "google_analytics_id": "UA-154795830-5",
-}
+})
 
 html_theme = "pydata_sphinx_theme"
 html_logo = "_static/logo_horizontal.svg"
@@ -71,7 +67,8 @@ nbsite_gallery_conf = {
     },
 }
 
-# Override the Sphinx default title that appends `documentation`
-html_title = f'{project} v{version}'
-# Format of the last updated section in the footer
-html_last_updated_fmt = '%Y-%m-%d'
+html_context.update({
+    "last_release": f"v{release}",
+    "github_user": "holoviz",
+    "github_repo": "panel",
+})
