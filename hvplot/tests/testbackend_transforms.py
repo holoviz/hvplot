@@ -5,7 +5,7 @@ from holoviews.element import Area, Curve
 
 from hvplot.backend_transforms import (
     _transfer_opts,
-    _transform_size,
+    _transform_size_to_mpl,
     _is_interactive_opt,
 )
 
@@ -20,8 +20,8 @@ from hvplot.backend_transforms import (
         (None, 300, None, {'fig_size': 100.0}),
     )
 )
-def test_transform_size(width, height, aspect, opts):
-    assert _transform_size(width, height, aspect) == opts
+def test_transform_size_to_mpl(width, height, aspect, opts):
+    assert _transform_size_to_mpl(width, height, aspect) == opts
 
 
 @pytest.mark.parametrize(

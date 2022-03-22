@@ -9,7 +9,7 @@ from holoviews.plotting.util import COLOR_ALIASES
 UNSET = type('UNSET', (), {})
 
 
-def _transform_size(width, height, aspect):
+def _transform_size_to_mpl(width, height, aspect):
     opts = {}
     if width and height:
         opts = {'aspect': width/height, 'fig_size': (width/300.)*100}
@@ -56,7 +56,7 @@ def _transfer_opts(element, backend):
                 continue
             new_opts[opt] = val
     if backend == 'matplotlib':
-        size_opts = _transform_size(
+        size_opts = _transform_size_to_mpl(
             el_options.get('width'), el_options.get('height'),
             el_options.get('aspect')
         )
