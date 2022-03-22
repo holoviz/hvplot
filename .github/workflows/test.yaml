@@ -56,10 +56,7 @@ jobs:
         with:
           path: ${{ matrix.path }}
           key: ${{ runner.os }}-conda-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}-${{ env.TODAY }}-${{ env.CACHE_VERSION }}
-          restore-keys: |
-           ${{ runner.os }}-conda-${{ matrix.python-version }}-${{ env.TODAY }}-${{ env.CACHE_VERSION }}
         id: cache
-
       - name: conda setup
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
