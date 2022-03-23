@@ -1,6 +1,8 @@
 import inspect
 import textwrap
 
+from functools import wraps as _wraps
+
 import param
 import panel as _pn
 import holoviews as _hv
@@ -8,6 +10,7 @@ import holoviews as _hv
 from holoviews import Store, render  # noqa
 
 from .converter import HoloViewsConverter
+from .interactive import Interactive
 from .utilities import hvplot_extension, output, save, show # noqa
 from .plotting import (hvPlot, hvPlotTabular,  # noqa
                        andrews_curves, lag_plot,
@@ -151,3 +154,9 @@ def _hook_patch_docstrings(backend):
 Store._backend_switch_hooks.append(_hook_patch_docstrings)
 
 extension = hvplot_extension
+
+@_wraps(_pn.bind)
+def bind(function, *args, **kwargs):
+    bound = _pn.bind(function, *args, **kwargs)
+    bound.interactive = lambda **kwargs: Interactive(bound, **kwargs)
+    return bound

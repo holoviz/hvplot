@@ -6,12 +6,15 @@ import abc
 import operator
 import sys
 
+from types import FunctionType, MethodType
+
 import holoviews as hv
 import pandas as pd
 import panel as pn
 import param
 
 from panel.layout import Column, Row, VSpacer, HSpacer
+from panel.util import get_method_owner
 from panel.widgets.base import Widget
 
 from .util import is_tabular, is_xarray, is_xarray_dataarray
@@ -56,6 +59,11 @@ class Interactive():
                  loc='top_left', center=False, dmap=False, inherit_kwargs={},
                  max_rows=100, **kwargs):
         self._init = False
+        if isinstance(obj, (FunctionType, MethodType)):
+            self._fn = pn.panel(obj)
+            obj = self._fn.eval(self._fn.object)
+        else:
+            self._fn = None
         self._obj = obj
         self._method = None
         if transform is None:
@@ -87,22 +95,51 @@ class Interactive():
         self._current = self._transform.apply(ds, keep_index=True, compute=False)
         self._init = True
 
+    @classmethod
+    def bind(cls, function, *args, **kwargs):
+        """
+        Given a function, returns an Interactive object that binds the
+        values of some or all arguments to parameter or widget values
+        and expresses Param dependencies on those values. The
+        resulting Interactive object will update whenever one of the
+        parameter values change.
+
+        For more details see panel.bind documentation.
+        """
+        return cls(pn.bind(function, *args, **kwargs))
+
+    @property
+    def _fn_params(self):
+        if self._fn is None:
+            deps = []
+        elif isinstance(self._fn, pn.param.ParamFunction):
+            dinfo = getattr(self._fn.object, '_dinfo', {})
+            deps = list(dinfo.get('dependencies', [])) + list(dinfo.get('kw', {}).values())
+        else:
+            parameterized = get_method_owner(self._fn.object)
+            deps = parameterized.param.method_dependencies(self._fn.object.__name__)
+        return deps
+        
     @property
     def _params(self):
-        return [v for k, v in self._transform.params.items() if k != 'ax']
+        return self._fn_params + [v for k, v in self._transform.params.items() if k != 'ax']
 
     @property
     def _callback(self):
         @pn.depends(*self._params)
         def evaluate(*args, **kwargs):
-            ds = hv.Dataset(self._obj)
-            obj = self._transform.apply(ds, keep_index=True, compute=False)
+            obj = self._fn.eval(self._fn.object) if self._fn else self._obj
+            ds = hv.Dataset(obj)
+            transform = self._transform
+            if ds.interface.datatype == 'xarray' and is_xarray_dataarray(obj):
+                transform = transform.clone(obj.name)
+            obj = transform.apply(ds, keep_index=True, compute=False)
             if self._method:
                 obj = getattr(obj, self._method, obj)
             if self._plot:
                 return Interactive._fig
             elif isinstance(obj, pd.DataFrame):
-                return pn.pane.DataFrame(obj, max_rows=self._max_rows)
+                return pn.pane.DataFrame(obj, max_rows=self._max_rows, **self._kwargs)
             else:
                 return obj
         return evaluate
@@ -116,7 +153,8 @@ class Interactive():
         dmap = self._dmap if dmap is None else dmap
         depth = self._depth+1
         kwargs = dict(self._inherit_kwargs, **dict(self._kwargs, **kwargs))
-        return type(self)(self._obj, transform, plot, depth,
+        obj = self._fn.object if self._fn else self._obj
+        return type(self)(obj, transform, plot, depth,
                           loc, center, dmap, **kwargs)
 
     def _repr_mimebundle_(self, include=[], exclude=[]):
@@ -459,6 +497,10 @@ class Interactive():
         A Column of widgets
         """
         widgets = []
+        for p in self._fn_params:
+            if (isinstance(p.owner, pn.widgets.Widget) and
+                p.owner not in widgets):
+                widgets.append(p.owner)
         for op in self._transform.ops:
             for w in _find_widgets(op):
                 if w not in widgets:
