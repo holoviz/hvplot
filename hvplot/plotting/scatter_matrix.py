@@ -155,7 +155,7 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
     if c:
         if cmap and colormap:
             raise TypeError("Only specify `cmap` or `colormap`.")
-        ncolors = len(_np.unique(data.dimension_values('CAT')))
+        ncolors = len(_np.unique(data.dimension_values(c)))
         cmap = cmap or colormap or 'Category10'
         cmap = _hv.plotting.util.process_cmap(cmap, ncolors=ncolors, categorical=True)
         chart_opts['cmap'] = cmap
