@@ -2,6 +2,8 @@
 hvPlot <img src="/doc/_static/logo.png" width="50" height="50">
 </h1>
 
+-----------------
+
 **A high-level plotting API for the PyData ecosystem built on HoloViews.**
 
 |    |    |
