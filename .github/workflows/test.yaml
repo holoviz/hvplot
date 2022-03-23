@@ -52,18 +52,10 @@ jobs:
       - name: Get Today's date for cache
         run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
       - name: conda cache
-        if: matrix.python-version == '3.6'
         uses: actions/cache@v2
         with:
           path: ${{ matrix.path }}
-          key: ${{ runner.os }}-conda-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}-tests-${{ env.TODAY }}-${{ env.CACHE_VERSION }}
-        id: cache
-      - name: conda cache
-        if: matrix.python-version > '3.6'
-        uses: actions/cache@v2
-        with:
-          path: ${{ matrix.path }}
-          key: ${{ runner.os }}-conda-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}-tests,examples-${{ env.TODAY }}-${{ env.CACHE_VERSION }}
+          key: ${{ runner.os }}-conda-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}-tests_examples-${{ env.TODAY }}-${{ env.CACHE_VERSION }}
         id: cache
       - name: conda setup
         if: steps.cache.outputs.cache-hit != 'true'
