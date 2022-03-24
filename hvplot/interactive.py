@@ -117,19 +117,6 @@ class Interactive():
     def _update_obj(self, *args):
         self._obj = self._fn.eval(self._fn.object)
 
-    @classmethod
-    def bind(cls, function, *args, **kwargs):
-        """
-        Given a function, returns an Interactive object that binds the
-        values of some or all arguments to parameter or widget values
-        and expresses Param dependencies on those values. The
-        resulting Interactive object will update whenever one of the
-        parameter values change.
-
-        For more details see panel.bind documentation.
-        """
-        return cls(pn.bind(function, *args, **kwargs))
-
     @property
     def _fn_params(self):
         if self._fn is None:
