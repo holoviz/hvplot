@@ -14,7 +14,7 @@ import panel as pn
 import param
 
 from panel.layout import Column, Row, VSpacer, HSpacer
-from panel.util import get_method_owner
+from panel.util import get_method_owner, full_groupby
 from panel.widgets.base import Widget
 
 from .util import is_tabular, is_xarray, is_xarray_dataarray
@@ -80,6 +80,10 @@ class Interactive():
                  loc='top_left', center=False, dmap=False, inherit_kwargs={},
                  max_rows=100, **kwargs):
         self._init = False
+        if self._fn is not None:
+            for _, params in full_groupby(self._fn_params, lambda x: id(x.owner)):
+                p = params[0]
+                p.owner.param.watch(self._update_obj, [_p.name for _p in params])
         self._method = None
         if transform is None:
             dim = '*'
@@ -109,6 +113,9 @@ class Interactive():
         ds = hv.Dataset(self._obj)
         self._current = self._transform.apply(ds, keep_index=True, compute=False)
         self._init = True
+
+    def _update_obj(self, *args):
+        self._obj = self._fn.eval(self._fn.object)
 
     @classmethod
     def bind(cls, function, *args, **kwargs):
@@ -143,7 +150,7 @@ class Interactive():
     def _callback(self):
         @pn.depends(*self._params)
         def evaluate(*args, **kwargs):
-            obj = self._fn.eval(self._fn.object) if self._fn else self._obj
+            obj = self._obj
             ds = hv.Dataset(obj)
             transform = self._transform
             if ds.interface.datatype == 'xarray' and is_xarray_dataarray(obj):
