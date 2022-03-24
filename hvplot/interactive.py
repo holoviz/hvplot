@@ -55,16 +55,31 @@ class Interactive():
 
     _fig = None
 
-    def __init__(self, obj, transform=None, plot=False, depth=0,
+    def __new__(cls, obj, **kwargs):
+        if 'fn' in kwargs:
+            fn = kwargs.pop('fn')
+        elif isinstance(obj, (FunctionType, MethodType)):
+            fn = pn.panel(obj)
+            obj = fn.eval(obj)
+        else:
+            fn = None
+        clss = cls
+        for subcls in cls.__subclasses__():
+            if subcls.applies(obj):
+                clss = subcls
+        inst = super(Interactive, cls).__new__(clss)
+        inst._obj = obj
+        inst._fn = fn
+        return inst
+
+    @classmethod
+    def applies(cls, obj):
+        return True
+
+    def __init__(self, obj, transform=None, fn=None, plot=False, depth=0,
                  loc='top_left', center=False, dmap=False, inherit_kwargs={},
                  max_rows=100, **kwargs):
         self._init = False
-        if isinstance(obj, (FunctionType, MethodType)):
-            self._fn = pn.panel(obj)
-            obj = self._fn.eval(self._fn.object)
-        else:
-            self._fn = None
-        self._obj = obj
         self._method = None
         if transform is None:
             dim = '*'
@@ -153,9 +168,8 @@ class Interactive():
         dmap = self._dmap if dmap is None else dmap
         depth = self._depth+1
         kwargs = dict(self._inherit_kwargs, **dict(self._kwargs, **kwargs))
-        obj = self._fn.object if self._fn else self._obj
-        return type(self)(obj, transform, plot, depth,
-                          loc, center, dmap, **kwargs)
+        return type(self)(self._obj, fn=self._fn, transform=transform, plot=plot, depth=depth,
+                          loc=loc, center=center, dmap=dmap, **kwargs)
 
     def _repr_mimebundle_(self, include=[], exclude=[]):
         return self.layout()._repr_mimebundle_()
