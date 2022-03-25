@@ -3,7 +3,7 @@ import numpy as np
 from unittest import SkipTest, expectedFailure
 from parameterized import parameterized
 
-from holoviews import NdOverlay, Store
+from holoviews import NdOverlay, Store, dim
 from holoviews.element import Curve, Area, Scatter, Points, Path, HeatMap
 from holoviews.element.comparison import ComparisonTestCase
 
@@ -243,6 +243,13 @@ class TestChart1D(ComparisonTestCase):
         plot = self.cat_df.hvplot.hist('y', by='category', legend='left')
         opts = Store.lookup_options('bokeh', plot, 'plot')
         self.assertEqual(opts.kwargs['legend_position'], 'left')
+
+    def test_scatter_color_internally_set_to_dim(self):
+        altered_df = self.cat_df.copy().rename(columns={'category': 'red'})
+        plot = altered_df.hvplot.scatter('x', 'y', c='red')
+        opts = Store.lookup_options('bokeh', plot, 'style')
+        self.assertIsInstance(opts.kwargs['color'], dim)
+        self.assertEqual(opts.kwargs['color'].dimension.name, 'red')
 
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
     def test_only_includes_num_chart(self, kind, element):

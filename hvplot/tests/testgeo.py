@@ -177,6 +177,13 @@ class TestGeoElements(TestCase):
         points = self.df.hvplot.points('x', 'y', geo=True)
         self.assertEqual(points.crs, self.crs)
 
+    def test_geo_points_color_internally_set_to_dim(self):
+        altered_df = self.df.copy().assign(red=np.random.choice(['a', 'b'], len(self.df)))
+        plot = altered_df.hvplot.points('x', 'y', c='red', geo=True)
+        opts = hv.Store.lookup_options('bokeh', plot, 'style')
+        self.assertIsInstance(opts.kwargs['color'], hv.dim)
+        self.assertEqual(opts.kwargs['color'].dimension.name, 'red')
+
     def test_geo_opts(self):
         points = self.df.hvplot.points('x', 'y', geo=True)
         opts = hv.Store.lookup_options('bokeh', points, 'plot').kwargs

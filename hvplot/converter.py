@@ -1449,12 +1449,17 @@ class HoloViewsConverter:
         if 'ylabel' in self._plot_opts and 'y' not in labelled:
             labelled.append('y')
         
+        cur_el_opts = self._get_opts(element.name, labelled=labelled, backend='bokeh')
+        compat_el_opts = self._get_opts(element.name, labelled=labelled, backend=self._backend_compat)
+        for opts_ in [cur_el_opts, compat_el_opts]:
+            if 'color' in opts_ and opts_['color'] in data.columns:
+                opts_['color'] = hv.dim(opts_['color'])
         cur_opts = {
-            element.name: self._get_opts(element.name, labelled=labelled, backend='bokeh'),
+            element.name: cur_el_opts,
             'NdOverlay': filter_opts('NdOverlay', dict(self._overlay_opts, batched=False), backend='bokeh'),
         }
         compat_opts = {
-            element.name: self._get_opts(element.name, labelled=labelled, backend=self._backend_compat),
+            element.name: compat_el_opts,
             'NdOverlay': filter_opts('NdOverlay', dict(self._overlay_opts), backend=self._backend_compat),
         }
 
@@ -2185,6 +2190,9 @@ class HoloViewsConverter:
             vdims = Dataset(data).vdims
         element = self._get_element(kind)
         cur_opts, compat_opts = self._get_compat_opts(element.name)
+        for opts_ in [cur_opts, compat_opts]:
+            if 'color' in opts_ and opts_['color'] in vdims:
+                opts_['color'] = hv.dim(opts_['color'])
         if self.geo: params['crs'] = self.crs
         if self.by:
             obj = Dataset(data).to(element, kdims, vdims, self.by, **params).overlay(sort=False)
