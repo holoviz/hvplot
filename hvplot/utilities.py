@@ -4,6 +4,8 @@ import holoviews as _hv
 
 renderer = _hv.renderer('bokeh')
 
+output = _hv.output
+
 save = _hv.save
 
 def show(obj, title=None, port=0, **kwargs):
@@ -36,8 +38,6 @@ class hvplot_extension(_hv.extension):
 
     logo = param.Boolean(default=False)
 
-    _compatibility = None
-
     def __call__(self, *args, **params):
         # importing e.g. hvplot.pandas always loads the bokeh extension.
         # so hvplot.extension('matplotlib', compatibility='bokeh') doesn't
@@ -55,7 +55,7 @@ class hvplot_extension(_hv.extension):
         # are matplotlib options.
         if not compatibility:
             compatibility = backend
-        hvplot_extension._compatibility = compatibility
+        hvplot_extension.compatibility = compatibility
         # Patch or re-patch the docstrings/signatures to display
         # the right styling options.
         from . import _patch_hvplot_docstrings

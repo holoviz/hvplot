@@ -8,7 +8,7 @@ import holoviews as _hv
 from holoviews import Store, render  # noqa
 
 from .converter import HoloViewsConverter
-from .utilities import hvplot_extension, save, show # noqa
+from .utilities import hvplot_extension, output, save, show # noqa
 from .plotting import (hvPlot, hvPlotTabular,  # noqa
                        andrews_curves, lag_plot,
                        parallel_coordinates, scatter_matrix, plot)
@@ -39,7 +39,7 @@ def _get_doc_and_signature(
         formatter += "{options}"
 
     # Bokeh is the default backend
-    backend = hvplot_extension._compatibility or 'bokeh'
+    backend = hvplot_extension.compatibility or 'bokeh'
     if eltype in Store.registry[backend]:
         valid_opts = Store.registry[backend][eltype].style_opts
         if style:
@@ -141,5 +141,14 @@ class _PatchHvplotDocstrings:
 
 _patch_hvplot_docstrings = _PatchHvplotDocstrings()
 _patch_hvplot_docstrings()
+
+def _update_compatibility(backend):
+    hvplot_extension.compatibility = backend
+    # Patch or re-patch the docstrings/signatures to display
+    # the right styling options.
+    from . import _patch_hvplot_docstrings
+    _patch_hvplot_docstrings()
+
+Store._backend_switch_hooks.append(_update_compatibility)
 
 extension = hvplot_extension
