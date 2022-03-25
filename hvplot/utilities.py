@@ -45,7 +45,7 @@ class hvplot_extension(_hv.extension):
         compatibility = params.pop('compatibility', None)
         super().__call__(*args, **params)
         backend = _hv.Store.current_backend
-        if compatibility in ['matpliotlib', 'plotly'] and backend != compatibility:
+        if compatibility in ['matplotlib', 'plotly'] and backend != compatibility:
             param.main.param.warning(
                 f'Compatibility from {compatibility} to {backend} '
                 'not yet implemented. Defaults to bokeh.'
