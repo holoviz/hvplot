@@ -451,7 +451,10 @@ class HoloViewsConverter:
         self._by_type = NdLayout if subplots else NdOverlay
 
         self._backend = Store.current_backend
-        self._backend_compat = hvplot_extension.compatibility or 'bokeh'
+        if hvplot_extension.compatibility is None:
+            self._backend_compat = self._backend
+        else:
+            self._backend_compat = hvplot_extension.compatibility
 
         self.stacked = stacked
 

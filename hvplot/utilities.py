@@ -31,9 +31,8 @@ def show(obj, title=None, port=0, **kwargs):
 
 class hvplot_extension(_hv.extension):
 
-    compatibility = param.Selector(
-        default=None, objects=['bokeh', 'matplotlib', 'plotly'],
-        allow_None=True, doc="""
+    compatibility = param.ObjectSelector(
+        allow_None=True, objects=['bokeh', 'matplotlib', 'plotly'], doc="""
             Backend used to parse styling options.""")
 
     logo = param.Boolean(default=False)
@@ -50,11 +49,6 @@ class hvplot_extension(_hv.extension):
                 f'Compatibility from {compatibility} to {backend} '
                 'not yet implemented. Defaults to bokeh.'
             )
-            compatibility = 'bokeh'
-        # hvplot.extension('matplotlib') assumes the styling options
-        # are matplotlib options.
-        if not compatibility:
-            compatibility = backend
         hvplot_extension.compatibility = compatibility
         # Patch or re-patch the docstrings/signatures to display
         # the right styling options.

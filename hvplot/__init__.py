@@ -142,13 +142,12 @@ class _PatchHvplotDocstrings:
 _patch_hvplot_docstrings = _PatchHvplotDocstrings()
 _patch_hvplot_docstrings()
 
-def _update_compatibility(backend):
-    hvplot_extension.compatibility = backend
+def _hook_patch_docstrings(backend):
     # Patch or re-patch the docstrings/signatures to display
     # the right styling options.
     from . import _patch_hvplot_docstrings
     _patch_hvplot_docstrings()
 
-Store._backend_switch_hooks.append(_update_compatibility)
+Store._backend_switch_hooks.append(_hook_patch_docstrings)
 
 extension = hvplot_extension
