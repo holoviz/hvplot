@@ -33,7 +33,7 @@ class hvplot_extension(_hv.extension):
 
     compatibility = param.ObjectSelector(
         allow_None=True, objects=['bokeh', 'matplotlib', 'plotly'], doc="""
-            Backend used to parse styling options.""")
+            Plotting library used to process extra keyword arguments.""")
 
     logo = param.Boolean(default=False)
 
