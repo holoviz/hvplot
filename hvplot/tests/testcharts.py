@@ -101,6 +101,7 @@ class TestChart1D(ComparisonTestCase):
             raise SkipTest('Pandas not available')
         import hvplot.pandas   # noqa
         self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
+        self.df_desc = self.df.describe().transpose().sort_values('mean')
         self.dt_df = pd.DataFrame(np.random.rand(90), index=pd.date_range('2019-01-01', '2019-03-31'))
         self.cat_df = pd.DataFrame([[1, 2, 'A'], [3, 4, 'B'], [5, 6, 'C']],
                                    columns=['x', 'y', 'category'])
@@ -322,6 +323,12 @@ class TestChart1D(ComparisonTestCase):
         assert plot.kdims == ['x']
         assert plot[1].kdims == ['index']
         assert plot[1].vdims == ['y']
+    
+    def test_errorbars_no_hover(self):
+        plot = self.df_desc.hvplot.errorbars(y='mean', yerr1='std')
+        assert list(plot.dimensions()) == ['index', 'mean', 'std']
+        bkplot = Store.renderers['bokeh'].get_plot(plot)
+        assert not bkplot.tools
 
 
 class TestChart1DDask(TestChart1D):
