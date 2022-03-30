@@ -1314,6 +1314,8 @@ class HoloViewsConverter:
                             "Feature scale of %r not recognized, "
                             "must be one of '10m', '50m' or '110m'." %
                         scale)
+                    else:
+                        feature_obj = feature_obj.opts(scale=scale)
                 obj = feature_obj * obj
 
         if self.tiles:
