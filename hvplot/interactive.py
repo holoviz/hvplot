@@ -82,8 +82,7 @@ class Interactive():
         self._init = False
         if self._fn is not None:
             for _, params in full_groupby(self._fn_params, lambda x: id(x.owner)):
-                p = params[0]
-                p.owner.param.watch(self._update_obj, [_p.name for _p in params])
+                params[0].owner.param.watch(self._update_obj, [p.name for p in params])
         self._method = None
         if transform is None:
             dim = '*'
@@ -131,7 +130,12 @@ class Interactive():
         
     @property
     def _params(self):
-        return self._fn_params + [v for k, v in self._transform.params.items() if k != 'ax']
+        ps = self._fn_params
+        for k, p in self._transform.params.items():
+            if k == 'ax' or p in ps:
+                continue
+            ps.append(p)
+        return ps
 
     @property
     def _callback(self):
@@ -154,14 +158,17 @@ class Interactive():
         return evaluate
 
     def _clone(self, transform=None, plot=None, loc=None, center=None,
-               dmap=None, **kwargs):
+               dmap=None, copy=False, **kwargs):
         plot = self._plot or plot
         transform = transform or self._transform
         loc = self._loc if loc is None else loc
         center = self._center if center is None else center
         dmap = self._dmap if dmap is None else dmap
         depth = self._depth+1
-        kwargs = dict(self._inherit_kwargs, **dict(self._kwargs, **kwargs))
+        if copy:
+            kwargs = dict(self._kwargs, inherit_kwargs=self._inherit_kwargs, **kwargs)
+        else:
+            kwargs = dict(self._inherit_kwargs, **dict(self._kwargs, **kwargs))
         return type(self)(self._obj, fn=self._fn, transform=transform, plot=plot, depth=depth,
                           loc=loc, center=center, dmap=dmap, **kwargs)
 
@@ -202,7 +209,7 @@ class Interactive():
                 finally:
                     self._method = None
             else:
-                new = self
+                new = self._clone(copy=True)
             new._method = name
             try:
                 new.__doc__ = getattr(new, name).__doc__
