@@ -78,12 +78,12 @@ class Interactive():
 
     def __init__(self, obj, transform=None, fn=None, plot=False, depth=0,
                  loc='top_left', center=False, dmap=False, inherit_kwargs={},
-                 max_rows=100, **kwargs):
+                 max_rows=100, method=None, **kwargs):
         self._init = False
         if self._fn is not None:
             for _, params in full_groupby(self._fn_params, lambda x: id(x.owner)):
                 params[0].owner.param.watch(self._update_obj, [p.name for p in params])
-        self._method = None
+        self._method = method
         if transform is None:
             dim = '*'
             transform = hv.util.transform.dim
@@ -166,11 +166,11 @@ class Interactive():
         dmap = self._dmap if dmap is None else dmap
         depth = self._depth+1
         if copy:
-            kwargs = dict(self._kwargs, inherit_kwargs=self._inherit_kwargs, **kwargs)
+            kwargs = dict(self._kwargs, inherit_kwargs=self._inherit_kwargs, method=self._method, **kwargs)
         else:
             kwargs = dict(self._inherit_kwargs, **dict(self._kwargs, **kwargs))
         return type(self)(self._obj, fn=self._fn, transform=transform, plot=plot, depth=depth,
-                          loc=loc, center=center, dmap=dmap, **kwargs)
+                         loc=loc, center=center, dmap=dmap, **kwargs)
 
     def _repr_mimebundle_(self, include=[], exclude=[]):
         return self.layout()._repr_mimebundle_()
@@ -187,6 +187,20 @@ class Interactive():
         except Exception:
             return sorted(set(dir(type(self))) | set(self.__dict__) | extras)
 
+    def _resolve_accessor(self):
+        if not self._method:
+            return self._clone(copy=True)
+        transform = type(self._transform)(self._transform, self._method, accessor=True)
+        transform._ns = self._current
+        inherit_kwargs = {}
+        if self._method == 'plot':
+            inherit_kwargs['ax'] = self._get_ax_fn()
+        try:
+            new = self._clone(transform, inherit_kwargs=inherit_kwargs)
+        finally:
+            self._method = None
+        return new
+
     def __getattribute__(self, name):
         self_dict = super().__getattribute__('__dict__')
         if not self_dict.get('_init'):
@@ -198,21 +212,10 @@ class Interactive():
             current = getattr(current, method)
         extras = [d for d in dir(current) if not d.startswith('_')]
         if name in extras and name not in super().__dir__():
-            if self._method:
-                transform = type(self._transform)(self._transform, self._method, accessor=True)
-                transform._ns = self._current
-                inherit_kwargs = {}
-                if self._method == 'plot':
-                    inherit_kwargs['ax'] = self._get_ax_fn()
-                try:
-                    new = self._clone(transform, inherit_kwargs=inherit_kwargs)
-                finally:
-                    self._method = None
-            else:
-                new = self._clone(copy=True)
+            new = self._resolve_accessor()
             new._method = name
             try:
-                new.__doc__ = getattr(new, name).__doc__
+                new.__call__.__doc__ = getattr(new, name).__doc__
             except Exception:
                 pass
             return new
@@ -236,13 +239,13 @@ class Interactive():
             raise AttributeError
         elif self._method == 'plot':
             kwargs['ax'] = self._get_ax_fn()
+        new = self._clone(copy=True)
         try:
-            method = type(self._transform)(self._transform, self._method,
-                                       accessor=True)
-            kwargs = dict(self._inherit_kwargs, **kwargs)
-            clone = self._clone(method(*args, **kwargs), plot=self._method == 'plot')
+            method = type(new._transform)(new._transform, new._method, accessor=True)
+            kwargs = dict(new._inherit_kwargs, **kwargs)
+            clone = new._clone(method(*args, **kwargs), plot=new._method == 'plot')
         finally:
-            self._method = None
+            new._method = None
         return clone
 
     #----------------------------------------------------------------
@@ -250,22 +253,16 @@ class Interactive():
     #----------------------------------------------------------------
 
     def __array_ufunc__(self, *args, **kwargs):
-        transform = self._transform
-        if self._method:
-            transform = type(transform)(transform, self._method, accessor=True)
-            transform._ns = self._current
-            self._method = None
+        new = self._resolve_accessor()
+        transform = new._transform
         transform = args[0](transform, *args[3:], **kwargs)
-        return self._clone(transform)
+        return new._clone(transform)
 
     def _apply_operator(self, operator, *args, **kwargs):
-        transform = self._transform
-        if self._method:
-            transform = type(transform)(transform, self._method, accessor=True)
-            transform._ns = self._current
-            self._method = None
+        new = self._resolve_accessor()
+        transform = new._transform
         transform = type(transform)(transform, operator, *args)
-        return self._clone(transform)
+        return new._clone(transform)
 
     # Builtin functions
     def __abs__(self):
@@ -392,23 +389,17 @@ class Interactive():
             FigureCanvas(fig)
             return fig.subplots()
         kwargs['ax'] = get_ax
-        transform = self._transform
-        if self._method:
-            transform = type(transform)(transform, self._method, accessor=True)
-            transform._ns = self._current
-            self._method = None
+        new = self._resolve_accessor()
+        transform = new._transform
         transform = type(transform)(transform, 'plot', accessor=True)
-        return self._clone(transform(*args, **kwargs), plot=True)
+        return new._clone(transform(*args, **kwargs), plot=True)
 
     def hvplot(self, *args, **kwargs):
-        transform = self._transform
-        if self._method:
-            transform = type(transform)(transform, self._method, accessor=True)
-            transform._ns = self._current
-            self._method = None
+        new = self._resolve_accessor()
+        transform = new._transform
         transform = type(transform)(transform, 'hvplot', accessor=True)
         dmap = 'kind' not in kwargs
-        return self._clone(transform(*args, **kwargs), dmap=dmap)
+        return new._clone(transform(*args, **kwargs), dmap=dmap)
 
     #----------------------------------------------------------------
     # Public API
