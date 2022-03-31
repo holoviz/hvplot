@@ -54,6 +54,7 @@ jobs:
           conda activate test-environment
           conda list
           doit develop_install -o doc -o examples --conda-mode=mamba
+          mamba install "ipykernel<6.10 ipython<8.2 jupyter_server<1.16 pydata-sphinx-theme<0.8.1 setuptools<61 sphinx<4.5 tqdm<4.63.1"
       - name: doit env_capture
         run: |
           eval "$(conda shell.bash hook)"
