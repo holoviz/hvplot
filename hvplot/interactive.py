@@ -215,7 +215,7 @@ class Interactive():
             new = self._resolve_accessor()
             new._method = name
             try:
-                new.__call__.__doc__ = getattr(new, name).__doc__
+                new.__doc__ = getattr(current, name).__doc__
             except Exception:
                 pass
             return new
