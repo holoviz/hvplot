@@ -527,7 +527,10 @@ class HoloViewsConverter:
             plot_opts[axis] = rot
 
         tools = list(tools) or list(plot_opts.get('tools', []))
-        if hover is None:
+        # Disable hover for errorbars plot as Bokeh annotations can't be hovered.
+        if kind == 'errorbars':
+            hover = False
+        elif hover is None:
             hover = not self.datashade
         if hover and not any(t for t in tools if isinstance(t, HoverTool)
                              or t in ['hover', 'vline', 'hline']):
@@ -1314,6 +1317,8 @@ class HoloViewsConverter:
                             "Feature scale of %r not recognized, "
                             "must be one of '10m', '50m' or '110m'." %
                         scale)
+                    else:
+                        feature_obj = feature_obj.opts(scale=scale)
                 obj = feature_obj * obj
 
         if self.tiles:
@@ -1403,7 +1408,10 @@ class HoloViewsConverter:
         if 'ylabel' in self._plot_opts and 'y' not in labelled:
             labelled.append('y')
 
-        opts = {element.name: self._get_opts(element.name, labelled=labelled),
+        el_opts = self._get_opts(element.name, labelled=labelled)
+        if 'color' in el_opts and el_opts['color'] in data.columns:
+            el_opts['color'] = hv.dim(el_opts['color'])
+        opts = {element.name: el_opts,
                 'NdOverlay': dict(self._overlay_opts, batched=False)}
 
         ys = [y]
@@ -2052,6 +2060,8 @@ class HoloViewsConverter:
             vdims = Dataset(data).vdims
         element = self._get_element(kind)
         opts = self._get_opts(element.name)
+        if 'color' in opts and opts['color'] in vdims:
+            opts['color'] = hv.dim(opts['color'])
         if self.geo: params['crs'] = self.crs
         if self.by:
             obj = Dataset(data).to(element, kdims, vdims, self.by, **params).overlay(sort=False)
