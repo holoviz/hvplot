@@ -74,6 +74,9 @@ jobs:
           eval "$(conda shell.bash hook)"
           conda activate test-environment
           nbsite build --what=html --output=builtdocs --org holoviz --project-name hvplot
+      - name: report failure
+        if: failure()
+        run: cat /tmp/sphinx-*.log | tail -n 100
       - name: Deploy dev
         uses: peaceiris/actions-gh-pages@v3
         if: |
