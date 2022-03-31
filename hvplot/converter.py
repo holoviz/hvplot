@@ -527,7 +527,10 @@ class HoloViewsConverter:
             plot_opts[axis] = rot
 
         tools = list(tools) or list(plot_opts.get('tools', []))
-        if hover is None:
+        # Disable hover for errorbars plot as Bokeh annotations can't be hovered.
+        if kind == 'errorbars':
+            hover = False
+        elif hover is None:
             hover = not self.datashade
         if hover and not any(t for t in tools if isinstance(t, HoverTool)
                              or t in ['hover', 'vline', 'hline']):
