@@ -36,9 +36,8 @@ jobs:
           fetch-depth: "100"
       - uses: conda-incubator/setup-miniconda@v2
         with:
-          mamba-version: "*"
+          miniconda-version: "latest"
           channels: pyviz/label/dev,conda-forge,nodefaults
-          channel-priority: strict
       - name: Fetch unshallow
         run: git fetch --prune --tags --unshallow -f
       - name: Set and echo git ref
@@ -48,14 +47,13 @@ jobs:
           echo ::set-output name=tag::${GITHUB_REF#refs/*/}
       - name: conda setup
         run: |
-          conda create -n test-environment python=3.8.12 pyctdev
+          conda create -n test-environment python=3.8 pyctdev
       - name: doit develop_install
         run: |
           eval "$(conda shell.bash hook)"
           conda activate test-environment
           conda list
-          doit develop_install -o doc -o examples --conda-mode=mamba
-          mamba install "ipykernel<6.10" "ipython<8.2" "jupyter_server<1.16" "pydata-sphinx-theme<0.8.1" "setuptools<61" "sphinx<4.5" "tqdm<4.63.1" "websocket-client=1.3.1" "fonttools=4.31.1" "pyviz_comms=2.1.0" "click=8.0.4" "expat=2.4.7" "harfbuzz=4.0.1" "importlib_resources=5.4.0" "kiwisolver=1.4.0" "pytz=2021.3" "qtconsole=5.2.2" "qtconsole-base=5.2.2" "sqlalchemy=1.4.32" "tifffile=2022.3.16" "affine=2.3.0" "aiobotocore=2.1.0" "panel=0.13.0a45" "geotiff=1.7.1" "libthrift=0.15.0" "param=1.12.1a1" "pyctdev=0.6.6a2" "cryptography=36.0.0" "nbsite=0.7.2a11"
+          doit develop_install -o doc -o examples
       - name: doit env_capture
         run: |
           eval "$(conda shell.bash hook)"
