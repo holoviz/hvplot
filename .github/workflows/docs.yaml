@@ -38,6 +38,7 @@ jobs:
         with:
           mamba-version: "*"
           channels: pyviz/label/dev,conda-forge,nodefaults
+          channel-priority: strict
       - name: Fetch unshallow
         run: git fetch --prune --tags --unshallow -f
       - name: Set and echo git ref
