@@ -118,5 +118,8 @@ hvplot/.version
 # doit
 .doit.db
 
-# vscode
-.vscode
+# IDE
+/.vscode
+
+# MacOS
+.DS_Store

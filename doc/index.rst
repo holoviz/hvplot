@@ -12,7 +12,7 @@
    :hidden:
    :maxdepth: 2
 
-   Introduction <self>
+   Home <self>
    User Guide <user_guide/index>
    Reference Gallery <reference/index>
    Topics <topics>

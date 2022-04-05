@@ -1,9 +1,10 @@
 from functools import partial
-from packaging.version import Version
 import warnings
 
 import holoviews as _hv
+from packaging.version import Version
 
+from ..backend_transforms import _transfer_opts_cur_backend
 from ..converter import HoloViewsConverter
 from ..util import with_hv_extension
 
@@ -182,7 +183,10 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
     # set the histogram colors 
     diagonal_opts = dict(fill_color=_hv.Cycle(values=colors), **diagonal_kwds)
     # actually changing to the same color scheme for both scatter and histogram plots.
-    grid = grid.options({chart.__name__: chart_opts, diagonal.__name__: diagonal_opts})
+    grid = grid.options(
+        {chart.__name__: chart_opts, diagonal.__name__: diagonal_opts},
+        backend='bokeh',
+    )
     
     # Perform datashade options after all the coloring is finished.
     if datashade or rasterize:
@@ -192,5 +196,6 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
             spreadfn = hd.dynspread if dynspread else (hd.spread if spread else lambda z, **_: z)
             eltype = _hv.RGB if datashade else _hv.Image
             grid = grid.map(partial(spreadfn, **sp_kwds), specs=eltype)
-
+ 
+    grid = _transfer_opts_cur_backend(grid)
     return grid
