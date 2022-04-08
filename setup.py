@@ -84,6 +84,7 @@ extras_require = {
         'plotly',
         'xarray',
         'pooch',
+        'scipy',
     ],
     'examples': _examples,
     'examples_extra': _examples_extra,
