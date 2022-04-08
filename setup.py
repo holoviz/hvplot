@@ -82,6 +82,7 @@ extras_require = {
         'numpy >=1.7',
         'matplotlib',
         'plotly',
+        'xarray',
     ],
     'examples': _examples,
     'examples_extra': _examples_extra,
