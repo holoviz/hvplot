@@ -266,7 +266,7 @@ class HoloViewsConverter:
 
     _op_options = [
         'datashade', 'rasterize', 'x_sampling', 'y_sampling',
-        'aggregator'
+        'aggregator', 'rescale_discrete_levels'
     ]
 
     # Options specific to a particular plot type
@@ -370,7 +370,7 @@ class HoloViewsConverter:
         y_sampling=None, project=False, tools=[], attr_labels=None,
         coastline=False, tiles=False, sort_date=True,
         check_symmetric_max=1000000, transforms={}, stream=None,
-        cnorm=None, features=None, **kwds
+        cnorm=None, features=None, rescale_discrete_levels=True, **kwds
     ):
         # Process data and related options
         self._redim = fields
@@ -445,6 +445,7 @@ class HoloViewsConverter:
         self.precompute = precompute
         self.x_sampling = x_sampling
         self.y_sampling = y_sampling
+        self.rescale_discrete_levels = rescale_discrete_levels
 
         # By type
         self.subplots = subplots
@@ -1276,12 +1277,18 @@ class HoloViewsConverter:
             else:
                 opts['cmap'] = process_cmap(cmap, levels, categorical=categorical)
 
+        if 'line_width' in self._style_opts:
+            opts['line_width'] = self._style_opts['line_width']
+
         style = {}
         if self.datashade:
             operation = datashade
             if 'cmap' in opts and not 'color_key' in opts:
                 opts['color_key'] = opts['cmap']
             eltype = 'RGB'
+            if 'cnorm' in self._plot_opts:
+                opts['cnorm'] = self._plot_opts['cnorm']
+            opts['rescale_discrete_levels'] = self.rescale_discrete_levels
         else:
             operation = rasterize
             eltype = 'Image'
