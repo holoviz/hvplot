@@ -61,8 +61,7 @@ jobs:
       - name: conda setup
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          conda install "pyctdev>=0.5"
-          doit env_create --python=${{ matrix.python-version }}
+          conda create -n test-environment python=${{ matrix.python-version }} pyctdev "typing_extensions<4.2.0"
       - name: doit develop_install py > 3.6
         if: steps.cache.outputs.cache-hit != 'true' && matrix.python-version != '3.6'
         run: |
