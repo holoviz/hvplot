@@ -83,6 +83,9 @@ jobs:
           # - Install importlib_resources to fix tqdm that missed adding it as a dependency
           # for 3.6 (https://github.com/conda-forge/tqdm-feedstock/pull/114) 
           conda install "panel=0.12" "importlib_resources "
+      - name: Pin tifffile on 3.6 and 3.7
+        if: matrix.python-version == '3.6'  || matrix.python-version == '3.7'
+        run: conda install "tifffile<2022.4.22"
       - name: pygraphviz
         if: steps.cache.outputs.cache-hit != 'true' && ((contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos')) && matrix.python-version != '3.6')
         run: |
