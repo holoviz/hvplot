@@ -27,7 +27,7 @@ jobs:
           path: /Users/runner/miniconda3/envs/
         - os: windows-latest
           path: C:\Miniconda3\envs\
-    timeout-minutes: 60
+    timeout-minutes: 90
     defaults:
       run:
         shell: bash -l {0} 
