@@ -7,6 +7,8 @@ on:
     branches:
     - '*'
   workflow_dispatch:
+  schedule:
+    - cron: '0 15 * * SUN'
 
 env:
   CACHE_VERSION: 1
