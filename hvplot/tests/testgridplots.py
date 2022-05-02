@@ -199,6 +199,7 @@ class TestGridPlots(ComparisonTestCase):
         # DataArray.
         da = xr.DataArray(
             data=np.arange(-100, 100).reshape(10, 10, 2),
+            dims=['x', 'y', 'z'],
             coords={'x': np.arange(10), 'y': np.arange(10), 'z': np.arange(2)}
         )
         ds = xr.Dataset(data_vars={'value': da})
@@ -216,6 +217,7 @@ class TestGridPlots(ComparisonTestCase):
     def test_symmetric_dataset_in_memory(self):
         da = xr.DataArray(
             data=np.arange(-100, 100).reshape(10, 10, 2),
+            dims=['x', 'y', 'z'],
             coords={'x': np.arange(10), 'y': np.arange(10), 'z': np.arange(2)}
         )
         ds = xr.Dataset(data_vars={'value': da})
