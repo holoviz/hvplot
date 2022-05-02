@@ -33,4 +33,4 @@ dependencies:
   - plotly
   - pip
   - pip:
-    - .
+    - ..
