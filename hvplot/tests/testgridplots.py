@@ -213,6 +213,7 @@ class TestGridPlots(ComparisonTestCase):
             # If a DataArray is not in memory, computing whether it's symmetric should
             # not be done and return False.
             assert not plot_opts.kwargs['symmetric']
+            ds.close()
     
     def test_symmetric_dataset_in_memory(self):
         da = xr.DataArray(
