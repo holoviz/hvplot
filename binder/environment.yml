@@ -30,6 +30,7 @@ dependencies:
   - pyepsg>=0.4.0
   - matplotlib
   - plotly
+  - pygraphviz
   - pip
   - pip:
     - ..
