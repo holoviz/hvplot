@@ -1,6 +1,5 @@
 name: hvplotxxx
 channels:
-  - pyviz
   - conda-forge
   - nodefaults
 dependencies:
