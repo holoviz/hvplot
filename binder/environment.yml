@@ -1,4 +1,4 @@
-name: hvplotxxx
+name: hvplot
 channels:
   - conda-forge
   - nodefaults
