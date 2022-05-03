@@ -11,6 +11,7 @@ from holoviews.core.util import dimension_sanitizer
 from holoviews.plotting.bokeh import GraphPlot, LabelsPlot
 from holoviews.plotting.bokeh.styles import markers
 
+from .backend_transforms import _transfer_opts_cur_backend
 from .util import process_crs
 from .utilities import save, show # noqa
 
@@ -320,7 +321,7 @@ def draw(G, pos=None, **kwargs):
                 for label, name in tooltip_dims if name not in node_styles + edge_styles]
     opts['tools'] = [HoverTool(tooltips=tooltips), 'tap']
 
-    g.opts(**opts)
+    g.opts(**opts, backend='bokeh')
 
     # Construct Labels
     if kwargs.get('with_labels', kwargs.get('labels', False)):
@@ -342,11 +343,14 @@ def draw(G, pos=None, **kwargs):
             labels = label_element(data, g.nodes.kdims[:2], 'text', **label_params)
         else:
             labels = label_element(g.nodes, g.nodes.kdims[:2], labels, **label_params)
-        g = g * labels.opts(**label_opts)
+        g = g * labels.opts(**label_opts, backend='bokeh')
 
     # Apply label
     if 'label' in kwargs:
         g = g.relabel(kwargs.pop('label'))
+
+    # Process options
+    g = _transfer_opts_cur_backend(g)
 
     return g
 

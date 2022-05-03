@@ -3,7 +3,7 @@ import numpy as np
 from unittest import SkipTest, expectedFailure
 from parameterized import parameterized
 
-from holoviews import NdOverlay, Store
+from holoviews import NdOverlay, Store, dim
 from holoviews.element import Curve, Area, Scatter, Points, Path, HeatMap
 from holoviews.element.comparison import ComparisonTestCase
 
@@ -101,6 +101,7 @@ class TestChart1D(ComparisonTestCase):
             raise SkipTest('Pandas not available')
         import hvplot.pandas   # noqa
         self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
+        self.df_desc = self.df.describe().transpose().sort_values('mean')
         self.dt_df = pd.DataFrame(np.random.rand(90), index=pd.date_range('2019-01-01', '2019-03-31'))
         self.cat_df = pd.DataFrame([[1, 2, 'A'], [3, 4, 'B'], [5, 6, 'C']],
                                    columns=['x', 'y', 'category'])
@@ -244,6 +245,13 @@ class TestChart1D(ComparisonTestCase):
         opts = Store.lookup_options('bokeh', plot, 'plot')
         self.assertEqual(opts.kwargs['legend_position'], 'left')
 
+    def test_scatter_color_internally_set_to_dim(self):
+        altered_df = self.cat_df.copy().rename(columns={'category': 'red'})
+        plot = altered_df.hvplot.scatter('x', 'y', c='red')
+        opts = Store.lookup_options('bokeh', plot, 'style')
+        self.assertIsInstance(opts.kwargs['color'], dim)
+        self.assertEqual(opts.kwargs['color'].dimension.name, 'red')
+
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
     def test_only_includes_num_chart(self, kind, element):
         plot = self.cat_df.hvplot(kind=kind)
@@ -315,6 +323,12 @@ class TestChart1D(ComparisonTestCase):
         assert plot.kdims == ['x']
         assert plot[1].kdims == ['index']
         assert plot[1].vdims == ['y']
+    
+    def test_errorbars_no_hover(self):
+        plot = self.df_desc.hvplot.errorbars(y='mean', yerr1='std')
+        assert list(plot.dimensions()) == ['index', 'mean', 'std']
+        bkplot = Store.renderers['bokeh'].get_plot(plot)
+        assert not bkplot.tools
 
 
 class TestChart1DDask(TestChart1D):

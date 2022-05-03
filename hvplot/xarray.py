@@ -7,6 +7,10 @@ from .interactive import Interactive
 
 class XArrayInteractive(Interactive):
 
+    @classmethod
+    def applies(cls, obj):
+        return isinstance(obj, (xr.DataArray, xr.Dataset))
+
     def sel(self, **kwargs):
         processed = {}
         for k, v in kwargs.items():

@@ -14,8 +14,11 @@ on:
         options:
         - dev
         - main
+        - dryrun
         required: true
-        default: dev
+        default: dryrun
+  schedule:
+    - cron: '0 15 * * SUN'
 
 jobs:
   build_docs:
@@ -37,7 +40,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           mamba-version: "*"
-          channels: pyviz/label/dev,bokeh,conda-forge,nodefaults
+          channels: pyviz/label/dev,conda-forge,nodefaults
       - name: Fetch unshallow
         run: git fetch --prune --tags --unshallow -f
       - name: Set and echo git ref
@@ -47,7 +50,6 @@ jobs:
           echo ::set-output name=tag::${GITHUB_REF#refs/*/}
       - name: conda setup
         run: |
-          conda install "pyctdev>=0.5"
           conda create -n test-environment python=3.8 pyctdev
       - name: doit develop_install
         run: |
@@ -75,6 +77,9 @@ jobs:
           eval "$(conda shell.bash hook)"
           conda activate test-environment
           nbsite build --what=html --output=builtdocs --org holoviz --project-name hvplot
+      - name: report failure
+        if: failure()
+        run: cat /tmp/sphinx-*.log | tail -n 100
       - name: Deploy dev
         uses: peaceiris/actions-gh-pages@v3
         if: |

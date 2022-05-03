@@ -554,6 +554,8 @@ class hvDataFrameExplorer(hvPlotExplorer):
                 return 0, 1
         if values.dtype.kind in 'OSU':
             return None
+        elif not len(values):
+            return (np.nan, np.nan)
         return (np.nanmin(values), np.nanmax(values))
 
     @param.depends('y', 'y_multi')
@@ -561,5 +563,7 @@ class hvDataFrameExplorer(hvPlotExplorer):
         y = self._y
         if not isinstance(y, list):
             y = [y]
-        values = (self._data[y] for y in y)
+        values = [ys for ys in (self._data[y] for y in y) if len(ys)]
+        if not len(values):
+            return (np.nan, np.nan)
         return max_range([(np.nanmin(vs), np.nanmax(vs)) for vs in values])

@@ -6,12 +6,15 @@ import abc
 import operator
 import sys
 
+from types import FunctionType, MethodType
+
 import holoviews as hv
 import pandas as pd
 import panel as pn
 import param
 
 from panel.layout import Column, Row, VSpacer, HSpacer
+from panel.util import get_method_owner, full_groupby
 from panel.widgets.base import Widget
 
 from .util import is_tabular, is_xarray, is_xarray_dataarray
@@ -52,12 +55,35 @@ class Interactive():
 
     _fig = None
 
-    def __init__(self, obj, transform=None, plot=False, depth=0,
+    def __new__(cls, obj, **kwargs):
+        if 'fn' in kwargs:
+            fn = kwargs.pop('fn')
+        elif isinstance(obj, (FunctionType, MethodType)):
+            fn = pn.panel(obj)
+            obj = fn.eval(obj)
+        else:
+            fn = None
+        clss = cls
+        for subcls in cls.__subclasses__():
+            if subcls.applies(obj):
+                clss = subcls
+        inst = super(Interactive, cls).__new__(clss)
+        inst._obj = obj
+        inst._fn = fn
+        return inst
+
+    @classmethod
+    def applies(cls, obj):
+        return True
+
+    def __init__(self, obj, transform=None, fn=None, plot=False, depth=0,
                  loc='top_left', center=False, dmap=False, inherit_kwargs={},
-                 max_rows=100, **kwargs):
+                 max_rows=100, method=None, **kwargs):
         self._init = False
-        self._obj = obj
-        self._method = None
+        if self._fn is not None:
+            for _, params in full_groupby(self._fn_params, lambda x: id(x.owner)):
+                params[0].owner.param.watch(self._update_obj, [p.name for p in params])
+        self._method = method
         if transform is None:
             dim = '*'
             transform = hv.util.transform.dim
@@ -87,37 +113,64 @@ class Interactive():
         self._current = self._transform.apply(ds, keep_index=True, compute=False)
         self._init = True
 
+    def _update_obj(self, *args):
+        self._obj = self._fn.eval(self._fn.object)
+
+    @property
+    def _fn_params(self):
+        if self._fn is None:
+            deps = []
+        elif isinstance(self._fn, pn.param.ParamFunction):
+            dinfo = getattr(self._fn.object, '_dinfo', {})
+            deps = list(dinfo.get('dependencies', [])) + list(dinfo.get('kw', {}).values())
+        else:
+            parameterized = get_method_owner(self._fn.object)
+            deps = parameterized.param.method_dependencies(self._fn.object.__name__)
+        return deps
+        
     @property
     def _params(self):
-        return [v for k, v in self._transform.params.items() if k != 'ax']
+        ps = self._fn_params
+        for k, p in self._transform.params.items():
+            if k == 'ax' or p in ps:
+                continue
+            ps.append(p)
+        return ps
 
     @property
     def _callback(self):
         @pn.depends(*self._params)
         def evaluate(*args, **kwargs):
-            ds = hv.Dataset(self._obj)
-            obj = self._transform.apply(ds, keep_index=True, compute=False)
+            obj = self._obj
+            ds = hv.Dataset(obj)
+            transform = self._transform
+            if ds.interface.datatype == 'xarray' and is_xarray_dataarray(obj):
+                transform = transform.clone(obj.name)
+            obj = transform.apply(ds, keep_index=True, compute=False)
             if self._method:
                 obj = getattr(obj, self._method, obj)
             if self._plot:
                 return Interactive._fig
             elif isinstance(obj, pd.DataFrame):
-                return pn.pane.DataFrame(obj, max_rows=self._max_rows)
+                return pn.pane.DataFrame(obj, max_rows=self._max_rows, **self._kwargs)
             else:
                 return obj
         return evaluate
 
     def _clone(self, transform=None, plot=None, loc=None, center=None,
-               dmap=None, **kwargs):
+               dmap=None, copy=False, **kwargs):
         plot = self._plot or plot
         transform = transform or self._transform
         loc = self._loc if loc is None else loc
         center = self._center if center is None else center
         dmap = self._dmap if dmap is None else dmap
         depth = self._depth+1
-        kwargs = dict(self._inherit_kwargs, **dict(self._kwargs, **kwargs))
-        return type(self)(self._obj, transform, plot, depth,
-                          loc, center, dmap, **kwargs)
+        if copy:
+            kwargs = dict(self._kwargs, inherit_kwargs=self._inherit_kwargs, method=self._method, **kwargs)
+        else:
+            kwargs = dict(self._inherit_kwargs, **dict(self._kwargs, **kwargs))
+        return type(self)(self._obj, fn=self._fn, transform=transform, plot=plot, depth=depth,
+                         loc=loc, center=center, dmap=dmap, **kwargs)
 
     def _repr_mimebundle_(self, include=[], exclude=[]):
         return self.layout()._repr_mimebundle_()
@@ -134,6 +187,20 @@ class Interactive():
         except Exception:
             return sorted(set(dir(type(self))) | set(self.__dict__) | extras)
 
+    def _resolve_accessor(self):
+        if not self._method:
+            return self._clone(copy=True)
+        transform = type(self._transform)(self._transform, self._method, accessor=True)
+        transform._ns = self._current
+        inherit_kwargs = {}
+        if self._method == 'plot':
+            inherit_kwargs['ax'] = self._get_ax_fn()
+        try:
+            new = self._clone(transform, inherit_kwargs=inherit_kwargs)
+        finally:
+            self._method = None
+        return new
+
     def __getattribute__(self, name):
         self_dict = super().__getattribute__('__dict__')
         if not self_dict.get('_init'):
@@ -145,21 +212,10 @@ class Interactive():
             current = getattr(current, method)
         extras = [d for d in dir(current) if not d.startswith('_')]
         if name in extras and name not in super().__dir__():
-            if self._method:
-                transform = type(self._transform)(self._transform, self._method, accessor=True)
-                transform._ns = self._current
-                inherit_kwargs = {}
-                if self._method == 'plot':
-                    inherit_kwargs['ax'] = self._get_ax_fn()
-                try:
-                    new = self._clone(transform, inherit_kwargs=inherit_kwargs)
-                finally:
-                    self._method = None
-            else:
-                new = self
+            new = self._resolve_accessor()
             new._method = name
             try:
-                new.__doc__ = getattr(new, name).__doc__
+                new.__doc__ = getattr(current, name).__doc__
             except Exception:
                 pass
             return new
@@ -183,13 +239,13 @@ class Interactive():
             raise AttributeError
         elif self._method == 'plot':
             kwargs['ax'] = self._get_ax_fn()
+        new = self._clone(copy=True)
         try:
-            method = type(self._transform)(self._transform, self._method,
-                                       accessor=True)
-            kwargs = dict(self._inherit_kwargs, **kwargs)
-            clone = self._clone(method(*args, **kwargs), plot=self._method == 'plot')
+            method = type(new._transform)(new._transform, new._method, accessor=True)
+            kwargs = dict(new._inherit_kwargs, **kwargs)
+            clone = new._clone(method(*args, **kwargs), plot=new._method == 'plot')
         finally:
-            self._method = None
+            new._method = None
         return clone
 
     #----------------------------------------------------------------
@@ -197,22 +253,16 @@ class Interactive():
     #----------------------------------------------------------------
 
     def __array_ufunc__(self, *args, **kwargs):
-        transform = self._transform
-        if self._method:
-            transform = type(transform)(transform, self._method, accessor=True)
-            transform._ns = self._current
-            self._method = None
+        new = self._resolve_accessor()
+        transform = new._transform
         transform = args[0](transform, *args[3:], **kwargs)
-        return self._clone(transform)
+        return new._clone(transform)
 
     def _apply_operator(self, operator, *args, **kwargs):
-        transform = self._transform
-        if self._method:
-            transform = type(transform)(transform, self._method, accessor=True)
-            transform._ns = self._current
-            self._method = None
+        new = self._resolve_accessor()
+        transform = new._transform
         transform = type(transform)(transform, operator, *args)
-        return self._clone(transform)
+        return new._clone(transform)
 
     # Builtin functions
     def __abs__(self):
@@ -339,23 +389,17 @@ class Interactive():
             FigureCanvas(fig)
             return fig.subplots()
         kwargs['ax'] = get_ax
-        transform = self._transform
-        if self._method:
-            transform = type(transform)(transform, self._method, accessor=True)
-            transform._ns = self._current
-            self._method = None
+        new = self._resolve_accessor()
+        transform = new._transform
         transform = type(transform)(transform, 'plot', accessor=True)
-        return self._clone(transform(*args, **kwargs), plot=True)
+        return new._clone(transform(*args, **kwargs), plot=True)
 
     def hvplot(self, *args, **kwargs):
-        transform = self._transform
-        if self._method:
-            transform = type(transform)(transform, self._method, accessor=True)
-            transform._ns = self._current
-            self._method = None
+        new = self._resolve_accessor()
+        transform = new._transform
         transform = type(transform)(transform, 'hvplot', accessor=True)
         dmap = 'kind' not in kwargs
-        return self._clone(transform(*args, **kwargs), dmap=dmap)
+        return new._clone(transform(*args, **kwargs), dmap=dmap)
 
     #----------------------------------------------------------------
     # Public API
@@ -459,6 +503,10 @@ class Interactive():
         A Column of widgets
         """
         widgets = []
+        for p in self._fn_params:
+            if (isinstance(p.owner, pn.widgets.Widget) and
+                p.owner not in widgets):
+                widgets.append(p.owner)
         for op in self._transform.ops:
             for w in _find_widgets(op):
                 if w not in widgets:
