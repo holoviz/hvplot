@@ -599,9 +599,9 @@ class HoloViewsConverter:
 
         if is_xarray(self.data):
             # chunks mean it's lazily loaded; nanquantile will eagerly load
-            if self.data.chunks:
-                return False
             data = self.data[self.z]
+            if not getattr(data, '_in_memory', True) or data.chunks:
+                return False
             if is_xarray_dataarray(data):
                 if data.size > check_symmetric_max:
                     return False

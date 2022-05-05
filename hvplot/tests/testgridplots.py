@@ -1,3 +1,6 @@
+import os
+import tempfile
+
 from unittest import SkipTest
 from collections import OrderedDict
 
@@ -191,3 +194,36 @@ class TestGridPlots(ComparisonTestCase):
         assert p.kdims[0].name == 'lon'
         assert p.kdims[1].name == 'lat'
 
+    def test_symmetric_dataset_not_in_memory(self):
+        # Creating a netcdf file and loading it as to get an non in memory
+        # DataArray.
+        da = xr.DataArray(
+            data=np.arange(-100, 100).reshape(10, 10, 2),
+            dims=['x', 'y', 'z'],
+            coords={'x': np.arange(10), 'y': np.arange(10), 'z': np.arange(2)}
+        )
+        ds = xr.Dataset(data_vars={'value': da})
+        with tempfile.TemporaryDirectory() as tempdir:
+            fpath = os.path.join(tempdir, 'data.nc')
+            ds.to_netcdf(fpath)
+            ds = xr.open_dataset(fpath)
+            plot = ds.value.hvplot(x='x', y='y', check_symmetric_max=ds.value.size+1)
+            plot[(0)]
+            plot_opts = Store.lookup_options('bokeh', plot.last, 'plot')
+            # If a DataArray is not in memory, computing whether it's symmetric should
+            # not be done and return False.
+            assert not plot_opts.kwargs['symmetric']
+            ds.close()
+    
+    def test_symmetric_dataset_in_memory(self):
+        da = xr.DataArray(
+            data=np.arange(-100, 100).reshape(10, 10, 2),
+            dims=['x', 'y', 'z'],
+            coords={'x': np.arange(10), 'y': np.arange(10), 'z': np.arange(2)}
+        )
+        ds = xr.Dataset(data_vars={'value': da})
+        plot = ds.value.hvplot(x='x', y='y', check_symmetric_max=ds.value.size+1)
+        plot[(0)]
+        plot_opts = Store.lookup_options('bokeh', plot.last, 'plot')
+        # This DataArray happens to be symmetric.
+        assert plot_opts.kwargs['symmetric']
