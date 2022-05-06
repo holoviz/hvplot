@@ -40,7 +40,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           mamba-version: "*"
-          channels: pyviz/label/dev,conda-forge,nodefaults
+          channels: pyviz,conda-forge,nodefaults
       - name: Fetch unshallow
         run: git fetch --prune --tags --unshallow -f
       - name: Set and echo git ref
