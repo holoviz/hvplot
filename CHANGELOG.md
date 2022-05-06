@@ -43,11 +43,8 @@ Documentation:
 - Various minor documentation enhancements and fixes ([#625](https://github.com/holoviz/hvplot/pull/625), [#643](https://github.com/holoviz/hvplot/pull/643), [#644](https://github.com/holoviz/hvplot/pull/644), [#663](https://github.com/holoviz/hvplot/pull/663), [#678](https://github.com/holoviz/hvplot/pull/678), [#722](https://github.com/holoviz/hvplot/pull/722))
 
 Maintenance:
-- Drop support for py2.7, min supported version is py3.6 now ([#702](https://github.com/holoviz/hvplot/pull/702))
-- Switch to Pytest and run the CI on Python 3.6, 3.8 and 3.9 ([#703](https://github.com/holoviz/hvplot/pull/703))
+- Drop support for Python 2.7, minimum supported version is now Python 3.6 ([#702](https://github.com/holoviz/hvplot/pull/702))
 - Changed to `packaging.version` ([#708](https://github.com/holoviz/hvplot/pull/708))
-- Fix a broken test due to PROJ unexpectedly matching a normal string ([#660](https://github.com/holoviz/hvplot/pull/660))
-- Various improvements to the CI ([#690](https://github.com/holoviz/hvplot/pull/690), [#691](https://github.com/holoviz/hvplot/pull/691). [#709](https://github.com/holoviz/hvplot/pull/709), [#712](https://github.com/holoviz/hvplot/pull/712), [#715](https://github.com/holoviz/hvplot/pull/715), [#719](https://github.com/holoviz/hvplot/pull/719), [#724](https://github.com/holoviz/hvplot/pull/724), [#727](https://github.com/holoviz/hvplot/pull/727), [#730](https://github.com/holoviz/hvplot/pull/730), [#732](https://github.com/holoviz/hvplot/pull/732), [#733](https://github.com/holoviz/hvplot/pull/733), [#734](https://github.com/holoviz/hvplot/pull/734), [#735](https://github.com/holoviz/hvplot/pull/735))
 
 
 ## Version 0.7.3
