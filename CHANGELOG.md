@@ -5,7 +5,7 @@
 The 0.8.0 release is a minor release with some exciting new features and a large number of bug fixes and enhancements. Many thanks to @FabianHofmann, @jomey, @ablythed, @jlstevens, @Hoxbro, @michaelaye, @MridulS, @ppwadhwa, @maximlt, @philippjfr for contributing!
 
 Main new features:
-- Add ability to call interactive on bound functions ([#720](https://github.com/holoviz/hvplot/pull/720))
+- Add ability to call `.interactive()` on bound functions ([#720](https://github.com/holoviz/hvplot/pull/720))
 - Add support to the Matplotlib and Plotly backends ([#653](https://github.com/holoviz/hvplot/pull/653))
 - Add the `hvPlotExplorer`, a Panel UI component designed to explore data ([#638](https://github.com/holoviz/hvplot/pull/638), [#639](https://github.com/holoviz/hvplot/pull/639), [#651](https://github.com/holoviz/hvplot/pull/651), [#710](https://github.com/holoviz/hvplot/pull/710), [#726](https://github.com/holoviz/hvplot/pull/726))
 
@@ -45,7 +45,6 @@ Documentation:
 Maintenance:
 - Drop support for Python 2.7, minimum supported version is now Python 3.6 ([#702](https://github.com/holoviz/hvplot/pull/702))
 - Changed to `packaging.version` ([#708](https://github.com/holoviz/hvplot/pull/708))
-
 
 ## Version 0.7.3
 
