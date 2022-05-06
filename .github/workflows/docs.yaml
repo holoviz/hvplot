@@ -40,7 +40,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           mamba-version: "*"
-          channels: pyviz,conda-forge,nodefaults
+          channels: pyviz/label/dev,conda-forge,nodefaults
       - name: Fetch unshallow
         run: git fetch --prune --tags --unshallow -f
       - name: Set and echo git ref
@@ -57,6 +57,7 @@ jobs:
           conda activate test-environment
           conda list
           doit develop_install -o doc -o examples --conda-mode=mamba
+          mamba install "datashader=0.14.0"
       - name: doit env_capture
         run: |
           eval "$(conda shell.bash hook)"
