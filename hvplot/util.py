@@ -8,6 +8,7 @@ from functools import wraps
 from packaging.version import Version
 from types import FunctionType
 
+import numpy as np
 import pandas as pd
 import param
 import holoviews as hv
@@ -252,6 +253,21 @@ def process_crs(crs):
     elif not isinstance(crs, ccrs.CRS):
         raise ValueError("Projection must be defined as a EPSG code, proj4 string, cartopy CRS or pyproj.Proj.")
     return crs
+
+
+def is_list_like(obj):
+    """
+    Adapted from pandas' is_list_like cython function.
+    """
+    return (
+        # equiv: `isinstance(obj, abc.Iterable)`
+        hasattr(obj, "__iter__") and not isinstance(obj, type)
+        # we do not count strings/unicode/bytes as list-like
+        and not isinstance(obj, (str, bytes))
+        # exclude zero-dimensional numpy arrays, effectively scalars
+        and not (isinstance(obj, np.ndarray) and obj.ndim == 0)
+    )
+
 
 def is_tabular(data):
     if check_library(data, ['dask', 'streamz', 'pandas', 'geopandas', 'cudf']):
