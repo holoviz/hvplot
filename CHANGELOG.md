@@ -1,3 +1,51 @@
+## Version 0.8.0
+
+**May 6, 2022**
+
+The 0.8.0 release is a minor release with some exciting new features and a large number of bug fixes and enhancements. Many thanks to @FabianHofmann, @jomey, @ablythed, @jlstevens, @Hoxbro, @michaelaye, @MridulS, @ppwadhwa, @maximlt, @philippjfr for contributing!
+
+Main new features:
+- Add ability to call `.interactive()` on bound functions ([#720](https://github.com/holoviz/hvplot/pull/720))
+- Add support to the Matplotlib and Plotly backends ([#653](https://github.com/holoviz/hvplot/pull/653))
+- Add the `hvPlotExplorer`, a Panel UI component designed to explore data ([#638](https://github.com/holoviz/hvplot/pull/638), [#639](https://github.com/holoviz/hvplot/pull/639), [#651](https://github.com/holoviz/hvplot/pull/651), [#710](https://github.com/holoviz/hvplot/pull/710), [#726](https://github.com/holoviz/hvplot/pull/726))
+
+Enhancements:
+- Interactive:
+  - Allow using getitem on an accessor in interactive ([#633](https://github.com/holoviz/hvplot/pull/633))
+  - Allow attribute access on ufunc on interactive ([#635](https://github.com/holoviz/hvplot/pull/635))
+  - Enhancements for `interactive` API ([#640](https://github.com/holoviz/hvplot/pull/640))
+  - Flatten op_args to be able to find nested widgets ([#699](https://github.com/holoviz/hvplot/pull/699))
+- Allow dynspread to be used with `rasterize` ([#637](https://github.com/holoviz/hvplot/pull/637))
+- Add a title to xarray plots with scalar coords ([#659](https://github.com/holoviz/hvplot/pull/659))
+- Adding `datashade` and `rasterize` options to scatter_matrix ([#495](https://github.com/holoviz/hvplot/pull/495))
+- Update the default internal value of `clim` to support Matplotlib ([#679](https://github.com/holoviz/hvplot/pull/679))
+- Ensure bokeh/panel extension is loaded only once ([#686](https://github.com/holoviz/hvplot/pull/686))
+- Add support for planar layout from Networkx ([#700](https://github.com/holoviz/hvplot/pull/700))
+- Wrap color in `hv.dim` when it matches a dimension/column ([#717](https://github.com/holoviz/hvplot/pull/717))
+- Expose datashader line_width and rescale_discrete_levels options ([#731](https://github.com/holoviz/hvplot/pull/731))
+- Improve array-like handling for x and y inputs ([#714](https://github.com/holoviz/hvplot/pull/714))
+
+Fixes:
+- Interactive:
+  - Interactive fixes ([#630](https://github.com/holoviz/hvplot/pull/630))
+  - Fix for interactive transform ([#632](https://github.com/holoviz/hvplot/pull/632))
+  - Fix issue with accessors on interactive ([#641](https://github.com/holoviz/hvplot/pull/641))
+  - Consistently dereference attribute access ([#642](https://github.com/holoviz/hvplot/pull/642))
+- State that the data cannot be symmetric if it's empty ([#680](https://github.com/holoviz/hvplot/pull/680))
+- Disable hover on errorbars plot ([#721](https://github.com/holoviz/hvplot/pull/721))
+- Fix application of the scale argument for geoviews features ([#725](https://github.com/holoviz/hvplot/pull/725))
+
+Documentation:
+- Add scatter matrix reference ([#689](https://github.com/holoviz/hvplot/pull/689))
+- Plotting user guide enhancement ([#694](https://github.com/holoviz/hvplot/pull/694))
+- Download a tutorial file with the right filename ([#711](https://github.com/holoviz/hvplot/pull/711))
+- Add more imports to try/except import check ([#693](https://github.com/holoviz/hvplot/pull/693))
+- Various minor documentation enhancements and fixes ([#625](https://github.com/holoviz/hvplot/pull/625), [#643](https://github.com/holoviz/hvplot/pull/643), [#644](https://github.com/holoviz/hvplot/pull/644), [#663](https://github.com/holoviz/hvplot/pull/663), [#678](https://github.com/holoviz/hvplot/pull/678), [#722](https://github.com/holoviz/hvplot/pull/722))
+
+Maintenance:
+- Drop support for Python 2.7, minimum supported version is now Python 3.6 ([#702](https://github.com/holoviz/hvplot/pull/702))
+- Changed to `packaging.version` ([#708](https://github.com/holoviz/hvplot/pull/708))
+
 ## Version 0.7.3
 
 **August 4, 2021**
