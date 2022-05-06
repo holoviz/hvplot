@@ -8,7 +8,7 @@ except:
     panel_available = False
 
 from ..converter import HoloViewsConverter
-from ..util import process_dynamic_args
+from ..util import is_list_like, process_dynamic_args
 
 
 class hvPlotBase:
@@ -45,8 +45,8 @@ class hvPlotBase:
         HoloViews object: Object representing the requested visualization
         """
         # Convert an array-like to a list
-        x = list(x) if hasattr(x, "all") else x
-        y = list(y) if hasattr(y, "all") else y
+        x = list(x) if is_list_like(x) else x
+        y = list(y) if is_list_like(y) else y
 
         if isinstance(kind, str) and kind not in self.__all__:
             raise NotImplementedError("kind='{kind}' for data of type {type}".format(

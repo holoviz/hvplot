@@ -6,8 +6,11 @@ import pytest
 
 @pytest.mark.parametrize("y", (
     ["A", "B", "C", "D"],
+    ("A", "B", "C", "D"),
+    {"A", "B", "C", "D"},
     np.array(["A", "B", "C", "D"]),
     pd.Index(["A", "B", "C", "D"]),
+    pd.Series(["A", "B", "C", "D"]),
     ))
 def test_diffent_input_types(y):
     df = pd._testing.makeDataFrame()
