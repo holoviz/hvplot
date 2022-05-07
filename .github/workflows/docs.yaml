@@ -57,7 +57,6 @@ jobs:
           conda activate test-environment
           conda list
           doit develop_install -o doc -o examples --conda-mode=mamba
-          mamba install "datashader=0.14.0"
       - name: doit env_capture
         run: |
           eval "$(conda shell.bash hook)"
