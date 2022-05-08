@@ -23,6 +23,11 @@ html_css_files = [
     'custom.css'
 ]
 
+# Use require.js vendored by nbsite to display the Plotly figure
+# add the end of the Plotting_Extensions notebook. require.js is normally
+# loaded automatically by nbconvert but that happens not to be the case
+# when a notebook converted via nbsite. Other HoloViews-Plotly plots
+# are rendered via Panel, in a way that doesn't require require.js.
 html_js_files = ['require.js']
 
 html_theme_options.update({
