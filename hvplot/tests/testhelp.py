@@ -6,13 +6,13 @@ from holoviews.element import Curve
 
 
 @pytest.fixture
-def reset_backend():
+def reset_default_backend():
     yield
     hvplot.extension('bokeh')
     hvplot.extension.compatibility = None
 
 
-def test_help_style_extension_output(reset_backend):
+def test_help_style_extension_output(reset_default_backend):
     # default, after e.g. import hvplot.pandas
     docstring, signature = hvplot._get_doc_and_signature(
         cls=hvplot.hvPlot,
@@ -51,7 +51,7 @@ def test_help_style_extension_output(reset_backend):
     )
     assert docstring == '\nStyle options\n-------------\n\n' + '\n'.join(sorted(Store.registry['plotly'][Curve].style_opts))
 
-def test_help_style_compatibility(reset_backend):
+def test_help_style_compatibility(reset_default_backend):
     # The current backend is plotly but the style options are those of matplotlib
     hvplot.extension('plotly', 'matplotlib', compatibility='matplotlib')
     docstring, signature = hvplot._get_doc_and_signature(
