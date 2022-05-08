@@ -1,6 +1,6 @@
 ## Version 0.8.0
 
-**May 6, 2022**
+**May 8, 2022**
 
 The 0.8.0 release is a minor release with some exciting new features and a large number of bug fixes and enhancements. Many thanks to @FabianHofmann, @jomey, @ablythed, @jlstevens, @Hoxbro, @michaelaye, @MridulS, @ppwadhwa, @maximlt, @philippjfr for contributing!
 
