@@ -42,7 +42,7 @@ def _get_doc_and_signature(
         formatter += "{options}"
 
     # Bokeh is the default backend
-    backend = hvplot_extension.compatibility or 'bokeh'
+    backend = hvplot_extension.compatibility or Store.current_backend
     if eltype in Store.registry[backend]:
         valid_opts = Store.registry[backend][eltype].style_opts
         if style:
