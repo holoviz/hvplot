@@ -23,6 +23,8 @@ html_css_files = [
     'custom.css'
 ]
 
+html_js_files = ['require.js']
+
 html_theme_options.update({
     "github_url": "https://github.com/holoviz/hvplot",
     "icon_links": [
