@@ -4,11 +4,12 @@ Tests  utilities to convert data and projections
 import sys
 
 import numpy as np
+import pandas as pd
 import pytest
 
 from unittest import TestCase, SkipTest
 
-from hvplot.util import check_crs, process_xarray
+from hvplot.util import check_crs, is_list_like, process_xarray
 
 
 class TestProcessXarray(TestCase):
@@ -275,3 +276,15 @@ def test_check_crs():
     assert p.srs == '+proj=utm +zone=15 +datum=NAD83 +units=m +no_defs'
     p = check_crs('wrong')
     assert p is None
+
+
+def test_is_list_like():
+    assert not is_list_like(0)
+    assert not is_list_like('string')
+    assert not is_list_like(np.array('a'))
+    assert is_list_like(['a', 'b'])
+    assert is_list_like(('a', 'b'))
+    assert is_list_like({'a', 'b'})
+    assert is_list_like(pd.Series(['a', 'b']))
+    assert is_list_like(pd.Index(['a', 'b']))
+    assert is_list_like(np.array(['a', 'b']))

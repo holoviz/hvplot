@@ -8,9 +8,10 @@ from functools import wraps
 from packaging.version import Version
 from types import FunctionType
 
+import numpy as np
 import pandas as pd
-import holoviews as hv
 import param
+import holoviews as hv
 try:
     import panel as pn
     panel_available = True
@@ -27,7 +28,8 @@ def with_hv_extension(func, extension='bokeh', logo=False):
     @wraps(func)
     def wrapper(*args, **kwargs):
         if extension and not getattr(hv.extension, '_loaded', False):
-            hv.extension(extension, logo=logo)
+            from . import hvplot_extension
+            hvplot_extension(extension, logo=logo)
         return func(*args, **kwargs)
     return wrapper
 
@@ -230,7 +232,7 @@ def process_crs(crs):
         import cartopy.crs as ccrs
         import geoviews as gv # noqa
         import pyproj
-    except:
+    except ImportError:
         raise ImportError('Geographic projection support requires GeoViews and cartopy.')
 
     if crs is None:
@@ -251,6 +253,21 @@ def process_crs(crs):
     elif not isinstance(crs, ccrs.CRS):
         raise ValueError("Projection must be defined as a EPSG code, proj4 string, cartopy CRS or pyproj.Proj.")
     return crs
+
+
+def is_list_like(obj):
+    """
+    Adapted from pandas' is_list_like cython function.
+    """
+    return (
+        # equiv: `isinstance(obj, abc.Iterable)`
+        hasattr(obj, "__iter__") and not isinstance(obj, type)
+        # we do not count strings/unicode/bytes as list-like
+        and not isinstance(obj, (str, bytes))
+        # exclude zero-dimensional numpy arrays, effectively scalars
+        and not (isinstance(obj, np.ndarray) and obj.ndim == 0)
+    )
+
 
 def is_tabular(data):
     if check_library(data, ['dask', 'streamz', 'pandas', 'geopandas', 'cudf']):
@@ -497,4 +514,5 @@ def filter_opts(eltype, options, backend='bokeh'):
     opts = getattr(hv.Store.options(backend), eltype)
     allowed = [k for g in opts.groups.values()
                for k in list(g.allowed_keywords)]
-    return {k: v for k, v in options.items() if k in allowed}
+    opts = {k: v for k, v in options.items() if k in allowed}
+    return opts

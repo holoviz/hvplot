@@ -6,6 +6,9 @@ on:
   pull_request:
     branches:
     - '*'
+  workflow_dispatch:
+  schedule:
+    - cron: '0 15 * * SUN'
 
 env:
   CACHE_VERSION: 1
@@ -18,7 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version: ['3.6', '3.7', '3.8', '3.9', '3.10']
         include:
         - os: ubuntu-latest
           path: /usr/share/miniconda3/envs/
@@ -26,7 +29,7 @@ jobs:
           path: /Users/runner/miniconda3/envs/
         - os: windows-latest
           path: C:\Miniconda3\envs\
-    timeout-minutes: 60
+    timeout-minutes: 90
     defaults:
       run:
         shell: bash -l {0} 
@@ -60,8 +63,7 @@ jobs:
       - name: conda setup
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          conda install "pyctdev>=0.5"
-          doit env_create --python=${{ matrix.python-version }}
+          conda create -n test-environment python=${{ matrix.python-version }} pyctdev "typing_extensions<4.2.0"
       - name: doit develop_install py > 3.6
         if: steps.cache.outputs.cache-hit != 'true' && matrix.python-version != '3.6'
         run: |
@@ -83,7 +85,13 @@ jobs:
           # - Install importlib_resources to fix tqdm that missed adding it as a dependency
           # for 3.6 (https://github.com/conda-forge/tqdm-feedstock/pull/114) 
           conda install "panel=0.12" "importlib_resources "
-      - name: pygraphviz
+      - name: Pin tifffile on 3.6 and 3.7
+        if: steps.cache.outputs.cache-hit != 'true' && (matrix.python-version == '3.6'  || matrix.python-version == '3.7')
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda activate test-environment
+          conda install "tifffile<2022.4.22"
+      - name: pygraphviz on ubuntu and macos
         if: steps.cache.outputs.cache-hit != 'true' && ((contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos')) && matrix.python-version != '3.6')
         run: |
           eval "$(conda shell.bash hook)"
@@ -105,7 +113,7 @@ jobs:
           eval "$(conda shell.bash hook)"
           conda activate test-environment
           doit test_unit
-      - name: test examples ubuntu
+      - name: test examples ubuntu / macos
         if: (contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos')) && matrix.python-version != '3.6'
         run: |
           eval "$(conda shell.bash hook)"

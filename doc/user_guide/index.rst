@@ -41,8 +41,14 @@ rather than Matplotlib.
 * `Introduction <Introduction.html>`_
   Introduction to hvPlot and how to start using it.
 
-* `Plotting <Plotting.html>`_
-  Overview of plotting your data with hvPlot.
+* `Plotting with Bokeh <Plotting.html>`_
+  Overview of plotting your data with hvPlot and Bokeh.
+
+* `Plotting with Matplotlib <Plotting_with_Matplotlib.html>`_
+  Overview of plotting your data with hvPlot and Matplotib.
+
+* `Plotting with Plotly <Plotting_with_Plotly.html>`_
+  Overview of plotting your data with hvPlot and Plotly.
 
 * `Customization <Customization.html>`_
   Listing of available options to customize plots.
@@ -52,6 +58,9 @@ rather than Matplotlib.
 
 * `Widgets <Widgets.html>`_
   Adding and customizing interactivity using Panel widgets.
+
+* `Plotting Extensions <Plotting_Extensions.html>`_
+  Changing the plotting extension.
 
 * `Viewing <Viewing.html>`_
   Displaying and saving plots in the notebook, at the command prompt, or in scripts.
@@ -86,10 +95,13 @@ rather than Matplotlib.
     :maxdepth: 2
 
     Introduction <Introduction>
-    Plotting <Plotting>
+    Plotting with Bokeh <Plotting>
+    Plotting with Matplotlib <Plotting_with_Matplotlib>
+    Plotting with Plotly <Plotting_with_Plotly>
     Customization <Customization>
     Interactive <Interactive>
     Widgets <Widgets>
+    Plotting Extensions <Plotting_Extensions>
     Viewing <Viewing>
     Subplots <Subplots>
     Streaming <Streaming>

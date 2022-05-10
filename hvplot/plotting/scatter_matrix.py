@@ -1,9 +1,12 @@
 from functools import partial
-from packaging.version import Version
 import warnings
 
 import holoviews as _hv
+import numpy as _np
 
+from packaging.version import Version
+
+from ..backend_transforms import _transfer_opts_cur_backend
 from ..converter import HoloViewsConverter
 from ..util import with_hv_extension
 
@@ -42,7 +45,7 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
         Interaction tools to include
         Defaults are 'box_select' and 'lasso_select'
     cmap/colormap: str or colormap object, optional
-        Colormap to use for off-diagonal plots
+        Colormap to use when ``c`` is set.
         Default is `Category10 <https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md#category10>`.
     diagonal_kwds/hist_kwds/density_kwds: dict, optional
         Keyword options for the diagonal plots
@@ -148,12 +151,16 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
         if 'mask' in kwds:
             sp_kwds['mask'] = kwds.pop('mask')
 
-    if cmap and colormap:
-        raise TypeError("Only specify one of `cmap` and `colormap`.")
-    colors = cmap or colormap or _hv.plotting.util.process_cmap('Category10', categorical=True)
     tools = tools or ['box_select', 'lasso_select']
-    chart_opts = dict(alpha=alpha, cmap=colors, tools=tools,
+    chart_opts = dict(alpha=alpha, tools=tools,
                       nonselection_alpha=nonselection_alpha, **kwds)
+    if c:
+        if cmap and colormap:
+            raise TypeError("Only specify `cmap` or `colormap`.")
+        ncolors = len(_np.unique(data.dimension_values(c)))
+        cmap = cmap or colormap or 'Category10'
+        cmap = _hv.plotting.util.process_cmap(cmap, ncolors=ncolors, categorical=True)
+        chart_opts['cmap'] = cmap
 
     #get initial scatter matrix.  No color.
     grid = _hv.operation.gridmatrix(data, diagonal_type=diagonal, chart_type=chart)
@@ -178,11 +185,15 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
         raise TypeError('Specify at most one of `diagonal_kwds`, `hist_kwds`, or '
                         '`density_kwds`.')
 
-    diagonal_kwds = diagonal_kwds or hist_kwds or density_kwds or {}
-    # set the histogram colors 
-    diagonal_opts = dict(fill_color=_hv.Cycle(values=colors), **diagonal_kwds)
+    diagonal_opts = diagonal_kwds or hist_kwds or density_kwds or {}
+    # set the histogram colors
+    if c:
+        diagonal_opts['fill_color'] = _hv.Cycle(cmap)
     # actually changing to the same color scheme for both scatter and histogram plots.
-    grid = grid.options({chart.__name__: chart_opts, diagonal.__name__: diagonal_opts})
+    grid = grid.options(
+        {chart.__name__: chart_opts, diagonal.__name__: diagonal_opts},
+        backend='bokeh',
+    )
     
     # Perform datashade options after all the coloring is finished.
     if datashade or rasterize:
@@ -192,5 +203,6 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
             spreadfn = hd.dynspread if dynspread else (hd.spread if spread else lambda z, **_: z)
             eltype = _hv.RGB if datashade else _hv.Image
             grid = grid.map(partial(spreadfn, **sp_kwds), specs=eltype)
-
+ 
+    grid = _transfer_opts_cur_backend(grid)
     return grid

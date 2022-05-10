@@ -32,7 +32,8 @@ install_requires = [
     'colorcet >=2',
     'holoviews >=1.11.0',
     'pandas',
-    'numpy>=1.15'
+    'numpy>=1.15',
+    'packaging',
 ]
 
 _examples = [
@@ -62,6 +63,8 @@ _examples = [
     'fiona >=1.8.18',
     # Extra dependency of cartopy on Python 3.6 only
     'pyepsg >=0.4.0',
+    'matplotlib',
+    'plotly',
 ]
 
 _examples_extra = _examples + [
@@ -78,6 +81,11 @@ extras_require = {
         'numpy >=1.7',
         'nbqa==1.2.3',
         'nbval',
+        'matplotlib',
+        'plotly',
+        'xarray',
+        'pooch',
+        'scipy',
     ],
     'examples': _examples,
     'examples_extra': _examples_extra,
@@ -122,6 +130,7 @@ setup_args = dict(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Operating System :: OS Independent",
         "Intended Audience :: Science/Research",
         "Intended Audience :: Developers",
