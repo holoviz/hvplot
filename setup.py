@@ -76,7 +76,7 @@ extras_require = {
         'pytest',
         'pytest-cov',
         'numpy >=1.7',
-        'nbqa',
+        'nbqa==1.2.3',
         'nbval',
     ],
     'examples': _examples,
