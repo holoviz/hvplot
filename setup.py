@@ -79,7 +79,6 @@ extras_require = {
         'pytest',
         'pytest-cov',
         'numpy >=1.7',
-        'nbqa==1.2.3',
         'nbval',
         'matplotlib',
         'plotly',
