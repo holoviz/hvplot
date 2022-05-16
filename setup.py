@@ -60,7 +60,7 @@ _examples = [
     'scikit-image >=0.17.2',
     'python-snappy >=0.6.0',
     'pooch >=1.6.0',
-    'fiona >=1.8.18',
+    'fiona >=1.8.21',
     # Extra dependency of cartopy on Python 3.6 only
     'pyepsg >=0.4.0',
     'matplotlib',
