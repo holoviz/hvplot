@@ -84,7 +84,7 @@ jobs:
           # Panel 0.13 will support Python >= 3.7 only so the pin here can stay indefinitely.
           # - Install importlib_resources to fix tqdm that missed adding it as a dependency
           # for 3.6 (https://github.com/conda-forge/tqdm-feedstock/pull/114) 
-          conda install "panel=0.12" "importlib_resources "
+          conda install "panel=0.12" "importlib_resources" --no-update-deps
       - name: Pin tifffile on 3.6 and 3.7
         if: steps.cache.outputs.cache-hit != 'true' && (matrix.python-version == '3.6'  || matrix.python-version == '3.7')
         run: |
