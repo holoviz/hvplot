@@ -65,9 +65,6 @@ _examples = [
     'pyepsg >=0.4.0',
     'matplotlib',
     'plotly',
-]
-
-_examples_extra = _examples + [
     'pygraphviz',
 ]
 
@@ -87,8 +84,7 @@ extras_require = {
         'scipy',
     ],
     'examples': _examples,
-    'examples_extra': _examples_extra,
-    'doc': _examples_extra + [
+    'doc': _examples + [
         'nbsite >=0.7.1',
         'pydata-sphinx-theme',
         'sphinx-copybutton',
