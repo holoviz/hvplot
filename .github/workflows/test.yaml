@@ -106,6 +106,7 @@ jobs:
           conda activate test-environment
           doit test_unit
       - name: test examples
+        if: matrix.python-version != '3.6'
         run: |
           eval "$(conda shell.bash hook)"
           conda activate test-environment
