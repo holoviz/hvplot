@@ -77,7 +77,6 @@ jobs:
           eval "$(conda shell.bash hook)"
           conda activate test-environment
           conda list
-          conda install "pip <22"
           doit develop_install -o tests
           # - Pin panel on Python 3.6 because one or more dev releases on the 0.13.* series
           # can be installed on Python 3.6 but are actually not compatible with Python 3.6
