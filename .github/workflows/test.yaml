@@ -36,7 +36,6 @@ jobs:
     env:
       DESC: "Python ${{ matrix.python-version }} tests"
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      PYCTDEV_SELF_CHANNEL: "pyviz/label/dev"
       MAMBA_NO_BANNER: 1
     steps:
       - uses: actions/checkout@v2
@@ -48,7 +47,6 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           miniconda-version: "latest"
-          mamba-version: "*"
       - name: Fetch unshallow
         run: git fetch --prune --tags --unshallow
       - name: Get Today's date for cache
