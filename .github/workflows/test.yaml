@@ -48,7 +48,6 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           miniconda-version: "latest"
-          channels: pyviz/label/dev,conda-forge,nodefaults
           mamba-version: "*"
       - name: Fetch unshallow
         run: git fetch --prune --tags --unshallow
@@ -63,9 +62,13 @@ jobs:
       - name: conda setup
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          conda list
-          conda install -c defaults --override-channels "conda>=4.12"
-          conda list
+          conda install -n base -c defaults "conda>=4.12"
+          conda install -n base -c conda-forge mamba --no-update-deps
+          conda install -c conda-forge "nodejs=15.3.0" --no-update-deps
+          conda config --prepend channels nodefaults
+          conda config --prepend channels conda-forge
+          conda config --prepend channels pyviz/label/dev
+          conda config --remove channels defaults
           conda create -n test-environment python=${{ matrix.python-version }} pyctdev
       - name: doit develop_install py
         if: steps.cache.outputs.cache-hit != 'true'
