@@ -2210,7 +2210,11 @@ class HoloViewsConverter:
                 opts_['color'] = hv.dim(opts_['color'])
         if self.geo: params['crs'] = self.crs
         if self.by:
-            obj = Dataset(data).to(element, kdims, vdims, self.by, **params).overlay(sort=False)
+            obj = Dataset(data).to(element, kdims, vdims, self.by, **params)
+            if self.subplots:
+                obj = obj.layout(sort=False)
+            else:
+                obj = obj.overlay(sort=False)
         else:
             obj = element(data, kdims, vdims, **params)
 
