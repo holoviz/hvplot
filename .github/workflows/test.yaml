@@ -65,7 +65,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           conda install -n base -c defaults "conda>=4.12"
-          conda install -n base -c conda-forge mamba --no-update-deps
+          conda install -n base -c conda-forge "mamba>=0.23" --no-update-deps
           conda install -c conda-forge "nodejs=15.3.0" --no-update-deps
           conda config --prepend channels nodefaults
           conda config --prepend channels conda-forge
