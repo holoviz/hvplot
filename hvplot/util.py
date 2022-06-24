@@ -18,8 +18,6 @@ try:
 except:
     panel_available = False
 
-from holoviews.core.util import basestring
-
 hv_version = Version(hv.__version__)
 
 
@@ -74,8 +72,8 @@ def check_crs(crs):
         out = crs
     elif isinstance(crs, crs_type):
         out = pyproj.Proj(crs.to_wkt(), preserve_units=True)
-    elif isinstance(crs, dict) or isinstance(crs, basestring):
-        if isinstance(crs, basestring):
+    elif isinstance(crs, dict) or isinstance(crs, str):
+        if isinstance(crs, str):
             # quick fix for https://github.com/pyproj4/pyproj/issues/345
             crs = crs.replace(' ', '').replace('+', ' +')
         try:
@@ -238,14 +236,14 @@ def process_crs(crs):
     if crs is None:
         return ccrs.PlateCarree()
 
-    if isinstance(crs, basestring) and crs.lower().startswith('epsg'):
+    if isinstance(crs, str) and crs.lower().startswith('epsg'):
         try:
             crs = ccrs.epsg(crs[5:].lstrip().rstrip())
         except:
             raise ValueError("Could not parse EPSG code as CRS, must be of the format 'EPSG: {code}.'")
     elif isinstance(crs, int):
         crs = ccrs.epsg(crs)
-    elif isinstance(crs, (basestring, pyproj.Proj)):
+    elif isinstance(crs, (str, pyproj.Proj)):
         try:
             crs = proj_to_cartopy(crs)
         except:

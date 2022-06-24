@@ -13,7 +13,7 @@ from holoviews.core.spaces import DynamicMap, HoloMap, Callable
 from holoviews.core.overlay import NdOverlay
 from holoviews.core.options import Store, Cycle, Palette
 from holoviews.core.layout import NdLayout
-from holoviews.core.util import max_range, basestring
+from holoviews.core.util import max_range
 from holoviews.element import (
     Curve, Scatter, Area, Bars, BoxWhisker, Dataset, Distribution,
     Table, HeatMap, Image, HexTiles, QuadMesh, Bivariate, Histogram,
@@ -410,7 +410,7 @@ class HoloViewsConverter:
             from cartopy import crs as ccrs
             from geoviews.util import project_extents
 
-            if isinstance(projection, basestring):
+            if isinstance(projection, str):
                 all_crs = [proj for proj in dir(ccrs) if
                            callable(getattr(ccrs, proj)) and
                            proj not in ['ABCMeta', 'CRS'] and
@@ -636,7 +636,7 @@ class HoloViewsConverter:
                     "a `data.attr` containing a valid crs.".format(crs))
 
     def _transform_columnar_data(self, data):
-        renamed = {c: str(c) for c in data.columns if not isinstance(c, basestring)}
+        renamed = {c: str(c) for c in data.columns if not isinstance(c, str)}
         if renamed:
             data = data.rename(columns=renamed)
         return data
@@ -1022,7 +1022,7 @@ class HoloViewsConverter:
             color = style_opts.get('color')
 
         for k, v in style.items():
-            if isinstance(v, Cycle) and isinstance(v, basestring):
+            if isinstance(v, Cycle) and isinstance(v, str):
                 if color == cmap:
                     if color not in Palette.colormaps and color.title() in Palette.colormaps:
                         color = color.title()
@@ -1048,7 +1048,7 @@ class HoloViewsConverter:
                 self.data = self.data.assign(_size=size)
                 style_opts['size'] = '_size'
                 self.variables.append('_size')
-            elif isinstance(size, basestring):
+            elif isinstance(size, str):
                 style_opts['size'] = np.sqrt(dim(size)) * scale
             elif not isinstance(size, dim):
                 style_opts['size'] = np.sqrt(size) * scale
@@ -1248,7 +1248,7 @@ class HoloViewsConverter:
         if self.aggregator:
             import datashader as ds
             agg = self.aggregator
-            if isinstance(agg, basestring) and self._color_dim:
+            if isinstance(agg, str) and self._color_dim:
                 categorical = agg == 'count_cat'
                 agg = getattr(reductions, agg)(self._color_dim)
             else:
@@ -1379,7 +1379,7 @@ class HoloViewsConverter:
                     dim = dim.clone(**replace)
                 elif isinstance(dim, dict) and 'range' not in dim:
                     dim = dict(dim, **replace)
-                elif isinstance(dim, (tuple, basestring)):
+                elif isinstance(dim, (tuple, str)):
                     dim = Dimension(dim, **replace)
             else:
                 dim = replace
@@ -1389,7 +1389,7 @@ class HoloViewsConverter:
     def _validate_dim(self, dimension):
         if isinstance(dimension, dim):
             dimension = dimension.dimension.name
-        if isinstance(dimension, basestring) and dimension in self.variables:
+        if isinstance(dimension, str) and dimension in self.variables:
             return dimension
 
     @property
@@ -1412,7 +1412,7 @@ class HoloViewsConverter:
                 vdims.append(agg_col)
                 dimensions.append(agg_col)
         for dimension in self.hover_cols:
-            if (isinstance(dimension, basestring) and dimension in self.variables
+            if (isinstance(dimension, str) and dimension in self.variables
                 and dimension not in dimensions):
                 vdims.append(dimension)
         return kdims, vdims
