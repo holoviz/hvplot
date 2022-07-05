@@ -58,8 +58,11 @@ class Interactive():
     def __new__(cls, obj, **kwargs):
         if 'fn' in kwargs:
             fn = kwargs.pop('fn')
-        elif isinstance(obj, (FunctionType, MethodType)):
-            fn = pn.panel(obj)
+        elif isinstance(obj, FunctionType):
+            fn = pn.param.ParamFunction(obj, lazy=True)
+            obj = fn.eval(obj)
+        elif isinstance(obj,  MethodType):
+            fn = pn.param.ParamMethod(obj, lazy=True)
             obj = fn.eval(obj)
         else:
             fn = None
@@ -82,7 +85,11 @@ class Interactive():
         self._init = False
         if self._fn is not None:
             for _, params in full_groupby(self._fn_params, lambda x: id(x.owner)):
-                params[0].owner.param.watch(self._update_obj, [p.name for p in params])
+                w = params[0].owner.param.watch(self._update_obj, [p.name for p in params])
+                if any(w.inst == w2.inst and w.what == w2.what for w2 in params[0].owner.param.watchers):
+                    params[0].owner.param.unwatch(w)
+                else:
+                    params[0].owner.param.watchers.append(w)
         self._method = method
         if transform is None:
             dim = '*'
