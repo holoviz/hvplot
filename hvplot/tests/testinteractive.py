@@ -106,7 +106,7 @@ def test_interactive_with_bound_function_calls():
 
     # Setting up interactive with a function
     dfi = hvplot.bind(load_data, w_species).interactive()
-    interactive = (dfi.loc[dfi['sex'].isin(w_sex)])
+    (dfi.loc[dfi['sex'].isin(w_sex)])
     assert load_data.COUNT ==  1
 
     w_species.value = "Chinstrap"
