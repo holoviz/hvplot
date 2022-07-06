@@ -83,13 +83,9 @@ class Interactive():
                  loc='top_left', center=False, dmap=False, inherit_kwargs={},
                  max_rows=100, method=None, **kwargs):
         self._init = False
-        if self._fn is not None:
+        if self._fn is not None and depth == 0:
             for _, params in full_groupby(self._fn_params, lambda x: id(x.owner)):
-                w = params[0].owner.param.watch(self._update_obj, [p.name for p in params])
-                if any(w.inst == w2.inst and w.what == w2.what for w2 in params[0].owner.param.watchers):
-                    params[0].owner.param.unwatch(w)
-                else:
-                    params[0].owner.param.watchers.append(w)
+                params[0].owner.param.watch(self._update_obj, [p.name for p in params])
         self._method = method
         if transform is None:
             dim = '*'
