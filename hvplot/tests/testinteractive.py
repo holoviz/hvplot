@@ -3,7 +3,6 @@ import panel as pn
 
 from holoviews.util.transform import dim
 
-import hvplot.pandas  # noqa
 from hvplot import bind
 from hvplot.interactive import Interactive
 from hvplot.xarray import XArrayInteractive
@@ -87,27 +86,3 @@ def test_interactive_xarray_function():
     select.value = 'air2'
     assert (dsi._obj == ds.air2).all()
     assert dsi._transform == dim('air2')
-
-def test_interactive_with_bound_function_calls():
-    from bokeh.sampledata import penguins
-
-    df = penguins.data
-
-    w_species = pn.widgets.Select(name='Species', options=list(df['species'].unique()))
-    w_sex = pn.widgets.MultiSelect(name='Sex', value=['MALE'], options=['MALE', 'FEMALE'])
-
-    def load_data(species):
-        """Simluate loading data from e.g a database or from a web API."""
-        data = df.loc[df['species'] == species]
-        load_data.COUNT += 1
-        return data
-
-    load_data.COUNT = 0
-
-    # Setting up interactive with a function
-    dfi = hvplot.bind(load_data, w_species).interactive()
-    (dfi.loc[dfi['sex'].isin(w_sex)])
-    assert load_data.COUNT ==  1
-
-    w_species.value = "Chinstrap"
-    assert load_data.COUNT == 2

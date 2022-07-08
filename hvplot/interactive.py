@@ -58,11 +58,8 @@ class Interactive():
     def __new__(cls, obj, **kwargs):
         if 'fn' in kwargs:
             fn = kwargs.pop('fn')
-        elif isinstance(obj, FunctionType):
-            fn = pn.param.ParamFunction(obj, lazy=True)
-            obj = fn.eval(obj)
-        elif isinstance(obj,  MethodType):
-            fn = pn.param.ParamMethod(obj, lazy=True)
+        elif isinstance(obj, (FunctionType, MethodType)):
+            fn = pn.panel(obj)
             obj = fn.eval(obj)
         else:
             fn = None
