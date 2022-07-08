@@ -25,9 +25,8 @@ def _find_widgets(op):
     op_args = list(op['args'])+list(op['kwargs'].values())
     op_args = hv.core.util.flatten(op_args)
     for op_arg in op_args:
-        if 'panel' in sys.modules:
-            if isinstance(op_arg, Widget) and op_arg not in widgets:
-                widgets.append(op_arg)
+        if isinstance(op_arg, Widget) and op_arg not in widgets:
+            widgets.append(op_arg)
         if isinstance(op_arg, hv.dim):
             for nested_op in op_arg.ops:
                 for widget in _find_widgets(nested_op):
@@ -41,6 +40,11 @@ def _find_widgets(op):
             isinstance(op_arg.owner, pn.widgets.Widget) and
             op_arg.owner not in widgets):
             widgets.append(op_arg.owner)
+        if isinstance(op_arg, slice):
+            nested_op = {"args": [op_arg.start, op_arg.stop, op_arg.step], "kwargs": {}}
+            for widget in _find_widgets(nested_op):
+                if widget not in widgets:
+                    widgets.append(widget)
     return widgets
 
 
