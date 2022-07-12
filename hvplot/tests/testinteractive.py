@@ -54,7 +54,7 @@ def test_interactive_pandas_function():
     df = pd._testing.makeMixedDataFrame()
 
     select = pn.widgets.Select(options=list(df.columns))
-    
+
     def sel_col(col):
         return df[col]
 
@@ -73,7 +73,7 @@ def test_interactive_xarray_function():
     ds['air2'] = ds.air*2
 
     select = pn.widgets.Select(options=list(ds))
-    
+
     def sel_col(sel):
         return ds[sel]
 
@@ -86,3 +86,39 @@ def test_interactive_xarray_function():
     select.value = 'air2'
     assert (dsi._obj == ds.air2).all()
     assert dsi._transform == dim('air2')
+
+def test_interactive_nested_widgets():
+    df = pd._testing.makeDataFrame()
+    w = pn.widgets.RadioButtonGroup(value="A", options=list("ABC"))
+
+    idf = Interactive(df)
+    pipeline = idf.groupby(["D", w]).mean()
+    ioutput = pipeline.panel().object().object
+    iw = pipeline.widgets()
+
+    output = df.groupby(["D", "A"]).mean()
+
+    pd.testing.assert_frame_equal(ioutput, output)
+    assert len(iw) == 1
+    assert iw[0] == w
+
+
+def test_interactive_slice():
+    df = pd._testing.makeDataFrame()
+    w = pn.widgets.IntSlider(start=10, end=40)
+
+    idf = Interactive(df)
+    pipeline = idf.iloc[:w]
+    ioutput = pipeline.panel().object().object
+    iw = pipeline.widgets()
+
+    output = df.iloc[:10]
+
+    pd.testing.assert_frame_equal(ioutput, output)
+    assert len(iw) == 1
+    assert iw[0] == w
+
+    w.value = 15
+    ioutput = pipeline.panel().object().object
+    output = df.iloc[:15]
+    pd.testing.assert_frame_equal(ioutput, output)
