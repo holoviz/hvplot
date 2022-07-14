@@ -1,3 +1,4 @@
+import pathlib
 import sys
 
 from unittest import TestCase, SkipTest, expectedFailure
@@ -22,9 +23,9 @@ class TestGeo(TestCase):
             raise SkipTest('xarray, rasterio, geoviews, or cartopy not available')
         import hvplot.xarray  # noqa
         import hvplot.pandas  # noqa
-        self.da = (xr.open_rasterio(
-            'https://github.com/rasterio/rasterio/raw/main/tests/data/RGB.byte.tif')
-            .sel(band=1))
+        self.da = xr.open_rasterio(
+           pathlib.Path(__file__).parent / 'data' / 'RGB-red.byte.tif'
+        ).sel(band=1)
         self.crs = ccrs.epsg(self.da.crs.split('epsg:')[1])
 
     def assertCRS(self, plot, proj='utm'):
