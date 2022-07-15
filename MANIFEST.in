@@ -1,6 +1,7 @@
 include README.rst
 include LICENSE
 include hvplot/.version
+include hvplot/tests/test_data/*.tif
 graft examples
 graft hvplot/examples
 global-exclude *.py[co]
