@@ -5,7 +5,7 @@ interactive API
 import abc
 import operator
 import sys
-
+from functools import partial
 from types import FunctionType, MethodType
 
 import holoviews as hv
@@ -17,6 +17,7 @@ from panel.layout import Column, Row, VSpacer, HSpacer
 from panel.util import get_method_owner, full_groupby
 from panel.widgets.base import Widget
 
+from .converter import HoloViewsConverter
 from .util import is_tabular, is_xarray, is_xarray_dataarray
 
 
@@ -112,6 +113,7 @@ class Interactive():
         ds = hv.Dataset(self._obj)
         self._current = self._transform.apply(ds, keep_index=True, compute=False)
         self._init = True
+        self.hvplot = _hvplot(self)
 
     def _update_obj(self, *args):
         self._obj = self._fn.eval(self._fn.object)
@@ -394,13 +396,6 @@ class Interactive():
         transform = type(transform)(transform, 'plot', accessor=True)
         return new._clone(transform(*args, **kwargs), plot=True)
 
-    def hvplot(self, *args, **kwargs):
-        new = self._resolve_accessor()
-        transform = new._transform
-        transform = type(transform)(transform, 'hvplot', accessor=True)
-        dmap = 'kind' not in kwargs
-        return new._clone(transform(*args, **kwargs), dmap=dmap)
-
     #----------------------------------------------------------------
     # Public API
     #----------------------------------------------------------------
@@ -512,3 +507,31 @@ class Interactive():
                 if w not in widgets:
                     widgets.append(w)
         return pn.Column(*widgets)
+
+
+class _hvplot():
+    _converters = tuple(HoloViewsConverter._kind_mapping)
+
+    __slots__ = ["_interactive"]
+
+    def __init__(self, _interactive):
+        self._interactive = _interactive
+
+    def __call__(self, *args, _kind=None, **kwargs):
+        # The underscore in _kind is to be able to overwrite
+        # kind in kwargs, if used with partial. E.g. the following
+        # `dfi.hvplot.scatter('x','y', kind='area')` will return a
+        # scatter plot.
+        new = self._interactive._resolve_accessor()
+        transform = new._transform
+        transform = type(transform)(transform, 'hvplot', accessor=True)
+        if _kind:
+            kwargs["kind"] = _kind
+        dmap = 'kind' not in kwargs
+        return new._clone(transform(*args, **kwargs), dmap=dmap)
+
+    def __getattr__(self, attr):
+        if attr in self._converters:
+            return partial(self, _kind=attr)
+        else:
+            raise AttributeError(f"'hvplot' object has no attribute '{attr}'")
