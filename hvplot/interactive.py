@@ -527,7 +527,7 @@ class _hvplot():
         transform = type(transform)(transform, 'hvplot', accessor=True)
         if _kind:
             kwargs["kind"] = _kind
-        dmap = 'kind' not in kwargs
+        dmap = 'kind' not in kwargs or not isinstance(kwargs['kind'], str)
         return new._clone(transform(*args, **kwargs), dmap=dmap)
 
     def __getattr__(self, attr):
