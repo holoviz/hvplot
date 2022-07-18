@@ -86,3 +86,29 @@ def test_interactive_xarray_function():
     select.value = 'air2'
     assert (dsi._obj == ds.air2).all()
     assert dsi._transform == dim('air2')
+
+
+def test_interactive_pandas_dataframe_accessor():
+    import hvplot.pandas  # noqa
+
+    df = pd._testing.makeMixedDataFrame()
+    dfi = df.interactive()
+
+    assert dfi.hvplot(kind="scatter")._transform == dfi.hvplot.scatter()._transform
+
+    # Assert that accessor has higher priority than kwargs["kind"]
+    assert dfi.hvplot(kind="scatter")._transform == dfi.hvplot.scatter(kind="area")._transform
+
+
+def test_interactive_xarray_dataset_accessor():
+    import xarray as xr
+    import hvplot.xarray  # noqa
+
+    ds = xr.tutorial.load_dataset('air_temperature')
+
+    dsi = ds.air.interactive
+
+    assert dsi.hvplot(kind="line")._transform == dsi.hvplot.line()._transform
+
+    # Assert that accessor has higher priority than kwargs["kind"]
+    assert dsi.hvplot(kind="line")._transform == dsi.hvplot.line(kind="area")._transform
