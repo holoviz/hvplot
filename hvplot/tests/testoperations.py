@@ -67,6 +67,19 @@ class TestDatashader(ComparisonTestCase):
         opts = Store.lookup_options('bokeh', plot, 'style').kwargs
         self.assertEqual(opts.get('cmap'), 'kbc_r')
 
+    def test_rasterize_default_colorbar(self):
+        plot = self.df.hvplot.scatter('x', 'y', dynamic=False, rasterize=True)
+        opts = Store.lookup_options('bokeh', plot, 'plot').kwargs
+        self.assertTrue(opts.get('colorbar'))
+
+    def test_rasterize_default_colorbar_with_cmap(self):
+        cmap = 'Reds'
+        plot = self.df.hvplot.scatter('x', 'y', dynamic=False, rasterize=True, cmap=cmap)
+        opts = Store.lookup_options('bokeh', plot, 'style').kwargs
+        self.assertEqual(opts.get('cmap'), cmap)
+        opts = Store.lookup_options('bokeh', plot, 'plot').kwargs
+        self.assertTrue(opts.get('colorbar'))
+
     def test_rasterize_set_clim(self):
         plot = self.df.hvplot.scatter('x', 'y', dynamic=False, rasterize=True, clim=(1, 4))
         opts = Store.lookup_options('bokeh', plot, 'plot').kwargs
