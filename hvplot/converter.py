@@ -526,7 +526,7 @@ class HoloViewsConverter:
             plot_opts['colorbar'] = colorbar
         elif self.kind in self._colorbar_types:
             plot_opts['colorbar'] = True
-        elif self.rasterize or self.datashade:
+        elif self.rasterize:
             plot_opts['colorbar'] = plot_opts.get('colorbar', True)
         if 'logz' in kwds and 'logz' in self._kind_options.get(self.kind, {}):
             plot_opts['logz'] = kwds.pop('logz')
