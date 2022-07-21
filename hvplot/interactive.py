@@ -535,3 +535,7 @@ class _hvplot():
             return partial(self, _kind=attr)
         else:
             raise AttributeError(f"'hvplot' object has no attribute '{attr}'")
+
+    def __dir__(self):
+        # This function is for autocompletion
+        return self._converters
