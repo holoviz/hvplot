@@ -25,11 +25,12 @@ from holoviews.plotting.util import process_cmap
 from holoviews.operation import histogram
 from holoviews.streams import Buffer, Pipe
 from holoviews.util.transform import dim
+from packaging.version import Version
 from pandas import DatetimeIndex, MultiIndex
 
 from .backend_transforms import _transfer_opts_cur_backend
 from .util import (
-    filter_opts, is_tabular, is_series, is_dask, is_intake, is_cudf,
+    filter_opts, hv_version, is_tabular, is_series, is_dask, is_intake, is_cudf,
     is_streamz, is_ibis, is_xarray, is_xarray_dataarray, process_crs,
     process_intake, process_xarray, check_library, is_geodataframe,
     process_derived_datetime_xarray, process_derived_datetime_pandas,
@@ -578,7 +579,7 @@ class HoloViewsConverter:
                 pass
         if cnorm is not None:
             plot_opts['cnorm'] = cnorm
-        if rescale_discrete_levels is not None:
+        if rescale_discrete_levels is not None and hv_version >= Version('1.15.0'):
             plot_opts['rescale_discrete_levels'] = rescale_discrete_levels
 
         self._plot_opts = plot_opts
