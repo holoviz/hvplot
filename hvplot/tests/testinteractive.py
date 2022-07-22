@@ -103,8 +103,8 @@ def test_interactive_pandas_dataframe_accessor():
 
     assert dfi.hvplot(kind="scatter")._transform == dfi.hvplot.scatter()._transform
 
-    # Assert that accessor has higher priority than kwargs["kind"]
-    assert dfi.hvplot(kind="scatter")._transform == dfi.hvplot.scatter(kind="area")._transform
+    with pytest.raises(TypeError):
+        dfi.hvplot.scatter(kind="area")
 
 
 @xr_available
@@ -114,5 +114,5 @@ def test_interactive_xarray_dataset_accessor():
 
     assert dsi.hvplot(kind="line")._transform == dsi.hvplot.line()._transform
 
-    # Assert that accessor has higher priority than kwargs["kind"]
-    assert dsi.hvplot(kind="line")._transform == dsi.hvplot.line(kind="area")._transform
+    with pytest.raises(TypeError):
+        dsi.hvplot.line(kind="area")
