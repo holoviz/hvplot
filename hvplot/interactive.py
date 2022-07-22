@@ -45,7 +45,7 @@ def _find_widgets(op):
     return widgets
 
 
-class Interactive():
+class Interactive:
     """
     Interactive is a wrapper around a Python object that lets users create
     interactive pipelines by calling existing APIs on an object with
@@ -129,7 +129,7 @@ class Interactive():
             parameterized = get_method_owner(self._fn.object)
             deps = parameterized.param.method_dependencies(self._fn.object.__name__)
         return deps
-        
+
     @property
     def _params(self):
         ps = self._fn_params
@@ -509,8 +509,8 @@ class Interactive():
         return pn.Column(*widgets)
 
 
-class _hvplot():
-    _converters = tuple(HoloViewsConverter._kind_mapping)
+class _hvplot:
+    _kinds = tuple(HoloViewsConverter._kind_mapping)
 
     __slots__ = ["_interactive"]
 
@@ -518,24 +518,26 @@ class _hvplot():
         self._interactive = _interactive
 
     def __call__(self, *args, _kind=None, **kwargs):
-        # The underscore in _kind is to be able to overwrite
-        # kind in kwargs, if used with partial. E.g. the following
-        # `dfi.hvplot.scatter('x','y', kind='area')` will return a
-        # scatter plot.
+        # The underscore in _kind is to not overwrite it
+        # if 'kind' is in kwargs and the function
+        # is used with partial.
+        if _kind and "kind" in kwargs:
+            raise TypeError(f"{_kind}() got an unexpected keyword argument 'kind'")
+        if _kind:
+            kwargs["kind"] = _kind
+
         new = self._interactive._resolve_accessor()
         transform = new._transform
         transform = type(transform)(transform, 'hvplot', accessor=True)
-        if _kind:
-            kwargs["kind"] = _kind
         dmap = 'kind' not in kwargs or not isinstance(kwargs['kind'], str)
         return new._clone(transform(*args, **kwargs), dmap=dmap)
 
     def __getattr__(self, attr):
-        if attr in self._converters:
+        if attr in self._kinds:
             return partial(self, _kind=attr)
         else:
             raise AttributeError(f"'hvplot' object has no attribute '{attr}'")
 
     def __dir__(self):
         # This function is for autocompletion
-        return self._converters
+        return self._interactive._obj.hvplot.__all__
