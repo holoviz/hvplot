@@ -63,9 +63,8 @@ To see the available arguments for a specific kind of plot run
 
 >>> hvplot.help(kind='scatter')
 
-In a notebook or ipython environment tab completion will also be able to
-provide you with the list of available arguments for your data source and
-plotting backend.
+In a notebook or ipython environment TAB and SHIFT+TAB completion will help you
+navigate and learn.
 
 How to export
 -------------
