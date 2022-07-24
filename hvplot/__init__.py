@@ -59,6 +59,7 @@ How to get help
 
 To see the available arguments for a specific kind of plot run
 
+>>> import hvplot
 >>> hvplot.help(kind='scatter')
 
 In a notebook or ipython environment TAB and SHIFT+TAB completion will help you
