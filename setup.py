@@ -39,7 +39,7 @@ install_requires = [
 _examples = [
     'geoviews >=1.6.0',
     'numba >=0.51.0',
-    'geopandas >=0.9.0',
+    'geopandas',
     'xarray >=0.18.2',
     'networkx >=2.6.3',
     'streamz >=0.3.0',
@@ -49,9 +49,9 @@ _examples = [
     'dask >=2021.3.0',
     'datashader >=0.6.5',
     'notebook >=5.4',
-    'rasterio >=1.2.6',
-    'cartopy >= 0.18.0',
-    'pyproj >=3.0.1',
+    'rasterio',
+    'cartopy',
+    'pyproj',
     's3fs >=2022.1.0',
     'scipy >=1.5.3',
     'pillow >=8.2.0',
@@ -60,14 +60,11 @@ _examples = [
     'scikit-image >=0.17.2',
     'python-snappy >=0.6.0',
     'pooch >=1.6.0',
-    'fiona >=1.8.18',
+    'fiona',
     # Extra dependency of cartopy on Python 3.6 only
-    'pyepsg >=0.4.0',
+    'pyepsg',
     'matplotlib',
     'plotly',
-]
-
-_examples_extra = _examples + [
     'pygraphviz',
 ]
 
@@ -87,10 +84,9 @@ extras_require = {
         'scipy',
     ],
     'examples': _examples,
-    'examples_extra': _examples_extra,
-    'doc': _examples_extra + [
+    'doc': _examples + [
         'nbsite >=0.7.1',
-        'pydata-sphinx-theme',
+        'pydata-sphinx-theme <0.9.0',
         'sphinx-copybutton',
     ]
 }
@@ -129,6 +125,7 @@ setup_args = dict(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Operating System :: OS Independent",
         "Intended Audience :: Science/Research",
         "Intended Audience :: Developers",

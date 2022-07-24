@@ -8,6 +8,7 @@ from functools import wraps
 from packaging.version import Version
 from types import FunctionType
 
+import numpy as np
 import pandas as pd
 import param
 import holoviews as hv
@@ -16,8 +17,6 @@ try:
     panel_available = True
 except:
     panel_available = False
-
-from holoviews.core.util import basestring
 
 hv_version = Version(hv.__version__)
 
@@ -73,8 +72,8 @@ def check_crs(crs):
         out = crs
     elif isinstance(crs, crs_type):
         out = pyproj.Proj(crs.to_wkt(), preserve_units=True)
-    elif isinstance(crs, dict) or isinstance(crs, basestring):
-        if isinstance(crs, basestring):
+    elif isinstance(crs, dict) or isinstance(crs, str):
+        if isinstance(crs, str):
             # quick fix for https://github.com/pyproj4/pyproj/issues/345
             crs = crs.replace(' ', '').replace('+', ' +')
         try:
@@ -237,14 +236,14 @@ def process_crs(crs):
     if crs is None:
         return ccrs.PlateCarree()
 
-    if isinstance(crs, basestring) and crs.lower().startswith('epsg'):
+    if isinstance(crs, str) and crs.lower().startswith('epsg'):
         try:
             crs = ccrs.epsg(crs[5:].lstrip().rstrip())
         except:
             raise ValueError("Could not parse EPSG code as CRS, must be of the format 'EPSG: {code}.'")
     elif isinstance(crs, int):
         crs = ccrs.epsg(crs)
-    elif isinstance(crs, (basestring, pyproj.Proj)):
+    elif isinstance(crs, (str, pyproj.Proj)):
         try:
             crs = proj_to_cartopy(crs)
         except:
@@ -252,6 +251,21 @@ def process_crs(crs):
     elif not isinstance(crs, ccrs.CRS):
         raise ValueError("Projection must be defined as a EPSG code, proj4 string, cartopy CRS or pyproj.Proj.")
     return crs
+
+
+def is_list_like(obj):
+    """
+    Adapted from pandas' is_list_like cython function.
+    """
+    return (
+        # equiv: `isinstance(obj, abc.Iterable)`
+        hasattr(obj, "__iter__") and not isinstance(obj, type)
+        # we do not count strings/unicode/bytes as list-like
+        and not isinstance(obj, (str, bytes))
+        # exclude zero-dimensional numpy arrays, effectively scalars
+        and not (isinstance(obj, np.ndarray) and obj.ndim == 0)
+    )
+
 
 def is_tabular(data):
     if check_library(data, ['dask', 'streamz', 'pandas', 'geopandas', 'cudf']):
