@@ -9,6 +9,7 @@ import pandas as pd
 from holoviews import Store
 from holoviews.element import Image, QuadMesh
 from holoviews.element.comparison import ComparisonTestCase
+from hvplot.converter import HoloViewsConverter
 
 
 class TestDatashader(ComparisonTestCase):
@@ -127,6 +128,11 @@ class TestDatashader(ComparisonTestCase):
         data = pd.DataFrame(np.random.randn(100).cumsum())
         img = data.hvplot(xlim=(0, 20000), datashade=True, dynamic=False)
         assert img.range(0) == (0, 20000)
+
+    def test_wide_charts_categorically_shaded(self):
+        plot = pd._testing.makeTimeDataFrame().hvplot.line(datashade=True)
+        expected_cmap = HoloViewsConverter._default_cmaps['categorical']
+        assert expected_cmap == plot.callback.inputs[0].callback.operation.p.cmap
 
 
 class TestChart2D(ComparisonTestCase):
