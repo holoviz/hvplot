@@ -63,35 +63,44 @@ Installing Dependencies
 -----------------------
 
 hvPlot requires many additional packages for development and
-testing. Many of these are on the main Anaconda default channel.
+testing.
 
 Conda Environments
 ~~~~~~~~~~~~~~~~~~
 
+Create an empty conda environment with the name that you prefer, here we've
+chosen hvplot_dev. Activate and configure its channels to only use
+``pyviz/label/dev`` and ``conda-forge``. The former is used to install the
+development versions of the other HoloViz packages, such as HoloViews or Panel.
+
+.. code-block:: sh
+
+    conda create -n hvplot_dev
+    conda activate hvplot_dev
+    conda config --env --append channels pyviz/label/dev --append channels conda-forge --append channels nodefaults
+    conda config --env --remove channels defaults
+
 Since hvPlot interfaces with a large range of different libraries the
 full test suite requires a wide range of dependencies. To make it
 easier to install and run different parts of the test suite across
-different platforms hvPlot uses a library called pyctdev to make things
-more consistent and general.
+different platforms hvPlot uses a library called ``pyctdev`` to make things
+more consistent and general. Specify also the desired Python version you want
+to base your environment on. It is advised to choose the minimum version
+currently supported by hvPlot on the main development branch.
 
 .. code-block:: sh
 
-    conda create -n hvplot_dev -c pyviz pyctdev python=3.6
-
-Specify the desired Python version, currently hvPlot officially
-supports Python 3.6 and 3.7. Once the environment has been
-created you can activate it with:
-
-.. code-block:: sh
-
-    conda activate hvplot_dev
+    conda install python=3.x pyctdev
 
 Finally to install the dependencies required to run the full unit test
 suite and all the examples:
 
 .. code-block:: sh
 
-    doit develop_install -c pyviz/label/dev -o all
+    doit develop_install -o tests -o examples
+
+Add ``-o doc`` if you want to install the dependencies required to build
+the website.
 
 .. _devguide_python_setup:
 
