@@ -13,8 +13,8 @@ Rapids cuDF, Streamz, Intake, Geopandas, NetworkX and Ibis.
 - is built on top of HoloViews and allows you to drop into the rest of the
 HoloViz ecosystem when more power or flexibility is needed.
 
-To learn more check out https://hvplot.holoviz.org/. To report issues or contribute check out
-https://github.com/holoviz/hvplot. To join the community check out
+To learn more check out https://hvplot.holoviz.org/. To report issues or contribute go to
+https://github.com/holoviz/hvplot. To join the community go to
 https://discourse.holoviz.org/.
 
 How to use hvPlot in 3 simple steps
