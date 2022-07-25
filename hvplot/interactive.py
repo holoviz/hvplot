@@ -59,7 +59,7 @@ class Interactive():
         if 'fn' in kwargs:
             fn = kwargs.pop('fn')
         elif isinstance(obj, (FunctionType, MethodType)):
-            fn = pn.panel(obj)
+            fn = pn.panel(obj, lazy=True)
             obj = fn.eval(obj)
         else:
             fn = None
