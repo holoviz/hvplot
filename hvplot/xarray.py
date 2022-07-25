@@ -10,8 +10,8 @@ hvPlot
 - supports a wide range of data sources including Pandas, Dask, XArray
 Rapids cuDF, Streamz, Intake, Geopandas, NetworkX and Ibis.
 - supports the plotting backends Bokeh (default), Matplotlib and Plotly.
-- is built on top of HoloViews and allows you to drop into HoloViews when
-more flexibility and power is needed.
+- is built on top of HoloViews and allows you to drop into the rest of the
+HoloViz ecosystem when more power or flexibility is needed.
 
 To learn more check out https://hvplot.holoviz.org/. To report issues or contribute check out
 https://github.com/holoviz/hvplot. To join the community check out
@@ -42,68 +42,18 @@ air temperature time series.
 For more check out the user guide https://hvplot.holoviz.org/user_guide/index.html and the
 introduction to working with gridded data https://hvplot.holoviz.org/user_guide/Gridded_Data.html.
 
-How to select the kind of plot
-------------------------------
-
-You can add the `kind` argument
-
->>> air1d.hvplot(kind="scatter")
-
-or use the specific kind of plot method
-
->>> air1d.hvplot.scatter()
-
-For the available kinds of plots check out the reference gallery
-https://hvplot.holoviz.org/reference/index.html
-
 How to get help
 ---------------
 
-To see the available arguments for a specific kind of plot run
+To see the available arguments for a specific `kind` of plot run
 
 >>> import hvplot
 >>> hvplot.help(kind='scatter')
 
-In a notebook or ipython environment TAB and SHIFT+TAB completion will help you
-navigate and learn.
+In a notebook or ipython environment the usual
 
-How to export
--------------
-
->>> hvplot.save(curve, filename="curve.html")
-
-For more check out https://hvplot.holoviz.org/user_guide/Viewing.html#saving-plots
-
-How to drop into HoloViews
---------------------------
-
-You don't have to do anything special as a hvPlot object is already a HoloViews
-object.
-
-You can understand the structure of your objects as usual by printing them
-
->>> print(curve)
-:Curve   [time]   (air)
-
-and list the available options using `hv.help´.
-
->>> import holoviews as hv
->>> hv.help(curve)
-
-# Todo: fix https://github.com/holoviz/holoviews/issues/5364
-
-How to create data apps
------------------------
-
-You can create powerful data apps by combining with Panel.
-
->>> import panel as pn
->>> pn.pane.HoloViews(curve, sizing_mode="stretch_both").servable()
-
-Then run `panel serve script.py --autoreload --show`. This will open the plot in your browser. When
-you save the script, the browser will reload. This speeds up your development process.
-
-For more check out https://panel.holoviz.org/reference/panes/HoloViews.html
+- `help` and `?` will provide you with documentation.
+- `TAB` and `SHIFT+TAB` completion will help you navigate.
 """
 import xarray as xr
 
