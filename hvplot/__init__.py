@@ -30,7 +30,7 @@ Import the hvplot extension for your data source
 
 >>> import hvplot.pandas
 
-Use the `.hvplot` api as you would use the Pandas `.plot` api.
+Use the `.hvplot` API as you would use the Pandas `.plot` API.
 
 >>> curves = df.hvplot()
 >>> curves
