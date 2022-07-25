@@ -5,6 +5,7 @@ import pytest
 
 from holoviews import Store
 from holoviews.core.options import Options, OptionTree
+from packaging.version import Version
 
 try:
     import pandas as pd
@@ -553,4 +554,8 @@ class TestXarrayTitle:
         ds_sel = ds2.sel(time=0, band=0, x=0, y=0)
         plot = ds_sel.hvplot.scatter(x='foo', y='bar')  # Image plot
         opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['title'] == 'y = 0, x = 0, time = 0, band = 0'
+        # First assertion to remove when support for Python 3.7 is dropped.
+        if Version(xr.__version__) < Version('2022.6.0'):
+            assert opts.kwargs['title'] == 'y = 0, x = 0, time = 0, band = 0'
+        else:
+            assert opts.kwargs['title'] == 'time = 0, y = 0, x = 0, band = 0'
