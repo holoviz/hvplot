@@ -35,8 +35,7 @@ Use the `.hvplot` API as you would use the Pandas `.plot` API.
 >>> curves = df.hvplot()
 >>> curves
 
-In a Jupyter Notebook, this will display a line plot of the
-A, B, C and D time series.
+In a notebook, this will display a line plot of the A, B, C and D time series.
 
 For more check out the user guide https://hvplot.holoviz.org/user_guide/index.html
 
@@ -52,6 +51,9 @@ In a notebook or ipython environment the usual
 
 - `help` and `?` will provide you with documentation.
 - `TAB` and `SHIFT+TAB` completion will help you navigate.
+
+To ask the community go to https://discourse.holoviz.org/.
+To report issues go to https://github.com/holoviz/holoviews.
 """
 from .interactive  import Interactive
 
