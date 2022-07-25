@@ -108,5 +108,5 @@ def test_interactive_with_bound_function_calls():
     (dfi.loc[dfi['sex'].isin(w_sex)])
     assert load_data.COUNT ==  1
 
-    # w_species.value = 2
-    # assert load_data.COUNT == 2
+    w_species.value = 2
+    assert load_data.COUNT == 2
