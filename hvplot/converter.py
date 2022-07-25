@@ -560,6 +560,7 @@ class HoloViewsConverter:
                 if not use_dask:
                     symmetric = self._process_symmetric(symmetric, clim, check_symmetric_max)
                 if self._style_opts.get('cmap') is None:
+                    # Default to categorical camp if we detect categorical shading
                     if (self.datashade and (self.aggregator is None or str(self.aggregator).contains('count_cat')) and
                         ((self.by and not self.subplots) or
                          (isinstance(self.y, list) or (self.y is None and len(self.variables) > 1)))):
