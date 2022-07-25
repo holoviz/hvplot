@@ -32,7 +32,7 @@ Import the hvplot extension for your data source
 
 Use the `.hvplot` api as you would use the Pandas `.plot` api.
 
->>> curves=df.hvplot()
+>>> curves = df.hvplot()
 >>> curves
 
 In a Jupyter Notebook, this will provide you with a plot of the
