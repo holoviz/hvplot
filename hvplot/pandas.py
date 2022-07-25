@@ -10,7 +10,7 @@ hvPlot
 - supports a wide range of data sources including Pandas, Dask, XArray
 Rapids cuDF, Streamz, Intake, Geopandas, NetworkX and Ibis.
 - supports the plotting backends Bokeh (default), Matplotlib and Plotly.
-- is build on top of HoloViews and allows you to drop into HoloViews when
+- is built on top of HoloViews and allows you to drop into HoloViews when
 more flexibility and power is needed.
 
 To learn more check out https://hvplot.holoviz.org/. To report issues or contribute check out
@@ -30,12 +30,12 @@ Import the hvplot extension for your data source
 
 >>> import hvplot.pandas
 
-Use the `.hvplot` api as you would use the Pandas `.plot` api.
+Use the `.hvplot` API as you would use the Pandas `.plot` API.
 
->>> curves=df.hvplot()
+>>> curves = df.hvplot()
 >>> curves
 
-In a Jupyter Notebook, this will provide you with a plot of the
+In a Jupyter Notebook, this will display a line plot of the
 A, B, C and D time series.
 
 For more check out the user guide https://hvplot.holoviz.org/user_guide/index.html
@@ -87,7 +87,6 @@ You can understand the structure of your objects as usual by printing them
 and list the available options using `hv.help´.
 
 >>> import holoviews as hv
->>> hv.extension("bokeh")
 >>> hv.help(curves)
 
 # Todo: fix https://github.com/holoviz/holoviews/issues/5364
