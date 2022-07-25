@@ -514,3 +514,30 @@ def filter_opts(eltype, options, backend='bokeh'):
                for k in list(g.allowed_keywords)]
     opts = {k: v for k, v in options.items() if k in allowed}
     return opts
+
+
+def _flatten(line):
+    """
+    Flatten an arbitrarily nested sequence.
+
+    Inspired by: pd.core.common.flatten
+
+    Parameters
+    ----------
+    line : sequence
+        The sequence to flatten
+
+    Notes
+    -----
+    This only flattens list, tuple, and dict sequences.
+
+    Returns
+    -------
+    flattened : generator
+    """
+
+    for element in line:
+        if any(isinstance(element, tp) for tp in (list, tuple, dict)):
+            yield from _flatten(element)
+        else:
+            yield element
