@@ -87,7 +87,6 @@ You can understand the structure of your objects as usual by printing them
 and list the available options using `hv.help´.
 
 >>> import holoviews as hv
->>> hv.extension("bokeh")
 >>> hv.help(curves)
 
 # Todo: fix https://github.com/holoviz/holoviews/issues/5364
