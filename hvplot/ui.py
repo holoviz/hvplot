@@ -1,3 +1,4 @@
+import holoviews as _hv
 import numpy as np
 import panel as pn
 import param
@@ -26,6 +27,27 @@ GEO_FEATURES = [
 GEO_TILES = list(tile_sources)
 AGGREGATORS = [None, 'count', 'min', 'max', 'mean', 'sum', 'any']
 MAX_ROWS = 10000
+
+
+def explorer(data, backend='bokeh', **kwargs):
+    """Explore your data by building a plot in a Panel UI component.
+
+    Parameters
+    ----------
+    data : pandas.DataFrame, geopandas.DataFrame
+        Data structure to explore.
+    backend: str, optional
+        Plotting backend; one of 'bokeh', 'matplotlib' and 'plotly'. By default 'bokeh'.
+
+    Returns
+    -------
+    hvplotExporer
+        Panel component to explore a dataset.
+    """
+    if not getattr(_hv.extension, '_loaded', False) or _hv.Store.current_backend != backend:
+        from .utilities import hvplot_extension
+        hvplot_extension(backend, logo=False)
+    return hvPlotExplorer.from_data(data, **kwargs)
 
 
 class Controls(Viewer):
