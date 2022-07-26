@@ -129,10 +129,27 @@ class TestDatashader(ComparisonTestCase):
         img = data.hvplot(xlim=(0, 20000), datashade=True, dynamic=False)
         assert img.range(0) == (0, 20000)
 
-    def test_wide_charts_categorically_shaded(self):
-        plot = pd._testing.makeTimeDataFrame().hvplot.line(datashade=True)
+    @parameterized.expand([('scatter',), ('line',), ('area',)])
+    def test_wide_charts_categorically_shaded_explicit_ys(self, kind):
+        df = pd._testing.makeTimeDataFrame()
+        plot = pd._testing.makeTimeDataFrame().hvplot(y=list(df.columns), datashade=True, kind=kind)
         expected_cmap = HoloViewsConverter._default_cmaps['categorical']
-        assert expected_cmap == plot.callback.inputs[0].callback.operation.p.cmap
+        assert plot.callback.inputs[0].callback.operation.p.cmap == expected_cmap
+        assert  plot.callback.inputs[0].callback.operation.p.aggregator.column == 'Variable'
+
+    @parameterized.expand([('scatter',), ('line',), ('area',)])
+    def test_wide_charts_categorically_shaded_implicit_ys(self, kind):
+        plot = pd._testing.makeTimeDataFrame().hvplot(datashade=True, kind=kind)
+        expected_cmap = HoloViewsConverter._default_cmaps['categorical']
+        assert plot.callback.inputs[0].callback.operation.p.cmap == expected_cmap
+        assert  plot.callback.inputs[0].callback.operation.p.aggregator.column == 'Variable'
+
+    def test_wide_charts_categorically_shaded_by(self):
+        cat_col = 'category'
+        plot = self.df.hvplot.scatter('x', 'y', by=cat_col, datashade=True)
+        expected_cmap = HoloViewsConverter._default_cmaps['categorical']
+        assert  plot.callback.inputs[0].callback.operation.p.cmap == expected_cmap
+        assert  plot.callback.inputs[0].callback.operation.p.aggregator.column == cat_col
 
 
 class TestChart2D(ComparisonTestCase):
