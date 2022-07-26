@@ -7,18 +7,18 @@ from holoviews.element import tile_sources
 from holoviews.plotting.util import list_cmaps
 from panel.viewable import Viewer
 
-from .converter import HoloViewsConverter as hvConverter
+from .converter import HoloViewsConverter as _hvConverter
 from .plotting import hvPlot as _hvPlot
 from .util import is_geodataframe, is_xarray
 
 # Defaults
-DATAFRAME_KINDS = sorted(set(hvConverter._kind_mapping) - set(hvConverter._gridded_types))
-GRIDDED_KINDS = sorted(hvConverter._kind_mapping)
+DATAFRAME_KINDS = sorted(set(_hvConverter._kind_mapping) - set(_hvConverter._gridded_types))
+GRIDDED_KINDS = sorted(_hvConverter._kind_mapping)
 GEOM_KINDS = ['paths', 'polygons', 'points']
 STATS_KINDS = ['hist', 'kde', 'boxwhisker', 'violin', 'heatmap', 'bar', 'barh']
 TWOD_KINDS = ['bivariate', 'heatmap', 'hexbin', 'labels', 'vectorfield'] + GEOM_KINDS
 CMAPS = [cm for cm in list_cmaps() if not cm.endswith('_r_r')]
-DEFAULT_CMAPS = hvConverter._default_cmaps
+DEFAULT_CMAPS = _hvConverter._default_cmaps
 GEO_FEATURES = [
     'borders', 'coastline', 'land', 'lakes', 'ocean', 'rivers',
     'states', 'grid'
@@ -80,7 +80,7 @@ class Colormapping(Controls):
 
     @property
     def colormapped(self):
-        if self.explorer.kind in hvConverter._colorbar_types:
+        if self.explorer.kind in _hvConverter._colorbar_types:
             return True
         return self.color is not None and self.color in self._data
 
@@ -88,7 +88,7 @@ class Colormapping(Controls):
     def _update_coloropts(self):
         if not self.colormapped or self.cmap not in list(DEFAULT_CMAPS.values()):
             return
-        if self.explorer.kind in hvConverter._colorbar_types:
+        if self.explorer.kind in _hvConverter._colorbar_types:
             key = 'diverging' if self.symmetric else 'linear'
             self.colorbar = True
         elif self.color in self._data:
@@ -113,7 +113,7 @@ class Style(Controls):
 
 class Axes(Controls):
 
-    legend = param.Selector(default='right', objects=hvConverter._legend_positions)
+    legend = param.Selector(default='right', objects=_hvConverter._legend_positions)
 
     logx = param.Boolean(default=False)
 
@@ -308,7 +308,7 @@ class hvPlotExplorer(Viewer):
         x, y = params.get('x'), params.get('y')
         if 'y' in params:
             params['y_multi'] = params.pop('y') if isinstance(params['y'], list) else [params['y']]
-        converter = hvConverter(df, x, y, **{k: v for k, v in params.items() if k not in ('x', 'y')})
+        converter = _hvConverter(df, x, y, **{k: v for k, v in params.items() if k not in ('x', 'y')})
         controller_params = {}
         for cls in param.concrete_descendents(Controls).values():
             controller_params[cls] = {
