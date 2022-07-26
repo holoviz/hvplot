@@ -291,7 +291,8 @@ class hvPlotExplorer(Viewer):
 
     style = param.ClassSelector(class_=Style)
 
-    def __new__(cls, data, **params):
+    @classmethod
+    def from_data(cls, data, **params):
         if is_geodataframe(data):
             cls = hvGeomExplorer
         elif is_xarray(data):
@@ -451,9 +452,6 @@ class hvGeomExplorer(hvPlotExplorer):
 
     kind = param.Selector(default=None, objects=sorted(GEOM_KINDS))
 
-    def __new__(cls, data, **params):
-        return super(hvPlotExplorer, cls).__new__(cls)
-
     @property
     def _single_y(self):
         return True
@@ -478,9 +476,6 @@ class hvGeomExplorer(hvPlotExplorer):
 class hvGridExplorer(hvPlotExplorer):
 
     kind = param.Selector(default=None, objects=sorted(GRIDDED_KINDS))
-
-    def __new__(cls, data, **params):
-        return super(hvPlotExplorer, cls).__new__(cls)
 
     @property
     def _x(self):
@@ -517,9 +512,6 @@ class hvDataFrameExplorer(hvPlotExplorer):
     z = param.Selector()
 
     kind = param.Selector(default='line', objects=sorted(DATAFRAME_KINDS))
-
-    def __new__(cls, data, **params):
-        return super(hvPlotExplorer, cls).__new__(cls)
 
     @property
     def xcat(self):
