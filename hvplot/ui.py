@@ -354,7 +354,7 @@ class hvPlotExplorer(Viewer):
             sizing_mode='stretch_both'
         )
         self._plot()
-        self.param.trigger('kind')
+        self._toggle_controls()
 
     def _populate(self):
         variables = self._converter.variables
@@ -408,15 +408,15 @@ class hvPlotExplorer(Viewer):
             return True
         return False
 
-    def _toggle_controls(self, event):
+    def _toggle_controls(self, event=None):
         # Control high-level parameters
         visible = True
-        if event.new in ('table', 'dataset'):
+        if event and event.new in ('table', 'dataset'):
             parameters = ['kind', 'columns']
             visible = False
-        elif event.new in TWOD_KINDS:
+        elif event and event.new in TWOD_KINDS:
             parameters = ['kind', 'x', 'y', 'by', 'groupby']
-        elif event.new in ('hist', 'kde', 'density'):
+        elif event and event.new in ('hist', 'kde', 'density'):
             self.x = None
             parameters = ['kind', 'y_multi', 'by', 'groupby']
         else:
@@ -438,7 +438,7 @@ class hvPlotExplorer(Viewer):
                 ('Operations', self.operations),
                 ('Geo', self.geo)
             ]
-            if event.new not in ('area', 'kde', 'line', 'ohlc', 'rgb', 'step'):
+            if event and event.new not in ('area', 'kde', 'line', 'ohlc', 'rgb', 'step'):
                 tabs.insert(5, ('Colormapping', self.colormapping))
         self._tabs[:] = tabs
 
