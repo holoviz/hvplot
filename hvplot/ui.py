@@ -308,7 +308,10 @@ class hvPlotExplorer(Viewer):
         x, y = params.get('x'), params.get('y')
         if 'y' in params:
             params['y_multi'] = params.pop('y') if isinstance(params['y'], list) else [params['y']]
-        converter = _hvConverter(df, x, y, **{k: v for k, v in params.items() if k not in ('x', 'y')})
+        converter = _hvConverter(
+            df, x, y,
+            **{k: v for k, v in params.items() if k not in ('x', 'y', 'y_multi')}
+        )
         controller_params = {}
         for cls in param.concrete_descendents(Controls).values():
             controller_params[cls] = {
