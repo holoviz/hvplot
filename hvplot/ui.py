@@ -8,6 +8,7 @@ from holoviews.plotting.util import list_cmaps
 from panel.viewable import Viewer
 
 from .converter import HoloViewsConverter as hvConverter
+from .plotting import hvPlot as _hvPlot
 from .util import is_geodataframe, is_xarray
 
 # Defaults
@@ -381,7 +382,7 @@ class hvPlotExplorer(Viewer):
         if len(df) > MAX_ROWS and not (self.kind in STATS_KINDS or kwargs.get('rasterize') or kwargs.get('datashade')):
             df = df.sample(n=MAX_ROWS)
         try:
-            plot = df.hvplot(
+            plot = _hvPlot(df)(
                 kind=self.kind, x=self.x, y=y, by=self.by, groupby=self.groupby, **kwargs
             )
             hvplot = pn.pane.HoloViews(
