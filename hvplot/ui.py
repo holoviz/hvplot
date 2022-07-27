@@ -535,6 +535,7 @@ class hvPlotExplorer(Viewer):
                 settings[p] = value
         if 'y_multi' in settings:
             settings['y'] = settings.pop('y_multi')
+        settings = {k: v for k, v in sorted(list(settings.items()))}
         return settings
 
     def widgets(self):
