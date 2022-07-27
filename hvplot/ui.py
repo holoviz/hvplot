@@ -1,3 +1,5 @@
+import importlib
+
 import holoviews as _hv
 import numpy as np
 import panel as pn
@@ -29,8 +31,12 @@ AGGREGATORS = [None, 'count', 'min', 'max', 'mean', 'sum', 'any']
 MAX_ROWS = 10000
 
 
-def explorer(data, backend='bokeh', **kwargs):
+def explorer(data, backend='bokeh', set_accessor=True, **kwargs):
     """Explore your data by building a plot in a Panel UI component.
+
+    This function returns a Panel component that has on the right-side
+    hand a plot view and on the left-side hand a number of widgets that
+    control the plot.
 
     Parameters
     ----------
@@ -38,6 +44,8 @@ def explorer(data, backend='bokeh', **kwargs):
         Data structure to explore.
     backend: str, optional
         Plotting backend; one of 'bokeh', 'matplotlib' and 'plotly'. By default 'bokeh'.
+    set_accessor: bool, optional
+        Set the accessor for the data type. By default True.
 
     Returns
     -------
@@ -50,7 +58,11 @@ def explorer(data, backend='bokeh', **kwargs):
     ):
         from .utilities import hvplot_extension
         hvplot_extension(backend, logo=False)
-    return hvPlotExplorer.from_data(data, **kwargs)
+    explorer = hvPlotExplorer.from_data(data, **kwargs)
+    if set_accessor:
+        accessor = accessors_mapping[type(explorer)]
+        importlib.import_module(f'hvplot.{accessor}')
+    return explorer
 
 
 class Controls(Viewer):
@@ -588,3 +600,10 @@ class hvDataFrameExplorer(hvPlotExplorer):
         if not len(values):
             return (np.nan, np.nan)
         return max_range([(np.nanmin(vs), np.nanmax(vs)) for vs in values])
+
+
+accessors_mapping = {
+    hvDataFrameExplorer: 'pandas',
+    hvGeomExplorer: 'pandas',
+    hvGridExplorer: 'xarray',
+}
