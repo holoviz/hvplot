@@ -525,7 +525,8 @@ class hvPlotExplorer(Viewer):
     def save(self, filename, **kwargs):
         """Save the plot to file.
         
-        Uses holoviews.save, refer to its documentation for a full description.
+        Calls the `holoviews.save` utility, refer to its documentation
+        for a full description of the available kwargs.
 
         Parameters
         ----------
@@ -535,10 +536,10 @@ class hvPlotExplorer(Viewer):
         _hv.save(self._hvplot, filename, **kwargs)
 
     def settings(self):
-        """Return a dictionary of the changed settings.
+        """Return a dictionary of the customized settings.
         
-        This dictionary can be reused as input to the `explorer` or
-        a call to the `hvplot` accessor.
+        This dictionary can be reused as an unpacked input to the explorer or
+        a call to the `.hvplot` accessor.
 
         >>> hvplot.explorer(df, **settings)
         >>> df.hvplot(**settings)
