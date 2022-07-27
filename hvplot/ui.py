@@ -491,7 +491,7 @@ class hvPlotExplorer(Viewer):
     # Public API
     #----------------------------------------------------------------
 
-    def holoviews(self):
+    def hvplot(self):
         """Return the plot as a HoloViews object.
         """
         return self._hvplot.clone()
