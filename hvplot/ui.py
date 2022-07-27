@@ -391,7 +391,6 @@ class hvPlotExplorer(Viewer):
                 p.objects = variables
 
     def _plot(self, *events):
-        self._layout.loading = True
         y = self.y_multi if 'y_multi' in self._controls.parameters else self.y
         if isinstance(y, list) and len(y) == 1:
             y = y[0]
@@ -410,6 +409,7 @@ class hvPlotExplorer(Viewer):
         df = self._data
         if len(df) > MAX_ROWS and not (self.kind in STATS_KINDS or kwargs.get('rasterize') or kwargs.get('datashade')):
             df = df.sample(n=MAX_ROWS)
+        self._layout.loading = True
         try:
             plot = _hvPlot(df)(
                 kind=self.kind, x=self.x, y=y, by=self.by, groupby=self.groupby, **kwargs
