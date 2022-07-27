@@ -501,6 +501,27 @@ class hvPlotExplorer(Viewer):
         """
         return self._hvpane
     
+    def repr(self, var_name='df'):
+        """Return a string representation that can be easily copy-pasted
+        in a notebook cell to create a plot from a call to the `.hvplot`
+        accessor, and that includes all the customized settings of the explorer.
+
+        >>> hvexplorer(var_name='data')
+        "data.hvplot(x='time', y='value')"
+
+        Parameters
+        ----------
+        var_name: string
+            Data variable name by which the returned string will start.
+        """
+        settings = self.settings()
+        args = ''
+        if settings:
+            for k, v in settings.items():
+                args += f'{k}={v!r}, '
+            args = args[:-2]
+        return f'{var_name}.hvplot({args})'
+    
     def save(self, filename, **kwargs):
         """Save the plot to file.
         
