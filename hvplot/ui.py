@@ -499,7 +499,7 @@ class hvPlotExplorer(Viewer):
     def panel(self):
         """Return the plot wrapped in a Panel HoloViews Pane.
         """
-        return self._hvpane.clone()
+        return self._hvpane
     
     def save(self, filename, **kwargs):
         """Save the plot to file.
