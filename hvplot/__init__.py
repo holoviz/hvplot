@@ -105,12 +105,7 @@ def help(kind=None, docstring=True, generic=True, style=True):
 
 def post_patch(extension='bokeh', logo=False):
     if extension and not getattr(_hv.extension, '_loaded', False):
-        if getattr(_pn.extension, '_loaded', False):
-            ext = _hv.extension._backends[extension]
-            __import__('holoviews.plotting.%s' % ext)
-            _hv.Store.set_current_backend(extension)
-        else:
-            hvplot_extension(extension, logo=logo)
+        hvplot_extension(extension, logo=logo)
 
 
 def _patch_doc(cls, kind, signature=None):

@@ -1,13 +1,21 @@
 import pandas as pd
 import panel as pn
+import pytest
 
 from holoviews.util.transform import dim
 
-import hvplot.pandas
+import hvplot.pandas  # noqa
 from hvplot import bind
 from hvplot.interactive import Interactive
 from hvplot.xarray import XArrayInteractive
 
+try:
+    import xarray as xr
+    import hvplot.xarray  # noqa
+except ImportError:
+    xr = None
+
+xr_available = pytest.mark.skipif(xr is None, reason="requires xarray")
 
 def test_interactive_pandas_dataframe():
     df = pd._testing.makeMixedDataFrame()
@@ -29,8 +37,8 @@ def test_interactive_pandas_series():
     assert dfi._fn is None
     assert dfi._transform == dim('*')
 
+@xr_available
 def test_interactive_xarray_dataarray():
-    import xarray as xr
     ds = xr.tutorial.load_dataset('air_temperature')
 
     dsi = Interactive(ds.air)
@@ -40,8 +48,8 @@ def test_interactive_xarray_dataarray():
     assert dsi._fn is None
     assert dsi._transform == dim('air')
 
+@xr_available
 def test_interactive_xarray_dataset():
-    import xarray as xr
     ds = xr.tutorial.load_dataset('air_temperature')
 
     dsi = Interactive(ds)
@@ -55,7 +63,7 @@ def test_interactive_pandas_function():
     df = pd._testing.makeMixedDataFrame()
 
     select = pn.widgets.Select(options=list(df.columns))
-    
+
     def sel_col(col):
         return df[col]
 
@@ -68,13 +76,13 @@ def test_interactive_pandas_function():
     select.value = 'B'
     assert dfi._obj is df.B
 
+@xr_available
 def test_interactive_xarray_function():
-    import xarray as xr
     ds = xr.tutorial.load_dataset('air_temperature')
     ds['air2'] = ds.air*2
 
     select = pn.widgets.Select(options=list(ds))
-    
+
     def sel_col(sel):
         return ds[sel]
 
@@ -87,6 +95,27 @@ def test_interactive_xarray_function():
     select.value = 'air2'
     assert (dsi._obj == ds.air2).all()
     assert dsi._transform == dim('air2')
+
+
+def test_interactive_pandas_dataframe_accessor():
+    df = pd._testing.makeMixedDataFrame()
+    dfi = df.interactive()
+
+    assert dfi.hvplot(kind="scatter")._transform == dfi.hvplot.scatter()._transform
+
+    with pytest.raises(TypeError):
+        dfi.hvplot.scatter(kind="area")
+
+
+@xr_available
+def test_interactive_xarray_dataset_accessor():
+    ds = xr.tutorial.load_dataset('air_temperature')
+    dsi = ds.air.interactive
+
+    assert dsi.hvplot(kind="line")._transform == dsi.hvplot.line()._transform
+
+    with pytest.raises(TypeError):
+        dsi.hvplot.line(kind="area")
 
 
 def test_interactive_with_bound_function_calls():

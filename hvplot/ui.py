@@ -70,6 +70,8 @@ class Colormapping(Controls):
     cmap = param.Selector(default=DEFAULT_CMAPS['linear'],
                           label='Colormap', objects=CMAPS)
 
+    rescale_discrete_levels = param.Boolean(default=True)
+
     symmetric = param.Boolean(default=False)
 
     def __init__(self, data, **params):

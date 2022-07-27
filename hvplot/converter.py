@@ -25,11 +25,12 @@ from holoviews.plotting.util import process_cmap
 from holoviews.operation import histogram
 from holoviews.streams import Buffer, Pipe
 from holoviews.util.transform import dim
+from packaging.version import Version
 from pandas import DatetimeIndex, MultiIndex
 
 from .backend_transforms import _transfer_opts_cur_backend
 from .util import (
-    filter_opts, is_tabular, is_series, is_dask, is_intake, is_cudf,
+    filter_opts, hv_version, is_tabular, is_series, is_dask, is_intake, is_cudf,
     is_streamz, is_ibis, is_xarray, is_xarray_dataarray, process_crs,
     process_intake, process_xarray, check_library, is_geodataframe,
     process_derived_datetime_xarray, process_derived_datetime_pandas,
@@ -127,6 +128,13 @@ class HoloViewsConverter:
         specify different amount of padding for x- and y-axis and
         tuples of tuples to specify different amounts of padding for
         upper and lower bounds.
+    rescale_discrete_levels (default=True): boolean
+        If `cnorm='eq_hist` and there are only a few discrete values,
+        then `rescale_discrete_levels=True` (the default) decreases
+        the lower limit of the autoranged span so that the values are
+        rendering towards the (more visible) top of the `cmap` range, 
+        thus avoiding washout of the lower values.  Has no effect if
+        `cnorm!=`eq_hist`.
     responsive: boolean
         Whether the plot should responsively resize depending on the
         size of the browser. Responsive mode will only work if at
@@ -261,12 +269,12 @@ class HoloViewsConverter:
 
     _style_options = [
         'color', 'alpha', 'colormap', 'fontsize', 'c', 'cmap',
-        'color_key', 'cnorm'
+        'color_key', 'cnorm', 'rescale_discrete_levels'
     ]
 
     _op_options = [
         'datashade', 'rasterize', 'x_sampling', 'y_sampling',
-        'aggregator', 'rescale_discrete_levels'
+        'aggregator'
     ]
 
     # Options specific to a particular plot type
@@ -370,7 +378,7 @@ class HoloViewsConverter:
         y_sampling=None, project=False, tools=[], attr_labels=None,
         coastline=False, tiles=False, sort_date=True,
         check_symmetric_max=1000000, transforms={}, stream=None,
-        cnorm=None, features=None, rescale_discrete_levels=True, **kwds
+        cnorm=None, features=None, rescale_discrete_levels=None, **kwds
     ):
         # Process data and related options
         self._redim = fields
@@ -445,7 +453,6 @@ class HoloViewsConverter:
         self.precompute = precompute
         self.x_sampling = x_sampling
         self.y_sampling = y_sampling
-        self.rescale_discrete_levels = rescale_discrete_levels
 
         # By type
         self.subplots = subplots
@@ -526,6 +533,8 @@ class HoloViewsConverter:
             plot_opts['colorbar'] = colorbar
         elif self.kind in self._colorbar_types:
             plot_opts['colorbar'] = True
+        elif self.rasterize:
+            plot_opts['colorbar'] = plot_opts.get('colorbar', True)
         if 'logz' in kwds and 'logz' in self._kind_options.get(self.kind, {}):
             plot_opts['logz'] = kwds.pop('logz')
         if invert:
@@ -576,6 +585,8 @@ class HoloViewsConverter:
                 pass
         if cnorm is not None:
             plot_opts['cnorm'] = cnorm
+        if rescale_discrete_levels is not None and hv_version >= Version('1.15.0'):
+            plot_opts['rescale_discrete_levels'] = rescale_discrete_levels
 
         self._plot_opts = plot_opts
         self._overlay_opts = {k: v for k, v in self._plot_opts.items()
@@ -1012,8 +1023,6 @@ class HoloViewsConverter:
 
         if cmap is not None:
             style_opts['cmap'] = cmap
-        elif self.rasterize:
-            plot_opts['colorbar'] = plot_opts.get('colorbar', True)
 
         if 'color' in style_opts:
             color = style_opts['color']
@@ -1296,7 +1305,8 @@ class HoloViewsConverter:
             eltype = 'RGB'
             if 'cnorm' in self._plot_opts:
                 opts['cnorm'] = self._plot_opts['cnorm']
-            opts['rescale_discrete_levels'] = self.rescale_discrete_levels
+            if 'rescale_discrete_levels' in self._plot_opts:
+                opts['rescale_discrete_levels'] = self._plot_opts['rescale_discrete_levels']
         else:
             operation = rasterize
             eltype = 'Image'

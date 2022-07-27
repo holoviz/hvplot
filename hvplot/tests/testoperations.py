@@ -68,6 +68,19 @@ class TestDatashader(ComparisonTestCase):
         opts = Store.lookup_options('bokeh', plot, 'style').kwargs
         self.assertEqual(opts.get('cmap'), 'kbc_r')
 
+    def test_rasterize_default_colorbar(self):
+        plot = self.df.hvplot.scatter('x', 'y', dynamic=False, rasterize=True)
+        opts = Store.lookup_options('bokeh', plot, 'plot').kwargs
+        self.assertTrue(opts.get('colorbar'))
+
+    def test_rasterize_default_colorbar_with_cmap(self):
+        cmap = 'Reds'
+        plot = self.df.hvplot.scatter('x', 'y', dynamic=False, rasterize=True, cmap=cmap)
+        opts = Store.lookup_options('bokeh', plot, 'style').kwargs
+        self.assertEqual(opts.get('cmap'), cmap)
+        opts = Store.lookup_options('bokeh', plot, 'plot').kwargs
+        self.assertTrue(opts.get('colorbar'))
+
     def test_rasterize_set_clim(self):
         plot = self.df.hvplot.scatter('x', 'y', dynamic=False, rasterize=True, clim=(1, 4))
         opts = Store.lookup_options('bokeh', plot, 'plot').kwargs
@@ -150,6 +163,35 @@ class TestDatashader(ComparisonTestCase):
         expected_cmap = HoloViewsConverter._default_cmaps['categorical']
         assert  plot.callback.inputs[0].callback.operation.p.cmap == expected_cmap
         assert  plot.callback.inputs[0].callback.operation.p.aggregator.column == cat_col
+    def test_rasterize_cnorm(self):
+        expected = 'eq_hist'
+        plot = self.df.hvplot(x='x', y='y', rasterize=True, cnorm=expected)
+        opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
+        assert opts.get('cnorm') == expected
+
+    def test_datashade_cnorm(self):
+        expected = 'eq_hist'
+        plot = self.df.hvplot(x='x', y='y', datashade=True, cnorm=expected)
+        actual = plot.callback.inputs[0].callback.operation.p['cnorm']
+        assert actual == expected
+
+    def test_rasterize_rescale_discrete_levels(self):
+        expected = False
+        plot = self.df.hvplot(x='x', y='y', rasterize=True, cnorm='eq_hist', rescale_discrete_levels=expected)
+        opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
+        assert opts.get('rescale_discrete_levels') is expected
+
+    def test_datashade_rescale_discrete_levels(self):
+        expected = False
+        plot = self.df.hvplot(x='x', y='y', datashade=True, cnorm='eq_hist', rescale_discrete_levels=expected)
+        actual = plot.callback.inputs[0].callback.operation.p['rescale_discrete_levels']
+        assert actual is expected
+
+    def test_datashade_rescale_discrete_levels_default_True(self):
+        expected = True
+        plot = self.df.hvplot(x='x', y='y', datashade=True, cnorm='eq_hist')
+        actual = plot.callback.inputs[0].callback.operation.p['rescale_discrete_levels']
+        assert actual is expected
 
 
 class TestChart2D(ComparisonTestCase):
