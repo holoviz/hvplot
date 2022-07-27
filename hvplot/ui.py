@@ -44,7 +44,10 @@ def explorer(data, backend='bokeh', **kwargs):
     hvplotExporer
         Panel component to explore a dataset.
     """
-    if not getattr(_hv.extension, '_loaded', False) or _hv.Store.current_backend != backend:
+    if backend and (
+        not getattr(_hv.extension, "_loaded", False)
+        or _hv.Store.current_backend != backend
+    ):
         from .utilities import hvplot_extension
         hvplot_extension(backend, logo=False)
     return hvPlotExplorer.from_data(data, **kwargs)
