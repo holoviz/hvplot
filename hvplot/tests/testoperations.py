@@ -128,6 +128,36 @@ class TestDatashader(ComparisonTestCase):
         img = data.hvplot(xlim=(0, 20000), datashade=True, dynamic=False)
         assert img.range(0) == (0, 20000)
 
+    def test_rasterize_cnorm(self):
+        expected = 'eq_hist'
+        plot = self.df.hvplot(x='x', y='y', rasterize=True, cnorm=expected)
+        opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
+        assert opts.get('cnorm') == expected
+
+    def test_datashade_cnorm(self):
+        expected = 'eq_hist'
+        plot = self.df.hvplot(x='x', y='y', datashade=True, cnorm=expected)
+        actual = plot.callback.inputs[0].callback.operation.p['cnorm']
+        assert actual == expected
+
+    def test_rasterize_rescale_discrete_levels(self):
+        expected = False
+        plot = self.df.hvplot(x='x', y='y', rasterize=True, cnorm='eq_hist', rescale_discrete_levels=expected)
+        opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
+        assert opts.get('rescale_discrete_levels') is expected
+
+    def test_datashade_rescale_discrete_levels(self):
+        expected = False
+        plot = self.df.hvplot(x='x', y='y', datashade=True, cnorm='eq_hist', rescale_discrete_levels=expected)
+        actual = plot.callback.inputs[0].callback.operation.p['rescale_discrete_levels']
+        assert actual is expected
+
+    def test_datashade_rescale_discrete_levels_default_True(self):
+        expected = True
+        plot = self.df.hvplot(x='x', y='y', datashade=True, cnorm='eq_hist')
+        actual = plot.callback.inputs[0].callback.operation.p['rescale_discrete_levels']
+        assert actual is expected
+
 
 class TestChart2D(ComparisonTestCase):
 
