@@ -378,8 +378,8 @@ class hvPlotExplorer(Viewer):
             pn.layout.HSpacer(),
             sizing_mode='stretch_both'
         )
-        self._plot()
         self._toggle_controls()
+        self._plot()
 
     def _populate(self):
         variables = self._converter.variables
