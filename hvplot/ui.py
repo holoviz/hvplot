@@ -514,9 +514,9 @@ class hvPlotExplorer(Viewer):
         _hv.save(self._hvplot, filename, **kwargs)
 
     def settings(self):
-        """Return a dictionnary of the changed settings.
+        """Return a dictionary of the changed settings.
         
-        This dictionnary can be reused as input to the `explorer` or
+        This dictionary can be reused as input to the `explorer` or
         a call to the `hvplot` accessor.
 
         >>> hvplot.explorer(df, **settings)
