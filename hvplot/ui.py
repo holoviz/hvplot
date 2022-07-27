@@ -369,13 +369,13 @@ class hvPlotExplorer(Viewer):
         self._tabs = pn.Tabs(
             tabs_location='left', width=400
         )
-        controllers = {
+        self._controllers = {
             cls.name.lower(): cls(df, explorer=self, **params)
             for cls, params in controller_params.items()
         }
-        self.param.set_param(**controllers)
+        self.param.set_param(**self._controllers)
         self.param.watch(self._plot, list(self.param))
-        for controller in controllers.values():
+        for controller in self._controllers.values():
             controller.param.watch(self._plot, list(controller.param))
         self._alert = pn.pane.Alert(
             alert_type='danger', visible=False, sizing_mode='stretch_width'
@@ -423,13 +423,13 @@ class hvPlotExplorer(Viewer):
             df = df.sample(n=MAX_ROWS)
         self._layout.loading = True
         try:
-            plot = _hvPlot(df)(
+            self._hvplot = _hvPlot(df)(
                 kind=self.kind, x=self.x, y=y, by=self.by, groupby=self.groupby, **kwargs
             )
-            hvplot = pn.pane.HoloViews(
-                plot, sizing_mode='stretch_width', margin=(0, 20, 0, 20)
+            self._hvpane = pn.pane.HoloViews(
+                self._hvplot, sizing_mode='stretch_width', margin=(0, 20, 0, 20)
             ).layout
-            self._layout[1][1] = hvplot
+            self._layout[1][1] = self._hvpane
             self._alert.visible = False
         except Exception as e:
             self._alert.param.set_param(
@@ -486,6 +486,61 @@ class hvPlotExplorer(Viewer):
     def _check_by(self, event):
         if event.new and 'y_multi' in self._controls.parameters and self.y_multi and len(self.y_multi) > 1:
             self.by = []
+
+    #----------------------------------------------------------------
+    # Public API
+    #----------------------------------------------------------------
+
+    def holoviews(self):
+        """Return the plot as a HoloViews object.
+        """
+        return self._hvplot.clone()
+
+    def panel(self):
+        """Return the plot wrapped in a Panel HoloViews Pane.
+        """
+        return self._hvpane.clone()
+    
+    def save(self, filename, **kwargs):
+        """Save the plot to file.
+        
+        Uses holoviews.save, refer to its documentation for a full description.
+
+        Parameters
+        ----------
+        filename: string or IO object
+            The filename or BytesIO/StringIO object to save to
+        """
+        _hv.save(self._hvplot, filename, **kwargs)
+
+    def settings(self):
+        """Return a dictionnary of the changed settings.
+        
+        This dictionnary can be reused as input to the `explorer` or
+        a call to the `hvplot` accessor.
+
+        >>> hvplot.explorer(df, **settings)
+        >>> df.hvplot(**settings)
+        """
+        settings = {}
+        for controller in self._controllers.values():
+            params = set(controller.param) - set(['name', 'explorer'])
+            for p in params:
+                value = getattr(controller, p)
+                if value != controller.param[p].default:
+                    settings[p] = value
+        for p in self._controls.parameters:
+            value = getattr(self, p)
+            if value != self.param[p].default:
+                settings[p] = value
+        if 'y_multi' in settings:
+            settings['y'] = settings.pop('y_multi')
+        return settings
+
+    def widgets(self):
+        """Return the widgets in their Panel Tabs layout.
+        """
+        return self._tabs
 
 
 class hvGeomExplorer(hvPlotExplorer):
