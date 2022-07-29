@@ -2,7 +2,7 @@
 hvPlot makes data analysis and visualization simple
 ===================================================
 
-hvPlot provides an easy to use, high-level, extended 🐼 Pandas .plot like API
+hvPlot provides an easy to use high-level API for visualization, based on the 🐼 Pandas .plot() API
 that works across a wide range of data sources and plotting backends.
 
 hvPlot
