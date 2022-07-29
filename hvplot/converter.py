@@ -568,9 +568,13 @@ class HoloViewsConverter:
             try:
                 if not use_dask:
                     symmetric = self._process_symmetric(symmetric, clim, check_symmetric_max)
-
                 if self._style_opts.get('cmap') is None:
-                    if symmetric:
+                    # Default to categorical camp if we detect categorical shading
+                    if (self.datashade and (self.aggregator is None or 'count_cat' in str(self.aggregator)) and
+                        ((self.by and not self.subplots) or
+                         (isinstance(self.y, list) or (self.y is None and len(set(self.variables) - set(self.indexes)) > 1)))):
+                        self._style_opts['cmap'] = self._default_cmaps['categorical']
+                    elif symmetric:
                         self._style_opts['cmap'] = self._default_cmaps['diverging']
                     else:
                         self._style_opts['cmap'] = self._default_cmaps['linear']
@@ -1253,6 +1257,10 @@ class HoloViewsConverter:
         categorical = False
         if self.by and not self.subplots:
             opts['aggregator'] = reductions.count_cat(self.by[0])
+            categorical = True
+        elif ((isinstance(self.y, list) or self.y is None and len(set(self.variables) - set(self.indexes)) > 1) and
+              self.kind in ('scatter', 'line', 'area')):
+            opts['aggregator'] = reductions.count_cat(self.group_label)
             categorical = True
         if self.aggregator:
             import datashader as ds
