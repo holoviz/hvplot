@@ -109,8 +109,6 @@ class Style(Controls):
 
     alpha = param.Magnitude(default=1)
 
-    marker = param.Selector()
-
 
 class Axes(Controls):
 
