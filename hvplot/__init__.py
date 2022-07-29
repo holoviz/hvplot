@@ -10,8 +10,7 @@ hvPlot
 - supports a wide range of data sources including Pandas, Dask, XArray
 Rapids cuDF, Streamz, Intake, Geopandas, NetworkX and Ibis.
 - supports the plotting backends Bokeh (default), Matplotlib and Plotly.
-- is built on top of HoloViews and allows you to drop into the rest of the
-HoloViz ecosystem when more power or flexibility is needed.
+- exposes the powerful tools from the HoloViz ecosystem in a familiar and convenient API, while letting you drop down into the underlying HoloViz tools when more power or flexibility is needed.
 
 To learn more check out https://hvplot.holoviz.org/. To report issues or contribute go to
 https://github.com/holoviz/hvplot. To join the community go to
