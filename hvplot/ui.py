@@ -22,7 +22,7 @@ GEO_FEATURES = [
     'borders', 'coastline', 'land', 'lakes', 'ocean', 'rivers',
     'states', 'grid'
 ]
-GEO_TILES = list(tile_sources)
+GEO_TILES = [None] + list(tile_sources)
 AGGREGATORS = [None, 'count', 'min', 'max', 'mean', 'sum', 'any']
 MAX_ROWS = 10000
 
@@ -204,14 +204,18 @@ class Geo(Controls):
         can be selected by name or a tiles object or class can be passed,
         the default is 'Wikipedia'.""")
 
-    @param.depends('geo', 'project', 'features', watch=True, on_init=True)
-    def _update_crs(self):
-        enabled = bool(self.geo or self.project or self.features)
-        self.param.crs.constant = not enabled
-        self.param.crs_kwargs.constant = not enabled
-        self.geo = enabled
-        if not enabled:
-            return
+    @param.depends('geo', watch=True, on_init=True)
+    def _update_params(self):
+        enabled = bool(self.geo)
+        geo_controls = set(self.param) - set(Controls.param) - {"geo"}
+        for p in geo_controls:
+            self.param[p].constant = not enabled
+
+        if self.crs is None and enabled:
+            self._populate_crs()
+
+    def _populate_crs(self):
+        # Method exists because cartopy is not a dependency of hvplot
         from cartopy.crs import CRS, GOOGLE_MERCATOR
         crs = {
             k: v for k, v in param.concrete_descendents(CRS).items()
@@ -219,7 +223,7 @@ class Geo(Controls):
         }
         crs['WebMercator'] = GOOGLE_MERCATOR
         self.param.crs.objects = crs
-
+        self.crs = next(iter(crs))
 
 
 class Operations(Controls):
@@ -366,7 +370,11 @@ class hvPlotExplorer(Viewer):
         if isinstance(y, list) and len(y) == 1:
             y = y[0]
         kwargs = {}
-        for p, v in self.param.values().items():
+        for v in self.param.values().values():
+            # Geo is not enabled so not adding it to kwargs
+            if isinstance(v, Geo) and not v.geo:
+                continue
+
             if isinstance(v, Controls):
                 kwargs.update(v.kwargs)
 
