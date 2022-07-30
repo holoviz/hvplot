@@ -348,7 +348,6 @@ class hvPlotExplorer(Viewer):
             pn.layout.HSpacer(),
             sizing_mode='stretch_both'
         )
-        self._plot()
         self.param.trigger('kind')
 
     def _populate(self):
