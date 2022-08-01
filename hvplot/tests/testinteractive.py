@@ -2,20 +2,13 @@ import numpy as np
 import pandas as pd
 import panel as pn
 import pytest
+import xarray as xr
 
 from holoviews.util.transform import dim
 
-from hvplot import bind, hvPlotTabular
+from hvplot import bind, hvPlot, hvPlotTabular
 from hvplot.interactive import Interactive
 from hvplot.xarray import XArrayInteractive
-
-try:
-    import xarray as xr
-    import hvplot.xarray  # noqa
-except ImportError:
-    xr = None
-
-xr_available = pytest.mark.skipif(xr is None, reason="requires xarray")
 
 
 @pytest.fixture(scope='module')
@@ -98,6 +91,28 @@ def pandas_patch_hvplot():
     delattr(pd.Series, 'hvplot')
 
 
+@pytest.fixture
+def xarray_patch_interactive():
+    xr.register_dataset_accessor('interactive')(XArrayInteractive)
+    xr.register_dataarray_accessor('interactive')(XArrayInteractive)
+
+    yield
+
+    delattr(xr.DataArray, 'interactive')
+    delattr(xr.Dataset, 'interactive')
+
+
+@pytest.fixture
+def xarray_patch_hvplot():
+    xr.register_dataset_accessor('hvplot')(hvPlot)
+    xr.register_dataarray_accessor('hvplot')(hvPlot)
+
+    yield
+
+    delattr(xr.DataArray, 'hvplot')
+    delattr(xr.Dataset, 'hvplot')
+
+
 def test_spy(clone_spy, series):
     si = Interactive(series)
     si._clone()
@@ -134,7 +149,6 @@ def test_interactive_pandas_series():
     assert dfi._transform == dim('*')
 
 
-@xr_available
 def test_interactive_xarray_dataarray():
     ds = xr.tutorial.load_dataset('air_temperature')
 
@@ -146,7 +160,6 @@ def test_interactive_xarray_dataarray():
     assert dsi._transform == dim('air')
 
 
-@xr_available
 def test_interactive_xarray_dataset():
     ds = xr.tutorial.load_dataset('air_temperature')
 
@@ -176,7 +189,6 @@ def test_interactive_pandas_function():
     assert dfi._obj is df.B
 
 
-@xr_available
 def test_interactive_xarray_function():
     ds = xr.tutorial.load_dataset('air_temperature')
     ds['air2'] = ds.air*2
@@ -208,7 +220,7 @@ def test_interactive_pandas_dataframe_accessor():
         dfi.hvplot.scatter(kind="area")
 
 
-@xr_available
+@pytest.mark.usefixtures("xarray_patch_interactive", "xarray_patch_hvplot")
 def test_interactive_xarray_dataset_accessor():
     ds = xr.tutorial.load_dataset('air_temperature')
     dsi = ds.air.interactive
@@ -234,7 +246,7 @@ def test_interactive_with_bound_function_calls():
     load_data.COUNT = 0
 
     # Setting up interactive with a function
-    dfi = hvplot.bind(load_data, w_species).interactive()
+    dfi = bind(load_data, w_species).interactive()
     (dfi.loc[dfi['sex'].isin(w_sex)])
     assert load_data.COUNT ==  1
 
