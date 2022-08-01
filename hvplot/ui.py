@@ -207,7 +207,9 @@ class Geo(Controls):
     @param.depends('geo', watch=True, on_init=True)
     def _update_params(self):
         enabled = bool(self.geo)
-        geo_controls = set(self.param) - set(Controls.param) - {"geo"}
+        geo_controls = [
+            "crs", "crs_kwargs", "global_extent", "project", "features", "tiles"
+        ]
         for p in geo_controls:
             self.param[p].constant = not enabled
 
