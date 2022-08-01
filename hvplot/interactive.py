@@ -57,6 +57,8 @@ class Interactive:
     _fig = None
 
     def __new__(cls, obj, **kwargs):
+        # __new__ implemented to support functions as input, i.e. 
+        # hvplot.find(foo, widget).interactive().max()
         if 'fn' in kwargs:
             fn = kwargs.pop('fn')
         elif isinstance(obj, (FunctionType, MethodType)):
