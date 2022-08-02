@@ -470,7 +470,7 @@ def test_interactive_pandas_frame_chained_attrs(df, clone_spy):
 
     assert dfi._obj is df
     assert isinstance(dfi._current, float)
-    assert pytest.approx(dfi._current, df.A.max())
+    assert dfi._current == pytest.approx(df.A.max())
     # This is a weird repr! Bug?
     assert repr(dfi._transform) == "dim('*').pd.A).max("
     assert dfi._depth == 4
@@ -498,7 +498,7 @@ def test_interactive_pandas_out_repr(series):
 
     assert isinstance(si, Interactive)
     assert isinstance(si._current, pd.Series)
-    assert pytest.approx(si._current.A, series.max())
+    assert si._current.A == pytest.approx(series.max())
     assert si._obj is series
     assert repr(si._transform) == "dim('*').pd.max()"
     # One _clone from _resolve_accessor, two from _clone
@@ -508,7 +508,7 @@ def test_interactive_pandas_out_repr(series):
     out = si._callback()
 
     assert isinstance(out, pd.Series)
-    assert pytest.approx(out.A, series.max())
+    assert out.A == pytest.approx(series.max())
 
 
 def test_interactive_pandas_out_frame(series):
