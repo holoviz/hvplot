@@ -22,6 +22,16 @@ def df():
     return pd._testing.makeMixedDataFrame()
 
 
+@pytest.fixture(scope='module')
+def dataset():
+    return xr.tutorial.load_dataset('air_temperature')
+
+
+@pytest.fixture(scope='module')
+def dataarray(dataset):
+    return dataset.air
+
+
 class CallArgs:
     def __init__(self, args, kwargs):
         self.args = args
@@ -78,9 +88,7 @@ def test_spy(clone_spy, series):
     assert clone_spy.calls[1].kwargs == dict(x='X')
 
 
-def test_interactive_pandas_dataframe():
-    df = pd._testing.makeMixedDataFrame()
-
+def test_interactive_pandas_dataframe(df):
     dfi = Interactive(df)
 
     assert type(dfi) is Interactive
@@ -89,42 +97,34 @@ def test_interactive_pandas_dataframe():
     assert dfi._transform == dim('*')
 
 
-def test_interactive_pandas_series():
-    df = pd._testing.makeMixedDataFrame()
+def test_interactive_pandas_series(series):
+    si = Interactive(series)
 
-    dfi = Interactive(df.A)
-
-    assert type(dfi) is Interactive
-    assert dfi._obj is df.A
-    assert dfi._fn is None
-    assert dfi._transform == dim('*')
+    assert type(si) is Interactive
+    assert si._obj is series
+    assert si._fn is None
+    assert si._transform == dim('*')
 
 
-def test_interactive_xarray_dataarray():
-    ds = xr.tutorial.load_dataset('air_temperature')
+def test_interactive_xarray_dataarray(dataarray):
+    dai = Interactive(dataarray)
 
-    dsi = Interactive(ds.air)
-
-    assert type(dsi) is XArrayInteractive
-    assert (dsi._obj == ds.air).all()
-    assert dsi._fn is None
-    assert dsi._transform == dim('air')
+    assert type(dai) is XArrayInteractive
+    assert (dai._obj == dataarray).all()
+    assert dai._fn is None
+    assert dai._transform == dim('air')
 
 
-def test_interactive_xarray_dataset():
-    ds = xr.tutorial.load_dataset('air_temperature')
-
-    dsi = Interactive(ds)
+def test_interactive_xarray_dataset(dataset):
+    dsi = Interactive(dataset)
 
     assert type(dsi) is XArrayInteractive
-    assert dsi._obj is ds
+    assert dsi._obj is dataset
     assert dsi._fn is None
     assert dsi._transform == dim('*')
 
 
-def test_interactive_pandas_function():
-    df = pd._testing.makeMixedDataFrame()
-
+def test_interactive_pandas_function(df):
     select = pn.widgets.Select(options=list(df.columns))
 
     def sel_col(col):
@@ -140,8 +140,8 @@ def test_interactive_pandas_function():
     assert dfi._obj is df.B
 
 
-def test_interactive_xarray_function():
-    ds = xr.tutorial.load_dataset('air_temperature')
+def test_interactive_xarray_function(dataset):
+    ds = dataset.copy()
     ds['air2'] = ds.air*2
 
     select = pn.widgets.Select(options=list(ds))
@@ -160,8 +160,7 @@ def test_interactive_xarray_function():
     assert dsi._transform == dim('air2')
 
 
-def test_interactive_pandas_dataframe_accessor():
-    df = pd._testing.makeMixedDataFrame()
+def test_interactive_pandas_dataframe_accessor(df):
     dfi = df.interactive()
 
     assert dfi.hvplot(kind="scatter")._transform == dfi.hvplot.scatter()._transform
@@ -170,14 +169,13 @@ def test_interactive_pandas_dataframe_accessor():
         dfi.hvplot.scatter(kind="area")
 
 
-def test_interactive_xarray_dataset_accessor():
-    ds = xr.tutorial.load_dataset('air_temperature')
-    dsi = ds.air.interactive
+def test_interactive_xarray_dataset_accessor(dataarray):
+    dai = dataarray.interactive
 
-    assert dsi.hvplot(kind="line")._transform == dsi.hvplot.line()._transform
+    assert dai.hvplot(kind="line")._transform == dai.hvplot.line()._transform
 
     with pytest.raises(TypeError):
-        dsi.hvplot.line(kind="area")
+        dai.hvplot.line(kind="area")
 
 
 def test_interactive_with_bound_function_calls():
