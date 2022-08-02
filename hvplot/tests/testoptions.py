@@ -1,21 +1,13 @@
 import hvplot
 import holoviews as hv
 import numpy as np
+import pandas as pd
 import pytest
+import xarray as xr
 
 from holoviews import Store
 from holoviews.core.options import Options, OptionTree
 from packaging.version import Version
-
-try:
-    import pandas as pd
-except ImportError:
-    pd = None
-
-try:
-    import xarray as xr
-except ImportError:
-    xr = None
 
 
 @pytest.fixture(scope='class')
@@ -55,7 +47,6 @@ def symmetric_df():
                                         columns=['x', 'y', 'number'])
 
 
-@pytest.mark.skipif(pd is None, reason='Pandas not available')
 @pytest.mark.usefixtures('load_pandas_accessor')
 class TestOptions:
 
@@ -501,7 +492,6 @@ def ds2(da, da2):
     return xr.Dataset(dict(foo=da, bar=da2))
 
 
-@pytest.mark.skipif(xr is None, reason='Xarray not available')
 @pytest.mark.usefixtures('load_xarray_accessor')
 class TestXarrayTitle:
 

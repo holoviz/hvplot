@@ -1,17 +1,12 @@
 from collections import OrderedDict
-from unittest import SkipTest
 
 import numpy as np
 import pandas as pd
+import xarray as xr
 
 from hvplot.plotting import hvPlot, hvPlotTabular
 from holoviews import Store, Scatter
 from holoviews.element.comparison import ComparisonTestCase
-
-try:
-    import xarray as xr
-except:
-    xr = None
 
 
 class TestOverrides(ComparisonTestCase):
@@ -61,8 +56,6 @@ class TestOverrides(ComparisonTestCase):
 class TestXArrayOverrides(ComparisonTestCase):
 
     def setUp(self):
-        if xr is None:
-            raise SkipTest('XArray not available')
         coords = OrderedDict([('time', [0, 1]), ('lat', [0, 1]), ('lon', [0, 1])])
         self.da_img_by_time = xr.DataArray(np.arange(8).reshape((2, 2, 2)),
                                            coords, ['time', 'lat', 'lon']).assign_coords(
