@@ -115,6 +115,12 @@ def test_interactive_xarray_dataarray(dataarray):
     assert dai._transform == dim('air')
 
 
+def test_interactive_xarray_dataarray_no_name():
+    dataarray = xr.DataArray(np.random.rand(2, 2))
+    with pytest.raises(ValueError, match='Cannot use interactive API on DataArray without name'):
+        Interactive(dataarray)
+
+
 def test_interactive_xarray_dataset(dataset):
     dsi = Interactive(dataset)
 
