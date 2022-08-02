@@ -1,5 +1,6 @@
 import hvplot.pandas  # noqa
 import hvplot.xarray  # noqa
+import matplotlib
 import numpy as np
 import pandas as pd
 import panel as pn
@@ -760,3 +761,31 @@ def test_interactive_pandas_series_operator_round(series):
     assert si._obj is series
     assert repr(si._transform) == "dim('*', round)"
     assert si._depth == 2
+
+
+def test_interactive_pandas_series_plot(series, clone_spy):
+    si = Interactive(series)
+
+    si = si.plot()
+
+    assert isinstance(si, Interactive)
+
+    assert clone_spy.count == 3
+
+    assert not clone_spy.calls[0].args
+    assert clone_spy.calls[0].kwargs == {'copy': True}
+
+    assert not clone_spy.calls[1].args
+    assert clone_spy.calls[1].kwargs == {'copy': True}
+
+    assert len(clone_spy.calls[2].args) == 1
+    # Not the complete repr as the function doesn't have a nice repr,
+    # its repr displays  the memory address.
+    assert "dim('*').pd.plot(ax=<function Interactive._get_ax_fn.<locals>.get_ax" in repr(clone_spy.calls[2].args[0])
+    assert clone_spy.calls[2].kwargs == {'plot': True}
+
+    assert not si._dmap
+    assert isinstance(si._fig, matplotlib.figure.Figure)
+
+    # Just test that it doesn't raise any error.
+    si.output()
