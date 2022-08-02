@@ -366,7 +366,7 @@ def test_interactive_pandas_series_operator_and_method_widget(series):
     assert si._params[1] is w2.param.value
 
 
-def test_interactive_pandas_series_operator_ipywidget(series):
+def test_interactive_pandas_series_operator_ipywidgets(series):
     ipywidgets = pytest.importorskip("ipywidgets")
 
     w = ipywidgets.FloatSlider(value=2., min=1., max=5.)
@@ -384,6 +384,13 @@ def test_interactive_pandas_series_operator_ipywidget(series):
 
     # TODO: Isn't that a bug?
     assert len(si._params) == 0
+
+    widgets = si.widgets()
+
+    assert isinstance(widgets, pn.Column)
+    assert len(widgets) == 1
+    assert isinstance(widgets[0], pn.pane.IPyWidget)
+    assert widgets[0].object is w
 
 
 def test_interactive_pandas_series_operator_out_widgets(series):
