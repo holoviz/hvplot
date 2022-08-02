@@ -214,7 +214,6 @@ def test_interactive_pandas_series_init(series, clone_spy):
 
 
 def test_interactive_pandas_series_accessor(series, clone_spy):
-
     si = series.interactive()
 
     assert isinstance(si, Interactive)
@@ -275,8 +274,6 @@ def test_interactive_pandas_series_method(series, clone_spy):
 
 def test_interactive_pandas_series_operator_and_method(series, clone_spy):
     si = Interactive(series)
-
-    assert isinstance(si, Interactive)
     
     si = (si + 2).head(2)
 
@@ -349,8 +346,6 @@ def test_interactive_pandas_series_operator_and_method_widget(series):
 
     si = Interactive(series)
 
-    assert isinstance(si, Interactive)
-    
     si = (si + w1).head(w2)
 
     assert isinstance(si, Interactive)
@@ -363,6 +358,99 @@ def test_interactive_pandas_series_operator_and_method_widget(series):
     assert len(si._params) == 2
     assert si._params[0] is w1.param.value
     assert si._params[1] is w2.param.value
+
+
+def test_interactive_pandas_series_operator_ipywidget(series):
+    ipywidgets = pytest.importorskip("ipywidgets")
+
+    w = ipywidgets.FloatSlider(value=2., min=1., max=5.)
+
+    si = Interactive(series)
+
+    si = si + w
+
+    assert isinstance(si, Interactive)
+    assert isinstance(si._current, pd.DataFrame)
+    pd.testing.assert_series_equal(si._current.A, series + w.value)
+    assert si._obj is series
+    assert repr(si._transform) == "dim('*').pd+FloatSlider(value=2.0, max=5.0, min=1.0)"
+    assert si._depth == 2
+
+    # TODO: Isn't that a bug?
+    assert len(si._params) == 0
+
+
+def test_interactive_pandas_series_operator_out_widgets(series):
+    w = pn.widgets.FloatSlider(value=2., start=1., end=5.)
+    si = Interactive(series)
+    si = si + w
+
+    widgets = si.widgets()
+
+    assert isinstance(widgets, pn.Column)
+    assert len(widgets) == 1
+    assert widgets[0] is w
+
+
+def test_interactive_pandas_series_method_out_widgets(series):
+    w = pn.widgets.IntSlider(value=2, start=1, end=5)
+    si = Interactive(series)
+    si = si.head(w)
+
+    widgets = si.widgets()
+
+    assert isinstance(widgets, pn.Column)
+    assert len(widgets) == 1
+    assert widgets[0] is w
+
+
+def test_interactive_pandas_series_operator_and_method_out_widgets(series):
+    w1 = pn.widgets.FloatSlider(value=2., start=1., end=5.)
+    w2 = pn.widgets.IntSlider(value=2, start=1, end=5)
+    si = Interactive(series)
+    
+    si = (si + w1).head(w2)
+
+    widgets = si.widgets()
+
+    assert isinstance(widgets, pn.Column)
+    assert len(widgets) == 2
+    assert widgets[0] is w1
+    assert widgets[1] is w2
+
+
+def test_interactive_pandas_frame_bind_out_widgets(df):
+    select = pn.widgets.Select(options=list(df.columns))
+
+    def sel_col(col):
+        return df[col]
+
+    dfi = Interactive(bind(sel_col, select))
+
+    widgets = dfi.widgets()
+
+    assert isinstance(widgets, pn.Column)
+    assert len(widgets) == 1
+    assert widgets[0] is select
+
+
+def test_interactive_pandas_frame_bind_operator_out_widgets(df):
+    select = pn.widgets.Select(default='A', options=list(df.columns))
+
+    def sel_col(col):
+        return df[col]
+
+    dfi = Interactive(bind(sel_col, select))
+
+    w = pn.widgets.FloatSlider(value=2., start=1., end=5.)
+    dfi = dfi + w
+
+    widgets = dfi.widgets()
+
+    assert isinstance(widgets, pn.Column)
+    assert len(widgets) == 2
+    assert widgets[0] is select
+    assert widgets[1] is w
 
 
 def test_interactive_pandas_series_operator_widget_update(series):
