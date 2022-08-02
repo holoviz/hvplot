@@ -635,3 +635,27 @@ def test_interactive_pandas_series_operator_reverse_binary(op):
     val_repr = '2.0' if isinstance(val, float) else 'True'
     assert repr(si._transform) == f"{val_repr}{op}dim('*')"
     assert si._depth == 2
+
+
+def test_interactive_pandas_series_operator_abs(series):
+    si = Interactive(series)
+    si = abs(si)
+
+    assert isinstance(si, Interactive)
+    assert isinstance(si._current, pd.DataFrame)
+    pd.testing.assert_series_equal(si._current.A, abs(series))
+    assert si._obj is series
+    assert repr(si._transform) == "absdim('*')"
+    assert si._depth == 2
+
+
+def test_interactive_pandas_series_operator_round(series):
+    si = Interactive(series)
+    si = round(si)
+
+    assert isinstance(si, Interactive)
+    assert isinstance(si._current, pd.DataFrame)
+    pd.testing.assert_series_equal(si._current.A, round(series))
+    assert si._obj is series
+    assert repr(si._transform) == "dim('*', round)"
+    assert si._depth == 2
