@@ -1,3 +1,5 @@
+import hvplot.pandas  # noqa
+import hvplot.xarray  # noqa
 import numpy as np
 import pandas as pd
 import panel as pn
@@ -5,8 +7,7 @@ import pytest
 import xarray as xr
 
 from holoviews.util.transform import dim
-
-from hvplot import bind, hvPlot, hvPlotTabular
+from hvplot import bind
 from hvplot.interactive import Interactive
 from hvplot.xarray import XArrayInteractive
 
@@ -61,56 +62,6 @@ def clone_spy():
     yield spy
 
     Interactive._clone = _clone
-
-
-@pytest.fixture
-def pandas_patch_interactive():
-    _patch_interactive = lambda self: Interactive(self)
-    _patch_interactive.__doc__ = Interactive.__call__.__doc__
-    interactive_prop = property(_patch_interactive)
-    setattr(pd.DataFrame, 'interactive', interactive_prop)
-    setattr(pd.Series, 'interactive', interactive_prop)
-
-    yield
-
-    delattr(pd.DataFrame, 'interactive')
-    delattr(pd.Series, 'interactive')
-
-
-@pytest.fixture
-def pandas_patch_hvplot():
-    _patch_plot = lambda self: hvPlotTabular(self)
-    _patch_plot.__doc__ = hvPlotTabular.__call__.__doc__
-    plot_prop = property(_patch_plot)
-    setattr(pd.DataFrame, 'hvplot', plot_prop)
-    setattr(pd.Series, 'hvplot', plot_prop)
-
-    yield
-
-    delattr(pd.DataFrame, 'hvplot')
-    delattr(pd.Series, 'hvplot')
-
-
-@pytest.fixture
-def xarray_patch_interactive():
-    xr.register_dataset_accessor('interactive')(XArrayInteractive)
-    xr.register_dataarray_accessor('interactive')(XArrayInteractive)
-
-    yield
-
-    delattr(xr.DataArray, 'interactive')
-    delattr(xr.Dataset, 'interactive')
-
-
-@pytest.fixture
-def xarray_patch_hvplot():
-    xr.register_dataset_accessor('hvplot')(hvPlot)
-    xr.register_dataarray_accessor('hvplot')(hvPlot)
-
-    yield
-
-    delattr(xr.DataArray, 'hvplot')
-    delattr(xr.Dataset, 'hvplot')
 
 
 def test_spy(clone_spy, series):
@@ -209,7 +160,6 @@ def test_interactive_xarray_function():
     assert dsi._transform == dim('air2')
 
 
-@pytest.mark.usefixtures("pandas_patch_interactive", "pandas_patch_hvplot")
 def test_interactive_pandas_dataframe_accessor():
     df = pd._testing.makeMixedDataFrame()
     dfi = df.interactive()
@@ -220,7 +170,6 @@ def test_interactive_pandas_dataframe_accessor():
         dfi.hvplot.scatter(kind="area")
 
 
-@pytest.mark.usefixtures("xarray_patch_interactive", "xarray_patch_hvplot")
 def test_interactive_xarray_dataset_accessor():
     ds = xr.tutorial.load_dataset('air_temperature')
     dsi = ds.air.interactive
@@ -266,7 +215,6 @@ def test_interactive_pandas_series_init(series, clone_spy):
     assert si._depth == 0
 
 
-@pytest.mark.usefixtures("pandas_patch_interactive")
 def test_interactive_pandas_series_accessor(series, clone_spy):
 
     si = series.interactive()
