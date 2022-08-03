@@ -92,6 +92,8 @@ class Colormapping(Controls):
     cmap = param.Selector(default=DEFAULT_CMAPS['linear'],
                           label='Colormap', objects=CMAPS)
 
+    rescale_discrete_levels = param.Boolean(default=True)
+
     symmetric = param.Boolean(default=False)
 
     def __init__(self, data, **params):
@@ -128,8 +130,6 @@ class Colormapping(Controls):
 class Style(Controls):
 
     alpha = param.Magnitude(default=1)
-
-    marker = param.Selector()
 
 
 class Axes(Controls):
@@ -379,12 +379,21 @@ class hvPlotExplorer(Viewer):
 
     def _populate(self):
         variables = self._converter.variables
+        indexes = getattr(self._converter, "indexes", [])
+        variables_no_index = [v for v in variables if v not in indexes]
         for pname in self.param:
             if pname == 'kind':
                 continue
             p = self.param[pname]
             if isinstance(p, param.Selector):
-                p.objects = variables
+                if pname == "x":
+                    p.objects = variables
+                else:
+                    p.objects = variables_no_index
+
+                # Setting the default value
+                if pname == "x" or pname == "y":
+                    setattr(self, pname, p.objects[0])
 
     def _plot(self, *events):
         y = self.y_multi if 'y_multi' in self._controls.parameters else self.y
