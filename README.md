@@ -1,4 +1,4 @@
-# hvPlot <img src="doc/_static/logo.png" style="width:2em;margin-bottom:-15px">
+# hvPlot <img src="https://github.com/holoviz/hvplot/blob/master/doc/_static/logo.png" style="width:2em;margin-bottom:-15px">
 
 **hvPlot makes data analysis and visualization simple**
 
