@@ -1,8 +1,16 @@
+import sys
+
 import holoviews as hv
 import hvplot.pandas
+import pytest
 
 from bokeh.sampledata import penguins
 from hvplot.ui import hvDataFrameExplorer
+
+pytestmark = pytest.mark.skipif(
+    sys.version_info < (3, 7),
+    reason='Penguins dataset not available on Python 3.6',
+)
 
 df = penguins.data
 
