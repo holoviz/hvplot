@@ -15,13 +15,13 @@
 
 [Home](https://hvplot.holoviz.org/) | [Installation instructions](#installation-instructions) | [Getting Started](https://hvplot.holoviz.org/user_guide/index.html) | [Reference Guides](https://hvplot.holoviz.org/reference/index.html) | [Examples](https://hvplot.holoviz.org/topics.html) | [Support](#support--feedback)
 
-## hvPlot provides an easy to use, high-level API for visualization
+## hvPlot provides a familiar, high-level API for visualization
 
 The API is based on the familiar 🐼 Pandas `.plot()` API and the innovative `.interactive` API.
 
 <img src="https://github.com/MarcSkovMadsen/awesome-panel-assets/blob/master/images/hvPlot/hvplot-total-intro.gif?raw=true" style="max-height:600px;border-radius:2%;">
 
-## hvPlot Works with the tools you know and ❤️
+## hvPlot works with the tools you know and ❤️
 
 hvPlot
 
@@ -79,7 +79,6 @@ df.interactive(width=600).head(n=pn.widgets.IntSlider(start=1, end=5, value=3))
 
 [<img src="https://github.com/MarcSkovMadsen/awesome-panel-assets/blob/master/images/hvPlot/hvplot-intro-interactive.gif?raw=true" style="max-height:300px;border-radius:2%;">](https://hvplot.holoviz.org/user_guide/Interactive.html)
 
-
 To get started check out the [`.interactive` Guide](https://hvplot.holoviz.org/user_guide/Interactive.html).
 
 ## How to find documentation from your notebook or editor
@@ -102,8 +101,11 @@ In a notebook or ipython environment the usual
 | ------------------------ | ------------------------------------------------------ |
 | 🚨&nbsp; **Bug Reports**       | <a href="https://github.com/holoviz/hvplot/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+label%3Abug+sort%3Areactions-%2B1-desc+" title="Open Bug Report"><img src="https://img.shields.io/github/issues/holoviz/hvplot/bug.svg?label=bug"></a>                                 |
 | 🎁&nbsp; **Feature Requests**  | <a href="https://github.com/holoviz/hvplot/issues?q=is%3Aopen+is%3Aissue+label%3Afeature+sort%3Areactions-%2B1-desc" title="Open Feature Request"><img src="https://img.shields.io/github/issues/holoviz/hvplot/feature.svg?label=feature%20request"></a>                                 |
-| 👩‍💻&nbsp; **Usage Questions**   |  <a href="https://discourse.holoviz.org/" title="Open Support Request"> <img src="https://img.shields.io/discourse/status?server=https%3A%2F%2Fdiscourse.holoviz.org"></a> |
+| 👩&nbsp; **Usage Questions**   |  <a href="https://discourse.holoviz.org/" title="Open Support Request"> <img src="https://img.shields.io/discourse/status?server=https%3A%2F%2Fdiscourse.holoviz.org"></a> |
+| 👩‍💻&nbsp; **Developer Questions**   |  <a href="https://gitter.im/pyviz/pyviz" title="Discuss with developers"> <img src="https://img.shields.io/gitter/room/TechnologyAdvice/Stardust.svg"></a> |
 | 📢&nbsp; **Announcements**  | <a href="https://twitter.com/HoloViz_org" title="Follow hvPlot on Twitter"><img src="https://img.shields.io/twitter/follow/HoloViz_org.svg?style=social&label=Follow"> |
+
+Reach out on [Gitter](https://gitter.im/pyviz/pyviz) if you would like to join the weekly triaging or bi-weekly HoloViz call.
 
 ## Installation Instructions
 
