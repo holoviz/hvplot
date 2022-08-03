@@ -652,10 +652,3 @@ class hvDataFrameExplorer(hvPlotExplorer):
         if not len(values):
             return (np.nan, np.nan)
         return max_range([(np.nanmin(vs), np.nanmax(vs)) for vs in values])
-
-
-accessors_mapping = {
-    hvDataFrameExplorer: 'pandas',
-    hvGeomExplorer: 'pandas',
-    hvGridExplorer: 'xarray',
-}
