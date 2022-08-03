@@ -1,5 +1,3 @@
-import importlib
-
 import holoviews as _hv
 import numpy as np
 import panel as pn
@@ -31,7 +29,7 @@ AGGREGATORS = [None, 'count', 'min', 'max', 'mean', 'sum', 'any']
 MAX_ROWS = 10000
 
 
-def explorer(data, backend='bokeh', set_accessor=True, **kwargs):
+def explorer(data, **kwargs):
     """Explore your data by building a plot in a Panel UI component.
 
     This function returns a Panel component that has on the right-side
@@ -42,27 +40,13 @@ def explorer(data, backend='bokeh', set_accessor=True, **kwargs):
     ----------
     data : pandas.DataFrame, geopandas.DataFrame
         Data structure to explore.
-    backend: str, optional
-        Plotting backend; one of 'bokeh', 'matplotlib' and 'plotly'. By default 'bokeh'.
-    set_accessor: bool, optional
-        Set the accessor for the data type. By default True.
 
     Returns
     -------
     hvplotExporer
         Panel component to explore a dataset.
     """
-    if backend and (
-        not getattr(_hv.extension, "_loaded", False)
-        or _hv.Store.current_backend != backend
-    ):
-        from .utilities import hvplot_extension
-        hvplot_extension(backend, logo=False)
-    explorer = hvPlotExplorer.from_data(data, **kwargs)
-    if set_accessor:
-        accessor = accessors_mapping[type(explorer)]
-        importlib.import_module(f'hvplot.{accessor}')
-    return explorer
+    return hvPlotExplorer.from_data(data, **kwargs)
 
 
 class Controls(Viewer):
