@@ -1,3 +1,4 @@
+import holoviews as hv
 import hvplot.pandas  # noqa
 import hvplot.xarray  # noqa
 import matplotlib
@@ -33,13 +34,22 @@ def dataarray(dataset):
     return dataset.air
 
 
-class CallArgs:
-    def __init__(self, args, kwargs):
-        self.args = args
-        self.kwargs = kwargs
+class CallCtxt:
+    def __init__(self, call_args, call_kwargs, **kwargs):
+        for k, v in kwargs.items():
+            if k in ['args', 'kwargs']:
+                raise ValueError(
+                    '**kwargs passed to CallCtxt cant be named args or kwargs'
+                )
+            setattr(self, k, v)
+        self.args = call_args
+        self.kwargs = call_kwargs
 
     def __repr__(self):
-        return f'CallArgs(args={self.args!r}, kwargs={self.kwargs!r})'
+        inner = ''
+        for attr in vars(self):
+            inner += f'{attr}={getattr(self, attr)!r}, '
+        return f'CallCtxt({inner}args={self.args!r}, kwargs={self.kwargs!r})'
 
     def is_empty(self):
         return not self.args and not self.kwargs
@@ -53,20 +63,24 @@ class Spy:
     def __repr__(self):
         return f'Spy(count={self.count!r}, calls={self.calls!r})'
 
-    def register_call(self, args, kwargs):
-        self.calls[self.count] = CallArgs(args, kwargs)
+    def register_call(self, called_args, called_kwargs, **kwargs):
+        self.calls[self.count] = CallCtxt(called_args, called_kwargs, **kwargs)
         self.count += 1
 
 
 @pytest.fixture
 def clone_spy():
+    # In hindsight it might have been a better idea to spy __init__
+    # rather than _clone, to check exactly how new instances are created
+    # and not depend on the implementation of _clone.
     spy = Spy()
 
     _clone = Interactive._clone
 
     def clone_bis(inst, *args, **kwargs):
-        spy.register_call(args, kwargs)
-        return _clone(inst, *args, **kwargs)
+        cloned = _clone(inst, *args, **kwargs)
+        spy.register_call(args, kwargs, depth=cloned._depth)
+        return cloned
 
     Interactive._clone = clone_bis
 
@@ -96,6 +110,7 @@ def test_interactive_pandas_dataframe(df):
     assert dfi._obj is df
     assert dfi._fn is None
     assert dfi._transform == dim('*')
+    assert dfi._method is None
 
 
 def test_interactive_pandas_series(series):
@@ -105,6 +120,7 @@ def test_interactive_pandas_series(series):
     assert si._obj is series
     assert si._fn is None
     assert si._transform == dim('*')
+    assert si._method is None
 
 
 def test_interactive_xarray_dataarray(dataarray):
@@ -114,6 +130,7 @@ def test_interactive_xarray_dataarray(dataarray):
     assert (dai._obj == dataarray).all()
     assert dai._fn is None
     assert dai._transform == dim('air')
+    assert dai._method is None
 
 
 def test_interactive_xarray_dataarray_no_name():
@@ -129,6 +146,7 @@ def test_interactive_xarray_dataset(dataset):
     assert dsi._obj is dataset
     assert dsi._fn is None
     assert dsi._transform == dim('*')
+    assert dsi._method is None
 
 
 def test_interactive_pandas_function(df):
@@ -142,6 +160,7 @@ def test_interactive_pandas_function(df):
     assert dfi._obj is df.A
     assert isinstance(dfi._fn, pn.param.ParamFunction)
     assert dfi._transform == dim('*')
+    assert dfi._method is None
 
     select.value = 'B'
     assert dfi._obj is df.B
@@ -161,13 +180,14 @@ def test_interactive_xarray_function(dataset):
     assert type(dsi) is XArrayInteractive
     assert isinstance(dsi._fn, pn.param.ParamFunction)
     assert dsi._transform == dim('air')
+    assert dsi._method is None
 
     select.value = 'air2'
     assert (dsi._obj == ds.air2).all()
     assert dsi._transform == dim('air2')
 
 
-def test_interactive_pandas_dataframe_accessor(df):
+def test_interactive_pandas_dataframe_hvplot_accessor(df):
     dfi = df.interactive()
 
     assert dfi.hvplot(kind="scatter")._transform == dfi.hvplot.scatter()._transform
@@ -176,13 +196,30 @@ def test_interactive_pandas_dataframe_accessor(df):
         dfi.hvplot.scatter(kind="area")
 
 
-def test_interactive_xarray_dataset_accessor(dataarray):
+def test_interactive_xarray_dataset_hvplot_accessor(dataarray):
     dai = dataarray.interactive
 
     assert dai.hvplot(kind="line")._transform == dai.hvplot.line()._transform
 
     with pytest.raises(TypeError):
         dai.hvplot.line(kind="area")
+
+
+@pytest.mark.xfail(reason='Not sure?')
+def test_interactive_pandas_dataframe_hvplot_accessor_dmap(df):
+    dfi = df.interactive()
+    dfi = dfi.hvplot.line(y='A')
+
+    # TODO: Not sure about the logic 
+    assert dfi._dmap is True
+
+
+def test_interactive_pandas_dataframe_hvplot_accessor_dmap_kind_widget(df):
+    w = pn.widgets.Select(options=['line', 'scatter'])
+    dfi = df.interactive()
+    dfi = dfi.hvplot(kind=w, y='A')
+
+    assert dfi._dmap is True
 
 
 def test_interactive_with_bound_function_calls():
@@ -218,6 +255,7 @@ def test_interactive_pandas_series_init(series, clone_spy):
     assert isinstance(si._current, pd.DataFrame)
     pd.testing.assert_series_equal(si._current.A, series)
     assert si._depth == 0
+    assert si._method is None
 
 
 def test_interactive_pandas_series_accessor(series, clone_spy):
@@ -232,6 +270,7 @@ def test_interactive_pandas_series_accessor(series, clone_spy):
     assert isinstance(si._current, pd.DataFrame)
     pd.testing.assert_series_equal(si._current.A, series)
     assert si._depth == 1
+    assert si._method is None
 
 
 def test_interactive_pandas_series_operator(series, clone_spy):
@@ -244,18 +283,23 @@ def test_interactive_pandas_series_operator(series, clone_spy):
     assert si._obj is series
     assert repr(si._transform) == "dim('*').pd+2"
     assert si._depth == 2
+    assert si._method is None
 
     assert clone_spy.count == 2
 
+    # _clone(copy=True) in _resolve_accessor in _apply_operator
+    assert clone_spy.calls[0].depth == 1
     assert not clone_spy.calls[0].args
     assert clone_spy.calls[0].kwargs == {'copy': True}
 
+    # _clone in _apply_operator
+    assert clone_spy.calls[1].depth == 2
     assert len(clone_spy.calls[1].args) == 1
     assert repr(clone_spy.calls[1].args[0]) == "dim('*').pd+2"
     assert not clone_spy.calls[1].kwargs
 
 
-def test_interactive_pandas_series_method(series, clone_spy):
+def test_interactive_pandas_series_method_args(series, clone_spy):
     si = Interactive(series)
     si = si.head(2)
 
@@ -265,18 +309,97 @@ def test_interactive_pandas_series_method(series, clone_spy):
     assert si._obj is series
     assert repr(si._transform) == "dim('*').pd.head(2)"
     assert si._depth == 3
+    assert si._method is None
 
     assert clone_spy.count == 3
 
+    # _clone in _resolve_accessor in __getattribute__(name='head')
+    assert clone_spy.calls[0].depth == 1
     assert not clone_spy.calls[0].args
     assert clone_spy.calls[0].kwargs == {'copy': True}
 
+    # 1st _clone(copy=True) in __call__
+    assert clone_spy.calls[1].depth == 2
     assert not clone_spy.calls[1].args
     assert clone_spy.calls[1].kwargs == {'copy': True}
 
+    # 2nd _clone in __call__
+    assert clone_spy.calls[2].depth == 3
     assert len(clone_spy.calls[2].args) == 1
     assert repr(clone_spy.calls[2].args[0]) == "dim('*').pd.head(2)"
     assert clone_spy.calls[2].kwargs == {'plot': False}
+
+
+def test_interactive_pandas_series_method_kwargs(series, clone_spy):
+    si = Interactive(series)
+    si = si.head(n=2)
+
+    assert isinstance(si, Interactive)
+    assert isinstance(si._current, pd.DataFrame)
+    pd.testing.assert_series_equal(si._current.A, series.head(2))
+    assert si._obj is series
+    assert repr(si._transform) == "dim('*').pd.head(n=2)"
+    assert si._depth == 3
+    assert si._method is None
+
+    assert clone_spy.count == 3
+
+    # _clone in _resolve_accessor in __getattribute__(name='head')
+    assert clone_spy.calls[0].depth == 1
+    assert not clone_spy.calls[0].args
+    assert clone_spy.calls[0].kwargs == {'copy': True}
+
+    # 1st _clone(copy=True) in __call__
+    assert clone_spy.calls[1].depth == 2
+    assert not clone_spy.calls[1].args
+    assert clone_spy.calls[1].kwargs == {'copy': True}
+
+    # 2nd _clone in __call__
+    assert clone_spy.calls[2].depth == 3
+    assert len(clone_spy.calls[2].args) == 1
+    assert repr(clone_spy.calls[2].args[0]) == "dim('*').pd.head(n=2)"
+    assert clone_spy.calls[2].kwargs == {'plot': False}
+
+
+
+def test_interactive_pandas_series_method_not_called(series, clone_spy):
+    si = Interactive(series)
+    si = si.head
+
+    assert isinstance(si, Interactive)
+    assert isinstance(si._current, pd.DataFrame)
+    pd.testing.assert_series_equal(si._current.A, si._obj)
+    assert si._obj is series
+    assert repr(si._transform) == "dim('*')"
+    assert si._depth == 1
+    assert si._method == 'head'
+
+    assert clone_spy.count == 1
+
+    # _clone in _resolve_accessor in __getattribute__(name='head')
+    assert clone_spy.calls[0].depth == 1
+    assert not clone_spy.calls[0].args
+    assert clone_spy.calls[0].kwargs == {'copy': True}
+
+
+def test_interactive_pandas_frame_attrib(df, clone_spy):
+    dfi = Interactive(df)
+    dfi = dfi.A
+
+    assert isinstance(dfi, Interactive)
+    assert isinstance(dfi._current, pd.DataFrame)
+    pd.testing.assert_frame_equal(dfi._current, dfi._obj)
+    assert dfi._obj is df
+    assert repr(dfi._transform) == "dim('*')"
+    assert dfi._depth == 1
+    assert dfi._method == 'A'
+
+    assert clone_spy.count == 1
+
+    # _clone in _resolve_accessor in __getattribute__(name='A')
+    assert clone_spy.calls[0].depth == 1
+    assert not clone_spy.calls[0].args
+    assert clone_spy.calls[0].kwargs == {'copy': True}
 
 
 def test_interactive_pandas_series_operator_and_method(series, clone_spy):
@@ -290,22 +413,33 @@ def test_interactive_pandas_series_operator_and_method(series, clone_spy):
     assert si._obj is series
     assert repr(si._transform) == "(dim('*').pd+2).head(2)"
     assert si._depth == 5
+    assert si._method is None
 
     assert clone_spy.count == 5
 
+    # _clone(copy=True) in _resolve_accessor in _apply_operator
+    assert clone_spy.calls[0].depth == 1
     assert not clone_spy.calls[0].args
     assert clone_spy.calls[0].kwargs == {'copy': True}
 
+    # _clone in _apply_operator
+    assert clone_spy.calls[1].depth == 2
     assert len(clone_spy.calls[1].args) == 1
     assert repr(clone_spy.calls[1].args[0]) == "dim('*').pd+2"
     assert not clone_spy.calls[1].kwargs
 
+    # _clone in _resolve_accessor in __getattribute__(name='head')
+    assert clone_spy.calls[2].depth == 3
     assert not clone_spy.calls[2].args
     assert clone_spy.calls[2].kwargs == {'copy': True}
 
+    # 1st _clone(copy=True) in __call__
+    assert clone_spy.calls[3].depth == 4
     assert not clone_spy.calls[3].args
     assert clone_spy.calls[3].kwargs == {'copy': True}
 
+    # 2nd _clone in __call__
+    assert clone_spy.calls[4].depth == 5
     assert len(clone_spy.calls[4].args) == 1
     assert repr(clone_spy.calls[4].args[0]) == "(dim('*').pd+2).head(2)"
     assert clone_spy.calls[4].kwargs == {'plot': False}
@@ -324,6 +458,7 @@ def test_interactive_pandas_series_operator_widget(series):
     assert si._obj is series
     assert repr(si._transform) == "dim('*').pd+FloatSlider(end=5.0, start=1.0, value=2.0)"
     assert si._depth == 2
+    assert si._method is None
 
     assert len(si._params) == 1
     assert si._params[0] is w.param.value
@@ -342,6 +477,7 @@ def test_interactive_pandas_series_method_widget(series):
     assert si._obj is series
     assert repr(si._transform) == "dim('*').pd.head(IntSlider(end=5, start=1, value=2))"
     assert si._depth == 3
+    assert si._method is None
 
     assert len(si._params) == 1
     assert si._params[0] is w.param.value
@@ -361,6 +497,7 @@ def test_interactive_pandas_series_operator_and_method_widget(series):
     assert si._obj is series
     assert repr(si._transform) == "(dim('*').pd+FloatSlider(end=5.0, start=1.0, value=2.0)).head(IntSlider(end=5, start=1, value=2))"
     assert si._depth == 5
+    assert si._method is None
 
     assert len(si._params) == 2
     assert si._params[0] is w1.param.value
@@ -382,6 +519,7 @@ def test_interactive_pandas_series_operator_ipywidgets(series):
     assert si._obj is series
     assert repr(si._transform) == "dim('*').pd+FloatSlider(value=2.0, max=5.0, min=1.0)"
     assert si._depth == 2
+    assert si._method is None
 
     # TODO: Isn't that a bug?
     assert len(si._params) == 0
@@ -521,15 +659,12 @@ def test_interactive_pandas_frame_loc(df):
     pd.testing.assert_series_equal(dfi._current, df.loc[:, 'A'])
     assert repr(dfi._transform) == "dim('*').pd.loc, getitem, (slice(None, None, None), 'A')"
     assert dfi._depth == 3
+    assert dfi._method is None
 
 
-def test_interactive_pandas_frame_selection(df, clone_spy):
+def test_interactive_pandas_frame_filtering(df, clone_spy):
     dfi = Interactive(df)
 
-    # There are 2 references to dfi in the right part of this expression,
-    # so it's cloned twice from its root, which is why in the end dfi._depth
-    # only reaches 1. 
-    # TODO: Comment no longer true...
     dfi = dfi[dfi.A > 1]
 
     assert isinstance(dfi, Interactive)
@@ -538,24 +673,38 @@ def test_interactive_pandas_frame_selection(df, clone_spy):
     assert isinstance(dfi._current, pd.DataFrame)
     pd.testing.assert_frame_equal(dfi._current, df[df.A > 1])
     assert repr(dfi._transform) == "dim('*', getitem, dim('*').pd.A)>1"
+    # The depth of that Interactive instance is 2 because the last part of
+    # the chain executed, i.e. dfi[], leads to two clones being created,
+    # incrementing the _depth up to 2.
     assert dfi._depth == 2
+    assert dfi._method is None
 
     assert clone_spy.count == 5
 
+    # _clone(True) in _resolve_accessor in __getattribute__(name='A')
+    assert clone_spy.calls[0].depth == 1
     assert not clone_spy.calls[0].args
     assert clone_spy.calls[0].kwargs == {'copy': True}
 
+    # _clone in _resolve_accessor in _apply_operator(__gt__)
+    assert clone_spy.calls[1].depth == 2
     assert len(clone_spy.calls[1].args) == 1
     assert repr(clone_spy.calls[1].args[0]) == "dim('*').pd.A()"
     assert clone_spy.calls[1].kwargs == {'inherit_kwargs': {}}
 
+    # _clone in _apply_operator(__gt__)
+    assert clone_spy.calls[2].depth == 3
     assert len(clone_spy.calls[2].args) == 1
     assert repr(clone_spy.calls[2].args[0]) == "(dim('*').pd.A())>1"
     assert not clone_spy.calls[2].kwargs
 
+    # _clone(True) in _resolve_accessor in _apply_operator(getitem)
+    assert clone_spy.calls[3].depth == 1
     assert not clone_spy.calls[3].args
     assert clone_spy.calls[3].kwargs == {'copy': True}
 
+    # _clone in _apply_operator(getitem)
+    assert clone_spy.calls[4].depth == 2
     assert len(clone_spy.calls[4].args) == 1
     assert repr(clone_spy.calls[4].args[0]) == "dim('*', getitem, (dim('*').pd.A())>1)"
     assert not clone_spy.calls[4].kwargs
@@ -574,19 +723,28 @@ def test_interactive_pandas_frame_chained_attrs(df, clone_spy):
     # This is a weird repr! Bug?
     assert repr(dfi._transform) == "dim('*').pd.A).max("
     assert dfi._depth == 4
+    assert dfi._method is None
 
     assert clone_spy.count == 4
 
+    # _clone(True) in _resolve_accessor in __getattribute__(name='A')
+    assert clone_spy.calls[0].depth == 1
     assert not clone_spy.calls[0].args
     assert clone_spy.calls[0].kwargs == {'copy': True}
 
+    # _clone(True) in _resolve_accessor in __getattribute__(name='max')
+    assert clone_spy.calls[1].depth == 2
     assert len(clone_spy.calls[1].args) == 1
     assert repr(clone_spy.calls[1].args[0]) == "dim('*').pd.A()"
     assert clone_spy.calls[1].kwargs == {'inherit_kwargs': {}}
 
+    # 1st _clone(copy=True) in __call__
+    assert clone_spy.calls[2].depth == 3
     assert not clone_spy.calls[2].args
     assert clone_spy.calls[2].kwargs == {'copy': True}
 
+    # 2nd _clone in __call__
+    assert clone_spy.calls[3].depth == 4
     assert len(clone_spy.calls[3].args) == 1
     assert repr(clone_spy.calls[3].args[0]) == "(dim('*').pd.A()).max()"
     assert clone_spy.calls[3].kwargs == {'plot': False}
@@ -603,12 +761,28 @@ def test_interactive_pandas_out_repr(series):
     assert repr(si._transform) == "dim('*').pd.max()"
     # One _clone from _resolve_accessor, two from _clone
     assert si._depth == 3
+    assert si._method is None
 
     # Equivalent to eval
     out = si._callback()
 
     assert isinstance(out, pd.Series)
     assert out.A == pytest.approx(series.max())
+
+
+def test_interactive_xarray_dataarray_out_repr(dataarray):
+    dai = Interactive(dataarray)
+
+    assert isinstance(dai._current, xr.DataArray)
+    assert dai._obj is dataarray
+    assert repr(dai._transform) == "dim('air')"
+    assert dai._depth == 0
+    assert dai._method is None
+
+    # Equivalent to eval
+    out = dai._callback()
+
+    assert isinstance(out, xr.DataArray)
 
 
 def test_interactive_pandas_out_frame(series):
@@ -620,14 +794,52 @@ def test_interactive_pandas_out_frame(series):
     pd.testing.assert_series_equal(si._current.A, series.head(2))
     assert si._obj is series
     assert repr(si._transform) == "dim('*').pd.head(2)"
-    # One _clone from _resolve_accessor, two from _clone
     assert si._depth == 3
+    assert si._method is None
 
     # Equivalent to eval
     out = si._callback()
 
     assert isinstance(out, pn.pane.DataFrame)
     pd.testing.assert_frame_equal(out.object, si._current)
+
+
+@pytest.mark.xfail(reason='Bug: max_rows is not propagated to the next instance')
+def test_interactive_pandas_out_frame_max_rows(series):
+    si = Interactive(series, max_rows=5)
+    si = si.head(2)
+
+    # Equivalent to eval
+    out = si._callback()
+
+    assert isinstance(out, pn.pane.DataFrame)
+    assert out.max_rows == 5
+
+
+def test_interactive_pandas_out_frame_kwargs(series):
+    si = Interactive(series, width=100)
+    si = si.head(2)
+
+    # Equivalent to eval
+    out = si._callback()
+
+    assert isinstance(out, pn.pane.DataFrame)
+    assert out.width == 100
+
+
+def test_interactive_pandas_out_frame_attrib(df):
+    dfi = Interactive(df)
+    dfi = dfi.A
+
+    assert dfi._method == 'A'
+
+    # Equivalent to eval
+    out = dfi._callback()
+
+    # In that case the default behavior is to return the object transformed
+    # and to which _method is applied
+    assert isinstance(out, pd.Series)
+    pd.testing.assert_series_equal(df.A, out)
 
 
 @pytest.mark.parametrize('op', [
@@ -651,6 +863,7 @@ def test_interactive_pandas_series_operator_unary(series, op):
     assert si._obj is series
     assert repr(si._transform) == f"{op}dim('*')"
     assert si._depth == 2
+    assert si._method is None
 
 
 def test_interactive_pandas_series_operator_unary_invert():  # __invert__
@@ -664,6 +877,7 @@ def test_interactive_pandas_series_operator_unary_invert():  # __invert__
     assert si._obj is series
     assert repr(si._transform) == "dim('*', inv)"
     assert si._depth == 2
+    assert si._method is None
 
 
 @pytest.mark.parametrize('op', [
@@ -703,6 +917,7 @@ def test_interactive_pandas_series_operator_binary(series, op):
     val_repr = '2.0' if isinstance(val, float) else 'True'
     assert repr(si._transform) == f"dim('*').pd{op}{val_repr}"
     assert si._depth == 2
+    assert si._method is None
 
 
 @pytest.mark.xfail()
@@ -737,6 +952,7 @@ def test_interactive_pandas_series_operator_reverse_binary(op):
     val_repr = '2.0' if isinstance(val, float) else 'True'
     assert repr(si._transform) == f"{val_repr}{op}dim('*')"
     assert si._depth == 2
+    assert si._method is None
 
 
 def test_interactive_pandas_series_operator_abs(series):
@@ -749,6 +965,7 @@ def test_interactive_pandas_series_operator_abs(series):
     assert si._obj is series
     assert repr(si._transform) == "absdim('*')"
     assert si._depth == 2
+    assert si._method is None
 
 
 def test_interactive_pandas_series_operator_round(series):
@@ -761,6 +978,7 @@ def test_interactive_pandas_series_operator_round(series):
     assert si._obj is series
     assert repr(si._transform) == "dim('*', round)"
     assert si._depth == 2
+    assert si._method is None
 
 
 def test_interactive_pandas_series_plot(series, clone_spy):
@@ -769,15 +987,26 @@ def test_interactive_pandas_series_plot(series, clone_spy):
     si = si.plot()
 
     assert isinstance(si, Interactive)
+    assert isinstance(si._current, matplotlib.axes.Axes)
+    assert si._obj is series
+    assert "dim('*').pd.plot(ax=<function Interactive._get_ax_fn.<locals>.get_ax" in repr(si._transform)
+    assert si._depth == 3
+    assert si._method is None
 
     assert clone_spy.count == 3
 
+    # _clone(True) in _resolve_accessor in __getattribute__(name='plot')
+    assert clone_spy.calls[0].depth == 1
     assert not clone_spy.calls[0].args
     assert clone_spy.calls[0].kwargs == {'copy': True}
 
+    # 1st _clone(copy=True) in __call__
+    assert clone_spy.calls[1].depth == 2
     assert not clone_spy.calls[1].args
     assert clone_spy.calls[1].kwargs == {'copy': True}
 
+    # 2nd _clone in __call__
+    assert clone_spy.calls[2].depth == 3
     assert len(clone_spy.calls[2].args) == 1
     # Not the complete repr as the function doesn't have a nice repr,
     # its repr displays  the memory address.
@@ -789,3 +1018,240 @@ def test_interactive_pandas_series_plot(series, clone_spy):
 
     # Just test that it doesn't raise any error.
     si.output()
+
+
+def test_interactive_pandas_series_plot_kind_attr(series, clone_spy):
+    # TODO: Not checking the dim reprs in this test as that was
+    # affecting the pipeline.
+    si = Interactive(series)
+
+    si = si.plot.line()
+
+
+    assert isinstance(si, Interactive)
+    assert isinstance(si._current, matplotlib.axes.Axes)
+    assert si._obj is series
+    # assert "dim('*').pd.plot).line(ax=<function Interactive._get_ax_fn.<locals>.get_ax" in repr(si._transform)
+    assert si._depth == 4
+    assert si._method is None
+
+    assert clone_spy.count == 4
+
+    # _clone(True) in _resolve_accessor in __getattribute__(name='plot')
+    assert clone_spy.calls[0].depth == 1
+    assert not clone_spy.calls[0].args
+    assert clone_spy.calls[0].kwargs == {'copy': True}
+
+    # _clone in _resolve_accessor in __getattribute__(name='line')
+    assert clone_spy.calls[1].depth == 2
+    assert len(clone_spy.calls[1].args) == 1
+    # assert repr(clone_spy.calls[1].args[0]) == "dim('*').pd.plot()" 
+    assert len(clone_spy.calls[1].kwargs) == 1
+    assert 'inherit_kwargs' in clone_spy.calls[1].kwargs
+    assert 'ax' in clone_spy.calls[1].kwargs['inherit_kwargs']
+
+    # 1st _clone(copy=True) in __call__
+    assert clone_spy.calls[2].depth == 3
+    assert not clone_spy.calls[2].args
+    assert clone_spy.calls[2].kwargs == {'copy': True}
+
+    # 2nd _clone in __call__
+    assert clone_spy.calls[3].depth == 4
+    assert len(clone_spy.calls[3].args) == 1
+    # assert "(dim('*').pd.plot()).line(ax=<function Interactive._get_ax_fn.<locals>.get_ax" in repr(clone_spy.calls[3].args[0])
+    # TODO: Looks like a bug, 'plot' should be True?
+    assert clone_spy.calls[3].kwargs == {'plot': False}
+
+    assert not si._dmap
+    assert isinstance(si._fig, matplotlib.figure.Figure)
+
+    # Just test that it doesn't raise any error.
+    si.output()
+
+
+
+def test_interactive_pandas_dir_no_type_change(df):
+    dfi = Interactive(df)
+    dfi = dfi.head()
+
+    attrs = dir(dfi)
+
+    assert all(col in attrs for col in list(df.columns))
+    assert 'describe' in attrs
+
+
+def test_interactive_pandas_dir_with_type_change(df):
+    dfi = Interactive(df)
+    dfi = dfi.head().A.head()
+
+    attrs = dir(dfi)
+
+    assert not any(col in attrs for col in  list(df.columns))
+    assert 'T' in attrs
+
+
+@pytest.mark.xfail(reason='hvplot.util.check_library expects the obj to have __module__, which is not true for a float')
+def test_interactive_pandas_dir_with_type_change_to_float(df):
+    dfi = Interactive(df)
+    dfi = dfi.head().A.max()
+
+    attrs = dir(dfi)
+
+    assert not any(col in attrs for col in  list(df.columns))
+    assert 'describe' not in attrs
+    assert 'real' not in attrs
+
+
+def test_interactive_pandas_dir_attrib(df):
+    dfi = Interactive(df)
+    dfi = dfi.head().A
+
+    attrs = dir(dfi)
+
+    assert not any(col in attrs for col in  list(df.columns))
+    assert 'T' in attrs
+
+
+def test_interactive_pandas_layout_default_no_widgets(df):
+    dfi = Interactive(df)
+    dfi = dfi.head()
+
+    assert dfi._center is False
+    assert dfi._loc == 'top_left'
+
+    layout = dfi.layout()
+
+    assert isinstance(layout, pn.Row)
+    assert len(layout) == 1
+
+
+def test_interactive_pandas_layout_default_no_widgets_kwargs(df):
+    dfi = Interactive(df)
+    dfi = dfi.head()
+
+    layout = dfi.layout(width=200)
+
+    assert isinstance(layout, pn.Row)
+    assert layout.width == 200
+
+
+def test_interactive_pandas_layout_default_with_widgets(df):
+    w = pn.widgets.IntSlider(value=2, start=1, end=5)
+    dfi = Interactive(df)
+    dfi = dfi.head(w)
+
+    assert dfi._center is False
+    assert dfi._loc == 'top_left'
+
+    layout = dfi.layout()
+
+    assert isinstance(layout, pn.Row)
+    assert len(layout) == 1
+    assert isinstance(layout[0], pn.Column)
+    assert len(layout[0]) == 2
+    assert isinstance(layout[0][0], pn.Row)
+    assert isinstance(layout[0][1], pn.pane.PaneBase)
+    assert len(layout[0][0]) == 2
+    assert isinstance(layout[0][0][0], pn.Column)
+    assert len(layout[0][0][0]) == 1
+    assert isinstance(layout[0][0][0][0], pn.widgets.Widget)
+    assert isinstance(layout[0][0][1], pn.layout.HSpacer)
+
+
+def test_interactive_pandas_layout_center_with_widgets(df):
+    w = pn.widgets.IntSlider(value=2, start=1, end=5)
+    dfi = df.interactive(center=True)
+    dfi = dfi.head(w)
+
+    assert dfi._center is True
+    assert dfi._loc == 'top_left'
+
+    layout = dfi.layout()
+
+    assert isinstance(layout, pn.Row)
+    assert len(layout) == 3
+    assert isinstance(layout[0], pn.layout.HSpacer)
+    assert isinstance(layout[1], pn.Column)
+    assert isinstance(layout[2], pn.layout.HSpacer)
+    assert len(layout[1]) == 2
+    assert isinstance(layout[1][0], pn.Row)
+    assert isinstance(layout[1][1], pn.Row)
+    assert len(layout[1][0]) == 2
+    assert len(layout[1][1]) == 3
+    assert isinstance(layout[1][0][0], pn.Column)
+    assert len(layout[1][0][0]) == 1
+    assert isinstance(layout[1][0][0][0], pn.widgets.Widget)
+    assert isinstance(layout[1][1][0], pn.layout.HSpacer)
+    assert isinstance(layout[1][1][1], pn.pane.PaneBase)
+    assert isinstance(layout[1][1][2], pn.layout.HSpacer)
+
+
+def test_interactive_pandas_layout_loc_with_widgets(df):
+    w = pn.widgets.IntSlider(value=2, start=1, end=5)
+    dfi = df.interactive(loc='top_right')
+    dfi = dfi.head(w)
+
+    assert dfi._center is False
+    assert dfi._loc == 'top_right'
+
+    layout = dfi.layout()
+
+    assert isinstance(layout, pn.Row)
+    assert len(layout) == 1
+    assert isinstance(layout[0], pn.Column)
+    assert len(layout[0]) == 2
+    assert isinstance(layout[0][0], pn.Row)
+    assert isinstance(layout[0][1], pn.pane.PaneBase)
+    assert len(layout[0][0]) == 2
+    assert isinstance(layout[0][0][0], pn.layout.HSpacer)
+    assert isinstance(layout[0][0][1], pn.Column)
+    assert len(layout[0][0][1]) == 1
+    assert isinstance(layout[0][0][1][0], pn.widgets.Widget)
+
+
+def test_interactive_pandas_eval(df):
+    dfi = Interactive(df)
+    dfi = dfi.head(2)
+
+    pd.testing.assert_frame_equal(dfi.eval(), df.head(2))
+
+
+def test_interactive_pandas_eval_attrib(df):
+    dfi = Interactive(df)
+    dfi = dfi.head(2).A
+
+    pd.testing.assert_series_equal(dfi.eval(), df.head(2).A)
+
+
+def test_interactive_pandas_eval_hvplot(df):
+    dfi = Interactive(df)
+    dfi = dfi.head(2).hvplot(y='A')
+
+    evaled = dfi.eval()
+
+    assert isinstance(evaled, hv.Curve)
+
+
+def test_interactive_pandas_series_widget_value(series):
+    w = pn.widgets.FloatSlider(value=2., start=1., end=5.)
+
+    si = Interactive(series)
+
+    si = si + w.param.value
+
+    assert isinstance(si, Interactive)
+    assert isinstance(si._current, pd.DataFrame)
+    pd.testing.assert_series_equal(si._current.A, series + w.value)
+    assert si._obj is series
+    assert "dim('*').pd+<param.Number object" in repr(si._transform)
+    assert si._depth == 2
+    assert si._method is None
+
+    assert len(si._params) == 1
+    assert si._params[0] is w.param.value
+
+    widgets = si.widgets()
+
+    assert isinstance(widgets, pn.Column)
+    assert len(widgets) == 1
+    assert widgets[0] is w
