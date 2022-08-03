@@ -480,11 +480,6 @@ class hvPlotExplorer(Viewer):
         """
         return self._hvplot.clone()
 
-    def panel(self):
-        """Return the plot wrapped in a Panel HoloViews Pane.
-        """
-        return self._hvpane
-    
     def repr(self, var_name='df'):
         """Return a string representation that can be easily copy-pasted
         in a notebook cell to create a plot from a call to the `.hvplot`
@@ -514,8 +509,8 @@ class hvPlotExplorer(Viewer):
 
         Parameters
         ----------
-        filename: string or IO object
-            The filename or BytesIO/StringIO object to save to
+        filename: string, pathlib.Path or IO object
+            The path or BytesIO/StringIO object to save to
         """
         _hv.save(self._hvplot, filename, **kwargs)
 
@@ -543,11 +538,6 @@ class hvPlotExplorer(Viewer):
             settings['y'] = settings.pop('y_multi')
         settings = {k: v for k, v in sorted(list(settings.items()))}
         return settings
-
-    def widgets(self):
-        """Return the widgets in their Panel Tabs layout.
-        """
-        return self._tabs
 
 
 class hvGeomExplorer(hvPlotExplorer):
