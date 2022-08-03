@@ -804,7 +804,6 @@ def test_interactive_pandas_out_frame(series):
     pd.testing.assert_frame_equal(out.object, si._current)
 
 
-@pytest.mark.xfail(reason='Bug: max_rows is not propagated to the next instance')
 def test_interactive_pandas_out_frame_max_rows(series):
     si = Interactive(series, max_rows=5)
     si = si.head(2)

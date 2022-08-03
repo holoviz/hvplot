@@ -270,7 +270,7 @@ class Interactive:
         else:
             kwargs = dict(self._inherit_kwargs, **dict(self._kwargs, **kwargs))
         return type(self)(self._obj, fn=self._fn, transform=transform, plot=plot, depth=depth,
-                         loc=loc, center=center, dmap=dmap, **kwargs)
+                         loc=loc, center=center, dmap=dmap, max_rows=self._max_rows, **kwargs)
 
     def _repr_mimebundle_(self, include=[], exclude=[]):
         return self.layout()._repr_mimebundle_()
