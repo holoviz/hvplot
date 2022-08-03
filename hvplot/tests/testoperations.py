@@ -3,6 +3,7 @@ import sys
 from unittest import SkipTest
 from parameterized import parameterized
 
+import hvplot.pandas  # noqa
 import numpy as np
 import pandas as pd
 
