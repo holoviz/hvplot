@@ -14,7 +14,7 @@ pytestmark = pytest.mark.skipif(
     reason='Penguins dataset not available on Python 3.6',
 )
 
-df = penguins.data
+df = penguins.data if penguins is not None else None
 
 
 def test_explorer_basic():
