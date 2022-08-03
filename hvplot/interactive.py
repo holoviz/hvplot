@@ -409,10 +409,6 @@ class Interactive:
     def __and__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.and_, other)
-    def __div__(self, other):
-        # TODO: operator.div is only available in Python 2, to be removed.
-        other = other._transform if isinstance(other, Interactive) else other
-        return self._apply_operator(operator.div, other)
     def __eq__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.eq, other)
