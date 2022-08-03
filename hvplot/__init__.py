@@ -28,7 +28,6 @@ Work with the data source you already know and ❤️
 Import the hvplot extension for your data source and optionally set the plotting backend
 
 >>> import hvplot.pandas
->>> # import hvplot
 >>> # hvplot.extension('matplotlib')
 
 Use the `.hvplot` API as you would use the Pandas `.plot` API.
