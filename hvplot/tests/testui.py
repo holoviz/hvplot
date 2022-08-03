@@ -1,14 +1,16 @@
-import sys
-
 import holoviews as hv
 import hvplot.pandas
 import pytest
 
-from bokeh.sampledata import penguins
+try:
+    from bokeh.sampledata import penguins
+except ImportError:
+    penguions = None
+
 from hvplot.ui import hvDataFrameExplorer
 
 pytestmark = pytest.mark.skipif(
-    sys.version_info < (3, 7),
+    penguins is None,
     reason='Penguins dataset not available on Python 3.6',
 )
 
