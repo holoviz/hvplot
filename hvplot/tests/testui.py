@@ -5,7 +5,7 @@ import pytest
 try:
     from bokeh.sampledata import penguins
 except ImportError:
-    penguions = None
+    penguins = None
 
 from hvplot.ui import hvDataFrameExplorer
 
