@@ -378,10 +378,10 @@ class Interactive:
         transform = args[0](transform, *args[3:], **kwargs)
         return new._clone(transform)
 
-    def _apply_operator(self, operator, *args, **kwargs):
+    def _apply_operator(self, operator, *args, reverse=False, **kwargs):
         new = self._resolve_accessor()
         transform = new._transform
-        transform = type(transform)(transform, operator, *args)
+        transform = type(transform)(transform, operator, *args, reverse=reverse)
         return new._clone(transform)
 
     # Builtin functions

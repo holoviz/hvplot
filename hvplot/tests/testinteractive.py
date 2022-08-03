@@ -920,7 +920,6 @@ def test_interactive_pandas_series_operator_binary(series, op):
     assert si._method is None
 
 
-@pytest.mark.xfail()
 @pytest.mark.parametrize('op', [
     '+',  # __radd__
     '&',  # __rand__
