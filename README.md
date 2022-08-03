@@ -53,7 +53,6 @@ Import the hvplot extension for your data source and optionally set the plotting
 
 ```python
 import hvplot.pandas
-# Optional: import hvplot
 # Optional: hvplot.extension('matplotlib') or hvplot.extension('plotly')
 ```
 
