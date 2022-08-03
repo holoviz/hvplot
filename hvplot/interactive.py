@@ -462,7 +462,7 @@ class Interactive:
     # Reverse binary operators
     def __radd__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        return self._apply_operator(operator.div, other, reverse=True)
+        return self._apply_operator(operator.add, other, reverse=True)
     def __rand__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.and_, other, reverse=True)
