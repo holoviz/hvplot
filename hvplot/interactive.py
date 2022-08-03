@@ -80,7 +80,7 @@ class Interactive():
                  loc='top_left', center=False, dmap=False, inherit_kwargs={},
                  max_rows=100, method=None, **kwargs):
         self._init = False
-        if self._fn is not None and depth == 0:
+        if self._fn is not None:
             for _, params in full_groupby(self._fn_params, lambda x: id(x.owner)):
                 params[0].owner.param.watch(self._update_obj, [p.name for p in params])
         self._method = method
@@ -127,7 +127,7 @@ class Interactive():
             parameterized = get_method_owner(self._fn.object)
             deps = parameterized.param.method_dependencies(self._fn.object.__name__)
         return deps
-        
+
     @property
     def _params(self):
         ps = self._fn_params
@@ -169,7 +169,16 @@ class Interactive():
             kwargs = dict(self._kwargs, inherit_kwargs=self._inherit_kwargs, method=self._method, **kwargs)
         else:
             kwargs = dict(self._inherit_kwargs, **dict(self._kwargs, **kwargs))
-        return type(self)(self._obj, fn=self._fn, transform=transform, plot=plot, depth=depth,
+
+        # This is a hack to avoid calling the original bound function multiple times
+        # when cloning. self._obj is updated by the orignal function with depth=0
+        if self._fn:
+            f = pn.panel(pn.bind(lambda *args, **kwargs: self._obj), lazy=True)
+            f.object._dinfo = self._fn.object._dinfo
+        else:
+            f = self._fn
+
+        return type(self)(self._obj, fn=f, transform=transform, plot=plot, depth=depth,
                          loc=loc, center=center, dmap=dmap, **kwargs)
 
     def _repr_mimebundle_(self, include=[], exclude=[]):
