@@ -1,4 +1,3 @@
-import holoviews as hv
 import numpy as np
 import panel as pn
 import param
@@ -26,18 +25,6 @@ GEO_FEATURES = [
 GEO_TILES = list(tile_sources)
 AGGREGATORS = [None, 'count', 'min', 'max', 'mean', 'sum', 'any']
 MAX_ROWS = 10000
-
-
-def _no_axis_hook(plot, element):
-    backend = hv.Store.current_backend
-    if backend == "bokeh":
-        plot.state.axis.visible = False
-        plot.state.grid.visible = False
-
-
-EMPTY_PLOT = pn.pane.HoloViews(
-    hv.Curve(None).opts(hooks=[_no_axis_hook]), sizing_mode='stretch_width', margin=(0, 20, 0, 20)
-)
 
 
 class Controls(Viewer):
@@ -411,7 +398,6 @@ class hvPlotExplorer(Viewer):
             self._layout[1][1] = hvplot
             self._alert.visible = False
         except Exception as e:
-            self._layout[1][1] = EMPTY_PLOT
             self._alert.param.set_param(
                 object=f'**Rendering failed with following error**: {e}',
                 visible=True
