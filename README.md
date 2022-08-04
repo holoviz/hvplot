@@ -1,6 +1,6 @@
 # hvPlot makes data analysis and visualization simple <img src="https://github.com/holoviz/hvplot/blob/master/doc/_static/logo.png?raw=true" style="width:2em;margin-bottom:-15px">
 
-[Home](https://hvplot.holoviz.org/) | [Installation instructions](#installation-instructions) | [Getting Started Guide](https://hvplot.holoviz.org/user_guide/index.html) | [Reference Guides](https://hvplot.holoviz.org/reference/index.html) | [Examples](#examples) | [License](#license) | [Support](#support--feedback)
+[Home](https://hvplot.holoviz.org/) | [Installation instructions](#installation-instructions) | [Getting Started Guide](https://hvplot.holoviz.org/user_guide/index.html) | [Reference Guides](https://hvplot.holoviz.org/reference/index.html) | [Examples](#examples) | [License](#license) | [Support](#support--feedback) | [Contributions](#contributions)
 
 ## hvPlot provides a familiar, high-level API for visualization
 
@@ -125,7 +125,13 @@ hvPlot is completely free and open-source. It is licensed under the [BSD 3-Claus
 | 👩‍💻&nbsp; **Developer Questions**   |  <a href="https://gitter.im/pyviz/pyviz" title="Discuss with developers"> <img src="https://img.shields.io/gitter/room/TechnologyAdvice/Stardust.svg"></a> |
 | 📢&nbsp; **Announcements**  | <a href="https://twitter.com/HoloViz_org" title="Follow hvPlot on Twitter"><img src="https://img.shields.io/twitter/follow/HoloViz_org.svg?style=social&label=Follow"> |
 
-Reach out on [Gitter](https://gitter.im/pyviz/pyviz) if you would like to join the weekly triaging or bi-weekly HoloViz call.
+## Contributions
+
+We would ❤️ to work with you no matter whether you want to contribute to issue management, PRs, documentation, blog posts, community support or social media communication.
+
+To get started with the code or docs check out the [Developer Guide](https://hvplot.holoviz.org/developer_guide/index.html).
+
+Reach out on [Gitter](https://gitter.im/pyviz/pyviz) to discuss with the developers, join the weekly triaging or join the bi-weekly HoloViz call.
 
 ## Project Status
 
