@@ -78,7 +78,7 @@ To get started check out the [user guide](https://hvplot.holoviz.org/user_guide/
 
 ## How to make your data pipeline  `.interactive`
 
-Just add `.interactive` and replace your normal arguments with [Panel widgets](https://panel.holoviz.org/reference/index.html#widgets).
+Just add `.interactive` and replace your normal arguments with [Ipywidgets](https://ipywidgets.readthedocs.io/en/stable/examples/Widget%20List.html) or [Panel widgets](https://panel.holoviz.org/reference/index.html#widgets).
 
 ```python
 import panel as pn
