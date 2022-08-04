@@ -96,7 +96,6 @@ To get started check out the [`.interactive` guide](https://hvplot.holoviz.org/u
 To see the available arguments for a specific `kind` of plot run
 
 ```python
-import hvplot
 hvplot.help(kind='scatter')
 ```
 
