@@ -22,8 +22,8 @@ def test_explorer_basic():
 
     assert isinstance(explorer, hvDataFrameExplorer)
     assert explorer.kind == 'line'
-    assert explorer.x is None
-    assert explorer.y is None
+    assert explorer.x == 'index'
+    assert explorer.y == 'species'
 
 
 def test_explorer_settings():
