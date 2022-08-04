@@ -1,6 +1,6 @@
 # hvPlot makes data analysis and visualization simple <img src="https://github.com/holoviz/hvplot/blob/master/doc/_static/logo.png?raw=true" style="width:2em;margin-bottom:-15px">
 
-[Home](https://hvplot.holoviz.org/) | [Installation instructions](#installation-instructions) | [Getting Started Guide](https://hvplot.holoviz.org/user_guide/index.html) | [Reference Guides](https://hvplot.holoviz.org/reference/index.html) | [Examples](#examples) | [License](#license) | [Support](#support--feedback) | [Contributions](#contributions)
+[Home](https://hvplot.holoviz.org/) | [Installation instructions](#installation-instructions) | [Getting Started Guide](https://hvplot.holoviz.org/user_guide/index.html) | [Reference Guides](https://hvplot.holoviz.org/reference/index.html) | [Examples](#examples) | [License](#license) | [Support](#support--feedback)
 
 ## hvPlot provides a familiar, high-level API for visualization
 
