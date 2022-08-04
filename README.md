@@ -4,7 +4,7 @@
 
 ## hvPlot provides a familiar, high-level API for visualization
 
-The API is based on the familiar 🐼 Pandas `.plot()` API and the innovative `.interactive` API.
+The API is based on the familiar 🐼 Pandas `.plot` API and the innovative `.interactive` API.
 
 <img src="https://github.com/MarcSkovMadsen/awesome-panel-assets/blob/master/images/hvPlot/hvplot-total-intro.gif?raw=true" style="max-height:600px;border-radius:2%;">
 
@@ -74,7 +74,7 @@ df.hvplot()
 
 [<img src="https://github.com/MarcSkovMadsen/awesome-panel-assets/blob/master/images/hvPlot/hvplot-intro-plot.gif?raw=true" style="max-height:300px;border-radius:2%;">](https://hvplot.holoviz.org/user_guide/index.html)
 
-To get started check out the [installation instructions](#installation-instructions), [user guide](https://hvplot.holoviz.org/user_guide/index.html) or the [live user guide on Binder](https://mybinder.org/v2/gh/holoviz/hvplot/v0.8.0?urlpath=lab/tree/examples/user_guide/Introduction.ipynb).
+To get started check out the [user guide](https://hvplot.holoviz.org/user_guide/index.html) or the [live user guide on Binder](https://mybinder.org/v2/gh/holoviz/hvplot/v0.8.0?urlpath=lab/tree/examples/user_guide/Introduction.ipynb).
 
 ## How to make your data pipeline  `.interactive`
 
@@ -113,7 +113,7 @@ In a notebook or ipython environment the usual
 
 ## License
 
-hvPlot is completely free and open-source and licensed under the [BSD 3-Clause License](https://opensource.org/licenses/BSD-3-Clause).
+hvPlot is completely free and open-source. It is licensed under the [BSD 3-Clause License](https://opensource.org/licenses/BSD-3-Clause).
 
 ## Support & Feedback
 
