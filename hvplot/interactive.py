@@ -365,6 +365,22 @@ class Interactive:
         return get_ax
 
     def __call__(self, *args, **kwargs):
+        """
+        The `.interactive` API enhances the API of your favorite data
+        analysis libraries like Pandas, Dask, and xarray by allowing the
+        passing of dynamic widgets as arguments and not just static constants.
+        So when a widget changes, the final output is automatically updated as needed.
+
+        Reference: https://hvplot.holoviz.org/user_guide/Interactive.html
+
+        :Example:
+
+        >>> widget = panel.widgets.IntSlider(value=1, start=1, end=5)
+        >>> dfi = df.interactive
+        >>> dfi.head(widget)
+
+        """
+
         if self._method is None:
             if self._depth == 0:
                 # This code path is entered when initializing an interactive
