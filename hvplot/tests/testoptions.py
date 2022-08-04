@@ -1,20 +1,13 @@
 import hvplot
 import holoviews as hv
 import numpy as np
+import pandas as pd
 import pytest
+import xarray as xr
 
 from holoviews import Store
 from holoviews.core.options import Options, OptionTree
-
-try:
-    import pandas as pd
-except ImportError:
-    pd = None
-
-try:
-    import xarray as xr
-except ImportError:
-    xr = None
+from packaging.version import Version
 
 
 @pytest.fixture(scope='class')
@@ -54,7 +47,6 @@ def symmetric_df():
                                         columns=['x', 'y', 'number'])
 
 
-@pytest.mark.skipif(pd is None, reason='Pandas not available')
 @pytest.mark.usefixtures('load_pandas_accessor')
 class TestOptions:
 
@@ -500,7 +492,6 @@ def ds2(da, da2):
     return xr.Dataset(dict(foo=da, bar=da2))
 
 
-@pytest.mark.skipif(xr is None, reason='Xarray not available')
 @pytest.mark.usefixtures('load_xarray_accessor')
 class TestXarrayTitle:
 
@@ -553,4 +544,8 @@ class TestXarrayTitle:
         ds_sel = ds2.sel(time=0, band=0, x=0, y=0)
         plot = ds_sel.hvplot.scatter(x='foo', y='bar')  # Image plot
         opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['title'] == 'y = 0, x = 0, time = 0, band = 0'
+        # First assertion to remove when support for Python 3.7 is dropped.
+        if Version(xr.__version__) < Version('2022.6.0'):
+            assert opts.kwargs['title'] == 'y = 0, x = 0, time = 0, band = 0'
+        else:
+            assert opts.kwargs['title'] == 'time = 0, y = 0, x = 0, band = 0'

@@ -1,3 +1,60 @@
+"""
+hvPlot makes data analysis and visualization simple
+===================================================
+
+hvPlot provides an easy to use high-level API for visualization, based on the 🐼 Pandas .plot() API
+that works across a wide range of data sources and plotting backends.
+
+hvPlot
+
+- supports a wide range of data sources including Pandas, Dask, XArray
+Rapids cuDF, Streamz, Intake, Geopandas, NetworkX and Ibis.
+- supports the plotting backends Bokeh (default), Matplotlib and Plotly.
+- exposes the powerful tools from the HoloViz ecosystem in a familiar and convenient API, while letting you drop down into the underlying HoloViz tools when more power or flexibility is needed.
+
+To learn more check out https://hvplot.holoviz.org/. To report issues or contribute go to
+https://github.com/holoviz/hvplot. To join the community go to
+https://discourse.holoviz.org/.
+
+How to use hvPlot in 3 simple steps
+-----------------------------------
+
+Work with the data source you already know and ❤️
+
+>>> import pandas as pd, numpy as np
+>>> idx = pd.date_range('1/1/2000', periods=1000)
+>>> df  = pd.DataFrame(np.random.randn(1000, 4), index=idx, columns=list('ABCD')).cumsum()
+
+Import the hvplot extension for your data source
+
+>>> import hvplot.pandas
+
+Use the `.hvplot` API as you would use the Pandas `.plot` API.
+
+>>> curves = df.hvplot()
+>>> curves
+
+In a Jupyter Notebook, this will display a line plot of the
+A, B, C and D time series.
+
+For more check out the user guide https://hvplot.holoviz.org/user_guide/index.html
+
+How to get help
+---------------
+
+To see the available arguments for a specific `kind` of plot run
+
+>>> import hvplot
+>>> hvplot.help(kind='scatter')
+
+In a notebook or ipython environment the usual
+
+- `help` and `?` will provide you with documentation.
+- `TAB` and `SHIFT+TAB` completion will help you navigate.
+
+To ask the community go to https://discourse.holoviz.org/.
+To report issues go to https://github.com/holoviz/holoviews.
+"""
 import inspect
 import textwrap
 
@@ -105,12 +162,7 @@ def help(kind=None, docstring=True, generic=True, style=True):
 
 def post_patch(extension='bokeh', logo=False):
     if extension and not getattr(_hv.extension, '_loaded', False):
-        if getattr(_pn.extension, '_loaded', False):
-            ext = _hv.extension._backends[extension]
-            __import__('holoviews.plotting.%s' % ext)
-            _hv.Store.set_current_backend(extension)
-        else:
-            hvplot_extension(extension, logo=logo)
+        hvplot_extension(extension, logo=logo)
 
 
 def _patch_doc(cls, kind, signature=None):
