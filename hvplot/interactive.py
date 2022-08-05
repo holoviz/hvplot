@@ -400,10 +400,10 @@ class Interactive:
         transform = args[0](transform, *args[3:], **kwargs)
         return new._clone(transform)
 
-    def _apply_operator(self, operator, *args, **kwargs):
+    def _apply_operator(self, operator, *args, reverse=False, **kwargs):
         new = self._resolve_accessor()
         transform = new._transform
-        transform = type(transform)(transform, operator, *args)
+        transform = type(transform)(transform, operator, *args, reverse=reverse)
         return new._clone(transform)
 
     # Builtin functions
@@ -431,10 +431,6 @@ class Interactive:
     def __and__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.and_, other)
-    def __div__(self, other):
-        # TODO: operator.div is only available in Python 2, to be removed.
-        other = other._transform if isinstance(other, Interactive) else other
-        return self._apply_operator(operator.div, other)
     def __eq__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.eq, other)
@@ -484,7 +480,7 @@ class Interactive:
     # Reverse binary operators
     def __radd__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        return self._apply_operator(operator.div, other, reverse=True)
+        return self._apply_operator(operator.add, other, reverse=True)
     def __rand__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.and_, other, reverse=True)
