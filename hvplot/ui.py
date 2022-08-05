@@ -469,7 +469,7 @@ class hvPlotExplorer(Viewer):
                 })),
                 ('Style', self.style),
                 ('Operations', self.operations),
-                ('Geo', self.geo)
+                # ('Geo', self.geo)
             ]
             if event and event.new not in ('area', 'kde', 'line', 'ohlc', 'rgb', 'step'):
                 tabs.insert(5, ('Colormapping', self.colormapping))
