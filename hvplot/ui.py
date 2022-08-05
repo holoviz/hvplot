@@ -300,6 +300,8 @@ class hvPlotExplorer(Viewer):
 
     groupby = param.ListSelector(default=[])
 
+    # Controls that will show up as new tabs, must be ClassSelector
+
     axes = param.ClassSelector(class_=Axes)
 
     colormapping = param.ClassSelector(class_=Colormapping)
@@ -337,7 +339,14 @@ class hvPlotExplorer(Viewer):
             **{k: v for k, v in params.items() if k not in ('x', 'y', 'y_multi')}
         )
         controller_params = {}
-        for cls in param.concrete_descendents(Controls).values():
+        # Assumes the controls aren't passed on instantiation.
+        controls = [
+            p.class_
+            for p in self.param.params().values()
+            if isinstance(p, param.ClassSelector)
+            and issubclass(p.class_, Controls)
+        ]
+        for cls in controls:
             controller_params[cls] = {
                 k: params.pop(k) for k, v in dict(params).items()
                 if k in cls.param
