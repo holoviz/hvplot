@@ -873,6 +873,17 @@ def test_interactive_pandas_out_frame_kwargs(series):
     assert out.width == 100
 
 
+def test_interactive_pandas_out_frame_kwargs_accessor_called(series):
+    si = series.interactive(width=100)
+    si = si.head(2)
+
+    # Equivalent to eval
+    out = si._callback()
+
+    assert isinstance(out, pn.pane.DataFrame)
+    assert out.width == 100
+
+
 def test_interactive_pandas_out_frame_attrib(df):
     dfi = Interactive(df)
     dfi = dfi.A
