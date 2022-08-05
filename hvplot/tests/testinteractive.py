@@ -863,25 +863,25 @@ def test_interactive_pandas_out_frame_max_rows_accessor_called(series):
 
 
 def test_interactive_pandas_out_frame_kwargs(series):
-    si = Interactive(series, width=100)
+    si = Interactive(series, width=111)
     si = si.head(2)
 
     # Equivalent to eval
     out = si._callback()
 
     assert isinstance(out, pn.pane.DataFrame)
-    assert out.width == 100
+    assert out.width == 111
 
 
 def test_interactive_pandas_out_frame_kwargs_accessor_called(series):
-    si = series.interactive(width=100)
+    si = series.interactive(width=111)
     si = si.head(2)
 
     # Equivalent to eval
     out = si._callback()
 
     assert isinstance(out, pn.pane.DataFrame)
-    assert out.width == 100
+    assert out.width == 111
 
 
 def test_interactive_pandas_out_frame_attrib(df):
