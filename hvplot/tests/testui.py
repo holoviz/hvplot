@@ -46,7 +46,7 @@ def test_explorer_settings():
     )
 
 
-def test_explorer_repr():
+def test_explorer_plot_code():
     explorer = hvplot.explorer(df)
 
     explorer.param.set_param(
@@ -56,13 +56,13 @@ def test_explorer_repr():
         by=['species'],
     )
 
-    hvrepr = explorer.repr()
+    hvplot_code = explorer.plot_code()
 
-    assert hvrepr == "df.hvplot(by=['species'], kind='scatter', x='bill_length_mm', y=['bill_depth_mm'])"
+    assert hvplot_code == "df.hvplot(by=['species'], kind='scatter', x='bill_length_mm', y=['bill_depth_mm'])"
     
-    hvrepr = explorer.repr(var_name='othername')
+    hvplot_code = explorer.plot_code(var_name='othername')
 
-    assert hvrepr == "othername.hvplot(by=['species'], kind='scatter', x='bill_length_mm', y=['bill_depth_mm'])"
+    assert hvplot_code == "othername.hvplot(by=['species'], kind='scatter', x='bill_length_mm', y=['bill_depth_mm'])"
 
 
 def test_explorer_hvplot():

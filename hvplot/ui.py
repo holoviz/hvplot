@@ -489,12 +489,12 @@ class hvPlotExplorer(Viewer):
         """
         return self._hvplot.clone()
 
-    def repr(self, var_name='df'):
+    def plot_code(self, var_name='df'):
         """Return a string representation that can be easily copy-pasted
         in a notebook cell to create a plot from a call to the `.hvplot`
         accessor, and that includes all the customized settings of the explorer.
 
-        >>> hvexplorer(var_name='data')
+        >>> hvexplorer.plot_code(var_name='data')
         "data.hvplot(x='time', y='value')"
 
         Parameters
