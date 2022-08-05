@@ -851,6 +851,17 @@ def test_interactive_pandas_out_frame_max_rows(series):
     assert out.max_rows == 5
 
 
+def test_interactive_pandas_out_frame_max_rows_accessor_called(series):
+    si = series.interactive(max_rows=5)
+    si = si.head(2)
+
+    # Equivalent to eval
+    out = si._callback()
+
+    assert isinstance(out, pn.pane.DataFrame)
+    assert out.max_rows == 5
+
+
 def test_interactive_pandas_out_frame_kwargs(series):
     si = Interactive(series, width=100)
     si = si.head(2)
