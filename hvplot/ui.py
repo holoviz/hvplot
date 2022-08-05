@@ -356,7 +356,7 @@ class hvPlotExplorer(Viewer):
         self._converter = converter
         self._controls = pn.Param(
             self.param, parameters=['kind', 'x', 'y', 'by', 'groupby'],
-            sizing_mode='stretch_width', max_width=300
+            sizing_mode='stretch_width', max_width=300, show_name=False,
         )
         self.param.watch(self._toggle_controls, 'kind')
         self.param.watch(self._check_y, 'y_multi')
@@ -472,10 +472,10 @@ class hvPlotExplorer(Viewer):
                 ('Axes', pn.Param(self.axes, widgets={
                     'xlim': {'throttled': True},
                     'ylim': {'throttled': True}
-                })),
+                }, show_name=False)),
                 ('Labels', pn.Param(self.labels, widgets={
                     'rot': {'throttled': True}
-                })),
+                }, show_name=False)),
                 ('Style', self.style),
                 ('Operations', self.operations),
                 # ('Geo', self.geo)
