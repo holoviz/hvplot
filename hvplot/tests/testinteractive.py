@@ -223,26 +223,62 @@ def test_interactive_pandas_dataframe_hvplot_accessor_dmap_kind_widget(df):
 
 
 def test_interactive_with_bound_function_calls():
-    df = pd.DataFrame({"species": [1, 1, 2, 2], "sex": 2 * ["MALE", "FEMALE"]})
+    df = pd.DataFrame({"species": [1, 1, 1, 2, 2, 2], "sex": 3 * ["MALE", "FEMALE"]})
 
     w_species = pn.widgets.Select(name='Species', options=[1, 2])
     w_sex = pn.widgets.MultiSelect(name='Sex', value=['MALE'], options=['MALE', 'FEMALE'])
 
-    def load_data(species):
-        """Simluate loading data from e.g a database or from a web API."""
-        data = df.loc[df['species'] == species]
-        load_data.COUNT += 1
-        return data
+    def load_data(species, watch=True):
+        if watch:
+            load_data.COUNT += 1
+        return df.loc[df['species'] == species]
 
     load_data.COUNT = 0
 
     # Setting up interactive with a function
     dfi = bind(load_data, w_species).interactive()
+    dfi = dfi.loc[dfi['sex'].isin(w_sex)]
+
+    out = dfi.output()
+
+    assert isinstance(out, pn.param.ParamFunction)
+    assert isinstance(out._pane, pn.pane.DataFrame)
+    pd.testing.assert_frame_equal(
+        out._pane.object,
+        load_data(w_species.value, watch=False).loc[df['sex'].isin(w_sex.value)]
+    )
+
     (dfi.loc[dfi['sex'].isin(w_sex)])
     assert load_data.COUNT ==  1
 
-    # w_species.value = 2
-    # assert load_data.COUNT == 2
+    w_species.value = 2
+
+    pd.testing.assert_frame_equal(
+        out._pane.object,
+        load_data(w_species.value, watch=False).loc[df['sex'].isin(w_sex.value)]
+    )
+
+    assert load_data.COUNT == 2
+
+    dfi = dfi.head(1)
+
+    assert load_data.COUNT == 2
+
+    out = dfi.output()
+
+    pd.testing.assert_frame_equal(
+        out._pane.object,
+        load_data(w_species.value, watch=False).loc[df['sex'].isin(w_sex.value)].head(1)
+    )
+
+    w_species.value = 1
+
+    pd.testing.assert_frame_equal(
+        out._pane.object,
+        load_data(w_species.value, watch=False).loc[df['sex'].isin(w_sex.value)].head(1)
+    )
+
+    assert load_data.COUNT == 3
 
 
 def test_interactive_pandas_series_init(series, clone_spy):
@@ -920,7 +956,6 @@ def test_interactive_pandas_series_operator_binary(series, op):
     assert si._method is None
 
 
-@pytest.mark.xfail()
 @pytest.mark.parametrize('op', [
     '+',  # __radd__
     '&',  # __rand__

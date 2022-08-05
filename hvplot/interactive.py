@@ -157,27 +157,25 @@ class Interactive:
             if subcls.applies(obj):
                 clss = subcls
         inst = super(Interactive, cls).__new__(clss)
-        inst._obj = obj
+        inst._shared_obj = kwargs.get('_shared_obj', [obj])
         inst._fn = fn
         return inst
 
     @classmethod
     def applies(cls, obj):
         """
-        Subclasses must implement applies and return a boolean to indicates
+        Subclasses must implement applies and return a boolean to indicate
         wheter the subclass should apply or not to the obj.
         """
         return True
 
     def __init__(self, obj, transform=None, fn=None, plot=False, depth=0,
                  loc='top_left', center=False, dmap=False, inherit_kwargs={},
-                 max_rows=100, method=None, **kwargs):
+                 max_rows=100, method=None, _shared_obj=None, **kwargs):
         # _init is used to prevent to __getattribute__ to execute its
         # specialized code.
         self._init = False
-        if self._fn is not None:
-            for _, params in full_groupby(self._fn_params, lambda x: id(x.owner)):
-                params[0].owner.param.watch(self._update_obj, [p.name for p in params])
+        self._set_fn_watchers(depth)
         self._method = method
         if transform is None:
             dim = '*'
@@ -211,7 +209,31 @@ class Interactive:
         self._init = True
         self.hvplot = _hvplot(self)
 
+    @property
+    def _obj(self):
+        return self._shared_obj[0]
+
+    @_obj.setter
+    def _obj(self, obj):
+        if self._shared_obj is None:
+            self._shared_obj = [obj]
+        else:
+            self._shared_obj[0] = obj
+
+    def _set_fn_watchers(self, depth):
+        """
+        self._update_obj is set as a callback, watching the parameters that
+        control fn. Even if _set_fn_watchers is called on every instantiation,
+        the watchers should only be set once in a pipeline to avoid multiple
+        callbacks to be called whenever a fn parameter changes. This is why
+        it is only applied to the root instance.
+        """
+        if self._fn is not None and depth == 0:
+            for _, params in full_groupby(self._fn_params, lambda x: id(x.owner)):
+                params[0].owner.param.watch(self._update_obj, [p.name for p in params])
+
     def _update_obj(self, *args):
+        """Update the original pipeline object."""
         self._obj = self._fn.eval(self._fn.object)
 
     @property
@@ -270,7 +292,7 @@ class Interactive:
         else:
             kwargs = dict(self._inherit_kwargs, **dict(self._kwargs, **kwargs))
         return type(self)(self._obj, fn=self._fn, transform=transform, plot=plot, depth=depth,
-                         loc=loc, center=center, dmap=dmap, **kwargs)
+                         loc=loc, center=center, dmap=dmap, _shared_obj=self._shared_obj, **kwargs)
 
     def _repr_mimebundle_(self, include=[], exclude=[]):
         return self.layout()._repr_mimebundle_()
@@ -378,10 +400,10 @@ class Interactive:
         transform = args[0](transform, *args[3:], **kwargs)
         return new._clone(transform)
 
-    def _apply_operator(self, operator, *args, **kwargs):
+    def _apply_operator(self, operator, *args, reverse=False, **kwargs):
         new = self._resolve_accessor()
         transform = new._transform
-        transform = type(transform)(transform, operator, *args)
+        transform = type(transform)(transform, operator, *args, reverse=reverse)
         return new._clone(transform)
 
     # Builtin functions
@@ -409,10 +431,6 @@ class Interactive:
     def __and__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.and_, other)
-    def __div__(self, other):
-        # TODO: operator.div is only available in Python 2, to be removed.
-        other = other._transform if isinstance(other, Interactive) else other
-        return self._apply_operator(operator.div, other)
     def __eq__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.eq, other)
@@ -462,7 +480,7 @@ class Interactive:
     # Reverse binary operators
     def __radd__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
-        return self._apply_operator(operator.div, other, reverse=True)
+        return self._apply_operator(operator.add, other, reverse=True)
     def __rand__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.and_, other, reverse=True)
