@@ -38,7 +38,7 @@ def explorer(data, **kwargs):
 
     Parameters
     ----------
-    data : pandas.DataFrame, geopandas.DataFrame
+    data : pandas.DataFrame
         Data structure to explore.
 
     Returns
@@ -306,7 +306,8 @@ class hvPlotExplorer(Viewer):
 
     labels = param.ClassSelector(class_=Labels)
 
-    geo = param.ClassSelector(class_=Geo)
+    # Hide the geo tab until it's better supported
+    # geo = param.ClassSelector(class_=Geo)
 
     operations = param.ClassSelector(class_=Operations)
 
@@ -315,9 +316,11 @@ class hvPlotExplorer(Viewer):
     @classmethod
     def from_data(cls, data, **params):
         if is_geodataframe(data):
-            cls = hvGeomExplorer
+            # cls = hvGeomExplorer
+            raise TypeError('GeoDataFrame objects not yet supported.')
         elif is_xarray(data):
-            cls = hvGridExplorer
+            # cls = hvGridExplorer
+            raise TypeError('Xarray objects not yet supported.')
         else:
             cls = hvDataFrameExplorer
         return cls(data, **params)
