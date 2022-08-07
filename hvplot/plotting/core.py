@@ -668,12 +668,17 @@ class hvPlot(hvPlotTabular):
         """
         Image plot
 
-        You can very often use `image` to display an x, y grid, An example could be geographic
+        You can very often use `image` to display an x, y grid, like for example geographic
         data with `latitude` and `longitude` coordinates.
 
         Reference: https://hvplot.holoviz.org/reference/xarray/image.html
 
-        :example:
+        Example:
+
+        >>> import hvplot.xarray
+        >>> import xarray as xr
+        >>> ds = xr.tutorial.open_dataset('air_temperature')
+        >>> ds.hvplot.image(x='lon', y='lat', z='air', groupby='time', cmap='kbc_r')
 
         Parameters
         ----------
