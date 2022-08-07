@@ -235,7 +235,7 @@ def bind(function, *args, **kwargs):
     ...     # Loading data for the given experiment ...
     ...     return pd.DataFrame({"x": list(range(0,experiment))})
 
-    >>> hvplot.bind(get_data,experiment=experiment).interactive().head(n=rows)
+    >>> hvplot.bind(get_data, experiment=experiment).interactive().head(n=rows)
 
     In a notebook or data app you can now use the `experiment` and `rows` sliders to visualize
     your data interactively as a line plot.
