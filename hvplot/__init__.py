@@ -209,6 +209,54 @@ extension = hvplot_extension
 
 @_wraps(_pn.bind)
 def bind(function, *args, **kwargs):
+    """
+    Returns a *reactive* function that *depends* on widgets, parameters or Python objects.
+    This means that the "reactive" function can be automatically invoked whenever the underlying
+    widget or parameter values change. The widgets can be Panel or IpyWidgets.
+    
+    `hv.bind` can be **used to start your `.interactive` pipeline** by loading data depending
+    on widgets or pameters values.
+    
+    Reference: https://github.com/holoviz/hvplot/issues/825
+
+    :Example:
+
+    >>> import pandas as pd
+    >>> import panel as pn
+
+    >>> import hvplot
+
+    >>> pn.extension()
+
+    >>> experiment = pn.widgets.IntSlider(value=5, start=0, end=10, step=1, name="Experiment")
+    >>> rows = pn.widgets.IntSlider(value=5, start=0, end=10, step=1, name="Rows")
+
+    >>> def get_data(experiment):
+    ...     # Loading data for the given experiment ...
+    ...     return pd.DataFrame({"x": list(range(0,experiment))})
+
+    >>> hvplot.bind(get_data,experiment=experiment).interactive().head(n=rows)
+
+    In a notebook or data app you can now use the `experiment` and `rows` sliders to visualize
+    your data interactively as a line plot.
+
+    This function is the same as `panel.bind`, but extended by adding the `.interactive` method to
+    the *reactive* function returned.
+
+    Arguments
+    ---------
+    function: callable
+        The function to bind constant or dynamic args and kwargs to.
+    args: object, param.Parameter, panel.widget.Widget, or ipywidget
+        Positional arguments to bind to the function.
+    kwargs: object, param.Parameter, panel.widget.Widget, or ipywidget
+        Keyword arguments to bind to the function.
+
+    Returns
+    -------
+    Returns a new function with the args and kwargs bound to it and
+        annotated with all dependencies.
+    """
     bound = _pn.bind(function, *args, **kwargs)
     bound.interactive = lambda **kwargs: Interactive(bound, **kwargs)
     return bound
