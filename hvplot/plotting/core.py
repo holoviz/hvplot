@@ -598,6 +598,42 @@ class hvPlotTabular(hvPlotBase):
         return self(x, y, text=text, kind='labels', **kwds)
 
 class hvPlot(hvPlotTabular):
+    """hvPlot provides methods like `.line`, `step`, `scatter` etc. to plot your tabular
+    data source. These methods works just like the familiar Pandas `.plot` function.
+    
+    `hvPlot` supports a wide range of data sources and plotting backends.
+
+    `hvPlot` is available as `.hvplot` on your data source after you have imported the appropriate
+    backend.
+    
+    Example: `.hvplot`   
+
+    >>> import pandas as pd
+    >>> import hvplot.pandas
+
+    >>> x=y=list(range(0, 10))
+    >>> df = pd.DataFrame({"observation": x, "value": y})
+
+    >>> df.hvplot.scatter(x="observation", y="value")
+    >>> # or
+    >>> df.hvplot(x="observation", y="value", kind="scatter")
+    
+    Example: `hvPlot`
+
+    >>> import pandas as pd
+    >>> from hvplot import hvPlot
+
+    >>> x=y=list(range(0, 10))
+    >>> df = pd.DataFrame({"observation": x, "value": y})
+
+    >>> hvPlot(df).scatter(x="observation", y="value")
+
+    We recommend using 
+    
+    - `.hvplot` in a notebook environment as its very familiar to DataFrame users.
+    - `hvPlot` in editors like VS Code because it provides better tooltips and TAB completion.
+
+    """
     __all__ = [
         'line',
         'step',
@@ -632,17 +668,25 @@ class hvPlot(hvPlotTabular):
         """
         Image plot
 
+        You can very often use `image` to display an x, y grid, An example could be geographic
+        data with `latitude` and `longitude` coordinates.
+
+        Reference: https://hvplot.holoviz.org/reference/xarray/image.html
+
+        :example:
+
         Parameters
         ----------
-        x, y : string, optional
-            The coordinate variable along the x- and y-axis
+        x : string, optional
+            The coordinate variable along the x-axis
+        y : string, optional
+            The coordinate variable along the y-axis
         z : string, optional
             The data variable to plot
         colorbar: boolean
             Whether to display a colorbar
-        **kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+        kwds : optional
+            To see all the keyword arguments available, run `hvplot.help('image')`.
         Returns
         -------
         obj : HoloViews object
