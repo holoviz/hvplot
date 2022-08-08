@@ -33,13 +33,16 @@ class hvPlotBase:
 
         Parameters
         ----------
-        x, y : string, list, or array-like, optional
-            Field name(s) in the data to draw x- and y-positions from
+        x : string, list, or array-like, optional
+            Field name(s) to draw x-positions from
+        y : string, list, or array-like, optional
+            Field name(s) to draw y-positions from
         kind : string, optional
             The kind of plot to generate, e.g. 'line', 'scatter', etc.
         **kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('scatter')` or similar
+            depending on the type of plot.
+        
         Returns
         -------
         HoloViews object: Object representing the requested visualization
@@ -143,48 +146,116 @@ class hvPlotTabular(hvPlotBase):
 
     def line(self, x=None, y=None, **kwds):
         """
-        Line plot
+        The `line` plot connect the points with a continous curve. It is useful when data is
+        continuous and has a continuous axis.
+
+        Reference: https://hvplot.holoviz.org/reference/pandas/line.html
+
+        Wiki: https://en.wikipedia.org/wiki/Line_chart
+
+        Example:
+
+        >>> import hvplot.pandas
+        >>> from bokeh.sampledata.degrees import data as deg
+        >>> line = deg.hvplot.line(
+        ...     x='Year', y=['Art and Performance', 'Business', 'Biology', 'Education', 'Computer Science'],
+        ...     value_label='% of Degrees Earned by Women', legend='top', height=500, width=620
+        ... )
+        >>> line
+
+        You can can add *markers* to a `line` plot by overlaying with a `scatter` plot.
+
+        >>> scatter = deg.hvplot.scatter(
+        ...     x='Year', y=['Art and Performance', 'Business', 'Biology', 'Education', 'Computer Science'],
+        ...     value_label='% of Degrees Earned by Women', legend='top', height=500, width=620
+        ... )
+        >>> line * scatter
 
         Parameters
         ----------
-        x, y : string, optional
-            Field name to draw x- and y-positions from
+        x : string, optional
+            Field name to draw x-positions from
+        y : string, optional
+            Field name to draw y-positions from
         **kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('line')`.
+                
         Returns
         -------
-        HoloViews object: Object representing the requested visualization
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(x, y, kind='line', **kwds)
 
     def step(self, x=None, y=None, where='mid', **kwds):
         """
-        Step plot
+        The `step` plot can be used pretty much anytime the `line` plot might be used, and has many
+        of the same options available.
+
+        Reference: https://hvplot.holoviz.org/reference/pandas/step.html
+
+        Wiki: #Todo: Find a link
+        
+        Example:
+
+        >>> import hvplot.pandas
+        >>> from bokeh.sampledata.degrees import data as deg
+        >>> deg.sample(n=5)
+        >>> deg.hvplot.step(
+        ...     x='Year',
+        ...     y=['Art and Performance', 'Business', 'Biology', 'Education', 'Computer Science'], 
+        ...     value_label='% of Degrees Earned by Women', legend='top', height=500, width=620
+        ... )
 
         Parameters
         ----------
-        x, y : string, optional
-            Field name to draw x- and y-positions from
+        x : string, optional
+            Field name to draw x-positions from
+        y : string, optional
+            Field name to draw y-positions from
         where : string, optional
             Defines where the steps are placed (options: 'mid' (default), 'pre' and 'post')
         **kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('step')`.
+        
         Returns
         -------
-        HoloViews object: Object representing the requested visualization
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(x, y, kind='step', where=where, **kwds)
 
     def scatter(self, x=None, y=None, **kwds):
         """
-        Scatter plot
+        The `scatter` plot is a good first way to plot data with non continuous axes.
+        
+        Todo: Figure out why "non continous axes"
+
+        Reference: https://hvplot.holoviz.org/reference/pandas/scatter.html
+
+        Wiki: https://en.wikipedia.org/wiki/Scatter_plot
+
+        Example:
+
+        >>> import hvplot.pandas
+        >>> from bokeh.sampledata.iris import flowers as df
+        >>> df.hvplot.scatter(
+        ...     x='sepal_length', y='sepal_width', by='species', 
+        ...     legend='top', height=400, width=400
+        ... )
+
+        The points will be grouped and color coded `by` the categorical values in the 'species'
+        column.
 
         Parameters
+
         ----------
-        x, y : string, optional
-            Field name to draw x- and y-positions from
+        x : string, optional
+            Field name to draw x-positions from
+        y : string, optional
+            Field name to draw y-positions from
         c: string, optional
             Name of the field to color points by
         s: string, optional
@@ -192,18 +263,26 @@ class hvPlotTabular(hvPlotBase):
         scale: number, optional
             Scaling factor to apply to point scaling
         **kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('scatter')`.
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(x, y, kind='scatter', **kwds)
 
     def area(self, x=None, y=None, y2=None, stacked=True, **kwds):
         """
-        Area plot
+        The `area` plot can be used to color the area under a line or to color the space between two
+        lines.
+
+        Reference: https://hvplot.holoviz.org/reference/pandas/area.html
+
+        Wiki: https://en.wikipedia.org/wiki/Area_chart
+
+        Example:
 
         Parameters
         ----------
@@ -212,12 +291,13 @@ class hvPlotTabular(hvPlotBase):
         stacked : boolean
             Whether to stack multiple areas
         **kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('area')`.
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         if 'alpha' not in kwds and not stacked:
             kwds['alpha'] = 0.5
@@ -225,7 +305,12 @@ class hvPlotTabular(hvPlotBase):
 
     def errorbars(self, x=None, y=None, yerr1=None, yerr2=None, **kwds):
         """
-        ErrorBars plot
+        The `errorbars` plot can be used for plotting the `mean` and `std`. `errorbars` is most
+        helpful when overlayed with other plot types. To do this you can use the * operator.
+
+        Reference: https://hvplot.holoviz.org/reference/pandas/errorbars.html
+
+        Example:
 
         Parameters
         ----------
@@ -236,19 +321,24 @@ class hvPlotTabular(hvPlotBase):
         yerr2 : string, optional
             Field name to draw positive errors from
         **kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('errorbars')`.
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(x, y, kind='errorbars',
                     yerr1=yerr1, yerr2=yerr2, **kwds)
 
     def ohlc(self, x=None, y=None, **kwds):
         """
-        OHLC
+        The `ohlc` plot visualizes the open, high, low and close prices of stocks and other assets.
+
+        Reference: https://hvplot.holoviz.org/reference/pandas/ohlc.html
+
+        Example:
 
         Parameters
         ----------
@@ -257,23 +347,34 @@ class hvPlotTabular(hvPlotBase):
         y: list or tuple, optional
             Field names of the OHLC columns
         **kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('ohlc')`.
+        
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(kind='ohlc', x=x, y=y, **kwds)
 
     def heatmap(self, x=None, y=None, C=None, colorbar=True, **kwds):
         """
-        HeatMap plot
+        The `heatmap` plot shows the magnitude of a phenomenon as color coded cells in a two
+        dimensional matrix.
+
+        Reference: https://hvplot.holoviz.org/reference/pandas/heatmap.html
+        
+        Wiki: https://en.wikipedia.org/wiki/Heat_map
+
+        Example:
 
         Parameters
         ----------
-        x, y : string, optional
-            Field name to draw x- and y-positions from
+        x : string, optional
+            Field name to draw x-positions from
+        y : string, optional
+            Field name to draw y-positions from
         C : string
             Field to draw heatmap color from
         colorbar: boolean
@@ -281,23 +382,41 @@ class hvPlotTabular(hvPlotBase):
         reduce_function : function
             Function to compute statistics for heatmap
         **kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('heatmap')`.
+        
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj : Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(x, y, kind='heatmap', C=C, colorbar=colorbar, **kwds)
 
     def hexbin(self, x=None, y=None, C=None, colorbar=True, **kwds):
         """
-        HexBin plot
+        The `hexbin` plot uses hexagons to split the area into several parts and attribute a color
+        to it.
+        
+        The graphic area is divided into a multitude of hexagons
+        and the number of data points in each is counted and represented using a color gradient.
+        This chart is used to visualize density, where hexagon as a shape permits to create
+        contiguous areas easily while dividing the whole space into discrete units.
+
+        `hexbin` offers a straightforward method for plotting dense data.
+
+        Reference: https://hvplot.holoviz.org/reference/pandas/hexbin.html
+        
+        Wiki: https://think.design/services/data-visualization-data-design/hexbin/
+
+        Example:
 
         Parameters
         ----------
-        x, y : string, optional
-            Field name to draw x- and y-positions from
+        x : string, optional
+            Field name to draw x-positions from
+        y : string, optional
+            Field name to draw y-positions from
         C : string
             Field to draw heatmap color from
         colorbar: boolean
@@ -308,72 +427,125 @@ class hvPlotTabular(hvPlotBase):
             The display threshold before a bin is shown, by default bins with
             a count of less than 1 are hidden
         **kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('hexbin')`.
+        
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(x, y, kind='hexbin', C=C, colorbar=colorbar, **kwds)
 
     def bivariate(self, x=None, y=None, colorbar=True, **kwds):
         """
-        Bivariate plot for 2D density
+        `bivariate` is a statistical method for creating a *2D density plot*. `bivariate`
+        plots can be a useful alternative to scatter plots, if your data are too dense to plot
+        each point individually.
+
+        Reference: https://hvplot.holoviz.org/reference/pandas/bivariate.html
+
+        Wiki: https://en.wikipedia.org/wiki/Bivariate_analysis
+
+        Example:
 
         Parameters
         ----------
-        x, y : string, optional
-            Field name to draw x- and y-positions from
+        x : string, optional
+            Field name to draw x-positions from
+        y : string, optional
+            Field name to draw y-positions from
         colorbar: boolean
             Whether to display a colorbar
         **kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('bivariate')`.
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(x, y, kind='bivariate', colorbar=colorbar, **kwds)
 
     def bar(self, x=None, y=None, **kwds):
         """
-        Bars plot
+        A vertical bar plot
+
+        A `bar` plot represents categorical data with rectangular bars
+        with heights proportional to the values that they represent. The x-axis
+        plots categories and the y axis represents the value scale.
+        The bars are of equal width which allows for instant comparison of data.
+        
+        `bar` can be used on dataframes with regular Index or MultiIndex.
+
+        Reference: https://hvplot.holoviz.org/reference/pandas/bar.html
+        
+        Wiki: https://en.wikipedia.org/wiki/Bar_chart
+
+        Example:
 
         Parameters
         ----------
-        x, y : string, optional
-            Field name to draw x- and y-positions from
+        x : string, optional
+            Field name to draw x-positions from
+        y : string, optional
+            Field name to draw y-positions from
         **kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('bar')`.
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(x, y, kind='bar', **kwds)
 
     def barh(self, x=None, y=None, **kwds):
         """
-        Horizontal bar plot
+        A horizontal bar plot
+
+        A `barh` plot represents categorical data with rectangular bars
+        with heights proportional to the values that they represent. The y-axis of the chart
+        plots categories and the x-axis represents the value scale.
+        The bars are of equal width which allows for instant comparison of data.
+        
+        `barh` can be used on dataframes with regular Index or MultiIndex.
+
+        Reference: https://hvplot.holoviz.org/reference/pandas/barh.html
+        
+        Wiki: https://en.wikipedia.org/wiki/Bar_chart
+
+        Example:
 
         Parameters
         ----------
         **kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('image')`.
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(x, y, kind='barh', **kwds)
 
     def box(self, y=None, by=None, **kwds):
         """
-        Boxplot
+        The `box` plot gives you a visual idea about 5 components in a dataset. It is also
+        known as *box and whiskers plot*. It is useful for describing measures of
+        central tendencies and measures of dispersion in a dataset.
+
+        `box` plots are most useful when grouped by additional dimensions.
+
+        Reference: https://hvplot.holoviz.org/reference/pandas/box.html
+
+        Wiki: https://en.wikipedia.org/wiki/Box_plot
+
+        Example:
 
         Parameters
         ----------
@@ -382,18 +554,23 @@ class hvPlotTabular(hvPlotBase):
         by : string or sequence
             Column in the DataFrame to group by.
         kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('box')`.
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(kind='box', x=None, y=y, by=by, **dict(kwds, hover=False))
 
     def violin(self, y=None, by=None, **kwds):
         """
-        Boxplot
+        Violin plot
+
+        Reference: https://hvplot.holoviz.org/reference/pandas/violin.html
+
+        Example:
 
         Parameters
         ----------
@@ -402,12 +579,13 @@ class hvPlotTabular(hvPlotBase):
         by : string or sequence
             Column in the DataFrame to group by.
         kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('violin')`.
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(kind='violin', x=None, y=y, by=by, **dict(kwds, hover=False))
 
@@ -415,6 +593,10 @@ class hvPlotTabular(hvPlotBase):
         """
         Histogram
 
+        Reference: https://hvplot.holoviz.org/reference/pandas/hist.html
+
+        Example:
+
         Parameters
         ----------
         y : string or sequence
@@ -422,18 +604,23 @@ class hvPlotTabular(hvPlotBase):
         by : string or sequence
             Column in the DataFrame to group by.
         kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('hist')`.
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(kind='hist', x=None, y=y, by=by, **kwds)
 
     def kde(self, y=None, by=None, **kwds):
         """
-        KDE
+        KDE plot
+
+        Reference: https://hvplot.holoviz.org/reference/pandas/kde.html
+
+        Example:
 
         Parameters
         ----------
@@ -442,18 +629,23 @@ class hvPlotTabular(hvPlotBase):
         by : string or sequence
             Column in the DataFrame to group by.
         kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('kde')`.
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(kind='kde', x=None, y=y, by=by, **kwds)
 
     def density(self, y=None, by=None, **kwds):
         """
-        alias for KDE
+        Density plot. Same as `kde` plot
+
+        Reference: https://hvplot.holoviz.org/reference/pandas/kde.html
+
+        Example:
 
         Parameters
         ----------
@@ -462,12 +654,13 @@ class hvPlotTabular(hvPlotBase):
         by : string or sequence
             Column in the DataFrame to group by.
         kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('kde')`.
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(kind='kde', x=None, y=y, by=by, **kwds)
 
@@ -475,15 +668,20 @@ class hvPlotTabular(hvPlotBase):
         """
         Table
 
+        Reference: https://hvplot.holoviz.org/reference/pandas/table.html
+
+        Example:
+
         Parameters
         ----------
         **kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('table')`.
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(kind='table', **dict(kwds, columns=columns))
 
@@ -491,15 +689,22 @@ class hvPlotTabular(hvPlotBase):
         """
         Dataset
 
+        Todo: Describe the reason for exposing this.
+
+        Reference: Todo. Find link
+
+        Example:
+
         Parameters
         ----------
         **kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('dataset')`.
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews Dataset
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(kind='dataset', **dict(kwds, columns=columns))
 
@@ -507,17 +712,22 @@ class hvPlotTabular(hvPlotBase):
         """
         Point plot use for 2D coordinate systems
 
+        Reference: https://hvplot.holoviz.org/reference/geopandas/points.html
+
+        Example:
+
         Parameters
         ----------
         x, y : string, optional
             The coordinate variable along the x- and y-axis
         **kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('points')`.
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(x, y, kind='points', **kwds)
 
@@ -525,21 +735,28 @@ class hvPlotTabular(hvPlotBase):
         """
         Vectorfield plot
 
+        Reference: https://hvplot.holoviz.org/reference/xarray/vectorfield.html
+
+        Example:
+
         Parameters
         ----------
-        x, y : string, optional
-            Field name to draw x- and y-positions from
+        x : string, optional
+            Field name to draw x-positions from
+        y : string, optional
+            Field name to draw y-positions from
         mag : string, optional
             Magnitude
         angle : string, optional
             Angle
         **kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('vectorfield')`.
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(x, y, angle=angle, mag=mag, kind='vectorfield', **kwds)
 
@@ -547,17 +764,22 @@ class hvPlotTabular(hvPlotBase):
         """
         Polygon plot for geopandas dataframes
 
+        Reference: https://hvplot.holoviz.org/reference/geopandas/polygons.html
+
+        Example:
+
         Parameters
         ----------
         c: string, optional
             The dimension to color the polygons by
         **kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('polygons')`.
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(x, y, c=c, kind='polygons', **kwds)
 
@@ -565,21 +787,30 @@ class hvPlotTabular(hvPlotBase):
         """
         LineString and LineRing plot for geopandas dataframes.
 
+        Reference: https://github.com/holoviz/hvplot/issues/828
+
+        Example:
+
         Parameters
         ----------
         **kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('paths')`.
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(x, y, c=c, kind='paths', **kwds)
 
     def labels(self, x=None, y=None, text=None, **kwds):
         """
         Labels plot.
+
+        Reference: https://hvplot.holoviz.org/reference/pandas/labels.html
+
+        Example:
 
         Parameters
         ----------
@@ -588,12 +819,13 @@ class hvPlotTabular(hvPlotBase):
         text : string, optional
             The column to draw the text labels from
         **kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('labels')`.
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(x, y, text=text, kind='labels', **kwds)
 
@@ -606,7 +838,7 @@ class hvPlot(hvPlotTabular):
     `hvPlot` is available as `.hvplot` on your data source after you have imported the appropriate
     backend.
     
-    Example: `.hvplot`   
+    Example:
 
     >>> import pandas as pd
     >>> import hvplot.pandas
@@ -615,24 +847,13 @@ class hvPlot(hvPlotTabular):
     >>> df = pd.DataFrame({"observation": x, "value": y})
 
     >>> df.hvplot.scatter(x="observation", y="value")
-    >>> # or
+    >>> # or alternatively
     >>> df.hvplot(x="observation", y="value", kind="scatter")
+
+    Tips & Tricks:
     
-    Example: `hvPlot`
-
-    >>> import pandas as pd
-    >>> from hvplot import hvPlot
-
-    >>> x=y=list(range(0, 10))
-    >>> df = pd.DataFrame({"observation": x, "value": y})
-
-    >>> hvPlot(df).scatter(x="observation", y="value")
-
-    We recommend using 
-    
-    - `.hvplot` in a notebook environment as its very familiar to DataFrame users.
-    - `hvPlot` in editors like VS Code because it provides better tooltips and TAB completion.
-
+    - Run `hvplot.help('scatter')` to see all the available arguments for a scatter plot.
+    - Use `*` to overlay two plots and `+` to layout two plots next to each other.
     """
     __all__ = [
         'line',
@@ -680,6 +901,8 @@ class hvPlot(hvPlotTabular):
         >>> ds = xr.tutorial.open_dataset('air_temperature')
         >>> ds.hvplot.image(x='lon', y='lat', z='air', groupby='time', cmap='kbc_r')
 
+        Example:
+
         Parameters
         ----------
         x : string, optional
@@ -692,16 +915,22 @@ class hvPlot(hvPlotTabular):
             Whether to display a colorbar
         kwds : optional
             To see all the keyword arguments available, run `hvplot.help('image')`.
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(x, y, z=z, kind='image', colorbar=colorbar, **kwds)
 
     def rgb(self, x=None, y=None, z=None, bands=None, **kwds):
         """
         RGB plot
+
+        Reference: https://hvplot.holoviz.org/reference/xarray/rgb.html
+
+        Example:
 
         Parameters
         ----------
@@ -712,12 +941,13 @@ class hvPlot(hvPlotTabular):
         z : string, optional
             The data variable to plot
         **kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('rgb')`.
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         if bands is not None:
             kwds['bands'] = bands
@@ -727,6 +957,10 @@ class hvPlot(hvPlotTabular):
         """
         QuadMesh plot
 
+        Reference: https://hvplot.holoviz.org/reference/xarray/quadmesh.html
+
+        Example:
+
         Parameters
         ----------
         x, y : string, optional
@@ -736,12 +970,13 @@ class hvPlot(hvPlotTabular):
         colorbar: boolean
             Whether to display a colorbar
         **kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('quadmesh')`.
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(x, y, z=z, kind='quadmesh', colorbar=colorbar, **kwds)
 
@@ -749,6 +984,10 @@ class hvPlot(hvPlotTabular):
         """
         Line contour plot
 
+        Reference: https://hvplot.holoviz.org/reference/xarray/contour.html
+
+        Example:
+
         Parameters
         ----------
         x, y : string, optional
@@ -760,12 +999,13 @@ class hvPlot(hvPlotTabular):
         colorbar: boolean
             Whether to display a colorbar
         **kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('contour')`.
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(x, y, z=z, kind='contour', colorbar=colorbar, **kwds)
 
@@ -773,6 +1013,10 @@ class hvPlot(hvPlotTabular):
         """
         Filled contour plot
 
+        Reference. https://hvplot.holoviz.org/reference/xarray/contourf.html
+
+        Example:
+
         Parameters
         ----------
         x, y : string, optional
@@ -784,11 +1028,12 @@ class hvPlot(hvPlotTabular):
         colorbar: boolean
             Whether to display a colorbar
         **kwds : optional
-            Keyword arguments to pass on to
-            :py:meth:`hvplot.converter.HoloViewsConverter`.
+            To see the keyword arguments available, run `hvplot.help('contourf')`.
+        
         Returns
         -------
-        obj : HoloViews object
-            The HoloViews representation of the plot.
+        obj: Holoviews object
+            You can `print` the object to study its composition and run `hv.help` on the the
+            object to learn more about its parameters and options.
         """
         return self(x, y, z=z, kind='contourf', colorbar=colorbar, **kwds)
