@@ -231,9 +231,9 @@ def bind(function, *args, **kwargs):
     >>> experiment = pn.widgets.IntSlider(value=5, start=0, end=10, step=1, name="Experiment")
     >>> rows = pn.widgets.IntSlider(value=5, start=0, end=10, step=1, name="Rows")
 
-    >>> def get_data(experiment):
-    ...     # Loading data for the given experiment ...
-    ...     return pd.DataFrame({"x": list(range(0,experiment))})
+    >>> def algorithm(alpha):
+    ...         # Running an algorithm that uses alpha...
+    ...         return pd.DataFrame({"output": np.array([0, 3, 5, 2]) ** alpha})
 
     >>> hvplot.bind(get_data, experiment=experiment).interactive().head(n=rows)
 
