@@ -208,6 +208,7 @@ class hvPlotTabular(hvPlotBase):
         ----------
 
         - Bokeh: https://docs.bokeh.org/en/latest/docs/first_steps/first_steps_1.html#creating-a-simple-line-chart
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Curve.html
         - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.line.html
         - Plotly: https://plotly.com/python/line-charts/
         - Matplotlib: https://matplotlib.org/stable/plot_types/basic/plot.html
