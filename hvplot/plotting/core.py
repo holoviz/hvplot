@@ -40,7 +40,7 @@ class hvPlotBase:
         kind : string, optional
             The kind of plot to generate, e.g. 'line', 'scatter', etc.
         **kwds : optional
-            To see the keyword arguments available, run `hvplot.help('scatter')` or similar
+            Additional keywords arguments are documented in `hvplot.help('scatter')` or similar
             depending on the type of plot.
         
         Returns
@@ -146,14 +146,14 @@ class hvPlotTabular(hvPlotBase):
 
     def line(self, x=None, y=None, **kwds):
         """
-        The `line` plot connect the points with a continous curve. It is useful when data is
-        continuous and has a continuous axis.
+        The `line` plot connect the points with a continous curve.
+        
+        A `line` plot is useful when data is continuous and has a continuous axis.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/line.html
 
-        Wiki: https://en.wikipedia.org/wiki/Line_chart
-
-        Example:
+        Examples
+        --------
 
         >>> import hvplot.pandas
         >>> from bokeh.sampledata.degrees import data as deg
@@ -174,17 +174,44 @@ class hvPlotTabular(hvPlotBase):
         Parameters
         ----------
         x : string, optional
-            Field name to draw x-positions from
-        y : string, optional
-            Field name to draw y-positions from
+            Allows plotting of one column versus another. If not specified, the index is
+            used.
+        y : string or list, optional
+            Allows plotting of one column versus another. If not specified, all numerical
+            dimensions are used.
+        by : string, optional
+            A single column or list of columns to group by.
+        color : str, array-like, or dict, optional
+            The color for each of the series. Possible values are:
+            
+            A single color string referred to by name, RGB or RGBA code, for instance 'red' or
+            '#a98d19.
+
+            A sequence of color strings referred to by name, RGB or RGBA code, which will be used
+            for each series recursively. For instance ['green','yellow'] each column’s line will be
+            filled in green or yellow, alternatively. If there is only a single series to be
+            plotted, then only the first color from the color list will be used.
+
+            A dict of the form {column namecolor}, so that each series will be colored accordingly.
+            For example, if your series are called a and b, then passing {'a': 'green', 'b': 'red'}
+            will color lines for series a in green and lines for series b in red.
         **kwds : optional
-            To see the keyword arguments available, run `hvplot.help('line')`.
+            Additional keywords arguments are documented in `hvplot.help('line')`.
                 
         Returns
         -------
         obj: Holoviews object
             You can `print` the object to study its composition and run `hv.help` on the the
             object to learn more about its parameters and options.
+
+        References
+        ----------
+
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/first_steps/first_steps_1.html#creating-a-simple-line-chart
+        - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.line.html
+        - Plotly: https://plotly.com/python/line-charts/
+        - Matplotlib: https://matplotlib.org/stable/plot_types/basic/plot.html
+        - Wiki: https://en.wikipedia.org/wiki/Line_chart
         """
         return self(x, y, kind='line', **kwds)
 
@@ -217,7 +244,7 @@ class hvPlotTabular(hvPlotBase):
         where : string, optional
             Defines where the steps are placed (options: 'mid' (default), 'pre' and 'post')
         **kwds : optional
-            To see the keyword arguments available, run `hvplot.help('step')`.
+            Additional keywords arguments are documented in `hvplot.help('step')`.
         
         Returns
         -------
@@ -263,7 +290,7 @@ class hvPlotTabular(hvPlotBase):
         scale: number, optional
             Scaling factor to apply to point scaling
         **kwds : optional
-            To see the keyword arguments available, run `hvplot.help('scatter')`.
+            Additional keywords arguments are documented in `hvplot.help('scatter')`.
         
         Returns
         -------
@@ -291,7 +318,7 @@ class hvPlotTabular(hvPlotBase):
         stacked : boolean
             Whether to stack multiple areas
         **kwds : optional
-            To see the keyword arguments available, run `hvplot.help('area')`.
+            Additional keywords arguments are documented in `hvplot.help('area')`.
         
         Returns
         -------
@@ -321,7 +348,7 @@ class hvPlotTabular(hvPlotBase):
         yerr2 : string, optional
             Field name to draw positive errors from
         **kwds : optional
-            To see the keyword arguments available, run `hvplot.help('errorbars')`.
+            Additional keywords arguments are documented in `hvplot.help('errorbars')`.
         
         Returns
         -------
@@ -347,7 +374,7 @@ class hvPlotTabular(hvPlotBase):
         y: list or tuple, optional
             Field names of the OHLC columns
         **kwds : optional
-            To see the keyword arguments available, run `hvplot.help('ohlc')`.
+            Additional keywords arguments are documented in `hvplot.help('ohlc')`.
         
         
         Returns
@@ -382,7 +409,7 @@ class hvPlotTabular(hvPlotBase):
         reduce_function : function
             Function to compute statistics for heatmap
         **kwds : optional
-            To see the keyword arguments available, run `hvplot.help('heatmap')`.
+            Additional keywords arguments are documented in `hvplot.help('heatmap')`.
         
         
         Returns
@@ -427,7 +454,7 @@ class hvPlotTabular(hvPlotBase):
             The display threshold before a bin is shown, by default bins with
             a count of less than 1 are hidden
         **kwds : optional
-            To see the keyword arguments available, run `hvplot.help('hexbin')`.
+            Additional keywords arguments are documented in `hvplot.help('hexbin')`.
         
         
         Returns
@@ -459,7 +486,7 @@ class hvPlotTabular(hvPlotBase):
         colorbar: boolean
             Whether to display a colorbar
         **kwds : optional
-            To see the keyword arguments available, run `hvplot.help('bivariate')`.
+            Additional keywords arguments are documented in `hvplot.help('bivariate')`.
         
         Returns
         -------
@@ -493,7 +520,7 @@ class hvPlotTabular(hvPlotBase):
         y : string, optional
             Field name to draw y-positions from
         **kwds : optional
-            To see the keyword arguments available, run `hvplot.help('bar')`.
+            Additional keywords arguments are documented in `hvplot.help('bar')`.
         
         Returns
         -------
@@ -523,7 +550,7 @@ class hvPlotTabular(hvPlotBase):
         Parameters
         ----------
         **kwds : optional
-            To see the keyword arguments available, run `hvplot.help('image')`.
+            Additional keywords arguments are documented in `hvplot.help('image')`.
         
         Returns
         -------
@@ -554,7 +581,7 @@ class hvPlotTabular(hvPlotBase):
         by : string or sequence
             Column in the DataFrame to group by.
         kwds : optional
-            To see the keyword arguments available, run `hvplot.help('box')`.
+            Additional keywords arguments are documented in `hvplot.help('box')`.
         
         Returns
         -------
@@ -579,7 +606,7 @@ class hvPlotTabular(hvPlotBase):
         by : string or sequence
             Column in the DataFrame to group by.
         kwds : optional
-            To see the keyword arguments available, run `hvplot.help('violin')`.
+            Additional keywords arguments are documented in `hvplot.help('violin')`.
         
         Returns
         -------
@@ -604,7 +631,7 @@ class hvPlotTabular(hvPlotBase):
         by : string or sequence
             Column in the DataFrame to group by.
         kwds : optional
-            To see the keyword arguments available, run `hvplot.help('hist')`.
+            Additional keywords arguments are documented in `hvplot.help('hist')`.
         
         Returns
         -------
@@ -629,7 +656,7 @@ class hvPlotTabular(hvPlotBase):
         by : string or sequence
             Column in the DataFrame to group by.
         kwds : optional
-            To see the keyword arguments available, run `hvplot.help('kde')`.
+            Additional keywords arguments are documented in `hvplot.help('kde')`.
         
         Returns
         -------
@@ -654,7 +681,7 @@ class hvPlotTabular(hvPlotBase):
         by : string or sequence
             Column in the DataFrame to group by.
         kwds : optional
-            To see the keyword arguments available, run `hvplot.help('kde')`.
+            Additional keywords arguments are documented in `hvplot.help('kde')`.
         
         Returns
         -------
@@ -675,7 +702,7 @@ class hvPlotTabular(hvPlotBase):
         Parameters
         ----------
         **kwds : optional
-            To see the keyword arguments available, run `hvplot.help('table')`.
+            Additional keywords arguments are documented in `hvplot.help('table')`.
         
         Returns
         -------
@@ -698,7 +725,7 @@ class hvPlotTabular(hvPlotBase):
         Parameters
         ----------
         **kwds : optional
-            To see the keyword arguments available, run `hvplot.help('dataset')`.
+            Additional keywords arguments are documented in `hvplot.help('dataset')`.
         
         Returns
         -------
@@ -721,7 +748,7 @@ class hvPlotTabular(hvPlotBase):
         x, y : string, optional
             The coordinate variable along the x- and y-axis
         **kwds : optional
-            To see the keyword arguments available, run `hvplot.help('points')`.
+            Additional keywords arguments are documented in `hvplot.help('points')`.
         
         Returns
         -------
@@ -750,7 +777,7 @@ class hvPlotTabular(hvPlotBase):
         angle : string, optional
             Angle
         **kwds : optional
-            To see the keyword arguments available, run `hvplot.help('vectorfield')`.
+            Additional keywords arguments are documented in `hvplot.help('vectorfield')`.
         
         Returns
         -------
@@ -773,7 +800,7 @@ class hvPlotTabular(hvPlotBase):
         c: string, optional
             The dimension to color the polygons by
         **kwds : optional
-            To see the keyword arguments available, run `hvplot.help('polygons')`.
+            Additional keywords arguments are documented in `hvplot.help('polygons')`.
         
         Returns
         -------
@@ -794,7 +821,7 @@ class hvPlotTabular(hvPlotBase):
         Parameters
         ----------
         **kwds : optional
-            To see the keyword arguments available, run `hvplot.help('paths')`.
+            Additional keywords arguments are documented in `hvplot.help('paths')`.
         
         Returns
         -------
@@ -819,7 +846,7 @@ class hvPlotTabular(hvPlotBase):
         text : string, optional
             The column to draw the text labels from
         **kwds : optional
-            To see the keyword arguments available, run `hvplot.help('labels')`.
+            Additional keywords arguments are documented in `hvplot.help('labels')`.
         
         Returns
         -------
@@ -941,7 +968,7 @@ class hvPlot(hvPlotTabular):
         z : string, optional
             The data variable to plot
         **kwds : optional
-            To see the keyword arguments available, run `hvplot.help('rgb')`.
+            Additional keywords arguments are documented in `hvplot.help('rgb')`.
         
         Returns
         -------
@@ -970,7 +997,7 @@ class hvPlot(hvPlotTabular):
         colorbar: boolean
             Whether to display a colorbar
         **kwds : optional
-            To see the keyword arguments available, run `hvplot.help('quadmesh')`.
+            Additional keywords arguments are documented in `hvplot.help('quadmesh')`.
         
         Returns
         -------
@@ -999,7 +1026,7 @@ class hvPlot(hvPlotTabular):
         colorbar: boolean
             Whether to display a colorbar
         **kwds : optional
-            To see the keyword arguments available, run `hvplot.help('contour')`.
+            Additional keywords arguments are documented in `hvplot.help('contour')`.
         
         Returns
         -------
@@ -1028,7 +1055,7 @@ class hvPlot(hvPlotTabular):
         colorbar: boolean
             Whether to display a colorbar
         **kwds : optional
-            To see the keyword arguments available, run `hvplot.help('contourf')`.
+            Additional keywords arguments are documented in `hvplot.help('contourf')`.
         
         Returns
         -------
