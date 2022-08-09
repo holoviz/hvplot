@@ -171,6 +171,9 @@ class hvPlotTabular(hvPlotBase):
         ... )
         >>> line * scatter
 
+        Please note that you can pass widgets or reactive functions as arguments instead of
+        literal values, c.f. https://hvplot.holoviz.org/user_guide/Widgets.html.
+
         Parameters
         ----------
         x : string, optional
@@ -180,7 +183,11 @@ class hvPlotTabular(hvPlotBase):
             Allows plotting of one column versus another. If not specified, all numerical
             dimensions are used.
         by : string, optional
-            A single column or list of columns to group by.
+            A single of categorical column or list of columns to group by. All the subgroups are
+            visualized.
+        groupby: string, list, optional
+            A single column or list of columns to group and filter by. Adds one or widgets to
+            select the subgroup(s) to visualize.
         color : str, array-like, or dict, optional
             The color for each of the series. Possible values are:
             
