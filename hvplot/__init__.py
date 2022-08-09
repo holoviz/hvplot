@@ -211,7 +211,7 @@ def bind(function, *args, **kwargs):
     """
     Returns a *reactive* function that can be used to start your `.interactive` pipeline by running
     a model or loading data depending on inputs from widgets, parameters or python objects.
-    The widgets can be Panel or IpyWidgets.
+    The widgets can be Panel or ipywidgets.
     
     Reference: https://hvplot.holoviz.org/user_guide/Interactive.html#functions-as-inputs
 
