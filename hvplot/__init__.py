@@ -207,41 +207,30 @@ Store._backend_switch_hooks.append(_hook_patch_docstrings)
 
 extension = hvplot_extension
 
-@_wraps(_pn.bind)
 def bind(function, *args, **kwargs):
     """
-    Returns a *reactive* function that *depends* on widgets, parameters or Python objects.
-    This means that the "reactive" function can be automatically invoked whenever the underlying
-    widget or parameter values change. The widgets can be Panel or IpyWidgets.
+    Returns a *reactive* function that can be used to start your `.interactive` pipeline by running
+    a model or loading data depending on inputs from widgets, parameters or python objects.
+    The widgets can be Panel or IpyWidgets.
     
-    `hv.bind` can be **used to start your `.interactive` pipeline** by loading data depending
-    on widgets or pameters values.
-    
-    Reference: https://github.com/holoviz/hvplot/issues/825
+    Reference: https://hvplot.holoviz.org/user_guide/Interactive.html#functions-as-inputs
 
-    :Example:
+    Example
+    -------
 
     >>> import pandas as pd
     >>> import panel as pn
-
     >>> import hvplot
-
-    >>> pn.extension()
-
-    >>> experiment = pn.widgets.IntSlider(value=5, start=0, end=10, step=1, name="Experiment")
-    >>> rows = pn.widgets.IntSlider(value=5, start=0, end=10, step=1, name="Rows")
-
+    >>> import numpy as np
+    >>> alpha = pn.widgets.FloatSlider(value=0.5, start=0, end=1.0, step=0.1, name="Alpha")
+    >>> top = pn.widgets.RadioButtonGroup(value=10, options=[5, 10, 25], name="Top")
     >>> def algorithm(alpha):
-    ...         # Running an algorithm that uses alpha...
-    ...         return pd.DataFrame({"output": np.array([0, 3, 5, 2]) ** alpha})
+    ...     # Running an algorithm that uses alpha...
+    ...     return pd.DataFrame({"output": (np.array(range(0,100)) ** alpha)*50})
+    >>> table = hvplot.bind(algorithm, alpha=alpha).interactive().head(n=top)
 
-    >>> hvplot.bind(get_data, experiment=experiment).interactive().head(n=rows)
-
-    In a notebook or data app you can now use the `experiment` and `rows` sliders to visualize
-    your data interactively as a line plot.
-
-    This function is the same as `panel.bind`, but extended by adding the `.interactive` method to
-    the *reactive* function returned.
+    In a notebook or data app you can now see the `alpha` and `top` widgets as well as the `top`
+    results of the algorithm when run with the `alpha` value as input. 
 
     Arguments
     ---------
