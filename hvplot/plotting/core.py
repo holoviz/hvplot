@@ -183,8 +183,7 @@ class hvPlotTabular(hvPlotBase):
             Allows plotting of one column versus another. If not specified, all numerical
             dimensions are used.
         by : string, optional
-            A single of categorical column or list of columns to group by. All the subgroups are
-            visualized.
+            A single column or list of columns to group by. All the subgroups are visualized.
         groupby: string, list, optional
             A single column or list of columns to group and filter by. Adds one or widgets to
             select the subgroup(s) to visualize.
