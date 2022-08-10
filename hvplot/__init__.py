@@ -244,7 +244,7 @@ def bind(function, *args, **kwargs):
     Returns
     -------
     Returns a new function with the args and kwargs bound to it and
-        annotated with all dependencies.
+    annotated with all dependencies.
     """
     bound = _pn.bind(function, *args, **kwargs)
     bound.interactive = lambda **kwargs: Interactive(bound, **kwargs)
