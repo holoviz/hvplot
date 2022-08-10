@@ -2,15 +2,18 @@
 hvPlot makes data analysis and visualization simple
 ===================================================
 
-hvPlot provides an easy to use high-level API for visualization, based on the 🐼 Pandas .plot() API
-that works across a wide range of data sources and plotting backends.
+hvPlot provides a familiar, high-level API for interactive data exploration and visualization,
+based on the 🐼 Pandas `.plot` API and the innovative `.interactive` API.
 
 hvPlot
 
 - supports a wide range of data sources including Pandas, Dask, XArray
 Rapids cuDF, Streamz, Intake, Geopandas, NetworkX and Ibis.
 - supports the plotting backends Bokeh (default), Matplotlib and Plotly.
-- exposes the powerful tools from the HoloViz ecosystem in a familiar and convenient API, while letting you drop down into the underlying HoloViz tools when more power or flexibility is needed.
+- exposes the powerful tools from the HoloViz ecosystem in a familiar and convenient API, while
+letting you drop down into the underlying HoloViz tools when more power or flexibility is needed.
+
+hvPlot is the recommend entrypoint to the HoloViz ecosystem.
 
 To learn more check out https://hvplot.holoviz.org/. To report issues or contribute go to
 https://github.com/holoviz/hvplot. To join the community go to
