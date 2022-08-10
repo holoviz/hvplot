@@ -247,11 +247,11 @@ def bind(function, *args, **kwargs):
 
     Arguments
     ---------
-    function: callable
+    function : callable
         The function to bind constant or dynamic args and kwargs to.
-    args: object, param.Parameter, panel.widget.Widget, or ipywidget
+    args : object, param.Parameter, panel.widget.Widget, or ipywidget
         Positional arguments to bind to the function.
-    kwargs: object, param.Parameter, panel.widget.Widget, or ipywidget
+    kwargs : object, param.Parameter, panel.widget.Widget, or ipywidget
         Keyword arguments to bind to the function.
 
     Returns
