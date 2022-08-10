@@ -217,8 +217,8 @@ def bind(function, *args, **kwargs):
     
     Reference: https://hvplot.holoviz.org/user_guide/Interactive.html#functions-as-inputs
 
-    Arguments
-    ---------
+    Parameters
+    ----------
     function : callable
         The function to bind constant or dynamic args and kwargs to.
     args : object, param.Parameter, panel.widget.Widget, or ipywidget
