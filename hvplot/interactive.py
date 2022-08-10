@@ -49,90 +49,144 @@ def _find_widgets(op):
     return widgets
 
 
+"""
+How Interactive works
+---------------------
+
+`Interactive` is a wrapper around a Python object that lets users create
+interactive pipelines by calling existing APIs on an object with dynamic
+parameters or widgets.
+
+An `Interactive` instance watches what operations are applied to the object.
+
+To do so, each operation returns a new `Interactive` instance - the creation
+of a new instance being taken care of by the `_clone` method - which allows
+the next operation to be recorded, and so on and so forth. E.g. `dfi.head()`
+first records that the `'head'` attribute is accessed, this is achieved
+by overriding `__getattribute__`. A new interactive object is returned,
+which will then record that it is being called, and that new object will be
+itself called as `Interactive` implements `__call__`. `__call__`  returns
+another `Interactive` instance.
+
+Note that under the hood even more `Interactive` instances may be created,
+but this is the gist of it.
+
+To be able to watch all the potential operations that may be applied to an
+object, `Interactive` implements on top of `__getattribute__` and
+`__call__`:
+
+- operators such as `__gt__`, `__add__`, etc.
+- the builtin functions `__abs__` and `__round__`
+- `__getitem__`
+- `__array_ufunc__`
+
+The `_depth` attribute starts at 0 and is incremented by 1 everytime
+a new `Interactive` instance is created part of a chain.
+The root instance in an expression has a `_depth` of 0. An expression can
+consist of multiple chains, such as `dfi[dfi.A > 1]`, as the `Interactive`
+instance is referenced twice in the expression. As a consequence `_depth`
+is not the total count of `Interactive` instance creations of a pipeline,
+it is the count of instances created in outer chain. In the example, that
+would be `dfi[]`. `Interactive` instances don't have references about
+the instances that created them or that they create, they just know their
+current location in a chain thanks to `_depth`. However, as some parameters
+need to be passed down the whole pipeline, they do have to propagate. E.g.
+in `dfi.interactive(width=200)`, `width=200` will be propagated as `kwargs`.
+
+Recording the operations applied to an object in a pipeline is done
+by gradually building a so-called "dim expression", or "dim transform",
+which is an expression language provided by HoloViews. dim transform
+objects are a way to express transforms on `Dataset`s, a `Dataset` being
+another HoloViews object that is a wrapper around common data structures
+such as Pandas/Dask/... Dataframes/Series, Xarray Dataset/DataArray, etc.
+For instance a Python expression such as `(series + 2).head()` can be
+expressed with a dim transform whose repr will be `(dim('*').pd+2).head(2)`,
+effectively showing that the dim transfom has recorded the different
+operations that are meant to be applied to the data.
+The `_transform` attribute stores the dim transform.
+
+The `_obj` attribute holds the original data structure that feeds the
+pipeline. All the `Interactive` instances created while parsing the
+pipeline share the same `_obj` object. And they all wrap it in a `Dataset`
+instance, and all apply the current dim transform they are aware of to
+the original data structure to compute the intermediate state of the data,
+that is stored it in the `_current` attribute. Doing so is particularly
+useful in Notebook sessions, as this allows to inspect the transformed
+object at any point of the pipeline, and as such provide correct
+auto-completion and docstrings. E.g. executing `dfi.A.max?` in a Notebook
+will correctly return the docstring of the Pandas Series `.max()` method,
+as the pipeline evaluates `dfi.A` to hold a current object `_current` that
+is a Pandas Series, and no longer and DataFrame.
+
+The `_obj` attribute is implemented as a property which gets/sets the value
+from a list that contains the shared attribute. This is required for the 
+"function as input" to be able to update the object from a callback set up
+on the root Interactive instance.
+
+The `_method` attribute is a string that temporarily stores the method/attr
+accessed on the object, e.g. `_method` is 'head' in `dfi.head()`, until the
+Interactive instance created in the pipeline is called at which point `_method`
+is reset to None. In cases such as `dfi.head` or `dfi.A`, `_method` is not
+(yet) reset to None. At this stage the Interactive instance returned has
+its `_current` attribute not updated, e.g. `dfi.A._current` is still the
+original dataframe, not the 'A' series. Keeping `_method` is thus useful for
+instance to display `dfi.A`, as the evaluation of the object will check
+whether `_method` is set or not, and if it's set it will use it to compute
+the object returned, e.g. the series `df.A` or the method `df.head`, and
+display its repr.
+"""
+
+
 class Interactive:
     """
-    `Interactive` is a wrapper around a Python object that lets users create
-    interactive pipelines by calling existing APIs on an object with dynamic
-    parameters or widgets.
+    The `.interactive` API enhances the API of data analysis libraries
+    like Pandas, Dask, and Xarray, by allowing to replace in a pipeline
+    static values by dynamic widgets. When displayed, an interactive
+    pipeline will incorporate the dynamic widgets that control it, as long
+    as its normal output that will automatically be updated as soon as a
+    widget value is changed.
 
-    `Interactive` can be instantiated with an object:
+    `Interactive` can be instantiated with an object. However the recommended
+    approach is to instantiate it via the `.interactive` accessor that is
+    available on a data structure when it has been patched, e.g. after
+    executing `import hvplot.pandas`. The accessor can also be called which
+    allows to pass down kwargs.
     
+    A pipeline can then be created from this object, the pipeline will render
+    with its widgets and its interactive output.
+
+    Reference: https://hvplot.holoviz.org/user_guide/Interactive.html
+
+    Parameters
+    ----------
+    obj: DataFrame, Series, DataArray, DataSet
+        A supported data structure object
+    loc : str, optional
+        Widget(s) location, one of 'bottom_left', 'bottom_right', 'right'
+        'top-right', 'top-left' and 'left'. By default 'top_left'
+    center : bool, optional
+        Whether to center to pipeline output, by default False
+    max_rows : int, optional
+        Maximum number of rows displayed, only used when the output is a
+        dataframe, by default 100
+    kwargs: optional
+        Optional kwargs that are passed down to customize the displayed
+        object. E.g. if the output is a DataFrame `width=200` will set
+        the size of the DataFrame Pane that renders it.
+
+    Examples
+    --------
+    Instantiate it from an object:
     >>> dfi = Interactive(df)
 
-    However the recommended approach is to instantiate it via the
-    `.interactive` accessor that is available on a data structure when it has
-    been patched, e.g. after executing `import hvplot.pandas`.
-
+    Or with the `.interactive` accessor when the object is patched:
+    >>> import hvplot.pandas
     >>> dfi = df.interactive
+    >>> dfi = df.interactive(width=200)
 
-    The `.interactive` accessor can also be called which allows to pass kwargs.
-
-    >>> dfi = df.interactive()
-
-    How it works
-    ------------
-
-    An `Interactive` instance watches what operations are applied to the object.
-
-    To do so, each operation returns a new `Interactive` instance - the creation
-    of a new instance being taken care of by the `_clone` method - which allows
-    the next operation to be recorded, and so on and so forth. E.g. `dfi.head()`
-    first records that the `'head'` attribute is accessed, this is achieved
-    by overriding `__getattribute__`. A new interactive object is returned,
-    which will then record that it is being called, and that will be called as
-    `Interactive` implements `__call__`, which itself returns an `Interactive`
-    instance.
-
-    Note that under the hood even more `Interactive` instances may be created,
-    but this is the gist of it.
-
-    To be able to watch all the potential operations that may be applied to an
-    object, `Interactive` implements on top of `__getattribute__` and
-    `__call__`:
-    
-    - operators such as `__gt__`, `__add__`, etc.
-    - the builtin functions `__abs__` and `__round__`
-    - `__getitem__`
-    - `__array_ufunc__`
-
-    The `_depth` attribute starts at 0 and is incremented by 1 everytime
-    a new `Interactive` instance is created part of a chain.
-    The root instance in an expression has a `_depth` of 0. An expression can
-    consist of multiple chains, such as `dfi[dfi.A > 1]`, as the `Interactive`
-    instance is referenced twice in the expression. As a consequence `_depth`
-    is not the total count of `Interactive` instance creations of a pipeline,
-    it is the count of instances created in outer chain. In the example, that
-    would be `dfi[]`. `Interactive` instances don't have references about
-    the instances that created them or that they create, they just know their
-    current location in a chain thanks to `_depth`. However, as some parameters
-    need to be passed down the whole pipeline, they do have to propagate. E.g.
-    in `dfi.interactive(width=200)`, `width=200` will be propagated as `kwargs`.
-
-    
-    Recording the operations applied to an object in a pipeline is done
-    by gradually building a so-called "dim expression", or "dim transform",
-    which is an expression language provided by HoloViews. dim transform
-    objects are a way to express transforms on `Dataset`s, a `Dataset` being
-    another HoloViews object that is a wrapper around common data structures
-    such as Pandas/Dask/... Dataframes/Series, Xarray Dataset/DataArray, etc.
-    For instance a Python expression such as `(series + 2).head()` can be
-    expressed with a dim transform whose repr will be `(dim('*').pd+2).head(2)`,
-    effectively showing that the dim transfom has recorded the different
-    operations that are meant to be applied to the data.
-    The `_transform` attribute stores the dim transform.
-
-    The `_obj` attribute holds the original data structure that feeds the
-    pipeline. All the `Interactive` instances created while parsing the
-    pipeline share the same `_obj` object. And they all wrap it in a `Dataset`
-    instance, and all apply the current dim transform they are aware of to
-    the original data structure to compute the intermediate state of the data,
-    that is stored it in the `_current` attribute. Doing so is particularly
-    useful in Notebook sessions, as this allows to inspect the transformed
-    object at any point of the pipeline, and as such provide correct
-    auto-completion and docstrings. E.g. executing `dfi.A.max?` in a Notebook
-    will correctly return the docstring of the Pandas Series `.max()` method,
-    as the pipeline evaluates `dfi.A` to hold a current object `_current` that
-    is a Pandas Series, and no longer and DataFrame.
+    Create interactive pipelines from the `Interactive` object:
+    >>> widget = panel.widgets.IntSlider(value=1, start=1, end=5)
+    >>> dfi.head(widget)
     """
 
     # TODO: Why?
@@ -365,6 +419,43 @@ class Interactive:
         return get_ax
 
     def __call__(self, *args, **kwargs):
+        """
+        The `.interactive` API enhances the API of data analysis libraries
+        like Pandas, Dask, and Xarray, by allowing to replace in a pipeline
+        static values by dynamic widgets. When displayed, an interactive
+        pipeline will incorporate the dynamic widgets that control it, as long
+        as its normal output that will automatically be updated as soon as a
+        widget value is changed.
+
+        Reference: https://hvplot.holoviz.org/user_guide/Interactive.html
+
+        Parameters
+        ----------
+        loc : str, optional
+            Widget(s) location, one of 'bottom_left', 'bottom_right', 'right'
+            'top-right', 'top-left' and 'left'. By default 'top_left'
+        center : bool, optional
+            Whether to center to pipeline output, by default False
+        max_rows : int, optional
+            Maximum number of rows displayed, only used when the output is a
+            dataframe, by default 100
+        kwargs: optional
+            Optional kwargs that are passed down to customize the displayed
+            object. E.g. if the output is a DataFrame `width=200` will set
+            the size of the DataFrame Pane that renders it.
+
+        Returns
+        -------
+        Interactive
+            The next `Interactive` object of the pipeline.
+
+        Examples
+        --------
+        >>> widget = panel.wid7ugets.IntSlider(value=1, start=1, end=5)
+        >>> dfi = df.interactive(width=200)
+        >>> dfi.head(widget)
+        """
+
         if self._method is None:
             if self._depth == 0:
                 # This code path is entered when initializing an interactive
