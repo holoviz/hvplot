@@ -58,8 +58,6 @@ To report issues go to https://github.com/holoviz/holoviews.
 import inspect
 import textwrap
 
-from functools import wraps as _wraps
-
 import param
 import panel as _pn
 import holoviews as _hv
@@ -211,6 +209,7 @@ def bind(function, *args, **kwargs):
     """
     Returns a *reactive* function that can be used to start your `.interactive` pipeline by running
     a model or loading data depending on inputs from widgets, parameters or python objects.
+    
     The widgets can be Panel or ipywidgets.
     
     Reference: https://hvplot.holoviz.org/user_guide/Interactive.html#functions-as-inputs
@@ -218,19 +217,33 @@ def bind(function, *args, **kwargs):
     Example
     -------
 
+    Develop your **algorithm** or data extraction method with the tools you know and love.
+
     >>> import pandas as pd
-    >>> import panel as pn
-    >>> import hvplot
     >>> import numpy as np
+    
+    >>> def algorithm(alpha):
+    ...     # An example algorithm that uses alpha ...
+    ...     return pd.DataFrame({"output": (np.array(range(0,100)) ** alpha)*50})
+    
+    Make it **interactive** using `.bind`, `.interactive` and widgets.
+
+    >>> import hvplot
+    >>> import panel as pn
+    
     >>> alpha = pn.widgets.FloatSlider(value=0.5, start=0, end=1.0, step=0.1, name="Alpha")
     >>> top = pn.widgets.RadioButtonGroup(value=10, options=[5, 10, 25], name="Top")
-    >>> def algorithm(alpha):
-    ...     # Running an algorithm that uses alpha...
-    ...     return pd.DataFrame({"output": (np.array(range(0,100)) ** alpha)*50})
-    >>> table = hvplot.bind(algorithm, alpha=alpha).interactive().head(n=top)
+    >>> interactive_table = (
+    ...     hvplot
+    ...     .bind(algorithm, alpha=alpha)
+    ...     .interactive()
+    ...     .head(n=top)
+    ... )
+    >>> interactive_table
 
-    In a notebook or data app you can now see the `alpha` and `top` widgets as well as the `top`
-    results of the algorithm when run with the `alpha` value as input. 
+    In a notebook or data app you can now select the appropriate `alpha` and `top` values via
+    widgets and see the `top` results of the algorithm in a table depending on the value of `alpha`
+    selected.
 
     Arguments
     ---------
