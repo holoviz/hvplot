@@ -217,8 +217,23 @@ def bind(function, *args, **kwargs):
     
     Reference: https://hvplot.holoviz.org/user_guide/Interactive.html#functions-as-inputs
 
-    Example
+    Arguments
+    ---------
+    function : callable
+        The function to bind constant or dynamic args and kwargs to.
+    args : object, param.Parameter, panel.widget.Widget, or ipywidget
+        Positional arguments to bind to the function.
+    kwargs : object, param.Parameter, panel.widget.Widget, or ipywidget
+        Keyword arguments to bind to the function.
+
+    Returns
     -------
+    Returns a new function with the args and kwargs bound to it and
+    annotated with all dependencies. This function has an `interactive`
+    attribute that can be called to instantiate an `Interactive` pipeline.
+
+    Examples
+    --------
 
     Develop your **algorithm** or data extraction method with the tools you know and love.
 
@@ -247,21 +262,6 @@ def bind(function, *args, **kwargs):
     In a notebook or data app you can now select the appropriate `alpha` and `top` values via
     widgets and see the `top` results of the algorithm in a table depending on the value of `alpha`
     selected.
-
-    Arguments
-    ---------
-    function : callable
-        The function to bind constant or dynamic args and kwargs to.
-    args : object, param.Parameter, panel.widget.Widget, or ipywidget
-        Positional arguments to bind to the function.
-    kwargs : object, param.Parameter, panel.widget.Widget, or ipywidget
-        Keyword arguments to bind to the function.
-
-    Returns
-    -------
-    Returns a new function with the args and kwargs bound to it and
-    annotated with all dependencies. This function has an `interactive`
-    attribute that can be called to instantiate an `Interactive` pipeline.
     """
     bound = _pn.bind(function, *args, **kwargs)
     bound.interactive = lambda **kwargs: Interactive(bound, **kwargs)
