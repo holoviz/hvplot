@@ -3,7 +3,7 @@ hvPlot makes data analysis and visualization simple
 ===================================================
 
 hvPlot provides a familiar, high-level API for interactive data exploration and visualization,
-based on the 🐼 Pandas `.plot` API and the innovative `.interactive` API.
+based on the Pandas `.plot` API and the innovative `.interactive` API.
 
 hvPlot
 
@@ -260,7 +260,8 @@ def bind(function, *args, **kwargs):
     Returns
     -------
     Returns a new function with the args and kwargs bound to it and
-    annotated with all dependencies.
+    annotated with all dependencies. This function has an `interactive`
+    attribute that can be called to instantiate an `Interactive` pipeline.
     """
     bound = _pn.bind(function, *args, **kwargs)
     bound.interactive = lambda **kwargs: Interactive(bound, **kwargs)
