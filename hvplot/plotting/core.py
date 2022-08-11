@@ -152,28 +152,6 @@ class hvPlotTabular(hvPlotBase):
 
         Reference: https://hvplot.holoviz.org/reference/pandas/line.html
 
-        Examples
-        --------
-
-        >>> import hvplot.pandas
-        >>> from bokeh.sampledata.degrees import data as deg
-        >>> line = deg.hvplot.line(
-        ...     x='Year', y=['Art and Performance', 'Business', 'Biology', 'Education', 'Computer Science'],
-        ...     value_label='% of Degrees Earned by Women', legend='top', height=500, width=620
-        ... )
-        >>> line
-
-        You can can add *markers* to a `line` plot by overlaying with a `scatter` plot.
-
-        >>> scatter = deg.hvplot.scatter(
-        ...     x='Year', y=['Art and Performance', 'Business', 'Biology', 'Education', 'Computer Science'],
-        ...     value_label='% of Degrees Earned by Women', legend='top', height=500, width=620
-        ... )
-        >>> line * scatter
-
-        Please note that you can pass widgets or reactive functions as arguments instead of
-        literal values, c.f. https://hvplot.holoviz.org/user_guide/Widgets.html.
-
         Parameters
         ----------
         x : string, optional
@@ -205,6 +183,28 @@ class hvPlotTabular(hvPlotBase):
         A Holoviews object. You can `print` the object to study its composition and run `hv.help` on
         the object to learn more about its parameters and options.
 
+        Examples
+        --------
+
+        >>> import hvplot.pandas
+        >>> from bokeh.sampledata.degrees import data as deg
+        >>> line = deg.hvplot.line(
+        ...     x='Year', y=['Art and Performance', 'Business', 'Biology', 'Education', 'Computer Science'],
+        ...     value_label='% of Degrees Earned by Women', legend='top', height=500, width=620
+        ... )
+        >>> line
+
+        You can can add *markers* to a `line` plot by overlaying with a `scatter` plot.
+
+        >>> scatter = deg.hvplot.scatter(
+        ...     x='Year', y=['Art and Performance', 'Business', 'Biology', 'Education', 'Computer Science'],
+        ...     value_label='% of Degrees Earned by Women', legend='top', height=500, width=620
+        ... )
+        >>> line * scatter
+
+        Please note that you can pass widgets or reactive functions as arguments instead of
+        literal values, c.f. https://hvplot.holoviz.org/user_guide/Widgets.html.
+
         References
         ----------
 
@@ -225,30 +225,6 @@ class hvPlotTabular(hvPlotBase):
         of the same options available.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/step.html
-
-        Examples
-        --------
-
-        >>> import hvplot.pandas
-        >>> from bokeh.sampledata.degrees import data as deg
-        >>> plot = deg.hvplot.step(
-        ...     x='Year',
-        ...     y=['Art and Performance', 'Business', 'Biology', 'Education', 'Computer Science'], 
-        ...     value_label='% of Degrees Earned by Women', legend='top', height=500, width=1000
-        ... )
-        >>> plot
-
-        You can can add *markers* to a `step` plot by overlaying with a `scatter` plot.
-
-        >>> markers = deg.hvplot.scatter(
-        ...     x='Year',
-        ...     y=['Art and Performance', 'Business', 'Biology', 'Education', 'Computer Science'], 
-        ...     value_label='% of Degrees Earned by Women', legend='top', height=500, width=1000
-        ... )
-        >>> plot*markers
-
-        Please note that you can pass widgets or reactive functions as arguments instead of
-        literal values, c.f. https://hvplot.holoviz.org/user_guide/Widgets.html.
 
         Parameters
         ----------
@@ -281,6 +257,30 @@ class hvPlotTabular(hvPlotBase):
         A Holoviews object. You can `print` the object to study its composition and run `hv.help` on
         the object to learn more about its parameters and options.
 
+                Examples
+        --------
+
+        >>> import hvplot.pandas
+        >>> from bokeh.sampledata.degrees import data as deg
+        >>> plot = deg.hvplot.step(
+        ...     x='Year',
+        ...     y=['Art and Performance', 'Business', 'Biology', 'Education', 'Computer Science'], 
+        ...     value_label='% of Degrees Earned by Women', legend='top', height=500, width=1000
+        ... )
+        >>> plot
+
+        You can can add *markers* to a `step` plot by overlaying with a `scatter` plot.
+
+        >>> markers = deg.hvplot.scatter(
+        ...     x='Year',
+        ...     y=['Art and Performance', 'Business', 'Biology', 'Education', 'Computer Science'], 
+        ...     value_label='% of Degrees Earned by Women', legend='top', height=500, width=1000
+        ... )
+        >>> plot*markers
+
+        Please note that you can pass widgets or reactive functions as arguments instead of
+        literal values, c.f. https://hvplot.holoviz.org/user_guide/Widgets.html.
+        
         References
         ----------
 
@@ -301,19 +301,6 @@ class hvPlotTabular(hvPlotBase):
         Todo: Figure out why "non continous axes"
 
         Reference: https://hvplot.holoviz.org/reference/pandas/scatter.html
-
-        Example
-        -------
-
-        >>> import hvplot.pandas
-        >>> from bokeh.sampledata.iris import flowers as df
-        >>> df.hvplot.scatter(
-        ...     x='sepal_length', y='sepal_width', by='species', 
-        ...     legend='top', height=400, width=400
-        ... )
-
-        The points will be grouped and color coded `by` the categorical values in the 'species'
-        column.
 
         Parameters
         ----------
@@ -342,6 +329,19 @@ class hvPlotTabular(hvPlotBase):
             plotted, then only the first color from the color list will be used.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('scatter')`.
+        
+        Example
+        -------
+
+        >>> import hvplot.pandas
+        >>> from bokeh.sampledata.iris import flowers as df
+        >>> df.hvplot.scatter(
+        ...     x='sepal_length', y='sepal_width', by='species', 
+        ...     legend='top', height=400, width=400
+        ... )
+
+        The points will be grouped and color coded `by` the categorical values in the 'species'
+        column.
         
         Returns
         -------
