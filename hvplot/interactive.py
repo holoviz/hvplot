@@ -171,7 +171,8 @@ class Interactive:
 
     def __init__(self, obj, transform=None, fn=None, plot=False, depth=0,
                  loc='top_left', center=False, dmap=False, inherit_kwargs={},
-                 max_rows=100, method=None, _shared_obj=None, **kwargs):
+                 max_rows=100, method=None, _shared_obj=None, _current=None, **kwargs):
+
         # _init is used to prevent to __getattribute__ to execute its
         # specialized code.
         self._init = False
@@ -205,7 +206,10 @@ class Interactive:
         self._max_rows = max_rows
         self._kwargs = kwargs
         ds = hv.Dataset(self._obj)
-        self._current = self._transform.apply(ds, keep_index=True, compute=False)
+        if _current is not None:
+            self._current = _current
+        else:
+            self._current = self._transform.apply(ds, keep_index=True, compute=False)
         self._init = True
         self.hvplot = _hvplot(self)
 
@@ -288,7 +292,7 @@ class Interactive:
         dmap = self._dmap if dmap is None else dmap
         depth = self._depth + 1
         if copy:
-            kwargs = dict(self._kwargs, inherit_kwargs=self._inherit_kwargs, method=self._method, **kwargs)
+            kwargs = dict(self._kwargs, _current=self._current, inherit_kwargs=self._inherit_kwargs, method=self._method, **kwargs)
         else:
             kwargs = dict(self._inherit_kwargs, **dict(self._kwargs, **kwargs))
         return type(self)(self._obj, fn=self._fn, transform=transform, plot=plot, depth=depth,
