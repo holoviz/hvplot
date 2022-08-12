@@ -124,3 +124,6 @@ hvplot/.version
 
 # MacOS
 .DS_Store
+
+# Examples artefacts
+examples/user_guide/plot.html

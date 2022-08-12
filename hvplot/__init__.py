@@ -69,6 +69,7 @@ from holoviews import Store, render  # noqa
 
 from .converter import HoloViewsConverter
 from .interactive import Interactive
+from .ui import explorer  # noqa
 from .utilities import hvplot_extension, output, save, show # noqa
 from .plotting import (hvPlot, hvPlotTabular,  # noqa
                        andrews_curves, lag_plot,
