@@ -557,59 +557,90 @@ class hvPlotTabular(hvPlotBase):
 
         Reference: https://hvplot.holoviz.org/reference/pandas/ohlc.html
 
-        Example
-        -------
-
         Parameters
         ----------
-        x: string, optional
-            Field name to draw x coordinates from.
-        y: list or tuple, optional
-            Field names of the OHLC columns
+        x : string, optional
+            Field name to draw x coordinates from. If not specified, the index is used.
+        y : list or tuple, optional
+            Field names of the OHLC columns. Default is ["open", "high", "low", "close"]
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('ohlc')`.
-
 
         Returns
         -------
         A Holoviews object. You can `print` the object to study its composition and run `hv.help` on
         the object to learn more about its parameters and options.
+
+        Example
+        -------
+        >>> import hvplot.pandas
+        >>> import pandas as pd
+        >>> data = pd.DataFrame({
+        ...     "open": [100, 101, 102],
+        ...     "high": [101, 103, 104],
+        ...     "low": [99, 100, 100],
+        ...     "close": [101, 99, 103],
+        ... }, index=[pd.Timestamp("2022-08-01"), pd.Timestamp("2022-08-02"), pd.Timestamp("2022-08-03")])
+        >>> data.hvplot.ohlc()
+
+        References
+        ----------
+
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/candlestick.html
+        - Matplotlib: https://www.statology.org/matplotlib-python-candlestick-chart/
+        - Plotly: https://plotly.com/python/ohlc-charts/
+        - Wikipedia: https://en.wikipedia.org/wiki/Candlestick_chart
         """
         return self(kind="ohlc", x=x, y=y, **kwds)
 
     def heatmap(self, x=None, y=None, C=None, colorbar=True, **kwds):
         """
-        The `heatmap` plot shows the magnitude of a phenomenon as color coded cells in a two
-        dimensional matrix.
+        `heatmap` visualises tabular data indexed by two key dimensions as a grid of colored values.
+        This allows spotting correlations in multivariate data and provides a high-level overview
+        of how the two variables are plotted.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/heatmap.html
-
-        Wiki: https://en.wikipedia.org/wiki/Heat_map
-
-        Example
-        -------
 
         Parameters
         ----------
         x : string, optional
-            Field name to draw x-positions from
-        y : string, optional
+            Field name to draw x coordinates from. If not specified, the index is used.
+        y : string
             Field name to draw y-positions from
-        C : string
-            Field to draw heatmap color from
-        colorbar: boolean
-            Whether to display a colorbar
-        reduce_function : function
-            Function to compute statistics for heatmap
+        C : string, optional
+            Field to draw heatmap color from. If not specified a simple count will be shown.
+        colorbar: boolean, optional
+            Whether to display a colorbar. Default is True.
+        reduce_function : function, optional
+            Function to compute statistics for heatmap, for example `np.mean`.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('heatmap')`.
 
-
         Returns
         -------
-        obj : Holoviews object
-            You can `print` the object to study its composition and run `hv.help` on the the
-            object to learn more about its parameters and options.
+        A Holoviews object. You can `print` the object to study its composition and run `hv.help`
+        on the the object to learn more about its parameters and options.
+
+        Example
+        -------
+
+        >>> import hvplot.pandas
+        >>> from bokeh.sampledata import sea_surface_temperature as sst
+
+        >>> df = sst.sea_surface_temperature
+        >>> df.hvplot.heatmap(
+        ...     x="time.month", y="time.day", C="temperature", reduce_function=np.mean,
+        ...     height=500, width=500, colorbar=False,
+        ... )
+
+        References
+        ----------
+
+        - Bokeh: http://docs.bokeh.org/en/latest/docs/gallery/categorical_heatmap.html
+        - Matplotlib: https://matplotlib.org/stable/gallery/images_contours_and_fields/image_annotated_heatmap.html
+        - Plotly: https://plotly.com/python/heatmaps/
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/HeatMap.html
+        - Wiki: https://en.wikipedia.org/wiki/Heat_map
         """
         return self(x, y, kind="heatmap", C=C, colorbar=colorbar, **kwds)
 
@@ -627,34 +658,53 @@ class hvPlotTabular(hvPlotBase):
 
         Reference: https://hvplot.holoviz.org/reference/pandas/hexbin.html
 
-        Wiki: https://think.design/services/data-visualization-data-design/hexbin/
-
-        Example
-        -------
-
         Parameters
         ----------
         x : string, optional
-            Field name to draw x-positions from
-        y : string, optional
+            Field name to draw x coordinates from. If not specified, the index is used.
+        y : string
             Field name to draw y-positions from
-        C : string
-            Field to draw heatmap color from
-        colorbar: boolean
-            Whether to display a colorbar
-        reduce_function : function
-            Function to compute statistics for hexbins
-        min_count : number
+        C : string, optional
+            Field to draw hexbin color from. If not specified a simple count will be shown.
+        colorbar: boolean, optional
+            Whether to display a colorbar. Default is True.
+        reduce_function : function, optional
+            Function to compute statistics for hexbins, for example `np.mean`.
+        gridsize: int, optional
+            The number of hexagons in the x-direction
+        min_count : number, optional
             The display threshold before a bin is shown, by default bins with
             a count of less than 1 are hidden
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('hexbin')`.
 
-
         Returns
         -------
         A Holoviews object. You can `print` the object to study its composition and run `hv.help` on
         the object to learn more about its parameters and options.
+
+        Example
+        -------
+
+        >>> import hvplot.pandas
+        >>> import pandas as pd
+        >>> import numpy as np
+
+        >>> n = 500
+        >>> df = pd.DataFrame({
+        ...     "x": 2 + 2 * np.random.standard_normal(n),
+        ...     "y": 2 + 2 * np.random.standard_normal(n),
+        ... })
+        >>> df.hvplot.hexbin("x", "y", clabel="Count", height=400, width=500)
+
+        References
+        ----------
+
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/hexbin.html
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/HexTiles.html
+        - Pandas:
+        - Plotly: https://plotly.com/python/hexbin-mapbox/
+        - Wiki: https://think.design/services/data-visualization-data-design/hexbin/
         """
         return self(x, y, kind="hexbin", C=C, colorbar=colorbar, **kwds)
 
@@ -665,8 +715,6 @@ class hvPlotTabular(hvPlotBase):
         each point individually.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/bivariate.html
-
-        Wiki: https://en.wikipedia.org/wiki/Bivariate_analysis
 
         Example
         -------
@@ -686,6 +734,8 @@ class hvPlotTabular(hvPlotBase):
         -------
         A Holoviews object. You can `print` the object to study its composition and run `hv.help` on
         the object to learn more about its parameters and options.
+
+        Wiki: https://en.wikipedia.org/wiki/Bivariate_analysis
         """
         return self(x, y, kind="bivariate", colorbar=colorbar, **kwds)
 
