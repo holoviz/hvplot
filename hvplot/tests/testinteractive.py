@@ -1290,3 +1290,17 @@ def test_interactive_pandas_series_widget_value(series):
     assert isinstance(widgets, pn.Column)
     assert len(widgets) == 1
     assert widgets[0] is w
+
+
+def test_clones_dont_reexecute_transforms():
+    # Fixes https://github.com/holoviz/hvplot/issues/832
+    df = pd.DataFrame()
+    msgs = []
+
+    def piped(df, msg):
+        msgs.append(msg)
+        return df
+
+    df.interactive.pipe(piped, msg="1").pipe(piped, msg="2")
+
+    assert len(msgs) == 3
