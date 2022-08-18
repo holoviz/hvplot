@@ -56,6 +56,8 @@ extensions += [
     'sphinx_copybutton',
 ]
 
+myst_enable_extensions = ["colon_fence"]
+
 nbsite_gallery_conf = {
     'github_org': 'holoviz',
     'github_project': 'hvplot',
