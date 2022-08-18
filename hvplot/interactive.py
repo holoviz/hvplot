@@ -334,19 +334,21 @@ class Interactive:
         return evaluate
 
     def _clone(self, transform=None, plot=None, loc=None, center=None,
-               dmap=None, copy=False, **kwargs):
+               dmap=None, copy=False, max_rows=None, **kwargs):
         plot = self._plot or plot
         transform = transform or self._transform
         loc = self._loc if loc is None else loc
         center = self._center if center is None else center
         dmap = self._dmap if dmap is None else dmap
+        max_rows = self._max_rows if max_rows is None else max_rows
         depth = self._depth + 1
         if copy:
             kwargs = dict(self._kwargs, inherit_kwargs=self._inherit_kwargs, method=self._method, **kwargs)
         else:
             kwargs = dict(self._inherit_kwargs, **dict(self._kwargs, **kwargs))
         return type(self)(self._obj, fn=self._fn, transform=transform, plot=plot, depth=depth,
-                         loc=loc, center=center, dmap=dmap, _shared_obj=self._shared_obj, **kwargs)
+                         loc=loc, center=center, dmap=dmap, _shared_obj=self._shared_obj,
+                         max_rows=max_rows, **kwargs)
 
     def _repr_mimebundle_(self, include=[], exclude=[]):
         return self.layout()._repr_mimebundle_()

@@ -840,7 +840,6 @@ def test_interactive_pandas_out_frame(series):
     pd.testing.assert_frame_equal(out.object, si._current)
 
 
-@pytest.mark.xfail(reason='Bug: max_rows is not propagated to the next instance')
 def test_interactive_pandas_out_frame_max_rows(series):
     si = Interactive(series, max_rows=5)
     si = si.head(2)
@@ -852,15 +851,37 @@ def test_interactive_pandas_out_frame_max_rows(series):
     assert out.max_rows == 5
 
 
-def test_interactive_pandas_out_frame_kwargs(series):
-    si = Interactive(series, width=100)
+def test_interactive_pandas_out_frame_max_rows_accessor_called(series):
+    si = series.interactive(max_rows=5)
     si = si.head(2)
 
     # Equivalent to eval
     out = si._callback()
 
     assert isinstance(out, pn.pane.DataFrame)
-    assert out.width == 100
+    assert out.max_rows == 5
+
+
+def test_interactive_pandas_out_frame_kwargs(series):
+    si = Interactive(series, width=111)
+    si = si.head(2)
+
+    # Equivalent to eval
+    out = si._callback()
+
+    assert isinstance(out, pn.pane.DataFrame)
+    assert out.width == 111
+
+
+def test_interactive_pandas_out_frame_kwargs_accessor_called(series):
+    si = series.interactive(width=111)
+    si = si.head(2)
+
+    # Equivalent to eval
+    out = si._callback()
+
+    assert isinstance(out, pn.pane.DataFrame)
+    assert out.width == 111
 
 
 def test_interactive_pandas_out_frame_attrib(df):
