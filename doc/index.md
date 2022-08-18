@@ -21,20 +21,6 @@ width: 70%
 ---
 ```
 
-::::{grid} 2
-
-:::{grid-item-card}
-```bash
-conda install -c pyviz hvplot`
-```
-:::
-:::{grid-item-card}
-```bash
-pip install hvplot
-```
-:::
-::::
-
 ---
 
 **`.hvplot()` for a more versatile and powerful `.plot()` API**
