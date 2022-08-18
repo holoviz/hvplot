@@ -68,7 +68,6 @@ class hvPlotBase:
     __all__ = []
 
     def __init__(self, data, custom_plots={}, **metadata):
-        "Hello"
         if "query" in metadata:
             data = data.query(metadata.pop("query"))
         if "sel" in metadata:
@@ -196,7 +195,6 @@ class hvPlotTabular(hvPlotBase):
     >>> scatter = deg.hvplot.scatter(
     ...     x='Year', y=['Art and Performance', 'Business', 'Biology', 'Education', 'Computer Science'],
     ...     value_label='% of Degrees Earned by Women', legend='top', height=500, width=620,
-    ...     kind='scatter',
     ... )
     >>> line * scatter
 
@@ -702,7 +700,6 @@ class hvPlotTabular(hvPlotBase):
 
         - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/hexbin.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/HexTiles.html
-        - Pandas:
         - Plotly: https://plotly.com/python/hexbin-mapbox/
         - Wiki: https://think.design/services/data-visualization-data-design/hexbin/
         """
@@ -710,9 +707,11 @@ class hvPlotTabular(hvPlotBase):
 
     def bivariate(self, x=None, y=None, colorbar=True, **kwds):
         """
-        `bivariate` is a statistical method for creating a *2D density plot*. `bivariate`
-        plots can be a useful alternative to scatter plots, if your data are too dense to plot
-        each point individually.
+        A bivariate, density plot uses nested contours (or contours plus colors) to indicate
+        regions of higher local density.
+
+        `bivariate` plots can be a useful alternative to scatter plots, if your data are too dense
+        to plot each point individually.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/bivariate.html
 
@@ -730,11 +729,16 @@ class hvPlotTabular(hvPlotBase):
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('bivariate')`.
 
+        # Todo: Figure out if other aggregation functions than relative count are supported.
+
         Returns
         -------
         A Holoviews object. You can `print` the object to study its composition and run `hv.help` on
         the object to learn more about its parameters and options.
 
+        ggplot: https://bio304-class.github.io/bio304-fall2017/ggplot-bivariate.html
+        Plotly: https://plotly.com/python/2d-histogram-contour/
+        Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.contour.html
         Wiki: https://en.wikipedia.org/wiki/Bivariate_analysis
         """
         return self(x, y, kind="bivariate", colorbar=colorbar, **kwds)
