@@ -404,7 +404,7 @@ class hvPlotTabular(hvPlotBase):
         - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/step.html
         - HoloViews: https://holoviews.org/gallery/demos/bokeh/step_chart.html
         - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.line.html (use `draw_style='step')
-        - Plotly: https://https://plotly.com/python/line-charts/ (See the Interpolation Section)
+        - Plotly: https://plotly.com/python/line-charts/ (See the Interpolation Section)
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.step.html
         """
         return self(x, y, kind="step", where=where, **kwds)
