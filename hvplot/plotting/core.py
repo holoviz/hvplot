@@ -770,9 +770,6 @@ class hvPlotTabular(hvPlotBase):
 
         Reference: https://hvplot.holoviz.org/reference/pandas/bivariate.html
 
-        Example
-        -------
-
         Parameters
         ----------
         x : string, optional
@@ -836,9 +833,28 @@ class hvPlotTabular(hvPlotBase):
 
         to learn more about its parameters and options.
 
+        Example
+        -------
+
+        >>> import hvplot.pandas
+        >>> import pandas as pd
+
+        >>> df = pd.DataFrame({
+        ...     'speed': [0.1, 17.5, 40, 48, 52, 69, 88],
+        ...     'lifespan': [2, 8, 70, 1.5, 25, 12, 28],
+        ...     },
+        ...     index= ['snail', 'pig', 'elephant', 'rabbit', 'giraffe', 'coyote', 'horse']
+        ... )
+        >>> df.hvplot.bar(rot=90, color=["#457278", "#615078"])
+
         References
         ----------
 
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/vbar.html
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Bars.html
+        - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.bar.html
+        - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.bar.html
+        - Plotly: https://plotly.com/python/bar-charts/
         - Wiki: https://en.wikipedia.org/wiki/Bar_chart
         """
         return self(x, y, kind="bar", **kwds)
