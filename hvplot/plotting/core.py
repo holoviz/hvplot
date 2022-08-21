@@ -274,7 +274,7 @@ class hvPlotTabular(hvPlotBase):
         groupby: string, list, optional
             A single field or list of fields to group and filter by. Adds one or more widgets to
             select the subgroup(s) to visualize.
-        color : str or array-like, optional, abbreviation `c`.
+        color : str or array-like, optional.
             The color for each of the series. Possible values are:
 
             A single color string referred to by name, RGB or RGBA code, for instance 'red' or
@@ -352,7 +352,7 @@ class hvPlotTabular(hvPlotBase):
         groupby: string, list, optional
             A single field or list of fields to group and filter by. Adds one or more widgets to
             select the subgroup(s) to visualize.
-        color : str or array-like, optional, abbreviation `c`.
+        color : str or array-like, optional.
             The color for each of the series. Possible values are:
 
             A single color string referred to by name, RGB or RGBA code, for instance 'red' or
@@ -433,7 +433,7 @@ class hvPlotTabular(hvPlotBase):
             select the subgroup(s) to visualize.
         scale: number, optional, abbreviation `s`.
             Scaling factor to apply to point scaling.
-        color : str or array-like, optional, abbreviation `c`.
+        color : str or array-like, optional.
             The color for each of the series. Possible values are:
 
             A single color string referred to by name, RGB or RGBA code, for instance 'red' or
@@ -496,8 +496,8 @@ class hvPlotTabular(hvPlotBase):
             Field name to draw the first y-position from
         y2 : string, optional
             Field name to second y-position from
-        stacked : boolean
-            Whether to stack multiple areas
+        stacked : boolean, optional
+            Whether to stack multiple areas. Default is False.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('area')`.
 
@@ -773,7 +773,7 @@ class hvPlotTabular(hvPlotBase):
         Parameters
         ----------
         x : string, optional
-            Field name to draw x-positions from
+            Field name to draw x-positions from. If not specified, the index is used.
         y : string, optional
             Field name to draw y-positions from
         colorbar: boolean
@@ -791,6 +791,21 @@ class hvPlotTabular(hvPlotBase):
         >>> hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        Examples
+        --------
+
+        >>> import hvplot.pandas
+        >>> from bokeh.sampledata.autompg import autompg_clean as df
+
+        >>> bivariate = df.hvplot.bivariate("accel", "mpg")
+        >>> bivariate
+
+        To get a better intuitive understanding of the `bivariate` plot, you can try overlaying the
+        corresponding scatter plot.
+
+        >>> scatter = df.hvplot.scatter("accel", "mpg")
+        >>> bivariate * scatter
 
         References
         ----------
@@ -818,9 +833,22 @@ class hvPlotTabular(hvPlotBase):
         Parameters
         ----------
         x : string, optional
-            Field name to draw x-positions from
+            Field name to draw x-positions from. If not specified, the index is used.
         y : string, optional
-            Field name to draw y-positions from
+            Field name to draw y-positions from. If not specified, all numerical
+            fields are used.
+        stacked : bool, optional
+            If True, creates a stacked bar plot. Default is False.
+        color : str or array-like, optional.
+            The color for each of the series. Possible values are:
+
+            A single color string referred to by name, RGB or RGBA code, for instance 'red' or
+            '#a98d19.
+
+            A sequence of color strings referred to by name, RGB or RGBA code, which will be used
+            for each series recursively. For instance ['green','yellow'] each field’s line will be
+            filled in green or yellow, alternatively. If there is only a single series to be
+            plotted, then only the first color from the color list will be used.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('bar')`.
 
@@ -846,6 +874,10 @@ class hvPlotTabular(hvPlotBase):
         ...     index= ['snail', 'pig', 'elephant', 'rabbit', 'giraffe', 'coyote', 'horse']
         ... )
         >>> df.hvplot.bar(rot=90, color=["#457278", "#615078"])
+
+        You can stack the bars by setting `stacked=True`
+
+        >>> df.hvplot.bar(stacked=True, rot=90, color=["#457278", "#615078"])
 
         References
         ----------
@@ -886,9 +918,33 @@ class hvPlotTabular(hvPlotBase):
 
         to learn more about its parameters and options.
 
+        Examples
+        --------
+
+        >>> import hvplot.pandas
+        >>> import pandas as pd
+
+        >>> df = pd.DataFrame(
+        ...     {
+        ...         "speed": [0.1, 17.5, 40, 48, 52, 69, 88],
+        ...         "lifespan": [2, 8, 70, 1.5, 25, 12, 28],
+        ...     },
+        ...     index=["snail", "pig", "elephant", "rabbit", "giraffe", "coyote", "horse"],
+        ... )
+        >>> df.hvplot.barh(color=["#457278", "#615078"])
+
+        You can stack the bars by setting `stacked=True`
+
+        >>> df.hvplot.barh(stacked=True, color=["#457278", "#615078"])
+
         References
         ----------
 
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/hbar.html
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Bars.html
+        - Matplotlib: https://matplotlib.org/stable/gallery/lines_bars_and_markers/barh.html
+        - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.barh.html
+        - Plotly: https://plotly.com/python/horizontal-bar-charts/
         - Wiki: https://en.wikipedia.org/wiki/Bar_chart
         """
         return self(x, y, kind="barh", **kwds)
