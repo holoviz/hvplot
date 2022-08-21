@@ -352,6 +352,8 @@ class hvPlotTabular(hvPlotBase):
         groupby: string, list, optional
             A single field or list of fields to group and filter by. Adds one or more widgets to
             select the subgroup(s) to visualize.
+        where: string, optional
+            The interpolation method. One of 'mid', 'pre', 'post'. Default is 'mid'.
         color : str or array-like, optional.
             The color for each of the series. Possible values are:
 
@@ -426,6 +428,13 @@ class hvPlotTabular(hvPlotBase):
         y : string or list, optional
             Field name(s) to draw y-positions from. If not specified, all numerical
             fields are used.
+        marker : string, optional
+            The marker shape specified above can be any supported by matplotlib, e.g. s, d, o etc.
+            See https://matplotlib.org/stable/api/markers_api.html.
+        c : string, optional
+            A color or a Field name to draw the color of the marker from
+        s : int, optional, also available as 'size'
+            The size of the marker
         by : string, optional
             A single field or list of fields to group by. All the subgroups are visualized.
         groupby: string, list, optional
@@ -433,6 +442,8 @@ class hvPlotTabular(hvPlotBase):
             select the subgroup(s) to visualize.
         scale: number, optional, abbreviation `s`.
             Scaling factor to apply to point scaling.
+        logz : bool
+            Whether to apply log scaling to the z-axis. Default is False.
         color : str or array-like, optional.
             The color for each of the series. Possible values are:
 
@@ -495,7 +506,7 @@ class hvPlotTabular(hvPlotBase):
         y : string, optional
             Field name to draw the first y-position from
         y2 : string, optional
-            Field name to second y-position from
+            Field name to draw the second y-position from
         stacked : boolean, optional
             Whether to stack multiple areas. Default is False.
         **kwds : optional
@@ -607,6 +618,12 @@ class hvPlotTabular(hvPlotBase):
             Field name to draw x coordinates from. If not specified, the index is used.
         y : list or tuple, optional
             Field names of the OHLC fields. Default is ["open", "high", "low", "close"]
+        line_color : string, optional
+            The line color. Default is black
+        pos_color : string, optional
+            The color indicating a positive change. Default is green.
+        neg_color : string, optional
+            The color indicating a negative change. Default is red.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('ohlc')`.
 
@@ -659,6 +676,8 @@ class hvPlotTabular(hvPlotBase):
             Field to draw heatmap color from. If not specified a simple count will be used.
         colorbar: boolean, optional
             Whether to display a colorbar. Default is True.
+        logz : bool
+            Whether to apply log scaling to the z-axis. Default is False.
         reduce_function : function, optional
             Function to compute statistics for heatmap, for example `np.mean`.
         **kwds : optional
@@ -691,9 +710,9 @@ class hvPlotTabular(hvPlotBase):
         ----------
 
         - Bokeh: http://docs.bokeh.org/en/latest/docs/gallery/categorical_heatmap.html
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/HeatMap.html
         - Matplotlib: https://matplotlib.org/stable/gallery/images_contours_and_fields/image_annotated_heatmap.html
         - Plotly: https://plotly.com/python/heatmaps/
-        - HoloViews: https://holoviews.org/reference/elements/bokeh/HeatMap.html
         - Wiki: https://en.wikipedia.org/wiki/Heat_map
         """
         return self(x, y, kind="heatmap", C=C, colorbar=colorbar, **kwds)
@@ -721,6 +740,8 @@ class hvPlotTabular(hvPlotBase):
             Function to compute statistics for hexbins, for example `np.mean`.
         gridsize: int, optional
             The number of hexagons in the x-direction
+        logz : bool
+            Whether to apply log scaling to the z-axis. Default is False.
         min_count : number, optional
             The display threshold before a bin is shown, by default bins with
             a count of less than 1 are hidden
@@ -778,10 +799,17 @@ class hvPlotTabular(hvPlotBase):
             Field name to draw y-positions from
         colorbar: boolean
             Whether to display a colorbar
+        bandwidth: int, optional
+            The bandwidth of the kernel for the density estimate. Default is None.
+        cut: Integer, Optional
+            Draw the estimate to cut * bw from the extreme data points. Default is None.
+        filled : bool, optional
+            If True the the contours will be filled. Default is False.
+        levels: int, optional
+            The number of contour lines to draw. Default is 10.
+
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('bivariate')`.
-
-        # Todo: Figure out if other aggregation functions than relative count are supported.
 
         Returns
         -------
@@ -810,10 +838,11 @@ class hvPlotTabular(hvPlotBase):
         References
         ----------
 
-        ggplot: https://bio304-class.github.io/bio304-fall2017/ggplot-bivariate.html
-        Plotly: https://plotly.com/python/2d-histogram-contour/
-        Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.contour.html
-        Wiki: https://en.wikipedia.org/wiki/Bivariate_analysis
+        - ggplot: https://bio304-class.github.io/bio304-fall2017/ggplot-bivariate.html
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Bivariate.html
+        - Plotly: https://plotly.com/python/2d-histogram-contour/
+        - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.contour.html
+        - Wiki: https://en.wikipedia.org/wiki/Bivariate_analysis
         """
         return self(x, y, kind="bivariate", colorbar=colorbar, **kwds)
 
