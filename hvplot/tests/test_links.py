@@ -22,7 +22,7 @@ FIXTURES = [pytest.param(file, id=file.name) for file in _get_files_to_check()]
 
 def _find_urls(text):
     url = re.findall(URL_REGEX, text)
-    return [x[0] for x in url]
+    return set(x[0] for x in url)
 
 
 def _url_exists(url):
