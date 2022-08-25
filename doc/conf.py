@@ -45,6 +45,7 @@ html_theme_options.update({
         },
     ],
     "google_analytics_id": "UA-154795830-5",
+    "navbar_end": ["navbar-icon-links"],
 })
 
 html_theme = "pydata_sphinx_theme"

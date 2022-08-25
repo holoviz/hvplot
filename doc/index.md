@@ -50,7 +50,6 @@ xr_ds.hvplot()
 ---
 alt: xarray support
 align: center
-height: 300px
 ---
 ```
 :::
@@ -67,7 +66,6 @@ df_dask.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
 ---
 alt: dask support
 align: center
-height: 300px
 ---
 :::
 
@@ -83,7 +81,6 @@ gdf.hvplot(global_extent=True, tiles=True)
 ---
 alt: geopandas support
 align: center
-height: 300px
 ---
 :::
 
@@ -99,7 +96,6 @@ hvnx.draw(G, with_labels=True)
 ---
 alt: networkx support
 align: center
-height: 300px
 ---
 :::
 
@@ -114,7 +110,6 @@ cat.us_crime.hvplot.line(x='Year', y='Violent Crime rate')
 ---
 alt: intake support
 align: center
-height: 300px
 ---
 :::
 
@@ -130,7 +125,6 @@ df_streamz.hvplot()
 ---
 alt: streamz support
 align: center
-height: 300px
 ---
 :::
 
@@ -155,7 +149,6 @@ df.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
 ---
 alt: matplotlib as a plotting backend
 align: center
-height: 300px
 ---
 ```
 :::
@@ -174,7 +167,6 @@ df.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
 ---
 alt: plotly as a plotting backend
 align: center
-height: 300px
 ---
 :::
 
@@ -197,7 +189,6 @@ plot1 + plot2
 ---
 alt: laying out plots
 align: center
-height: 300px
 ---
 ```
 :::
@@ -215,7 +206,6 @@ df.hvplot.scatter(y='mean') * dff.hvplot.errorbars(y='mean', yerr1='std')
 ---
 alt: overlaying plots
 align: center
-height: 300px
 ---
 ```
 :::
@@ -231,7 +221,6 @@ df.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', groupby='island', widge
 ---
 alt: more control with widgets
 align: center
-height: 300px
 ---
 ```
 :::
@@ -248,7 +237,6 @@ df.hvplot.scatter(x='distance', y='airtime', rasterize=True, cnorm='eq_hist', wi
 ---
 alt: visualize and explore large data
 align: center
-height: 300px
 ---
 ```
 :::
@@ -268,7 +256,6 @@ air_ds.air.sel(time='2013-06-01 12:00').hvplot.quadmesh(
 ---
 alt: geographic plots
 align: center
-height: 300px
 ---
 ```
 :::
@@ -299,7 +286,6 @@ dfi.loc[(dfi['sex'].isin(w_sex)) & (dfi['body_mass_g'] > w_body_mass)]['bill_len
 ---
 alt: interactive app from pandas
 align: center
-height: 300px
 ---
 ```
 :::
@@ -319,7 +305,6 @@ da.interactive.isel(time=w_time).mean().item() - da.mean().item()
 ---
 alt: interactive app from xarray
 align: center
-height: 150px
 ---
 ```
 :::
@@ -347,7 +332,6 @@ da.interactive(loc='left') \
 ---
 alt: interactive pipeline with an hvplot output
 align: center
-height: 300px
 ---
 ```
 
@@ -368,7 +352,6 @@ hvexplorer
 ---
 alt: explore data with the hvplot explorer
 align: center
-height: 300px
 ---
 ```
 

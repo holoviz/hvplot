@@ -60,3 +60,7 @@
 .fa-discourse:before {
     color: white;
 }
+
+ul.current.nav.bd-sidenav {
+    padding: 0;
+}
