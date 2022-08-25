@@ -765,7 +765,7 @@ class _hvplot:
         new = self._interactive._resolve_accessor()
         transform = new._transform
         transform = type(transform)(transform, 'hvplot', accessor=True)
-        dmap = 'kind' not in kwargs or not isinstance(kwargs['kind'], str)
+        dmap = 'kind' not in kwargs or isinstance(kwargs['kind'], str)
         return new._clone(transform(*args, **kwargs), dmap=dmap)
 
     def __getattr__(self, attr):

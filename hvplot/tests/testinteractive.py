@@ -205,7 +205,6 @@ def test_interactive_xarray_dataset_hvplot_accessor(dataarray):
         dai.hvplot.line(kind="area")
 
 
-@pytest.mark.xfail(reason='Not sure?')
 def test_interactive_pandas_dataframe_hvplot_accessor_dmap(df):
     dfi = df.interactive()
     dfi = dfi.hvplot.line(y='A')
@@ -219,7 +218,7 @@ def test_interactive_pandas_dataframe_hvplot_accessor_dmap_kind_widget(df):
     dfi = df.interactive()
     dfi = dfi.hvplot(kind=w, y='A')
 
-    assert dfi._dmap is True
+    assert dfi._dmap is False
 
 
 def test_interactive_with_bound_function_calls():
