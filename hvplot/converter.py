@@ -1258,7 +1258,7 @@ class HoloViewsConverter:
         if self.by and not self.subplots:
             opts['aggregator'] = reductions.count_cat(self.by[0])
             categorical = True
-        elif ((isinstance(self.y, list) or self.y is None and len(set(self.variables) - set(self.indexes)) > 1) and
+        elif ((isinstance(self.y, list) and len(self.y) > 1 or self.y is None and len(set(self.variables) - set(self.indexes)) > 1) and
               self.kind in ('scatter', 'line', 'area')):
             opts['aggregator'] = reductions.count_cat(self.group_label)
             categorical = True
