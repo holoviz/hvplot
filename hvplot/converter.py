@@ -1334,7 +1334,7 @@ class HoloViewsConverter:
     def _apply_layers(self, obj):
         if self.coastline:
             import geoviews as gv
-            coastline = gv.feature.coastline
+            coastline = gv.feature.coastline.clone()
             if self.coastline in ['10m', '50m', '110m']:
                 coastline = coastline.opts(scale=self.coastline)
             elif self.coastline is not True:
@@ -1352,6 +1352,7 @@ class HoloViewsConverter:
                         "Feature %r was not recognized, must be one of "
                         "'borders', 'coastline', 'lakes', 'land', 'ocean', "
                         "'rivers' and 'states'." % feature)
+                feature_obj = feature_obj.clone()
                 if isinstance(self.features, dict):
                     scale = self.features[feature]
                     if scale not in ['10m', '50m', '110m']:
