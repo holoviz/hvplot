@@ -109,6 +109,8 @@ doc/**/*.ipynb
 doc/**/*.json
 # this dir contains the whole website and should not be checked in on master
 builtdocs/
+# mystnb
+jupyter_execute/
 
 # pip
 pip-wheel-metadata/
