@@ -326,6 +326,7 @@ class hvPlotTabular(hvPlotBase):
         - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.line.html
         - Plotly: https://plotly.com/python/line-charts/
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html
+        - Seaborn: http://seaborn.pydata.org/generated/seaborn.lineplot.html
         - Wiki: https://en.wikipedia.org/wiki/Line_chart
         """
         return self(x, y, kind="line", **kwds)
@@ -487,6 +488,7 @@ class hvPlotTabular(hvPlotBase):
         - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.scatter.html
         - Plotly: https://plotly.com/python/line-and-scatter/
         - Matplotlib:  https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html
+        - Seaborn: https://seaborn.pydata.org/generated/seaborn.scatterplot.html
         - Wiki: https://en.wikipedia.org/wiki/Scatter_plot
         """
         return self(x, y, kind="scatter", **kwds)
@@ -842,6 +844,7 @@ class hvPlotTabular(hvPlotBase):
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Bivariate.html
         - Plotly: https://plotly.com/python/2d-histogram-contour/
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.contour.html
+        - Seaborn: https://seaborn.pydata.org/generated/seaborn.kdeplot.html
         - Wiki: https://en.wikipedia.org/wiki/Bivariate_analysis
         """
         return self(x, y, kind="bivariate", colorbar=colorbar, **kwds)
