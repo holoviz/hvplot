@@ -1341,11 +1341,8 @@ class hvPlotTabular(hvPlotBase):
 
     def dataset(self, columns=None, **kwds):
         """
-        Dataset
-
-        Todo: Describe the reason for exposing this.
-
-        Reference: Todo. Find link
+        The 'dataset' wraps a tabular or gridded dataset and can be further transformed and
+        annotated via methods from HoloViews.
 
         Parameters
         ----------
@@ -1357,6 +1354,21 @@ class hvPlotTabular(hvPlotBase):
         obj: Holoviews Dataset
             You can `print` the object to study its composition and run `hv.help` on the the
             object to learn more about its parameters and options.
+
+        Example
+        -------
+
+        >>> import pandas as pd
+        >>> import hvplot.pandas
+        >>> data = pd.DataFrame({"x": ['a', 'b', 'c'], "y": [1, 2, 3]})
+        >>> data.hvplot.dataset()
+        :Dataset   [x,y]
+
+        References
+        ----------
+
+        - HoloViews Tabular: https://holoviews.org/getting_started/Tabular_Datasets.html
+        - HoloViews Gridded: https://holoviews.org/getting_started/Gridded_Datasets.html
         """
         return self(kind="dataset", **dict(kwds, columns=columns))
 
