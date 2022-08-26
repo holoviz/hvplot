@@ -995,7 +995,7 @@ class hvPlotTabular(hvPlotBase):
         Returns
         -------
         A Holoviews object. You can `print` the object to study its composition and run
-        
+
         >>> import holoviews as hv
         >>> hv.help(the_holoviews_object)
 
@@ -1157,16 +1157,27 @@ class hvPlotTabular(hvPlotBase):
 
     def kde(self, y=None, by=None, **kwds):
         """
-        KDE plot
+        The Kernel density estimate (`kde`) plot shows the distribution and spread of the data.
+
+        The `kde` and `density` plots are the same.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/kde.html
 
         Parameters
         ----------
         y : string or sequence
-            Field in the data to compute distribution on.
+            Field(s) in the data to compute distribution on. If not specified all numerical fields
+            are used.
         by : string or sequence
-            Field in the data to group by.
+            Field(s) in the data to group by.
+        bandwidth : float, optional
+            The bandwidth of the kernel for the density estimate. Default is None.
+        cut : 
+            Draw the estimate to cut * bw from the extreme data points.
+        n_samples : int, optional
+            Number of samples to compute the KDE over. Default is 100.
+        filled : 
+            Whether the bivariate contours should be filled. Default is True.
         kwds : optional
             Additional keywords arguments are documented in `hvplot.help('kde')`.
 
@@ -1178,23 +1189,68 @@ class hvPlotTabular(hvPlotBase):
         >>> hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        Examples
+        --------
+
+        Lets display a 'kde' plot from *wide* data
+
+        >>> import hvplot.pandas # noqa
+        >>> import pandas as pd
+        >>> import numpy as np
+        >>> df = pd.DataFrame({
+        ...     'x': [1, 2, 2.5, 3, 3.5, 4, 5],
+        ...     'y': [4, 4, 4.5, 5, 5.5, 6, 6],
+        >>> })
+        >>> df.hvplot.kde(color=["orange", "green"], )
+
+        Lets display a 'kde' plot from *long* data using the 'by' attribute
+
+        >>> import hvplot.pandas # noqa
+        >>> import pandas as pd
+        >>> import numpy as np
+        >>> df = pd.DataFrame({
+        ...     'category': list('xxxxxxxyyyyyyy'),
+        ...     'value': [1, 2, 2.5, 3, 3.5, 4, 5, 4, 4, 4.5, 5, 5.5, 6, 6],
+        ... })
+        ... df.hvplot.kde(by='category', filled=False)
+
+        References
+        ----------
+
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Distribution.html
+        - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.kde.html
+        - Plotly: https://plotly.com/python/distplot/
+        - Seaborn: https://seaborn.pydata.org/generated/seaborn.kdeplot.html
+        - Wiki: https://en.wikipedia.org/wiki/Kernel_density_estimation
         """
         return self(kind="kde", x=None, y=y, by=by, **kwds)
 
     def density(self, y=None, by=None, **kwds):
         """
-        Density plot. Same as `kde` plot
+        The Kernel density estimate (`density`) plot shows the distribution and spread of the data.
+
+        The `kde` and `density` plots are the same.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/kde.html
 
         Parameters
         ----------
         y : string or sequence
-            Field in the data to compute distribution on.
+            Field(s) in the data to compute distribution from. If not specified all numerical fields
+            are used.
         by : string or sequence
-            Field in the data to group by.
+            Field(s) in the data to group by.
+        bandwidth : float, optional
+            The bandwidth of the kernel for the density estimate. Default is None.
+        cut : 
+            Draw the estimate to cut * bw from the extreme data points.
+        n_samples : int, optional
+            Number of samples to compute the KDE over. Default is 100.
+        filled : 
+            Whether the bivariate contours should be filled. Default is True.
         kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('kde')`.
+            Additional keywords arguments are documented in `hvplot.help('density')`.
 
         Returns
         -------
@@ -1204,17 +1260,57 @@ class hvPlotTabular(hvPlotBase):
         >>> hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        Examples
+        --------
+
+        Lets display a 'density' plot from *wide* data
+
+        >>> import hvplot.pandas # noqa
+        >>> import pandas as pd
+        >>> import numpy as np
+        >>> df = pd.DataFrame({
+        ...     'x': [1, 2, 2.5, 3, 3.5, 4, 5],
+        ...     'y': [4, 4, 4.5, 5, 5.5, 6, 6],
+        >>> })
+        >>> df.hvplot.kde(color=["orange", "green"], )
+
+        Lets display a 'density' plot from *long* data using the 'by' attribute
+
+        >>> import hvplot.pandas # noqa
+        >>> import pandas as pd
+        >>> import numpy as np
+        >>> df = pd.DataFrame({
+        ...     'category': list('xxxxxxxyyyyyyy'),
+        ...     'value': [1, 2, 2.5, 3, 3.5, 4, 5, 4, 4, 4.5, 5, 5.5, 6, 6],
+        ... })
+        ... df.hvplot.kde(by='category', filled=False)
+
+        References
+        ----------
+
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Distribution.html
+        - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.kde.html
+        - Plotly: https://plotly.com/python/distplot/
+        - Seaborn: https://seaborn.pydata.org/generated/seaborn.kdeplot.html
+        - Wiki: https://en.wikipedia.org/wiki/Kernel_density_estimation
         """
         return self(kind="kde", x=None, y=y, by=by, **kwds)
 
     def table(self, columns=None, **kwds):
         """
-        Table
+        Displays a 'table'.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/table.html
 
         Parameters
         ----------
+        columns : string or sequence
+            The field(s) to display as columns.
+        sortable : bool, optional
+            If True the columns are sortable. Default is False.
+        selectable : bool, optional
+            If True the cells are selectable. Default is False. # Todo: Describe how to use this
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('table')`.
 
@@ -1226,6 +1322,20 @@ class hvPlotTabular(hvPlotBase):
         >>> hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        Example
+        -------
+
+        >>> import hvplot.pandas # noqa
+        >>> from bokeh.sampledata.autompg import autompg_clean as df
+        >>> df.hvplot.table(columns=['origin', 'name', 'yr'], sortable=True, selectable=True)
+
+        References
+        ----------
+
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Table.html
+        - Plotly: https://plotly.com/python/table/
+        - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.table.html
         """
         return self(kind="table", **dict(kwds, columns=columns))
 
