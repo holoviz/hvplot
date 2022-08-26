@@ -47,7 +47,6 @@ class hvPlotBase:
 
     >>> import hvplot.pandas
     >>> from bokeh.sampledata.degrees import data as deg
-
     >>> line = deg.hvplot(
     ...     x="Year",
     ...     y=["Art and Performance", "Business", "Biology", "Education", "Computer Science"],
@@ -199,7 +198,6 @@ class hvPlotTabular(hvPlotBase):
 
     >>> import hvplot.pandas
     >>> from bokeh.sampledata.degrees import data as deg
-
     >>> line = deg.hvplot(
     ...     x="Year",
     ...     y=["Art and Performance", "Business", "Biology", "Education", "Computer Science"],
@@ -699,9 +697,7 @@ class hvPlotTabular(hvPlotBase):
 
         >>> import numpy as np
         >>> from bokeh.sampledata import sea_surface_temperature as sst
-
         >>> import hvplot.pandas
-
         >>> df = sst.sea_surface_temperature
         >>> df.hvplot.heatmap(
         ...     x="time.month", y="time.day", C="temperature", reduce_function=np.mean,
@@ -765,7 +761,6 @@ class hvPlotTabular(hvPlotBase):
         >>> import hvplot.pandas
         >>> import pandas as pd
         >>> import numpy as np
-
         >>> n = 500
         >>> df = pd.DataFrame({
         ...     "x": 2 + 2 * np.random.standard_normal(n),
@@ -827,7 +822,6 @@ class hvPlotTabular(hvPlotBase):
 
         >>> import hvplot.pandas
         >>> from bokeh.sampledata.autompg import autompg_clean as df
-
         >>> bivariate = df.hvplot.bivariate("accel", "mpg")
         >>> bivariate
 
@@ -898,7 +892,6 @@ class hvPlotTabular(hvPlotBase):
 
         >>> import hvplot.pandas
         >>> import pandas as pd
-
         >>> df = pd.DataFrame({
         ...     'speed': [0.1, 17.5, 40, 48, 52, 69, 88],
         ...     'lifespan': [2, 8, 70, 1.5, 25, 12, 28],
@@ -955,7 +948,6 @@ class hvPlotTabular(hvPlotBase):
 
         >>> import hvplot.pandas
         >>> import pandas as pd
-
         >>> df = pd.DataFrame(
         ...     {
         ...         "speed": [0.1, 17.5, 40, 48, 52, 69, 88],
@@ -997,7 +989,13 @@ class hvPlotTabular(hvPlotBase):
             numerical fields will be used.
         by : string or sequence
             Field in the *long* data to group by.
+        kwds : optional
+            Additional keywords arguments are documented in `hvplot.help('box')`.
 
+        Returns
+        -------
+        A Holoviews object. You can `print` the object to study its composition and run
+        
         >>> import holoviews as hv
         >>> hv.help(the_holoviews_object)
 
@@ -1036,16 +1034,20 @@ class hvPlotTabular(hvPlotBase):
 
     def violin(self, y=None, by=None, **kwds):
         """
-        Violin plot
+        `violin`  plots are similar to `box` plots, but they provide a better sense of the
+        distribution of data.
+        
+        Note that `violin` plots depend on the `scipy` library.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/violin.html
 
         Parameters
         ----------
         y : string or sequence
-            Field in the data to compute distribution on.
+            Field(s) in the *wide* data to compute distribution from. If none is provided all
+            numerical fields will be used.
         by : string or sequence
-            Field in the data to group by.
+            Field in the *long* data to group by.
         kwds : optional
             Additional keywords arguments are documented in `hvplot.help('violin')`.
 
@@ -1058,10 +1060,34 @@ class hvPlotTabular(hvPlotBase):
 
         to learn more about its parameters and options.
 
+        Examples
+        --------
+
+        Here is an example using *wide* data.
+
+        >>> import hvplot.pandas # noqa
+        >>> import pandas as pd
+        >>> import numpy as np
+        >>> data = np.random.randn(25, 4)
+        >>> df = pd.DataFrame(data, columns=list('ABCD'))
+        >>> df.hvplot.violin(ylim=(-5, 5))
+
+        Here is an example using *long* data and the `by` argument.
+
+        >>> import hvplot.pandas  # noqa
+        >>> import pandas as pd
+        >>> age_list = [8, 10, 12, 14, 72, 74, 76, 78, 20, 25, 30, 35, 60, 85]
+        >>> df = pd.DataFrame({"gender": list("MMMMMMMMFFFFFF"), "age": age_list})
+        >>> df.hvplot.violin(y='age', by='gender', height=400, width=400, legend=False, ylim=(-100, 200))
+
         References
         ----------
 
-        - Wiki: https://en.wikipedia.org/wiki/Box_plot
+        - Seaborn: https://seaborn.pydata.org/generated/seaborn.violinplot.html
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Violin.html
+        - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.violinplot.html
+        - Plotly: https://plotly.com/python/violin/
+        - Wiki: https://en.wikipedia.org/wiki/Violin_plot
         """
         return self(kind="violin", x=None, y=y, by=by, **dict(kwds, hover=False))
 
@@ -1347,7 +1373,6 @@ class hvPlot(hvPlotTabular):
 
     >>> import hvplot.pandas
     >>> from bokeh.sampledata.degrees import data as deg
-
     >>> line = deg.hvplot(
     ...     x="Year",
     ...     y=["Art and Performance", "Business", "Biology", "Education", "Computer Science"],
