@@ -326,7 +326,7 @@ class hvPlotTabular(hvPlotBase):
         - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.line.html
         - Plotly: https://plotly.com/python/line-charts/
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html
-        - Seaborn: http://seaborn.pydata.org/generated/seaborn.lineplot.html
+        - Seaborn: https://seaborn.pydata.org/generated/seaborn.lineplot.html
         - Wiki: https://en.wikipedia.org/wiki/Line_chart
         """
         return self(x, y, kind="line", **kwds)
@@ -483,8 +483,8 @@ class hvPlotTabular(hvPlotBase):
         References
         ----------
 
-        - Bokeh: http://docs.bokeh.org/en/latest/docs/user_guide/plotting.html#scatter-markers
-        - HoloViews: http://holoviews.org/reference/elements/matplotlib/Scatter.html
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/user_guide/plotting.html#scatter-markers
+        - HoloViews: https://holoviews.org/reference/elements/matplotlib/Scatter.html
         - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.scatter.html
         - Plotly: https://plotly.com/python/line-and-scatter/
         - Matplotlib:  https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html
@@ -536,8 +536,8 @@ class hvPlotTabular(hvPlotBase):
         References
         ----------
 
-        - Bokeh: http://docs.bokeh.org/en/latest/docs/user_guide/plotting.html#directed-areas
-        - HoloViews: http://holoviews.org/reference/elements/matplotlib/Area.html
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/user_guide/plotting.html#directed-areas
+        - HoloViews: https://holoviews.org/reference/elements/matplotlib/Area.html
         - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.area.html
         - Plotly: https://plotly.com/python/filled-area-plots/
         - Matplotlib:  https://matplotlib.org/stable/gallery/lines_bars_and_markers/fill_between_demo.html
@@ -711,7 +711,7 @@ class hvPlotTabular(hvPlotBase):
         References
         ----------
 
-        - Bokeh: http://docs.bokeh.org/en/latest/docs/gallery/categorical_heatmap.html
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/categorical_heatmap.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/HeatMap.html
         - Matplotlib: https://matplotlib.org/stable/gallery/images_contours_and_fields/image_annotated_heatmap.html
         - Plotly: https://plotly.com/python/heatmaps/
@@ -983,9 +983,8 @@ class hvPlotTabular(hvPlotBase):
 
     def box(self, y=None, by=None, **kwds):
         """
-        The `box` plot gives you a visual idea about 5 components in a dataset. It is also
-        known as *box and whiskers plot*. It is useful for describing measures of
-        central tendencies and measures of dispersion in a dataset.
+        The `box` plot gives you a visual idea about the *locality*, *spread* and *skewness* of
+        numerical data through their quartiles. It is also known as *box and whiskers plot*.
 
         `box` plots are most useful when grouped by additional dimensions.
 
@@ -994,9 +993,10 @@ class hvPlotTabular(hvPlotBase):
         Parameters
         ----------
         y : string or sequence
-            Field in the data to compute distribution from.
+            Field(s) in the *wide* data to compute distribution from. If none is provided all
+            numerical fields will be used.
         by : string or sequence
-            Field in the data to group by.
+            Field in the *long* data to group by.
         kwds : optional
             Additional keywords arguments are documented in `hvplot.help('box')`.
 
@@ -1009,9 +1009,33 @@ class hvPlotTabular(hvPlotBase):
 
         to learn more about its parameters and options.
 
+        Example
+        -------
+
+        Here is an example using *wide* data.
+
+        >>> import hvplot.pandas # noqa
+        >>> import pandas as pd
+        >>> import numpy as np
+        >>> data = np.random.randn(25, 4)
+        >>> df = pd.DataFrame(data, columns=list('ABCD'))
+        >>> df.hvplot.box()
+
+        Here is an example using *long* data and the `by` argument.
+
+        >>> import hvplot.pandas  # noqa
+        >>> import pandas as pd
+        >>> age_list = [8, 10, 12, 14, 72, 74, 76, 78, 20, 25, 30, 35, 60, 85]
+        >>> df = pd.DataFrame({"gender": list("MMMMMMMMFFFFFF"), "age": age_list})
+        >>> df.hvplot.box(y='age', by='gender', height=400, width=400, legend=False, ylim=(0, None))
+
         References
         ----------
-
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/boxplot.html
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/BoxWhisker.html
+        - Matplotlib: https://matplotlib.org/stable/plot_types/stats/boxplot_plot.html#sphx-glr-plot-types-stats-boxplot-plot-py
+        - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.boxplot.html
+        - Plotly: https://plotly.com/python/box-plots/
         - Wiki: https://en.wikipedia.org/wiki/Box_plot
         """
         return self(kind="box", x=None, y=y, by=by, **dict(kwds, hover=False))
