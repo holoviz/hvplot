@@ -126,5 +126,5 @@ If you have any problems with the steps here, please `contact the developers`_.
     :hidden:
     :maxdepth: 2
 
-    Getting Set up <index>
+    Getting Set up <self>
     Testing <testing>

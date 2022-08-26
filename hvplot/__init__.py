@@ -2,15 +2,18 @@
 hvPlot makes data analysis and visualization simple
 ===================================================
 
-hvPlot provides an easy to use high-level API for visualization, based on the 🐼 Pandas .plot() API
-and the innovative `.interactive` API.
+hvPlot provides a familiar, high-level API for interactive data exploration and visualization,
+based on the Pandas `.plot` API and the innovative `.interactive` API.
 
 hvPlot
 
 - supports a wide range of data sources including Pandas, Dask, XArray
 Rapids cuDF, Streamz, Intake, Geopandas, NetworkX and Ibis.
 - supports the plotting backends Bokeh (default), Matplotlib and Plotly.
-- exposes the powerful tools from the HoloViz ecosystem in a familiar and convenient API, while letting you drop down into the underlying HoloViz tools when more power or flexibility is needed.
+- exposes the powerful tools from the HoloViz ecosystem in a familiar and convenient API, while
+letting you drop down into the underlying HoloViz tools when more power or flexibility is needed.
+
+hvPlot is the recommend entrypoint to the HoloViz ecosystem.
 
 To learn more check out https://hvplot.holoviz.org/. To report issues or contribute go to
 https://github.com/holoviz/hvplot. To join the community go to
@@ -57,8 +60,6 @@ To report issues go to https://github.com/holoviz/holoviews.
 import inspect
 import textwrap
 
-from functools import wraps as _wraps
-
 import param
 import panel as _pn
 import holoviews as _hv
@@ -67,6 +68,7 @@ from holoviews import Store, render  # noqa
 
 from .converter import HoloViewsConverter
 from .interactive import Interactive
+from .ui import explorer  # noqa
 from .utilities import hvplot_extension, output, save, show # noqa
 from .plotting import (hvPlot, hvPlotTabular,  # noqa
                        andrews_curves, lag_plot,
@@ -206,8 +208,61 @@ Store._backend_switch_hooks.append(_hook_patch_docstrings)
 
 extension = hvplot_extension
 
-@_wraps(_pn.bind)
 def bind(function, *args, **kwargs):
+    """
+    Returns a *reactive* function that can be used to start your `.interactive` pipeline by running
+    a model or loading data depending on inputs from widgets, parameters or python objects.
+    
+    The widgets can be Panel or ipywidgets.
+    
+    Reference: https://hvplot.holoviz.org/user_guide/Interactive.html#functions-as-inputs
+
+    Parameters
+    ----------
+    function : callable
+        The function to bind constant or dynamic args and kwargs to.
+    args : object, param.Parameter, panel.widget.Widget, or ipywidget
+        Positional arguments to bind to the function.
+    kwargs : object, param.Parameter, panel.widget.Widget, or ipywidget
+        Keyword arguments to bind to the function.
+
+    Returns
+    -------
+    Returns a new function with the args and kwargs bound to it and
+    annotated with all dependencies. This function has an `interactive`
+    attribute that can be called to instantiate an `Interactive` pipeline.
+
+    Examples
+    --------
+
+    Develop your **algorithm** or data extraction method with the tools you know and love.
+
+    >>> import pandas as pd
+    >>> import numpy as np
+    
+    >>> def algorithm(alpha):
+    ...     # An example algorithm that uses alpha ...
+    ...     return pd.DataFrame({"output": (np.array(range(0,100)) ** alpha)*50})
+    
+    Make it **interactive** using `.bind`, `.interactive` and widgets.
+
+    >>> import hvplot
+    >>> import panel as pn
+    
+    >>> alpha = pn.widgets.FloatSlider(value=0.5, start=0, end=1.0, step=0.1, name="Alpha")
+    >>> top = pn.widgets.RadioButtonGroup(value=10, options=[5, 10, 25], name="Top")
+    >>> interactive_table = (
+    ...     hvplot
+    ...     .bind(algorithm, alpha=alpha)
+    ...     .interactive()
+    ...     .head(n=top)
+    ... )
+    >>> interactive_table
+
+    In a notebook or data app you can now select the appropriate `alpha` and `top` values via
+    widgets and see the `top` results of the algorithm in a table depending on the value of `alpha`
+    selected.
+    """
     bound = _pn.bind(function, *args, **kwargs)
     bound.interactive = lambda **kwargs: Interactive(bound, **kwargs)
     return bound

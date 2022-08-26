@@ -45,6 +45,7 @@ html_theme_options.update({
         },
     ],
     "google_analytics_id": "UA-154795830-5",
+    "navbar_end": ["navbar-icon-links"],
 })
 
 html_theme = "pydata_sphinx_theme"
@@ -55,6 +56,8 @@ extensions += [
     'nbsite.gallery',
     'sphinx_copybutton',
 ]
+
+myst_enable_extensions = ["colon_fence"]
 
 nbsite_gallery_conf = {
     'github_org': 'holoviz',
