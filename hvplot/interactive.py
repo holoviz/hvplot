@@ -318,8 +318,7 @@ class Interactive:
 
     @property
     def _callback(self):
-        @pn.depends(*self._params)
-        def evaluate(*args, **kwargs):
+        def evaluate_inner():
             obj = self._obj
             ds = hv.Dataset(obj)
             transform = self._transform
@@ -335,6 +334,14 @@ class Interactive:
                 return pn.pane.DataFrame(obj, max_rows=self._max_rows, **self._kwargs)
             else:
                 return obj
+        params = self._params
+        if params:
+            @pn.depends(*params)
+            def evaluate(*args, **kwargs):
+                return evaluate_inner()
+        else:
+            def evaluate():
+                return evaluate_inner()
         return evaluate
 
     def _clone(self, transform=None, plot=None, loc=None, center=None,
@@ -765,7 +772,7 @@ class _hvplot:
         new = self._interactive._resolve_accessor()
         transform = new._transform
         transform = type(transform)(transform, 'hvplot', accessor=True)
-        dmap = 'kind' not in kwargs or not isinstance(kwargs['kind'], str)
+        dmap = 'kind' not in kwargs or isinstance(kwargs['kind'], str)
         return new._clone(transform(*args, **kwargs), dmap=dmap)
 
     def __getattr__(self, attr):
