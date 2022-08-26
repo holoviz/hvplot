@@ -997,12 +997,6 @@ class hvPlotTabular(hvPlotBase):
             numerical fields will be used.
         by : string or sequence
             Field in the *long* data to group by.
-        kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('box')`.
-
-        Returns
-        -------
-        A Holoviews object. You can `print` the object to study its composition and run
 
         >>> import holoviews as hv
         >>> hv.help(the_holoviews_object)

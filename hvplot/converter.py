@@ -1258,7 +1258,7 @@ class HoloViewsConverter:
         if self.by and not self.subplots:
             opts['aggregator'] = reductions.count_cat(self.by[0])
             categorical = True
-        elif ((isinstance(self.y, list) or self.y is None and len(set(self.variables) - set(self.indexes)) > 1) and
+        elif ((isinstance(self.y, list) and len(self.y) > 1 or self.y is None and len(set(self.variables) - set(self.indexes)) > 1) and
               self.kind in ('scatter', 'line', 'area')):
             opts['aggregator'] = reductions.count_cat(self.group_label)
             categorical = True
@@ -1334,7 +1334,7 @@ class HoloViewsConverter:
     def _apply_layers(self, obj):
         if self.coastline:
             import geoviews as gv
-            coastline = gv.feature.coastline()
+            coastline = gv.feature.coastline.clone()
             if self.coastline in ['10m', '50m', '110m']:
                 coastline = coastline.opts(scale=self.coastline)
             elif self.coastline is not True:
@@ -1346,13 +1346,13 @@ class HoloViewsConverter:
         if self.features:
             import geoviews as gv
             for feature in reversed(self.features):
-                feature_cls = getattr(gv.feature, feature)
-                if feature_cls is None:
+                feature_obj = getattr(gv.feature, feature)
+                if feature_obj is None:
                     raise ValueError(
                         "Feature %r was not recognized, must be one of "
                         "'borders', 'coastline', 'lakes', 'land', 'ocean', "
                         "'rivers' and 'states'." % feature)
-                feature_obj = feature_cls()
+                feature_obj = feature_obj.clone()
                 if isinstance(self.features, dict):
                     scale = self.features[feature]
                     if scale not in ['10m', '50m', '110m']:

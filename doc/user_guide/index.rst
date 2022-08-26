@@ -62,6 +62,9 @@ rather than Matplotlib.
 * `Plotting Extensions <Plotting_Extensions.html>`_
   Changing the plotting extension.
 
+* `Exploring data <Explorer.html>`_
+  Exploring data with user interface.
+
 * `Viewing <Viewing.html>`_
   Displaying and saving plots in the notebook, at the command prompt, or in scripts.
 
@@ -102,6 +105,7 @@ rather than Matplotlib.
     Interactive <Interactive>
     Widgets <Widgets>
     Plotting Extensions <Plotting_Extensions>
+    Exploring data <Explorer>
     Viewing <Viewing>
     Subplots <Subplots>
     Streaming <Streaming>

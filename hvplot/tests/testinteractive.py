@@ -223,26 +223,62 @@ def test_interactive_pandas_dataframe_hvplot_accessor_dmap_kind_widget(df):
 
 
 def test_interactive_with_bound_function_calls():
-    df = pd.DataFrame({"species": [1, 1, 2, 2], "sex": 2 * ["MALE", "FEMALE"]})
+    df = pd.DataFrame({"species": [1, 1, 1, 2, 2, 2], "sex": 3 * ["MALE", "FEMALE"]})
 
     w_species = pn.widgets.Select(name='Species', options=[1, 2])
     w_sex = pn.widgets.MultiSelect(name='Sex', value=['MALE'], options=['MALE', 'FEMALE'])
 
-    def load_data(species):
-        """Simluate loading data from e.g a database or from a web API."""
-        data = df.loc[df['species'] == species]
-        load_data.COUNT += 1
-        return data
+    def load_data(species, watch=True):
+        if watch:
+            load_data.COUNT += 1
+        return df.loc[df['species'] == species]
 
     load_data.COUNT = 0
 
     # Setting up interactive with a function
     dfi = bind(load_data, w_species).interactive()
+    dfi = dfi.loc[dfi['sex'].isin(w_sex)]
+
+    out = dfi.output()
+
+    assert isinstance(out, pn.param.ParamFunction)
+    assert isinstance(out._pane, pn.pane.DataFrame)
+    pd.testing.assert_frame_equal(
+        out._pane.object,
+        load_data(w_species.value, watch=False).loc[df['sex'].isin(w_sex.value)]
+    )
+
     (dfi.loc[dfi['sex'].isin(w_sex)])
     assert load_data.COUNT ==  1
 
-    # w_species.value = 2
-    # assert load_data.COUNT == 2
+    w_species.value = 2
+
+    pd.testing.assert_frame_equal(
+        out._pane.object,
+        load_data(w_species.value, watch=False).loc[df['sex'].isin(w_sex.value)]
+    )
+
+    assert load_data.COUNT == 2
+
+    dfi = dfi.head(1)
+
+    assert load_data.COUNT == 2
+
+    out = dfi.output()
+
+    pd.testing.assert_frame_equal(
+        out._pane.object,
+        load_data(w_species.value, watch=False).loc[df['sex'].isin(w_sex.value)].head(1)
+    )
+
+    w_species.value = 1
+
+    pd.testing.assert_frame_equal(
+        out._pane.object,
+        load_data(w_species.value, watch=False).loc[df['sex'].isin(w_sex.value)].head(1)
+    )
+
+    assert load_data.COUNT == 3
 
 
 def test_interactive_pandas_series_init(series, clone_spy):
@@ -804,7 +840,6 @@ def test_interactive_pandas_out_frame(series):
     pd.testing.assert_frame_equal(out.object, si._current)
 
 
-@pytest.mark.xfail(reason='Bug: max_rows is not propagated to the next instance')
 def test_interactive_pandas_out_frame_max_rows(series):
     si = Interactive(series, max_rows=5)
     si = si.head(2)
@@ -816,15 +851,37 @@ def test_interactive_pandas_out_frame_max_rows(series):
     assert out.max_rows == 5
 
 
-def test_interactive_pandas_out_frame_kwargs(series):
-    si = Interactive(series, width=100)
+def test_interactive_pandas_out_frame_max_rows_accessor_called(series):
+    si = series.interactive(max_rows=5)
     si = si.head(2)
 
     # Equivalent to eval
     out = si._callback()
 
     assert isinstance(out, pn.pane.DataFrame)
-    assert out.width == 100
+    assert out.max_rows == 5
+
+
+def test_interactive_pandas_out_frame_kwargs(series):
+    si = Interactive(series, width=111)
+    si = si.head(2)
+
+    # Equivalent to eval
+    out = si._callback()
+
+    assert isinstance(out, pn.pane.DataFrame)
+    assert out.width == 111
+
+
+def test_interactive_pandas_out_frame_kwargs_accessor_called(series):
+    si = series.interactive(width=111)
+    si = si.head(2)
+
+    # Equivalent to eval
+    out = si._callback()
+
+    assert isinstance(out, pn.pane.DataFrame)
+    assert out.width == 111
 
 
 def test_interactive_pandas_out_frame_attrib(df):
@@ -920,7 +977,6 @@ def test_interactive_pandas_series_operator_binary(series, op):
     assert si._method is None
 
 
-@pytest.mark.xfail()
 @pytest.mark.parametrize('op', [
     '+',  # __radd__
     '&',  # __rand__
@@ -1255,3 +1311,17 @@ def test_interactive_pandas_series_widget_value(series):
     assert isinstance(widgets, pn.Column)
     assert len(widgets) == 1
     assert widgets[0] is w
+
+
+def test_clones_dont_reexecute_transforms():
+    # Fixes https://github.com/holoviz/hvplot/issues/832
+    df = pd.DataFrame()
+    msgs = []
+
+    def piped(df, msg):
+        msgs.append(msg)
+        return df
+
+    df.interactive.pipe(piped, msg="1").pipe(piped, msg="2")
+
+    assert len(msgs) == 3
