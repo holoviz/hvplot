@@ -108,7 +108,7 @@ setup_args = dict(
     name='hvplot',
     version=get_setup_version("hvplot"),
     description='A high-level plotting API for the PyData ecosystem built on HoloViews.',
-    long_description=open("README.md").read(),
+    long_description=open("README.md", mode="r", encoding="utf8").read(),
     long_description_content_type="text/markdown",
     author= "Philipp Rudiger",
     author_email= "developers@pyviz.org",
