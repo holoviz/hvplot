@@ -1093,16 +1093,31 @@ class hvPlotTabular(hvPlotBase):
 
     def hist(self, y=None, by=None, **kwds):
         """
-        Histogram
+        A `histogram` displays an approximate representation of the distribution of numerical data.
+        Together with `scatter` it is often a good first visualization of your data.        
+        
+        Similar methods include `kde`.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/hist.html
 
         Parameters
         ----------
         y : string or sequence
-            Field in the data to compute distribution on.
+            Field(s) in the *wide* data to compute the distribution(s) from.
         by : string or sequence
-            Field in the data to group by.
+            Field(s) in the *long* data to group by.
+        bins : int, optional
+            The number of bins
+        bin_range: tuple, optional
+            The lower and upper range of the bins. Default is None.
+        normed : bool, optional
+            If True the distribution will sum to 1. Default is False.
+        cumulative: bool, optional
+            If True, then a histogram is computed where each bin gives the counts in that bin plus
+            all bins for smaller values. The last bin gives the total number of datapoints.
+            Default is False.
+        alpha : float, optional
+            An alpha value between 0.0 and 1.0 to better visualize multiple fields. Default is 1.0.
         kwds : optional
             Additional keywords arguments are documented in `hvplot.help('hist')`.
 
@@ -1114,6 +1129,29 @@ class hvPlotTabular(hvPlotBase):
         >>> hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        Examples
+        --------
+
+        Lets display some *wide* data created by rolling two dices
+
+        >>> import hvplot.pandas # noqa
+        >>> import pandas as pd
+        >>> import numpy as np
+        >>> df = pd.DataFrame(np.random.randint(1, 7, 6000), columns = ['one'])
+        >>> df['two'] = df['one'] + np.random.randint(1, 7, 6000)
+        >>> df.hvplot.hist(bins=12, alpha=0.5, color=["lightgreen", "pink"])
+
+        References
+        ----------
+
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/histogram.html
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Histogram.html
+        - Pandas: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.plot.hist.html
+        - Plotly: https://plotly.com/python/histograms/
+        - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.hist.html
+        - Seaborn: https://seaborn.pydata.org/generated/seaborn.histplot.html
+        - Wiki: https://en.wikipedia.org/wiki/Histogram
         """
         return self(kind="hist", x=None, y=y, by=by, **kwds)
 
