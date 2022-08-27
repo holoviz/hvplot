@@ -1351,9 +1351,12 @@ class hvPlotTabular(hvPlotBase):
 
         Returns
         -------
-        obj: Holoviews Dataset
-            You can `print` the object to study its composition and run `hv.help` on the the
-            object to learn more about its parameters and options.
+        A Holoviews object. You can `print` the object to study its composition and run
+
+        >>> import holoviews as hv
+        >>> hv.help(the_holoviews_object)
+
+        to learn more about its parameters and options.
 
         Example
         -------
