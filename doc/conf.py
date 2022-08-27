@@ -81,4 +81,5 @@ html_context.update({
     "last_release": f"v{release}",
     "github_user": "holoviz",
     "github_repo": "panel",
+    "default_mode": "light",
 })
