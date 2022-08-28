@@ -21,11 +21,11 @@ width: 70%
 ---
 ```
 
+**`.hvplot()` is a powerful and interactive Pandas `.plot()` API**
+
 ---
 
-**`.hvplot()` for a more versatile and powerful `.plot()` API**
-
-By replacing `.plot()` by `.hvplot()` you get an interactive [Bokeh](https://bokeh.org/) plot.
+By replacing `.plot()` with `.hvplot()` you get an interactive plot.
 
 ```{code-cell} ipython3
 import hvplot.pandas  # noqa
@@ -34,25 +34,11 @@ from bokeh.sampledata.penguins import data as df
 df.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
 ```
 
-`.hvplot()` supports many data structures of the PyData ecosystem on top of [Pandas](https://pandas.pydata.org/):
+---
+
+`.hvplot()` can generate plots from [Pandas](https://pandas.pydata.org/) DataFrames and many other data structures in the PyData ecosystem:
 
 ::::{tab-set}
-
-:::{tab-item} Xarray
-```python
-import hvplot.xarray  # noqa
-import xarray as xr
-
-xr_ds = xr.tutorial.open_dataset('air_temperature').load().sel(time='2013-06-01 12:00')
-xr_ds.hvplot()
-```
-```{image} ./_static/home/xarray.gif
----
-alt: xarray support
-align: center
----
-```
-:::
 
 :::{tab-item} Dask
 ```python
@@ -64,7 +50,7 @@ df_dask.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
 ```
 ```{image} ./_static/home/dask.gif
 ---
-alt: dask support
+alt: Works with Dask
 align: center
 ---
 :::
@@ -79,7 +65,21 @@ gdf.hvplot(global_extent=True, tiles=True)
 ```
 ```{image} ./_static/home/geopandas.gif
 ---
-alt: geopandas support
+alt: Works with GeoPandas
+align: center
+---
+:::
+
+:::{tab-item} Intake
+```python
+import hvplot.intake  # noqa
+from hvplot.sample_data import catalogue as cat
+
+cat.us_crime.hvplot.line(x='Year', y='Violent Crime rate')
+```
+```{image} ./_static/home/intake.gif
+---
+alt: Works with Intake
 align: center
 ---
 :::
@@ -94,23 +94,25 @@ hvnx.draw(G, with_labels=True)
 ```
 ```{image} ./_static/home/networkx.gif
 ---
-alt: networkx support
+alt: Works with Networkx
 align: center
 ---
 :::
 
-:::{tab-item} Intake
+:::{tab-item} Pandas
 ```python
-import hvplot.intake  # noqa
-from hvplot.sample_data import catalogue as cat
+import hvplot.pandas  # noqa
+from bokeh.sampledata.autompg import autompg_clean as df
 
-cat.us_crime.hvplot.line(x='Year', y='Violent Crime rate')
+table = df.groupby(['origin', 'mfr'])['mpg'].mean().sort_values().tail(5)
+table.hvplot.barh('mfr', 'mpg', by='origin', stacked=True, cmap=["#848484", "#cd5c5c"], legend='bottom_right')
 ```
-```{image} ./_static/home/intake.gif
+```{image} ./_static/home/pandas.gif
 ---
-alt: intake support
+alt: Works with Pandas
 align: center
 ---
+```
 :::
 
 :::{tab-item} Streamz
@@ -123,17 +125,48 @@ df_streamz.hvplot()
 ```
 ```{image} ./assets/streamz_demo.gif
 ---
-alt: streamz support
+alt: Works with Streamz
 align: center
 ---
 :::
 
+:::{tab-item} Xarray
+```python
+import hvplot.xarray  # noqa
+import xarray as xr
+
+xr_ds = xr.tutorial.open_dataset('air_temperature').load().sel(time='2013-06-01 12:00')
+xr_ds.hvplot()
+```
+```{image} ./_static/home/xarray.gif
+---
+alt: Works with XArray
+align: center
+---
+```
+:::
+
 ::::
 
-`.hvplot()` can also generate plots with [Matplotlib](https://matplotlib.org/) or [Plotly](https://plotly.com/).
-
+`.hvplot()` can generate plots with [Bokeh](https://bokeh.org/) (default), [Matplotlib](https://matplotlib.org/) and [Plotly](https://plotly.com/).
 
 ::::{tab-set}
+
+:::{tab-item} Bokeh
+```python
+import hvplot.pandas  # noqa
+from bokeh.sampledata.autompg import autompg_clean as df
+
+table = df.groupby(['origin', 'mfr'])['mpg'].mean().sort_values().tail(5)
+table.hvplot.barh('mfr', 'mpg', by='origin', stacked=True, cmap=["#848484", "#cd5c5c"], legend='bottom_right')
+```
+```{image} ./_static/home/pandas.gif
+---
+alt: Works with Bokeh
+align: center
+---
+```
+:::
 
 :::{tab-item} Matplotlib
 ```python
@@ -147,7 +180,7 @@ df.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
 ```
 ```{image} ./_static/home/matplotlib.png
 ---
-alt: matplotlib as a plotting backend
+alt: Works with Matplotlib
 align: center
 ---
 ```
@@ -165,7 +198,7 @@ df.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
 ```
 ```{image} ./_static/home/plotly.gif
 ---
-alt: plotly as a plotting backend
+alt: Works with Plotly
 align: center
 ---
 :::
@@ -266,7 +299,7 @@ align: center
 
 **`.interactive()` to turn data pipelines into widget-based interactive applications**
 
-By starting a data pipeline with `.interactive()` you can then inject widgets into an extract and transform data pipeline. The pipeline output dynamically updates with widget changes, making data exploration in Jupyter notebooks in particular a lot more efficient.
+By starting a data pipeline with [`.interactive()`](https://pyviz-dev.github.io/hvplot/getting_started/interactive.html) you can then inject widgets into an extract and transform data pipeline. The pipeline output dynamically updates with widget changes, making data exploration in Jupyter notebooks in particular a lot more efficient.
 
 ::::{tab-set}
 
@@ -311,8 +344,11 @@ align: center
 
 ::::
 
-`.interactive()` supports displaying the pipeline output with `.hvplot()`.
+`.interactive()` supports displaying the pipeline output with `.hvplot()`. You can even output to any other output that [Panel](https://panel.holoviz.org/reference/index.html) supports using `.pipe(...)`.
 
+::::{tab-set}
+
+:::{tab-item} `.hvplot`
 ```python
 import hvplot.xarray  # noqa
 import panel as pn
@@ -327,15 +363,41 @@ da.interactive(loc='left') \
 .quantile(q=w_quantile, dim='lon') \
 .hvplot(ylabel='Air Temperature [K]', width=500)
 ```
-
 ```{image} ./_static/home/interactive_hvplot.gif
 ---
 alt: interactive pipeline with an hvplot output
 align: center
 ---
 ```
+:::
 
+:::{tab-item} `.pipe`
+```python
+import altair as alt
+import panel as pn
+pn.extension("vega")
+
+def altair_plot(source):
+    return alt.Chart(source, width="container").mark_line().encode(x="bill_length_mm", y="bill_depth_mm")
+
+import hvplot.pandas  # noqa
+from bokeh.sampledata.penguins import data as df
+
+w_sex = pn.widgets.MultiSelect(name='Sex', value=['MALE'], options=['MALE', 'FEMALE'])
+w_body_mass = pn.widgets.FloatSlider(name='Min body mass', start=2700, end=6300, step=50)
+
+dfi = df.interactive(loc='left', sizing_mode="stretch_width")
+dfi.loc[(dfi['sex'].isin(w_sex)) & (dfi['body_mass_g'] > w_body_mass)].pipe(altair_plot)
+```
+```{image} ./_static/home/interactive_altair.gif
 ---
+alt: Interactive app with Altair
+align: center
+---
+```
+:::
+
+::::
 
 **`explorer()` to explore data in a web application**
 
