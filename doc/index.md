@@ -11,7 +11,7 @@ kernelspec:
 
 # hvPlot
 
-***Familiar and high-level API for data exploration and visualization***
+***A familiar and high-level API for data exploration and visualization***
 
 ```{image} ./assets/diagram.svg
 ---
