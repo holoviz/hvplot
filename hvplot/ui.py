@@ -30,11 +30,11 @@ MAX_ROWS = 10000
 
 
 def explorer(data, **kwargs):
-    """Explore your data and design your plot via an interactive UI component.
+    """Explore your data and design your plot via an interactive user interface.
 
-    This function returns an interactive UI that enable you to quickly change the
-    settings of your plot via widgets.
-
+    This function returns an interactive Panel component that enable you to quickly change the
+    settings of your plot via widgets. 
+    
     Reference: https://hvplot.holoviz.org/getting_started/explorer.html
 
     Parameters
