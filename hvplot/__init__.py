@@ -28,17 +28,16 @@ Work with the data source you already know and ❤️
 >>> idx = pd.date_range('1/1/2000', periods=1000)
 >>> df  = pd.DataFrame(np.random.randn(1000, 4), index=idx, columns=list('ABCD')).cumsum()
 
-Import the hvplot extension for your data source
+Import the hvplot extension for your data source and optionally set the plotting backend
 
 >>> import hvplot.pandas
+>>> # hvplot.extension('matplotlib')
 
 Use the `.hvplot` API as you would use the Pandas `.plot` API.
 
->>> curves = df.hvplot()
->>> curves
+>>> df.hvplot()
 
-In a Jupyter Notebook, this will display a line plot of the
-A, B, C and D time series.
+In a Jupyter Notebook, this will display a line plot of the A, B, C and D time series.
 
 For more check out the user guide https://hvplot.holoviz.org/user_guide/index.html
 
