@@ -30,21 +30,36 @@ MAX_ROWS = 10000
 
 
 def explorer(data, **kwargs):
-    """Explore your data by building a plot in a Panel UI component.
+    """Explore your data and design your plot via an interactive UI component.
 
-    This function returns a Panel component that has on the right-side
-    hand a plot view and on the left-side hand a number of widgets that
-    control the plot.
+    This function returns an interactive UI that enable you to quickly change the
+    settings of your plot via widgets.
+
+    Reference: https://hvplot.holoviz.org/getting_started/explorer.html
 
     Parameters
     ----------
     data : pandas.DataFrame
         Data structure to explore.
+    kwargs : optional
+        Arguments that `data.hvplot()` would also accept like `kind='bar'`.
 
     Returns
     -------
     hvplotExporer
-        Panel component to explore a dataset.
+        Panel component to explore the data and design your plot.
+
+    Example
+    -------
+
+    >>> import hvplot.pandas
+    >>> import pandas as pd
+    >>> df = pd.DataFrame({"x": [1, 2, 3], "y": [1, 4, 9]})
+    >>> hvplot.explorer(df)
+    
+    You can also specify initial values
+
+    >>> hvplot.explorer(df, kind='bar', x='x')
     """
     return hvPlotExplorer.from_data(data, **kwargs)
 
