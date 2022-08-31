@@ -177,7 +177,7 @@ def _configure_bokeh_theme(theme):
     )
 
 # Todo: Figure out if more arguments are needed
-def hvplot_extension(backend="bokeh", theme="fast", color=None, cmap=None, font=None):
+def hvplot_extension(backend="bokeh", theme="fast", color=None, cmap=None, font=None, css=None):
     """Configures hvplot
 
     Args:
@@ -187,6 +187,9 @@ def hvplot_extension(backend="bokeh", theme="fast", color=None, cmap=None, font=
         color (_type_, optional): _description_. Defaults to None.
         cmap (_type_, optional): _description_. Defaults to None.
         font (_type_, optional): _description_. Defaults to None.
+        css (_type_, optional): _description_. Defaults to None. This will enable users with
+        custom, proprietary css based fonts to inject them. Similarly if they want a custom icon
+        to replace the Bokeh icon or other icons.
     """
     hv.extension(backend)
     
