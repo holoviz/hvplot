@@ -2,7 +2,6 @@
 # [] Convert .css file to jinja template
 # [] Improve styling (css) of tooltip: rounding, background color etc
 # [] Change Fast mouse curser from crosshair to pointer (I think its much more modern)
-# [] Get the toolbar to autohide via css instead of plot.toolbar.autohide = True which does not work
 # [] Figure out if some kind of (horizontal) grid should be shown in the background.
 # [] Go over the FastStyle Bokeh Theme once again comparing it to existing Bokeh Themes, to other
 # themes from Matplotlib, Seaborn and Plotly. Comparing it to .js themes from chart.js, HighCharts and Tableau.
@@ -124,6 +123,7 @@ class FastStyle(param.Parameterized):
 
     @property
     def bokeh_css(self):
+        # Todo: Replace with jinja templating or similar
         return BOKEH_FAST_CSS.replace(
             "var(--body-font)", self.font
             ).replace(
@@ -136,8 +136,10 @@ class FastStyle(param.Parameterized):
             "var(--neutral-fill-stealth-hover)", self.neutral_fill_card_rest
             )
 
+    # Figure out in holoviews how to apply the content of the hook by default
     def bokeh_hook(self, plot, element):
         plot = plot.handles["plot"]
+        # Probably implement autohide via css
         plot.toolbar.autohide = True
         plot.js_on_event(DoubleTap, CustomJS(args=dict(p=plot), code="p.reset.emit()"))
         plot.toolbar_location="above"
