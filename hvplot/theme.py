@@ -176,6 +176,7 @@ def _configure_bokeh_theme(theme):
         opts.Bivariate(active_tools=theme.active_tools, hooks=[theme.bokeh_hook])
     )
 
+# Todo: Figure out if more arguments are needed
 def hvplot_extension(backend="bokeh", theme="fast", color=None, cmap=None, font=None):
     """Configures hvplot
 
