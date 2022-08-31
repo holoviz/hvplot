@@ -3,7 +3,7 @@ import panel as pn
 from bokeh.sampledata.autompg import autompg_clean as df
 from hvplot.theme import get_theme, hvplot_extension
 
-THEME = "fast-dark" # "fast"
+THEME = "fast-dark" # "fast" or "fast-dark"
 COLOR = "#f700a1"
 CMAP = "Accent"
 
@@ -18,7 +18,7 @@ theme = get_theme(theme=THEME, color=COLOR, cmap=CMAP)
 # Todo: Figure out why cmap applied in hvplot_extension does not work
 plot = df.hvplot.bivariate("accel", "mpg", cut=False, cmap=theme.cmap, responsive=True, filled=True)
 
-# Todo: Figure out how to add css in hvPlot/ HoloViews directly
+# Todo: Figure out how to add css in hvPlot/ HoloViews directly. I.e. make this example indenpendent of Panel
 pn.config.raw_css.append(theme.bokeh_css)
 pn.extension()
 pn.panel(plot, sizing_mode="stretch_both").servable()

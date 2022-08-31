@@ -7,6 +7,7 @@
 # [] Go over the FastStyle Bokeh Theme once again comparing it to existing Bokeh Themes, to other
 # themes from Matplotlib, Seaborn and Plotly. Comparing it to .js themes from chart.js, HighCharts and Tableau.
 # Minimize the amount of custom css
+# Change away from using scientific notation as default for axis labels. I have never seen that used in enterprise.
 # [] realign with Panel FastTemplate FastStyle
 
 import pathlib
