@@ -461,7 +461,7 @@ class hvPlotTabular(hvPlotBase):
         groupby: string, list, optional
             A single field or list of fields to group and filter by. Adds one or more widgets to
             select the subgroup(s) to visualize.
-        scale: number, optional, abbreviation `s`.
+        scale: number, optional
             Scaling factor to apply to point scaling.
         logz : bool
             Whether to apply log scaling to the z-axis. Default is False.
@@ -1479,16 +1479,31 @@ class hvPlotTabular(hvPlotBase):
 
     def points(self, x=None, y=None, **kwds):
         """
-        Point plot use for 2D coordinate systems
+        A `points` plot visualizes positions in a 2D space. This is useful for example for
+        geographic plots.
+        
+        There is no assumption that 'y' depends on 'x'. This is different from a `scatter` plot
+        which assumes that `y` depends `x`.
 
         Reference: https://hvplot.holoviz.org/reference/geopandas/points.html
 
-        # Todo: Figure out how to use this. The reference link uses `geo=True`, not `kind='points'`.
-
         Parameters
         ----------
-        x, y : string, optional
-            The coordinate variable along the x- and y-axis
+        x : string, optional
+            The coordinate variable along the x-axis. Default is the first numeric field.
+        y : string, optional
+            The coordinate variable along the y-axis. Default is the second numeric field.
+        c : string, optional
+            The dimension to color the points by
+        s : int, optional, also available as 'size'
+            The size of the marker
+        marker : string, optional
+            The marker shape specified above can be any supported by matplotlib, e.g. s, d, o etc.
+            See https://matplotlib.org/stable/api/markers_api.html.
+        scale: number, optional
+            Scaling factor to apply to point scaling.
+        logz : bool
+            Whether to apply log scaling to the z-axis. Default is False.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('points')`.
 
@@ -1502,25 +1517,49 @@ class hvPlotTabular(hvPlotBase):
             hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        Examples
+        --------
+
+        .. code-block::
+
+            import hvplot.pandas
+            import pandas as pd
+
+            data = pd.DataFrame(dict(x=[49.9, 50.0, 50.1, 50.2], y=[50.2, 49.9, 50.0, 50.2]))
+            plot = data.hvplot.points(color="green", size=100, marker="square")
+            plot
+
+        The plot can be sliced to further focus on a subset of points
+
+        .. code-block::
+
+            plot[49.9:50.1,]
+
+        References
+        ----------
+
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Points.html
         """
         return self(x, y, kind="points", **kwds)
 
     def vectorfield(self, x=None, y=None, angle=None, mag=None, **kwds):
         """
-        Vectorfield plot
+        `vectorfield visualizes vectors given by the (`x , `y`) starting point, a magnitude (`mag`)
+        and an `angle` . A `vectorfield` plot is also known as a `quiver` plot.
 
         Reference: https://hvplot.holoviz.org/reference/xarray/vectorfield.html
 
         Parameters
         ----------
-        x : string, optional
+        x : string
             Field name to draw x-positions from
-        y : string, optional
+        y : string
             Field name to draw y-positions from
-        mag : string, optional
+        mag : string
             Magnitude
-        angle : string, optional
-            Angle
+        angle : string
+            Angle in radians.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('vectorfield')`.
 
@@ -1534,19 +1573,53 @@ class hvPlotTabular(hvPlotBase):
             hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        Example
+        -------
+
+        .. code-block::
+
+            import hvplot.pandas
+            import pandas as pd
+            import numpy as np
+
+            data = pd.DataFrame(
+                dict(
+                    x=[49.9, 50.0, 50.1, 50.2],
+                    y=[50.2, 49.9, 50.0, 50.2],
+                    angle=[2 * np.pi, np.pi, np.pi, np.pi],
+                    mag=[0.01, 0.02, -0.02, -0.01],
+                )
+            )
+            data.hvplot.vectorfield(x="x", y="y", angle="angle", mag="mag")
+
+        References
+        ----------
+
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/quiver.html
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/VectorField.html
+        - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.quiver.html
+        - Plotly: https://plotly.com/python/quiver-plots/
+        - Wiki: https://simple.wikipedia.org/wiki/Vector_field
         """
         return self(x, y, angle=angle, mag=mag, kind="vectorfield", **kwds)
 
     def polygons(self, x=None, y=None, c=None, **kwds):
         """
-        Polygon plot for geopandas dataframes
+        Polygon plot for geopandas dataframes. Assumes there is a column 'geometries' with the
+        geometries.
 
         Reference: https://hvplot.holoviz.org/reference/geopandas/polygons.html
 
         Parameters
         ----------
-        c: string, optional
+        c : string, optional
             The dimension to color the polygons by
+        logz : bool
+            Enables logarithmic colormapping. Default is False.
+        geo : bool, optional
+            Whether the plot should be treated as geographic (and assume
+            PlateCarree, i.e. lat/lon coordinates).
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('polygons')`.
 
@@ -1560,6 +1633,17 @@ class hvPlotTabular(hvPlotBase):
             hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        Examples
+        --------
+
+        .. code-block::
+
+            import hvplot.pandas  # noqa
+            import geopandas as gpd
+
+            countries = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
+            countries.hvplot.polygons(geo=True, c='pop_est', hover_cols='all')
         """
         return self(x, y, c=c, kind="polygons", **kwds)
 
@@ -1584,19 +1668,27 @@ class hvPlotTabular(hvPlotBase):
             hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        References
+        ----------
+
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Path.html
         """
         return self(x, y, c=c, kind="paths", **kwds)
 
     def labels(self, x=None, y=None, text=None, **kwds):
         """
-        Labels plot.
+        Labels plot. `labels` are mostly useful when overlaid on top of other plots using the `*`
+        operator.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/labels.html
 
         Parameters
         ----------
-        x, y : string, optional
-            The coordinate variable along the x- and y-axis
+        x : string, optional
+            The coordinate variable along the x-axis
+        y : string, optional
+            The coordinate variable along the y-axis
         text : string, optional
             The column to draw the text labels from
         **kwds : optional
@@ -1612,6 +1704,11 @@ class hvPlotTabular(hvPlotBase):
             hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        References
+        ----------
+
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Labels.html
         """
         return self(x, y, text=text, kind="labels", **kwds)
 
