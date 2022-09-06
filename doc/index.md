@@ -135,6 +135,15 @@ align: center
 
 ::::{tab-set}
 
+:::{tab-item} Bokeh
+```{code-cell} ipython3
+import hvplot.pandas  # noqa
+from bokeh.sampledata.penguins import data as df
+
+df.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
+```
+:::
+
 :::{tab-item} Matplotlib
 ```python
 import hvplot.pandas
