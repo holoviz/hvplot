@@ -130,7 +130,7 @@ align: center
 
 ::::
 
-`.hvplot()` uses Bokeh as the backend in default. It can also generate plots with [Matplotlib](https://matplotlib.org/) or [Plotly](https://plotly.com/).
+`.hvplot()` uses Bokeh as the backend by default. It can also generate plots with [Matplotlib](https://matplotlib.org/) or [Plotly](https://plotly.com/).
 
 
 ::::{tab-set}
