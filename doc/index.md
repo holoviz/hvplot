@@ -11,7 +11,7 @@ kernelspec:
 
 # hvPlot
 
-***Familiar and high-level API for data exploration and visualization***
+***A familiar and high-level API for data exploration and visualization***
 
 ```{image} ./assets/diagram.svg
 ---
@@ -153,18 +153,11 @@ align: center
 ::::{tab-set}
 
 :::{tab-item} Bokeh
-```python
+```{code-cell} ipython3
 import hvplot.pandas  # noqa
-from bokeh.sampledata.autompg import autompg_clean as df
+from bokeh.sampledata.penguins import data as df
 
-table = df.groupby(['origin', 'mfr'])['mpg'].mean().sort_values().tail(5)
-table.hvplot.barh('mfr', 'mpg', by='origin', stacked=True, cmap=["#848484", "#cd5c5c"], legend='bottom_right')
-```
-```{image} ./_static/home/pandas.gif
----
-alt: Works with Bokeh
-align: center
----
+df.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
 ```
 :::
 
