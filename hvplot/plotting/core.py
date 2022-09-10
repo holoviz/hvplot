@@ -1705,10 +1705,31 @@ class hvPlotTabular(hvPlotBase):
 
         to learn more about its parameters and options.
 
+        Examples
+        --------
+
+        .. code-block::
+
+            import hvplot.pandas  # noqa
+            import pandas as pd
+
+            df = pd.DataFrame(
+                {'City': ['Buenos Aires', 'Brasilia', 'Santiago', 'Bogota', 'Caracas'],
+                'Country': ['Argentina', 'Brazil', 'Chile', 'Colombia', 'Venezuela'],
+                'Latitude': [-34.58, -15.78, -33.45, 4.60, 10.48],
+                'Longitude': [-58.66, -47.91, -70.66, -74.08, -66.86],
+                'Color': ['blue', 'green', 'white', 'black', 'yellow']})
+
+            df.hvplot.points(x='Longitude', y='Latitude') * \
+            df.hvplot.labels(x='Longitude', y='Latitude', text='City', text_baseline="bottom")
+
         References
         ----------
 
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/text.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Labels.html
+        - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.text.html#matplotlib.pyplot.text
+        - Plotly: https://plotly.com/python/text-and-annotations/
         """
         return self(x, y, text=text, kind="labels", **kwds)
 
