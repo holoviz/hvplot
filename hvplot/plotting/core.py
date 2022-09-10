@@ -1833,8 +1833,8 @@ class hvPlot(hvPlotTabular):
         """
         Image plot
 
-        You can very often use `image` to display an x, y grid, like for example geographic
-        data with `latitude` and `longitude` coordinates.
+        You can use `image` to display for example geographic data with independent `latitude` and
+        `longitude` fields and a third dependent field.
 
         Reference: https://hvplot.holoviz.org/reference/xarray/image.html
 
@@ -1871,12 +1871,23 @@ class hvPlot(hvPlotTabular):
             import xarray as xr
             ds = xr.tutorial.open_dataset('air_temperature')
             ds.hvplot.image(x='lon', y='lat', z='air', groupby='time', cmap='kbc_r')
+
+        References
+        ----------
+
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/image.html
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Image.html
+        - Matplotlib: https://matplotlib.org/stable/tutorials/introductory/images.html
+        - Plotly: https://plotly.com/python/imshow/
         """
         return self(x, y, z=z, kind="image", colorbar=colorbar, **kwds)
 
     def rgb(self, x=None, y=None, z=None, bands=None, **kwds):
         """
         RGB plot
+
+        `rgb`  can be used to display images that are distributed as three separate "channels" or
+        "bands".
 
         Reference: https://hvplot.holoviz.org/reference/xarray/rgb.html
 
@@ -1901,6 +1912,11 @@ class hvPlot(hvPlotTabular):
             hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        References
+        ----------
+
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Image.html
         """
         if bands is not None:
             kwds["bands"] = bands
@@ -1909,6 +1925,9 @@ class hvPlot(hvPlotTabular):
     def quadmesh(self, x=None, y=None, z=None, colorbar=True, **kwds):
         """
         QuadMesh plot
+
+        `quadmesh` allows you to plot values on an irregular grid by representing each value as a
+        polygon.
 
         Reference: https://hvplot.holoviz.org/reference/xarray/quadmesh.html
 
@@ -1933,6 +1952,11 @@ class hvPlot(hvPlotTabular):
             hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        References
+        ----------
+
+        - HolovVews: https://holoviews.org/reference/elements/bokeh/QuadMesh.html
         """
         return self(x, y, z=z, kind="quadmesh", colorbar=colorbar, **kwds)
 
