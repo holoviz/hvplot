@@ -83,6 +83,7 @@ extras_require = {
         'pooch',
         'scipy',
         'ipywidgets',
+        'rioxarray',
     ],
     'examples': _examples,
     'doc': _examples + [

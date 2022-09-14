@@ -8,6 +8,8 @@ import numpy as np
 import pandas as pd
 import holoviews as hv
 
+from hvplot.util import proj_to_cartopy
+
 
 class TestGeo(TestCase):
 
@@ -19,14 +21,15 @@ class TestGeo(TestCase):
             import rasterio  # noqa
             import geoviews  # noqa
             import cartopy.crs as ccrs
+            import rioxarray as rxr
         except:
-            raise SkipTest('xarray, rasterio, geoviews, or cartopy not available')
+            raise SkipTest('xarray, rasterio, geoviews, cartopy, or rioxarray not available')
         import hvplot.xarray  # noqa
         import hvplot.pandas  # noqa
-        self.da = xr.open_rasterio(
+        self.da = rxr.open_rasterio(
            pathlib.Path(__file__).parent / 'data' / 'RGB-red.byte.tif'
-        ).sel(band=1)
-        self.crs = ccrs.epsg(self.da.crs.split('epsg:')[1])
+        ).isel(band=0)
+        self.crs = proj_to_cartopy(self.da.spatial_ref.attrs['crs_wkt'])
 
     def assertCRS(self, plot, proj='utm'):
         import cartopy
@@ -46,9 +49,12 @@ class TestCRSInference(TestGeo):
         if sys.platform == "win32":
             raise SkipTest("Skip CRS inference on Windows")
         super().setUp()
-        
+
     def test_plot_with_crs_as_proj_string(self):
-        plot = self.da.hvplot.image('x', 'y', crs=self.da.crs)
+        da = self.da.copy()
+        da = da.drop_vars('spatial_ref')  # To not treat it as a rioxarray
+
+        plot = self.da.hvplot.image('x', 'y', crs="epsg:32618")
         self.assertCRS(plot)
 
     def test_plot_with_geo_as_true_crs_undefined(self):
@@ -64,19 +70,24 @@ class TestProjections(TestGeo):
 
     def test_plot_with_crs_as_attr_str(self):
         da = self.da.copy()
+        da = da.drop_vars('spatial_ref')  # To not treat it as a rioxarray
         da.attrs = {'bar': self.crs}
         plot = da.hvplot.image('x', 'y', crs='bar')
         self.assertCRS(plot)
 
     def test_plot_with_crs_as_nonexistent_attr_str(self):
+        da = self.da.copy()
+        da = da.drop_vars('spatial_ref')  # To not treat it as a rioxarray
+
         # Used to test crs='foo' but this is parsed under-the-hood
         # by PROJ (projinfo) which matches a geographic projection named
         # 'Amersfoort'
         with self.assertRaisesRegex(ValueError, "'name_of_some_invalid_projection' must be"):
-            self.da.hvplot.image('x', 'y', crs='name_of_some_invalid_projection')
+            da.hvplot.image('x', 'y', crs='name_of_some_invalid_projection')
 
     def test_plot_with_geo_as_true_crs_no_crs_on_data_returns_default(self):
         da = self.da.copy()
+        da = da.drop_vars('spatial_ref')  # To not treat it as a rioxarray
         da.attrs = {'bar': self.crs}
         plot = da.hvplot.image('x', 'y', geo=True)
         self.assertCRS(plot, 'eqc')
