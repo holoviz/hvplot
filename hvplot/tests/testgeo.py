@@ -17,10 +17,10 @@ class TestGeo(TestCase):
         if sys.platform == "win32":
             raise SkipTest("Skip geo tests on windows for now")
         try:
-            import xarray as xr
+            import xarray as xr  # noqa
             import rasterio  # noqa
             import geoviews  # noqa
-            import cartopy.crs as ccrs
+            import cartopy.crs as ccrs  # noqa
             import rioxarray as rxr
         except:
             raise SkipTest('xarray, rasterio, geoviews, cartopy, or rioxarray not available')
