@@ -1,0 +1,720 @@
+
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="Docutils 0.17.1: http://docutils.sourceforge.net/" name="generator"/>
+<title>Streaming — hvPlot 0.8.1 documentation</title>
+<script>
+  document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+  document.documentElement.dataset.theme = localStorage.getItem("theme") || "light"
+</script>
+<!-- Loaded before other Sphinx assets -->
+<link href="../_static/styles/theme.css?digest=92025949c220c2e29695" rel="stylesheet"/>
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=92025949c220c2e29695" rel="stylesheet"/>
+<link href="../_static/vendor/fontawesome/5.13.0/css/all.min.css" rel="stylesheet"/>
+<link as="font" crossorigin="" href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2" rel="preload" type="font/woff2"/>
+<link as="font" crossorigin="" href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2" rel="preload" type="font/woff2"/>
+<link href="../_static/pygments.css" rel="stylesheet" type="text/css">
+<link href="../_static/togglebutton.css" rel="stylesheet" type="text/css">
+<link href="../_static/mystnb.css" rel="stylesheet" type="text/css">
+<link href="../_static/graphviz.css" rel="stylesheet" type="text/css">
+<link href="../_static/copybutton.css" rel="stylesheet" type="text/css">
+<link href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" rel="stylesheet" type="text/css"/>
+<link href="../_static/nbsite.css" rel="stylesheet" type="text/css"/>
+<link href="../_static/custom.css" rel="stylesheet" type="text/css"/>
+<!-- Pre-loaded scripts that we'll load fully later -->
+<link as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695" rel="preload"/>
+<script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+<script src="../_static/jquery.js"></script>
+<script src="../_static/underscore.js"></script>
+<script src="../_static/doctools.js"></script>
+<script src="../_static/clipboard.min.js"></script>
+<script src="../_static/copybutton.js"></script>
+<script>let toggleHintShow = 'Click to show';</script>
+<script>let toggleHintHide = 'Click to hide';</script>
+<script>let toggleOpenOnPrint = 'true';</script>
+<script src="../_static/togglebutton.js"></script>
+<script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+<script src="../_static/design-tabs.js"></script>
+<script async="async" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                window.ga = window.ga || function () {
+                    (ga.q = ga.q || []).push(arguments) };
+                ga.l = +new Date;
+                ga('create', 'UA-154795830-5', 'auto');
+                ga('set', 'anonymizeIp', true);
+                ga('send', 'pageview');
+            </script>
+<script src="../_static/require.js"></script>
+<link href="../_static/favicon.ico" rel="shortcut icon">
+<link href="../about.html" rel="author" title="About these documents"/>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="Gridded_Data.html" rel="next" title="Gridded Data"/>
+<link href="Subplots.html" rel="prev" title="Subplots"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="None" name="docsearch:language"/>
+</link></link></link></link></link></link></head>
+<body data-default-mode="light" data-offset="180" data-spy="scroll" data-target="#bd-toc-nav">
+<div class="bd-header-announcement container-fluid" id="banner">
+</div>
+<nav class="navbar navbar-dark navbar-expand-lg bg-dark fixed-top bd-navbar" id="navbar-main"><div class="bd-header__inner container-xl">
+<div id="navbar-start">
+<a class="navbar-brand logo" href="../index.html">
+<img alt="Logo image" class="logo__image only-light" src="../_static/logo_horizontal.svg"/>
+<img alt="Logo image" class="logo__image only-dark" src="../_static/logo_horizontal.svg"/>
+</a>
+</div>
+<button aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-target="#navbar-collapsible" data-toggle="collapse" type="button">
+<span class="fas fa-bars"></span>
+</button>
+<div class="col-lg-9 collapse navbar-collapse" id="navbar-collapsible">
+<div class="mr-auto" id="navbar-center">
+<div class="navbar-center-item">
+<ul class="navbar-nav" id="navbar-main-elements">
+<li class="toctree-l1 nav-item">
+<a class="reference internal nav-link" href="../index.html">
+  Home
+ </a>
+</li>
+<li class="toctree-l1 nav-item">
+<a class="reference internal nav-link" href="../getting_started/index.html">
+  Getting Started
+ </a>
+</li>
+<li class="toctree-l1 current active nav-item">
+<a class="reference internal nav-link" href="index.html">
+  User Guide
+ </a>
+</li>
+<li class="toctree-l1 nav-item">
+<a class="reference internal nav-link" href="../reference/index.html">
+  Reference Gallery
+ </a>
+</li>
+<li class="toctree-l1 nav-item">
+<a class="reference internal nav-link" href="../topics.html">
+  Topics
+ </a>
+</li>
+<li class="toctree-l1 nav-item">
+<a class="reference internal nav-link" href="../developer_guide/index.html">
+  Developer Guide
+ </a>
+</li>
+<li class="toctree-l1 nav-item">
+<a class="reference internal nav-link" href="../releases.html">
+  Releases
+ </a>
+</li>
+<li class="toctree-l1 nav-item">
+<a class="reference internal nav-link" href="../about.html">
+  About
+ </a>
+</li>
+</ul>
+</div>
+</div>
+<div id="navbar-end">
+<div class="navbar-end-item">
+<ul aria-label="Icon Links" class="navbar-nav" id="navbar-icon-links">
+<li class="nav-item">
+<a class="nav-link" href="https://github.com/holoviz/hvplot" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+<label class="sr-only">GitHub</label></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="https://twitter.com/HoloViews" rel="noopener" target="_blank" title="Twitter"><span><i class="fab fa-twitter-square"></i></span>
+<label class="sr-only">Twitter</label></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="https://discourse.holoviz.org/c/hvplot" rel="noopener" target="_blank" title="Discourse"><span><i class="fab fa-discourse"></i></span>
+<label class="sr-only">Discourse</label></a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</nav>
+<div class="bd-container container-xl">
+<div class="bd-container__inner row">
+<!-- Only show if we have sidebars configured, else just a small margin  -->
+<div class="bd-sidebar-primary col-12 col-md-2 bd-sidebar">
+<div class="sidebar-start-items"><form action="../search.html" class="bd-search d-flex align-items-center" method="get">
+<i class="icon fas fa-search"></i>
+<input aria-label="Search the docs ..." autocomplete="off" class="form-control" id="search-input" name="q" placeholder="Search the docs ..." type="search"/>
+</form><nav aria-label="Main navigation" class="bd-links" id="bd-docs-nav">
+<div class="bd-toc-item active">
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1">
+<a class="reference internal" href="../index.html">
+   Home
+  </a>
+</li>
+<li class="toctree-l1 has-children">
+<a class="reference internal" href="../getting_started/index.html">
+   Getting Started
+  </a>
+<input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox">
+<label for="toctree-checkbox-1">
+<i class="fas fa-chevron-down">
+</i>
+</label>
+<ul>
+<li class="toctree-l2">
+<a class="reference internal" href="../getting_started/installation.html">
+     Installation
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../getting_started/hvplot.html">
+     hvplot
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../getting_started/interactive.html">
+     interactive
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../getting_started/explorer.html">
+     explorer
+    </a>
+</li>
+</ul>
+</input></li>
+<li class="toctree-l1 current active has-children">
+<a class="reference internal" href="index.html">
+   User Guide
+  </a>
+<input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+<label for="toctree-checkbox-2">
+<i class="fas fa-chevron-down">
+</i>
+</label>
+<ul class="current">
+<li class="toctree-l2">
+<a class="reference internal" href="Introduction.html">
+     Introduction
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="Plotting.html">
+     Plotting with Bokeh
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="Plotting_with_Matplotlib.html">
+     Plotting with Matplotlib
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="Plotting_with_Plotly.html">
+     Plotting with Plotly
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="Customization.html">
+     Customization
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="Interactive.html">
+     Interactive
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="Widgets.html">
+     Widgets
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="Plotting_Extensions.html">
+     Plotting Extensions
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="Explorer.html">
+     Exploring data
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="Viewing.html">
+     Viewing
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="Subplots.html">
+     Subplots
+    </a>
+</li>
+<li class="toctree-l2 current active">
+<a class="current reference internal" href="#">
+     Streaming
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="Gridded_Data.html">
+     Gridded Data
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="NetworkX.html">
+     Network Graphs
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="Geographic_Data.html">
+     Geographic Data
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="Timeseries_Data.html">
+     Timeseries Data
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="Statistical_Plots.html">
+     Statistical Plots
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="Pandas_API.html">
+     Pandas API
+    </a>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children">
+<a class="reference internal" href="../reference/index.html">
+   Reference Gallery
+  </a>
+<input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+<label for="toctree-checkbox-3">
+<i class="fas fa-chevron-down">
+</i>
+</label>
+<ul>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/pandas/andrewscurves.html">
+     Andrewscurves
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/pandas/area.html">
+     Area
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/pandas/bar.html">
+     Bar
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/pandas/barh.html">
+     Barh
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/pandas/bivariate.html">
+     Bivariate
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/pandas/box.html">
+     Box
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/pandas/errorbars.html">
+     Errorbars
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/pandas/heatmap.html">
+     Heatmap
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/pandas/hexbin.html">
+     Hexbin
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/pandas/hist.html">
+     Hist
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/pandas/kde.html">
+     Kde
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/pandas/labels.html">
+     Labels
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/pandas/lagplot.html">
+     Lagplot
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/pandas/line.html">
+     Line
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/pandas/ohlc.html">
+     Ohlc
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/pandas/parallelcoordinates.html">
+     Parallelcoordinates
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/pandas/scatter.html">
+     Scatter
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/pandas/scattermatrix.html">
+     Scattermatrix
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/pandas/step.html">
+     Step
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/pandas/table.html">
+     Table
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/pandas/violin.html">
+     Violin
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/geopandas/points.html">
+     Points
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/geopandas/polygons.html">
+     Polygons
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/xarray/contour.html">
+     Contour
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/xarray/contourf.html">
+     Contourf
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/xarray/image.html">
+     Image
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/xarray/quadmesh.html">
+     Quadmesh
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/xarray/rgb.html">
+     Rgb
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../reference/xarray/vectorfield.html">
+     Vectorfield
+    </a>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children">
+<a class="reference internal" href="../topics.html">
+   Topics
+  </a>
+<input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+<label for="toctree-checkbox-4">
+<i class="fas fa-chevron-down">
+</i>
+</label>
+<ul>
+<li class="toctree-l2">
+<a class="reference external" href="https://examples.pyviz.org/portfolio_optimizer/portfolio.html">
+     Portfolio Optimizer
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference external" href="https://examples.pyviz.org/heat_and_trees/Heat_and_Trees.html">
+     Heat and Trees
+    </a>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children">
+<a class="reference internal" href="../developer_guide/index.html">
+   Developer Guide
+  </a>
+<input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+<label for="toctree-checkbox-5">
+<i class="fas fa-chevron-down">
+</i>
+</label>
+<ul>
+<li class="toctree-l2">
+<a class="reference internal" href="../developer_guide/index.html">
+     Getting Set up
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="../developer_guide/testing.html">
+     Testing
+    </a>
+</li>
+</ul>
+</li>
+<li class="toctree-l1">
+<a class="reference internal" href="../releases.html">
+   Releases
+  </a>
+</li>
+<li class="toctree-l1">
+<a class="reference internal" href="../about.html">
+   About
+  </a>
+</li>
+</ul>
+</div>
+</nav>
+</div>
+<div class="sidebar-end-items">
+</div>
+</div>
+<div class="bd-sidebar-secondary d-none d-xl-block col-xl-2 bd-toc">
+<div class="toc-item">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+<i class="fas fa-list"></i> On this page
+</div>
+<nav id="bd-toc-nav">
+<ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry">
+<a class="reference internal nav-link" href="#basic-plotting">
+   Basic plotting
+  </a>
+</li>
+<li class="toc-h2 nav-item toc-entry">
+<a class="reference internal nav-link" href="#controlling-the-backlog">
+   Controlling the backlog
+  </a>
+</li>
+<li class="toc-h2 nav-item toc-entry">
+<a class="reference internal nav-link" href="#composing-plots">
+   Composing Plots
+  </a>
+</li>
+<li class="toc-h2 nav-item toc-entry">
+<a class="reference internal nav-link" href="#deployment-as-bokeh-apps">
+   Deployment as Bokeh apps
+  </a>
+</li>
+<li class="toc-h2 nav-item toc-entry">
+<a class="reference internal nav-link" href="#using-holoviews-directly">
+   Using HoloViews directly
+  </a>
+</li>
+</ul>
+</nav>
+</div>
+<div class="toc-item">
+</div>
+</div>
+<div class="bd-content col-12 col-md-10 col-xl-8" role="main">
+<article class="bd-article" role="main">
+<section id="streaming">
+<h1>Streaming<a class="headerlink" href="#streaming" title="Permalink to this headline">#</a></h1>
+<p>hvPlot supports <a class="reference external" href="https://github.com/mrocklin/streamz">streamz</a> DataFrame and Series objects, automatically generating streaming plots in a Jupyter notebook or deployed as a <a class="reference external" href="https://bokeh.pydata.org/en/latest/docs/user_guide/server.html">Bokeh Server app</a>.</p>
+<p>All hvPlot methods on streamz objects return HoloViews <code class="docutils literal notranslate"><span class="pre">DynamicMap</span></code> objects that update the plot whenever <code class="docutils literal notranslate"><span class="pre">streamz</span></code> triggers an event. For more information on <code class="docutils literal notranslate"><span class="pre">DynamicMap</span></code> and HoloViews dynamic plotting support, see the <a class="reference external" href="http://holoviews.org/user_guide">HoloViews User Guide</a>; here we will focus on using the simple, high-level hvPlot API rather than on the details of how events and data flow behind the scenes.</p>
+<p><strong>All plots generated by the streamz plotting interface dynamically stream data from Python into the web browser.  The web version for this page includes <em>screen captures</em> of the streaming visualizations, not live streaming data.</strong></p>
+<p>As for any of the data backends, we start by patching the streamz library with the plotting API:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hvplot.streamz</span>  <span class="c1"># noqa</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="basic-plotting">
+<h2>Basic plotting<a class="headerlink" href="#basic-plotting" title="Permalink to this headline">#</a></h2>
+<p>Throughout this section we will be using the <code class="docutils literal notranslate"><span class="pre">Random</span></code> object from streamz, which provides an easy way of generating a DataFrame of random streaming data but which could be substituted with any streamz <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> or <code class="docutils literal notranslate"><span class="pre">Series</span></code> driven by a live, external data source instead. To stop the <code class="docutils literal notranslate"><span class="pre">Random</span></code> stream you can call <code class="docutils literal notranslate"><span class="pre">df.stop()</span></code> at any point.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">streamz.dataframe</span> <span class="kn">import</span> <span class="n">Random</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">Random</span><span class="p">(</span><span class="n">interval</span><span class="o">=</span><span class="s1">'200ms'</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">'50ms'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><img src="http://assets.holoviews.org/hvplot/gifs/df_streamz.gif" width="400px"/></p>
+<p>The plot method on Series and DataFrame is a simple wrapper around a
+line plot, which will plot all columns:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">hvplot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<center><img src="https://assets.holoviews.org/hvplot/gifs/df_plot.gif" width="700px"/></center><p>The plot method can also be called on a Series, plotting a specific column:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span><span class="o">.</span><span class="n">hvplot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<center><img src="https://assets.holoviews.org/hvplot/gifs/df_curve.gif" width="700px"/></center>
+<p>Actually, <em>all</em> the functionality described in the <a class="reference internal" href="Plotting.html"><span class="doc std std-doc">Plotting</span></a> user guide should work just the same as it does for a regular (non-streaming) dask or pandas DataFrame or Series, but will now update as new data appears.</p>
+</section>
+<section id="controlling-the-backlog">
+<h2>Controlling the backlog<a class="headerlink" href="#controlling-the-backlog" title="Permalink to this headline">#</a></h2>
+<p>The main difference when using a streaming DataFrame is that a only a certain amount of data will be buffered and displayed. The number of rows of data that will be buffered can be controlled by the <code class="docutils literal notranslate"><span class="pre">backlog</span></code> parameter. Here, let’s buffer and display 10 rows of our streaming DataFrame as a table:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">backlog</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<center><img src="https://assets.holoviews.org/hvplot/gifs/df_table.gif" width="400px"/></center><p>This of course only has an effect when we are directly streaming data point by point. When we have an aggregate DataFrame, the plot will continuously accumulate updates:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'y'</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">'y'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<center><img src="https://assets.holoviews.org/hvplot/gifs/df_bars.gif" width="700px"/></center></section>
+<section id="composing-plots">
+<h2>Composing Plots<a class="headerlink" href="#composing-plots" title="Permalink to this headline">#</a></h2>
+<p>hvPlot is a convenient API for generating HoloViews objects. One of the core strengths of HoloViews objects is the ease with which they can be composed, which works with streaming plots just as with static ones. Individual plots can be composed using the <code class="docutils literal notranslate"><span class="pre">*</span></code> and <code class="docutils literal notranslate"><span class="pre">+</span></code> operators, which overlay and compose plots into layouts respectively. For more information on composing objects see the HoloViews <a class="reference external" href="https://holoviews.org/user_guide/Composing_Elements.html">User Guide</a>.</p>
+<p>By using these operators we can combine multiple plots into composite Overlay and Layout objects, and lay them out in two columns using the <code class="docutils literal notranslate"><span class="pre">Layout.cols</span></code> method:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">backlog</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">backlog</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span> <span class="o">+</span>
+ <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'y'</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="s1">'y'</span><span class="p">,</span> <span class="s1">'x'</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span> <span class="o">+</span>
+ <span class="n">df</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">box</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span> <span class="o">+</span> <span class="n">df</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">kde</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">shared_axes</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span><span class="o">.</span><span class="n">cols</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<center><img src="https://assets.holoviews.org/hvplot/gifs/df_composite.gif" width="700px"/></center></section>
+<section id="deployment-as-bokeh-apps">
+<h2>Deployment as Bokeh apps<a class="headerlink" href="#deployment-as-bokeh-apps" title="Permalink to this headline">#</a></h2>
+<p>HoloViews objects automatically render themselves in Jupyter notebook cells, but when deploying a bokeh app the plot has to be rendered explicitly. Deploying as a Bokeh Server app allows you to share live, dynamically updated visualizations like those for streaming data, backed by a running Python process.</p>
+<p>The following example describes how to set up a streaming DataFrame, declare some plots, compose them, set up a callback to update the plot and finally convert the composite plot to a bokeh Document, which can be served from a script using <code class="docutils literal notranslate"><span class="pre">bokeh</span> <span class="pre">serve</span></code> on the commandline.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">hvplot.streamz</span>
+<span class="kn">import</span> <span class="nn">holoviews</span> <span class="k">as</span> <span class="nn">hv</span>
+
+<span class="kn">from</span> <span class="nn">streamz</span> <span class="kn">import</span> <span class="n">Stream</span>
+<span class="kn">from</span> <span class="nn">streamz.dataframe</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+
+<span class="n">renderer</span> <span class="o">=</span> <span class="n">hv</span><span class="o">.</span><span class="n">renderer</span><span class="p">(</span><span class="s1">'bokeh'</span><span class="p">)</span>
+
+<span class="c1"># Set up streaming DataFrame</span>
+<span class="n">stream</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+<span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span><span class="p">([])</span>
+<span class="n">example</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">'x'</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">'y'</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">'z'</span><span class="p">:</span> <span class="p">[]},</span>
+                       <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">'x'</span><span class="p">,</span> <span class="s1">'y'</span><span class="p">,</span> <span class="s1">'z'</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="p">[])</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">example</span><span class="o">=</span><span class="n">example</span><span class="p">)</span>
+<span class="n">cumulative</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()[[</span><span class="s1">'x'</span><span class="p">,</span> <span class="s1">'z'</span><span class="p">]]</span>
+
+<span class="c1"># Declare plots</span>
+<span class="n">line</span> <span class="o">=</span> <span class="n">cumulative</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+<span class="n">scatter</span> <span class="o">=</span> <span class="n">cumulative</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+<span class="n">bars</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'y'</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+<span class="n">box</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">box</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+<span class="n">kde</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">kde</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+
+<span class="c1"># Compose plots</span>
+<span class="n">layout</span> <span class="o">=</span> <span class="p">(</span><span class="n">line</span> <span class="o">*</span> <span class="n">scatter</span> <span class="o">+</span> <span class="n">bars</span> <span class="o">+</span> <span class="n">box</span> <span class="o">+</span> <span class="n">kde</span><span class="p">)</span><span class="o">.</span><span class="n">cols</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Set up callback with streaming data</span>
+<span class="k">def</span> <span class="nf">emit</span><span class="p">():</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="s1">'ms'</span><span class="p">)</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="n">now</span><span class="p">)</span><span class="o">-</span><span class="n">delta</span><span class="p">,</span> <span class="n">now</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">'100ms'</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">'x'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="p">)),</span>
+                       <span class="s1">'y'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="p">)),</span>
+                       <span class="s1">'z'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="p">))},</span>
+                      <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">'x'</span><span class="p">,</span> <span class="s1">'y'</span><span class="p">,</span> <span class="s1">'z'</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
+    <span class="n">stream</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+<span class="c1"># Render layout to bokeh server Document and attach callback</span>
+<span class="n">doc</span> <span class="o">=</span> <span class="n">renderer</span><span class="o">.</span><span class="n">server_doc</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+<span class="n">doc</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="s1">'Streamz HoloViews based Plotting API Bokeh App Demo'</span>
+<span class="n">doc</span><span class="o">.</span><span class="n">add_periodic_callback</span><span class="p">(</span><span class="n">emit</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For more details on deploying Bokeh apps see the HoloViews <a class="reference external" href="https://holoviews.org/user_guide/Deploying_Bokeh_Apps.html">User Guide</a>.</p>
+</section>
+<section id="using-holoviews-directly">
+<h2>Using HoloViews directly<a class="headerlink" href="#using-holoviews-directly" title="Permalink to this headline">#</a></h2>
+<p>HoloViews itself includes first class support for streamz DataFrame and Series; for more details see the <a class="reference external" href="https://holoviews.org/user_guide/Streaming_Data.html">Streaming Data section</a> in the HoloViews documentation.</p>
+</section>
+<div id="scroller-right">This web page was generated from a Jupyter notebook and not all interactivity will work on this website. <a href="https://raw.githubusercontent.com/holoviz/hvplot/master/examples/user_guide/Streaming.ipynb">Right click to download and run locally</a> for full Python-backed interactivity.</div></section>
+</article>
+<footer class="bd-footer-article">
+<!-- Previous / next buttons -->
+<div class="prev-next-area">
+<a class="left-prev" href="Subplots.html" id="prev-link" title="previous page">
+<i class="fas fa-angle-left"></i>
+<div class="prev-next-info">
+<p class="prev-next-subtitle">previous</p>
+<p class="prev-next-title">Subplots</p>
+</div>
+</a>
+<a class="right-next" href="Gridded_Data.html" id="next-link" title="next page">
+<div class="prev-next-info">
+<p class="prev-next-subtitle">next</p>
+<p class="prev-next-title">Gridded Data</p>
+</div>
+<i class="fas fa-angle-right"></i>
+</a>
+</div>
+</footer>
+</div>
+</div>
+</div>
+<!-- Scripts loaded after <body> so the DOM is not blocked -->
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695"></script>
+<footer class="bd-footer"><div class="bd-footer__inner container">
+<div class="footer-item">
+<p class="nbsite-copyright-last-updated">
+<span class="copyright">
+            © Copyright 2016-2022 Holoviz contributors.
+    </span>
+<span class="last-updated">Last updated on 2022-09-17.</span><br/>
+</p>
+</div>
+</div>
+</footer>
+</body>
+</html>

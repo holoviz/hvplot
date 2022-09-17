@@ -1,0 +1,536 @@
+
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Index — hvPlot 0.8.1 documentation</title>
+<script>
+  document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+  document.documentElement.dataset.theme = localStorage.getItem("theme") || "light"
+</script>
+<!-- Loaded before other Sphinx assets -->
+<link href="_static/styles/theme.css?digest=92025949c220c2e29695" rel="stylesheet"/>
+<link href="_static/styles/pydata-sphinx-theme.css?digest=92025949c220c2e29695" rel="stylesheet"/>
+<link href="_static/vendor/fontawesome/5.13.0/css/all.min.css" rel="stylesheet"/>
+<link as="font" crossorigin="" href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2" rel="preload" type="font/woff2"/>
+<link as="font" crossorigin="" href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2" rel="preload" type="font/woff2"/>
+<link href="_static/pygments.css" rel="stylesheet" type="text/css">
+<link href="_static/togglebutton.css" rel="stylesheet" type="text/css">
+<link href="_static/mystnb.css" rel="stylesheet" type="text/css">
+<link href="_static/graphviz.css" rel="stylesheet" type="text/css">
+<link href="_static/copybutton.css" rel="stylesheet" type="text/css">
+<link href="_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" rel="stylesheet" type="text/css"/>
+<link href="_static/nbsite.css" rel="stylesheet" type="text/css"/>
+<link href="_static/custom.css" rel="stylesheet" type="text/css"/>
+<!-- Pre-loaded scripts that we'll load fully later -->
+<link as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695" rel="preload"/>
+<script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+<script src="_static/jquery.js"></script>
+<script src="_static/underscore.js"></script>
+<script src="_static/doctools.js"></script>
+<script src="_static/clipboard.min.js"></script>
+<script src="_static/copybutton.js"></script>
+<script>let toggleHintShow = 'Click to show';</script>
+<script>let toggleHintHide = 'Click to hide';</script>
+<script>let toggleOpenOnPrint = 'true';</script>
+<script src="_static/togglebutton.js"></script>
+<script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+<script src="_static/design-tabs.js"></script>
+<script async="async" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                window.ga = window.ga || function () {
+                    (ga.q = ga.q || []).push(arguments) };
+                ga.l = +new Date;
+                ga('create', 'UA-154795830-5', 'auto');
+                ga('set', 'anonymizeIp', true);
+                ga('send', 'pageview');
+            </script>
+<script src="_static/require.js"></script>
+<link href="_static/favicon.ico" rel="shortcut icon">
+<link href="about.html" rel="author" title="About these documents"/>
+<link href="#" rel="index" title="Index"/>
+<link href="search.html" rel="search" title="Search"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="None" name="docsearch:language"/>
+</link></link></link></link></link></link></head>
+<body data-default-mode="light" data-offset="180" data-spy="scroll" data-target="#bd-toc-nav">
+<div class="bd-header-announcement container-fluid" id="banner">
+</div>
+<nav class="navbar navbar-dark navbar-expand-lg bg-dark fixed-top bd-navbar" id="navbar-main"><div class="bd-header__inner container-xl">
+<div id="navbar-start">
+<a class="navbar-brand logo" href="index.html">
+<img alt="Logo image" class="logo__image only-light" src="_static/logo_horizontal.svg"/>
+<img alt="Logo image" class="logo__image only-dark" src="_static/logo_horizontal.svg"/>
+</a>
+</div>
+<button aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-target="#navbar-collapsible" data-toggle="collapse" type="button">
+<span class="fas fa-bars"></span>
+</button>
+<div class="col-lg-9 collapse navbar-collapse" id="navbar-collapsible">
+<div class="mr-auto" id="navbar-center">
+<div class="navbar-center-item">
+<ul class="navbar-nav" id="navbar-main-elements">
+<li class="toctree-l1 nav-item">
+<a class="reference internal nav-link" href="index.html">
+  Home
+ </a>
+</li>
+<li class="toctree-l1 nav-item">
+<a class="reference internal nav-link" href="getting_started/index.html">
+  Getting Started
+ </a>
+</li>
+<li class="toctree-l1 nav-item">
+<a class="reference internal nav-link" href="user_guide/index.html">
+  User Guide
+ </a>
+</li>
+<li class="toctree-l1 nav-item">
+<a class="reference internal nav-link" href="reference/index.html">
+  Reference Gallery
+ </a>
+</li>
+<li class="toctree-l1 nav-item">
+<a class="reference internal nav-link" href="topics.html">
+  Topics
+ </a>
+</li>
+<li class="toctree-l1 nav-item">
+<a class="reference internal nav-link" href="developer_guide/index.html">
+  Developer Guide
+ </a>
+</li>
+<li class="toctree-l1 nav-item">
+<a class="reference internal nav-link" href="releases.html">
+  Releases
+ </a>
+</li>
+<li class="toctree-l1 nav-item">
+<a class="reference internal nav-link" href="about.html">
+  About
+ </a>
+</li>
+</ul>
+</div>
+</div>
+<div id="navbar-end">
+<div class="navbar-end-item">
+<ul aria-label="Icon Links" class="navbar-nav" id="navbar-icon-links">
+<li class="nav-item">
+<a class="nav-link" href="https://github.com/holoviz/hvplot" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+<label class="sr-only">GitHub</label></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="https://twitter.com/HoloViews" rel="noopener" target="_blank" title="Twitter"><span><i class="fab fa-twitter-square"></i></span>
+<label class="sr-only">Twitter</label></a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="https://discourse.holoviz.org/c/hvplot" rel="noopener" target="_blank" title="Discourse"><span><i class="fab fa-discourse"></i></span>
+<label class="sr-only">Discourse</label></a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</nav>
+<div class="bd-container container-xl">
+<div class="bd-container__inner row">
+<!-- Only show if we have sidebars configured, else just a small margin  -->
+<div class="bd-sidebar-primary col-12 col-md-2 bd-sidebar">
+<div class="sidebar-start-items"><form action="search.html" class="bd-search d-flex align-items-center" method="get">
+<i class="icon fas fa-search"></i>
+<input aria-label="Search the docs ..." autocomplete="off" class="form-control" id="search-input" name="q" placeholder="Search the docs ..." type="search"/>
+</form><nav aria-label="Main navigation" class="bd-links" id="bd-docs-nav">
+<div class="bd-toc-item active">
+<ul class="nav bd-sidenav">
+<li class="toctree-l1">
+<a class="reference internal" href="index.html">
+   Home
+  </a>
+</li>
+<li class="toctree-l1 has-children">
+<a class="reference internal" href="getting_started/index.html">
+   Getting Started
+  </a>
+<input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox">
+<label for="toctree-checkbox-1">
+<i class="fas fa-chevron-down">
+</i>
+</label>
+<ul>
+<li class="toctree-l2">
+<a class="reference internal" href="getting_started/installation.html">
+     Installation
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="getting_started/hvplot.html">
+     hvplot
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="getting_started/interactive.html">
+     interactive
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="getting_started/explorer.html">
+     explorer
+    </a>
+</li>
+</ul>
+</input></li>
+<li class="toctree-l1 has-children">
+<a class="reference internal" href="user_guide/index.html">
+   User Guide
+  </a>
+<input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+<label for="toctree-checkbox-2">
+<i class="fas fa-chevron-down">
+</i>
+</label>
+<ul>
+<li class="toctree-l2">
+<a class="reference internal" href="user_guide/Introduction.html">
+     Introduction
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="user_guide/Plotting.html">
+     Plotting with Bokeh
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="user_guide/Plotting_with_Matplotlib.html">
+     Plotting with Matplotlib
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="user_guide/Plotting_with_Plotly.html">
+     Plotting with Plotly
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="user_guide/Customization.html">
+     Customization
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="user_guide/Interactive.html">
+     Interactive
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="user_guide/Widgets.html">
+     Widgets
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="user_guide/Plotting_Extensions.html">
+     Plotting Extensions
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="user_guide/Explorer.html">
+     Exploring data
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="user_guide/Viewing.html">
+     Viewing
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="user_guide/Subplots.html">
+     Subplots
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="user_guide/Streaming.html">
+     Streaming
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="user_guide/Gridded_Data.html">
+     Gridded Data
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="user_guide/NetworkX.html">
+     Network Graphs
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="user_guide/Geographic_Data.html">
+     Geographic Data
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="user_guide/Timeseries_Data.html">
+     Timeseries Data
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="user_guide/Statistical_Plots.html">
+     Statistical Plots
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="user_guide/Pandas_API.html">
+     Pandas API
+    </a>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children">
+<a class="reference internal" href="reference/index.html">
+   Reference Gallery
+  </a>
+<input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+<label for="toctree-checkbox-3">
+<i class="fas fa-chevron-down">
+</i>
+</label>
+<ul>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/pandas/andrewscurves.html">
+     Andrewscurves
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/pandas/area.html">
+     Area
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/pandas/bar.html">
+     Bar
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/pandas/barh.html">
+     Barh
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/pandas/bivariate.html">
+     Bivariate
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/pandas/box.html">
+     Box
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/pandas/errorbars.html">
+     Errorbars
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/pandas/heatmap.html">
+     Heatmap
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/pandas/hexbin.html">
+     Hexbin
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/pandas/hist.html">
+     Hist
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/pandas/kde.html">
+     Kde
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/pandas/labels.html">
+     Labels
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/pandas/lagplot.html">
+     Lagplot
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/pandas/line.html">
+     Line
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/pandas/ohlc.html">
+     Ohlc
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/pandas/parallelcoordinates.html">
+     Parallelcoordinates
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/pandas/scatter.html">
+     Scatter
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/pandas/scattermatrix.html">
+     Scattermatrix
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/pandas/step.html">
+     Step
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/pandas/table.html">
+     Table
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/pandas/violin.html">
+     Violin
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/geopandas/points.html">
+     Points
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/geopandas/polygons.html">
+     Polygons
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/xarray/contour.html">
+     Contour
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/xarray/contourf.html">
+     Contourf
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/xarray/image.html">
+     Image
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/xarray/quadmesh.html">
+     Quadmesh
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/xarray/rgb.html">
+     Rgb
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="reference/xarray/vectorfield.html">
+     Vectorfield
+    </a>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children">
+<a class="reference internal" href="topics.html">
+   Topics
+  </a>
+<input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+<label for="toctree-checkbox-4">
+<i class="fas fa-chevron-down">
+</i>
+</label>
+<ul>
+<li class="toctree-l2">
+<a class="reference external" href="https://examples.pyviz.org/portfolio_optimizer/portfolio.html">
+     Portfolio Optimizer
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference external" href="https://examples.pyviz.org/heat_and_trees/Heat_and_Trees.html">
+     Heat and Trees
+    </a>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children">
+<a class="reference internal" href="developer_guide/index.html">
+   Developer Guide
+  </a>
+<input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+<label for="toctree-checkbox-5">
+<i class="fas fa-chevron-down">
+</i>
+</label>
+<ul>
+<li class="toctree-l2">
+<a class="reference internal" href="developer_guide/index.html">
+     Getting Set up
+    </a>
+</li>
+<li class="toctree-l2">
+<a class="reference internal" href="developer_guide/testing.html">
+     Testing
+    </a>
+</li>
+</ul>
+</li>
+<li class="toctree-l1">
+<a class="reference internal" href="releases.html">
+   Releases
+  </a>
+</li>
+<li class="toctree-l1">
+<a class="reference internal" href="about.html">
+   About
+  </a>
+</li>
+</ul>
+</div>
+</nav>
+</div>
+<div class="sidebar-end-items">
+</div>
+</div>
+<div class="bd-sidebar-secondary d-none d-xl-block col-xl-2 bd-toc">
+</div>
+<div class="bd-content col-12 col-md-10 col-xl-8" role="main">
+<article class="bd-article" role="main">
+<h1 id="index">Index</h1>
+<div class="genindex-jumpbox">
+</div>
+</article>
+<footer class="bd-footer-article">
+<!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div>
+</footer>
+</div>
+</div>
+</div>
+<!-- Scripts loaded after <body> so the DOM is not blocked -->
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695"></script>
+<footer class="bd-footer"><div class="bd-footer__inner container">
+<div class="footer-item">
+<p class="nbsite-copyright-last-updated">
+<span class="copyright">
+            © Copyright 2016-2022 Holoviz contributors.
+    </span>
+<span class="last-updated">Last updated on 2022-09-17.</span><br/>
+</p>
+</div>
+</div>
+</footer>
+</body>
+</html>
