@@ -12,11 +12,17 @@ except:
 from ..converter import HoloViewsConverter
 from ..util import is_list_like, process_dynamic_args
 
+# Color palette for examples: https://www.color-hex.com/color-palette/1018056
+# light green: #55a194
+# Dark green: #3b7067
+# Blue: #1e85f7
+# Orange: #f8b014
+# Red: #f16a6f
 
 class hvPlotBase:
     """
     The plotting method: `df.hvplot(...)` creates a plot similarly to the familiar Pandas
-    `df.plot` method.
+    `df.plot(...)` method.
 
     For more detailed options use a specific ploting method, e.g. `df.hvplot.line`.
 
@@ -48,15 +54,26 @@ class hvPlotBase:
     .. code-block::
 
         import hvplot.pandas
-        from bokeh.sampledata.degrees import data as deg
-        line = deg.hvplot(
-            x="Year",
-            y=["Art and Performance", "Business", "Biology", "Education", "Computer Science"],
-            value_label="% of Degrees Earned by Women",
-            legend="top",
+        import pandas as pd
+
+        df = pd.DataFrame(
+            {
+                "actual": [100, 150, 125, 140, 145, 135, 123],
+                "forecast": [90, 160, 125, 150, 141, 141, 120],
+                "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
+                "date": pd.date_range("2022-01-03", "2022-01-09"),
+                "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+            },
+        )
+        line = df.hvplot.line(
+            x="numerical",
+            y=["actual", "forecast"],
+            ylabel="value",
+            legend="bottom",
             height=500,
-            width=620,
-            kind="line",
+            color=["steelblue", "teal"],
+            alpha=0.7,
+            line_width=5,
         )
         line
 
@@ -64,15 +81,10 @@ class hvPlotBase:
 
     .. code-block::
 
-        scatter = deg.hvplot.scatter(
-            x="Year",
-            y=["Art and Performance", "Business", "Biology", "Education", "Computer Science"],
-            value_label="% of Degrees Earned by Women",
-            legend="top",
-            height=500,
-            width=620,
+        markers = df.hvplot.scatter(
+            x="numerical", y=["actual", "forecast"], color=["#f16a6f", "#1e85f7"], size=50
         )
-        line * scatter
+        line * markers
 
     Please note that you can pass widgets or reactive functions as arguments instead of
     literal values, c.f. https://hvplot.holoviz.org/user_guide/Widgets.html.
@@ -205,15 +217,26 @@ class hvPlotTabular(hvPlotBase):
     .. code-block::
 
         import hvplot.pandas
-        from bokeh.sampledata.degrees import data as deg
-        line = deg.hvplot(
-            x="Year",
-            y=["Art and Performance", "Business", "Biology", "Education", "Computer Science"],
-            value_label="% of Degrees Earned by Women",
-            legend="top",
+        import pandas as pd
+
+        df = pd.DataFrame(
+            {
+                "actual": [100, 150, 125, 140, 145, 135, 123],
+                "forecast": [90, 160, 125, 150, 141, 141, 120],
+                "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
+                "date": pd.date_range("2022-01-03", "2022-01-09"),
+                "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+            },
+        )
+        line = df.hvplot.line(
+            x="numerical",
+            y=["actual", "forecast"],
+            ylabel="value",
+            legend="bottom",
             height=500,
-            width=620,
-            kind="line",
+            color=["steelblue", "teal"],
+            alpha=0.7,
+            line_width=5,
         )
         line
 
@@ -221,15 +244,10 @@ class hvPlotTabular(hvPlotBase):
 
     .. code-block::
 
-        scatter = deg.hvplot.scatter(
-            x="Year",
-            y=["Art and Performance", "Business", "Biology", "Education", "Computer Science"],
-            value_label="% of Degrees Earned by Women",
-            legend="top",
-            height=500,
-            width=620,
+        markers = df.hvplot.scatter(
+            x="numerical", y=["actual", "forecast"], color=["#f16a6f", "#1e85f7"], size=50
         )
-        line * scatter
+        line * markers
 
     Please note that you can pass widgets or reactive functions as arguments instead of
     literal values, c.f. https://hvplot.holoviz.org/user_guide/Widgets.html.
@@ -265,15 +283,13 @@ class hvPlotTabular(hvPlotBase):
         """
         The `line` plot connects the points with a continous curve.
 
-        A `line` plot is useful when data is continuous and has a continuous axis.
-
         Reference: https://hvplot.holoviz.org/reference/pandas/line.html
 
         Parameters
         ----------
         x : string, optional
             Field name(s) to draw x-positions from. If not specified, the index is
-            used.
+            used. Can refer to continous and categorical data.
         y : string or list, optional
             Field name(s) to draw y-positions from. If not specified, all numerical
             fields are used.
@@ -312,10 +328,26 @@ class hvPlotTabular(hvPlotBase):
         .. code-block::
 
             import hvplot.pandas
-            from bokeh.sampledata.degrees import data as deg
-            line = deg.hvplot.line(
-                x='Year', y=['Art and Performance', 'Business', 'Biology', 'Education', 'Computer Science'],
-                value_label='% of Degrees Earned by Women', legend='top', height=500, width=620
+            import pandas as pd
+
+            df = pd.DataFrame(
+                {
+                    "actual": [100, 150, 125, 140, 145, 135, 123],
+                    "forecast": [90, 160, 125, 150, 141, 141, 120],
+                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
+                    "date": pd.date_range("2022-01-03", "2022-01-09"),
+                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                },
+            )
+            line = df.hvplot.line(
+                x="numerical",
+                y=["actual", "forecast"],
+                ylabel="value",
+                legend="bottom",
+                height=500,
+                color=["steelblue", "teal"],
+                alpha=0.7,
+                line_width=5,
             )
             line
 
@@ -323,11 +355,10 @@ class hvPlotTabular(hvPlotBase):
 
         .. code-block::
 
-            scatter = deg.hvplot.scatter(
-                x='Year', y=['Art and Performance', 'Business', 'Biology', 'Education', 'Computer Science'],
-                value_label='% of Degrees Earned by Women', legend='top', height=500, width=620
+            markers = df.hvplot.scatter(
+                x="numerical", y=["actual", "forecast"], color=["#f16a6f", "#1e85f7"], size=50
             )
-            line * scatter
+            line * markers
 
         Please note that you can pass widgets or reactive functions as arguments instead of
         literal values, c.f. https://hvplot.holoviz.org/user_guide/Widgets.html.
@@ -358,7 +389,7 @@ class hvPlotTabular(hvPlotBase):
         ----------
         x : string, optional
             Field name(s) to draw x-positions from. If not specified, the index is
-            used.
+            used. Must refer to continous data. Not categorical data.
         y : string or list, optional
             Field name(s) to draw y-positions from. If not specified, all numerical
             fields are used.
@@ -398,25 +429,37 @@ class hvPlotTabular(hvPlotBase):
 
         .. code-block::
 
+            import pandas as pd
             import hvplot.pandas
-            from bokeh.sampledata.degrees import data as deg
-            plot = deg.hvplot.step(
-                x='Year',
-                y=['Art and Performance', 'Business', 'Biology', 'Education', 'Computer Science'],
-                value_label='% of Degrees Earned by Women', legend='top', height=500, width=1000
+
+            df = pd.DataFrame(
+                {
+                    "actual": [100, 150, 125, 140, 145, 135, 123],
+                    "forecast": [90, 160, 125, 150, 141, 141, 120],
+                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
+                    "date": pd.date_range("2022-01-03", "2022-01-09"),
+                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                },
             )
-            plot
+            step = df.hvplot.step(
+                x="numerical",
+                y=["actual", "forecast"],
+                ylabel="value",
+                legend="bottom",
+                height=500,
+                color=["#f16a6f", "#1e85f7"],
+                line_width=5,
+            )
+            step
 
         You can can add *markers* to a `step` plot by overlaying with a `scatter` plot.
 
         .. code-block::
 
-            markers = deg.hvplot.scatter(
-                x='Year',
-                y=['Art and Performance', 'Business', 'Biology', 'Education', 'Computer Science'],
-                value_label='% of Degrees Earned by Women', legend='top', height=500, width=1000
+            markers = df.hvplot.scatter(
+                x="numerical", y=["actual", "forecast"], color=["#f16a6f", "#1e85f7"], size=100
             )
-            plot*markers
+            step * markers
 
         Please note that you can pass widgets or reactive functions as arguments instead of
         literal values, c.f. https://hvplot.holoviz.org/user_guide/Widgets.html.
@@ -445,7 +488,7 @@ class hvPlotTabular(hvPlotBase):
         ----------
         x : string, optional
             Field name(s) to draw x-positions from. If not specified, the index is
-            used.
+            used. Can refer to continous and categorical data.
         y : string or list, optional
             Field name(s) to draw y-positions from. If not specified, all numerical
             fields are used.
@@ -494,15 +537,37 @@ class hvPlotTabular(hvPlotBase):
 
         .. code-block::
 
+            import pandas as pd
             import hvplot.pandas
-            from bokeh.sampledata.iris import flowers as df
-            df.hvplot.scatter(
-                x='sepal_length', y='sepal_width', by='species',
-                legend='top', height=400, width=400
-            )
 
-        The points will be grouped and color coded `by` the categorical values in the 'species'
-        column.
+            df = pd.DataFrame(
+                {
+                    "actual": [100, 150, 125, 140, 145, 135, 123],
+                    "forecast": [90, 160, 125, 150, 141, 141, 120],
+                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
+                    "date": pd.date_range("2022-01-03", "2022-01-09"),
+                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                },
+            )
+            scatter = df.hvplot.scatter(
+                x="numerical",
+                y=["actual", "forecast"],
+                ylabel="value",
+                legend="bottom",
+                height=500,
+                color=["#f16a6f", "#1e85f7"],
+                size=100,
+            )
+            scatter
+
+        You can overlay the `scatter` markers on for example a `line` plot
+
+        .. code-block::
+
+            line = df.hvplot.line(
+                x="numerical", y=["actual", "forecast"], color=["#f16a6f", "#1e85f7"], line_width=5
+            )
+            scatter * line
 
         References
         ----------
@@ -522,13 +587,16 @@ class hvPlotTabular(hvPlotBase):
         The `area` plot can be used to color the area under a line or to color the space between two
         lines.
 
+        Please note that currently meaningful tooltips are not supported. See
+        https://github.com/holoviz/holoviews/issues/5375
+
         Reference: https://hvplot.holoviz.org/reference/pandas/area.html
 
         Parameters
         ----------
         x : string, optional
             Field name(s) to draw x-positions from. If not specified, the index is
-            used.
+            used. Can refer to continous and categorical data.
         y : string, optional
             Field name to draw the first y-position from
         y2 : string, optional
@@ -554,12 +622,34 @@ class hvPlotTabular(hvPlotBase):
 
         .. code-block::
 
-            import hvplot.pandas
-            from bokeh.sampledata.degrees import data
-            data.hvplot.area(x='Year', y='Computer Science',
-                label='% of Computer Science Degrees Earned by Women',
-                ylim=(0, 100), width=500, height=400, color='pink'
-            )
+        import pandas as pd
+        import hvplot.pandas
+
+        df = pd.DataFrame(
+            {
+                "actual": [100, 150, 125, 140, 145, 135, 123],
+                "forecast": [90, 160, 125, 150, 141, 141, 120],
+                "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
+                "date": pd.date_range("2022-01-03", "2022-01-09"),
+                "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+            },
+        )
+        df["min"] = df[["actual", "forecast"]].min(axis=1)
+        df["max"] = df[["actual", "forecast"]].max(axis=1)
+
+        area = df.hvplot.area(
+            x="numerical",
+            y="min",
+            y2="max",
+            ylabel="value",
+            legend="bottom",
+            height=500,
+            color=["#55a194"],
+            alpha=0.7,
+            line_width=2,
+            ylim=(0, 200),
+        )
+        area
 
         References
         ----------
@@ -587,7 +677,7 @@ class hvPlotTabular(hvPlotBase):
         ----------
         x : string, optional
             Field name to draw the x-position from. If not specified, the index is
-            used.
+            used. Can refer to continous and categorical data.
         y : string, optional
             Field name to draw the y-position from
         yerr1 : string, optional
@@ -615,20 +705,40 @@ class hvPlotTabular(hvPlotBase):
 
             import pandas as pd
             import hvplot.pandas
-            data = pd.DataFrame({
-                "y": [1.0, 1.2, 0.8],
-                "yerr1": [0.2, .4, 0.1],
-                "yerr2": [0.2, .2, 0.2],
-            })
-            errorbars = data.hvplot.errorbars(y="y", yerr1="yerr1", yerr2="yerr2")
+
+            df = pd.DataFrame(
+                {
+                    "actual": [100, 150, 125, 140, 145, 135, 123],
+                    "forecast": [90, 160, 125, 150, 141, 141, 120],
+                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
+                    "date": pd.date_range("2022-01-03", "2022-01-09"),
+                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                },
+            )
+            df["min"] = df[["actual", "forecast"]].min(axis=1)
+            df["max"] = df[["actual", "forecast"]].max(axis=1)
+            df["mean"] = df[["actual", "forecast"]].mean(axis=1)
+            df["yerr2"] = df["max"] - df["mean"]
+            df["yerr1"] = df["mean"] - df["min"]
+
+            errorbars = df.hvplot.errorbars(
+                x="numerical",
+                y="mean",
+                yerr1="yerr1",
+                yerr2="yerr2",
+                legend="bottom",
+                height=500,
+                alpha=0.5,
+                line_width=2,
+            )
             errorbars
 
         Normally you would overlay the `errorbars` on for example a `scatter` plot.
 
         .. code-block::
 
-            scatter = data.hvplot.scatter(y="y", color="green", size=50)
-            scatter * errorbars
+            mean = df.hvplot.scatter(x="numerical", y=["mean"], color=["#55a194"], size=50)
+            errorbars * mean
 
         References
         ----------
@@ -651,7 +761,8 @@ class hvPlotTabular(hvPlotBase):
         Parameters
         ----------
         x : string, optional
-            Field name to draw x coordinates from. If not specified, the index is used.
+            Field name to draw x coordinates from. If not specified, the index is used. Normally
+            refers to date values.
         y : list or tuple, optional
             Field names of the OHLC fields. Default is ["open", "high", "low", "close"]
         line_color : string, optional
@@ -679,15 +790,14 @@ class hvPlotTabular(hvPlotBase):
 
         .. code-block::
 
-            import hvplot.pandas
-            import pandas as pd
             data = pd.DataFrame({
                 "open": [100, 101, 102],
-                "high": [101, 103, 104],
-                "low": [99, 100, 100],
+                "high": [104, 105, 110],
+                "low": [94, 97, 99],
                 "close": [101, 99, 103],
             }, index=[pd.Timestamp("2022-08-01"), pd.Timestamp("2022-08-02"), pd.Timestamp("2022-08-03")])
-            data.hvplot.ohlc()
+            ohlc = data.hvplot.ohlc(pos_color="#55a194", neg_color="#f16a6f")
+            ohlc
 
         References
         ----------
@@ -710,9 +820,10 @@ class hvPlotTabular(hvPlotBase):
         Parameters
         ----------
         x : string, optional
-            Field name to draw x coordinates from. If not specified, the index is used.
+            Field name to draw x coordinates from. If not specified, the index is used. Can refer
+            to continous and categorical data.
         y : string
-            Field name to draw y-positions from
+            Field name to draw y-positions from. Can refer to continous and categorical data.
         C : string, optional
             Field to draw heatmap color from. If not specified a simple count will be used.
         colorbar: boolean, optional
@@ -746,7 +857,7 @@ class hvPlotTabular(hvPlotBase):
             df = sst.sea_surface_temperature
             df.hvplot.heatmap(
                 x="time.month", y="time.day", C="temperature", reduce_function=np.mean,
-                height=500, width=500, colorbar=False,
+                height=500, width=500, colorbar=False, cmap="blues"
             )
 
         References
@@ -815,7 +926,7 @@ class hvPlotTabular(hvPlotBase):
                 "x": 2 + 2 * np.random.standard_normal(n),
                 "y": 2 + 2 * np.random.standard_normal(n),
             })
-            df.hvplot.hexbin("x", "y", clabel="Count", height=400, width=500)
+            df.hvplot.hexbin("x", "y", clabel="Count", cmap="plasma_r", height=400, width=500)
 
         References
         ----------
@@ -875,7 +986,7 @@ class hvPlotTabular(hvPlotBase):
 
             import hvplot.pandas
             from bokeh.sampledata.autompg import autompg_clean as df
-            bivariate = df.hvplot.bivariate("accel", "mpg")
+            bivariate = df.hvplot.bivariate("accel", "mpg", filled=True, cmap="blues")
             bivariate
 
         To get a better intuitive understanding of the `bivariate` plot, you can try overlaying the
@@ -924,7 +1035,7 @@ class hvPlotTabular(hvPlotBase):
             The color for each of the series. Possible values are:
 
             A single color string referred to by name, RGB or RGBA code, for instance 'red' or
-            '#a98d19.
+            '#a98d19'.
 
             A sequence of color strings referred to by name, RGB or RGBA code, which will be used
             for each series recursively. For instance ['green','yellow'] each field’s line will be
@@ -949,17 +1060,29 @@ class hvPlotTabular(hvPlotBase):
 
         .. code-block::
 
-            import hvplot.pandas
             import pandas as pd
-            df = pd.DataFrame({
-                'speed': [0.1, 17.5, 40, 48, 52, 69, 88],
-                'lifespan': [2, 8, 70, 1.5, 25, 12, 28],
-                },
-                index= ['snail', 'pig', 'elephant', 'rabbit', 'giraffe', 'coyote', 'horse']
-            )
-            df.hvplot.bar(rot=90, color=["#457278", "#615078"])
 
-        You can stack the bars by setting `stacked=True`
+            import hvplot.pandas
+
+            df = pd.DataFrame(
+                {
+                    "actual": [100, 150, 125, 140, 145, 135, 123],
+                    "forecast": [90, 160, 125, 150, 141, 141, 120],
+                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
+                    "date": pd.date_range("2022-01-03", "2022-01-09"),
+                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                },
+            )
+            bar = df.hvplot.bar(x="string", y="actual", color="#f16a6f", legend="bottom", xlabel="day", ylabel="value")
+            bar
+
+        You can overlay for example a line plot via
+
+        .. code-block::
+
+            forecast_line = df.hvplot.line(x="string", y="forecast", color="#1e85f7", line_width=5, legend="bottom")
+            forecast_markers = df.hvplot.scatter(x="string", y="forecast", color="#1e85f7", size=100, legend="bottom")
+            bar * forecast_line * forecast_markers
 
         .. code-block::
 
@@ -1678,7 +1801,9 @@ class hvPlotTabular(hvPlotBase):
 
     def labels(self, x=None, y=None, text=None, **kwds):
         """
-        Labels plot. `labels` are mostly useful when overlaid on top of other plots using the `*`
+        Labels plot.
+
+        `labels` are mostly useful when overlaid on top of other plots using the `*`
         operator.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/labels.html
@@ -1769,15 +1894,26 @@ class hvPlot(hvPlotTabular):
     .. code-block::
 
         import hvplot.pandas
-        from bokeh.sampledata.degrees import data as deg
-        line = deg.hvplot(
-            x="Year",
-            y=["Art and Performance", "Business", "Biology", "Education", "Computer Science"],
-            value_label="% of Degrees Earned by Women",
-            legend="top",
+        import pandas as pd
+
+        df = pd.DataFrame(
+            {
+                "actual": [100, 150, 125, 140, 145, 135, 123],
+                "forecast": [90, 160, 125, 150, 141, 141, 120],
+                "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
+                "date": pd.date_range("2022-01-03", "2022-01-09"),
+                "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+            },
+        )
+        line = df.hvplot.line(
+            x="numerical",
+            y=["actual", "forecast"],
+            ylabel="value",
+            legend="bottom",
             height=500,
-            width=620,
-            kind="line",
+            color=["steelblue", "teal"],
+            alpha=0.7,
+            line_width=5,
         )
         line
 
@@ -1785,15 +1921,10 @@ class hvPlot(hvPlotTabular):
 
     .. code-block::
 
-        scatter = deg.hvplot.scatter(
-            x="Year",
-            y=["Art and Performance", "Business", "Biology", "Education", "Computer Science"],
-            value_label="% of Degrees Earned by Women",
-            legend="top",
-            height=500,
-            width=620,
+        markers = df.hvplot.scatter(
+            x="numerical", y=["actual", "forecast"], color=["#f16a6f", "#1e85f7"], size=50
         )
-        line * scatter
+        line * markers
 
     Please note that you can pass widgets or reactive functions as arguments instead of
     literal values, c.f. https://hvplot.holoviz.org/user_guide/Widgets.html.
@@ -1893,8 +2024,10 @@ class hvPlot(hvPlotTabular):
 
         Parameters
         ----------
-        x, y : string, optional
-            The coordinate variable along the x- and y-axis
+        x : string, optional
+            The coordinate variable along the x-axis
+        y : string, optional
+            The coordinate variable along the y-axis
         bands : string, optional
             The coordinate variable to draw the RGB channels from
         z : string, optional
@@ -1916,7 +2049,10 @@ class hvPlot(hvPlotTabular):
         References
         ----------
 
-        - HoloViews: https://holoviews.org/reference/elements/bokeh/Image.html
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/image_rgba.html
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/RGB.html
+        - Matplotlib: https://matplotlib.org/stable/tutorials/introductory/images.html
+        - Plotly: https://plotly.com/python/imshow/
         """
         if bands is not None:
             kwds["bands"] = bands
@@ -1933,8 +2069,10 @@ class hvPlot(hvPlotTabular):
 
         Parameters
         ----------
-        x, y : string, optional
-            The coordinate variable along the x- and y-axis
+        x : string, optional
+            The coordinate variable along the x-axis
+        y : string, optional
+            The coordinate variable along the y-axis
         z : string, optional
             The data variable to plot
         colorbar: boolean
@@ -1953,10 +2091,21 @@ class hvPlot(hvPlotTabular):
 
         to learn more about its parameters and options.
 
+        Examples
+        --------
+
+        .. code-block::
+
+            import hvplot.xarray  # noqa
+            import xarray as xr
+
+            ds = xr.tutorial.open_dataset('rasm')
+            ds.Tair.hvplot.quadmesh(x='xc', y='yc', geo=True, widget_location='bottom')
+
         References
         ----------
 
-        - HolovVews: https://holoviews.org/reference/elements/bokeh/QuadMesh.html
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/QuadMesh.html
         """
         return self(x, y, z=z, kind="quadmesh", colorbar=colorbar, **kwds)
 
@@ -1968,8 +2117,10 @@ class hvPlot(hvPlotTabular):
 
         Parameters
         ----------
-        x, y : string, optional
-            The coordinate variable along the x- and y-axis
+        x : string, optional
+            The coordinate variable along the x-axis
+        y : string, optional
+            The coordinate variable along the y-axis
         z : string, optional
             The data variable to plot
         levels: int, optional
@@ -1989,6 +2140,35 @@ class hvPlot(hvPlotTabular):
             hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        Examples
+        --------
+
+        .. code-block::
+
+            import hvplot.xarray  # noqa
+            import xarray as xr
+
+            ds = xr.tutorial.open_dataset("air_temperature")
+            ds.hvplot.contour(
+                geo=True,
+                tiles="EsriImagery",
+                z="air",
+                x="lon",
+                y="lat",
+                levels=20,
+                clabel="T [K]",
+                line_width=2,
+                label="Mean Air temperature [K]",
+                cmap="reds",
+            )
+
+        References
+        ----------
+
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Contours.html
+        - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.contour.html
+        - Plotly: https://plotly.com/python/contour-plots/
         """
         return self(x, y, z=z, kind="contour", colorbar=colorbar, **kwds)
 
@@ -1996,12 +2176,17 @@ class hvPlot(hvPlotTabular):
         """
         Filled contour plot
 
+        Similar to `image`, `contourf` displays values on a 2d grid. But it first segments data
+        into various levels.
+
         Reference. https://hvplot.holoviz.org/reference/xarray/contourf.html
 
         Parameters
         ----------
-        x, y : string, optional
-            The coordinate variable along the x- and y-axis
+        x : string, optional
+            The coordinate variable along the x-axis
+        y : string, optional
+            The coordinate variable along the y-axis
         z : string, optional
             The data variable to plot
         levels: int, optional
@@ -2021,5 +2206,33 @@ class hvPlot(hvPlotTabular):
             hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        Examples
+
+        .. code-block::
+
+            import hvplot.xarray  # noqa
+            import xarray as xr
+
+            ds = xr.tutorial.open_dataset("air_temperature")
+            ds.hvplot.contourf(
+                geo=True,
+                coastline=True,
+                z="air",
+                x="lon",
+                y="lat",
+                levels=20,
+                clabel="T [K]",
+                line_width=2,
+                label="Mean Air temperature [K]",
+                cmap="reds",
+            )
+
+        References
+        ----------
+
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Contours.html
+        - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.contour.html
+        - Plotly: https://plotly.com/python/contour-plots/
         """
         return self(x, y, z=z, kind="contourf", colorbar=colorbar, **kwds)
