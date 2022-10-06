@@ -52,7 +52,7 @@ class TestCRSInference(TestGeo):
 
     def test_plot_with_crs_as_proj_string(self):
         da = self.da.copy()
-        da = da.drop_vars('spatial_ref')  # To not treat it as a rioxarray
+        da.rio._crs = False  # To not treat it as a rioxarray
 
         plot = self.da.hvplot.image('x', 'y', crs="epsg:32618")
         self.assertCRS(plot)
@@ -70,14 +70,14 @@ class TestProjections(TestGeo):
 
     def test_plot_with_crs_as_attr_str(self):
         da = self.da.copy()
-        da = da.drop_vars('spatial_ref')  # To not treat it as a rioxarray
+        da.rio._crs = False  # To not treat it as a rioxarray
         da.attrs = {'bar': self.crs}
         plot = da.hvplot.image('x', 'y', crs='bar')
         self.assertCRS(plot)
 
     def test_plot_with_crs_as_nonexistent_attr_str(self):
         da = self.da.copy()
-        da = da.drop_vars('spatial_ref')  # To not treat it as a rioxarray
+        da.rio._crs = False  # To not treat it as a rioxarray
 
         # Used to test crs='foo' but this is parsed under-the-hood
         # by PROJ (projinfo) which matches a geographic projection named
@@ -87,7 +87,7 @@ class TestProjections(TestGeo):
 
     def test_plot_with_geo_as_true_crs_no_crs_on_data_returns_default(self):
         da = self.da.copy()
-        da = da.drop_vars('spatial_ref')  # To not treat it as a rioxarray
+        da.rio._crs = False  # To not treat it as a rioxarray
         da.attrs = {'bar': self.crs}
         plot = da.hvplot.image('x', 'y', geo=True)
         self.assertCRS(plot, 'eqc')

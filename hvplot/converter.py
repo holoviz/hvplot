@@ -639,9 +639,9 @@ class HoloViewsConverter:
     def _process_crs(self, data, crs):
         """Given crs as proj4 string, data.attr, or cartopy.crs return cartopy.crs
         """
-        if hasattr(data, "spatial_ref"):
+        if hasattr(data, 'rio') and data.rio.crs is not None:
             # if data is a rioxarray
-            _crs = data.spatial_ref.attrs.get('crs_wkt', crs)
+            _crs = data.rio.crs.to_wkt()
         else:
             # get the proj string: either the value of data.attrs[crs] or crs itself
             _crs = getattr(data, 'attrs', {}).get(crs or 'crs', crs)
