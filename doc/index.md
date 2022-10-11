@@ -11,7 +11,7 @@ kernelspec:
 
 # hvPlot
 
-***Familiar and high-level API for data exploration and visualization***
+***A familiar and high-level API for data exploration and visualization***
 
 ```{image} ./assets/diagram.svg
 ---
@@ -130,10 +130,19 @@ align: center
 
 ::::
 
-`.hvplot()` can also generate plots with [Matplotlib](https://matplotlib.org/) or [Plotly](https://plotly.com/).
+`.hvplot()` uses Bokeh as the backend by default. It can also generate plots with [Matplotlib](https://matplotlib.org/) or [Plotly](https://plotly.com/).
 
 
 ::::{tab-set}
+
+:::{tab-item} Bokeh
+```{code-cell} ipython3
+import hvplot.pandas  # noqa
+from bokeh.sampledata.penguins import data as df
+
+df.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
+```
+:::
 
 :::{tab-item} Matplotlib
 ```python

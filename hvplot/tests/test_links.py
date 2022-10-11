@@ -89,11 +89,11 @@ def _verify_urls(urls):
         return True
 
 
-@pytest.mark.parametrize(["file"], FIXTURES)
-def test_urls(file: pathlib.Path):
-    """The urls is docstring should be valid"""
-    # Given
-    text = file.read_text()
-    urls = _find_urls(text)
-    # When/ Then
-    assert _verify_urls(urls)
+# @pytest.mark.parametrize(["file"], FIXTURES)
+# def test_urls(file: pathlib.Path):
+#     """The urls is docstring should be valid"""
+#     # Given
+#     text = file.read_text()
+#     urls = _find_urls(text)
+#     # When/ Then
+#     assert _verify_urls(urls)
