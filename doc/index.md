@@ -21,7 +21,7 @@ width: 70%
 ---
 ```
 
-**`.hvplot()` is a powerful and interactive Pandas `.plot()` API**
+**`.hvplot()` is a powerful and interactive Pandas `.plot()` like API**
 
 ---
 
