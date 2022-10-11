@@ -73,12 +73,12 @@ jobs:
         run: |
           conda activate test-environment
           conda list
-          doit develop_install -o examples -o tests --conda-mode=mamba
+          doit develop_install -o examples -o tests
       - name: patch fiona/geostack on Macos
         if: steps.cache.outputs.cache-hit != 'true' && contains(matrix.os, 'macos')
         run: |
           conda activate test-environment
-          mamba install "fiona=1.8" "gdal=3.3"
+          conda install "fiona=1.8" "gdal=3.3"
       - name: hvplot install if env cached
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
