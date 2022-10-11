@@ -11,7 +11,7 @@ on:
     - cron: '0 15 * * SUN'
 
 env:
-  CACHE_VERSION: 1
+  CACHE_VERSION: 2
 
 jobs:
   test_suite:
