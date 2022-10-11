@@ -50,6 +50,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           miniconda-version: "latest"
+          channels: conda-forge
       - name: Fetch unshallow
         run: git fetch --prune --tags --unshallow
       - name: Get Today's date for cache
@@ -63,7 +64,7 @@ jobs:
       - name: conda setup
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          conda install -n base -c conda-forge "mamba>=0.23" --no-update-deps
+          conda install -n base "mamba>=0.23"
           conda create -n test-environment
           conda activate test-environment
           conda config --env --append channels pyviz/label/dev --append channels conda-forge
