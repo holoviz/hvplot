@@ -49,6 +49,8 @@ jobs:
           fetch-depth: "100"
       - uses: conda-incubator/setup-miniconda@v2
         with:
+          mamba-version: "*"
+          channels: conda-forge
           miniconda-version: "latest"
       - name: Fetch unshallow
         run: git fetch --prune --tags --unshallow
@@ -63,8 +65,6 @@ jobs:
       - name: conda setup
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          conda update -n base conda
-          conda install -n base -c conda-forge "mamba>=0.23" --no-update-deps
           conda create -n test-environment
           conda activate test-environment
           conda config --env --append channels pyviz/label/dev --append channels conda-forge
