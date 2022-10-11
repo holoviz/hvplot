@@ -65,8 +65,8 @@ jobs:
         run: |
           conda create -n test-environment
           conda activate test-environment
+          conda config --env --remove channels defaults --remove channels conda-forge
           conda config --env --append channels pyviz/label/dev --append channels conda-forge
-          conda config --env --remove channels defaults
           conda install python=${{ matrix.python-version }} pyctdev
       - name: doit develop_install py
         if: steps.cache.outputs.cache-hit != 'true'
