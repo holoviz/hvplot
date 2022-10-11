@@ -36,7 +36,7 @@ df.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
 
 ---
 
-`.hvplot()` can generate plots from [Pandas](https://pandas.pydata.org/) DataFrames and many other data structures in the PyData ecosystem:
+`.hvplot()` can generate plots from [Pandas](https://pandas.pydata.org/) DataFrames and many other data structures of the PyData ecosystem:
 
 ::::{tab-set}
 
@@ -105,7 +105,7 @@ import hvplot.pandas  # noqa
 from bokeh.sampledata.autompg import autompg_clean as df
 
 table = df.groupby(['origin', 'mfr'])['mpg'].mean().sort_values().tail(5)
-table.hvplot.barh('mfr', 'mpg', by='origin', stacked=True, cmap=["#848484", "#cd5c5c"], legend='bottom_right')
+table.hvplot.barh('mfr', 'mpg', by='origin', stacked=True)
 ```
 ```{image} ./_static/home/pandas.gif
 ---
@@ -148,7 +148,7 @@ align: center
 
 ::::
 
-`.hvplot()` can generate plots with [Bokeh](https://bokeh.org/) (default), [Matplotlib](https://matplotlib.org/) and [Plotly](https://plotly.com/).
+`.hvplot()` can generate plots with [Bokeh](https://bokeh.org/) (default), [Matplotlib](https://matplotlib.org/) or [Plotly](https://plotly.com/).
 
 ::::{tab-set}
 
