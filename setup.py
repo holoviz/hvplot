@@ -82,12 +82,14 @@ extras_require = {
         'xarray',
         'pooch',
         'scipy',
+        'ipywidgets',
     ],
     'examples': _examples,
     'doc': _examples + [
-        'nbsite >=0.7.1',
-        'pydata-sphinx-theme <0.9.0',
+        'nbsite >=0.7.2rc2',
+        'pydata-sphinx-theme <0.10',
         'sphinx-copybutton',
+        'sphinx-design',
     ]
 }
 
@@ -107,7 +109,7 @@ setup_args = dict(
     name='hvplot',
     version=get_setup_version("hvplot"),
     description='A high-level plotting API for the PyData ecosystem built on HoloViews.',
-    long_description=open("README.md").read(),
+    long_description=open("README.md", mode="r", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     author= "Philipp Rudiger",
     author_email= "developers@pyviz.org",
