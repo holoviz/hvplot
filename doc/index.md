@@ -148,7 +148,7 @@ align: center
 
 ::::
 
-`.hvplot()` can generate plots with [Bokeh](https://bokeh.org/) (default), [Matplotlib](https://matplotlib.org/) and [Plotly](https://plotly.com/).
+`.hvplot()` can generate plots with [Bokeh](https://bokeh.org/) (default), [Matplotlib](https://matplotlib.org/) or [Plotly](https://plotly.com/).
 
 ::::{tab-set}
 
