@@ -78,7 +78,7 @@ class TestChart2D(ComparisonTestCase):
     def test_xarray_dataset_with_attrs(self):
         try:
             import xarray as xr
-            import hvplot.xarray
+            import hvplot.xarray  # noqa
         except ImportError:
             raise SkipTest('xarray not available')
 
