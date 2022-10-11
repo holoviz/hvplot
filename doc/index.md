@@ -36,7 +36,7 @@ df.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
 
 ---
 
-`.hvplot()` can generate plots from [Pandas](https://pandas.pydata.org/) DataFrames and many other data structures in the PyData ecosystem:
+`.hvplot()` can generate plots from [Pandas](https://pandas.pydata.org/) DataFrames and many other data structures of the PyData ecosystem:
 
 ::::{tab-set}
 
