@@ -672,6 +672,7 @@ class HoloViewsConverter:
         if is_intake(data):
             data = process_intake(data, use_dask or persist)
         if isinstance(getattr(data, "columns", None), pd.RangeIndex):
+            data = data.copy()
             data.columns = map(str, data.columns)
 
         self.source_data = data
