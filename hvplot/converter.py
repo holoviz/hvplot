@@ -671,6 +671,9 @@ class HoloViewsConverter:
             data = data.to_frame()
         if is_intake(data):
             data = process_intake(data, use_dask or persist)
+        if isinstance(getattr(data, "columns", None), pd.RangeIndex):
+            data.columns = map(str, data.columns)
+
         self.source_data = data
 
         if groupby is not None and not isinstance(groupby, list):
