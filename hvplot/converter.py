@@ -1622,7 +1622,7 @@ class HoloViewsConverter:
         for c in y:
             kdims, vdims = self._get_dimensions([x], [c])
             chart = element(data, kdims, vdims).redim(**{c: self.value_label})
-            charts.append((c, chart.relabel(**self._relabel)))
+            charts.append((c, chart.relabel(**self._relabel).redim(**self._redim)))
         return (self._by_type(charts, self.group_label, sort=False)
                 .opts(cur_opts, backend='bokeh')
                 .opts(compat_opts, backend=self._backend_compat))
