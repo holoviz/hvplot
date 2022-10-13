@@ -6,6 +6,7 @@ import abc
 import operator
 import sys
 from functools import partial
+from packaging.version import Version
 from types import FunctionType, MethodType
 
 import holoviews as hv
@@ -46,6 +47,11 @@ def _find_widgets(op):
             op_arg.owner not in widgets):
             widgets.append(op_arg.owner)
         if isinstance(op_arg, slice):
+            if Version(hv.__version__) < Version("1.15.1"):
+                raise ValueError(
+                    "Using interactive with slices needs to have "
+                    "Holoviews 1.15.1 or greater installed."
+                )
             nested_op = {"args": [op_arg.start, op_arg.stop, op_arg.step], "kwargs": {}}
             for widget in _find_widgets(nested_op):
                 if widget not in widgets:

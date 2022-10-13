@@ -1,3 +1,5 @@
+from packaging.version import Version
+
 import holoviews as hv
 import hvplot.pandas  # noqa
 import hvplot.xarray  # noqa
@@ -203,6 +205,10 @@ def test_interactive_nested_widgets():
     assert iw[0] == w
 
 
+@pytest.mark.skipif(
+    Version(hv.__version__) < Version("1.15.1"),
+    reason="Needs holoviews 1.15.1",
+)
 def test_interactive_slice():
     df = pd._testing.makeDataFrame()
     w = pn.widgets.IntSlider(start=10, end=40)
