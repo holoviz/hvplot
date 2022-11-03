@@ -65,12 +65,19 @@ jobs:
           conda config --env --append channels pyviz/label/dev --append channels conda-forge
           conda config --env --remove channels defaults
           conda install python=${{ matrix.python-version }} pyctdev
-      - name: doit develop_install py
-        if: steps.cache.outputs.cache-hit != 'true'
+      - name: doit develop_install
+        if: matrix.os != 'macos-latest' && steps.cache.outputs.cache-hit != 'true'
         run: |
           conda activate test-environment
           conda list
           doit develop_install -o examples -o tests --conda-mode=mamba
+      - name: doit develop_install macos hack
+        if: matrix.os == 'macos-latest' && steps.cache.outputs.cache-hit != 'true'
+        run: |
+          conda activate test-environment
+          conda list
+          doit develop_install -o examples -o tests --conda-mode=mamba || echo "Keep going"
+          pip install --no-deps --no-build-isolation -e .
       - name: hvplot install if env cached
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
