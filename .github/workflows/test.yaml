@@ -29,10 +29,6 @@ jobs:
           path: /Users/runner/miniconda3/envs/
         - os: windows-latest
           path: C:\Miniconda3\envs\
-        exclude:
-          # Excluded because of issues with the geo-stack
-          - os: 'macos-latest'
-            python-version: '3.10'
     timeout-minutes: 90
     defaults:
       run:
