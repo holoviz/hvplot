@@ -68,7 +68,7 @@ jobs:
           conda activate test-environment
           conda config --env --append channels pyviz/label/dev --append channels conda-forge
           conda config --env --remove channels defaults
-          conda install python=${{ matrix.python-version }} pyctdev
+          conda install python=${{ matrix.python-version }} pyctdev "openssl <3"
       - name: doit develop_install py
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
