@@ -6,6 +6,7 @@ import abc
 import operator
 import sys
 from functools import partial
+from packaging.version import Version
 from types import FunctionType, MethodType
 
 import holoviews as hv
@@ -27,9 +28,8 @@ def _find_widgets(op):
     op_args = _flatten(op_args)
     for op_arg in op_args:
         # Find widgets introduced as `widget` in an expression
-        if 'panel' in sys.modules:
-            if isinstance(op_arg, Widget) and op_arg not in widgets:
-                widgets.append(op_arg)
+        if isinstance(op_arg, Widget) and op_arg not in widgets:
+            widgets.append(op_arg)
         # TODO: Find how to execute this path?
         if isinstance(op_arg, hv.dim):
             for nested_op in op_arg.ops:
@@ -46,6 +46,16 @@ def _find_widgets(op):
             isinstance(op_arg.owner, pn.widgets.Widget) and
             op_arg.owner not in widgets):
             widgets.append(op_arg.owner)
+        if isinstance(op_arg, slice):
+            if Version(hv.__version__) < Version("1.15.1"):
+                raise ValueError(
+                    "Using interactive with slices needs to have "
+                    "Holoviews 1.15.1 or greater installed."
+                )
+            nested_op = {"args": [op_arg.start, op_arg.stop, op_arg.step], "kwargs": {}}
+            for widget in _find_widgets(nested_op):
+                if widget not in widgets:
+                    widgets.append(widget)
     return widgets
 
 

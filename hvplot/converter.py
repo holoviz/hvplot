@@ -639,8 +639,13 @@ class HoloViewsConverter:
     def _process_crs(self, data, crs):
         """Given crs as proj4 string, data.attr, or cartopy.crs return cartopy.crs
         """
-        # get the proj string: either the value of data.attrs[crs] or crs itself
-        _crs = getattr(data, 'attrs', {}).get(crs or 'crs', crs)
+        if hasattr(data, 'rio') and data.rio.crs is not None:
+            # if data is a rioxarray
+            _crs = data.rio.crs.to_wkt()
+        else:
+            # get the proj string: either the value of data.attrs[crs] or crs itself
+            _crs = getattr(data, 'attrs', {}).get(crs or 'crs', crs)
+
         try:
             return process_crs(_crs)
         except ValueError:
@@ -1622,7 +1627,7 @@ class HoloViewsConverter:
         for c in y:
             kdims, vdims = self._get_dimensions([x], [c])
             chart = element(data, kdims, vdims).redim(**{c: self.value_label})
-            charts.append((c, chart.relabel(**self._relabel)))
+            charts.append((c, chart.relabel(**self._relabel).redim(**self._redim)))
         return (self._by_type(charts, self.group_label, sort=False)
                 .opts(cur_opts, backend='bokeh')
                 .opts(compat_opts, backend=self._backend_compat))

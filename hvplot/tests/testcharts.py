@@ -3,7 +3,7 @@ import numpy as np
 from unittest import SkipTest, expectedFailure
 from parameterized import parameterized
 
-from holoviews import NdOverlay, Store, dim
+from holoviews import NdOverlay, Store, dim, render
 from holoviews.element import Curve, Area, Scatter, Points, Path, HeatMap
 from holoviews.element.comparison import ComparisonTestCase
 
@@ -73,6 +73,23 @@ class TestChart2D(ComparisonTestCase):
         plot = self.time_df.hvplot.heatmap(x='time.hour', y='time.day', C='temp')
         assert plot.kdims == ['time.hour', 'time.day']
         assert plot.vdims == ['temp']
+
+
+    def test_xarray_dataset_with_attrs(self):
+        try:
+            import xarray as xr
+            import hvplot.xarray  # noqa
+        except ImportError:
+            raise SkipTest('xarray not available')
+
+
+        dset = xr.Dataset(
+            {"u": ("t", [1, 3]), "v": ("t", [4, 2])},
+            coords={"t": ("t", [0, 1], {"long_name": "time", "units": "s"})},
+        )
+        ndoverlay = dset.hvplot.line()
+
+        assert render(ndoverlay, "bokeh").xaxis.axis_label == "time (s)"
 
 
 class TestChart2DDask(TestChart2D):
