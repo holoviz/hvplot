@@ -482,8 +482,8 @@ class hvPlotTabular(hvPlotBase):
         References
         ----------
 
-        - Bokeh: http://docs.bokeh.org/en/latest/docs/user_guide/plotting.html#scatter-markers
-        - HoloViews: http://holoviews.org/reference/elements/matplotlib/Scatter.html
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/user_guide/plotting.html#scatter-markers
+        - HoloViews: https://holoviews.org/reference/elements/matplotlib/Scatter.html
         - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.scatter.html
         - Plotly: https://plotly.com/python/line-and-scatter/
         - Matplotlib:  https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html
@@ -534,8 +534,8 @@ class hvPlotTabular(hvPlotBase):
         References
         ----------
 
-        - Bokeh: http://docs.bokeh.org/en/latest/docs/user_guide/plotting.html#directed-areas
-        - HoloViews: http://holoviews.org/reference/elements/matplotlib/Area.html
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/user_guide/plotting.html#directed-areas
+        - HoloViews: https://holoviews.org/reference/elements/matplotlib/Area.html
         - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.area.html
         - Plotly: https://plotly.com/python/filled-area-plots/
         - Matplotlib:  https://matplotlib.org/stable/gallery/lines_bars_and_markers/fill_between_demo.html
@@ -709,7 +709,7 @@ class hvPlotTabular(hvPlotBase):
         References
         ----------
 
-        - Bokeh: http://docs.bokeh.org/en/latest/docs/gallery/categorical_heatmap.html
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/categorical_heatmap.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/HeatMap.html
         - Matplotlib: https://matplotlib.org/stable/gallery/images_contours_and_fields/image_annotated_heatmap.html
         - Plotly: https://plotly.com/python/heatmaps/
