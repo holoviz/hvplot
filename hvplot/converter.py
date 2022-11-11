@@ -875,7 +875,6 @@ class HoloViewsConverter:
                 elif kind in ('bar', 'barh'):
                     x, by = indexes
 
-            self.data = self._transform_columnar_data(self.data)
             self.variables = indexes + list(self.data.columns)
 
             # Reset groupby dimensions
