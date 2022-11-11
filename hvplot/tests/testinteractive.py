@@ -1,3 +1,5 @@
+from packaging.version import Version
+
 import holoviews as hv
 import hvplot.pandas  # noqa
 import hvplot.xarray  # noqa
@@ -185,6 +187,47 @@ def test_interactive_xarray_function(dataset):
     select.value = 'air2'
     assert (dsi._obj == ds.air2).all()
     assert dsi._transform == dim('air2')
+
+
+def test_interactive_nested_widgets():
+    df = pd._testing.makeDataFrame()
+    w = pn.widgets.RadioButtonGroup(value="A", options=list("ABC"))
+
+    idf = Interactive(df)
+    pipeline = idf.groupby(["D", w]).mean()
+    ioutput = pipeline.panel().object().object
+    iw = pipeline.widgets()
+
+    output = df.groupby(["D", "A"]).mean()
+
+    pd.testing.assert_frame_equal(ioutput, output)
+    assert len(iw) == 1
+    assert iw[0] == w
+
+
+@pytest.mark.skipif(
+    Version(hv.__version__) < Version("1.15.1"),
+    reason="Needs holoviews 1.15.1",
+)
+def test_interactive_slice():
+    df = pd._testing.makeDataFrame()
+    w = pn.widgets.IntSlider(start=10, end=40)
+
+    idf = Interactive(df)
+    pipeline = idf.iloc[:w]
+    ioutput = pipeline.panel().object().object
+    iw = pipeline.widgets()
+
+    output = df.iloc[:10]
+
+    pd.testing.assert_frame_equal(ioutput, output)
+    assert len(iw) == 1
+    assert iw[0] == w
+
+    w.value = 15
+    ioutput = pipeline.panel().object().object
+    output = df.iloc[:15]
+    pd.testing.assert_frame_equal(ioutput, output)
 
 
 def test_interactive_pandas_dataframe_hvplot_accessor(df):
@@ -1324,3 +1367,4 @@ def test_clones_dont_reexecute_transforms():
     df.interactive.pipe(piped, msg="1").pipe(piped, msg="2")
 
     assert len(msgs) == 3
+

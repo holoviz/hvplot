@@ -32,7 +32,7 @@ jobs:
         exclude:
           # Excluded because of issues with the geo-stack
           - os: 'macos-latest'
-            python-version: '3.10'
+            python-version: '3.7'
     timeout-minutes: 90
     defaults:
       run:
@@ -42,7 +42,7 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       MAMBA_NO_BANNER: 1
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: "100"
       - uses: conda-incubator/setup-miniconda@v2
@@ -69,17 +69,19 @@ jobs:
           conda config --env --append channels pyviz/label/dev --append channels conda-forge
           conda config --env --remove channels defaults
           conda install python=${{ matrix.python-version }} pyctdev
-      - name: doit develop_install py
-        if: steps.cache.outputs.cache-hit != 'true'
+      - name: doit develop_install
+        if: matrix.os != 'macos-latest' && steps.cache.outputs.cache-hit != 'true'
         run: |
           conda activate test-environment
           conda list
           doit develop_install -o examples -o tests --conda-mode=mamba
-      - name: patch fiona/geostack on Macos
-        if: steps.cache.outputs.cache-hit != 'true' && contains(matrix.os, 'macos')
+      - name: doit develop_install macos hack
+        if: matrix.os == 'macos-latest' && steps.cache.outputs.cache-hit != 'true'
         run: |
           conda activate test-environment
-          mamba install "fiona=1.8" "gdal=3.3"
+          conda list
+          doit develop_install -o examples -o tests --conda-mode=mamba || echo "Keep going"
+          pip install --no-deps --no-build-isolation -e .
       - name: hvplot install if env cached
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
@@ -130,10 +132,10 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       PYCTDEV_SELF_CHANNEL: "pyviz/label/dev"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: "100"
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - uses: conda-incubator/setup-miniconda@v2

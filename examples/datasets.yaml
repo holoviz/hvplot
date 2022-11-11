@@ -18,7 +18,7 @@ sources:
     args:
       urlpath: '{{ CATALOG_DIR }}/data/crime.csv'
     metadata:
-      url: https://www.ucrdatatool.gov/Search/Crime/State/StatebyState.cfm
+      url: https://web.archive.org/web/20201031163816/https://www.ucrdatatool.gov/Search/Crime/State/StatebyState.cfm
       plots:
         example:
           kind: line

@@ -61,6 +61,7 @@ _examples = [
     'python-snappy >=0.6.0',
     'pooch >=1.6.0',
     'fiona',
+    'rioxarray',
     # Extra dependency of cartopy on Python 3.6 only
     'pyepsg',
     'matplotlib',
