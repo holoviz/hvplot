@@ -9,14 +9,16 @@ repos:
     -   id: check-builtin-literals
     -   id: check-case-conflict
     -   id: check-docstring-first
+        exclude: hvplot/interactive.py
     -   id: check-executables-have-shebangs
     -   id: check-toml
     -   id: detect-private-key
     -   id: end-of-file-fixer
-        exclude: (\.min\.js$|\.svg)
+        exclude: (\.min\.js$|\.svg$)
     -   id: trailing-whitespace
--   repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.0.121
+-   repo: https://github.com/PyCQA/flake8
+    rev: 4.0.1
     hooks:
-    -   id: ruff
+    -   id: flake8  # See 'setup.cfg' for args
+        args: [hvplot]
         files: hvplot/
