@@ -178,14 +178,14 @@ class Axes(Controls):
     @param.depends('explorer.xlim', 'explorer.ylim',  watch=True)
     def _update_ranges(self):
         xlim = self.explorer.xlim()
-        if xlim is not None and is_number(xlim[0]) and is_number(xlim[1]):
+        if xlim is not None and is_number(xlim[0]) and is_number(xlim[1]) and xlim[0] != xlim[1]:
             xlim = self._convert_to_int(xlim)
             self.param.xlim.precedence = 0
             self.param.xlim.bounds = xlim
         else:
             self.param.xlim.precedence = -1
         ylim = self.explorer.ylim()
-        if ylim is not None and is_number(ylim[0]) and is_number(ylim[1]):
+        if ylim is not None and is_number(ylim[0]) and is_number(ylim[1]) and ylim[0] != ylim[1]:
             ylim = self._convert_to_int(ylim)
             self.param.ylim.precedence = 0
             self.param.ylim.bounds = ylim
