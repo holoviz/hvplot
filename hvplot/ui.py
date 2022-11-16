@@ -352,8 +352,7 @@ class hvPlotExplorer(Viewer):
             # cls = hvGeomExplorer
             raise TypeError('GeoDataFrame objects not yet supported.')
         elif is_xarray(data):
-            # cls = hvGridExplorer
-            raise TypeError('Xarray objects not yet supported.')
+            cls = hvGridExplorer
         else:
             cls = hvDataFrameExplorer
         return cls(data, **params)
@@ -458,9 +457,11 @@ class hvPlotExplorer(Viewer):
         if len(df) > MAX_ROWS and not (self.kind in STATS_KINDS or kwargs.get('rasterize') or kwargs.get('datashade')):
             df = df.sample(n=MAX_ROWS)
         self._layout.loading = True
+        # groupby = [] is not a no-op
+        groupby = self.groupby or None
         try:
             self._hvplot = _hvPlot(df)(
-                kind=self.kind, x=self.x, y=y, by=self.by, groupby=self.groupby, **kwargs
+                kind=self.kind, x=self.x, y=y, by=self.by, groupby=groupby, **kwargs
             )
             self._hvpane = pn.pane.HoloViews(
                 self._hvplot, sizing_mode='stretch_width', margin=(0, 20, 0, 20)
@@ -647,8 +648,37 @@ class hvGridExplorer(hvPlotExplorer):
         y = self._y
         if not isinstance(y, list):
             y = [y]
-        values = (self._data[y] for y in y)
+        import xarray as xr
+        if isinstance(self._data, xr.DataArray):
+            values = [self._data]
+        else:
+            values = (self._data[y] for y in y)
         return max_range([(np.nanmin(vs), np.nanmax(vs)) for vs in values])
+
+    def __init__(self, data, **params):
+        import xarray as xr
+        if not 'kind' in params:
+            if isinstance(data, xr.DataArray):
+                params['kind'] = 'image' if data.ndim >= 2 else 'line'
+            else:
+                params['kind'] = 'hist'
+        super().__init__(data, **params)
+
+    def _populate(self):
+        indexes = self._converter.indexes
+        for pname in self.param:
+            if pname == 'kind':
+                continue
+            p = self.param[pname]
+            if isinstance(p, param.Selector):
+                p.objects = indexes
+
+                if pname == 'x':
+                    setattr(self, pname, self._x)
+                elif pname == 'y_multi':
+                    setattr(self, pname, [self._y])
+                elif pname == 'groupby':
+                    setattr(self, pname, self._converter.groupby)
 
 
 class hvDataFrameExplorer(hvPlotExplorer):
