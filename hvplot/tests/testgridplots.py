@@ -214,7 +214,7 @@ class TestGridPlots(ComparisonTestCase):
             # not be done and return False.
             assert not plot_opts.kwargs['symmetric']
             ds.close()
-    
+
     def test_symmetric_dataset_in_memory(self):
         da = xr.DataArray(
             data=np.arange(-100, 100).reshape(10, 10, 2),

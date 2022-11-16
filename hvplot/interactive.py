@@ -1,65 +1,4 @@
 """
-interactive API
-"""
-
-import abc
-import operator
-import sys
-from functools import partial
-from packaging.version import Version
-from types import FunctionType, MethodType
-
-import holoviews as hv
-import pandas as pd
-import panel as pn
-import param
-
-from panel.layout import Column, Row, VSpacer, HSpacer
-from panel.util import get_method_owner, full_groupby
-from panel.widgets.base import Widget
-
-from .converter import HoloViewsConverter
-from .util import _flatten, is_tabular, is_xarray, is_xarray_dataarray
-
-
-def _find_widgets(op):
-    widgets = []
-    op_args = list(op['args']) + list(op['kwargs'].values())
-    op_args = _flatten(op_args)
-    for op_arg in op_args:
-        # Find widgets introduced as `widget` in an expression
-        if isinstance(op_arg, Widget) and op_arg not in widgets:
-            widgets.append(op_arg)
-        # TODO: Find how to execute this path?
-        if isinstance(op_arg, hv.dim):
-            for nested_op in op_arg.ops:
-                for widget in _find_widgets(nested_op):
-                    if widget not in widgets:
-                        widgets.append(widget)
-        # Find Ipywidgets
-        if 'ipywidgets' in sys.modules:
-            from ipywidgets import Widget as IPyWidget
-            if isinstance(op_arg, IPyWidget) and op_arg not in widgets:
-                widgets.append(op_arg)
-        # Find widgets introduced as `widget.param.value` in an expression
-        if (isinstance(op_arg, param.Parameter) and
-            isinstance(op_arg.owner, pn.widgets.Widget) and
-            op_arg.owner not in widgets):
-            widgets.append(op_arg.owner)
-        if isinstance(op_arg, slice):
-            if Version(hv.__version__) < Version("1.15.1"):
-                raise ValueError(
-                    "Using interactive with slices needs to have "
-                    "Holoviews 1.15.1 or greater installed."
-                )
-            nested_op = {"args": [op_arg.start, op_arg.stop, op_arg.step], "kwargs": {}}
-            for widget in _find_widgets(nested_op):
-                if widget not in widgets:
-                    widgets.append(widget)
-    return widgets
-
-
-"""
 How Interactive works
 ---------------------
 
@@ -129,7 +68,7 @@ as the pipeline evaluates `dfi.A` to hold a current object `_current` that
 is a Pandas Series, and no longer and DataFrame.
 
 The `_obj` attribute is implemented as a property which gets/sets the value
-from a list that contains the shared attribute. This is required for the 
+from a list that contains the shared attribute. This is required for the
 "function as input" to be able to update the object from a callback set up
 on the root Interactive instance.
 
@@ -146,6 +85,62 @@ the object returned, e.g. the series `df.A` or the method `df.head`, and
 display its repr.
 """
 
+import abc
+import operator
+import sys
+from functools import partial
+from packaging.version import Version
+from types import FunctionType, MethodType
+
+import holoviews as hv
+import pandas as pd
+import panel as pn
+import param
+
+from panel.layout import Column, Row, VSpacer, HSpacer
+from panel.util import get_method_owner, full_groupby
+from panel.widgets.base import Widget
+
+from .converter import HoloViewsConverter
+from .util import _flatten, is_tabular, is_xarray, is_xarray_dataarray
+
+
+def _find_widgets(op):
+    widgets = []
+    op_args = list(op['args']) + list(op['kwargs'].values())
+    op_args = _flatten(op_args)
+    for op_arg in op_args:
+        # Find widgets introduced as `widget` in an expression
+        if isinstance(op_arg, Widget) and op_arg not in widgets:
+            widgets.append(op_arg)
+        # TODO: Find how to execute this path?
+        if isinstance(op_arg, hv.dim):
+            for nested_op in op_arg.ops:
+                for widget in _find_widgets(nested_op):
+                    if widget not in widgets:
+                        widgets.append(widget)
+        # Find Ipywidgets
+        if 'ipywidgets' in sys.modules:
+            from ipywidgets import Widget as IPyWidget
+            if isinstance(op_arg, IPyWidget) and op_arg not in widgets:
+                widgets.append(op_arg)
+        # Find widgets introduced as `widget.param.value` in an expression
+        if (isinstance(op_arg, param.Parameter) and
+            isinstance(op_arg.owner, pn.widgets.Widget) and
+            op_arg.owner not in widgets):
+            widgets.append(op_arg.owner)
+        if isinstance(op_arg, slice):
+            if Version(hv.__version__) < Version("1.15.1"):
+                raise ValueError(
+                    "Using interactive with slices needs to have "
+                    "Holoviews 1.15.1 or greater installed."
+                )
+            nested_op = {"args": [op_arg.start, op_arg.stop, op_arg.step], "kwargs": {}}
+            for widget in _find_widgets(nested_op):
+                if widget not in widgets:
+                    widgets.append(widget)
+    return widgets
+
 
 class Interactive:
     """
@@ -161,7 +156,7 @@ class Interactive:
     available on a data structure when it has been patched, e.g. after
     executing `import hvplot.pandas`. The accessor can also be called which
     allows to pass down kwargs.
-    
+
     A pipeline can then be created from this object, the pipeline will render
     with its widgets and its interactive output.
 
@@ -207,7 +202,7 @@ class Interactive:
     _fig = None
 
     def __new__(cls, obj, **kwargs):
-        # __new__ implemented to support functions as input, e.g. 
+        # __new__ implemented to support functions as input, e.g.
         # hvplot.find(foo, widget).interactive().max()
         if 'fn' in kwargs:
             fn = kwargs.pop('fn')

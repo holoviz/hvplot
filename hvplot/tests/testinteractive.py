@@ -99,7 +99,7 @@ def test_spy(clone_spy, series):
     assert clone_spy.calls[0].is_empty()
 
     si._clone(x='X')
-    
+
     assert clone_spy.count == 2
     assert not clone_spy.calls[1].is_empty()
     assert clone_spy.calls[1].kwargs == dict(x='X')
@@ -252,7 +252,7 @@ def test_interactive_pandas_dataframe_hvplot_accessor_dmap(df):
     dfi = df.interactive()
     dfi = dfi.hvplot.line(y='A')
 
-    # TODO: Not sure about the logic 
+    # TODO: Not sure about the logic
     assert dfi._dmap is True
 
 
@@ -482,7 +482,7 @@ def test_interactive_pandas_frame_attrib(df, clone_spy):
 
 def test_interactive_pandas_series_operator_and_method(series, clone_spy):
     si = Interactive(series)
-    
+
     si = (si + 2).head(2)
 
     assert isinstance(si, Interactive)
@@ -638,7 +638,7 @@ def test_interactive_pandas_series_operator_and_method_out_widgets(series):
     w1 = pn.widgets.FloatSlider(value=2., start=1., end=5.)
     w2 = pn.widgets.IntSlider(value=2, start=1, end=5)
     si = Interactive(series)
-    
+
     si = (si + w1).head(w2)
 
     widgets = si.widgets()
@@ -690,7 +690,7 @@ def test_interactive_pandas_series_operator_widget_update(series):
 
     w.value = 3.
     assert repr(si._transform) == "dim('*').pd+FloatSlider(end=5.0, start=1.0, value=3.0)"
-    
+
     out = si._callback()
     assert isinstance(out, pn.pane.DataFrame)
     pd.testing.assert_series_equal(out.object.A, series + 3.)
@@ -703,7 +703,7 @@ def test_interactive_pandas_series_method_widget_update(series):
 
     w.value = 3
     assert repr(si._transform) =="dim('*').pd.head(IntSlider(end=5, start=1, value=3))"
-    
+
     out = si._callback()
     assert isinstance(out, pn.pane.DataFrame)
     pd.testing.assert_series_equal(out.object.A, series.head(3))
@@ -1143,7 +1143,7 @@ def test_interactive_pandas_series_plot_kind_attr(series, clone_spy):
     # _clone in _resolve_accessor in __getattribute__(name='line')
     assert clone_spy.calls[1].depth == 2
     assert len(clone_spy.calls[1].args) == 1
-    # assert repr(clone_spy.calls[1].args[0]) == "dim('*').pd.plot()" 
+    # assert repr(clone_spy.calls[1].args[0]) == "dim('*').pd.plot()"
     assert len(clone_spy.calls[1].kwargs) == 1
     assert 'inherit_kwargs' in clone_spy.calls[1].kwargs
     assert 'ax' in clone_spy.calls[1].kwargs['inherit_kwargs']
@@ -1367,4 +1367,3 @@ def test_clones_dont_reexecute_transforms():
     df.interactive.pipe(piped, msg="1").pipe(piped, msg="2")
 
     assert len(msgs) == 3
-

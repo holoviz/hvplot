@@ -33,8 +33,8 @@ def explorer(data, **kwargs):
     """Explore your data and design your plot via an interactive user interface.
 
     This function returns an interactive Panel component that enable you to quickly change the
-    settings of your plot via widgets. 
-    
+    settings of your plot via widgets.
+
     Reference: https://hvplot.holoviz.org/getting_started/explorer.html
 
     Parameters
@@ -56,7 +56,7 @@ def explorer(data, **kwargs):
     >>> import pandas as pd
     >>> df = pd.DataFrame({"x": [1, 2, 3], "y": [1, 4, 9]})
     >>> hvplot.explorer(df)
-    
+
     You can also specify initial values
 
     >>> hvplot.explorer(df, kind='bar', x='x')
@@ -536,10 +536,10 @@ class hvPlotExplorer(Viewer):
                 args += f'{k}={v!r}, '
             args = args[:-2]
         return f'{var_name}.hvplot({args})'
-    
+
     def save(self, filename, **kwargs):
         """Save the plot to file.
-        
+
         Calls the `holoviews.save` utility, refer to its documentation
         for a full description of the available kwargs.
 
@@ -552,7 +552,7 @@ class hvPlotExplorer(Viewer):
 
     def settings(self):
         """Return a dictionary of the customized settings.
-        
+
         This dictionary can be reused as an unpacked input to the explorer or
         a call to the `.hvplot` accessor.
 

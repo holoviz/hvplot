@@ -36,7 +36,7 @@ jobs:
     timeout-minutes: 90
     defaults:
       run:
-        shell: bash -l {0} 
+        shell: bash -l {0}
     env:
       DESC: "Python ${{ matrix.python-version }} tests"
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -126,7 +126,7 @@ jobs:
     timeout-minutes: 90
     defaults:
       run:
-        shell: bash -l {0} 
+        shell: bash -l {0}
     env:
       DESC: "Python ${{ matrix.python-version }} tests"
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -169,7 +169,7 @@ jobs:
           # can be installed on Python 3.6 but are actually not compatible with Python 3.6
           # Panel 0.13 will support Python >= 3.7 only so the pin here can stay indefinitely.
           # - Install importlib_resources to fix tqdm that missed adding it as a dependency
-          # for 3.6 (https://github.com/conda-forge/tqdm-feedstock/pull/114) 
+          # for 3.6 (https://github.com/conda-forge/tqdm-feedstock/pull/114)
           conda install "panel=0.12" "importlib_resources" --no-update-deps
       - name: hvplot install if env cached
         if: steps.cache.outputs.cache-hit == 'true'

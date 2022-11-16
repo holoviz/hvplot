@@ -4,3 +4,6 @@ requires = [
     "pyct >=0.4.4",
     "setuptools >=30.3.0"
 ]
+
+[tool.ruff]
+ignore = ["E", "W"]

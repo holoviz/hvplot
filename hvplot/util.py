@@ -149,9 +149,9 @@ def proj_to_cartopy(proj):
     km_std = {'lat_1': 'lat_1',
               'lat_2': 'lat_2',
               }
-    kw_proj = dict()
-    kw_globe = dict()
-    kw_std = dict()
+    kw_proj = {}
+    kw_globe = {}
+    kw_std = {}
     for s in srs.split('+'):
         s = s.split('=')
         if len(s) != 2:

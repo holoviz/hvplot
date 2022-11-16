@@ -59,7 +59,7 @@ def test_explorer_plot_code():
     hvplot_code = explorer.plot_code()
 
     assert hvplot_code == "df.hvplot(by=['species'], kind='scatter', x='bill_length_mm', y=['bill_depth_mm'])"
-    
+
     hvplot_code = explorer.plot_code(var_name='othername')
 
     assert hvplot_code == "othername.hvplot(by=['species'], kind='scatter', x='bill_length_mm', y=['bill_depth_mm'])"
