@@ -84,6 +84,7 @@ extras_require = {
         'pooch',
         'scipy',
         'ipywidgets',
+        'pre-commit',
     ],
     'examples': _examples,
     'doc': _examples + [
