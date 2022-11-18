@@ -676,6 +676,14 @@ class HoloViewsConverter:
             data = data.to_frame()
         if is_intake(data):
             data = process_intake(data, use_dask or persist)
+        # Pandas interface in HoloViews doesn't accept non-string columns.
+        # The converter stores a reference to the source data to
+        # update the `_dataset` property (of the hv object its __call__ method
+        # returns) with a hv Dataset created from the source data, which
+        # is done for optimizating some operations in HoloViews.
+        if hasattr(data, 'columns'):
+            data = self._transform_columnar_data(data)
+
         self.source_data = data
 
         if groupby is not None and not isinstance(groupby, list):
@@ -872,7 +880,6 @@ class HoloViewsConverter:
                 elif kind in ('bar', 'barh'):
                     x, by = indexes
 
-            self.data = self._transform_columnar_data(self.data)
             self.variables = indexes + list(self.data.columns)
 
             # Reset groupby dimensions
