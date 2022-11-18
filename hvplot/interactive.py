@@ -59,92 +59,92 @@ def _find_widgets(op):
     return widgets
 
 
-"""
-How Interactive works
----------------------
 
-`Interactive` is a wrapper around a Python object that lets users create
-interactive pipelines by calling existing APIs on an object with dynamic
-parameters or widgets.
+# How Interactive works
+# ---------------------
 
-An `Interactive` instance watches what operations are applied to the object.
+# `Interactive` is a wrapper around a Python object that lets users create
+# interactive pipelines by calling existing APIs on an object with dynamic
+# parameters or widgets.
 
-To do so, each operation returns a new `Interactive` instance - the creation
-of a new instance being taken care of by the `_clone` method - which allows
-the next operation to be recorded, and so on and so forth. E.g. `dfi.head()`
-first records that the `'head'` attribute is accessed, this is achieved
-by overriding `__getattribute__`. A new interactive object is returned,
-which will then record that it is being called, and that new object will be
-itself called as `Interactive` implements `__call__`. `__call__`  returns
-another `Interactive` instance.
+# An `Interactive` instance watches what operations are applied to the object.
 
-Note that under the hood even more `Interactive` instances may be created,
-but this is the gist of it.
+# To do so, each operation returns a new `Interactive` instance - the creation
+# of a new instance being taken care of by the `_clone` method - which allows
+# the next operation to be recorded, and so on and so forth. E.g. `dfi.head()`
+# first records that the `'head'` attribute is accessed, this is achieved
+# by overriding `__getattribute__`. A new interactive object is returned,
+# which will then record that it is being called, and that new object will be
+# itself called as `Interactive` implements `__call__`. `__call__`  returns
+# another `Interactive` instance.
 
-To be able to watch all the potential operations that may be applied to an
-object, `Interactive` implements on top of `__getattribute__` and
-`__call__`:
+# Note that under the hood even more `Interactive` instances may be created,
+# but this is the gist of it.
 
-- operators such as `__gt__`, `__add__`, etc.
-- the builtin functions `__abs__` and `__round__`
-- `__getitem__`
-- `__array_ufunc__`
+# To be able to watch all the potential operations that may be applied to an
+# object, `Interactive` implements on top of `__getattribute__` and
+# `__call__`:
 
-The `_depth` attribute starts at 0 and is incremented by 1 everytime
-a new `Interactive` instance is created part of a chain.
-The root instance in an expression has a `_depth` of 0. An expression can
-consist of multiple chains, such as `dfi[dfi.A > 1]`, as the `Interactive`
-instance is referenced twice in the expression. As a consequence `_depth`
-is not the total count of `Interactive` instance creations of a pipeline,
-it is the count of instances created in outer chain. In the example, that
-would be `dfi[]`. `Interactive` instances don't have references about
-the instances that created them or that they create, they just know their
-current location in a chain thanks to `_depth`. However, as some parameters
-need to be passed down the whole pipeline, they do have to propagate. E.g.
-in `dfi.interactive(width=200)`, `width=200` will be propagated as `kwargs`.
+# - operators such as `__gt__`, `__add__`, etc.
+# - the builtin functions `__abs__` and `__round__`
+# - `__getitem__`
+# - `__array_ufunc__`
 
-Recording the operations applied to an object in a pipeline is done
-by gradually building a so-called "dim expression", or "dim transform",
-which is an expression language provided by HoloViews. dim transform
-objects are a way to express transforms on `Dataset`s, a `Dataset` being
-another HoloViews object that is a wrapper around common data structures
-such as Pandas/Dask/... Dataframes/Series, Xarray Dataset/DataArray, etc.
-For instance a Python expression such as `(series + 2).head()` can be
-expressed with a dim transform whose repr will be `(dim('*').pd+2).head(2)`,
-effectively showing that the dim transfom has recorded the different
-operations that are meant to be applied to the data.
-The `_transform` attribute stores the dim transform.
+# The `_depth` attribute starts at 0 and is incremented by 1 everytime
+# a new `Interactive` instance is created part of a chain.
+# The root instance in an expression has a `_depth` of 0. An expression can
+# consist of multiple chains, such as `dfi[dfi.A > 1]`, as the `Interactive`
+# instance is referenced twice in the expression. As a consequence `_depth`
+# is not the total count of `Interactive` instance creations of a pipeline,
+# it is the count of instances created in outer chain. In the example, that
+# would be `dfi[]`. `Interactive` instances don't have references about
+# the instances that created them or that they create, they just know their
+# current location in a chain thanks to `_depth`. However, as some parameters
+# need to be passed down the whole pipeline, they do have to propagate. E.g.
+# in `dfi.interactive(width=200)`, `width=200` will be propagated as `kwargs`.
 
-The `_obj` attribute holds the original data structure that feeds the
-pipeline. All the `Interactive` instances created while parsing the
-pipeline share the same `_obj` object. And they all wrap it in a `Dataset`
-instance, and all apply the current dim transform they are aware of to
-the original data structure to compute the intermediate state of the data,
-that is stored it in the `_current` attribute. Doing so is particularly
-useful in Notebook sessions, as this allows to inspect the transformed
-object at any point of the pipeline, and as such provide correct
-auto-completion and docstrings. E.g. executing `dfi.A.max?` in a Notebook
-will correctly return the docstring of the Pandas Series `.max()` method,
-as the pipeline evaluates `dfi.A` to hold a current object `_current` that
-is a Pandas Series, and no longer and DataFrame.
+# Recording the operations applied to an object in a pipeline is done
+# by gradually building a so-called "dim expression", or "dim transform",
+# which is an expression language provided by HoloViews. dim transform
+# objects are a way to express transforms on `Dataset`s, a `Dataset` being
+# another HoloViews object that is a wrapper around common data structures
+# such as Pandas/Dask/... Dataframes/Series, Xarray Dataset/DataArray, etc.
+# For instance a Python expression such as `(series + 2).head()` can be
+# expressed with a dim transform whose repr will be `(dim('*').pd+2).head(2)`,
+# effectively showing that the dim transfom has recorded the different
+# operations that are meant to be applied to the data.
+# The `_transform` attribute stores the dim transform.
 
-The `_obj` attribute is implemented as a property which gets/sets the value
-from a list that contains the shared attribute. This is required for the
-"function as input" to be able to update the object from a callback set up
-on the root Interactive instance.
+# The `_obj` attribute holds the original data structure that feeds the
+# pipeline. All the `Interactive` instances created while parsing the
+# pipeline share the same `_obj` object. And they all wrap it in a `Dataset`
+# instance, and all apply the current dim transform they are aware of to
+# the original data structure to compute the intermediate state of the data,
+# that is stored it in the `_current` attribute. Doing so is particularly
+# useful in Notebook sessions, as this allows to inspect the transformed
+# object at any point of the pipeline, and as such provide correct
+# auto-completion and docstrings. E.g. executing `dfi.A.max?` in a Notebook
+# will correctly return the docstring of the Pandas Series `.max()` method,
+# as the pipeline evaluates `dfi.A` to hold a current object `_current` that
+# is a Pandas Series, and no longer and DataFrame.
 
-The `_method` attribute is a string that temporarily stores the method/attr
-accessed on the object, e.g. `_method` is 'head' in `dfi.head()`, until the
-Interactive instance created in the pipeline is called at which point `_method`
-is reset to None. In cases such as `dfi.head` or `dfi.A`, `_method` is not
-(yet) reset to None. At this stage the Interactive instance returned has
-its `_current` attribute not updated, e.g. `dfi.A._current` is still the
-original dataframe, not the 'A' series. Keeping `_method` is thus useful for
-instance to display `dfi.A`, as the evaluation of the object will check
-whether `_method` is set or not, and if it's set it will use it to compute
-the object returned, e.g. the series `df.A` or the method `df.head`, and
-display its repr.
-"""
+# The `_obj` attribute is implemented as a property which gets/sets the value
+# from a list that contains the shared attribute. This is required for the
+# "function as input" to be able to update the object from a callback set up
+# on the root Interactive instance.
+
+# The `_method` attribute is a string that temporarily stores the method/attr
+# accessed on the object, e.g. `_method` is 'head' in `dfi.head()`, until the
+# Interactive instance created in the pipeline is called at which point `_method`
+# is reset to None. In cases such as `dfi.head` or `dfi.A`, `_method` is not
+# (yet) reset to None. At this stage the Interactive instance returned has
+# its `_current` attribute not updated, e.g. `dfi.A._current` is still the
+# original dataframe, not the 'A' series. Keeping `_method` is thus useful for
+# instance to display `dfi.A`, as the evaluation of the object will check
+# whether `_method` is set or not, and if it's set it will use it to compute
+# the object returned, e.g. the series `df.A` or the method `df.head`, and
+# display its repr.
+
 
 
 class Interactive:
