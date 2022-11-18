@@ -35,7 +35,7 @@ class TestScatterMatrix(TestCase):
     def test_diagonal_default(self):
         sm = scatter_matrix(self.df)
         self.assertIsInstance(sm['a', 'a'], Histogram)
-    
+
     def test_offdiagonal_default(self):
         sm = scatter_matrix(self.df)
         self.assertIsInstance(sm['a', 'b'], Scatter)
@@ -43,11 +43,11 @@ class TestScatterMatrix(TestCase):
     def test_diagonal_kde(self):
         sm = scatter_matrix(self.df, diagonal='kde')
         self.assertIsInstance(sm['a', 'a'], Distribution)
-    
+
     def test_offdiagonal_bivariate(self):
         sm = scatter_matrix(self.df, chart='bivariate')
         self.assertIsInstance(sm['a', 'b'], Bivariate)
-    
+
     def test_offdiagonal_hexbin(self):
         sm = scatter_matrix(self.df, chart='hexbin')
         self.assertIsInstance(sm['a', 'b'], HexTiles)
@@ -68,12 +68,12 @@ class TestScatterMatrix(TestCase):
         df = self.df.copy(deep=True)
         df['e'] = np.random.choice(list('xyz'), size=len(df))
         sm = scatter_matrix(df, c='e')
-        
+
         self.assertIsInstance(sm['a', 'a'], NdOverlay)
         diag_kdims = sm['a', 'a'].kdims
         self.assertEqual(len(diag_kdims), 1)
         self.assertEqual(diag_kdims[0].name, 'e')
-        
+
         self.assertIsInstance(sm['a', 'b'], Scatter)
         offdiag_vdims = sm['a', 'b'].vdims
         self.assertTrue('e' in (d.name for d in offdiag_vdims))

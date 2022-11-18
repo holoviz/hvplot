@@ -21,4 +21,3 @@ For versions of `jupyterlab>=3.0` the necessary extension is automatically bundl
 To run the guides in this site create an environment with the required dependencies:
 
     conda create -n hvplot-env -c pyviz -c conda-forge -c nodefaults hvplot geoviews datashader xarray pandas geopandas dask streamz networkx intake intake-xarray intake-parquet s3fs scipy spatialpandas pooch rasterio fiona plotly matplotlib jupyterlab
-

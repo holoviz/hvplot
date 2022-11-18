@@ -132,7 +132,7 @@ class HoloViewsConverter:
         If `cnorm='eq_hist` and there are only a few discrete values,
         then `rescale_discrete_levels=True` (the default) decreases
         the lower limit of the autoranged span so that the values are
-        rendering towards the (more visible) top of the `cmap` range, 
+        rendering towards the (more visible) top of the `cmap` range,
         thus avoiding washout of the lower values.  Has no effect if
         `cnorm!=`eq_hist`.
     responsive: boolean
@@ -194,15 +194,15 @@ class HoloViewsConverter:
         very large if dynamic=False)
     datashade (default=False):
         Whether to apply rasterization and shading (colormapping) using
-        the Datashader library, returning an RGB object instead of 
+        the Datashader library, returning an RGB object instead of
         individual points
     dynspread (default=False):
-        For plots generated with datashade=True or rasterize=True, 
+        For plots generated with datashade=True or rasterize=True,
         automatically increase the point size when the data is sparse
         so that individual points become more visible
     rasterize (default=False):
         Whether to apply rasterization using the Datashader library,
-        returning an aggregated Image (to be colormapped by the 
+        returning an aggregated Image (to be colormapped by the
         plotting backend) instead of individual points
     x_sampling/y_sampling (default=None):
         Specifies the smallest allowed sampling interval along the x/y axis.
@@ -630,7 +630,7 @@ class HoloViewsConverter:
 
         if data.size == 0:
             return False
-        
+
         cmin = np.nanquantile(data, 0.05)
         cmax = np.nanquantile(data, 0.95)
 
@@ -794,13 +794,13 @@ class HoloViewsConverter:
                 groupby = [g for g in groupby if g not in grid]
 
             # Add a title to hvplot.xarray plots that displays scalar coords values,
-            # as done by xarray.plot()  
+            # as done by xarray.plot()
             if not groupby and not grid:
                 if isinstance(da, xr.DataArray):
                     self._title = da._title_for_slice()
                 elif isinstance(da, xr.Dataset):
                     self._title = partial(xr.DataArray._title_for_slice, da)()
-                        
+
             self.data = data
         else:
             raise ValueError('Supplied data type %s not understood' % type(data).__name__)
@@ -1332,7 +1332,7 @@ class HoloViewsConverter:
         if self.dynspread:
             processed = dynspread(processed, max_px=self.kwds.get('max_px', 3),
                                   threshold=self.kwds.get('threshold', 0.5))
-        
+
         opts = filter_opts(eltype, dict(self._plot_opts, **style), backend='bokeh')
         layers = self._apply_layers(processed).opts(eltype, **opts, backend='bokeh')
         layers = _transfer_opts_cur_backend(layers)
@@ -1493,7 +1493,7 @@ class HoloViewsConverter:
             labelled.append('x')
         if 'ylabel' in self._plot_opts and 'y' not in labelled:
             labelled.append('y')
-        
+
         cur_el_opts = self._get_opts(element.name, labelled=labelled, backend='bokeh')
         compat_el_opts = self._get_opts(element.name, labelled=labelled, backend=self._backend_compat)
         for opts_ in [cur_el_opts, compat_el_opts]:
