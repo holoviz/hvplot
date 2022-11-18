@@ -97,6 +97,7 @@ extras_require = {
 # until pyproject.toml/equivalent is widely supported (setup_requires
 # doesn't work well with pip)
 extras_require['build'] = [
+    'bokeh <3',  # temporary
     'param >=1.6.1',
     'pyct >=0.4.4',
     'setuptools' # should make this pip now
