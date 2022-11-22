@@ -68,6 +68,7 @@ _examples = [
     'matplotlib',
     'plotly',
     'pygraphviz',
+    'ipykernel <6.18.0'  # temporary
 ]
 
 extras_require = {
