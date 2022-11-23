@@ -2161,9 +2161,6 @@ class hvPlot(hvPlotTabular):
         """
         Filled contour plot
 
-        Similar to `image`, `contourf` displays values on a 2d grid. But it first segments data
-        into various levels.
-
         Reference. https://hvplot.holoviz.org/reference/xarray/contourf.html
 
         Parameters
