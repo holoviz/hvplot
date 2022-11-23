@@ -1761,8 +1761,6 @@ class hvPlotTabular(hvPlotBase):
         """
         LineString and LineRing plot for geopandas dataframes.
 
-        Reference: https://github.com/holoviz/hvplot/issues/828
-
         Parameters
         ----------
         **kwds : optional
