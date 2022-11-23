@@ -1647,12 +1647,6 @@ class hvPlotTabular(hvPlotBase):
             plot = data.hvplot.points(color="green", size=100, marker="square")
             plot
 
-        The plot can be sliced to further focus on a subset of points
-
-        .. code-block::
-
-            plot[49.9:50.1,]
-
         References
         ----------
 
