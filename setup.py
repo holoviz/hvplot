@@ -34,6 +34,7 @@ install_requires = [
     'pandas',
     'numpy>=1.15',
     'packaging',
+    'panel >=0.11.0',
 ]
 
 _examples = [
@@ -61,11 +62,13 @@ _examples = [
     'python-snappy >=0.6.0',
     'pooch >=1.6.0',
     'fiona',
+    'rioxarray',
     # Extra dependency of cartopy on Python 3.6 only
     'pyepsg',
     'matplotlib',
     'plotly',
     'pygraphviz',
+    'ipykernel <6.18.0'  # temporary
 ]
 
 extras_require = {
@@ -83,11 +86,12 @@ extras_require = {
         'pooch',
         'scipy',
         'ipywidgets',
+        'pre-commit',
     ],
     'examples': _examples,
     'doc': _examples + [
         'nbsite >=0.7.2rc2',
-        'pydata-sphinx-theme',
+        'pydata-sphinx-theme <0.10',
         'sphinx-copybutton',
         'sphinx-design',
     ]

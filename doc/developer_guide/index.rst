@@ -78,7 +78,7 @@ development versions of the other HoloViz packages, such as HoloViews or Panel.
     conda install mamba -c conda-forge
     conda create -n hvplot_dev
     conda activate hvplot_dev
-    conda config --env --append channels pyviz/label/dev --append channels conda-forge --append channels nodefaults
+    conda config --env --append channels pyviz/label/dev --append channels conda-forge
     conda config --env --remove channels defaults
 
 Since hvPlot interfaces with a large range of different libraries the
@@ -106,6 +106,18 @@ suite and all the examples:
 Add ``-o doc`` if you want to install the dependencies required to build
 the website.
 
+Setting up pre-commit
+~~~~~~~~~~~~~~~~~~~~~
+
+hvPlot uses ``pre-commit`` to automatically apply linting to hvPlot code.
+If you intend to contribute to hvPlot we recommend you enable it with:
+
+.. code-block:: sh
+
+    pre-commit install
+
+This will ensure that every time you make a commit linting will automatically be applied.
+
 .. _devguide_python_setup:
 
 Commands
@@ -123,8 +135,8 @@ You can list the available `doit` commands with `doit list`.
     env_create             Create named environment if it doesn't already exist
     env_dependency_graph   Write out dependency graph of named environment.
     env_export             Generate a pinned environment.yaml from specified env, filtering
-    env_export2            
-    list_envs              
+    env_export2
+    list_envs
     miniconda_download     Download Miniconda3-latest
     miniconda_install      Install Miniconda3-latest to location if not already present
     package_build          Build and then test conda.recipe/ (or specified alternative).

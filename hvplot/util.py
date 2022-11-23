@@ -149,9 +149,9 @@ def proj_to_cartopy(proj):
     km_std = {'lat_1': 'lat_1',
               'lat_2': 'lat_2',
               }
-    kw_proj = dict()
-    kw_globe = dict()
-    kw_std = dict()
+    kw_proj = {}
+    kw_globe = {}
+    kw_std = {}
     for s in srs.split('+'):
         s = s.split('=')
         if len(s) != 2:
@@ -231,7 +231,7 @@ def process_crs(crs):
         import geoviews as gv # noqa
         import pyproj
     except ImportError:
-        raise ImportError('Geographic projection support requires GeoViews and cartopy.')
+        raise ImportError('Geographic projection support requires GeoViews, pyproj and cartopy.')
 
     if crs is None:
         return ccrs.PlateCarree()

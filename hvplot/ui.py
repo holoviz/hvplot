@@ -3,7 +3,7 @@ import numpy as np
 import panel as pn
 import param
 
-from holoviews.core.util import is_number, max_range
+from holoviews.core.util import datetime_types, dt_to_int, is_number, max_range
 from holoviews.element import tile_sources
 from holoviews.plotting.util import list_cmaps
 from panel.viewable import Viewer
@@ -33,8 +33,8 @@ def explorer(data, **kwargs):
     """Explore your data and design your plot via an interactive user interface.
 
     This function returns an interactive Panel component that enable you to quickly change the
-    settings of your plot via widgets. 
-    
+    settings of your plot via widgets.
+
     Reference: https://hvplot.holoviz.org/getting_started/explorer.html
 
     Parameters
@@ -56,7 +56,7 @@ def explorer(data, **kwargs):
     >>> import pandas as pd
     >>> df = pd.DataFrame({"x": [1, 2, 3], "y": [1, 4, 9]})
     >>> hvplot.explorer(df)
-    
+
     You can also specify initial values
 
     >>> hvplot.explorer(df, kind='bar', x='x')
@@ -178,17 +178,33 @@ class Axes(Controls):
     @param.depends('explorer.xlim', 'explorer.ylim',  watch=True)
     def _update_ranges(self):
         xlim = self.explorer.xlim()
-        if xlim is not None and is_number(xlim[0]) and is_number(xlim[1]):
+        if xlim is not None and is_number(xlim[0]) and is_number(xlim[1]) and xlim[0] != xlim[1]:
+            xlim = self._convert_to_int(xlim)
             self.param.xlim.precedence = 0
             self.param.xlim.bounds = xlim
         else:
             self.param.xlim.precedence = -1
         ylim = self.explorer.ylim()
-        if ylim is not None and is_number(ylim[0]) and is_number(ylim[1]):
+        if ylim is not None and is_number(ylim[0]) and is_number(ylim[1]) and ylim[0] != ylim[1]:
+            ylim = self._convert_to_int(ylim)
             self.param.ylim.precedence = 0
             self.param.ylim.bounds = ylim
         else:
             self.param.ylim.precedence = -1
+
+    @staticmethod
+    def _convert_to_int(val):
+        """
+        Converts datetime to int to avoid the error in https://github.com/holoviz/hvplot/issues/964.
+
+        This function is a workaround and should be removed when a better solution is found.
+
+        """
+
+        if isinstance(val[0], datetime_types) and isinstance(val[1], datetime_types):
+            val = (dt_to_int(val[0], "ms"), dt_to_int(val[1], "ms"))
+
+        return val
 
 
 class Labels(Controls):
@@ -536,10 +552,10 @@ class hvPlotExplorer(Viewer):
                 args += f'{k}={v!r}, '
             args = args[:-2]
         return f'{var_name}.hvplot({args})'
-    
+
     def save(self, filename, **kwargs):
         """Save the plot to file.
-        
+
         Calls the `holoviews.save` utility, refer to its documentation
         for a full description of the available kwargs.
 
@@ -552,7 +568,7 @@ class hvPlotExplorer(Viewer):
 
     def settings(self):
         """Return a dictionary of the customized settings.
-        
+
         This dictionary can be reused as an unpacked input to the explorer or
         a call to the `.hvplot` accessor.
 

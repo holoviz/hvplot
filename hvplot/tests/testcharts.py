@@ -3,7 +3,7 @@ import numpy as np
 from unittest import SkipTest, expectedFailure
 from parameterized import parameterized
 
-from holoviews import NdOverlay, Store, dim
+from holoviews import NdOverlay, Store, dim, render
 from holoviews.element import Curve, Area, Scatter, Points, Path, HeatMap
 from holoviews.element.comparison import ComparisonTestCase
 
@@ -75,6 +75,23 @@ class TestChart2D(ComparisonTestCase):
         assert plot.vdims == ['temp']
 
 
+    def test_xarray_dataset_with_attrs(self):
+        try:
+            import xarray as xr
+            import hvplot.xarray  # noqa
+        except ImportError:
+            raise SkipTest('xarray not available')
+
+
+        dset = xr.Dataset(
+            {"u": ("t", [1, 3]), "v": ("t", [4, 2])},
+            coords={"t": ("t", [0, 1], {"long_name": "time", "units": "s"})},
+        )
+        ndoverlay = dset.hvplot.line()
+
+        assert render(ndoverlay, "bokeh").xaxis.axis_label == "time (s)"
+
+
 class TestChart2DDask(TestChart2D):
 
     def setUp(self):
@@ -122,7 +139,7 @@ class TestChart1D(ComparisonTestCase):
     def test_by_datetime_accessor(self):
         plot = self.dt_df.hvplot.line('index.dt.day', '0', by='index.dt.month')
         obj = NdOverlay({m: Curve((g.index.day, g[0]), 'index.dt.day', '0')
-                         for m, g in self.dt_df.groupby(self.dt_df.index.month)}, 'index.dt.month') 
+                         for m, g in self.dt_df.groupby(self.dt_df.index.month)}, 'index.dt.month')
         self.assertEqual(plot, obj)
 
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
@@ -323,7 +340,7 @@ class TestChart1D(ComparisonTestCase):
         assert plot.kdims == ['x']
         assert plot[1].kdims == ['index']
         assert plot[1].vdims == ['y']
-    
+
     def test_errorbars_no_hover(self):
         plot = self.df_desc.hvplot.errorbars(y='mean', yerr1='std')
         assert list(plot.dimensions()) == ['index', 'mean', 'std']
