@@ -12,67 +12,29 @@ except:
 from ..converter import HoloViewsConverter
 from ..util import is_list_like, process_dynamic_args
 
+# Color palette for examples: https://www.color-hex.com/color-palette/1018056
+# light green: #55a194
+# Dark green: #3b7067
+# Blue: #1e85f7
+# Orange: #f8b014
+# Red: #f16a6f
 
 class hvPlotBase:
     """
-    The plotting method: `df.hvplot(...)` creates a plot similarly to the familiar Pandas
-    `df.plot` method.
+    Internal base class.
 
-    For more detailed options use a specific ploting method, e.g. `df.hvplot.line`.
+    Concrete subclasses must implement plotting methods (e.g. `line`, `scatter`, `image`).
+    A plotting method must call `self` which will effectively create a HoloViewsConverter
+    and call it to return a HoloViews object.
 
-    Reference: https://hvplot.holoviz.org/reference/index.html
+    Concrete subclasses are meant to be mounted onto a datastructure property, e.g.:
 
-    Parameters
-    ----------
-    x : string, optional
-        Field name(s) to draw x-positions from. If not specified, the index is
-        used.
-    y : string or list, optional
-        Field name(s) to draw y-positions from. If not specified, all numerical
-        fields are used.
-    kind : string, optional
-        The kind of plot to generate, e.g. 'area', 'bar', 'line', 'scatter' etc. To see the
-        available plots run `print(df.hvplot.__all__)`.
-    **kwds : optional
-        Additional keywords arguments are documented in `hvplot.help('scatter')` or similar
-        depending on the kind of plot.
-
-    Returns
-    -------
-    A Holoviews object. You can `print` the object to study its composition and run `hv.help` on
-    the object to learn more about its parameters and options.
-
-    Examples
-    --------
-
-    >>> import hvplot.pandas
-    >>> from bokeh.sampledata.degrees import data as deg
-
-    >>> line = deg.hvplot(
-    ...     x="Year",
-    ...     y=["Art and Performance", "Business", "Biology", "Education", "Computer Science"],
-    ...     value_label="% of Degrees Earned by Women",
-    ...     legend="top",
-    ...     height=500,
-    ...     width=620,
-    ...     kind="line",
-    ... )
-    >>> line
-
-    You can can add *markers* to a `line` plot by overlaying with a `scatter` plot.
-
-    >>> scatter = deg.hvplot.scatter(
-    ...     x="Year",
-    ...     y=["Art and Performance", "Business", "Biology", "Education", "Computer Science"],
-    ...     value_label="% of Degrees Earned by Women",
-    ...     legend="top",
-    ...     height=500,
-    ...     width=620,
-    ... )
-    >>> line * scatter
-
-    Please note that you can pass widgets or reactive functions as arguments instead of
-    literal values, c.f. https://hvplot.holoviz.org/user_guide/Widgets.html.
+    ```
+    _patch_plot = lambda self: hvPlotTabular(self)
+    _patch_plot.__doc__ = hvPlotTabular.__call__.__doc__
+    plot_prop = property(_patch_plot)
+    setattr(pd.DataFrame, 'hvplot', plot_prop)
+    ```
     """
 
     __all__ = []
@@ -189,39 +151,50 @@ class hvPlotTabular(hvPlotBase):
     -------
     A Holoviews object. You can `print` the object to study its composition and run
 
-    >>> import holoviews as hv
-    >>> hv.help(the_holoviews_object)
+    .. code-block::
+
+        import holoviews as hv
+        hv.help(the_holoviews_object)
 
     to learn more about its parameters and options.
 
     Examples
     --------
 
-    >>> import hvplot.pandas
-    >>> from bokeh.sampledata.degrees import data as deg
+    .. code-block::
 
-    >>> line = deg.hvplot(
-    ...     x="Year",
-    ...     y=["Art and Performance", "Business", "Biology", "Education", "Computer Science"],
-    ...     value_label="% of Degrees Earned by Women",
-    ...     legend="top",
-    ...     height=500,
-    ...     width=620,
-    ...     kind="line",
-    ... )
-    >>> line
+        import pandas as pd
+        import hvplot.pandas
+
+        df = pd.DataFrame(
+            {
+                "actual": [100, 150, 125, 140, 145, 135, 123],
+                "forecast": [90, 160, 125, 150, 141, 141, 120],
+                "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
+                "date": pd.date_range("2022-01-03", "2022-01-09"),
+                "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+            },
+        )
+        line = df.hvplot.line(
+            x="numerical",
+            y=["actual", "forecast"],
+            ylabel="value",
+            legend="bottom",
+            height=500,
+            color=["steelblue", "teal"],
+            alpha=0.7,
+            line_width=5,
+        )
+        line
 
     You can can add *markers* to a `line` plot by overlaying with a `scatter` plot.
 
-    >>> scatter = deg.hvplot.scatter(
-    ...     x="Year",
-    ...     y=["Art and Performance", "Business", "Biology", "Education", "Computer Science"],
-    ...     value_label="% of Degrees Earned by Women",
-    ...     legend="top",
-    ...     height=500,
-    ...     width=620,
-    ... )
-    >>> line * scatter
+    .. code-block::
+
+        markers = df.hvplot.scatter(
+            x="numerical", y=["actual", "forecast"], color=["#f16a6f", "#1e85f7"], size=50
+        )
+        line * markers
 
     Please note that you can pass widgets or reactive functions as arguments instead of
     literal values, c.f. https://hvplot.holoviz.org/user_guide/Widgets.html.
@@ -257,15 +230,13 @@ class hvPlotTabular(hvPlotBase):
         """
         The `line` plot connects the points with a continous curve.
 
-        A `line` plot is useful when data is continuous and has a continuous axis.
-
         Reference: https://hvplot.holoviz.org/reference/pandas/line.html
 
         Parameters
         ----------
         x : string, optional
             Field name(s) to draw x-positions from. If not specified, the index is
-            used.
+            used. Can refer to continous and categorical data.
         y : string or list, optional
             Field name(s) to draw y-positions from. If not specified, all numerical
             fields are used.
@@ -291,29 +262,50 @@ class hvPlotTabular(hvPlotBase):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
 
         Examples
         --------
 
-        >>> import hvplot.pandas
-        >>> from bokeh.sampledata.degrees import data as deg
-        >>> line = deg.hvplot.line(
-        ...     x='Year', y=['Art and Performance', 'Business', 'Biology', 'Education', 'Computer Science'],
-        ...     value_label='% of Degrees Earned by Women', legend='top', height=500, width=620
-        ... )
-        >>> line
+        .. code-block::
+
+            import hvplot.pandas
+            import pandas as pd
+
+            df = pd.DataFrame(
+                {
+                    "actual": [100, 150, 125, 140, 145, 135, 123],
+                    "forecast": [90, 160, 125, 150, 141, 141, 120],
+                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
+                    "date": pd.date_range("2022-01-03", "2022-01-09"),
+                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                },
+            )
+            line = df.hvplot.line(
+                x="numerical",
+                y=["actual", "forecast"],
+                ylabel="value",
+                legend="bottom",
+                height=500,
+                color=["steelblue", "teal"],
+                alpha=0.7,
+                line_width=5,
+            )
+            line
 
         You can can add *markers* to a `line` plot by overlaying with a `scatter` plot.
 
-        >>> scatter = deg.hvplot.scatter(
-        ...     x='Year', y=['Art and Performance', 'Business', 'Biology', 'Education', 'Computer Science'],
-        ...     value_label='% of Degrees Earned by Women', legend='top', height=500, width=620
-        ... )
-        >>> line * scatter
+        .. code-block::
+
+            markers = df.hvplot.scatter(
+                x="numerical", y=["actual", "forecast"], color=["#f16a6f", "#1e85f7"], size=50
+            )
+            line * markers
 
         Please note that you can pass widgets or reactive functions as arguments instead of
         literal values, c.f. https://hvplot.holoviz.org/user_guide/Widgets.html.
@@ -326,6 +318,7 @@ class hvPlotTabular(hvPlotBase):
         - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.line.html
         - Plotly: https://plotly.com/python/line-charts/
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html
+        - Seaborn: https://seaborn.pydata.org/generated/seaborn.lineplot.html
         - Wiki: https://en.wikipedia.org/wiki/Line_chart
         """
         return self(x, y, kind="line", **kwds)
@@ -343,7 +336,7 @@ class hvPlotTabular(hvPlotBase):
         ----------
         x : string, optional
             Field name(s) to draw x-positions from. If not specified, the index is
-            used.
+            used. Must refer to continous data. Not categorical data.
         y : string or list, optional
             Field name(s) to draw y-positions from. If not specified, all numerical
             fields are used.
@@ -371,31 +364,49 @@ class hvPlotTabular(hvPlotBase):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
 
         Examples
         --------
 
-        >>> import hvplot.pandas
-        >>> from bokeh.sampledata.degrees import data as deg
-        >>> plot = deg.hvplot.step(
-        ...     x='Year',
-        ...     y=['Art and Performance', 'Business', 'Biology', 'Education', 'Computer Science'],
-        ...     value_label='% of Degrees Earned by Women', legend='top', height=500, width=1000
-        ... )
-        >>> plot
+        .. code-block::
+
+            import hvplot.pandas
+            import pandas as pd
+
+            df = pd.DataFrame(
+                {
+                    "actual": [100, 150, 125, 140, 145, 135, 123],
+                    "forecast": [90, 160, 125, 150, 141, 141, 120],
+                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
+                    "date": pd.date_range("2022-01-03", "2022-01-09"),
+                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                },
+            )
+            step = df.hvplot.step(
+                x="numerical",
+                y=["actual", "forecast"],
+                ylabel="value",
+                legend="bottom",
+                height=500,
+                color=["#f16a6f", "#1e85f7"],
+                line_width=5,
+            )
+            step
 
         You can can add *markers* to a `step` plot by overlaying with a `scatter` plot.
 
-        >>> markers = deg.hvplot.scatter(
-        ...     x='Year',
-        ...     y=['Art and Performance', 'Business', 'Biology', 'Education', 'Computer Science'],
-        ...     value_label='% of Degrees Earned by Women', legend='top', height=500, width=1000
-        ... )
-        >>> plot*markers
+        .. code-block::
+
+            markers = df.hvplot.scatter(
+                x="numerical", y=["actual", "forecast"], color=["#f16a6f", "#1e85f7"], size=100
+            )
+            step * markers
 
         Please note that you can pass widgets or reactive functions as arguments instead of
         literal values, c.f. https://hvplot.holoviz.org/user_guide/Widgets.html.
@@ -424,7 +435,7 @@ class hvPlotTabular(hvPlotBase):
         ----------
         x : string, optional
             Field name(s) to draw x-positions from. If not specified, the index is
-            used.
+            used. Can refer to continous and categorical data.
         y : string or list, optional
             Field name(s) to draw y-positions from. If not specified, all numerical
             fields are used.
@@ -440,7 +451,7 @@ class hvPlotTabular(hvPlotBase):
         groupby: string, list, optional
             A single field or list of fields to group and filter by. Adds one or more widgets to
             select the subgroup(s) to visualize.
-        scale: number, optional, abbreviation `s`.
+        scale: number, optional
             Scaling factor to apply to point scaling.
         logz : bool
             Whether to apply log scaling to the z-axis. Default is False.
@@ -461,23 +472,49 @@ class hvPlotTabular(hvPlotBase):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
 
         Example
         -------
 
-        >>> import hvplot.pandas
-        >>> from bokeh.sampledata.iris import flowers as df
-        >>> df.hvplot.scatter(
-        ...     x='sepal_length', y='sepal_width', by='species',
-        ...     legend='top', height=400, width=400
-        ... )
+        .. code-block::
 
-        The points will be grouped and color coded `by` the categorical values in the 'species'
-        column.
+            import hvplot.pandas
+            import pandas as pd
+
+            df = pd.DataFrame(
+                {
+                    "actual": [100, 150, 125, 140, 145, 135, 123],
+                    "forecast": [90, 160, 125, 150, 141, 141, 120],
+                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
+                    "date": pd.date_range("2022-01-03", "2022-01-09"),
+                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                },
+            )
+            scatter = df.hvplot.scatter(
+                x="numerical",
+                y=["actual", "forecast"],
+                ylabel="value",
+                legend="bottom",
+                height=500,
+                color=["#f16a6f", "#1e85f7"],
+                size=100,
+            )
+            scatter
+
+        You can overlay the `scatter` markers on for example a `line` plot
+
+        .. code-block::
+
+            line = df.hvplot.line(
+                x="numerical", y=["actual", "forecast"], color=["#f16a6f", "#1e85f7"], line_width=5
+            )
+            scatter * line
 
         References
         ----------
@@ -487,6 +524,7 @@ class hvPlotTabular(hvPlotBase):
         - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.scatter.html
         - Plotly: https://plotly.com/python/line-and-scatter/
         - Matplotlib:  https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html
+        - Seaborn: https://seaborn.pydata.org/generated/seaborn.scatterplot.html
         - Wiki: https://en.wikipedia.org/wiki/Scatter_plot
         """
         return self(x, y, kind="scatter", **kwds)
@@ -502,7 +540,7 @@ class hvPlotTabular(hvPlotBase):
         ----------
         x : string, optional
             Field name(s) to draw x-positions from. If not specified, the index is
-            used.
+            used. Can refer to continous and categorical data.
         y : string, optional
             Field name to draw the first y-position from
         y2 : string, optional
@@ -516,20 +554,46 @@ class hvPlotTabular(hvPlotBase):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
 
         Example
         -------
 
-        >>> import hvplot.pandas
-        >>> from bokeh.sampledata.degrees import data
-        >>> data.hvplot.area(x='Year', y='Computer Science',
-        ...     label='% of Computer Science Degrees Earned by Women',
-        ...     ylim=(0, 100), width=500, height=400, color='pink'
-        ... )
+        .. code-block::
+
+            import hvplot.pandas
+            import pandas as pd
+
+            df = pd.DataFrame(
+                {
+                    "actual": [100, 150, 125, 140, 145, 135, 123],
+                    "forecast": [90, 160, 125, 150, 141, 141, 120],
+                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
+                    "date": pd.date_range("2022-01-03", "2022-01-09"),
+                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                },
+            )
+            df["min"] = df[["actual", "forecast"]].min(axis=1)
+            df["max"] = df[["actual", "forecast"]].max(axis=1)
+
+            area = df.hvplot.area(
+                x="numerical",
+                y="min",
+                y2="max",
+                ylabel="value",
+                legend="bottom",
+                height=500,
+                color=["#55a194"],
+                alpha=0.7,
+                line_width=2,
+                ylim=(0, 200),
+            )
+            area
 
         References
         ----------
@@ -557,7 +621,7 @@ class hvPlotTabular(hvPlotBase):
         ----------
         x : string, optional
             Field name to draw the x-position from. If not specified, the index is
-            used.
+            used. Can refer to continous and categorical data.
         y : string, optional
             Field name to draw the y-position from
         yerr1 : string, optional
@@ -571,28 +635,54 @@ class hvPlotTabular(hvPlotBase):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
 
         Example
         -------
 
-        >>> import pandas as pd
-        >>> import hvplot.pandas
-        >>> data = pd.DataFrame({
-        ...     "y": [1.0, 1.2, 0.8],
-        ...     "yerr1": [0.2, .4, 0.1],
-        ...     "yerr2": [0.2, .2, 0.2],
-        ... })
-        >>> errorbars = data.hvplot.errorbars(y="y", yerr1="yerr1", yerr2="yerr2")
-        >>> errorbars
+        .. code-block::
+
+            import hvplot.pandas
+            import pandas as pd
+
+            df = pd.DataFrame(
+                {
+                    "actual": [100, 150, 125, 140, 145, 135, 123],
+                    "forecast": [90, 160, 125, 150, 141, 141, 120],
+                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
+                    "date": pd.date_range("2022-01-03", "2022-01-09"),
+                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                },
+            )
+            df["min"] = df[["actual", "forecast"]].min(axis=1)
+            df["max"] = df[["actual", "forecast"]].max(axis=1)
+            df["mean"] = df[["actual", "forecast"]].mean(axis=1)
+            df["yerr2"] = df["max"] - df["mean"]
+            df["yerr1"] = df["mean"] - df["min"]
+
+            errorbars = df.hvplot.errorbars(
+                x="numerical",
+                y="mean",
+                yerr1="yerr1",
+                yerr2="yerr2",
+                legend="bottom",
+                height=500,
+                alpha=0.5,
+                line_width=2,
+            )
+            errorbars
 
         Normally you would overlay the `errorbars` on for example a `scatter` plot.
 
-        >>> scatter = data.hvplot.scatter(y="y", color="green", size=50)
-        >>> scatter * errorbars
+        .. code-block::
+
+            mean = df.hvplot.scatter(x="numerical", y=["mean"], color=["#55a194"], size=50)
+            errorbars * mean
 
         References
         ----------
@@ -615,7 +705,8 @@ class hvPlotTabular(hvPlotBase):
         Parameters
         ----------
         x : string, optional
-            Field name to draw x coordinates from. If not specified, the index is used.
+            Field name to draw x coordinates from. If not specified, the index is used. Normally
+            refers to date values.
         y : list or tuple, optional
             Field names of the OHLC fields. Default is ["open", "high", "low", "close"]
         line_color : string, optional
@@ -631,22 +722,26 @@ class hvPlotTabular(hvPlotBase):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
 
         Example
         -------
-        >>> import hvplot.pandas
-        >>> import pandas as pd
-        >>> data = pd.DataFrame({
-        ...     "open": [100, 101, 102],
-        ...     "high": [101, 103, 104],
-        ...     "low": [99, 100, 100],
-        ...     "close": [101, 99, 103],
-        ... }, index=[pd.Timestamp("2022-08-01"), pd.Timestamp("2022-08-02"), pd.Timestamp("2022-08-03")])
-        >>> data.hvplot.ohlc()
+
+        .. code-block::
+
+            data = pd.DataFrame({
+                "open": [100, 101, 102],
+                "high": [104, 105, 110],
+                "low": [94, 97, 99],
+                "close": [101, 99, 103],
+            }, index=[pd.Timestamp("2022-08-01"), pd.Timestamp("2022-08-02"), pd.Timestamp("2022-08-03")])
+            ohlc = data.hvplot.ohlc(pos_color="#55a194", neg_color="#f16a6f")
+            ohlc
 
         References
         ----------
@@ -669,9 +764,10 @@ class hvPlotTabular(hvPlotBase):
         Parameters
         ----------
         x : string, optional
-            Field name to draw x coordinates from. If not specified, the index is used.
+            Field name to draw x coordinates from. If not specified, the index is used. Can refer
+            to continous and categorical data.
         y : string
-            Field name to draw y-positions from
+            Field name to draw y-positions from. Can refer to continous and categorical data.
         C : string, optional
             Field to draw heatmap color from. If not specified a simple count will be used.
         colorbar: boolean, optional
@@ -687,24 +783,27 @@ class hvPlotTabular(hvPlotBase):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
 
         Example
         -------
 
-        >>> import numpy as np
-        >>> from bokeh.sampledata import sea_surface_temperature as sst
+        .. code-block::
 
-        >>> import hvplot.pandas
+            import hvplot.pandas
+            import numpy as np
+            from bokeh.sampledata import sea_surface_temperature as sst
 
-        >>> df = sst.sea_surface_temperature
-        >>> df.hvplot.heatmap(
-        ...     x="time.month", y="time.day", C="temperature", reduce_function=np.mean,
-        ...     height=500, width=500, colorbar=False,
-        >>> )
+            df = sst.sea_surface_temperature
+            df.hvplot.heatmap(
+                x="time.month", y="time.day", C="temperature", reduce_function=np.mean,
+                height=500, width=500, colorbar=False, cmap="blues"
+            )
 
         References
         ----------
@@ -752,24 +851,28 @@ class hvPlotTabular(hvPlotBase):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
 
         Example
         -------
 
-        >>> import hvplot.pandas
-        >>> import pandas as pd
-        >>> import numpy as np
+        .. code-block::
 
-        >>> n = 500
-        >>> df = pd.DataFrame({
-        ...     "x": 2 + 2 * np.random.standard_normal(n),
-        ...     "y": 2 + 2 * np.random.standard_normal(n),
-        ... })
-        >>> df.hvplot.hexbin("x", "y", clabel="Count", height=400, width=500)
+            import hvplot.pandas
+            import pandas as pd
+            import numpy as np
+
+            n = 500
+            df = pd.DataFrame({
+                "x": 2 + 2 * np.random.standard_normal(n),
+                "y": 2 + 2 * np.random.standard_normal(n),
+            })
+            df.hvplot.hexbin("x", "y", clabel="Count", cmap="plasma_r", height=400, width=500)
 
         References
         ----------
@@ -815,25 +918,31 @@ class hvPlotTabular(hvPlotBase):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
 
         Examples
         --------
 
-        >>> import hvplot.pandas
-        >>> from bokeh.sampledata.autompg import autompg_clean as df
+        .. code-block::
 
-        >>> bivariate = df.hvplot.bivariate("accel", "mpg")
-        >>> bivariate
+            import hvplot.pandas
+            from bokeh.sampledata.autompg import autompg_clean as df
+
+            bivariate = df.hvplot.bivariate("accel", "mpg", filled=True, cmap="blues")
+            bivariate
 
         To get a better intuitive understanding of the `bivariate` plot, you can try overlaying the
         corresponding scatter plot.
 
-        >>> scatter = df.hvplot.scatter("accel", "mpg")
-        >>> bivariate * scatter
+        .. code-block::
+
+            scatter = df.hvplot.scatter("accel", "mpg")
+            bivariate * scatter
 
         References
         ----------
@@ -842,6 +951,7 @@ class hvPlotTabular(hvPlotBase):
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Bivariate.html
         - Plotly: https://plotly.com/python/2d-histogram-contour/
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.contour.html
+        - Seaborn: https://seaborn.pydata.org/generated/seaborn.kdeplot.html
         - Wiki: https://en.wikipedia.org/wiki/Bivariate_analysis
         """
         return self(x, y, kind="bivariate", colorbar=colorbar, **kwds)
@@ -872,7 +982,7 @@ class hvPlotTabular(hvPlotBase):
             The color for each of the series. Possible values are:
 
             A single color string referred to by name, RGB or RGBA code, for instance 'red' or
-            '#a98d19.
+            '#a98d19'.
 
             A sequence of color strings referred to by name, RGB or RGBA code, which will be used
             for each series recursively. For instance ['green','yellow'] each field’s line will be
@@ -885,28 +995,44 @@ class hvPlotTabular(hvPlotBase):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
 
         Example
         -------
 
-        >>> import hvplot.pandas
-        >>> import pandas as pd
+        .. code-block::
 
-        >>> df = pd.DataFrame({
-        ...     'speed': [0.1, 17.5, 40, 48, 52, 69, 88],
-        ...     'lifespan': [2, 8, 70, 1.5, 25, 12, 28],
-        ...     },
-        ...     index= ['snail', 'pig', 'elephant', 'rabbit', 'giraffe', 'coyote', 'horse']
-        ... )
-        >>> df.hvplot.bar(rot=90, color=["#457278", "#615078"])
+            import hvplot.pandas
+            import pandas as pd
 
-        You can stack the bars by setting `stacked=True`
+            df = pd.DataFrame(
+                {
+                    "actual": [100, 150, 125, 140, 145, 135, 123],
+                    "forecast": [90, 160, 125, 150, 141, 141, 120],
+                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
+                    "date": pd.date_range("2022-01-03", "2022-01-09"),
+                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                },
+            )
+            bar = df.hvplot.bar(x="string", y="actual", color="#f16a6f", legend="bottom", xlabel="day", ylabel="value")
+            bar
 
-        >>> df.hvplot.bar(stacked=True, rot=90, color=["#457278", "#615078"])
+        You can overlay for example a line plot via
+
+        .. code-block::
+
+            forecast_line = df.hvplot.line(x="string", y="forecast", color="#1e85f7", line_width=5, legend="bottom")
+            forecast_markers = df.hvplot.scatter(x="string", y="forecast", color="#1e85f7", size=100, legend="bottom")
+            bar * forecast_line * forecast_markers
+
+        .. code-block::
+
+            df.hvplot.bar(stacked=True, rot=90, color=["#457278", "#615078"])
 
         References
         ----------
@@ -942,29 +1068,35 @@ class hvPlotTabular(hvPlotBase):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
 
         Examples
         --------
 
-        >>> import hvplot.pandas
-        >>> import pandas as pd
+        .. code-block::
 
-        >>> df = pd.DataFrame(
-        ...     {
-        ...         "speed": [0.1, 17.5, 40, 48, 52, 69, 88],
-        ...         "lifespan": [2, 8, 70, 1.5, 25, 12, 28],
-        ...     },
-        ...     index=["snail", "pig", "elephant", "rabbit", "giraffe", "coyote", "horse"],
-        ... )
-        >>> df.hvplot.barh(color=["#457278", "#615078"])
+            import hvplot.pandas
+            import pandas as pd
+
+            df = pd.DataFrame(
+                {
+                    "speed": [0.1, 17.5, 40, 48, 52, 69, 88],
+                    "lifespan": [2, 8, 70, 1.5, 25, 12, 28],
+                },
+                index=["snail", "pig", "elephant", "rabbit", "giraffe", "coyote", "horse"],
+            )
+            df.hvplot.barh(color=["#457278", "#615078"])
 
         You can stack the bars by setting `stacked=True`
 
-        >>> df.hvplot.barh(stacked=True, color=["#457278", "#615078"])
+        .. code-block::
+
+            df.hvplot.barh(stacked=True, color=["#457278", "#615078"])
 
         References
         ----------
@@ -980,9 +1112,8 @@ class hvPlotTabular(hvPlotBase):
 
     def box(self, y=None, by=None, **kwds):
         """
-        The `box` plot gives you a visual idea about 5 components in a dataset. It is also
-        known as *box and whiskers plot*. It is useful for describing measures of
-        central tendencies and measures of dispersion in a dataset.
+        The `box` plot gives you a visual idea about the *locality*, *spread* and *skewness* of
+        numerical data through their quartiles. It is also known as *box and whiskers plot*.
 
         `box` plots are most useful when grouped by additional dimensions.
 
@@ -991,9 +1122,10 @@ class hvPlotTabular(hvPlotBase):
         Parameters
         ----------
         y : string or sequence
-            Field in the data to compute distribution from.
+            Field(s) in the *wide* data to compute distribution from. If none is provided all
+            numerical fields will be used.
         by : string or sequence
-            Field in the data to group by.
+            Field in the *long* data to group by.
         kwds : optional
             Additional keywords arguments are documented in `hvplot.help('box')`.
 
@@ -1001,30 +1133,65 @@ class hvPlotTabular(hvPlotBase):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
 
+        Example
+        -------
+
+        Here is an example using *wide* data.
+
+        .. code-block::
+
+            import hvplot.pandas
+            import numpy as np
+            import pandas as pd
+
+            data = np.random.randn(25, 4)
+            df = pd.DataFrame(data, columns=list('ABCD'))
+            df.hvplot.box()
+
+        Here is an example using *long* data and the `by` argument.
+
+        .. code-block::
+
+            import hvplot.pandas  # noqa
+            import pandas as pd
+            age_list = [8, 10, 12, 14, 72, 74, 76, 78, 20, 25, 30, 35, 60, 85]
+            df = pd.DataFrame({"gender": list("MMMMMMMMFFFFFF"), "age": age_list})
+            df.hvplot.box(y='age', by='gender', height=400, width=400, legend=False, ylim=(0, None))
+
         References
         ----------
-
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/boxplot.html
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/BoxWhisker.html
+        - Matplotlib: https://matplotlib.org/stable/plot_types/stats/boxplot_plot.html#sphx-glr-plot-types-stats-boxplot-plot-py
+        - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.boxplot.html
+        - Plotly: https://plotly.com/python/box-plots/
         - Wiki: https://en.wikipedia.org/wiki/Box_plot
         """
         return self(kind="box", x=None, y=y, by=by, **dict(kwds, hover=False))
 
     def violin(self, y=None, by=None, **kwds):
         """
-        Violin plot
+        `violin`  plots are similar to `box` plots, but they provide a better sense of the
+        distribution of data.
+
+        Note that `violin` plots depend on the `scipy` library.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/violin.html
 
         Parameters
         ----------
         y : string or sequence
-            Field in the data to compute distribution on.
+            Field(s) in the *wide* data to compute distribution from. If none is provided all
+            numerical fields will be used.
         by : string or sequence
-            Field in the data to group by.
+            Field in the *long* data to group by.
         kwds : optional
             Additional keywords arguments are documented in `hvplot.help('violin')`.
 
@@ -1032,30 +1199,73 @@ class hvPlotTabular(hvPlotBase):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        Examples
+        --------
+
+        Here is an example using *wide* data.
+
+        .. code-block::
+
+            import hvplot.pandas
+            import numpy as np
+            import pandas as pd
+
+            data = np.random.randn(25, 4)
+            df = pd.DataFrame(data, columns=list('ABCD'))
+            df.hvplot.violin(ylim=(-5, 5))
+
+        Here is an example using *long* data and the `by` argument.
+
+        .. code-block::
+
+            import hvplot.pandas  # noqa
+            import pandas as pd
+            age_list = [8, 10, 12, 14, 72, 74, 76, 78, 20, 25, 30, 35, 60, 85]
+            df = pd.DataFrame({"gender": list("MMMMMMMMFFFFFF"), "age": age_list})
+            df.hvplot.violin(y='age', by='gender', height=400, width=400, legend=False, ylim=(-100, 200))
 
         References
         ----------
 
-        - Wiki: https://en.wikipedia.org/wiki/Box_plot
+        - Seaborn: https://seaborn.pydata.org/generated/seaborn.violinplot.html
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Violin.html
+        - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.violinplot.html
+        - Plotly: https://plotly.com/python/violin/
+        - Wiki: https://en.wikipedia.org/wiki/Violin_plot
         """
         return self(kind="violin", x=None, y=y, by=by, **dict(kwds, hover=False))
 
     def hist(self, y=None, by=None, **kwds):
         """
-        Histogram
+        A `histogram` displays an approximate representation of the distribution of numerical data.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/hist.html
 
         Parameters
         ----------
         y : string or sequence
-            Field in the data to compute distribution on.
+            Field(s) in the *wide* data to compute the distribution(s) from.
         by : string or sequence
-            Field in the data to group by.
+            Field(s) in the *long* data to group by.
+        bins : int, optional
+            The number of bins
+        bin_range: tuple, optional
+            The lower and upper range of the bins. Default is None.
+        normed : bool, optional
+            If True the distribution will sum to 1. Default is False.
+        cumulative: bool, optional
+            If True, then a histogram is computed where each bin gives the counts in that bin plus
+            all bins for smaller values. The last bin gives the total number of datapoints.
+            Default is False.
+        alpha : float, optional
+            An alpha value between 0.0 and 1.0 to better visualize multiple fields. Default is 1.0.
         kwds : optional
             Additional keywords arguments are documented in `hvplot.help('hist')`.
 
@@ -1063,25 +1273,64 @@ class hvPlotTabular(hvPlotBase):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        Examples
+        --------
+
+        Lets display some *wide* data created by rolling two dices
+
+        .. code-block::
+
+            import hvplot.pandas
+            import numpy as np
+            import pandas as pd
+
+            df = pd.DataFrame(np.random.randint(1, 7, 6000), columns = ['one'])
+            df['two'] = df['one'] + np.random.randint(1, 7, 6000)
+            df.hvplot.hist(bins=12, alpha=0.5, color=["lightgreen", "pink"])
+
+        References
+        ----------
+
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/histogram.html
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Histogram.html
+        - Pandas: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.plot.hist.html
+        - Plotly: https://plotly.com/python/histograms/
+        - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.hist.html
+        - Seaborn: https://seaborn.pydata.org/generated/seaborn.histplot.html
+        - Wiki: https://en.wikipedia.org/wiki/Histogram
         """
         return self(kind="hist", x=None, y=y, by=by, **kwds)
 
     def kde(self, y=None, by=None, **kwds):
         """
-        KDE plot
+        The Kernel density estimate (`kde`) plot shows the distribution and spread of the data.
+
+        The `kde` and `density` plots are the same.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/kde.html
 
         Parameters
         ----------
         y : string or sequence
-            Field in the data to compute distribution on.
+            Field(s) in the data to compute distribution on. If not specified all numerical fields
+            are used.
         by : string or sequence
-            Field in the data to group by.
+            Field(s) in the data to group by.
+        bandwidth : float, optional
+            The bandwidth of the kernel for the density estimate. Default is None.
+        cut :
+            Draw the estimate to cut * bw from the extreme data points.
+        n_samples : int, optional
+            Number of samples to compute the KDE over. Default is 100.
+        filled :
+            Whether the bivariate contours should be filled. Default is True.
         kwds : optional
             Additional keywords arguments are documented in `hvplot.help('kde')`.
 
@@ -1089,47 +1338,146 @@ class hvPlotTabular(hvPlotBase):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        Examples
+        --------
+
+        Lets display a 'kde' plot from *wide* data
+
+        .. code-block::
+
+            import hvplot.pandas
+            import numpy as np
+            import pandas as pd
+
+            df = pd.DataFrame({
+                'x': [1, 2, 2.5, 3, 3.5, 4, 5],
+                'y': [4, 4, 4.5, 5, 5.5, 6, 6],
+            })
+            df.hvplot.kde(color=["orange", "green"])
+
+        Lets display a 'kde' plot from *long* data using the 'by' attribute
+
+        .. code-block::
+
+            import hvplot.pandas # noqa
+            import pandas as pd
+            import numpy as np
+            df = pd.DataFrame({
+                'category': list('xxxxxxxyyyyyyy'),
+                'value': [1, 2, 2.5, 3, 3.5, 4, 5, 4, 4, 4.5, 5, 5.5, 6, 6],
+            })
+            df.hvplot.kde(by='category', filled=False)
+
+        References
+        ----------
+
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Distribution.html
+        - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.kde.html
+        - Plotly: https://plotly.com/python/distplot/
+        - Seaborn: https://seaborn.pydata.org/generated/seaborn.kdeplot.html
+        - Wiki: https://en.wikipedia.org/wiki/Kernel_density_estimation
         """
         return self(kind="kde", x=None, y=y, by=by, **kwds)
 
     def density(self, y=None, by=None, **kwds):
         """
-        Density plot. Same as `kde` plot
+        The Kernel density estimate (`density`) plot shows the distribution and spread of the data.
+
+        The `kde` and `density` plots are the same.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/kde.html
 
         Parameters
         ----------
         y : string or sequence
-            Field in the data to compute distribution on.
+            Field(s) in the data to compute distribution from. If not specified all numerical fields
+            are used.
         by : string or sequence
-            Field in the data to group by.
+            Field(s) in the data to group by.
+        bandwidth : float, optional
+            The bandwidth of the kernel for the density estimate. Default is None.
+        cut :
+            Draw the estimate to cut * bw from the extreme data points.
+        n_samples : int, optional
+            Number of samples to compute the KDE over. Default is 100.
+        filled :
+            Whether the bivariate contours should be filled. Default is True.
         kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('kde')`.
+            Additional keywords arguments are documented in `hvplot.help('density')`.
 
         Returns
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        Examples
+        --------
+
+        Lets display a 'density' plot from *wide* data
+
+        .. code-block::
+
+            import hvplot.pandas
+            import numpy as np
+            import pandas as pd
+
+            df = pd.DataFrame({
+                'x': [1, 2, 2.5, 3, 3.5, 4, 5],
+                'y': [4, 4, 4.5, 5, 5.5, 6, 6],
+            })
+            df.hvplot.density(color=["orange", "green"])
+
+        Lets display a 'density' plot from *long* data using the 'by' attribute
+
+        .. code-block::
+
+            import hvplot.pandas # noqa
+            import pandas as pd
+            import numpy as np
+            df = pd.DataFrame({
+                'category': list('xxxxxxxyyyyyyy'),
+                'value': [1, 2, 2.5, 3, 3.5, 4, 5, 4, 4, 4.5, 5, 5.5, 6, 6],
+            })
+            df.hvplot.density(by='category', filled=False)
+
+        References
+        ----------
+
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Distribution.html
+        - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.kde.html
+        - Plotly: https://plotly.com/python/distplot/
+        - Seaborn: https://seaborn.pydata.org/generated/seaborn.kdeplot.html
+        - Wiki: https://en.wikipedia.org/wiki/Kernel_density_estimation
         """
         return self(kind="kde", x=None, y=y, by=by, **kwds)
 
     def table(self, columns=None, **kwds):
         """
-        Table
+        Displays a 'table'.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/table.html
 
         Parameters
         ----------
+        columns : string or sequence
+            The field(s) to display as columns.
+        sortable : bool, optional
+            If True the columns are sortable. Default is False.
+        selectable : bool, optional
+            If True the cells are selectable. Default is False. # Todo: Describe how to use this
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('table')`.
 
@@ -1137,20 +1485,36 @@ class hvPlotTabular(hvPlotBase):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        Example
+        -------
+
+        .. code-block::
+
+            import hvplot.pandas
+            from bokeh.sampledata.autompg import autompg_clean as df
+
+            df.hvplot.table(columns=['origin', 'name', 'yr'], sortable=True, selectable=True)
+
+        References
+        ----------
+
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Table.html
+        - Plotly: https://plotly.com/python/table/
+        - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.table.html
         """
         return self(kind="table", **dict(kwds, columns=columns))
 
     def dataset(self, columns=None, **kwds):
         """
-        Dataset
-
-        Todo: Describe the reason for exposing this.
-
-        Reference: Todo. Find link
+        The 'dataset' wraps a tabular or gridded dataset and can be further transformed and
+        annotated via methods from HoloViews.
 
         Parameters
         ----------
@@ -1159,22 +1523,61 @@ class hvPlotTabular(hvPlotBase):
 
         Returns
         -------
-        obj: Holoviews Dataset
-            You can `print` the object to study its composition and run `hv.help` on the the
-            object to learn more about its parameters and options.
+        A Holoviews object. You can `print` the object to study its composition and run
+
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
+
+        to learn more about its parameters and options.
+
+        Example
+        -------
+
+        .. code-block::
+
+            import hvplot.pandas
+            import pandas as pd
+
+            data = pd.DataFrame({"x": ['a', 'b', 'c'], "y": [1, 2, 3]})
+            data.hvplot.dataset()
+
+        References
+        ----------
+
+        - HoloViews Tabular: https://holoviews.org/getting_started/Tabular_Datasets.html
+        - HoloViews Gridded: https://holoviews.org/getting_started/Gridded_Datasets.html
         """
         return self(kind="dataset", **dict(kwds, columns=columns))
 
     def points(self, x=None, y=None, **kwds):
         """
-        Point plot use for 2D coordinate systems
+        A `points` plot visualizes positions in a 2D space. This is useful for example for
+        geographic plots.
+
+        There is no assumption that 'y' depends on 'x'. This is different from a `scatter` plot
+        which assumes that `y` depends `x`.
 
         Reference: https://hvplot.holoviz.org/reference/geopandas/points.html
 
         Parameters
         ----------
-        x, y : string, optional
-            The coordinate variable along the x- and y-axis
+        x : string, optional
+            The coordinate variable along the x-axis. Default is the first numeric field.
+        y : string, optional
+            The coordinate variable along the y-axis. Default is the second numeric field.
+        c : string, optional
+            The dimension to color the points by
+        s : int, optional, also available as 'size'
+            The size of the marker
+        marker : string, optional
+            The marker shape specified above can be any supported by matplotlib, e.g. s, d, o etc.
+            See https://matplotlib.org/stable/api/markers_api.html.
+        scale: number, optional
+            Scaling factor to apply to point scaling.
+        logz : bool
+            Whether to apply log scaling to the z-axis. Default is False.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('points')`.
 
@@ -1182,29 +1585,49 @@ class hvPlotTabular(hvPlotBase):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        Examples
+        --------
+
+        .. code-block::
+
+            import hvplot.pandas
+            import pandas as pd
+
+            data = pd.DataFrame(dict(x=[49.9, 50.0, 50.1, 50.2], y=[50.2, 49.9, 50.0, 50.2]))
+            plot = data.hvplot.points(color="green", size=100, marker="square")
+            plot
+
+        References
+        ----------
+
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Points.html
         """
         return self(x, y, kind="points", **kwds)
 
     def vectorfield(self, x=None, y=None, angle=None, mag=None, **kwds):
         """
-        Vectorfield plot
+        `vectorfield visualizes vectors given by the (`x , `y`) starting point, a magnitude (`mag`)
+        and an `angle` . A `vectorfield` plot is also known as a `quiver` plot.
 
         Reference: https://hvplot.holoviz.org/reference/xarray/vectorfield.html
 
         Parameters
         ----------
-        x : string, optional
+        x : string
             Field name to draw x-positions from
-        y : string, optional
+        y : string
             Field name to draw y-positions from
-        mag : string, optional
+        mag : string
             Magnitude
-        angle : string, optional
-            Angle
+        angle : string
+            Angle in radians.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('vectorfield')`.
 
@@ -1212,23 +1635,58 @@ class hvPlotTabular(hvPlotBase):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        Example
+        -------
+
+        .. code-block::
+
+            import hvplot.pandas
+            import numpy as np
+            import pandas as pd
+
+            data = pd.DataFrame(
+                dict(
+                    x=[49.9, 50.0, 50.1, 50.2],
+                    y=[50.2, 49.9, 50.0, 50.2],
+                    angle=[2 * np.pi, np.pi, np.pi, np.pi],
+                    mag=[0.01, 0.02, -0.02, -0.01],
+                )
+            )
+            data.hvplot.vectorfield(x="x", y="y", angle="angle", mag="mag")
+
+        References
+        ----------
+
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/quiver.html
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/VectorField.html
+        - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.quiver.html
+        - Plotly: https://plotly.com/python/quiver-plots/
+        - Wiki: https://simple.wikipedia.org/wiki/Vector_field
         """
         return self(x, y, angle=angle, mag=mag, kind="vectorfield", **kwds)
 
     def polygons(self, x=None, y=None, c=None, **kwds):
         """
-        Polygon plot for geopandas dataframes
+        Polygon plot for geopandas dataframes.
 
         Reference: https://hvplot.holoviz.org/reference/geopandas/polygons.html
 
         Parameters
         ----------
-        c: string, optional
+        c : string, optional
             The dimension to color the polygons by
+        logz : bool
+            Enables logarithmic colormapping. Default is False.
+        geo : bool, optional
+            Whether the plot should be treated as geographic (and assume
+            PlateCarree, i.e. lat/lon coordinates).
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('polygons')`.
 
@@ -1236,18 +1694,29 @@ class hvPlotTabular(hvPlotBase):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        Examples
+        --------
+
+        .. code-block::
+
+            import geopandas as gpd
+            import hvplot.pandas
+
+            countries = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
+            countries.hvplot.polygons(geo=True, c='pop_est', hover_cols='all')
         """
         return self(x, y, c=c, kind="polygons", **kwds)
 
     def paths(self, x=None, y=None, c=None, **kwds):
         """
         LineString and LineRing plot for geopandas dataframes.
-
-        Reference: https://github.com/holoviz/hvplot/issues/828
 
         Parameters
         ----------
@@ -1258,10 +1727,17 @@ class hvPlotTabular(hvPlotBase):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        References
+        ----------
+
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Path.html
         """
         return self(x, y, c=c, kind="paths", **kwds)
 
@@ -1269,12 +1745,17 @@ class hvPlotTabular(hvPlotBase):
         """
         Labels plot.
 
+        `labels` are mostly useful when overlaid on top of other plots using the `*`
+        operator.
+
         Reference: https://hvplot.holoviz.org/reference/pandas/labels.html
 
         Parameters
         ----------
-        x, y : string, optional
-            The coordinate variable along the x- and y-axis
+        x : string, optional
+            The coordinate variable along the x-axis
+        y : string, optional
+            The coordinate variable along the y-axis
         text : string, optional
             The column to draw the text labels from
         **kwds : optional
@@ -1284,10 +1765,38 @@ class hvPlotTabular(hvPlotBase):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        Examples
+        --------
+
+        .. code-block::
+
+            import hvplot.pandas
+            import pandas as pd
+
+            df = pd.DataFrame(
+                {'City': ['Buenos Aires', 'Brasilia', 'Santiago', 'Bogota', 'Caracas'],
+                'Country': ['Argentina', 'Brazil', 'Chile', 'Colombia', 'Venezuela'],
+                'Latitude': [-34.58, -15.78, -33.45, 4.60, 10.48],
+                'Longitude': [-58.66, -47.91, -70.66, -74.08, -66.86],
+                'Color': ['blue', 'green', 'white', 'black', 'yellow']})
+
+            df.hvplot.points(x='Longitude', y='Latitude') * \
+            df.hvplot.labels(x='Longitude', y='Latitude', text='City', text_baseline="bottom")
+
+        References
+        ----------
+
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/text.html
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Labels.html
+        - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.text.html#matplotlib.pyplot.text
+        - Plotly: https://plotly.com/python/text-and-annotations/
         """
         return self(x, y, text=text, kind="labels", **kwds)
 
@@ -1324,31 +1833,40 @@ class hvPlot(hvPlotTabular):
     Examples
     --------
 
-    >>> import hvplot.pandas
-    >>> from bokeh.sampledata.degrees import data as deg
+    .. code-block::
 
-    >>> line = deg.hvplot(
-    ...     x="Year",
-    ...     y=["Art and Performance", "Business", "Biology", "Education", "Computer Science"],
-    ...     value_label="% of Degrees Earned by Women",
-    ...     legend="top",
-    ...     height=500,
-    ...     width=620,
-    ...     kind="line",
-    ... )
-    >>> line
+        import hvplot.pandas
+        import pandas as pd
+
+        df = pd.DataFrame(
+            {
+                "actual": [100, 150, 125, 140, 145, 135, 123],
+                "forecast": [90, 160, 125, 150, 141, 141, 120],
+                "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
+                "date": pd.date_range("2022-01-03", "2022-01-09"),
+                "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+            },
+        )
+        line = df.hvplot.line(
+            x="numerical",
+            y=["actual", "forecast"],
+            ylabel="value",
+            legend="bottom",
+            height=500,
+            color=["steelblue", "teal"],
+            alpha=0.7,
+            line_width=5,
+        )
+        line
 
     You can can add *markers* to a `line` plot by overlaying with a `scatter` plot.
 
-    >>> scatter = deg.hvplot.scatter(
-    ...     x="Year",
-    ...     y=["Art and Performance", "Business", "Biology", "Education", "Computer Science"],
-    ...     value_label="% of Degrees Earned by Women",
-    ...     legend="top",
-    ...     height=500,
-    ...     width=620,
-    ... )
-    >>> line * scatter
+    .. code-block::
+
+        markers = df.hvplot.scatter(
+            x="numerical", y=["actual", "forecast"], color=["#f16a6f", "#1e85f7"], size=50
+        )
+        line * markers
 
     Please note that you can pass widgets or reactive functions as arguments instead of
     literal values, c.f. https://hvplot.holoviz.org/user_guide/Widgets.html.
@@ -1388,8 +1906,8 @@ class hvPlot(hvPlotTabular):
         """
         Image plot
 
-        You can very often use `image` to display an x, y grid, like for example geographic
-        data with `latitude` and `longitude` coordinates.
+        You can use `image` to display for example geographic data with independent `latitude` and
+        `longitude` fields and a third dependent field.
 
         Reference: https://hvplot.holoviz.org/reference/xarray/image.html
 
@@ -1410,18 +1928,31 @@ class hvPlot(hvPlotTabular):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
 
         Example
         -------
 
-        >>> import hvplot.xarray
-        >>> import xarray as xr
-        >>> ds = xr.tutorial.open_dataset('air_temperature')
-        >>> ds.hvplot.image(x='lon', y='lat', z='air', groupby='time', cmap='kbc_r')
+        .. code-block::
+
+            import hvplot.xarray
+            import xarray as xr
+
+            ds = xr.tutorial.open_dataset('air_temperature')
+            ds.hvplot.image(x='lon', y='lat', z='air', groupby='time', cmap='kbc_r')
+
+        References
+        ----------
+
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/image.html
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Image.html
+        - Matplotlib: https://matplotlib.org/stable/tutorials/introductory/images.html
+        - Plotly: https://plotly.com/python/imshow/
         """
         return self(x, y, z=z, kind="image", colorbar=colorbar, **kwds)
 
@@ -1429,12 +1960,17 @@ class hvPlot(hvPlotTabular):
         """
         RGB plot
 
+        `rgb`  can be used to display images that are distributed as three separate "channels" or
+        "bands".
+
         Reference: https://hvplot.holoviz.org/reference/xarray/rgb.html
 
         Parameters
         ----------
-        x, y : string, optional
-            The coordinate variable along the x- and y-axis
+        x : string, optional
+            The coordinate variable along the x-axis
+        y : string, optional
+            The coordinate variable along the y-axis
         bands : string, optional
             The coordinate variable to draw the RGB channels from
         z : string, optional
@@ -1446,10 +1982,20 @@ class hvPlot(hvPlotTabular):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        References
+        ----------
+
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/image_rgba.html
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/RGB.html
+        - Matplotlib: https://matplotlib.org/stable/tutorials/introductory/images.html
+        - Plotly: https://plotly.com/python/imshow/
         """
         if bands is not None:
             kwds["bands"] = bands
@@ -1459,12 +2005,17 @@ class hvPlot(hvPlotTabular):
         """
         QuadMesh plot
 
+        `quadmesh` allows you to plot values on an irregular grid by representing each value as a
+        polygon.
+
         Reference: https://hvplot.holoviz.org/reference/xarray/quadmesh.html
 
         Parameters
         ----------
-        x, y : string, optional
-            The coordinate variable along the x- and y-axis
+        x : string, optional
+            The coordinate variable along the x-axis
+        y : string, optional
+            The coordinate variable along the y-axis
         z : string, optional
             The data variable to plot
         colorbar: boolean
@@ -1476,10 +2027,28 @@ class hvPlot(hvPlotTabular):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        Examples
+        --------
+
+        .. code-block::
+
+            import hvplot.xarray
+            import xarray as xr
+
+            ds = xr.tutorial.open_dataset('rasm')
+            ds.Tair.hvplot.quadmesh(x='xc', y='yc', geo=True, widget_location='bottom')
+
+        References
+        ----------
+
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/QuadMesh.html
         """
         return self(x, y, z=z, kind="quadmesh", colorbar=colorbar, **kwds)
 
@@ -1491,8 +2060,10 @@ class hvPlot(hvPlotTabular):
 
         Parameters
         ----------
-        x, y : string, optional
-            The coordinate variable along the x- and y-axis
+        x : string, optional
+            The coordinate variable along the x-axis
+        y : string, optional
+            The coordinate variable along the y-axis
         z : string, optional
             The data variable to plot
         levels: int, optional
@@ -1506,10 +2077,41 @@ class hvPlot(hvPlotTabular):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        Examples
+        --------
+
+        .. code-block::
+
+            import hvplot.xarray
+            import xarray as xr
+
+            ds = xr.tutorial.open_dataset("air_temperature")
+            ds.hvplot.contour(
+                geo=True,
+                tiles="EsriImagery",
+                z="air",
+                x="lon",
+                y="lat",
+                levels=20,
+                clabel="T [K]",
+                line_width=2,
+                label="Mean Air temperature [K]",
+                cmap="reds",
+            )
+
+        References
+        ----------
+
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Contours.html
+        - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.contour.html
+        - Plotly: https://plotly.com/python/contour-plots/
         """
         return self(x, y, z=z, kind="contour", colorbar=colorbar, **kwds)
 
@@ -1521,8 +2123,10 @@ class hvPlot(hvPlotTabular):
 
         Parameters
         ----------
-        x, y : string, optional
-            The coordinate variable along the x- and y-axis
+        x : string, optional
+            The coordinate variable along the x-axis
+        y : string, optional
+            The coordinate variable along the y-axis
         z : string, optional
             The data variable to plot
         levels: int, optional
@@ -1536,9 +2140,39 @@ class hvPlot(hvPlotTabular):
         -------
         A Holoviews object. You can `print` the object to study its composition and run
 
-        >>> import holoviews as hv
-        >>> hv.help(the_holoviews_object)
+        .. code-block::
+
+            import holoviews as hv
+            hv.help(the_holoviews_object)
 
         to learn more about its parameters and options.
+
+        Examples
+
+        .. code-block::
+
+            import hvplot.xarray
+            import xarray as xr
+
+            ds = xr.tutorial.open_dataset("air_temperature")
+            ds.hvplot.contourf(
+                geo=True,
+                coastline=True,
+                z="air",
+                x="lon",
+                y="lat",
+                levels=20,
+                clabel="T [K]",
+                line_width=2,
+                label="Mean Air temperature [K]",
+                cmap="reds",
+            )
+
+        References
+        ----------
+
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Contours.html
+        - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.contour.html
+        - Plotly: https://plotly.com/python/contour-plots/
         """
         return self(x, y, z=z, kind="contourf", colorbar=colorbar, **kwds)
