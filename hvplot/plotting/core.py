@@ -163,8 +163,8 @@ class hvPlotTabular(hvPlotBase):
 
     .. code-block::
 
-        import hvplot.pandas
         import pandas as pd
+        import hvplot.pandas
 
         df = pd.DataFrame(
             {
@@ -376,8 +376,8 @@ class hvPlotTabular(hvPlotBase):
 
         .. code-block::
 
-            import pandas as pd
             import hvplot.pandas
+            import pandas as pd
 
             df = pd.DataFrame(
                 {
@@ -484,8 +484,8 @@ class hvPlotTabular(hvPlotBase):
 
         .. code-block::
 
-            import pandas as pd
             import hvplot.pandas
+            import pandas as pd
 
             df = pd.DataFrame(
                 {
@@ -566,8 +566,8 @@ class hvPlotTabular(hvPlotBase):
 
         .. code-block::
 
-            import pandas as pd
             import hvplot.pandas
+            import pandas as pd
 
             df = pd.DataFrame(
                 {
@@ -647,8 +647,8 @@ class hvPlotTabular(hvPlotBase):
 
         .. code-block::
 
-            import pandas as pd
             import hvplot.pandas
+            import pandas as pd
 
             df = pd.DataFrame(
                 {
@@ -795,9 +795,10 @@ class hvPlotTabular(hvPlotBase):
 
         .. code-block::
 
+            import hvplot.pandas
             import numpy as np
             from bokeh.sampledata import sea_surface_temperature as sst
-            import hvplot.pandas
+
             df = sst.sea_surface_temperature
             df.hvplot.heatmap(
                 x="time.month", y="time.day", C="temperature", reduce_function=np.mean,
@@ -865,6 +866,7 @@ class hvPlotTabular(hvPlotBase):
             import hvplot.pandas
             import pandas as pd
             import numpy as np
+
             n = 500
             df = pd.DataFrame({
                 "x": 2 + 2 * np.random.standard_normal(n),
@@ -930,6 +932,7 @@ class hvPlotTabular(hvPlotBase):
 
             import hvplot.pandas
             from bokeh.sampledata.autompg import autompg_clean as df
+
             bivariate = df.hvplot.bivariate("accel", "mpg", filled=True, cmap="blues")
             bivariate
 
@@ -1004,9 +1007,8 @@ class hvPlotTabular(hvPlotBase):
 
         .. code-block::
 
-            import pandas as pd
-
             import hvplot.pandas
+            import pandas as pd
 
             df = pd.DataFrame(
                 {
@@ -1080,6 +1082,7 @@ class hvPlotTabular(hvPlotBase):
 
             import hvplot.pandas
             import pandas as pd
+
             df = pd.DataFrame(
                 {
                     "speed": [0.1, 17.5, 40, 48, 52, 69, 88],
@@ -1144,9 +1147,10 @@ class hvPlotTabular(hvPlotBase):
 
         .. code-block::
 
-            import hvplot.pandas # noqa
-            import pandas as pd
+            import hvplot.pandas
             import numpy as np
+            import pandas as pd
+
             data = np.random.randn(25, 4)
             df = pd.DataFrame(data, columns=list('ABCD'))
             df.hvplot.box()
@@ -1209,9 +1213,10 @@ class hvPlotTabular(hvPlotBase):
 
         .. code-block::
 
-            import hvplot.pandas # noqa
-            import pandas as pd
+            import hvplot.pandas
             import numpy as np
+            import pandas as pd
+
             data = np.random.randn(25, 4)
             df = pd.DataFrame(data, columns=list('ABCD'))
             df.hvplot.violin(ylim=(-5, 5))
@@ -1282,9 +1287,10 @@ class hvPlotTabular(hvPlotBase):
 
         .. code-block::
 
-            import hvplot.pandas # noqa
-            import pandas as pd
+            import hvplot.pandas
             import numpy as np
+            import pandas as pd
+
             df = pd.DataFrame(np.random.randint(1, 7, 6000), columns = ['one'])
             df['two'] = df['one'] + np.random.randint(1, 7, 6000)
             df.hvplot.hist(bins=12, alpha=0.5, color=["lightgreen", "pink"])
@@ -1346,9 +1352,10 @@ class hvPlotTabular(hvPlotBase):
 
         .. code-block::
 
-            import hvplot.pandas # noqa
-            import pandas as pd
+            import hvplot.pandas
             import numpy as np
+            import pandas as pd
+
             df = pd.DataFrame({
                 'x': [1, 2, 2.5, 3, 3.5, 4, 5],
                 'y': [4, 4, 4.5, 5, 5.5, 6, 6],
@@ -1423,9 +1430,10 @@ class hvPlotTabular(hvPlotBase):
 
         .. code-block::
 
-            import hvplot.pandas # noqa
-            import pandas as pd
+            import hvplot.pandas
             import numpy as np
+            import pandas as pd
+
             df = pd.DataFrame({
                 'x': [1, 2, 2.5, 3, 3.5, 4, 5],
                 'y': [4, 4, 4.5, 5, 5.5, 6, 6],
@@ -1489,8 +1497,9 @@ class hvPlotTabular(hvPlotBase):
 
         .. code-block::
 
-            import hvplot.pandas # noqa
+            import hvplot.pandas
             from bokeh.sampledata.autompg import autompg_clean as df
+
             df.hvplot.table(columns=['origin', 'name', 'yr'], sortable=True, selectable=True)
 
         References
@@ -1528,8 +1537,9 @@ class hvPlotTabular(hvPlotBase):
 
         .. code-block::
 
-            import pandas as pd
             import hvplot.pandas
+            import pandas as pd
+
             data = pd.DataFrame({"x": ['a', 'b', 'c'], "y": [1, 2, 3]})
             data.hvplot.dataset()
 
@@ -1638,8 +1648,8 @@ class hvPlotTabular(hvPlotBase):
         .. code-block::
 
             import hvplot.pandas
-            import pandas as pd
             import numpy as np
+            import pandas as pd
 
             data = pd.DataFrame(
                 dict(
@@ -1696,8 +1706,8 @@ class hvPlotTabular(hvPlotBase):
 
         .. code-block::
 
-            import hvplot.pandas  # noqa
             import geopandas as gpd
+            import hvplot.pandas
 
             countries = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
             countries.hvplot.polygons(geo=True, c='pop_est', hover_cols='all')
@@ -1767,7 +1777,7 @@ class hvPlotTabular(hvPlotBase):
 
         .. code-block::
 
-            import hvplot.pandas  # noqa
+            import hvplot.pandas
             import pandas as pd
 
             df = pd.DataFrame(
@@ -1932,6 +1942,7 @@ class hvPlot(hvPlotTabular):
 
             import hvplot.xarray
             import xarray as xr
+
             ds = xr.tutorial.open_dataset('air_temperature')
             ds.hvplot.image(x='lon', y='lat', z='air', groupby='time', cmap='kbc_r')
 
@@ -2028,7 +2039,7 @@ class hvPlot(hvPlotTabular):
 
         .. code-block::
 
-            import hvplot.xarray  # noqa
+            import hvplot.xarray
             import xarray as xr
 
             ds = xr.tutorial.open_dataset('rasm')
@@ -2078,7 +2089,7 @@ class hvPlot(hvPlotTabular):
 
         .. code-block::
 
-            import hvplot.xarray  # noqa
+            import hvplot.xarray
             import xarray as xr
 
             ds = xr.tutorial.open_dataset("air_temperature")
@@ -2140,7 +2151,7 @@ class hvPlot(hvPlotTabular):
 
         .. code-block::
 
-            import hvplot.xarray  # noqa
+            import hvplot.xarray
             import xarray as xr
 
             ds = xr.tutorial.open_dataset("air_temperature")
