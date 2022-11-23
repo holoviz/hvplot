@@ -1717,8 +1717,7 @@ class hvPlotTabular(hvPlotBase):
 
     def polygons(self, x=None, y=None, c=None, **kwds):
         """
-        Polygon plot for geopandas dataframes. Assumes there is a column 'geometries' with the
-        geometries.
+        Polygon plot for geopandas dataframes.
 
         Reference: https://hvplot.holoviz.org/reference/geopandas/polygons.html
 
