@@ -1406,7 +1406,7 @@ class hvPlotTabular(hvPlotBase):
                 'x': [1, 2, 2.5, 3, 3.5, 4, 5],
                 'y': [4, 4, 4.5, 5, 5.5, 6, 6],
             })
-            df.hvplot.kde(color=["orange", "green"], )
+            df.hvplot.kde(color=["orange", "green"])
 
         Lets display a 'kde' plot from *long* data using the 'by' attribute
 
@@ -1483,7 +1483,7 @@ class hvPlotTabular(hvPlotBase):
                 'x': [1, 2, 2.5, 3, 3.5, 4, 5],
                 'y': [4, 4, 4.5, 5, 5.5, 6, 6],
             })
-            df.hvplot.density(color=["orange", "green"], )
+            df.hvplot.density(color=["orange", "green"])
 
         Lets display a 'density' plot from *long* data using the 'by' attribute
 
