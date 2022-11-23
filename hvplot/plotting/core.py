@@ -1180,7 +1180,7 @@ class hvPlotTabular(hvPlotBase):
         """
         `violin`  plots are similar to `box` plots, but they provide a better sense of the
         distribution of data.
-        
+
         Note that `violin` plots depend on the `scipy` library.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/violin.html
@@ -1244,7 +1244,7 @@ class hvPlotTabular(hvPlotBase):
 
     def hist(self, y=None, by=None, **kwds):
         """
-        A `histogram` displays an approximate representation of the distribution of numerical data.  
+        A `histogram` displays an approximate representation of the distribution of numerical data.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/hist.html
 
@@ -1325,11 +1325,11 @@ class hvPlotTabular(hvPlotBase):
             Field(s) in the data to group by.
         bandwidth : float, optional
             The bandwidth of the kernel for the density estimate. Default is None.
-        cut : 
+        cut :
             Draw the estimate to cut * bw from the extreme data points.
         n_samples : int, optional
             Number of samples to compute the KDE over. Default is 100.
-        filled : 
+        filled :
             Whether the bivariate contours should be filled. Default is True.
         kwds : optional
             Additional keywords arguments are documented in `hvplot.help('kde')`.
@@ -1403,11 +1403,11 @@ class hvPlotTabular(hvPlotBase):
             Field(s) in the data to group by.
         bandwidth : float, optional
             The bandwidth of the kernel for the density estimate. Default is None.
-        cut : 
+        cut :
             Draw the estimate to cut * bw from the extreme data points.
         n_samples : int, optional
             Number of samples to compute the KDE over. Default is 100.
-        filled : 
+        filled :
             Whether the bivariate contours should be filled. Default is True.
         kwds : optional
             Additional keywords arguments are documented in `hvplot.help('density')`.
@@ -1555,7 +1555,7 @@ class hvPlotTabular(hvPlotBase):
         """
         A `points` plot visualizes positions in a 2D space. This is useful for example for
         geographic plots.
-        
+
         There is no assumption that 'y' depends on 'x'. This is different from a `scatter` plot
         which assumes that `y` depends `x`.
 
