@@ -28,7 +28,7 @@ width: 70%
 By replacing `.plot()` with `.hvplot()` you get an interactive plot.
 
 ```{code-cell} ipython3
-import hvplot.pandas  # noqa
+import hvplot.pandas
 from bokeh.sampledata.penguins import data as df
 
 df.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
@@ -43,7 +43,7 @@ df.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
 :::{tab-item} Dask
 ```python
 import dask
-import hvplot.dask  # noqa
+import hvplot.dask
 
 df_dask = dask.dataframe.from_pandas(df, npartitions=2)
 df_dask.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
@@ -58,7 +58,7 @@ align: center
 :::{tab-item} GeoPandas
 ```python
 import geopandas as gpd
-import hvplot.pandas  # noqa
+import hvplot.pandas
 
 gdf = gpd.read_file(gpd.datasets.get_path('naturalearth_cities'))
 gdf.hvplot(global_extent=True, tiles=True)
@@ -72,7 +72,7 @@ align: center
 
 :::{tab-item} Intake
 ```python
-import hvplot.intake  # noqa
+import hvplot.intake
 from hvplot.sample_data import catalogue as cat
 
 cat.us_crime.hvplot.line(x='Year', y='Violent Crime rate')
@@ -101,7 +101,7 @@ align: center
 
 :::{tab-item} Pandas
 ```python
-import hvplot.pandas  # noqa
+import hvplot.pandas
 from bokeh.sampledata.autompg import autompg_clean as df
 
 table = df.groupby(['origin', 'mfr'])['mpg'].mean().sort_values().tail(5)
@@ -117,7 +117,7 @@ align: center
 
 :::{tab-item} Streamz
 ```python
-import hvplot.streamz  # noqa
+import hvplot.streamz
 from streamz.dataframe import Random
 
 df_streamz = Random(interval='200ms', freq='50ms')
@@ -132,7 +132,7 @@ align: center
 
 :::{tab-item} Xarray
 ```python
-import hvplot.xarray  # noqa
+import hvplot.xarray
 import xarray as xr
 
 xr_ds = xr.tutorial.open_dataset('air_temperature').load().sel(time='2013-06-01 12:00')
@@ -154,7 +154,7 @@ align: center
 
 :::{tab-item} Bokeh
 ```{code-cell} ipython3
-import hvplot.pandas  # noqa
+import hvplot.pandas
 from bokeh.sampledata.penguins import data as df
 
 df.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
@@ -204,7 +204,7 @@ align: center
 
 :::{tab-item} Layout
 ```python
-import hvplot.pandas  # noqa
+import hvplot.pandas
 from hvplot.sample_data import us_crime as df
 
 plot1 = df.hvplot(x='Year', y='Violent Crime rate', width=400)
@@ -221,7 +221,7 @@ align: center
 
 :::{tab-item} Overlay
 ```python
-import hvplot.pandas  # noqa
+import hvplot.pandas
 import pandas
 from bokeh.sampledata.penguins import data
 
@@ -238,7 +238,7 @@ align: center
 
 :::{tab-item} Widgets
 ```python
-import hvplot.pandas  # noqa
+import hvplot.pandas
 from bokeh.sampledata.penguins import data as df
 
 df.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', groupby='island', widget_location='top')
@@ -253,7 +253,7 @@ align: center
 
 :::{tab-item} Large Data
 ```python
-import hvplot.pandas  # noqa
+import hvplot.pandas
 from hvplot.sample_data import catalogue as cat
 
 df = cat.airline_flights.read()
@@ -269,7 +269,7 @@ align: center
 
 :::{tab-item} Geographic plots
 ```python
-import hvplot.xarray  # noqa
+import hvplot.xarray
 import xarray as xr, cartopy.crs as crs
 
 air_ds = xr.tutorial.open_dataset('air_temperature').load()
@@ -298,7 +298,7 @@ By starting a data pipeline with [`.interactive()`](https://pyviz-dev.github.io/
 
 :::{tab-item} Pandas
 ```python
-import hvplot.pandas  # noqa
+import hvplot.pandas
 import panel as pn
 from bokeh.sampledata.penguins import data as df
 
@@ -318,7 +318,7 @@ align: center
 
 :::{tab-item} Xarray
 ```python
-import hvplot.xarray  # noqa
+import hvplot.xarray
 import panel as pn
 import xarray as xr
 
@@ -340,7 +340,7 @@ align: center
 `.interactive()` supports displaying the pipeline output with `.hvplot()`. You can even output to any other output that [Panel](https://panel.holoviz.org/reference/index.html) supports using `.pipe(...)`.
 
 ```python
-import hvplot.xarray  # noqa
+import hvplot.xarray
 import panel as pn
 import xarray as xr
 
