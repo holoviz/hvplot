@@ -566,34 +566,34 @@ class hvPlotTabular(hvPlotBase):
 
         .. code-block::
 
-        import pandas as pd
-        import hvplot.pandas
+            import pandas as pd
+            import hvplot.pandas
 
-        df = pd.DataFrame(
-            {
-                "actual": [100, 150, 125, 140, 145, 135, 123],
-                "forecast": [90, 160, 125, 150, 141, 141, 120],
-                "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
-                "date": pd.date_range("2022-01-03", "2022-01-09"),
-                "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-            },
-        )
-        df["min"] = df[["actual", "forecast"]].min(axis=1)
-        df["max"] = df[["actual", "forecast"]].max(axis=1)
+            df = pd.DataFrame(
+                {
+                    "actual": [100, 150, 125, 140, 145, 135, 123],
+                    "forecast": [90, 160, 125, 150, 141, 141, 120],
+                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
+                    "date": pd.date_range("2022-01-03", "2022-01-09"),
+                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                },
+            )
+            df["min"] = df[["actual", "forecast"]].min(axis=1)
+            df["max"] = df[["actual", "forecast"]].max(axis=1)
 
-        area = df.hvplot.area(
-            x="numerical",
-            y="min",
-            y2="max",
-            ylabel="value",
-            legend="bottom",
-            height=500,
-            color=["#55a194"],
-            alpha=0.7,
-            line_width=2,
-            ylim=(0, 200),
-        )
-        area
+            area = df.hvplot.area(
+                x="numerical",
+                y="min",
+                y2="max",
+                ylabel="value",
+                legend="bottom",
+                height=500,
+                color=["#55a194"],
+                alpha=0.7,
+                line_width=2,
+                ylim=(0, 200),
+            )
+            area
 
         References
         ----------
