@@ -21,50 +21,36 @@ width: 70%
 ---
 ```
 
+**`.hvplot()` is a powerful and interactive Pandas-like `.plot()` API**
+
 ---
 
-**`.hvplot()` for a more versatile and powerful `.plot()` API**
-
-By replacing `.plot()` by `.hvplot()` you get an interactive [Bokeh](https://bokeh.org/) plot.
+By replacing `.plot()` with `.hvplot()` you get an interactive plot.
 
 ```{code-cell} ipython3
-import hvplot.pandas  # noqa
+import hvplot.pandas
 from bokeh.sampledata.penguins import data as df
 
 df.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
 ```
 
-`.hvplot()` supports many data structures of the PyData ecosystem on top of [Pandas](https://pandas.pydata.org/):
+---
+
+`.hvplot()` can generate plots from [Pandas](https://pandas.pydata.org/) DataFrames and many other data structures of the PyData ecosystem:
 
 ::::{tab-set}
-
-:::{tab-item} Xarray
-```python
-import hvplot.xarray  # noqa
-import xarray as xr
-
-xr_ds = xr.tutorial.open_dataset('air_temperature').load().sel(time='2013-06-01 12:00')
-xr_ds.hvplot()
-```
-```{image} ./_static/home/xarray.gif
----
-alt: xarray support
-align: center
----
-```
-:::
 
 :::{tab-item} Dask
 ```python
 import dask
-import hvplot.dask  # noqa
+import hvplot.dask
 
 df_dask = dask.dataframe.from_pandas(df, npartitions=2)
 df_dask.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
 ```
 ```{image} ./_static/home/dask.gif
 ---
-alt: dask support
+alt: Works with Dask
 align: center
 ---
 :::
@@ -72,14 +58,28 @@ align: center
 :::{tab-item} GeoPandas
 ```python
 import geopandas as gpd
-import hvplot.pandas  # noqa
+import hvplot.pandas
 
 gdf = gpd.read_file(gpd.datasets.get_path('naturalearth_cities'))
 gdf.hvplot(global_extent=True, tiles=True)
 ```
 ```{image} ./_static/home/geopandas.gif
 ---
-alt: geopandas support
+alt: Works with GeoPandas
+align: center
+---
+:::
+
+:::{tab-item} Intake
+```python
+import hvplot.intake
+from hvplot.sample_data import catalogue as cat
+
+cat.us_crime.hvplot.line(x='Year', y='Violent Crime rate')
+```
+```{image} ./_static/home/intake.gif
+---
+alt: Works with Intake
 align: center
 ---
 :::
@@ -94,28 +94,30 @@ hvnx.draw(G, with_labels=True)
 ```
 ```{image} ./_static/home/networkx.gif
 ---
-alt: networkx support
+alt: Works with Networkx
 align: center
 ---
 :::
 
-:::{tab-item} Intake
+:::{tab-item} Pandas
 ```python
-import hvplot.intake  # noqa
-from hvplot.sample_data import catalogue as cat
+import hvplot.pandas
+from bokeh.sampledata.autompg import autompg_clean as df
 
-cat.us_crime.hvplot.line(x='Year', y='Violent Crime rate')
+table = df.groupby(['origin', 'mfr'])['mpg'].mean().sort_values().tail(5)
+table.hvplot.barh('mfr', 'mpg', by='origin', stacked=True)
 ```
-```{image} ./_static/home/intake.gif
+```{image} ./_static/home/pandas.gif
 ---
-alt: intake support
+alt: Works with Pandas
 align: center
 ---
+```
 :::
 
 :::{tab-item} Streamz
 ```python
-import hvplot.streamz  # noqa
+import hvplot.streamz
 from streamz.dataframe import Random
 
 df_streamz = Random(interval='200ms', freq='50ms')
@@ -123,21 +125,36 @@ df_streamz.hvplot()
 ```
 ```{image} ./assets/streamz_demo.gif
 ---
-alt: streamz support
+alt: Works with Streamz
 align: center
 ---
 :::
 
+:::{tab-item} Xarray
+```python
+import hvplot.xarray
+import xarray as xr
+
+xr_ds = xr.tutorial.open_dataset('air_temperature').load().sel(time='2013-06-01 12:00')
+xr_ds.hvplot()
+```
+```{image} ./_static/home/xarray.gif
+---
+alt: Works with XArray
+align: center
+---
+```
+:::
+
 ::::
 
-`.hvplot()` uses Bokeh as the backend by default. It can also generate plots with [Matplotlib](https://matplotlib.org/) or [Plotly](https://plotly.com/).
-
+`.hvplot()` can generate plots with [Bokeh](https://bokeh.org/) (default), [Matplotlib](https://matplotlib.org/) or [Plotly](https://plotly.com/).
 
 ::::{tab-set}
 
 :::{tab-item} Bokeh
 ```{code-cell} ipython3
-import hvplot.pandas  # noqa
+import hvplot.pandas
 from bokeh.sampledata.penguins import data as df
 
 df.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
@@ -156,7 +173,7 @@ df.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
 ```
 ```{image} ./_static/home/matplotlib.png
 ---
-alt: matplotlib as a plotting backend
+alt: Works with Matplotlib
 align: center
 ---
 ```
@@ -174,7 +191,7 @@ df.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
 ```
 ```{image} ./_static/home/plotly.gif
 ---
-alt: plotly as a plotting backend
+alt: Works with Plotly
 align: center
 ---
 :::
@@ -187,7 +204,7 @@ align: center
 
 :::{tab-item} Layout
 ```python
-import hvplot.pandas  # noqa
+import hvplot.pandas
 from hvplot.sample_data import us_crime as df
 
 plot1 = df.hvplot(x='Year', y='Violent Crime rate', width=400)
@@ -204,7 +221,7 @@ align: center
 
 :::{tab-item} Overlay
 ```python
-import hvplot.pandas  # noqa
+import hvplot.pandas
 import pandas
 from bokeh.sampledata.penguins import data
 
@@ -221,7 +238,7 @@ align: center
 
 :::{tab-item} Widgets
 ```python
-import hvplot.pandas  # noqa
+import hvplot.pandas
 from bokeh.sampledata.penguins import data as df
 
 df.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', groupby='island', widget_location='top')
@@ -236,7 +253,7 @@ align: center
 
 :::{tab-item} Large Data
 ```python
-import hvplot.pandas  # noqa
+import hvplot.pandas
 from hvplot.sample_data import catalogue as cat
 
 df = cat.airline_flights.read()
@@ -252,7 +269,7 @@ align: center
 
 :::{tab-item} Geographic plots
 ```python
-import hvplot.xarray  # noqa
+import hvplot.xarray
 import xarray as xr, cartopy.crs as crs
 
 air_ds = xr.tutorial.open_dataset('air_temperature').load()
@@ -275,13 +292,13 @@ align: center
 
 **`.interactive()` to turn data pipelines into widget-based interactive applications**
 
-By starting a data pipeline with `.interactive()` you can then inject widgets into an extract and transform data pipeline. The pipeline output dynamically updates with widget changes, making data exploration in Jupyter notebooks in particular a lot more efficient.
+By starting a data pipeline with [`.interactive()`](https://pyviz-dev.github.io/hvplot/getting_started/interactive.html) you can then inject widgets into an extract and transform data pipeline. The pipeline output dynamically updates with widget changes, making data exploration in Jupyter notebooks in particular a lot more efficient.
 
 ::::{tab-set}
 
 :::{tab-item} Pandas
 ```python
-import hvplot.pandas  # noqa
+import hvplot.pandas
 import panel as pn
 from bokeh.sampledata.penguins import data as df
 
@@ -301,7 +318,7 @@ align: center
 
 :::{tab-item} Xarray
 ```python
-import hvplot.xarray  # noqa
+import hvplot.xarray
 import panel as pn
 import xarray as xr
 
@@ -320,10 +337,10 @@ align: center
 
 ::::
 
-`.interactive()` supports displaying the pipeline output with `.hvplot()`.
+`.interactive()` supports displaying the pipeline output with `.hvplot()`. You can even output to any other output that [Panel](https://panel.holoviz.org/reference/index.html) supports using `.pipe(...)`.
 
 ```python
-import hvplot.xarray  # noqa
+import hvplot.xarray
 import panel as pn
 import xarray as xr
 
@@ -336,15 +353,12 @@ da.interactive(loc='left') \
 .quantile(q=w_quantile, dim='lon') \
 .hvplot(ylabel='Air Temperature [K]', width=500)
 ```
-
 ```{image} ./_static/home/interactive_hvplot.gif
 ---
 alt: interactive pipeline with an hvplot output
 align: center
 ---
 ```
-
----
 
 **`explorer()` to explore data in a web application**
 
