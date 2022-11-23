@@ -21,7 +21,7 @@ width: 70%
 ---
 ```
 
-**`.hvplot()` is a powerful and interactive Pandas `.plot()` like API**
+**`.hvplot()` is a powerful and interactive Pandas-like `.plot()` API**
 
 ---
 
@@ -339,9 +339,6 @@ align: center
 
 `.interactive()` supports displaying the pipeline output with `.hvplot()`. You can even output to any other output that [Panel](https://panel.holoviz.org/reference/index.html) supports using `.pipe(...)`.
 
-::::{tab-set}
-
-:::{tab-item} `.hvplot`
 ```python
 import hvplot.xarray  # noqa
 import panel as pn
@@ -362,35 +359,6 @@ alt: interactive pipeline with an hvplot output
 align: center
 ---
 ```
-:::
-
-:::{tab-item} `.pipe`
-```python
-import altair as alt
-import panel as pn
-pn.extension("vega")
-
-def altair_plot(source):
-    return alt.Chart(source, width="container").mark_line().encode(x="bill_length_mm", y="bill_depth_mm")
-
-import hvplot.pandas  # noqa
-from bokeh.sampledata.penguins import data as df
-
-w_sex = pn.widgets.MultiSelect(name='Sex', value=['MALE'], options=['MALE', 'FEMALE'])
-w_body_mass = pn.widgets.FloatSlider(name='Min body mass', start=2700, end=6300, step=50)
-
-dfi = df.interactive(loc='left', sizing_mode="stretch_width")
-dfi.loc[(dfi['sex'].isin(w_sex)) & (dfi['body_mass_g'] > w_body_mass)].pipe(altair_plot)
-```
-```{image} ./_static/home/interactive_altair.gif
----
-alt: Interactive app with Altair
-align: center
----
-```
-:::
-
-::::
 
 **`explorer()` to explore data in a web application**
 
