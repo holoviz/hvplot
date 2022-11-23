@@ -1292,10 +1292,7 @@ class hvPlotTabular(hvPlotBase):
 
     def hist(self, y=None, by=None, **kwds):
         """
-        A `histogram` displays an approximate representation of the distribution of numerical data.
-        Together with `scatter` it is often a good first visualization of your data.        
-        
-        Similar methods include `kde`.
+        A `histogram` displays an approximate representation of the distribution of numerical data.  
 
         Reference: https://hvplot.holoviz.org/reference/pandas/hist.html
 
