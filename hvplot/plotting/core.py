@@ -21,73 +21,20 @@ from ..util import is_list_like, process_dynamic_args
 
 class hvPlotBase:
     """
-    The plotting method: `df.hvplot(...)` creates a plot similarly to the familiar Pandas
-    `df.plot(...)` method.
+    Internal base class.
 
-    For more detailed options use a specific ploting method, e.g. `df.hvplot.line`.
+    Concrete subclasses must implement plotting methods (e.g. `line`, `scatter`, `image`).
+    A plotting method must call `self` which will effectively create a HoloViewsConverter
+    and call it to return a HoloViews object.
 
-    Reference: https://hvplot.holoviz.org/reference/index.html
+    Concrete subclasses are meant to be mounted onto a datastructure property, e.g.:
 
-    Parameters
-    ----------
-    x : string, optional
-        Field name(s) to draw x-positions from. If not specified, the index is
-        used.
-    y : string or list, optional
-        Field name(s) to draw y-positions from. If not specified, all numerical
-        fields are used.
-    kind : string, optional
-        The kind of plot to generate, e.g. 'area', 'bar', 'line', 'scatter' etc. To see the
-        available plots run `print(df.hvplot.__all__)`.
-    **kwds : optional
-        Additional keywords arguments are documented in `hvplot.help('scatter')` or similar
-        depending on the kind of plot.
-
-    Returns
-    -------
-    A Holoviews object. You can `print` the object to study its composition and run `hv.help` on
-    the object to learn more about its parameters and options.
-
-    Examples
-    --------
-
-    .. code-block::
-
-        import hvplot.pandas
-        import pandas as pd
-
-        df = pd.DataFrame(
-            {
-                "actual": [100, 150, 125, 140, 145, 135, 123],
-                "forecast": [90, 160, 125, 150, 141, 141, 120],
-                "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
-                "date": pd.date_range("2022-01-03", "2022-01-09"),
-                "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-            },
-        )
-        line = df.hvplot.line(
-            x="numerical",
-            y=["actual", "forecast"],
-            ylabel="value",
-            legend="bottom",
-            height=500,
-            color=["steelblue", "teal"],
-            alpha=0.7,
-            line_width=5,
-        )
-        line
-
-    You can can add *markers* to a `line` plot by overlaying with a `scatter` plot.
-
-    .. code-block::
-
-        markers = df.hvplot.scatter(
-            x="numerical", y=["actual", "forecast"], color=["#f16a6f", "#1e85f7"], size=50
-        )
-        line * markers
-
-    Please note that you can pass widgets or reactive functions as arguments instead of
-    literal values, c.f. https://hvplot.holoviz.org/user_guide/Widgets.html.
+    ```
+    _patch_plot = lambda self: hvPlotTabular(self)
+    _patch_plot.__doc__ = hvPlotTabular.__call__.__doc__
+    plot_prop = property(_patch_plot)
+    setattr(pd.DataFrame, 'hvplot', plot_prop)
+    ```
     """
 
     __all__ = []
