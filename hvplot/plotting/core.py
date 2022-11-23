@@ -587,9 +587,6 @@ class hvPlotTabular(hvPlotBase):
         The `area` plot can be used to color the area under a line or to color the space between two
         lines.
 
-        Please note that currently meaningful tooltips are not supported. See
-        https://github.com/holoviz/holoviews/issues/5375
-
         Reference: https://hvplot.holoviz.org/reference/pandas/area.html
 
         Parameters
