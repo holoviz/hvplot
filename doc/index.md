@@ -181,7 +181,7 @@ align: center
 
 ::::
 
-`.hvplot()` sources its power in the [HoloViz](https://holoviz.org/) ecosystem. With [HoloViews](https://holoviews.org/) you get the ability to easily layout and overlay plots, with [Panel](https://panel.holoviz.org) you can get more interactive control of your plots with widgets, with [DataShader](https://datashader.org/) you can visualize and interactively explore very large data, and with [GeoViews](http://geoviews.org/) you can create geographic plots.
+`.hvplot()` sources its power in the [HoloViz](https://holoviz.org/) ecosystem. With [HoloViews](https://holoviews.org/) you get the ability to easily layout and overlay plots, with [Panel](https://panel.holoviz.org) you can get more interactive control of your plots with widgets, with [DataShader](https://datashader.org/) you can visualize and interactively explore very large data, and with [GeoViews](https://geoviews.org/) you can create geographic plots.
 
 ::::{tab-set}
 

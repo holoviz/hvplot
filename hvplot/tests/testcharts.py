@@ -139,7 +139,7 @@ class TestChart1D(ComparisonTestCase):
     def test_by_datetime_accessor(self):
         plot = self.dt_df.hvplot.line('index.dt.day', '0', by='index.dt.month')
         obj = NdOverlay({m: Curve((g.index.day, g[0]), 'index.dt.day', '0')
-                         for m, g in self.dt_df.groupby(self.dt_df.index.month)}, 'index.dt.month') 
+                         for m, g in self.dt_df.groupby(self.dt_df.index.month)}, 'index.dt.month')
         self.assertEqual(plot, obj)
 
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
@@ -340,7 +340,7 @@ class TestChart1D(ComparisonTestCase):
         assert plot.kdims == ['x']
         assert plot[1].kdims == ['index']
         assert plot[1].vdims == ['y']
-    
+
     def test_errorbars_no_hover(self):
         plot = self.df_desc.hvplot.errorbars(y='mean', yerr1='std')
         assert list(plot.dimensions()) == ['index', 'mean', 'std']

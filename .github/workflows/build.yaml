@@ -26,10 +26,10 @@ jobs:
       MPLBACKEND: "Agg"
       CONDA_UPLOAD_TOKEN: ${{ secrets.CONDA_UPLOAD_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: "100"
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - uses: conda-incubator/setup-miniconda@v2
@@ -40,7 +40,7 @@ jobs:
         run: git fetch --prune --tags --unshallow -f
       - name: Set output
         id: vars
-        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+        run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
       - name: conda setup
         run: |
           conda config --set always_yes True
@@ -70,10 +70,10 @@ jobs:
       PPP: ${{ secrets.PPP }}
       PYPI: "https://upload.pypi.org/legacy/"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: "100"
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - uses: conda-incubator/setup-miniconda@v2
