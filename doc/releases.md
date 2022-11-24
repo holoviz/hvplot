@@ -1,5 +1,37 @@
 # Releases
 
+See [the HoloViz blog](https://blog.holoviz.org/tag/hvplot.html) for a visual summary of the major features added in a selection of releases.
+
+## Version 0.8.2
+
+**November 24, 2022**
+
+The 0.8.2 release is a bug fix release. It improves compatibility with HoloViews 1.15.2 that emits now a warning when parsing DataFrame with non-string columns. The HoloViz tools are not yet compatible with the recent Bokeh 3, this hvPlot release pins Panel in a way that hvPlot users getting this version will no longer see Bokeh 3 being installed.  The documentation has seen some improvements too; @MarcSkovMadsen has kept improving the docstrings and we congratulate @sophiamyang for her first contribution that made the landing page nicer! Many thanks to @droumis, @Hoxbro, @maximlt, @philippjfr and @MarcSkovMadsen for contributing!
+
+- Interactive:
+  - Support slice ([#776](https://github.com/holoviz/hvplot/pull/776))
+- Plot:
+  - Convert `DataFrame` columns with type `RangeIndex` to strings to ensure compatibility with `HoloViews` ([#932](https://github.com/holoviz/hvplot/pull/932))
+  - Ensure that `xarray` dataset metadata propagates to `NdOverlays` ([#930](https://github.com/holoviz/hvplot/pull/930))
+  - Support `rioxarray` ([#905](https://github.com/holoviz/hvplot/pull/905))
+  - Improve error message mentionning `pyproj` ([#950](https://github.com/holoviz/hvplot/pull/950))
+- Explorer:
+  - Don't error on datetime-like axis ([#968](https://github.com/holoviz/hvplot/pull/968))
+  - Don't use xlim/ylim slider if start and end values are identical ([#966](https://github.com/holoviz/hvplot/pull/966))
+- Documentation:
+  - New and updated docstrings ([#892](https://github.com/holoviz/hvplot/pull/892), [#863](https://github.com/holoviz/hvplot/pull/863))
+  - Improve the landing page ([#874](https://github.com/holoviz/hvplot/pull/874), [#903](https://github.com/holoviz/hvplot/pull/903), [#876](https://github.com/holoviz/hvplot/pull/876))
+  - Change *http* to *https* ([#873](https://github.com/holoviz/hvplot/pull/873))
+  - Add intended `rolling_window` param into pipeline ([#944](https://github.com/holoviz/hvplot/pull/944))
+  - Updates the README ([#817](https://github.com/holoviz/hvplot/pull/817))
+  - Miscellaneous documentation improvements ([#866](https://github.com/holoviz/hvplot/pull/866), [#887](https://github.com/holoviz/hvplot/pull/887), [#910](https://github.com/holoviz/hvplot/pull/910))
+- Packaging:
+  - Add Panel lower pin to ensure Bokeh 3 is not installed ([#974](https://github.com/holoviz/hvplot/pull/974))
+- Development:
+  - Add pre-commit ([#967](https://github.com/holoviz/hvplot/pull/967))
+- CI:
+  - Miscellaneous fixes and improvements ([#867](https://github.com/holoviz/hvplot/pull/867), [#922](https://github.com/holoviz/hvplot/pull/922), [#947](https://github.com/holoviz/hvplot/pull/947), [#948](https://github.com/holoviz/hvplot/pull/948), [#949](https://github.com/holoviz/hvplot/pull/949), [#960](https://github.com/holoviz/hvplot/pull/960), [#977](https://github.com/holoviz/hvplot/pull/977))
+
 ## Version 0.8.1
 
 **August 26, 2022**
@@ -7,34 +39,34 @@
 The 0.8.1 release is a bug fix release, focusing mostly on improving `.interactive` and the *explorer*. The documentation has seen some improvements too; @MarcSkovMadsen has been improving the docstrings so make sure to check them out.  Many thanks to @jlstevens, @Hoxbro, @maximlt, @philippjfr and @MarcSkovMadsen for contributing!
 
 - Interactive:
-  - Set interactive function to lazy to avoid calling it twice ([772](https://github.com/holoviz/hvplot/pull/772))
-  - Add support for hvplot kind accessor ([781](https://github.com/holoviz/hvplot/pull/781), [858](https://github.com/holoviz/hvplot/pull/858))
-  - Add more tests to `Interactive` and some comments ([812](https://github.com/holoviz/hvplot/pull/812))
-  - Fixes to the operators implemented by Interactive ([814](https://github.com/holoviz/hvplot/pull/814))
-  - Propagate `max_rows` ([815](https://github.com/holoviz/hvplot/pull/815))
-  - Only register the function parameters watchers once ([818](https://github.com/holoviz/hvplot/pull/818))
-  - Do not re-execute transform on copied clones ([833](https://github.com/holoviz/hvplot/pull/833))
-  - Internal callback made dependent only when parameters are found ([857](https://github.com/holoviz/hvplot/pull/857))
+  - Set interactive function to lazy to avoid calling it twice ([#772](https://github.com/holoviz/hvplot/pull/772))
+  - Add support for hvplot kind accessor ([#781](https://github.com/holoviz/hvplot/pull/781), [#858](https://github.com/holoviz/hvplot/pull/858))
+  - Add more tests to `Interactive` and some comments ([#812](https://github.com/holoviz/hvplot/pull/812))
+  - Fixes to the operators implemented by Interactive ([#814](https://github.com/holoviz/hvplot/pull/814))
+  - Propagate `max_rows` ([#815](https://github.com/holoviz/hvplot/pull/815))
+  - Only register the function parameters watchers once ([#818](https://github.com/holoviz/hvplot/pull/818))
+  - Do not re-execute transform on copied clones ([#833](https://github.com/holoviz/hvplot/pull/833))
+  - Internal callback made dependent only when parameters are found ([#857](https://github.com/holoviz/hvplot/pull/857))
 - Explorer:
-  - Make the explorer easier to use ([799](https://github.com/holoviz/hvplot/pull/799))
-  - Enhancement to Fields tab in explorer ([811](https://github.com/holoviz/hvplot/pull/811))
-  - Remove the marker styling option of the explorer ([809](https://github.com/holoviz/hvplot/pull/809))
+  - Make the explorer easier to use ([#799](https://github.com/holoviz/hvplot/pull/799))
+  - Enhancement to Fields tab in explorer ([#811](https://github.com/holoviz/hvplot/pull/811))
+  - Remove the marker styling option of the explorer ([#809](https://github.com/holoviz/hvplot/pull/809))
 - Plot:
-  - Make `rescale_discrete_levels` a plot option ([758](https://github.com/holoviz/hvplot/pull/758))
-  - Ensure that dataframes with multiple columns are categorically shaded ([759](https://github.com/holoviz/hvplot/pull/759))
-  - Display a color bar when rasterize is enabled ([782](https://github.com/holoviz/hvplot/pull/782))
-  - Update the expected DataSet plot title after xarray `2022.6.0` ([795](https://github.com/holoviz/hvplot/pull/795))
-  - Set categorically shaded when there's more than one variable ([843](https://github.com/holoviz/hvplot/pull/843))
-  - Clone GeoViews' features ([850](https://github.com/holoviz/hvplot/pull/850))
+  - Make `rescale_discrete_levels` a plot option ([#758](https://github.com/holoviz/hvplot/pull/758))
+  - Ensure that dataframes with multiple columns are categorically shaded ([#759](https://github.com/holoviz/hvplot/pull/759))
+  - Display a color bar when rasterize is enabled ([#782](https://github.com/holoviz/hvplot/pull/782))
+  - Update the expected DataSet plot title after xarray `2022.6.0` ([#795](https://github.com/holoviz/hvplot/pull/795))
+  - Set categorically shaded when there's more than one variable ([#843](https://github.com/holoviz/hvplot/pull/843))
+  - Clone GeoViews' features ([#850](https://github.com/holoviz/hvplot/pull/850))
 - Documentation:
-  - Add new and improve existing docstrings ([793](https://github.com/holoviz/hvplot/pull/793), [826](https://github.com/holoviz/hvplot/pull/826), [827](https://github.com/holoviz/hvplot/pull/827), [822](https://github.com/holoviz/hvplot/pull/822))
-  - Update developer install instructions ([794](https://github.com/holoviz/hvplot/pull/794))
-  - Rework the landing page and add a Getting started guide ([838](https://github.com/holoviz/hvplot/pull/838))
+  - Add new and improve existing docstrings ([#793](https://github.com/holoviz/hvplot/pull/793), [#826](https://github.com/holoviz/hvplot/pull/826), [#827](https://github.com/holoviz/hvplot/pull/827), [#822](https://github.com/holoviz/hvplot/pull/822))
+  - Update developer install instructions ([#794](https://github.com/holoviz/hvplot/pull/794))
+  - Rework the landing page and add a Getting started guide ([#838](https://github.com/holoviz/hvplot/pull/838))
 - Misc:
-  - No longer use basestring from holoviews.core.util ([757](https://github.com/holoviz/hvplot/pull/757))
-  - Ensure that repr is initialized on hvplot backend import ([774](https://github.com/holoviz/hvplot/pull/774))
-  - Add RGB test data ([779](https://github.com/holoviz/hvplot/pull/779))
-  - Add flatten utility function ([798](https://github.com/holoviz/hvplot/pull/798))
+  - No longer use basestring from holoviews.core.util ([#757](https://github.com/holoviz/hvplot/pull/757))
+  - Ensure that repr is initialized on hvplot backend import ([#774](https://github.com/holoviz/hvplot/pull/774))
+  - Add RGB test data ([#779](https://github.com/holoviz/hvplot/pull/779))
+  - Add flatten utility function ([#798](https://github.com/holoviz/hvplot/pull/798))
 
 ## Version 0.8.0
 
