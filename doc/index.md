@@ -25,7 +25,7 @@ width: 70%
 
 ---
 
-By replacing `.plot()` with `.hvplot()` you get an interactive plot.
+By replacing `.plot()` with `.hvplot()` you get an interactive figure. Try it out below! 
 
 ```{code-cell} ipython3
 import hvplot.pandas
@@ -39,6 +39,38 @@ df.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
 `.hvplot()` can generate plots from [Pandas](https://pandas.pydata.org/) DataFrames and many other data structures of the PyData ecosystem:
 
 ::::{tab-set}
+
+:::{tab-item} Xarray
+```python
+import hvplot.xarray
+import xarray as xr
+
+xr_ds = xr.tutorial.open_dataset('air_temperature').load().sel(time='2013-06-01 12:00')
+xr_ds.hvplot()
+```
+```{image} ./_static/home/xarray.gif
+---
+alt: Works with XArray
+align: center
+---
+```
+:::
+
+:::{tab-item} Pandas
+```python
+import hvplot.pandas
+from bokeh.sampledata.autompg import autompg_clean as df
+
+table = df.groupby(['origin', 'mfr'])['mpg'].mean().sort_values().tail(5)
+table.hvplot.barh('mfr', 'mpg', by='origin', stacked=True)
+```
+```{image} ./_static/home/pandas.gif
+---
+alt: Works with Pandas
+align: center
+---
+```
+:::
 
 :::{tab-item} Dask
 ```python
@@ -99,22 +131,6 @@ align: center
 ---
 :::
 
-:::{tab-item} Pandas
-```python
-import hvplot.pandas
-from bokeh.sampledata.autompg import autompg_clean as df
-
-table = df.groupby(['origin', 'mfr'])['mpg'].mean().sort_values().tail(5)
-table.hvplot.barh('mfr', 'mpg', by='origin', stacked=True)
-```
-```{image} ./_static/home/pandas.gif
----
-alt: Works with Pandas
-align: center
----
-```
-:::
-
 :::{tab-item} Streamz
 ```python
 import hvplot.streamz
@@ -130,22 +146,6 @@ align: center
 ---
 :::
 
-:::{tab-item} Xarray
-```python
-import hvplot.xarray
-import xarray as xr
-
-xr_ds = xr.tutorial.open_dataset('air_temperature').load().sel(time='2013-06-01 12:00')
-xr_ds.hvplot()
-```
-```{image} ./_static/home/xarray.gif
----
-alt: Works with XArray
-align: center
----
-```
-:::
-
 ::::
 
 `.hvplot()` can generate plots with [Bokeh](https://bokeh.org/) (default), [Matplotlib](https://matplotlib.org/) or [Plotly](https://plotly.com/).
@@ -153,18 +153,23 @@ align: center
 ::::{tab-set}
 
 :::{tab-item} Bokeh
-```{code-cell} ipython3
+```python
 import hvplot.pandas
 from bokeh.sampledata.penguins import data as df
 
 df.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
+```
+```{image} ./_static/home/bokeh.gif
+---
+alt: Works with Bokeh (default)
+align: center
+---
 ```
 :::
 
 :::{tab-item} Matplotlib
 ```python
 import hvplot.pandas
-import pandas
 from bokeh.sampledata.penguins import data as df
 
 hvplot.extension('matplotlib')
@@ -182,7 +187,6 @@ align: center
 :::{tab-item} Plotly
 ```python
 import hvplot.pandas
-import pandas
 from bokeh.sampledata.penguins import data as df
 
 hvplot.extension('plotly')
