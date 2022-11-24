@@ -70,7 +70,7 @@ The 0.8.1 release is a bug fix release, focusing mostly on improving `.interacti
 
 ## Version 0.8.0
 
-**May 8, 2022**
+**May 9, 2022**
 
 The 0.8.0 release is a minor release with some exciting new features and a large number of bug fixes and enhancements. Many thanks to @FabianHofmann, @jomey, @ablythed, @jlstevens, @Hoxbro, @michaelaye, @MridulS, @ppwadhwa, @maximlt, @philippjfr for contributing!
 
@@ -118,6 +118,8 @@ Maintenance:
 
 ## Version 0.7.3
 
+**July 23, 2021**
+
 This is a minor release focusing on greatly improving the
 [`.interactive()`](https://hvplot.holoviz.org/user_guide/Interactive.html)
 API for flexibly building simple apps using widget controls. Thanks to
@@ -142,6 +144,8 @@ Features:
   Datashader supports it)
 
 ## Version 0.7.2
+
+**May 22, 2021**
 
 This is  a minor release with a number of bug fixes and enhancements.
 Many thanks to @StefanBrand, @loicduffar, @brl0, @michaelaye,
@@ -183,6 +187,8 @@ Documentation:
 
 ## Version 0.7.1
 
+**Mars 3, 2021**
+
 Major new features:
 
 - Add Ibis backend, providing hvPlot features for lazy SQL queries ([#507](https://github.com/holoviz/hvplot/pull/507))
@@ -200,6 +206,8 @@ Bug fixes:
 - Cast types after applying melt to data ([#566](https://github.com/holoviz/hvplot/pull/566))
 
 ## Version 0.7.0
+
+**November 18, 2020**
 
 Thanks to @philippjfr for managing this release and implementing most
 of the features, and to @jbednar, @ahuang11, and @AurelienSciarra for
@@ -226,6 +234,8 @@ Bug fixes:
 - Handle ``node_shape`` for networkx ([#527](https://github.com/holoviz/hvplot/pull/527))
 
 ## Version 0.6.0
+
+**June 2, 2020**
 
 This release includes major contributions from @philippjfr (overall
 maintenance and bugfixes) and @jsignell (reference gallery), plus
@@ -264,6 +274,8 @@ Documentation:
 
 ## Version 0.5.2
 
+**October 17, 2019**
+
 This release mostly includes contributions from @jsignell.
 
 - Allow tile sources to be objects as well as strings ([#345](https://github.com/holoviz/hvplot/pull/345))
@@ -274,9 +286,13 @@ This release mostly includes contributions from @jsignell.
 
 ## Version 0.5.1
 
+**October 13, 2019**
+
 Minor release with updates to continuous integration setup (from @jsignell).
 
 ## Version 0.5.0
+
+**October 10, 2019**
 
 This is a major release that includes bug fixes, changes to default behavior, and enhancements.
 
@@ -290,6 +306,8 @@ Features:
  - Allow use of strings as aggregators for datashader ([#257](https://github.com/holoviz/hvplot/pull/257))
 
 ## Version 0.4.0
+
+**January 28, 2019**
 
 This is a major release which includes the addition of a networkx
 plotting API and a number of important bug fixes.
@@ -307,6 +325,8 @@ Fixes:
 
 ## Version 0.3.0
 
+**January 7, 2019**
+
 This release includes a number of major improvements to the documentation and core functionality as well as a variety of bug fixes.
 
 - Added improved docstrings including all available options ([#103](https://github.com/pyviz/hvplot/pull/103), [#134](https://github.com/pyviz/hvplot/pull/134))
@@ -315,3 +335,15 @@ This release includes a number of major improvements to the documentation and co
 - Exposed bokeh styling options for all plot types ([#134](https://github.com/pyviz/hvplot/pull/134))
 - Compatibility with latest HoloViews/GeoViews releases ([#113](https://github.com/pyviz/hvplot/pull/113), [#118](https://github.com/pyviz/hvplot/pull/118), [#134](https://github.com/pyviz/hvplot/pull/134))
 - Added control over tools ([#120](https://github.com/pyviz/hvplot/pull/120)) and legend position ([#119](https://github.com/pyviz/hvplot/pull/119))
+
+## Version 0.2.1
+
+**July 8, 2018**
+
+## Version 0.2.0
+
+**July 7, 2018**
+
+## Version 0.1.1
+
+**July 6, 2018**
