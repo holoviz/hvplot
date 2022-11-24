@@ -6,8 +6,12 @@ See [the HoloViz blog](https://blog.holoviz.org/tag/hvplot.html) for a visual su
 
 **November 24, 2022**
 
-The 0.8.2 release is a bug fix release. It improves compatibility with HoloViews 1.15.2 that emits now a warning when parsing DataFrame with non-string columns. The HoloViz tools are not yet compatible with the recent Bokeh 3, this hvPlot release pins Panel in a way that hvPlot users getting this version will no longer see Bokeh 3 being installed.  The documentation has seen some improvements too; @MarcSkovMadsen has kept improving the docstrings and we congratulate @sophiamyang for her first contribution that made the landing page nicer! Many thanks to @droumis, @Hoxbro, @maximlt, @philippjfr and @MarcSkovMadsen for contributing!
+The 0.8.2 release brings a number of bugfixes and documentation improvements. @MarcSkovMadsen has kept improving the docstrings and we congratulate @sophiamyang for her first contribution that made the landing page nicer! Many thanks to @droumis, @Hoxbro, @maximlt, @philippjfr and @MarcSkovMadsen for contributing!
 
+Please note that hvPlot is not yet compatible with Bokeh 3.
+
+- Dependencies:
+  - Add Panel lower pin to ensure Bokeh 3 is not installed ([#974](https://github.com/holoviz/hvplot/pull/974))
 - Interactive:
   - Support slice ([#776](https://github.com/holoviz/hvplot/pull/776))
 - Plot:
@@ -25,10 +29,8 @@ The 0.8.2 release is a bug fix release. It improves compatibility with HoloViews
   - Add intended `rolling_window` param into pipeline ([#944](https://github.com/holoviz/hvplot/pull/944))
   - Updates the README ([#817](https://github.com/holoviz/hvplot/pull/817))
   - Miscellaneous documentation improvements ([#866](https://github.com/holoviz/hvplot/pull/866), [#887](https://github.com/holoviz/hvplot/pull/887), [#910](https://github.com/holoviz/hvplot/pull/910))
-- Packaging:
-  - Add Panel lower pin to ensure Bokeh 3 is not installed ([#974](https://github.com/holoviz/hvplot/pull/974))
 - Development:
-  - Add pre-commit ([#967](https://github.com/holoviz/hvplot/pull/967))
+  - Add `pre-commit` to format and lint the code on commits ([#967](https://github.com/holoviz/hvplot/pull/967))
 - CI:
   - Miscellaneous fixes and improvements ([#867](https://github.com/holoviz/hvplot/pull/867), [#922](https://github.com/holoviz/hvplot/pull/922), [#947](https://github.com/holoviz/hvplot/pull/947), [#948](https://github.com/holoviz/hvplot/pull/948), [#949](https://github.com/holoviz/hvplot/pull/949), [#960](https://github.com/holoviz/hvplot/pull/960), [#977](https://github.com/holoviz/hvplot/pull/977))
 
@@ -336,14 +338,6 @@ This release includes a number of major improvements to the documentation and co
 - Compatibility with latest HoloViews/GeoViews releases ([#113](https://github.com/pyviz/hvplot/pull/113), [#118](https://github.com/pyviz/hvplot/pull/118), [#134](https://github.com/pyviz/hvplot/pull/134))
 - Added control over tools ([#120](https://github.com/pyviz/hvplot/pull/120)) and legend position ([#119](https://github.com/pyviz/hvplot/pull/119))
 
-## Version 0.2.1
+## Previous versions
 
-**July 8, 2018**
-
-## Version 0.2.0
-
-**July 7, 2018**
-
-## Version 0.1.1
-
-**July 6, 2018**
+Versions 0.1.1, 0.2.0, 0.2.1 were released on the 6th of July 2018, 7th of July 2018 and 8th of July 2018.
