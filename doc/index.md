@@ -25,7 +25,7 @@ width: 70%
 
 ---
 
-By replacing `.plot()` with `.hvplot()` you get an interactive figure. Try it out below! 
+By replacing `.plot()` with `.hvplot()` you get an interactive figure. Try it out below!
 
 ```{code-cell} ipython3
 import hvplot.pandas
