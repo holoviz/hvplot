@@ -6,7 +6,7 @@ try:
     import hvplot.ibis # noqa
     import pandas as pd
 except:
-    pytest.skip(reason='Ibis test dependencies not available', allow_module_level=True)
+    pytest.skip(allow_module_level=True)
 
 
 @pytest.fixture
