@@ -24,24 +24,18 @@ How to use hvPlot in 3 simple steps
 
 Work with the data source you already know and ❤️
 
-.. code-block::
-
-    import pandas as pd, numpy as np
-    idx = pd.date_range('1/1/2000', periods=1000)
-    df  = pd.DataFrame(np.random.randn(1000, 4), index=idx, columns=list('ABCD')).cumsum()
+>>> import pandas as pd, numpy as np
+>>> idx = pd.date_range('1/1/2000', periods=1000)
+>>> df  = pd.DataFrame(np.random.randn(1000, 4), index=idx, columns=list('ABCD')).cumsum()
 
 Import the hvplot extension for your data source and optionally set the plotting backend
 
-.. code-block::
-
-    import hvplot.pandas
-    # hvplot.extension('matplotlib')
+>>> import hvplot.pandas
+>>> # hvplot.extension('matplotlib')
 
 Use the `.hvplot` API as you would use the Pandas `.plot` API.
 
-.. code-block::
-
-    df.hvplot()
+>>> df.hvplot()
 
 In a Jupyter Notebook, this will display a line plot of the A, B, C and D time series.
 
@@ -52,10 +46,8 @@ How to get help
 
 To see the available arguments for a specific `kind` of plot run
 
-.. code-block::
-
-    import hvplot
-    hvplot.help(kind='scatter')
+>>> import hvplot
+>>> hvplot.help(kind='scatter')
 
 In a notebook or ipython environment the usual
 
