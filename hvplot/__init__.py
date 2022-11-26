@@ -40,7 +40,7 @@ Import the hvplot extension for your data source and optionally set the plotting
 Use the `.hvplot` API as you would use the Pandas `.plot` API.
 
 .. code-block::
-    
+
     df.hvplot()
 
 In a Jupyter Notebook, this will display a line plot of the A, B, C and D time series.
@@ -53,7 +53,7 @@ How to get help
 To see the available arguments for a specific `kind` of plot run
 
 .. code-block::
-    
+
     import hvplot
     hvplot.help(kind='scatter')
 
