@@ -851,7 +851,7 @@ class HoloViewsConverter:
                                  'e.g. a NumPy array or xarray Dataset, '
                                  'found %s type' % (kind, type(self.data).__name__))
 
-            if hasattr(data, 'columns') and data.columns.name and not group_label:
+            if hasattr(data, 'columns') and hasattr(data.columns, 'name') and data.columns.name and not group_label:
                 group_label = data.columns.name
             elif not group_label:
                 group_label = 'Variable'
