@@ -303,7 +303,7 @@ class hvPlotTabular(hvPlotBase):
         .. code-block::
 
             markers = df.hvplot.scatter(
-                x="numerical", y=["actual", "forecast"], color=["#f16a6f", "#1e85f7"], size=50
+                x="numerical", y=["actual", "forecast"], color=["steelblue", "teal"], size=50
             )
             line * markers
 
