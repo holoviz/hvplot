@@ -69,6 +69,7 @@ _examples = [
     'plotly',
     'pygraphviz',
     'ipykernel <6.18.0'  # temporary
+    'ibis-framework[duckdb]',
 ]
 
 extras_require = {
