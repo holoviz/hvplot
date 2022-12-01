@@ -3,12 +3,15 @@ import sqlite3
 from pathlib import Path
 
 import holoviews as hv
+import matplotlib
 import pytest
+
+matplotlib.use('agg')
 
 try:
     import duckdb
     import hvplot.ibis  # noqa
-    import hvplot.pandas # noqa
+    import hvplot.pandas  # noqa
     import ibis
     import pandas as pd
 except:
@@ -27,7 +30,7 @@ def reference_df():
     )
 
 def pandas_data(df: pd.DataFrame, *args, **kwargs):
-    return df
+    return df.copy()
 
 def ibis_sqlite_data(df: pd.DataFrame, *args, **kwargs):
     tmpdir = kwargs["tmpdir"]
@@ -56,14 +59,15 @@ def data(request, reference_df, tmpdir):
 def backend(request):
     return request.param
 
-@pytest.mark.parametrize(["x", "y"], [
-    ("numerical", "actual"),
-])
-def test_can_hvplot(x, y, data, backend):
+@pytest.fixture(params=["date", "numerical", "string"])
+def xseries(request):
+    return request.param
+
+def test_can_hvplot(xseries, data, backend):
     """hvplot works with Ibis"""
-    plot = data.hvplot(x=x, y=y)
+    plot = data.hvplot(x=xseries, y="actual")
     hv.render(plot, backend=backend)
 
 def test_can_hist(data, backend):
-    plot = data.hvplot.hist("forecast", bins=3)
+    plot = data.hvplot.hist("actual", bins=3)
     hv.render(plot, backend=backend)
