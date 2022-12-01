@@ -1807,6 +1807,8 @@ class HoloViewsConverter:
                 ymin, ymax = (ys.min(), ys.max())
                 if is_dask(ys):
                     ymin, ymax = ymin.compute(), ymax.compute()
+                elif is_ibis(ys):
+                    ymin, ymax = ymin.execute(), ymax.execute()
                 hist_opts['bin_range'] = ymin, ymax
 
             ds = Dataset(data, self.by)
@@ -1830,6 +1832,8 @@ class HoloViewsConverter:
                 ymin, ymax = (ys.min(), ys.max())
                 if is_dask(ys):
                     ymin, ymax = ymin.compute(), ymax.compute()
+                elif is_ibis(ys):
+                    ymin, ymax = ymin.execute(), ymax.execute()
                 ranges.append((ymin, ymax))
         if ranges:
             hist_opts['bin_range'] = max_range(ranges)
