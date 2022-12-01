@@ -8,7 +8,7 @@ import pytest
 try:
     import duckdb
     import hvplot.ibis  # noqa
-    import hvplot.pandas
+    import hvplot.pandas # noqa
     import ibis
     import pandas as pd
 except:
