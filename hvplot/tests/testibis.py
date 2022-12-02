@@ -51,7 +51,18 @@ def ibis_duckdb_data(df: pd.DataFrame, *args, **kwargs):
 
     return ibis.duckdb.connect(filename).table("df")
 
-@pytest.fixture(params=[pandas_data, ibis_pandas_data, ibis_duckdb_data, ibis_sqlite_data])
+class IbisMemConnection(param.Parameterized):
+    def __init__(self, df):
+        super().__init__()
+        self._table = ibis.memtable(df)
+    
+    def table(self, df):
+        return self._table
+
+def ibis_mem_table(df: pd.DataFrame, *args, **kwargs):
+    return IbisMemConnection(df=df)
+
+@pytest.fixture(params=[pandas_data, ibis_pandas_data, ibis_duckdb_data, ibis_sqlite_data, ibis_mem_table])
 def data(request, reference_df, tmpdir):
     return request.param(reference_df, tmpdir=tmpdir)
 
@@ -69,5 +80,6 @@ def test_can_hvplot(xseries, data, backend):
     hv.render(plot, backend=backend)
 
 def test_can_hist(data, backend):
+    """hist works with Ibis"""
     plot = data.hvplot.hist("actual", bins=3)
     hv.render(plot, backend=backend)
