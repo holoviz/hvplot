@@ -4,6 +4,7 @@ from pathlib import Path
 
 import holoviews as hv
 import matplotlib
+import pandas as pd
 import pytest
 
 matplotlib.use('agg')
@@ -13,7 +14,6 @@ try:
     import hvplot.ibis  # noqa
     import hvplot.pandas  # noqa
     import ibis
-    import pandas as pd
 except:
     pytest.skip(allow_module_level=True)
 
@@ -51,18 +51,7 @@ def ibis_duckdb_data(df: pd.DataFrame, *args, **kwargs):
 
     return ibis.duckdb.connect(filename).table("df")
 
-class IbisMemConnection(param.Parameterized):
-    def __init__(self, df):
-        super().__init__()
-        self._table = ibis.memtable(df)
-    
-    def table(self, df):
-        return self._table
-
-def ibis_mem_table(df: pd.DataFrame, *args, **kwargs):
-    return IbisMemConnection(df=df)
-
-@pytest.fixture(params=[pandas_data, ibis_pandas_data, ibis_duckdb_data, ibis_sqlite_data, ibis_mem_table])
+@pytest.fixture(params=[pandas_data, ibis_pandas_data, ibis_duckdb_data, ibis_sqlite_data])
 def data(request, reference_df, tmpdir):
     return request.param(reference_df, tmpdir=tmpdir)
 
