@@ -100,9 +100,9 @@ extras_require = {
 # until pyproject.toml/equivalent is widely supported (setup_requires
 # doesn't work well with pip)
 extras_require['build'] = [
-    'param >=1.6.1',
+    'param >=1.7.0',
     'pyct >=0.4.4',
-    'setuptools' # should make this pip now
+    'setuptools >=30.3.0' # should make this pip now
 ]
 
 extras_require['all'] = sorted(set(sum(extras_require.values(), [])))
