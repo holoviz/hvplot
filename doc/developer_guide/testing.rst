@@ -74,7 +74,7 @@ absolute imports
 Continuous Integration
 ----------------------
 
-Every push to the `master` branch or any Pull Request branch on GitHub
+Every push to the `main` branch or any Pull Request branch on GitHub
 automatically triggers a full test build on the `TravisCI`_ continuous
 integration service. This is most often useful for running the full hvPlot
 test suite continuously, but also triggers automated scripts for publishing
