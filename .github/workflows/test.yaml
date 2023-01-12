@@ -33,11 +33,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: install unit deps
-        run: pip install -e ."[tests]"
+        run: pip install ."[tests]"
       - name: unit tests
         run: pytest -v hvplot --cov=hvplot --cov-append
       - name: install examples deps
-        run: pip install -e ."[tests, examples_without_geo]"
+        run: pip install ."[tests, examples_without_geo]"
       - name: examples tests
         run: pytest examples --nbsmoke-run -k ".ipynb"
 
