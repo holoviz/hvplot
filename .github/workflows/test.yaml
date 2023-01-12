@@ -32,7 +32,12 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: install unit deps
+      - name: debug
+        run: |
+          import sys
+          print(sys.version_info)
+        shell: python
+      - name: python3 --verson
         run: pip3 install ."[tests]"
       - name: unit tests
         run: pytest -v hvplot --cov=hvplot --cov-append
