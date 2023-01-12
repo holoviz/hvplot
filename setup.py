@@ -37,10 +37,8 @@ install_requires = [
     'panel >=0.11.0',
 ]
 
-_examples = [
-    'geoviews >=1.6.0',
+_examples_without_geo = [
     'numba >=0.51.0',
-    'geopandas',
     'xarray >=0.18.2',
     'networkx >=2.6.3',
     'streamz >=0.3.0',
@@ -50,9 +48,6 @@ _examples = [
     'dask >=2021.3.0',
     'datashader >=0.6.5',
     'notebook >=5.4',
-    'rasterio',
-    'cartopy',
-    'pyproj',
     's3fs >=2022.1.0',
     'scipy >=1.5.3',
     'pillow >=8.2.0',
@@ -61,15 +56,25 @@ _examples = [
     'scikit-image >=0.17.2',
     'python-snappy >=0.6.0',
     'pooch >=1.6.0',
-    'fiona',
-    'rioxarray',
-    # Extra dependency of cartopy on Python 3.6 only
-    'pyepsg',
     'matplotlib',
     'plotly',
     'pygraphviz',
     'ipykernel <6.18.0'  # temporary
 ]
+_examples_only_geo = [
+    'geoviews >=1.6.0',
+    'geopandas',
+    'rasterio',
+    'cartopy',
+    'pyproj',
+    'fiona',
+    'rioxarray',
+    # Extra dependency of cartopy on Python 3.6 only
+    'pyepsg',
+
+]
+
+_examples = _examples_without_geo + _examples_only_geo
 
 extras_require = {
     'tests': [
@@ -89,6 +94,7 @@ extras_require = {
         'pre-commit',
     ],
     'examples': _examples,
+    'examples_without_geo': _examples_without_geo,
     'doc': _examples + [
         'nbsite >=0.7.2rc2',
         'pydata-sphinx-theme <0.10',
