@@ -14,141 +14,17 @@ env:
   CACHE_VERSION: 3
 
 jobs:
-  pre_commit:
-    name: Run pre-commit hooks
-    runs-on: 'ubuntu-latest'
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: "1"
-      - name: set PY
-        run: echo "PY=$(python -VV | sha256sum | cut -d' ' -f1)" >> $GITHUB_ENV
-      - uses: actions/cache@v3
-        with:
-          path: ~/.cache/pre-commit
-          key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
-      - name: pre-commit
-        uses: pre-commit/action@v3.0.0
-  test_suite:
-    name: Pytest on ${{ matrix.os }} with Python ${{ matrix.python-version }}
-    needs: [pre_commit]
+  pip_test:
+    timeout-minutes: 90
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
-        python-version: ['3.7', '3.8', '3.9', '3.10']
-        include:
-        - os: ubuntu-latest
-          path: /usr/share/miniconda3/envs/
-        - os: macos-latest
-          path: /Users/runner/miniconda3/envs/
-        - os: windows-latest
-          path: C:\Miniconda3\envs\
-        exclude:
-          # Excluded because of issues with the geo-stack
-          - os: 'macos-latest'
-            python-version: '3.7'
-    timeout-minutes: 90
+        python-version: ['3.7', '3.9', '3.11']
     defaults:
       run:
         shell: bash -l {0}
-    env:
-      DESC: "Python ${{ matrix.python-version }} tests"
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      MAMBA_NO_BANNER: 1
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: "100"
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          miniconda-version: "latest"
-      - name: Fetch unshallow
-        run: git fetch --prune --tags --unshallow
-      - name: Get Today's date for cache
-        run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-      - name: conda cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ matrix.path }}
-          key: ${{ runner.os }}-conda-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}-tests_examples-${{ env.TODAY }}-${{ env.CACHE_VERSION }}
-        id: cache
-      - name: conda setup
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          conda install -n base -c defaults "conda>=4.12"
-          # TODO: remove pin
-          conda install -n base -c conda-forge "mamba<0.26" --no-update-deps
-          conda create -n test-environment
-          conda activate test-environment
-          conda config --env --append channels pyviz/label/dev --append channels conda-forge
-          conda config --env --remove channels defaults
-          conda install python=${{ matrix.python-version }} pyctdev
-      - name: doit develop_install
-        if: matrix.os != 'macos-latest' && steps.cache.outputs.cache-hit != 'true'
-        run: |
-          conda activate test-environment
-          conda list
-          doit develop_install -o examples -o tests --conda-mode=mamba
-      - name: doit develop_install macos hack
-        if: matrix.os == 'macos-latest' && steps.cache.outputs.cache-hit != 'true'
-        run: |
-          conda activate test-environment
-          conda list
-          doit develop_install -o examples -o tests --conda-mode=mamba || echo "Keep going"
-          pip install --no-deps --no-build-isolation -e .
-      - name: hvplot install if env cached
-        if: steps.cache.outputs.cache-hit == 'true'
-        run: |
-          conda activate test-environment
-          python -m pip install --no-deps --no-build-isolation -e .
-      - name: doit env_capture
-        run: |
-          conda activate test-environment
-          doit env_capture
-      - name: doit test_flakes
-        run: |
-          conda activate test-environment
-          doit test_flakes
-      - name: doit test_unit
-        run: |
-          conda activate test-environment
-          doit test_unit
-      - name: test examples
-        run: |
-          conda activate test-environment
-          bokeh sampledata
-          doit test_examples
-      - name: codecov
-        run: |
-          conda activate test-environment
-          codecov
-  test_suite_36:
-    name: Pytest on ${{ matrix.os }} with Python ${{ matrix.python-version }}
-    needs: [pre_commit]
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
-        python-version: ['3.6']
-        exclude:
-        - os: ubuntu-latest
-          python-version: '3.6'
-        include:
-        - os: macos-latest
-          path: /Users/runner/miniconda3/envs/
-        - os: windows-latest
-          path: C:\Miniconda3\envs\
-    timeout-minutes: 90
-    defaults:
-      run:
-        shell: bash -l {0}
-    env:
-      DESC: "Python ${{ matrix.python-version }} tests"
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      PYCTDEV_SELF_CHANNEL: "pyviz/label/dev"
     steps:
       - uses: actions/checkout@v3
         with:
@@ -156,62 +32,214 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-          miniconda-version: "latest"
-          channel-priority: strict
-          channels: pyviz/label/dev,conda-forge,nodefaults
-      - name: Fetch unshallow
-        run: git fetch --prune --tags --unshallow
-      - name: Get Today's date for cache
-        run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-      - name: conda cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ matrix.path }}
-          key: ${{ runner.os }}-conda-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}-tests_examples-${{ env.TODAY }}-${{ env.CACHE_VERSION }}
-        id: cache
-      - name: conda setup
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          conda create -n test-environment python=${{ matrix.python-version }} pyctdev
-      - name: doit develop_install py
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          eval "$(conda shell.bash hook)"
-          conda activate test-environment
-          conda list
-          doit develop_install -o tests
-          # - Pin panel on Python 3.6 because one or more dev releases on the 0.13.* series
-          # can be installed on Python 3.6 but are actually not compatible with Python 3.6
-          # Panel 0.13 will support Python >= 3.7 only so the pin here can stay indefinitely.
-          # - Install importlib_resources to fix tqdm that missed adding it as a dependency
-          # for 3.6 (https://github.com/conda-forge/tqdm-feedstock/pull/114)
-          conda install "panel=0.12" "importlib_resources" --no-update-deps
-      - name: hvplot install if env cached
-        if: steps.cache.outputs.cache-hit == 'true'
-        run: |
-          eval "$(conda shell.bash hook)"
-          conda activate test-environment
-          python -m pip install --no-deps --no-build-isolation -e .
-      - name: doit env_capture
-        run: |
-          eval "$(conda shell.bash hook)"
-          conda activate test-environment
-          doit env_capture
-      - name: doit test_flakes
-        run: |
-          eval "$(conda shell.bash hook)"
-          conda activate test-environment
-          doit test_flakes
-      - name: doit test_unit
-        run: |
-          eval "$(conda shell.bash hook)"
-          conda activate test-environment
-          doit test_unit
-      - name: codecov
-        run: |
-          eval "$(conda shell.bash hook)"
-          conda activate test-environment
-          codecov
+      - name: install unit deps
+        run: pip install -e ."[tests]"
+      - name: unit tests
+        run: pytest -v hvplot --cov=hvplot --cov-append
+      - name: install examples deps
+        run: pip install -e ."[tests, examples_without_geo]"
+      - name: examples tests
+        run: pytest examples --nbsmoke-run -k ".ipynb"
+
+# jobs:
+#   pre_commit:
+#     name: Run pre-commit hooks
+#     runs-on: 'ubuntu-latest'
+#     steps:
+#       - uses: actions/checkout@v3
+#         with:
+#           fetch-depth: "1"
+#       - name: set PY
+#         run: echo "PY=$(python -VV | sha256sum | cut -d' ' -f1)" >> $GITHUB_ENV
+#       - uses: actions/cache@v3
+#         with:
+#           path: ~/.cache/pre-commit
+#           key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
+#       - name: pre-commit
+#         uses: pre-commit/action@v3.0.0
+#   test_suite:
+#     name: Pytest on ${{ matrix.os }} with Python ${{ matrix.python-version }}
+#     needs: [pre_commit]
+#     runs-on: ${{ matrix.os }}
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
+#         python-version: ['3.7', '3.8', '3.9', '3.10']
+#         include:
+#         - os: ubuntu-latest
+#           path: /usr/share/miniconda3/envs/
+#         - os: macos-latest
+#           path: /Users/runner/miniconda3/envs/
+#         - os: windows-latest
+#           path: C:\Miniconda3\envs\
+#         exclude:
+#           # Excluded because of issues with the geo-stack
+#           - os: 'macos-latest'
+#             python-version: '3.7'
+#     timeout-minutes: 90
+#     defaults:
+#       run:
+#         shell: bash -l {0}
+#     env:
+#       DESC: "Python ${{ matrix.python-version }} tests"
+#       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#       MAMBA_NO_BANNER: 1
+#     steps:
+#       - uses: actions/checkout@v3
+#         with:
+#           fetch-depth: "100"
+#       - uses: conda-incubator/setup-miniconda@v2
+#         with:
+#           miniconda-version: "latest"
+#       - name: Fetch unshallow
+#         run: git fetch --prune --tags --unshallow
+#       - name: Get Today's date for cache
+#         run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+#       - name: conda cache
+#         uses: actions/cache@v2
+#         with:
+#           path: ${{ matrix.path }}
+#           key: ${{ runner.os }}-conda-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}-tests_examples-${{ env.TODAY }}-${{ env.CACHE_VERSION }}
+#         id: cache
+#       - name: conda setup
+#         if: steps.cache.outputs.cache-hit != 'true'
+#         run: |
+#           conda install -n base -c defaults "conda>=4.12"
+#           # TODO: remove pin
+#           conda install -n base -c conda-forge "mamba<0.26" --no-update-deps
+#           conda create -n test-environment
+#           conda activate test-environment
+#           conda config --env --append channels pyviz/label/dev --append channels conda-forge
+#           conda config --env --remove channels defaults
+#           conda install python=${{ matrix.python-version }} pyctdev
+#       - name: doit develop_install
+#         if: matrix.os != 'macos-latest' && steps.cache.outputs.cache-hit != 'true'
+#         run: |
+#           conda activate test-environment
+#           conda list
+#           doit develop_install -o examples -o tests --conda-mode=mamba
+#       - name: doit develop_install macos hack
+#         if: matrix.os == 'macos-latest' && steps.cache.outputs.cache-hit != 'true'
+#         run: |
+#           conda activate test-environment
+#           conda list
+#           doit develop_install -o examples -o tests --conda-mode=mamba || echo "Keep going"
+#           pip install --no-deps --no-build-isolation -e .
+#       - name: hvplot install if env cached
+#         if: steps.cache.outputs.cache-hit == 'true'
+#         run: |
+#           conda activate test-environment
+#           python -m pip install --no-deps --no-build-isolation -e .
+#       - name: doit env_capture
+#         run: |
+#           conda activate test-environment
+#           doit env_capture
+#       - name: doit test_flakes
+#         run: |
+#           conda activate test-environment
+#           doit test_flakes
+#       - name: doit test_unit
+#         run: |
+#           conda activate test-environment
+#           doit test_unit
+#       - name: test examples
+#         run: |
+#           conda activate test-environment
+#           bokeh sampledata
+#           doit test_examples
+#       - name: codecov
+#         run: |
+#           conda activate test-environment
+#           codecov
+#   test_suite_36:
+#     name: Pytest on ${{ matrix.os }} with Python ${{ matrix.python-version }}
+#     needs: [pre_commit]
+#     runs-on: ${{ matrix.os }}
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
+#         python-version: ['3.6']
+#         exclude:
+#         - os: ubuntu-latest
+#           python-version: '3.6'
+#         include:
+#         - os: macos-latest
+#           path: /Users/runner/miniconda3/envs/
+#         - os: windows-latest
+#           path: C:\Miniconda3\envs\
+#     timeout-minutes: 90
+#     defaults:
+#       run:
+#         shell: bash -l {0}
+#     env:
+#       DESC: "Python ${{ matrix.python-version }} tests"
+#       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#       PYCTDEV_SELF_CHANNEL: "pyviz/label/dev"
+#     steps:
+#       - uses: actions/checkout@v3
+#         with:
+#           fetch-depth: "100"
+#       - uses: actions/setup-python@v4
+#         with:
+#           python-version: ${{ matrix.python-version }}
+#       - uses: conda-incubator/setup-miniconda@v2
+#         with:
+#           auto-update-conda: true
+#           miniconda-version: "latest"
+#           channel-priority: strict
+#           channels: pyviz/label/dev,conda-forge,nodefaults
+#       - name: Fetch unshallow
+#         run: git fetch --prune --tags --unshallow
+#       - name: Get Today's date for cache
+#         run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+#       - name: conda cache
+#         uses: actions/cache@v2
+#         with:
+#           path: ${{ matrix.path }}
+#           key: ${{ runner.os }}-conda-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}-tests_examples-${{ env.TODAY }}-${{ env.CACHE_VERSION }}
+#         id: cache
+#       - name: conda setup
+#         if: steps.cache.outputs.cache-hit != 'true'
+#         run: |
+#           conda create -n test-environment python=${{ matrix.python-version }} pyctdev
+#       - name: doit develop_install py
+#         if: steps.cache.outputs.cache-hit != 'true'
+#         run: |
+#           eval "$(conda shell.bash hook)"
+#           conda activate test-environment
+#           conda list
+#           doit develop_install -o tests
+#           # - Pin panel on Python 3.6 because one or more dev releases on the 0.13.* series
+#           # can be installed on Python 3.6 but are actually not compatible with Python 3.6
+#           # Panel 0.13 will support Python >= 3.7 only so the pin here can stay indefinitely.
+#           # - Install importlib_resources to fix tqdm that missed adding it as a dependency
+#           # for 3.6 (https://github.com/conda-forge/tqdm-feedstock/pull/114)
+#           conda install "panel=0.12" "importlib_resources" --no-update-deps
+#       - name: hvplot install if env cached
+#         if: steps.cache.outputs.cache-hit == 'true'
+#         run: |
+#           eval "$(conda shell.bash hook)"
+#           conda activate test-environment
+#           python -m pip install --no-deps --no-build-isolation -e .
+#       - name: doit env_capture
+#         run: |
+#           eval "$(conda shell.bash hook)"
+#           conda activate test-environment
+#           doit env_capture
+#       - name: doit test_flakes
+#         run: |
+#           eval "$(conda shell.bash hook)"
+#           conda activate test-environment
+#           doit test_flakes
+#       - name: doit test_unit
+#         run: |
+#           eval "$(conda shell.bash hook)"
+#           conda activate test-environment
+#           doit test_unit
+#       - name: codecov
+#         run: |
+#           eval "$(conda shell.bash hook)"
+#           conda activate test-environment
+#           codecov
