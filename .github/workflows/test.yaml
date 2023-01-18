@@ -71,6 +71,8 @@ jobs:
           conda activate test-environment
           doit test_unit
       - name: test examples
+        # Should be removed when numba support python 3.11
+        if: matrix.python-version != '3.11'
         run: |
           conda activate test-environment
           bokeh sampledata
