@@ -52,61 +52,71 @@ jobs:
     timeout-minutes: 90
     defaults:
       run:
-        shell: bash -l {0}
+        shell: bash -el {0}
     env:
       DESC: "Python ${{ matrix.python-version }} tests"
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      MAMBA_NO_BANNER: 1
     steps:
-      - uses: actions/checkout@v3
+      - uses: pyviz-dev/holoviz_tasks/install@v0.1a9
         with:
-          fetch-depth: "100"
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          miniconda-version: "latest"
-      - name: Fetch unshallow
-        run: git fetch --prune --tags --unshallow
-      - name: Get Today's date for cache
-        run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-      - name: conda cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ matrix.path }}
-          key: ${{ runner.os }}-conda-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}-tests_examples-${{ env.TODAY }}-${{ env.CACHE_VERSION }}
-        id: cache
-      - name: conda setup
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          conda install -n base -c defaults "conda>=4.12"
-          # TODO: remove pin
-          conda install -n base -c conda-forge "mamba<0.26" --no-update-deps
-          conda create -n test-environment
-          conda activate test-environment
-          conda config --env --append channels pyviz/label/dev --append channels conda-forge
-          conda config --env --remove channels defaults
-          conda install python=${{ matrix.python-version }} pyctdev
-      - name: doit develop_install
-        if: matrix.os != 'macos-latest' && steps.cache.outputs.cache-hit != 'true'
-        run: |
-          conda activate test-environment
-          conda list
-          doit develop_install -o examples -o tests --conda-mode=mamba
-      - name: doit develop_install macos hack
-        if: matrix.os == 'macos-latest' && steps.cache.outputs.cache-hit != 'true'
-        run: |
-          conda activate test-environment
-          conda list
-          doit develop_install -o examples -o tests --conda-mode=mamba || echo "Keep going"
-          pip install --no-deps --no-build-isolation -e .
-      - name: hvplot install if env cached
-        if: steps.cache.outputs.cache-hit == 'true'
-        run: |
-          conda activate test-environment
-          python -m pip install --no-deps --no-build-isolation -e .
-      - name: doit env_capture
-        run: |
-          conda activate test-environment
-          doit env_capture
+          name: unit_test_suite
+          python-version: ${{ matrix.python-version }}
+          channel-priority: strict
+          channels: pyviz/label/dev,conda-forge,nodefaults
+          envs: "-o examples -o tests"
+          cache: true
+          conda-update: true
+          conda-mamba: mamba
+
+      # - uses: actions/checkout@v3
+      #   with:
+      #     fetch-depth: "100"
+      # - uses: conda-incubator/setup-miniconda@v2
+      #   with:
+      #     miniconda-version: "latest"
+      # - name: Fetch unshallow
+      #   run: git fetch --prune --tags --unshallow
+      # - name: Get Today's date for cache
+      #   run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+      # - name: conda cache
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: ${{ matrix.path }}
+      #     key: ${{ runner.os }}-conda-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}-tests_examples-${{ env.TODAY }}-${{ env.CACHE_VERSION }}
+      #   id: cache
+      # - name: conda setup
+      #   if: steps.cache.outputs.cache-hit != 'true'
+      #   run: |
+      #     conda install -n base -c defaults "conda>=4.12"
+      #     # TODO: remove pin
+      #     conda install -n base -c conda-forge "mamba<0.26" --no-update-deps
+      #     conda create -n test-environment
+      #     conda activate test-environment
+      #     conda config --env --append channels pyviz/label/dev --append channels conda-forge
+      #     conda config --env --remove channels defaults
+      #     conda install python=${{ matrix.python-version }} pyctdev
+      # - name: doit develop_install
+      #   if: matrix.os != 'macos-latest' && steps.cache.outputs.cache-hit != 'true'
+      #   run: |
+      #     conda activate test-environment
+      #     conda list
+      #     doit develop_install -o examples -o tests --conda-mode=mamba
+      # - name: doit develop_install macos hack
+      #   if: matrix.os == 'macos-latest' && steps.cache.outputs.cache-hit != 'true'
+      #   run: |
+      #     conda activate test-environment
+      #     conda list
+      #     doit develop_install -o examples -o tests --conda-mode=mamba || echo "Keep going"
+      #     pip install --no-deps --no-build-isolation -e .
+      # - name: hvplot install if env cached
+      #   if: steps.cache.outputs.cache-hit == 'true'
+      #   run: |
+      #     conda activate test-environment
+      #     python -m pip install --no-deps --no-build-isolation -e .
+      # - name: doit env_capture
+      #   run: |
+      #     conda activate test-environment
+      #     doit env_capture
       - name: doit test_flakes
         run: |
           conda activate test-environment
