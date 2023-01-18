@@ -38,7 +38,7 @@ install_requires = [
 ]
 
 _examples = [
-    'geoviews >=1.6.0',
+    'geoviews >=1.9.0',
     'geopandas',
     'xarray >=0.18.2',
     'networkx >=2.6.3',
