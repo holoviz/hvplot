@@ -10,9 +10,6 @@ on:
   schedule:
     - cron: '0 15 * * SUN'
 
-env:
-  CACHE_VERSION: 3
-
 jobs:
   pre_commit:
     name: Run pre-commit hooks
