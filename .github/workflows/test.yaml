@@ -54,6 +54,7 @@ jobs:
           cache: true
           conda-update: true
           conda-mamba: mamba
+        id: install
       - name: patch fiona/geostack on Python 3.7 / Macos
         if: steps.install.outputs.cache-hit != 'true' && contains(matrix.os, 'macos') && matrix.python-version == '3.7'
         run: |
