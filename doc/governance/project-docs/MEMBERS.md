@@ -1,6 +1,5 @@
 # Maintainers
 
-
 For member policy, see the description at the top of [HoloViz/HoloViz - MEMBERS.md](https://github.com/holoviz/holoviz/blob/hvplot-gov/doc/governance/project-docs/MEMBERS.md).
 
 
