@@ -295,7 +295,7 @@ def test_process_crs(input):
 
 def test_process_crs_raises_error():
     pytest.importorskip("pyproj")
-    ccrs = pytest.importorskip("cartopy.crs")
+    pytest.importorskip("cartopy.crs")
     with pytest.raises(ValueError, match="must be defined as a EPSG code, proj4 string"):
         process_crs(43823)
 
