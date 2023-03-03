@@ -9,7 +9,7 @@ import pytest
 
 from unittest import TestCase, SkipTest
 
-from hvplot.util import check_crs, is_list_like, process_xarray
+from hvplot.util import check_crs, is_list_like, process_crs, process_xarray
 
 
 class TestProcessXarray(TestCase):
@@ -276,6 +276,28 @@ def test_check_crs():
     assert p.srs == '+proj=utm +zone=15 +datum=NAD83 +units=m +no_defs'
     p = check_crs('wrong')
     assert p is None
+
+
+@pytest.mark.parametrize("input", [
+    "+init=epsg:26911",
+    "4326",
+    4326,
+    "epsg:4326",
+    "EPSG: 4326",
+])
+def test_process_crs(input):
+    pytest.importorskip("pyproj")
+    ccrs = pytest.importorskip("cartopy.crs")
+    crs = process_crs(input)
+
+    assert isinstance(crs, ccrs.CRS)
+
+
+def test_process_crs_raises_error():
+    pytest.importorskip("pyproj")
+    ccrs = pytest.importorskip("cartopy.crs")
+    with pytest.raises(ValueError, match="must be defined as a EPSG code, proj4 string"):
+        process_crs(43823)
 
 
 def test_is_list_like():
