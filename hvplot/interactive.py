@@ -5,6 +5,8 @@ interactive API
 import abc
 import operator
 import sys
+
+from collections import defaultdict
 from functools import partial
 from packaging.version import Version
 from types import FunctionType, MethodType
@@ -146,6 +148,9 @@ def _find_widgets(op):
 # display its repr.
 
 
+def _Undefined():
+    "Sentinel object indicating object is undefined"
+
 
 class Interactive:
     """
@@ -271,11 +276,12 @@ class Interactive:
         self._kwargs = kwargs
         ds = hv.Dataset(self._obj)
         if _current is not None:
-            self._current = _current
+            self._current_ = _current
         else:
-            self._current = self._transform.apply(ds, keep_index=True, compute=False)
+            self._current_ = self._transform.apply(ds, keep_index=True, compute=False)
         self._init = True
         self.hvplot = _hvplot(self)
+        self._setup_invalidation()
 
     @property
     def _obj(self):
@@ -287,6 +293,22 @@ class Interactive:
             self._shared_obj = [obj]
         else:
             self._shared_obj[0] = obj
+
+    def _setup_invalidation(self):
+        groups = defaultdict(list)
+        for p in self._params:
+            groups[p.owner].append(p.name)
+        for owner, params in groups.items():
+            owner.param.watch(self._invalidate_current, params)
+
+    def _invalidate_current(self, *events):
+        self._current_ = _Undefined
+
+    @property
+    def _current(self):
+        if self._current_ is _Undefined:
+            self.eval()
+        return self._current_
 
     def _set_fn_watchers(self, depth):
         """
@@ -329,21 +351,10 @@ class Interactive:
     @property
     def _callback(self):
         def evaluate_inner():
-            obj = self._obj
-            ds = hv.Dataset(obj)
-            transform = self._transform
-            if ds.interface.datatype == 'xarray' and is_xarray_dataarray(obj):
-                transform = transform.clone(obj.name)
-            obj = transform.apply(ds, keep_index=True, compute=False)
-            if self._method:
-                # E.g. `pi = dfi.A` leads to `pi._method` equal to `'A'`.
-                obj = getattr(obj, self._method, obj)
-            if self._plot:
-                return Interactive._fig
-            elif isinstance(obj, pd.DataFrame):
+            obj = self.eval()
+            if isinstance(obj, pd.DataFrame):
                 return pn.pane.DataFrame(obj, max_rows=self._max_rows, **self._kwargs)
-            else:
-                return obj
+            return obj
         params = self._params
         if params:
             @pn.depends(*params)
@@ -411,7 +422,7 @@ class Interactive:
         if not self_dict.get('_init'):
             return super().__getattribute__(name)
 
-        current = self_dict['_current']
+        current = self_dict['_current_']
         method = self_dict['_method']
         if method:
             current = getattr(current, method)
@@ -521,6 +532,7 @@ class Interactive:
         return new._clone(transform)
 
     # Builtin functions
+
     def __abs__(self):
         return self._apply_operator(abs)
 
@@ -664,9 +676,20 @@ class Interactive:
         Returns the current state of the interactive expression. The
         returned object is no longer interactive.
         """
-        obj = self._current
+        if self._current_ is not _Undefined:
+            return self._current_
+        obj = self._obj
+        ds = hv.Dataset(obj)
+        transform = self._transform
+        if ds.interface.datatype == 'xarray' and is_xarray_dataarray(obj):
+            transform = transform.clone(obj.name)
+        obj = transform.apply(ds, keep_index=True, compute=False)
         if self._method:
-            return getattr(obj, self._method, obj)
+            # E.g. `pi = dfi.A` leads to `pi._method` equal to `'A'`.
+            obj = getattr(obj, self._method, obj)
+        if self._plot:
+            obj = Interactive._fig
+        self._current_ = obj
         return obj
 
     def layout(self, **kwargs):
