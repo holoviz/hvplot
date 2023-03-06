@@ -676,20 +676,23 @@ class Interactive:
         Returns the current state of the interactive expression. The
         returned object is no longer interactive.
         """
-        if self._current_ is not _Undefined:
-            return self._current_
-        obj = self._obj
-        ds = hv.Dataset(obj)
-        transform = self._transform
-        if ds.interface.datatype == 'xarray' and is_xarray_dataarray(obj):
-            transform = transform.clone(obj.name)
-        obj = transform.apply(ds, keep_index=True, compute=False)
+        if self._current_ is _Undefined:
+            obj = self._obj
+            ds = hv.Dataset(obj)
+            transform = self._transform
+            if ds.interface.datatype == 'xarray' and is_xarray_dataarray(obj):
+                transform = transform.clone(obj.name)
+            obj = transform.apply(ds, keep_index=True, compute=False)
+            self._current_ = obj
+        else:
+            obj = self._current_
+
         if self._method:
             # E.g. `pi = dfi.A` leads to `pi._method` equal to `'A'`.
             obj = getattr(obj, self._method, obj)
         if self._plot:
             obj = Interactive._fig
-        self._current_ = obj
+
         return obj
 
     def layout(self, **kwargs):
