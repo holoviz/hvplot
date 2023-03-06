@@ -747,7 +747,7 @@ class HoloViewsConverter:
                 if isinstance(data, xr.Dataset):
                     z = list(data.data_vars)[0]
                 else:
-                    z = data.name or 'value'
+                    z = data.name or label or value_label
             if gridded and isinstance(data, xr.Dataset) and not isinstance(z, list):
                 data = data[z]
             self.z = z

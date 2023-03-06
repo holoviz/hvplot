@@ -227,3 +227,19 @@ class TestGridPlots(ComparisonTestCase):
         plot_opts = Store.lookup_options('bokeh', plot.last, 'plot')
         # This DataArray happens to be symmetric.
         assert plot_opts.kwargs['symmetric']
+
+    def test_dataarray_unnamed_label(self):
+        plot = self.da_rgb.sel(band=1).hvplot.image(label='test')
+        assert plot.vdims[0].name == 'test'
+
+    def test_dataarray_unnamed_value_label(self):
+        plot = self.da_rgb.sel(band=1).hvplot.image(value_label='test')
+        assert plot.vdims[0].name == 'test'
+
+    def test_dataarray_label_precedence(self):
+        # name > label > value_label
+        plot = self.da_rgb.sel(band=1).rename('a').hvplot.image(label='b')
+        assert plot.vdims[0].name == 'a'
+
+        plot = self.da_rgb.sel(band=1).hvplot.image(label='b', value_label='c')
+        assert plot.vdims[0].name == 'b'
