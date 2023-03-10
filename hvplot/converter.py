@@ -949,7 +949,7 @@ class HoloViewsConverter:
                 for var_name, var_attrs in var_tuples:
                     if var_name is None:
                         var_name = 'value'
-                    if 'long_name' in var_attrs:
+                    if isinstance(var_attrs.get('long_name'), str):
                         labels[var_name] = var_attrs['long_name']
                     if 'units' in var_attrs:
                         units[var_name] = var_attrs['units']
