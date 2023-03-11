@@ -962,10 +962,8 @@ class hvPlotTabular(hvPlotBase):
 
         A `bar` plot represents categorical data with rectangular bars
         with heights proportional to the values that they represent. The x-axis
-        plots categories and the y axis represents the value scale.
+        represents the categories and the y axis represents the value scale.
         The bars are of equal width which allows for instant comparison of data.
-
-        `bar` can be used on dataframes with regular Index or MultiIndex.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/bar.html
 
@@ -981,13 +979,14 @@ class hvPlotTabular(hvPlotBase):
         color : str or array-like, optional.
             The color for each of the series. Possible values are:
 
+            The name of the field to draw the colors from. The field can contain numerical values or strings
+            representing colors.
+            
             A single color string referred to by name, RGB or RGBA code, for instance 'red' or
             '#a98d19'.
 
             A sequence of color strings referred to by name, RGB or RGBA code, which will be used
-            for each series recursively. For instance ['green','yellow'] each field’s line will be
-            filled in green or yellow, alternatively. If there is only a single series to be
-            plotted, then only the first color from the color list will be used.
+            for each series recursively. For instance ['red', 'green','blue'].
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('bar')`.
 
