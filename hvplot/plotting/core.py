@@ -981,7 +981,7 @@ class hvPlotTabular(hvPlotBase):
 
             The name of the field to draw the colors from. The field can contain numerical values or strings
             representing colors.
-            
+
             A single color string referred to by name, RGB or RGBA code, for instance 'red' or
             '#a98d19'.
 
