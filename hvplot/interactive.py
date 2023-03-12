@@ -98,7 +98,7 @@ def _find_widgets(op):
 # consist of multiple chains, such as `dfi[dfi.A > 1]`, as the `Interactive`
 # instance is referenced twice in the expression. As a consequence `_depth`
 # is not the total count of `Interactive` instance creations of a pipeline,
-# it is the count of instances created in outer chain. In the example, that
+# it is the count of instances created in the outer chain. In the example, that
 # would be `dfi[]`. `Interactive` instances don't have references about
 # the instances that created them or that they create, they just know their
 # current location in a chain thanks to `_depth`. However, as some parameters
@@ -122,7 +122,7 @@ def _find_widgets(op):
 # pipeline share the same `_obj` object. And they all wrap it in a `Dataset`
 # instance, and all apply the current dim transform they are aware of to
 # the original data structure to compute the intermediate state of the data,
-# that is stored it in the `_current` attribute. Doing so is particularly
+# that is stored it in the `_current_` attribute. Doing so is particularly
 # useful in Notebook sessions, as this allows to inspect the transformed
 # object at any point of the pipeline, and as such provide correct
 # auto-completion and docstrings. E.g. executing `dfi.A.max?` in a Notebook
@@ -135,6 +135,12 @@ def _find_widgets(op):
 # "function as input" to be able to update the object from a callback set up
 # on the root Interactive instance.
 
+# Internally interactive holds the current evaluated state on the `_current_`
+# attribute, when some parameter in the interactive pipeline is changed
+# the pipeline is marked as `_dirty`. This means that the next time `_current`
+# is accessed the pipeline will be re-evaluated to get the up-to-date
+# current value.
+
 # The `_method` attribute is a string that temporarily stores the method/attr
 # accessed on the object, e.g. `_method` is 'head' in `dfi.head()`, until the
 # Interactive instance created in the pipeline is called at which point `_method`
@@ -146,10 +152,6 @@ def _find_widgets(op):
 # whether `_method` is set or not, and if it's set it will use it to compute
 # the object returned, e.g. the series `df.A` or the method `df.head`, and
 # display its repr.
-
-
-class _Undefined():
-    "Sentinel object indicating object is undefined"
 
 
 class Interactive:
@@ -245,7 +247,6 @@ class Interactive:
         # _init is used to prevent to __getattribute__ to execute its
         # specialized code.
         self._init = False
-        self._set_fn_watchers(depth)
         self._method = method
         if transform is None:
             dim = '*'
@@ -280,8 +281,9 @@ class Interactive:
         else:
             self._current_ = self._transform.apply(ds, keep_index=True, compute=False)
         self._init = True
+        self._dirty = False
         self.hvplot = _hvplot(self)
-        self._setup_invalidation()
+        self._setup_invalidations(depth)
 
     @property
     def _obj(self):
@@ -294,37 +296,11 @@ class Interactive:
         else:
             self._shared_obj[0] = obj
 
-    def _setup_invalidation(self):
-        groups = defaultdict(list)
-        for p in self._params:
-            groups[p.owner].append(p.name)
-        for owner, params in groups.items():
-            owner.param.watch(self._invalidate_current, params)
-
-    def _invalidate_current(self, *events):
-        self._current_ = _Undefined
-
     @property
     def _current(self):
-        if self._current_ is _Undefined:
+        if self._dirty:
             self.eval()
         return self._current_
-
-    def _set_fn_watchers(self, depth):
-        """
-        self._update_obj is set as a callback, watching the parameters that
-        control fn. Even if _set_fn_watchers is called on every instantiation,
-        the watchers should only be set once in a pipeline to avoid multiple
-        callbacks to be called whenever a fn parameter changes. This is why
-        it is only applied to the root instance.
-        """
-        if self._fn is not None and depth == 0:
-            for _, params in full_groupby(self._fn_params, lambda x: id(x.owner)):
-                params[0].owner.param.watch(self._update_obj, [p.name for p in params])
-
-    def _update_obj(self, *args):
-        """Update the original pipeline object."""
-        self._obj = self._fn.eval(self._fn.object)
 
     @property
     def _fn_params(self):
@@ -347,6 +323,37 @@ class Interactive:
                 continue
             ps.append(p)
         return ps
+
+    def _setup_invalidations(self, depth=0):
+        """
+        Since the parameters of the pipeline can change at any time
+        we have to invalidate the internal state of the pipeline.
+        To handle both invalidations of the inputs of the pipeline
+        and the pipeline itself we set up watchers on both.
+
+        1. The first invalidation we have to set up is to re-evaluate
+           the function that feeds the pipeline. Only the root node of
+           a pipeline has to perform this invalidation because all
+           leaf nodes inherit the same shared_obj. This avoids
+           evaluating the same function for every branch of the pipeline.
+        2. The second invalidation is for the pipeline itself, i.e.
+           if any parameter changes we have to notify the pipeline that
+           it has to re-evaluate the pipeline. This is done by marking
+           the pipeline as `_dirty`. The next time the `_current` value
+           is requested we then run and `.eval()` pass that re-executes
+           the pipeline.
+        """
+        if self._fn is not None and depth == 0:
+            for _, params in full_groupby(self._fn_params, lambda x: id(x.owner)):
+                params[0].owner.param.watch(self._update_obj, [p.name for p in params])
+        for _, params in full_groupby(self._params, lambda x: id(x.owner)):
+            params[0].owner.param.watch(self._invalidate_current, [p.name for p in params])
+
+    def _invalidate_current(self, *events):
+        self._dirty = True
+
+    def _update_obj(self, *args):
+        self._obj = self._fn.eval(self._fn.object)
 
     @property
     def _callback(self):
@@ -676,7 +683,7 @@ class Interactive:
         Returns the current state of the interactive expression. The
         returned object is no longer interactive.
         """
-        if self._current_ is _Undefined:
+        if self._dirty:
             obj = self._obj
             ds = hv.Dataset(obj)
             transform = self._transform
@@ -684,6 +691,7 @@ class Interactive:
                 transform = transform.clone(obj.name)
             obj = transform.apply(ds, keep_index=True, compute=False)
             self._current_ = obj
+            self._dirty = False
         else:
             obj = self._current_
 
