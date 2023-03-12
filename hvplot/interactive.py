@@ -148,7 +148,7 @@ def _find_widgets(op):
 # display its repr.
 
 
-def _Undefined():
+class _Undefined():
     "Sentinel object indicating object is undefined"
 
 
