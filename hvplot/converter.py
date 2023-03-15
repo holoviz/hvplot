@@ -13,7 +13,7 @@ from holoviews.core.spaces import DynamicMap, HoloMap, Callable
 from holoviews.core.overlay import NdOverlay
 from holoviews.core.options import Store, Cycle, Palette
 from holoviews.core.layout import NdLayout
-from holoviews.core.util import max_range, basestring
+from holoviews.core.util import max_range
 from holoviews.element import (
     Curve, Scatter, Area, Bars, BoxWhisker, Dataset, Distribution,
     Table, HeatMap, Image, HexTiles, QuadMesh, Bivariate, Histogram,
@@ -25,11 +25,12 @@ from holoviews.plotting.util import process_cmap
 from holoviews.operation import histogram
 from holoviews.streams import Buffer, Pipe
 from holoviews.util.transform import dim
+from packaging.version import Version
 from pandas import DatetimeIndex, MultiIndex
 
 from .backend_transforms import _transfer_opts_cur_backend
 from .util import (
-    filter_opts, is_tabular, is_series, is_dask, is_intake, is_cudf,
+    filter_opts, hv_version, is_tabular, is_series, is_dask, is_intake, is_cudf,
     is_streamz, is_ibis, is_xarray, is_xarray_dataarray, process_crs,
     process_intake, process_xarray, check_library, is_geodataframe,
     process_derived_datetime_xarray, process_derived_datetime_pandas,
@@ -127,6 +128,13 @@ class HoloViewsConverter:
         specify different amount of padding for x- and y-axis and
         tuples of tuples to specify different amounts of padding for
         upper and lower bounds.
+    rescale_discrete_levels (default=True): boolean
+        If `cnorm='eq_hist` and there are only a few discrete values,
+        then `rescale_discrete_levels=True` (the default) decreases
+        the lower limit of the autoranged span so that the values are
+        rendering towards the (more visible) top of the `cmap` range,
+        thus avoiding washout of the lower values.  Has no effect if
+        `cnorm!=`eq_hist`.
     responsive: boolean
         Whether the plot should responsively resize depending on the
         size of the browser. Responsive mode will only work if at
@@ -186,15 +194,15 @@ class HoloViewsConverter:
         very large if dynamic=False)
     datashade (default=False):
         Whether to apply rasterization and shading (colormapping) using
-        the Datashader library, returning an RGB object instead of 
+        the Datashader library, returning an RGB object instead of
         individual points
     dynspread (default=False):
-        For plots generated with datashade=True or rasterize=True, 
+        For plots generated with datashade=True or rasterize=True,
         automatically increase the point size when the data is sparse
         so that individual points become more visible
     rasterize (default=False):
         Whether to apply rasterization using the Datashader library,
-        returning an aggregated Image (to be colormapped by the 
+        returning an aggregated Image (to be colormapped by the
         plotting backend) instead of individual points
     x_sampling/y_sampling (default=None):
         Specifies the smallest allowed sampling interval along the x/y axis.
@@ -261,12 +269,12 @@ class HoloViewsConverter:
 
     _style_options = [
         'color', 'alpha', 'colormap', 'fontsize', 'c', 'cmap',
-        'color_key', 'cnorm'
+        'color_key', 'cnorm', 'rescale_discrete_levels'
     ]
 
     _op_options = [
         'datashade', 'rasterize', 'x_sampling', 'y_sampling',
-        'aggregator', 'rescale_discrete_levels'
+        'aggregator'
     ]
 
     # Options specific to a particular plot type
@@ -370,7 +378,7 @@ class HoloViewsConverter:
         y_sampling=None, project=False, tools=[], attr_labels=None,
         coastline=False, tiles=False, sort_date=True,
         check_symmetric_max=1000000, transforms={}, stream=None,
-        cnorm=None, features=None, rescale_discrete_levels=True, **kwds
+        cnorm=None, features=None, rescale_discrete_levels=None, **kwds
     ):
         # Process data and related options
         self._redim = fields
@@ -410,7 +418,7 @@ class HoloViewsConverter:
             from cartopy import crs as ccrs
             from geoviews.util import project_extents
 
-            if isinstance(projection, basestring):
+            if isinstance(projection, str):
                 all_crs = [proj for proj in dir(ccrs) if
                            callable(getattr(ccrs, proj)) and
                            proj not in ['ABCMeta', 'CRS'] and
@@ -445,7 +453,6 @@ class HoloViewsConverter:
         self.precompute = precompute
         self.x_sampling = x_sampling
         self.y_sampling = y_sampling
-        self.rescale_discrete_levels = rescale_discrete_levels
 
         # By type
         self.subplots = subplots
@@ -526,6 +533,8 @@ class HoloViewsConverter:
             plot_opts['colorbar'] = colorbar
         elif self.kind in self._colorbar_types:
             plot_opts['colorbar'] = True
+        elif self.rasterize:
+            plot_opts['colorbar'] = plot_opts.get('colorbar', True)
         if 'logz' in kwds and 'logz' in self._kind_options.get(self.kind, {}):
             plot_opts['logz'] = kwds.pop('logz')
         if invert:
@@ -559,9 +568,13 @@ class HoloViewsConverter:
             try:
                 if not use_dask:
                     symmetric = self._process_symmetric(symmetric, clim, check_symmetric_max)
-
                 if self._style_opts.get('cmap') is None:
-                    if symmetric:
+                    # Default to categorical camp if we detect categorical shading
+                    if (self.datashade and (self.aggregator is None or 'count_cat' in str(self.aggregator)) and
+                        ((self.by and not self.subplots) or
+                         (isinstance(self.y, list) or (self.y is None and len(set(self.variables) - set(self.indexes)) > 1)))):
+                        self._style_opts['cmap'] = self._default_cmaps['categorical']
+                    elif symmetric:
                         self._style_opts['cmap'] = self._default_cmaps['diverging']
                     else:
                         self._style_opts['cmap'] = self._default_cmaps['linear']
@@ -572,10 +585,12 @@ class HoloViewsConverter:
                 pass
         if cnorm is not None:
             plot_opts['cnorm'] = cnorm
+        if rescale_discrete_levels is not None and hv_version >= Version('1.15.0'):
+            plot_opts['rescale_discrete_levels'] = rescale_discrete_levels
 
         self._plot_opts = plot_opts
         self._overlay_opts = {k: v for k, v in self._plot_opts.items()
-                              if k in OverlayPlot.param.params()}
+                              if k in OverlayPlot.param.objects()}
 
         self._norm_opts = {'framewise': framewise, 'axiswise': not plot_opts.get('shared_axes')}
         self.kwds = kwds
@@ -599,9 +614,9 @@ class HoloViewsConverter:
 
         if is_xarray(self.data):
             # chunks mean it's lazily loaded; nanquantile will eagerly load
-            if self.data.chunks:
-                return False
             data = self.data[self.z]
+            if not getattr(data, '_in_memory', True) or data.chunks:
+                return False
             if is_xarray_dataarray(data):
                 if data.size > check_symmetric_max:
                     return False
@@ -615,7 +630,7 @@ class HoloViewsConverter:
 
         if data.size == 0:
             return False
-        
+
         cmin = np.nanquantile(data, 0.05)
         cmax = np.nanquantile(data, 0.95)
 
@@ -624,8 +639,13 @@ class HoloViewsConverter:
     def _process_crs(self, data, crs):
         """Given crs as proj4 string, data.attr, or cartopy.crs return cartopy.crs
         """
-        # get the proj string: either the value of data.attrs[crs] or crs itself
-        _crs = getattr(data, 'attrs', {}).get(crs or 'crs', crs)
+        if hasattr(data, 'rio') and data.rio.crs is not None:
+            # if data is a rioxarray
+            _crs = data.rio.crs.to_wkt()
+        else:
+            # get the proj string: either the value of data.attrs[crs] or crs itself
+            _crs = getattr(data, 'attrs', {}).get(crs or 'crs', crs)
+
         try:
             return process_crs(_crs)
         except ValueError:
@@ -636,7 +656,7 @@ class HoloViewsConverter:
                     "a `data.attr` containing a valid crs.".format(crs))
 
     def _transform_columnar_data(self, data):
-        renamed = {c: str(c) for c in data.columns if not isinstance(c, basestring)}
+        renamed = {c: str(c) for c in data.columns if not isinstance(c, str)}
         if renamed:
             data = data.rename(columns=renamed)
         return data
@@ -656,6 +676,14 @@ class HoloViewsConverter:
             data = data.to_frame()
         if is_intake(data):
             data = process_intake(data, use_dask or persist)
+        # Pandas interface in HoloViews doesn't accept non-string columns.
+        # The converter stores a reference to the source data to
+        # update the `_dataset` property (of the hv object its __call__ method
+        # returns) with a hv Dataset created from the source data, which
+        # is done for optimizating some operations in HoloViews.
+        if hasattr(data, 'columns'):
+            data = self._transform_columnar_data(data)
+
         self.source_data = data
 
         if groupby is not None and not isinstance(groupby, list):
@@ -719,7 +747,7 @@ class HoloViewsConverter:
                 if isinstance(data, xr.Dataset):
                     z = list(data.data_vars)[0]
                 else:
-                    z = data.name or 'value'
+                    z = data.name or label or value_label
             if gridded and isinstance(data, xr.Dataset) and not isinstance(z, list):
                 data = data[z]
             self.z = z
@@ -766,13 +794,13 @@ class HoloViewsConverter:
                 groupby = [g for g in groupby if g not in grid]
 
             # Add a title to hvplot.xarray plots that displays scalar coords values,
-            # as done by xarray.plot()  
+            # as done by xarray.plot()
             if not groupby and not grid:
                 if isinstance(da, xr.DataArray):
                     self._title = da._title_for_slice()
                 elif isinstance(da, xr.Dataset):
                     self._title = partial(xr.DataArray._title_for_slice, da)()
-                        
+
             self.data = data
         else:
             raise ValueError('Supplied data type %s not understood' % type(data).__name__)
@@ -823,7 +851,7 @@ class HoloViewsConverter:
                                  'e.g. a NumPy array or xarray Dataset, '
                                  'found %s type' % (kind, type(self.data).__name__))
 
-            if hasattr(data, 'columns') and data.columns.name and not group_label:
+            if hasattr(data, 'columns') and hasattr(data.columns, 'name') and data.columns.name and not group_label:
                 group_label = data.columns.name
             elif not group_label:
                 group_label = 'Variable'
@@ -852,7 +880,6 @@ class HoloViewsConverter:
                 elif kind in ('bar', 'barh'):
                     x, by = indexes
 
-            self.data = self._transform_columnar_data(self.data)
             self.variables = indexes + list(self.data.columns)
 
             # Reset groupby dimensions
@@ -922,7 +949,7 @@ class HoloViewsConverter:
                 for var_name, var_attrs in var_tuples:
                     if var_name is None:
                         var_name = 'value'
-                    if 'long_name' in var_attrs:
+                    if isinstance(var_attrs.get('long_name'), str):
                         labels[var_name] = var_attrs['long_name']
                     if 'units' in var_attrs:
                         units[var_name] = var_attrs['units']
@@ -1008,8 +1035,6 @@ class HoloViewsConverter:
 
         if cmap is not None:
             style_opts['cmap'] = cmap
-        elif self.rasterize or self.datashade:
-            plot_opts['colorbar'] = plot_opts.get('colorbar', True)
 
         if 'color' in style_opts:
             color = style_opts['color']
@@ -1022,7 +1047,7 @@ class HoloViewsConverter:
             color = style_opts.get('color')
 
         for k, v in style.items():
-            if isinstance(v, Cycle) and isinstance(v, basestring):
+            if isinstance(v, Cycle) and isinstance(v, str):
                 if color == cmap:
                     if color not in Palette.colormaps and color.title() in Palette.colormaps:
                         color = color.title()
@@ -1048,7 +1073,7 @@ class HoloViewsConverter:
                 self.data = self.data.assign(_size=size)
                 style_opts['size'] = '_size'
                 self.variables.append('_size')
-            elif isinstance(size, basestring):
+            elif isinstance(size, str):
                 style_opts['size'] = np.sqrt(dim(size)) * scale
             elif not isinstance(size, dim):
                 style_opts['size'] = np.sqrt(size) * scale
@@ -1245,10 +1270,14 @@ class HoloViewsConverter:
         if self.by and not self.subplots:
             opts['aggregator'] = reductions.count_cat(self.by[0])
             categorical = True
+        elif ((isinstance(self.y, list) and len(self.y) > 1 or self.y is None and len(set(self.variables) - set(self.indexes)) > 1) and
+              self.kind in ('scatter', 'line', 'area')):
+            opts['aggregator'] = reductions.count_cat(self.group_label)
+            categorical = True
         if self.aggregator:
             import datashader as ds
             agg = self.aggregator
-            if isinstance(agg, basestring) and self._color_dim:
+            if isinstance(agg, str) and self._color_dim:
                 categorical = agg == 'count_cat'
                 agg = getattr(reductions, agg)(self._color_dim)
             else:
@@ -1288,7 +1317,8 @@ class HoloViewsConverter:
             eltype = 'RGB'
             if 'cnorm' in self._plot_opts:
                 opts['cnorm'] = self._plot_opts['cnorm']
-            opts['rescale_discrete_levels'] = self.rescale_discrete_levels
+            if 'rescale_discrete_levels' in self._plot_opts:
+                opts['rescale_discrete_levels'] = self._plot_opts['rescale_discrete_levels']
         else:
             operation = rasterize
             eltype = 'Image'
@@ -1302,7 +1332,7 @@ class HoloViewsConverter:
         if self.dynspread:
             processed = dynspread(processed, max_px=self.kwds.get('max_px', 3),
                                   threshold=self.kwds.get('threshold', 0.5))
-        
+
         opts = filter_opts(eltype, dict(self._plot_opts, **style), backend='bokeh')
         layers = self._apply_layers(processed).opts(eltype, **opts, backend='bokeh')
         layers = _transfer_opts_cur_backend(layers)
@@ -1316,7 +1346,7 @@ class HoloViewsConverter:
     def _apply_layers(self, obj):
         if self.coastline:
             import geoviews as gv
-            coastline = gv.feature.coastline()
+            coastline = gv.feature.coastline.clone()
             if self.coastline in ['10m', '50m', '110m']:
                 coastline = coastline.opts(scale=self.coastline)
             elif self.coastline is not True:
@@ -1328,13 +1358,13 @@ class HoloViewsConverter:
         if self.features:
             import geoviews as gv
             for feature in reversed(self.features):
-                feature_cls = getattr(gv.feature, feature)
-                if feature_cls is None:
+                feature_obj = getattr(gv.feature, feature)
+                if feature_obj is None:
                     raise ValueError(
                         "Feature %r was not recognized, must be one of "
                         "'borders', 'coastline', 'lakes', 'land', 'ocean', "
                         "'rivers' and 'states'." % feature)
-                feature_obj = feature_cls()
+                feature_obj = feature_obj.clone()
                 if isinstance(self.features, dict):
                     scale = self.features[feature]
                     if scale not in ['10m', '50m', '110m']:
@@ -1379,7 +1409,7 @@ class HoloViewsConverter:
                     dim = dim.clone(**replace)
                 elif isinstance(dim, dict) and 'range' not in dim:
                     dim = dict(dim, **replace)
-                elif isinstance(dim, (tuple, basestring)):
+                elif isinstance(dim, (tuple, str)):
                     dim = Dimension(dim, **replace)
             else:
                 dim = replace
@@ -1389,7 +1419,7 @@ class HoloViewsConverter:
     def _validate_dim(self, dimension):
         if isinstance(dimension, dim):
             dimension = dimension.dimension.name
-        if isinstance(dimension, basestring) and dimension in self.variables:
+        if isinstance(dimension, str) and dimension in self.variables:
             return dimension
 
     @property
@@ -1412,7 +1442,7 @@ class HoloViewsConverter:
                 vdims.append(agg_col)
                 dimensions.append(agg_col)
         for dimension in self.hover_cols:
-            if (isinstance(dimension, basestring) and dimension in self.variables
+            if (isinstance(dimension, str) and dimension in self.variables
                 and dimension not in dimensions):
                 vdims.append(dimension)
         return kdims, vdims
@@ -1463,7 +1493,7 @@ class HoloViewsConverter:
             labelled.append('x')
         if 'ylabel' in self._plot_opts and 'y' not in labelled:
             labelled.append('y')
-        
+
         cur_el_opts = self._get_opts(element.name, labelled=labelled, backend='bokeh')
         compat_el_opts = self._get_opts(element.name, labelled=labelled, backend=self._backend_compat)
         for opts_ in [cur_el_opts, compat_el_opts]:
@@ -1604,7 +1634,7 @@ class HoloViewsConverter:
         for c in y:
             kdims, vdims = self._get_dimensions([x], [c])
             chart = element(data, kdims, vdims).redim(**{c: self.value_label})
-            charts.append((c, chart.relabel(**self._relabel)))
+            charts.append((c, chart.relabel(**self._relabel).redim(**self._redim)))
         return (self._by_type(charts, self.group_label, sort=False)
                 .opts(cur_opts, backend='bokeh')
                 .opts(compat_opts, backend=self._backend_compat))

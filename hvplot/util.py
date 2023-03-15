@@ -8,6 +8,7 @@ from functools import wraps
 from packaging.version import Version
 from types import FunctionType
 
+import numpy as np
 import pandas as pd
 import param
 import holoviews as hv
@@ -16,8 +17,6 @@ try:
     panel_available = True
 except:
     panel_available = False
-
-from holoviews.core.util import basestring
 
 hv_version = Version(hv.__version__)
 
@@ -73,8 +72,8 @@ def check_crs(crs):
         out = crs
     elif isinstance(crs, crs_type):
         out = pyproj.Proj(crs.to_wkt(), preserve_units=True)
-    elif isinstance(crs, dict) or isinstance(crs, basestring):
-        if isinstance(crs, basestring):
+    elif isinstance(crs, dict) or isinstance(crs, str):
+        if isinstance(crs, str):
             # quick fix for https://github.com/pyproj4/pyproj/issues/345
             crs = crs.replace(' ', '').replace('+', ' +')
         try:
@@ -150,9 +149,9 @@ def proj_to_cartopy(proj):
     km_std = {'lat_1': 'lat_1',
               'lat_2': 'lat_2',
               }
-    kw_proj = dict()
-    kw_globe = dict()
-    kw_std = dict()
+    kw_proj = {}
+    kw_globe = {}
+    kw_std = {}
     for s in srs.split('+'):
         s = s.split('=')
         if len(s) != 2:
@@ -232,26 +231,48 @@ def process_crs(crs):
         import geoviews as gv # noqa
         import pyproj
     except ImportError:
-        raise ImportError('Geographic projection support requires GeoViews and cartopy.')
+        raise ImportError('Geographic projection support requires geoviews, pyproj and cartopy.')
 
     if crs is None:
         return ccrs.PlateCarree()
 
-    if isinstance(crs, basestring) and crs.lower().startswith('epsg'):
+    errors = []
+    if isinstance(crs, str) and crs.lower().startswith('epsg'):
         try:
-            crs = ccrs.epsg(crs[5:].lstrip().rstrip())
-        except:
-            raise ValueError("Could not parse EPSG code as CRS, must be of the format 'EPSG: {code}.'")
-    elif isinstance(crs, int):
-        crs = ccrs.epsg(crs)
-    elif isinstance(crs, (basestring, pyproj.Proj)):
+            crs = crs[5:].lstrip().rstrip()
+            return ccrs.epsg(crs)
+        except Exception as e:
+            errors.append(e)
+    if isinstance(crs, int):
         try:
-            crs = proj_to_cartopy(crs)
-        except:
-            raise ValueError("Could not parse EPSG code as CRS, must be of the format 'proj4: {proj4 string}.'")
-    elif not isinstance(crs, ccrs.CRS):
-        raise ValueError("Projection must be defined as a EPSG code, proj4 string, cartopy CRS or pyproj.Proj.")
-    return crs
+            return ccrs.epsg(crs)
+        except Exception as e:
+            crs = str(crs)
+            errors.append(e)
+    if isinstance(crs, (str, pyproj.Proj)):
+        try:
+            return proj_to_cartopy(crs)
+        except Exception as e:
+            errors.append(e)
+    if isinstance(crs, ccrs.CRS):
+        return crs
+
+    raise ValueError("Projection must be defined as a EPSG code, proj4 string, cartopy CRS or pyproj.Proj.") from Exception(*errors)
+
+
+def is_list_like(obj):
+    """
+    Adapted from pandas' is_list_like cython function.
+    """
+    return (
+        # equiv: `isinstance(obj, abc.Iterable)`
+        hasattr(obj, "__iter__") and not isinstance(obj, type)
+        # we do not count strings/unicode/bytes as list-like
+        and not isinstance(obj, (str, bytes))
+        # exclude zero-dimensional numpy arrays, effectively scalars
+        and not (isinstance(obj, np.ndarray) and obj.ndim == 0)
+    )
+
 
 def is_tabular(data):
     if check_library(data, ['dask', 'streamz', 'pandas', 'geopandas', 'cudf']):
@@ -500,3 +521,30 @@ def filter_opts(eltype, options, backend='bokeh'):
                for k in list(g.allowed_keywords)]
     opts = {k: v for k, v in options.items() if k in allowed}
     return opts
+
+
+def _flatten(line):
+    """
+    Flatten an arbitrarily nested sequence.
+
+    Inspired by: pd.core.common.flatten
+
+    Parameters
+    ----------
+    line : sequence
+        The sequence to flatten
+
+    Notes
+    -----
+    This only flattens list, tuple, and dict sequences.
+
+    Returns
+    -------
+    flattened : generator
+    """
+
+    for element in line:
+        if any(isinstance(element, tp) for tp in (list, tuple, dict)):
+            yield from _flatten(element)
+        else:
+            yield element

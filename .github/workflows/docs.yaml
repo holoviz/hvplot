@@ -14,8 +14,11 @@ on:
         options:
         - dev
         - main
+        - dryrun
         required: true
-        default: dev
+        default: dryrun
+  schedule:
+    - cron: '0 15 * * SUN'
 
 jobs:
   build_docs:
@@ -31,7 +34,7 @@ jobs:
       MOZ_HEADLESS: 1
       DISPLAY: ":99.0"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: "100"
       - uses: conda-incubator/setup-miniconda@v2
@@ -44,7 +47,7 @@ jobs:
         id: vars
         run: |
           echo "Deploying from ref ${GITHUB_REF#refs/*/}"
-          echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+          echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
       - name: conda setup
         run: |
           conda create -n test-environment python=3.8 pyctdev

@@ -1,0 +1,36 @@
+name: hvplot
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - geoviews>=1.6.0
+  - numba>=0.51.0
+  - geopandas>=0.9.0
+  - xarray>=0.18.2
+  - networkx>=2.6.3
+  - streamz>=0.3.0
+  - intake>=0.6.5
+  - intake-parquet>=0.2.3
+  - intake-xarray>=0.5.0
+  - dask>=2021.3.0
+  - datashader>=0.6.5
+  - notebook>=5.4
+  - rasterio>=1.2.6
+  - cartopy>= 0.18.0
+  - pyproj>=3.0.1
+  - s3fs>=2022.1.0
+  - scipy>=1.5.3
+  - pillow>=8.2.0
+  - selenium>=3.141.0
+  - spatialpandas>=0.4.3
+  - scikit-image>=0.17.2
+  - python-snappy>=0.6.0
+  - pooch>=1.6.0
+  - fiona>=1.8.18
+  - pyepsg>=0.4.0
+  - matplotlib
+  - plotly
+  - pygraphviz
+  - pip
+  - pip:
+    - ..

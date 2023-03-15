@@ -2,6 +2,8 @@ from functools import partial
 import warnings
 
 import holoviews as _hv
+import numpy as _np
+
 from packaging.version import Version
 
 from ..backend_transforms import _transfer_opts_cur_backend
@@ -43,25 +45,25 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
         Interaction tools to include
         Defaults are 'box_select' and 'lasso_select'
     cmap/colormap: str or colormap object, optional
-        Colormap to use for off-diagonal plots
+        Colormap to use when ``c`` is set.
         Default is `Category10 <https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md#category10>`.
     diagonal_kwds/hist_kwds/density_kwds: dict, optional
         Keyword options for the diagonal plots
     datashade (default=False):
         Whether to apply rasterization and shading (colormapping) using
-        the Datashader library, returning an RGB object instead of 
+        the Datashader library, returning an RGB object instead of
         individual points
     rasterize (default=False):
         Whether to apply rasterization using the Datashader library,
-        returning an aggregated Image (to be colormapped by the 
+        returning an aggregated Image (to be colormapped by the
         plotting backend) instead of individual points
     dynspread (default=False):
-        For plots generated with datashade=True or rasterize=True, 
+        For plots generated with datashade=True or rasterize=True,
         automatically increase the point size when the data is sparse
         so that individual points become more visible.
         kwds supported include ``max_px``, ``threshold``,  ``shape``, ``how`` and ``mask``.
     spread (default=False):
-        Make plots generated with datashade=True or rasterize=True 
+        Make plots generated with datashade=True or rasterize=True
         increase the point size to make points more visible, by
         applying a fixed spreading of a certain number of cells/pixels. kwds
         supported include: ``px``, ``shape``, ``how`` and ``mask``.
@@ -76,7 +78,7 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
     --------
         :func:`pandas.plotting.scatter_matrix` : Equivalent pandas function.
     """
-    
+
     data = _hv.Dataset(data)
     supported = list(HoloViewsConverter._kind_mapping)
     if diagonal not in supported:
@@ -101,7 +103,7 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
                 "dynamic update of rasterized/datashaded scatter matrix. "
                 "Update holoviews to a newer version."
             )
-    
+
     if rasterize and datashade:
         raise ValueError("Choose to either rasterize or "
                          "datashade the scatter matrix, not both.")
@@ -120,7 +122,7 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
 
     #remove datashade kwds
     if datashade or rasterize:
-        import holoviews.operation.datashader as hd 
+        import holoviews.operation.datashader as hd
 
         ds_kwds = {}
         if 'aggregator' in kwds:
@@ -149,12 +151,16 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
         if 'mask' in kwds:
             sp_kwds['mask'] = kwds.pop('mask')
 
-    if cmap and colormap:
-        raise TypeError("Only specify one of `cmap` and `colormap`.")
-    colors = cmap or colormap or _hv.plotting.util.process_cmap('Category10', categorical=True)
     tools = tools or ['box_select', 'lasso_select']
-    chart_opts = dict(alpha=alpha, cmap=colors, tools=tools,
+    chart_opts = dict(alpha=alpha, tools=tools,
                       nonselection_alpha=nonselection_alpha, **kwds)
+    if c:
+        if cmap and colormap:
+            raise TypeError("Only specify `cmap` or `colormap`.")
+        ncolors = len(_np.unique(data.dimension_values(c)))
+        cmap = cmap or colormap or 'Category10'
+        cmap = _hv.plotting.util.process_cmap(cmap, ncolors=ncolors, categorical=True)
+        chart_opts['cmap'] = cmap
 
     #get initial scatter matrix.  No color.
     grid = _hv.operation.gridmatrix(data, diagonal_type=diagonal, chart_type=chart)
@@ -179,15 +185,16 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
         raise TypeError('Specify at most one of `diagonal_kwds`, `hist_kwds`, or '
                         '`density_kwds`.')
 
-    diagonal_kwds = diagonal_kwds or hist_kwds or density_kwds or {}
-    # set the histogram colors 
-    diagonal_opts = dict(fill_color=_hv.Cycle(values=colors), **diagonal_kwds)
+    diagonal_opts = diagonal_kwds or hist_kwds or density_kwds or {}
+    # set the histogram colors
+    if c:
+        diagonal_opts['fill_color'] = _hv.Cycle(cmap)
     # actually changing to the same color scheme for both scatter and histogram plots.
     grid = grid.options(
         {chart.__name__: chart_opts, diagonal.__name__: diagonal_opts},
         backend='bokeh',
     )
-    
+
     # Perform datashade options after all the coloring is finished.
     if datashade or rasterize:
         aggregatefn = hd.datashade if datashade else hd.rasterize
@@ -196,6 +203,6 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
             spreadfn = hd.dynspread if dynspread else (hd.spread if spread else lambda z, **_: z)
             eltype = _hv.RGB if datashade else _hv.Image
             grid = grid.map(partial(spreadfn, **sp_kwds), specs=eltype)
- 
+
     grid = _transfer_opts_cur_backend(grid)
     return grid

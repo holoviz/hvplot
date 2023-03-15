@@ -63,38 +63,92 @@ Installing Dependencies
 -----------------------
 
 hvPlot requires many additional packages for development and
-testing. Many of these are on the main Anaconda default channel.
+testing.
 
 Conda Environments
 ~~~~~~~~~~~~~~~~~~
 
+Create an empty conda environment with the name that you prefer, here we've
+chosen hvplot_dev. Activate and configure its channels to only use
+``pyviz/label/dev`` and ``conda-forge``. The former is used to install the
+development versions of the other HoloViz packages, such as HoloViews or Panel.
+
+.. code-block:: sh
+
+    conda install mamba -c conda-forge
+    conda create -n hvplot_dev
+    conda activate hvplot_dev
+    conda config --env --append channels pyviz/label/dev --append channels conda-forge
+    conda config --env --remove channels defaults
+
 Since hvPlot interfaces with a large range of different libraries the
 full test suite requires a wide range of dependencies. To make it
 easier to install and run different parts of the test suite across
-different platforms hvPlot uses a library called pyctdev to make things
-more consistent and general.
+different platforms hvPlot uses a library called ``pyctdev`` to make things
+more consistent and general. Specify also the desired Python version you want
+to base your environment on.
+
+You will need to pick a Python version. The best practice is to choose the minimum version
+currently supported by hvPlot on the main development branch. If you cannot get the minimum
+version installed, then try with a more recent version of Python.
 
 .. code-block:: sh
 
-    conda create -n hvplot_dev -c pyviz pyctdev python=3.6
-
-Specify the desired Python version, currently hvPlot officially
-supports Python 3.6 and 3.7. Once the environment has been
-created you can activate it with:
-
-.. code-block:: sh
-
-    conda activate hvplot_dev
+    mamba install python=3.x pyctdev
 
 Finally to install the dependencies required to run the full unit test
 suite and all the examples:
 
 .. code-block:: sh
 
-    doit develop_install -c pyviz/label/dev -o all
+    doit develop_install -o tests -o examples --conda-mode mamba
+
+Add ``-o doc`` if you want to install the dependencies required to build
+the website.
+
+Setting up pre-commit
+~~~~~~~~~~~~~~~~~~~~~
+
+hvPlot uses ``pre-commit`` to automatically apply linting to hvPlot code.
+If you intend to contribute to hvPlot we recommend you enable it with:
+
+.. code-block:: sh
+
+    pre-commit install
+
+This will ensure that every time you make a commit linting will automatically be applied.
 
 .. _devguide_python_setup:
 
+Commands
+--------
+
+You can list the available `doit` commands with `doit list`.
+
+.. code-block:: sh
+
+    $ doit list
+    build_docs             build docs
+    develop_install        python develop install, with specified optional groups of dependencies (installed by conda only).
+    ecosystem_setup        Common conda setup (must be run in base env).
+    env_capture            Report all information required to recreate current conda environment
+    env_create             Create named environment if it doesn't already exist
+    env_dependency_graph   Write out dependency graph of named environment.
+    env_export             Generate a pinned environment.yaml from specified env, filtering
+    env_export2
+    list_envs
+    miniconda_download     Download Miniconda3-latest
+    miniconda_install      Install Miniconda3-latest to location if not already present
+    package_build          Build and then test conda.recipe/ (or specified alternative).
+    package_test           Test existing package
+    package_upload         Upload package built from conda.recipe/ (or specified alternative).
+    pip_on_conda           Experimental: provide pip build env via conda
+    test_all               Run all tests
+    test_examples          Test that default examples run
+    test_flakes            Flake check python and notebooks
+    test_unit              Run unit tests with coverage
+
+You can learn more about using `doit` on the `DoIt`_ web site.
 
 Next Steps
 ----------
@@ -110,6 +164,7 @@ If you have any problems with the steps here, please `contact the developers`_.
 .. _GitHub: https://github.com
 .. _Installing Git: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 .. _Pro Git Book: https://git-scm.com/book/en/v2
+.. _DoIt: https://pydoit.org/
 
 
 .. toctree::
@@ -117,5 +172,5 @@ If you have any problems with the steps here, please `contact the developers`_.
     :hidden:
     :maxdepth: 2
 
-    Getting Set up <index>
+    Getting Set up <self>
     Testing <testing>

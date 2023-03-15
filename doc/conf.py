@@ -23,6 +23,13 @@ html_css_files = [
     'custom.css'
 ]
 
+# Use require.js vendored by nbsite to display the Plotly figure
+# add the end of the Plotting_Extensions notebook. require.js is normally
+# loaded automatically by nbconvert but that happens not to be the case
+# when a notebook converted via nbsite. Other HoloViews-Plotly plots
+# are rendered via Panel, in a way that doesn't require require.js.
+html_js_files = ['require.js']
+
 html_theme_options.update({
     "github_url": "https://github.com/holoviz/hvplot",
     "icon_links": [
@@ -38,6 +45,7 @@ html_theme_options.update({
         },
     ],
     "google_analytics_id": "UA-154795830-5",
+    "navbar_end": ["navbar-icon-links"],
 })
 
 html_theme = "pydata_sphinx_theme"
@@ -48,6 +56,8 @@ extensions += [
     'nbsite.gallery',
     'sphinx_copybutton',
 ]
+
+myst_enable_extensions = ["colon_fence"]
 
 nbsite_gallery_conf = {
     'github_org': 'holoviz',
@@ -71,4 +81,5 @@ html_context.update({
     "last_release": f"v{release}",
     "github_user": "holoviz",
     "github_repo": "panel",
+    "default_mode": "light",
 })

@@ -34,12 +34,13 @@ install_requires = [
     'pandas',
     'numpy>=1.15',
     'packaging',
+    'panel >=0.11.0',
+    'param >=1.9.0',
 ]
 
 _examples = [
-    'geoviews >=1.6.0',
-    'numba >=0.51.0',
-    'geopandas >=0.9.0',
+    'geoviews >=1.9.0',
+    'geopandas',
     'xarray >=0.18.2',
     'networkx >=2.6.3',
     'streamz >=0.3.0',
@@ -47,29 +48,34 @@ _examples = [
     'intake-parquet >=0.2.3',
     'intake-xarray >=0.5.0',
     'dask >=2021.3.0',
-    'datashader >=0.6.5',
     'notebook >=5.4',
-    'rasterio >=1.2.6',
-    'cartopy >= 0.18.0',
-    'pyproj >=3.0.1',
+    'rasterio',
+    'cartopy',
+    'pyproj',
     's3fs >=2022.1.0',
     'scipy >=1.5.3',
     'pillow >=8.2.0',
     'selenium >=3.141.0',
-    'spatialpandas >=0.4.3',
     'scikit-image >=0.17.2',
     'python-snappy >=0.6.0',
     'pooch >=1.6.0',
-    'fiona >=1.8.18',
+    'fiona',
+    'rioxarray',
     # Extra dependency of cartopy on Python 3.6 only
-    'pyepsg >=0.4.0',
+    'pyepsg',
     'matplotlib',
     'plotly',
+    'pygraphviz',
+    'ipykernel <6.18.0'  # temporary
 ]
 
-_examples_extra = _examples + [
-    'pygraphviz',
-]
+# Packages not working on python 3.11 because of numba
+if sys.version_info < (3, 11):
+    _examples += [
+        'numba >=0.51.0',
+        'datashader >=0.6.5',
+        'spatialpandas >=0.4.3',
+    ]
 
 extras_require = {
     'tests': [
@@ -85,22 +91,24 @@ extras_require = {
         'xarray',
         'pooch',
         'scipy',
+        'ipywidgets',
+        'pre-commit',
     ],
     'examples': _examples,
-    'examples_extra': _examples_extra,
-    'doc': _examples_extra + [
-        'nbsite >=0.7.1',
-        'pydata-sphinx-theme',
+    'doc': _examples + [
+        'nbsite >=0.7.2rc2',
+        'pydata-sphinx-theme <0.10',
         'sphinx-copybutton',
+        'sphinx-design',
     ]
 }
 
 # until pyproject.toml/equivalent is widely supported (setup_requires
 # doesn't work well with pip)
 extras_require['build'] = [
-    'param >=1.6.1',
+    'param >=1.7.0',
     'pyct >=0.4.4',
-    'setuptools' # should make this pip now
+    'setuptools >=30.3.0' # should make this pip now
 ]
 
 extras_require['all'] = sorted(set(sum(extras_require.values(), [])))
@@ -111,7 +119,7 @@ setup_args = dict(
     name='hvplot',
     version=get_setup_version("hvplot"),
     description='A high-level plotting API for the PyData ecosystem built on HoloViews.',
-    long_description=open("README.md").read(),
+    long_description=open("README.md", mode="r", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     author= "Philipp Rudiger",
     author_email= "developers@pyviz.org",
@@ -130,6 +138,7 @@ setup_args = dict(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Operating System :: OS Independent",
         "Intended Audience :: Science/Research",
         "Intended Audience :: Developers",

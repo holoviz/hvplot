@@ -1,23 +1,25 @@
+import holoviews as _hv
 import numpy as np
 import panel as pn
 import param
 
-from holoviews.core.util import is_number, max_range
+from holoviews.core.util import datetime_types, dt_to_int, is_number, max_range
 from holoviews.element import tile_sources
 from holoviews.plotting.util import list_cmaps
 from panel.viewable import Viewer
 
-from .converter import HoloViewsConverter as hvConverter
+from .converter import HoloViewsConverter as _hvConverter
+from .plotting import hvPlot as _hvPlot
 from .util import is_geodataframe, is_xarray
 
 # Defaults
-DATAFRAME_KINDS = sorted(set(hvConverter._kind_mapping) - set(hvConverter._gridded_types))
-GRIDDED_KINDS = sorted(hvConverter._kind_mapping)
+DATAFRAME_KINDS = sorted(set(_hvConverter._kind_mapping) - set(_hvConverter._gridded_types))
+GRIDDED_KINDS = sorted(_hvConverter._kind_mapping)
 GEOM_KINDS = ['paths', 'polygons', 'points']
 STATS_KINDS = ['hist', 'kde', 'boxwhisker', 'violin', 'heatmap', 'bar', 'barh']
 TWOD_KINDS = ['bivariate', 'heatmap', 'hexbin', 'labels', 'vectorfield'] + GEOM_KINDS
 CMAPS = [cm for cm in list_cmaps() if not cm.endswith('_r_r')]
-DEFAULT_CMAPS = hvConverter._default_cmaps
+DEFAULT_CMAPS = _hvConverter._default_cmaps
 GEO_FEATURES = [
     'borders', 'coastline', 'land', 'lakes', 'ocean', 'rivers',
     'states', 'grid'
@@ -25,6 +27,41 @@ GEO_FEATURES = [
 GEO_TILES = list(tile_sources)
 AGGREGATORS = [None, 'count', 'min', 'max', 'mean', 'sum', 'any']
 MAX_ROWS = 10000
+
+
+def explorer(data, **kwargs):
+    """Explore your data and design your plot via an interactive user interface.
+
+    This function returns an interactive Panel component that enable you to quickly change the
+    settings of your plot via widgets.
+
+    Reference: https://hvplot.holoviz.org/getting_started/explorer.html
+
+    Parameters
+    ----------
+    data : pandas.DataFrame
+        Data structure to explore.
+    kwargs : optional
+        Arguments that `data.hvplot()` would also accept like `kind='bar'`.
+
+    Returns
+    -------
+    hvplotExporer
+        Panel component to explore the data and design your plot.
+
+    Example
+    -------
+
+    >>> import hvplot.pandas
+    >>> import pandas as pd
+    >>> df = pd.DataFrame({"x": [1, 2, 3], "y": [1, 4, 9]})
+    >>> hvplot.explorer(df)
+
+    You can also specify initial values
+
+    >>> hvplot.explorer(df, kind='bar', x='x')
+    """
+    return hvPlotExplorer.from_data(data, **kwargs)
 
 
 class Controls(Viewer):
@@ -70,6 +107,8 @@ class Colormapping(Controls):
     cmap = param.Selector(default=DEFAULT_CMAPS['linear'],
                           label='Colormap', objects=CMAPS)
 
+    rescale_discrete_levels = param.Boolean(default=True)
+
     symmetric = param.Boolean(default=False)
 
     def __init__(self, data, **params):
@@ -79,7 +118,7 @@ class Colormapping(Controls):
 
     @property
     def colormapped(self):
-        if self.explorer.kind in hvConverter._colorbar_types:
+        if self.explorer.kind in _hvConverter._colorbar_types:
             return True
         return self.color is not None and self.color in self._data
 
@@ -87,7 +126,7 @@ class Colormapping(Controls):
     def _update_coloropts(self):
         if not self.colormapped or self.cmap not in list(DEFAULT_CMAPS.values()):
             return
-        if self.explorer.kind in hvConverter._colorbar_types:
+        if self.explorer.kind in _hvConverter._colorbar_types:
             key = 'diverging' if self.symmetric else 'linear'
             self.colorbar = True
         elif self.color in self._data:
@@ -107,12 +146,10 @@ class Style(Controls):
 
     alpha = param.Magnitude(default=1)
 
-    marker = param.Selector()
-
 
 class Axes(Controls):
 
-    legend = param.Selector(default='right', objects=hvConverter._legend_positions)
+    legend = param.Selector(default='right', objects=_hvConverter._legend_positions)
 
     logx = param.Boolean(default=False)
 
@@ -141,17 +178,33 @@ class Axes(Controls):
     @param.depends('explorer.xlim', 'explorer.ylim',  watch=True)
     def _update_ranges(self):
         xlim = self.explorer.xlim()
-        if xlim is not None and is_number(xlim[0]) and is_number(xlim[1]):
+        if xlim is not None and is_number(xlim[0]) and is_number(xlim[1]) and xlim[0] != xlim[1]:
+            xlim = self._convert_to_int(xlim)
             self.param.xlim.precedence = 0
             self.param.xlim.bounds = xlim
         else:
             self.param.xlim.precedence = -1
         ylim = self.explorer.ylim()
-        if ylim is not None and is_number(ylim[0]) and is_number(ylim[1]):
+        if ylim is not None and is_number(ylim[0]) and is_number(ylim[1]) and ylim[0] != ylim[1]:
+            ylim = self._convert_to_int(ylim)
             self.param.ylim.precedence = 0
             self.param.ylim.bounds = ylim
         else:
             self.param.ylim.precedence = -1
+
+    @staticmethod
+    def _convert_to_int(val):
+        """
+        Converts datetime to int to avoid the error in https://github.com/holoviz/hvplot/issues/964.
+
+        This function is a workaround and should be removed when a better solution is found.
+
+        """
+
+        if isinstance(val[0], datetime_types) and isinstance(val[1], datetime_types):
+            val = (dt_to_int(val[0], "ms"), dt_to_int(val[1], "ms"))
+
+        return val
 
 
 class Labels(Controls):
@@ -278,23 +331,29 @@ class hvPlotExplorer(Viewer):
 
     groupby = param.ListSelector(default=[])
 
+    # Controls that will show up as new tabs, must be ClassSelector
+
     axes = param.ClassSelector(class_=Axes)
 
     colormapping = param.ClassSelector(class_=Colormapping)
 
     labels = param.ClassSelector(class_=Labels)
 
-    geo = param.ClassSelector(class_=Geo)
+    # Hide the geo tab until it's better supported
+    # geo = param.ClassSelector(class_=Geo)
 
     operations = param.ClassSelector(class_=Operations)
 
     style = param.ClassSelector(class_=Style)
 
-    def __new__(cls, data, **params):
+    @classmethod
+    def from_data(cls, data, **params):
         if is_geodataframe(data):
-            cls = hvGeomExplorer
+            # cls = hvGeomExplorer
+            raise TypeError('GeoDataFrame objects not yet supported.')
         elif is_xarray(data):
-            cls = hvGridExplorer
+            # cls = hvGridExplorer
+            raise TypeError('Xarray objects not yet supported.')
         else:
             cls = hvDataFrameExplorer
         return cls(data, **params)
@@ -306,9 +365,19 @@ class hvPlotExplorer(Viewer):
         x, y = params.get('x'), params.get('y')
         if 'y' in params:
             params['y_multi'] = params.pop('y') if isinstance(params['y'], list) else [params['y']]
-        converter = hvConverter(df, x, y, **{k: v for k, v in params.items() if k not in ('x', 'y')})
+        converter = _hvConverter(
+            df, x, y,
+            **{k: v for k, v in params.items() if k not in ('x', 'y', 'y_multi')}
+        )
         controller_params = {}
-        for cls in param.concrete_descendents(Controls).values():
+        # Assumes the controls aren't passed on instantiation.
+        controls = [
+            p.class_
+            for p in self.param.objects().values()
+            if isinstance(p, param.ClassSelector)
+            and issubclass(p.class_, Controls)
+        ]
+        for cls in controls:
             controller_params[cls] = {
                 k: params.pop(k) for k, v in dict(params).items()
                 if k in cls.param
@@ -318,7 +387,7 @@ class hvPlotExplorer(Viewer):
         self._converter = converter
         self._controls = pn.Param(
             self.param, parameters=['kind', 'x', 'y', 'by', 'groupby'],
-            sizing_mode='stretch_width', max_width=300
+            sizing_mode='stretch_width', max_width=300, show_name=False,
         )
         self.param.watch(self._toggle_controls, 'kind')
         self.param.watch(self._check_y, 'y_multi')
@@ -327,13 +396,13 @@ class hvPlotExplorer(Viewer):
         self._tabs = pn.Tabs(
             tabs_location='left', width=400
         )
-        controllers = {
+        self._controllers = {
             cls.name.lower(): cls(df, explorer=self, **params)
             for cls, params in controller_params.items()
         }
-        self.param.set_param(**controllers)
+        self.param.set_param(**self._controllers)
         self.param.watch(self._plot, list(self.param))
-        for controller in controllers.values():
+        for controller in self._controllers.values():
             controller.param.watch(self._plot, list(controller.param))
         self._alert = pn.pane.Alert(
             alert_type='danger', visible=False, sizing_mode='stretch_width'
@@ -348,20 +417,28 @@ class hvPlotExplorer(Viewer):
             pn.layout.HSpacer(),
             sizing_mode='stretch_both'
         )
+        self._toggle_controls()
         self._plot()
-        self.param.trigger('kind')
 
     def _populate(self):
         variables = self._converter.variables
+        indexes = getattr(self._converter, "indexes", [])
+        variables_no_index = [v for v in variables if v not in indexes]
         for pname in self.param:
             if pname == 'kind':
                 continue
             p = self.param[pname]
             if isinstance(p, param.Selector):
-                p.objects = variables
+                if pname == "x":
+                    p.objects = variables
+                else:
+                    p.objects = variables_no_index
+
+                # Setting the default value if not set
+                if (pname == "x" or pname == "y") and getattr(self, pname, None) is None:
+                    setattr(self, pname, p.objects[0])
 
     def _plot(self, *events):
-        self._layout.loading = True
         y = self.y_multi if 'y_multi' in self._controls.parameters else self.y
         if isinstance(y, list) and len(y) == 1:
             y = y[0]
@@ -380,14 +457,15 @@ class hvPlotExplorer(Viewer):
         df = self._data
         if len(df) > MAX_ROWS and not (self.kind in STATS_KINDS or kwargs.get('rasterize') or kwargs.get('datashade')):
             df = df.sample(n=MAX_ROWS)
+        self._layout.loading = True
         try:
-            plot = df.hvplot(
+            self._hvplot = _hvPlot(df)(
                 kind=self.kind, x=self.x, y=y, by=self.by, groupby=self.groupby, **kwargs
             )
-            hvplot = pn.pane.HoloViews(
-                plot, sizing_mode='stretch_width', margin=(0, 20, 0, 20)
+            self._hvpane = pn.pane.HoloViews(
+                self._hvplot, sizing_mode='stretch_width', margin=(0, 20, 0, 20)
             ).layout
-            self._layout[1][1] = hvplot
+            self._layout[1][1] = self._hvpane
             self._alert.visible = False
         except Exception as e:
             self._alert.param.set_param(
@@ -403,15 +481,15 @@ class hvPlotExplorer(Viewer):
             return True
         return False
 
-    def _toggle_controls(self, event):
+    def _toggle_controls(self, event=None):
         # Control high-level parameters
         visible = True
-        if event.new in ('table', 'dataset'):
+        if event and event.new in ('table', 'dataset'):
             parameters = ['kind', 'columns']
             visible = False
-        elif event.new in TWOD_KINDS:
+        elif event and event.new in TWOD_KINDS:
             parameters = ['kind', 'x', 'y', 'by', 'groupby']
-        elif event.new in ('hist', 'kde', 'density'):
+        elif event and event.new in ('hist', 'kde', 'density'):
             self.x = None
             parameters = ['kind', 'y_multi', 'by', 'groupby']
         else:
@@ -425,15 +503,15 @@ class hvPlotExplorer(Viewer):
                 ('Axes', pn.Param(self.axes, widgets={
                     'xlim': {'throttled': True},
                     'ylim': {'throttled': True}
-                })),
+                }, show_name=False)),
                 ('Labels', pn.Param(self.labels, widgets={
                     'rot': {'throttled': True}
-                })),
+                }, show_name=False)),
                 ('Style', self.style),
                 ('Operations', self.operations),
-                ('Geo', self.geo)
+                # ('Geo', self.geo)
             ]
-            if event.new not in ('area', 'kde', 'line', 'ohlc', 'rgb', 'step'):
+            if event and event.new not in ('area', 'kde', 'line', 'ohlc', 'rgb', 'step'):
                 tabs.insert(5, ('Colormapping', self.colormapping))
         self._tabs[:] = tabs
 
@@ -445,13 +523,78 @@ class hvPlotExplorer(Viewer):
         if event.new and 'y_multi' in self._controls.parameters and self.y_multi and len(self.y_multi) > 1:
             self.by = []
 
+    #----------------------------------------------------------------
+    # Public API
+    #----------------------------------------------------------------
+
+    def hvplot(self):
+        """Return the plot as a HoloViews object.
+        """
+        return self._hvplot.clone()
+
+    def plot_code(self, var_name='df'):
+        """Return a string representation that can be easily copy-pasted
+        in a notebook cell to create a plot from a call to the `.hvplot`
+        accessor, and that includes all the customized settings of the explorer.
+
+        >>> hvexplorer.plot_code(var_name='data')
+        "data.hvplot(x='time', y='value')"
+
+        Parameters
+        ----------
+        var_name: string
+            Data variable name by which the returned string will start.
+        """
+        settings = self.settings()
+        args = ''
+        if settings:
+            for k, v in settings.items():
+                args += f'{k}={v!r}, '
+            args = args[:-2]
+        return f'{var_name}.hvplot({args})'
+
+    def save(self, filename, **kwargs):
+        """Save the plot to file.
+
+        Calls the `holoviews.save` utility, refer to its documentation
+        for a full description of the available kwargs.
+
+        Parameters
+        ----------
+        filename: string, pathlib.Path or IO object
+            The path or BytesIO/StringIO object to save to
+        """
+        _hv.save(self._hvplot, filename, **kwargs)
+
+    def settings(self):
+        """Return a dictionary of the customized settings.
+
+        This dictionary can be reused as an unpacked input to the explorer or
+        a call to the `.hvplot` accessor.
+
+        >>> hvplot.explorer(df, **settings)
+        >>> df.hvplot(**settings)
+        """
+        settings = {}
+        for controller in self._controllers.values():
+            params = set(controller.param) - set(['name', 'explorer'])
+            for p in params:
+                value = getattr(controller, p)
+                if value != controller.param[p].default:
+                    settings[p] = value
+        for p in self._controls.parameters:
+            value = getattr(self, p)
+            if value != self.param[p].default:
+                settings[p] = value
+        if 'y_multi' in settings:
+            settings['y'] = settings.pop('y_multi')
+        settings = {k: v for k, v in sorted(list(settings.items()))}
+        return settings
+
 
 class hvGeomExplorer(hvPlotExplorer):
 
     kind = param.Selector(default=None, objects=sorted(GEOM_KINDS))
-
-    def __new__(cls, data, **params):
-        return super(hvPlotExplorer, cls).__new__(cls)
 
     @property
     def _single_y(self):
@@ -477,9 +620,6 @@ class hvGeomExplorer(hvPlotExplorer):
 class hvGridExplorer(hvPlotExplorer):
 
     kind = param.Selector(default=None, objects=sorted(GRIDDED_KINDS))
-
-    def __new__(cls, data, **params):
-        return super(hvPlotExplorer, cls).__new__(cls)
 
     @property
     def _x(self):
@@ -516,9 +656,6 @@ class hvDataFrameExplorer(hvPlotExplorer):
     z = param.Selector()
 
     kind = param.Selector(default='line', objects=sorted(DATAFRAME_KINDS))
-
-    def __new__(cls, data, **params):
-        return super(hvPlotExplorer, cls).__new__(cls)
 
     @property
     def xcat(self):
