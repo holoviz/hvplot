@@ -272,7 +272,7 @@ class Interactive:
         self._inherit_kwargs = inherit_kwargs
         self._max_rows = max_rows
         self._kwargs = kwargs
-        ds = hv.Dataset(self._obj)
+        ds = hv.Dataset(self._transform_columnar_data(self._obj))
         if _current is not None:
             self._current_ = _current
         else:
@@ -292,6 +292,12 @@ class Interactive:
             self._shared_obj = [obj]
         else:
             self._shared_obj[0] = obj
+
+    def _transform_columnar_data(self, data):
+        renamed = {c: str(c) for c in getattr(data, "columns", []) if not isinstance(c, str)}
+        if renamed:
+            data = data.rename(columns=renamed)
+        return data
 
     @property
     def _current(self):
