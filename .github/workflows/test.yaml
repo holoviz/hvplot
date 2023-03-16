@@ -93,11 +93,12 @@ jobs:
           channel-priority: strict
           channels: pyviz/label/dev,conda-forge,nodefaults
           envs: "-o tests"
-          cache: false
+          cache: true
           conda-update: true
           conda-mamba: mamba
         id: install
       - name: doit develop_install py
+        if: steps.install.outputs.cache-hit != 'true'
         run: |
           conda activate test-environment
           # - Pin panel on Python 3.6 because one or more dev releases on the 0.13.* series
@@ -105,7 +106,7 @@ jobs:
           # Panel 0.13 will support Python >= 3.7 only so the pin here can stay indefinitely.
           # - Install importlib_resources to fix tqdm that missed adding it as a dependency
           # for 3.6 (https://github.com/conda-forge/tqdm-feedstock/pull/114)
-          mamba install "panel=0.12" "importlib_resources" --no-update-deps
+          conda install "panel=0.12" "importlib_resources" --no-update-deps
       - name: doit env_capture
         run: |
           conda activate test-environment
