@@ -95,7 +95,7 @@ jobs:
       - name: pip build
         run: |
           conda activate test-environment
-          doit ecosystem=pip package_build --test-group
+          doit ecosystem=pip package_build
       - name: pip upload
         if: github.event_name == 'push'
         run: |
