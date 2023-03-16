@@ -40,22 +40,17 @@ install_requires = [
 
 extras_require = {}
 
-extras_require['tests_setup'] = [
-    'codecov',
-    'flake8',
-    'pre-commit',
-]
-
 # Tests packages required to run the examples tests
 extras_require['tests_nb'] = [
-    'pytest',
     'pytest-xdist',
     'nbval',
 ]
 
-
 # Required to run the unit tests
-extras_require['tests_unit'] = [
+extras_require['tests'] = [
+    'codecov',
+    'flake8',
+    'pre-commit',
     'parameterized',
     'pytest',
     'pytest-cov',
@@ -65,13 +60,8 @@ extras_require['tests_unit'] = [
     'pooch',
     'scipy',
     'ipywidgets',
-]
 
-# Required to get setup and run the unit tests.
-# Also includes the examples test packages as they were included originally in 'tests.
-extras_require['tests'] = list(set(
-    extras_require['tests_setup'] + extras_require['tests_unit'] + extras_require['tests_nb']
-))
+]
 
 # Dependencies required to run the notebooks
 extras_require['examples'] = [
@@ -113,6 +103,9 @@ if sys.version_info < (3, 11):
         'datashader >=0.6.5',
         'spatialpandas >=0.4.3',
     ]
+
+# Run the example tests by installing examples_tests together with tests
+extras_require["examples_tests"] = extras_require["examples"] + extras_require['tests_nb']
 
 # Additional packages required to build the docs
 extras_require['doc'] = extras_require['examples'] + [
