@@ -1,7 +1,7 @@
 import pathlib
 import sys
 
-from unittest import TestCase, SkipTest, expectedFailure
+from unittest import TestCase, SkipTest
 
 from packaging.version import Version
 import numpy as np
