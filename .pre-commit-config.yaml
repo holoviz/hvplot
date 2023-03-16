@@ -21,3 +21,7 @@ repos:
     -   id: flake8  # See 'setup.cfg' for args
         args: [hvplot]
         files: hvplot/
+-   repo: https://github.com/hoxbro/clean_notebook
+    rev: v0.1.9
+    hooks:
+    - id: clean-notebook
