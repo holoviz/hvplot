@@ -223,6 +223,9 @@ class TestGeoPandas(TestCase):
             raise SkipTest('geopandas, geoviews, shapely or cartopy not available')
         import hvplot.pandas  # noqa
 
+
+        from shapely.geometry import Polygon
+
         p_geometry = gpd.points_from_xy(
             x=[12.45339, 12.44177, 9.51667, 6.13000, 158.14997],
             y=[41.90328, 43.93610, 47.13372, 49.61166, 6.91664],
@@ -232,8 +235,8 @@ class TestGeoPandas(TestCase):
         self.cities = gpd.GeoDataFrame(dict(name=p_names), geometry=p_geometry)
 
         pg_geometry = [
-            shapely.Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0))),
-            shapely.Polygon(((2, 2), (2, 3), (3, 3), (3, 2), (2, 2))),
+            Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0))),
+            Polygon(((2, 2), (2, 3), (3, 3), (3, 2), (2, 2))),
         ]
         pg_names = ['A', 'B']
         self.polygons = gpd.GeoDataFrame(dict(name=pg_names), geometry=pg_geometry)
