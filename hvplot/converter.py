@@ -129,7 +129,7 @@ class HoloViewsConverter:
         tuples of tuples to specify different amounts of padding for
         upper and lower bounds.
     rescale_discrete_levels (default=True): boolean
-        If `cnorm='eq_hist` and there are only a few discrete values,
+        If `cnorm='eq_hist'` and there are only a few discrete values,
         then `rescale_discrete_levels=True` (the default) decreases
         the lower limit of the autoranged span so that the values are
         rendering towards the (more visible) top of the `cmap` range,
@@ -151,7 +151,7 @@ class HoloViewsConverter:
     title (default=''): str
         Title for the plot
     tools (default=[]): list
-        List of tool instances or strings (e.g. ['tap', box_select'])
+        List of tool instances or strings (e.g. ['tap', 'box_select'])
     xaxis/yaxis: str or None
         Whether to show the x/y-axis and whether to place it at the
         'top'/'bottom' and 'left'/'right' respectively.
