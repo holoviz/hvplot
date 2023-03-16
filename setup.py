@@ -84,6 +84,7 @@ extras_require = {
         'parameterized',
         'pytest',
         'pytest-cov',
+        'pytest-xdist',
         'numpy >=1.7',
         'matplotlib',
         'plotly',
