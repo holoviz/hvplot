@@ -1,12 +1,13 @@
 import pathlib
 import sys
 
-from unittest import TestCase, SkipTest, expectedFailure
+from unittest import TestCase, SkipTest
 
 from packaging.version import Version
 import numpy as np
 import pandas as pd
 import holoviews as hv
+import pytest
 
 from hvplot.util import proj_to_cartopy
 
@@ -217,17 +218,28 @@ class TestGeoPandas(TestCase):
             import geopandas as gpd  # noqa
             import geoviews  # noqa
             import cartopy.crs as ccrs # noqa
+            import shapely  # noqa
         except:
-            raise SkipTest('geopandas, geoviews, or cartopy not available')
+            raise SkipTest('geopandas, geoviews, shapely or cartopy not available')
         import hvplot.pandas  # noqa
 
-        geometry = gpd.points_from_xy(
+
+        from shapely.geometry import Polygon
+
+        p_geometry = gpd.points_from_xy(
             x=[12.45339, 12.44177, 9.51667, 6.13000, 158.14997],
             y=[41.90328, 43.93610, 47.13372, 49.61166, 6.91664],
             crs='EPSG:4326'
         )
-        names = ['Vatican City', 'San Marino', 'Vaduz', 'Luxembourg', 'Palikir']
-        self.cities = gpd.GeoDataFrame(dict(name=names), geometry=geometry)
+        p_names = ['Vatican City', 'San Marino', 'Vaduz', 'Luxembourg', 'Palikir']
+        self.cities = gpd.GeoDataFrame(dict(name=p_names), geometry=p_geometry)
+
+        pg_geometry = [
+            Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0))),
+            Polygon(((2, 2), (2, 3), (3, 3), (3, 2), (2, 2))),
+        ]
+        pg_names = ['A', 'B']
+        self.polygons = gpd.GeoDataFrame(dict(name=pg_names), geometry=pg_geometry)
 
     def test_points_hover_cols_is_empty_by_default(self):
         points = self.cities.hvplot()
@@ -256,8 +268,16 @@ class TestGeoPandas(TestCase):
         opts = hv.Store.lookup_options('bokeh', points, 'style').kwargs
         assert opts['color'] == 'name'
 
-    @expectedFailure
+    @pytest.mark.xfail
     def test_points_hover_cols_with_by_set_to_name(self):
         points = self.cities.hvplot(by='name')
         assert points.kdims == ['x', 'y']
         assert points.vdims == ['name']
+
+    @pytest.mark.xfail(
+        reason='Waiting for upstream fix https://github.com/holoviz/holoviews/pull/5325',
+        raises=KeyError,
+    )
+    def test_polygons_by_subplots(self):
+        polygons = self.polygons.hvplot(geo=True, by="name", subplots=True)
+        assert isinstance(polygons, hv.core.layout.NdLayout)
