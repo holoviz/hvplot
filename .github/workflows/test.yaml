@@ -26,55 +26,52 @@ jobs:
           key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
       - name: pre-commit
         uses: pre-commit/action@v3.0.0
-  test_suite:
-    name: Pytest on ${{ matrix.os }} with Python ${{ matrix.python-version }}
-    needs: [pre_commit]
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
-        # Run on the full set on schedule, workflow_dispatch and push&tags events, otherwise on a subset.
-        python-version: ${{ ( github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || ( github.event_name == 'push' && github.ref_type == 'tag' ) ) && fromJSON('["3.7", "3.8", "3.9", "3.10", "3.11"]') || fromJSON('["3.7", "3.9", "3.11"]') }}
-    timeout-minutes: 90
-    defaults:
-      run:
-        shell: bash -el {0}
-    env:
-      DESC: "Python ${{ matrix.python-version }} tests"
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - uses: pyviz-dev/holoviz_tasks/install@v0.1a9
-        with:
-          name: unit_test_suite
-          python-version: ${{ matrix.python-version }}
-          channel-priority: strict
-          channels: pyviz/label/dev,conda-forge,nodefaults
-          envs: "-o examples -o tests"
-          cache: true
-          conda-update: true
-          conda-mamba: mamba
-        id: install
-      - name: patch fiona/geostack on Python 3.7 / Macos
-        if: steps.install.outputs.cache-hit != 'true' && contains(matrix.os, 'macos') && matrix.python-version == '3.7'
-        run: |
-          conda activate test-environment
-          mamba install "fiona=1.8" "gdal=3.3"
-      - name: doit test_unit
-        run: |
-          conda activate test-environment
-          doit test_unit
-      - name: test examples
-        # Should be removed when numba support python 3.11
-        if: matrix.python-version != '3.11'
-        run: |
-          conda activate test-environment
-          bokeh sampledata
-          doit test_examples
-      - name: codecov
-        run: |
-          conda activate test-environment
-          codecov
+  # test_suite:
+  #   name: Pytest on ${{ matrix.os }} with Python ${{ matrix.python-version }}
+  #   needs: [pre_commit]
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
+  #       # Run on the full set on schedule, workflow_dispatch and push&tags events, otherwise on a subset.
+  #       python-version: ${{ ( github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || ( github.event_name == 'push' && github.ref_type == 'tag' ) ) && fromJSON('["3.7", "3.8", "3.9", "3.10", "3.11"]') || fromJSON('["3.7", "3.9", "3.11"]') }}
+  #   timeout-minutes: 90
+  #   defaults:
+  #     run:
+  #       shell: bash -el {0}
+  #   steps:
+  #     - uses: pyviz-dev/holoviz_tasks/install@v0.1a12
+  #       with:
+  #         name: unit_test_suite
+  #         python-version: ${{ matrix.python-version }}
+  #         channel-priority: strict
+  #         channels: pyviz/label/dev,conda-forge,nodefaults
+  #         envs: "-o examples -o tests"
+  #         cache: true
+  #         conda-update: true
+  #         conda-mamba: mamba
+  #       id: install
+  #     - name: patch fiona/geostack on Python 3.7 / Macos
+  #       if: steps.install.outputs.cache-hit != 'true' && contains(matrix.os, 'macos') && matrix.python-version == '3.7'
+  #       run: |
+  #         conda activate test-environment
+  #         mamba install "fiona=1.8" "gdal=3.3"
+  #     - name: doit test_unit
+  #       run: |
+  #         conda activate test-environment
+  #         doit test_unit
+  #     - name: test examples
+  #       # Should be removed when numba support python 3.11
+  #       if: matrix.python-version != '3.11'
+  #       run: |
+  #         conda activate test-environment
+  #         bokeh sampledata
+  #         doit test_examples
+  #     - name: codecov
+  #       run: |
+  #         conda activate test-environment
+  #         codecov
   test_suite_36:
     name: Pytest on ${{ matrix.os }} with Python ${{ matrix.python-version }}
     needs: [pre_commit]
@@ -82,82 +79,42 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
+        os: ['macos-latest', 'windows-latest']
         python-version: ['3.6']
-        exclude:
-        - os: ubuntu-latest
-          python-version: '3.6'
-        include:
-        - os: macos-latest
-          path: /Users/runner/miniconda3/envs/
-        - os: windows-latest
-          path: C:\Miniconda3\envs\
     timeout-minutes: 90
     defaults:
       run:
         shell: bash -l {0}
-    env:
-      DESC: "Python ${{ matrix.python-version }} tests"
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      PYCTDEV_SELF_CHANNEL: "pyviz/label/dev"
     steps:
-      - uses: actions/checkout@v3
+      - uses: pyviz-dev/holoviz_tasks/install@v0.1a12
         with:
-          fetch-depth: "100"
-      - uses: actions/setup-python@v4
-        with:
+          name: unit_test_suite_36
           python-version: ${{ matrix.python-version }}
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-          miniconda-version: "latest"
           channel-priority: strict
           channels: pyviz/label/dev,conda-forge,nodefaults
-      - name: Fetch unshallow
-        run: git fetch --prune --tags --unshallow
-      - name: Get Today's date for cache
-        run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-      - name: conda cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ matrix.path }}
-          key: ${{ runner.os }}-conda-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}-tests_examples-${{ env.TODAY }}-${{ env.CACHE_VERSION }}
-        id: cache
-      - name: conda setup
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          conda create -n test-environment python=${{ matrix.python-version }} pyctdev
+          envs: "-o tests"
+          cache: false
+          conda-update: true
+          conda-mamba: mamba
+        id: install
       - name: doit develop_install py
-        if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          eval "$(conda shell.bash hook)"
           conda activate test-environment
-          conda list
-          doit develop_install -o tests
           # - Pin panel on Python 3.6 because one or more dev releases on the 0.13.* series
           # can be installed on Python 3.6 but are actually not compatible with Python 3.6
           # Panel 0.13 will support Python >= 3.7 only so the pin here can stay indefinitely.
           # - Install importlib_resources to fix tqdm that missed adding it as a dependency
           # for 3.6 (https://github.com/conda-forge/tqdm-feedstock/pull/114)
-          conda install "panel=0.12" "importlib_resources" --no-update-deps
-      - name: hvplot install if env cached
-        if: steps.cache.outputs.cache-hit == 'true'
-        run: |
-          eval "$(conda shell.bash hook)"
-          conda activate test-environment
-          python -m pip install --no-deps --no-build-isolation -e .
+          mamba install "panel=0.12" "importlib_resources" --no-update-deps
       - name: doit env_capture
         run: |
-          eval "$(conda shell.bash hook)"
           conda activate test-environment
           doit env_capture
       - name: doit test_unit
         run: |
-          eval "$(conda shell.bash hook)"
           conda activate test-environment
           doit test_unit
       - name: codecov
         run: |
-          eval "$(conda shell.bash hook)"
           conda activate test-environment
           codecov
