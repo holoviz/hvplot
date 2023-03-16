@@ -1244,7 +1244,7 @@ class hvPlotTabular(hvPlotBase):
 
     def hist(self, y=None, by=None, **kwds):
         """
-        A `histogram` displays an approximate representation of the distribution of numerical data.
+        A `histogram` displays an approximate representation of the distribution of continous data.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/hist.html
 
@@ -1252,6 +1252,7 @@ class hvPlotTabular(hvPlotBase):
         ----------
         y : string or sequence
             Field(s) in the *wide* data to compute the distribution(s) from.
+            Please note the fields should contain continuous data. Not categorical.
         by : string or sequence
             Field(s) in the *long* data to group by.
         bins : int, optional
@@ -1294,6 +1295,20 @@ class hvPlotTabular(hvPlotBase):
             df = pd.DataFrame(np.random.randint(1, 7, 6000), columns = ['one'])
             df['two'] = df['one'] + np.random.randint(1, 7, 6000)
             df.hvplot.hist(bins=12, alpha=0.5, color=["lightgreen", "pink"])
+
+        If you want to show the distribution of the values of a categorical column,
+        you can use Pandas' method `value_counts` and `bar` as shown below
+
+        .. code-block::
+
+            import hvplot.pandas
+            import pandas as pd
+
+            data = pd.DataFrame({
+                "library": ["bokeh", "plotly", "matplotlib", "bokeh", "matplotlib", "matplotlib"]
+            })
+
+            data["library"].value_counts().hvplot.bar()
 
         References
         ----------
