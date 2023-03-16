@@ -1297,7 +1297,7 @@ class hvPlotTabular(hvPlotBase):
             df.hvplot.hist(bins=12, alpha=0.5, color=["lightgreen", "pink"])
 
         If you want to show the distribution of the values of a categorical column,
-        you can use `value_counts` and `bar` as shown below
+        you can use Pandas' method `value_counts` and `bar` as shown below
 
         .. code-block::
 
