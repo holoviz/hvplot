@@ -89,18 +89,15 @@ jobs:
           doit env_create $CHANS_DEV --python=$PYTHON_VERSION
       - name: env setup
         run: |
-          eval "$(conda shell.bash hook)"
           conda activate test-environment
           doit develop_install $CHANS_DEV -o tests
           doit pip_on_conda
       - name: pip build
         run: |
-          eval "$(conda shell.bash hook)"
           conda activate test-environment
           doit ecosystem=pip package_build
       - name: pip upload
         if: github.event_name == 'push'
         run: |
-          eval "$(conda shell.bash hook)"
           conda activate test-environment
           doit ecosystem=pip package_upload -u $PPU -p $PPP -r $PYPI

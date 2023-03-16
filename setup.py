@@ -84,7 +84,7 @@ extras_require = {
         'parameterized',
         'pytest',
         'pytest-cov',
-        'nbsmoke >=0.2.0',
+        'pytest-xdist',
         'numpy >=1.7',
         'matplotlib',
         'plotly',
@@ -93,6 +93,7 @@ extras_require = {
         'scipy',
         'ipywidgets',
         'pre-commit',
+        'nbval',
     ],
     'examples': _examples,
     'doc': _examples + [
