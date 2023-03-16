@@ -4,6 +4,8 @@ Provides utilities to convert data and projections
 
 import sys
 
+from collections.abc import Hashable
+
 from functools import wraps
 from packaging.version import Version
 from types import FunctionType
@@ -551,11 +553,19 @@ def _flatten(line):
 
 
 def _convert_col_names_to_str(data):
-    """Convert column names to string.
     """
-    if not hasattr(data, 'columns'):
+    Convert column names to string.
+    """
+    # There's no generic way to rename columns across tabular object types.
+    # `columns` could refer to anything else on the object, e.g. a dim
+    # on an xarray DataArray. So this may need to be stricter.
+    if not hasattr(data, 'columns') or not hasattr(data, 'rename'):
         return data
-    renamed = {c: str(c) for c in data.columns if not isinstance(c, str)}
+    renamed = {
+        c: str(c)
+        for c in data.columns
+        if not isinstance(c, str) and isinstance(c, Hashable)
+    }
     if renamed:
         data = data.rename(columns=renamed)
     return data
