@@ -111,7 +111,10 @@ from panel.util import get_method_owner, full_groupby
 from panel.widgets.base import Widget
 
 from .converter import HoloViewsConverter
-from .util import _flatten, is_tabular, is_xarray, is_xarray_dataarray
+from .util import (
+    _flatten, is_tabular, is_xarray, is_xarray_dataarray,
+    _convert_col_names_to_str,
+)
 
 
 def _find_widgets(op):
@@ -272,7 +275,7 @@ class Interactive:
         self._inherit_kwargs = inherit_kwargs
         self._max_rows = max_rows
         self._kwargs = kwargs
-        ds = hv.Dataset(self._transform_columnar_data(self._obj))
+        ds = hv.Dataset(_convert_col_names_to_str(self._obj))
         if _current is not None:
             self._current_ = _current
         else:
@@ -292,12 +295,6 @@ class Interactive:
             self._shared_obj = [obj]
         else:
             self._shared_obj[0] = obj
-
-    def _transform_columnar_data(self, data):
-        renamed = {c: str(c) for c in getattr(data, "columns", []) if not isinstance(c, str)}
-        if renamed:
-            data = data.rename(columns=renamed)
-        return data
 
     @property
     def _current(self):
@@ -688,7 +685,7 @@ class Interactive:
         """
         if self._dirty:
             obj = self._obj
-            ds = hv.Dataset(obj)
+            ds = hv.Dataset(_convert_col_names_to_str(obj))
             transform = self._transform
             if ds.interface.datatype == 'xarray' and is_xarray_dataarray(obj):
                 transform = transform.clone(obj.name)

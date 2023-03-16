@@ -548,3 +548,14 @@ def _flatten(line):
             yield from _flatten(element)
         else:
             yield element
+
+
+def _convert_col_names_to_str(data):
+    """Convert column names to string.
+    """
+    if not hasattr(data, 'columns'):
+        return data
+    renamed = {c: str(c) for c in data.columns if not isinstance(c, str)}
+    if renamed:
+        data = data.rename(columns=renamed)
+    return data
