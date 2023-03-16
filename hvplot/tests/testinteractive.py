@@ -1381,3 +1381,18 @@ def test_clones_dont_reexecute_transforms():
     df.interactive.pipe(piped, msg="1").pipe(piped, msg="2")
 
     assert len(msgs) == 3
+
+
+def test_interactive_accept_non_str_columnar_data():
+    df = pd.DataFrame(np.random.random((10, 2)))
+    assert all(not isinstance(col, str) for col in df.columns)
+    dfi = Interactive(df)
+
+    w = pn.widgets.FloatSlider(start=0, end=1, step=0.05)
+
+    # Column names converted as string so can no longer use dfi[1]
+    dfi = dfi['1'] + w.param.value
+
+    w.value = 0.5
+
+    pytest.approx(dfi.eval().sum(), (df[1] + 0.5).sum())
