@@ -373,7 +373,7 @@ class hvPlotExplorer(Viewer):
         # Assumes the controls aren't passed on instantiation.
         controls = [
             p.class_
-            for p in self.param.params().values()
+            for p in self.param.objects().values()
             if isinstance(p, param.ClassSelector)
             and issubclass(p.class_, Controls)
         ]

@@ -231,26 +231,33 @@ def process_crs(crs):
         import geoviews as gv # noqa
         import pyproj
     except ImportError:
-        raise ImportError('Geographic projection support requires GeoViews, pyproj and cartopy.')
+        raise ImportError('Geographic projection support requires geoviews, pyproj and cartopy.')
 
     if crs is None:
         return ccrs.PlateCarree()
 
+    errors = []
     if isinstance(crs, str) and crs.lower().startswith('epsg'):
         try:
-            crs = ccrs.epsg(crs[5:].lstrip().rstrip())
-        except:
-            raise ValueError("Could not parse EPSG code as CRS, must be of the format 'EPSG: {code}.'")
-    elif isinstance(crs, int):
-        crs = ccrs.epsg(crs)
-    elif isinstance(crs, (str, pyproj.Proj)):
+            crs = crs[5:].lstrip().rstrip()
+            return ccrs.epsg(crs)
+        except Exception as e:
+            errors.append(e)
+    if isinstance(crs, int):
         try:
-            crs = proj_to_cartopy(crs)
-        except:
-            raise ValueError("Could not parse EPSG code as CRS, must be of the format 'proj4: {proj4 string}.'")
-    elif not isinstance(crs, ccrs.CRS):
-        raise ValueError("Projection must be defined as a EPSG code, proj4 string, cartopy CRS or pyproj.Proj.")
-    return crs
+            return ccrs.epsg(crs)
+        except Exception as e:
+            crs = str(crs)
+            errors.append(e)
+    if isinstance(crs, (str, pyproj.Proj)):
+        try:
+            return proj_to_cartopy(crs)
+        except Exception as e:
+            errors.append(e)
+    if isinstance(crs, ccrs.CRS):
+        return crs
+
+    raise ValueError("Projection must be defined as a EPSG code, proj4 string, cartopy CRS or pyproj.Proj.") from Exception(*errors)
 
 
 def is_list_like(obj):

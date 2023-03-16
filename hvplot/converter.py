@@ -590,7 +590,7 @@ class HoloViewsConverter:
 
         self._plot_opts = plot_opts
         self._overlay_opts = {k: v for k, v in self._plot_opts.items()
-                              if k in OverlayPlot.param.params()}
+                              if k in OverlayPlot.param.objects()}
 
         self._norm_opts = {'framewise': framewise, 'axiswise': not plot_opts.get('shared_axes')}
         self.kwds = kwds
@@ -747,7 +747,7 @@ class HoloViewsConverter:
                 if isinstance(data, xr.Dataset):
                     z = list(data.data_vars)[0]
                 else:
-                    z = data.name or 'value'
+                    z = data.name or label or value_label
             if gridded and isinstance(data, xr.Dataset) and not isinstance(z, list):
                 data = data[z]
             self.z = z
@@ -949,7 +949,7 @@ class HoloViewsConverter:
                 for var_name, var_attrs in var_tuples:
                     if var_name is None:
                         var_name = 'value'
-                    if 'long_name' in var_attrs:
+                    if isinstance(var_attrs.get('long_name'), str):
                         labels[var_name] = var_attrs['long_name']
                     if 'units' in var_attrs:
                         units[var_name] = var_attrs['units']
