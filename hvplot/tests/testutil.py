@@ -9,7 +9,10 @@ import pytest
 
 from unittest import TestCase, SkipTest
 
-from hvplot.util import check_crs, is_list_like, process_crs, process_xarray
+from hvplot.util import (
+    check_crs, is_list_like, process_crs, process_xarray,
+    _convert_col_names_to_str,
+)
 
 
 class TestProcessXarray(TestCase):
@@ -314,3 +317,10 @@ def test_is_list_like():
     assert is_list_like(pd.Series(['a', 'b']))
     assert is_list_like(pd.Index(['a', 'b']))
     assert is_list_like(np.array(['a', 'b']))
+
+
+def test_convert_col_names_to_str():
+    df = pd.DataFrame(np.random.random((10, 2)))
+    assert all(not isinstance(col, str) for col in df.columns)
+    df = _convert_col_names_to_str(df)
+    assert all(isinstance(col, str) for col in df.columns)

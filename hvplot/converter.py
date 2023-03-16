@@ -34,6 +34,7 @@ from .util import (
     is_streamz, is_ibis, is_xarray, is_xarray_dataarray, process_crs,
     process_intake, process_xarray, check_library, is_geodataframe,
     process_derived_datetime_xarray, process_derived_datetime_pandas,
+    _convert_col_names_to_str,
 )
 from .utilities import hvplot_extension
 
@@ -655,12 +656,6 @@ class HoloViewsConverter:
                     "'{}' must be either a valid crs or an reference to "
                     "a `data.attr` containing a valid crs.".format(crs))
 
-    def _transform_columnar_data(self, data):
-        renamed = {c: str(c) for c in data.columns if not isinstance(c, str)}
-        if renamed:
-            data = data.rename(columns=renamed)
-        return data
-
     def _process_data(self, kind, data, x, y, by, groupby, row, col,
                       use_dask, persist, backlog, label, group_label,
                       value_label, hover_cols, attr_labels, transforms,
@@ -681,8 +676,7 @@ class HoloViewsConverter:
         # update the `_dataset` property (of the hv object its __call__ method
         # returns) with a hv Dataset created from the source data, which
         # is done for optimizating some operations in HoloViews.
-        if hasattr(data, 'columns'):
-            data = self._transform_columnar_data(data)
+        data = _convert_col_names_to_str(data)
 
         self.source_data = data
 
@@ -1571,7 +1565,7 @@ class HoloViewsConverter:
         if data is None:
             data = self.data
         elif not self.gridded_data:
-            data = self._transform_columnar_data(data)
+            data = _convert_col_names_to_str(data)
 
         x = self._process_chart_x(data, x, y, single_y, categories=categories)
         y = self._process_chart_y(data, x, y, single_y)
