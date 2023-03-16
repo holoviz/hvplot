@@ -66,7 +66,8 @@ _examples = [
     'matplotlib',
     'plotly',
     'pygraphviz',
-    'ipykernel <6.18.0'  # temporary
+    'ipykernel <6.18.0',  # temporary
+    'numpy < 1.24'. # temporary, for a numba error
 ]
 
 # Packages not working on python 3.11 because of numba
