@@ -1308,7 +1308,7 @@ class hvPlotTabular(hvPlotBase):
                 "library": ["bokeh", "plotly", "matplotlib", "bokeh", "matplotlib", "matplotlib"]
             })
 
-            data["library"].value_counts().hvplot.bar(invert=True, flip_yaxis=True)
+            data["library"].value_counts().hvplot.bar()
 
         References
         ----------
