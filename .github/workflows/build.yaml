@@ -90,12 +90,12 @@ jobs:
       - name: env setup
         run: |
           conda activate test-environment
-          doit develop_install $CHANS_DEV -o _tests_unit
+          doit develop_install $CHANS_DEV -o tests_unit
           doit pip_on_conda
       - name: pip build
         run: |
           conda activate test-environment
-          doit ecosystem=pip package_build
+          doit ecosystem=pip package_build --test-group
       - name: pip upload
         if: github.event_name == 'push'
         run: |

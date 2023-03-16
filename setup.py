@@ -40,14 +40,14 @@ install_requires = [
 
 extras_require = {}
 
-extras_require['_tests_setup'] = [
+extras_require['tests_setup'] = [
     'codecov',
     'flake8',
     'pre-commit',
 ]
 
 # Tests packages required to run the examples tests
-extras_require['_tests_nb'] = [
+extras_require['tests_nb'] = [
     'pytest',
     'pytest-xdist',
     'nbval',
@@ -55,7 +55,7 @@ extras_require['_tests_nb'] = [
 
 
 # Required to run the unit tests
-extras_require['_tests_unit'] = [
+extras_require['tests_unit'] = [
     'parameterized',
     'pytest',
     'pytest-cov',
@@ -70,7 +70,7 @@ extras_require['_tests_unit'] = [
 # Required to get setup and run the unit tests.
 # Also includes the examples test packages as they were included originally in 'tests.
 extras_require['tests'] = list(set(
-    extras_require['_tests_setup'] + extras_require['_tests_unit'] + extras_require['_tests_nb']
+    extras_require['tests_setup'] + extras_require['tests_unit'] + extras_require['tests_nb']
 ))
 
 # Dependencies required to run the notebooks
