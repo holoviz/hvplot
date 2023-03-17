@@ -60,7 +60,6 @@ extras_require['tests'] = [
     'pooch',
     'scipy',
     'ipywidgets',
-
 ]
 
 # Dependencies required to run the notebooks
@@ -94,6 +93,7 @@ extras_require['examples'] = [
     'pygraphviz',
     'ipykernel <6.18.0',  # temporary
     'numpy < 1.24', # temporary, for a numba error
+    'ipywidgets',
 ]
 
 # Packages not working on python 3.11 because of numba
