@@ -38,7 +38,33 @@ install_requires = [
     'param >=1.9.0',
 ]
 
-_examples = [
+extras_require = {}
+
+# Tests packages required to run the examples tests
+extras_require['tests_nb'] = [
+    'pytest-xdist',
+    'nbval',
+]
+
+# Required to run the unit tests
+extras_require['tests'] = [
+    'codecov',
+    'flake8',
+    'pre-commit',
+    'parameterized',
+    'pytest',
+    'pytest-cov',
+    'matplotlib',
+    'plotly',
+    'xarray',
+    'pooch',
+    'scipy',
+    'ipywidgets',
+
+]
+
+# Dependencies required to run the notebooks
+extras_require['examples'] = [
     'geoviews >=1.9.0',
     'geopandas',
     'xarray >=0.18.2',
@@ -66,43 +92,28 @@ _examples = [
     'matplotlib',
     'plotly',
     'pygraphviz',
-    'ipykernel <6.18.0'  # temporary
+    'ipykernel <6.18.0',  # temporary
+    'numpy < 1.24', # temporary, for a numba error
 ]
 
 # Packages not working on python 3.11 because of numba
 if sys.version_info < (3, 11):
-    _examples += [
+    extras_require['examples'] += [
         'numba >=0.51.0',
         'datashader >=0.6.5',
         'spatialpandas >=0.4.3',
     ]
 
-extras_require = {
-    'tests': [
-        'codecov',
-        'flake8',
-        'parameterized',
-        'pytest',
-        'pytest-cov',
-        'pytest-xdist',
-        'numpy >=1.7',
-        'matplotlib',
-        'plotly',
-        'xarray',
-        'pooch',
-        'scipy',
-        'ipywidgets',
-        'pre-commit',
-        'nbval',
-    ],
-    'examples': _examples,
-    'doc': _examples + [
-        'nbsite >=0.7.2rc2',
-        'pydata-sphinx-theme <0.10',
-        'sphinx-copybutton',
-        'sphinx-design',
-    ]
-}
+# Run the example tests by installing examples_tests together with tests
+extras_require["examples_tests"] = extras_require["examples"] + extras_require['tests_nb']
+
+# Additional packages required to build the docs
+extras_require['doc'] = extras_require['examples'] + [
+    'nbsite >=0.7.2rc2',
+    'pydata-sphinx-theme <0.10',
+    'sphinx-copybutton',
+    'sphinx-design',
+]
 
 # until pyproject.toml/equivalent is widely supported (setup_requires
 # doesn't work well with pip)
