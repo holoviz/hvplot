@@ -2,6 +2,43 @@
 
 See [the HoloViz blog](https://blog.holoviz.org/tag/hvplot.html) for a visual summary of the major features added in a selection of releases.
 
+## Version 0.8.3
+
+**March 17, 2023**
+
+The 0.8.3 release brings a number of bugfixes and documentation improvements. This release is also marked by the adoption of a formal project governance, ensuring hvPlot's future as a healthy open-source project! Many thanks to @raybellwaves, @jsignell (welcome back!), @droumis, @Hoxbro, @maximlt, @philippjfr and @MarcSkovMadsen for contributing!
+
+Please note that hvPlot is not yet compatible with Bokeh 3.
+
+Bug fixes:
+
+* Allow `.hvplot` to execute for the *ibis* backend ([#990](https://github.com/holoviz/hvplot/pull/990))
+* Improve package name in error message ([#1005](https://github.com/holoviz/hvplot/pull/1005))
+* Let ``process_crs`` try a few approaches before raising error ([#1026](https://github.com/holoviz/hvplot/pull/1026))
+* Fix `label` on unnamed data array ([#1025](https://github.com/holoviz/hvplot/pull/1025))
+* Only use xarray `long_name` metadata if it is a string ([#1031](https://github.com/holoviz/hvplot/pull/1031))
+* Replace deprecated Param methods ([#1030](https://github.com/holoviz/hvplot/pull/1030))
+* Ensure interactive pipeline is not re-executed needlessly ([#1029](https://github.com/holoviz/hvplot/pull/1029))
+* Fixes `subplots=True` for `geo=True` and `by` ([#761](https://github.com/holoviz/hvplot/pull/761))
+* Force column names to string ([#1042](https://github.com/holoviz/hvplot/pull/1042))
+
+Documentation:
+
+* Docstring fixes ([#985](https://github.com/holoviz/hvplot/pull/985))
+* Improve the `hist` reference guide ([#1002](https://github.com/holoviz/hvplot/pull/1002))
+* Improve the `bar` reference guide ([#1032](https://github.com/holoviz/hvplot/pull/1032))
+
+Project governance:
+
+* Create initial project gov docs ([#1016](https://github.com/holoviz/hvplot/pull/1016))
+
+Maintenance:
+
+* Rename *master* branch to *main* ([#1011](https://github.com/holoviz/hvplot/pull/1011))
+* Add Python 3.11 to the test matrix ([#1015](https://github.com/holoviz/hvplot/pull/1015))
+* Run examples with `nbval` instead of `nbsmoke` ([#1044](https://github.com/holoviz/hvplot/pull/1044))
+* Fix the build by better defining the package extras ([#1046](https://github.com/holoviz/hvplot/pull/1046))
+
 ## Version 0.8.2
 
 **November 24, 2022**
