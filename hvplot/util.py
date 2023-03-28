@@ -320,10 +320,7 @@ def is_dask(data):
     return isinstance(data, (dd.DataFrame, dd.Series))
 
 def is_intake(data):
-    if not check_library(data, 'intake'):
-        return False
-    from intake.source.base import DataSource
-    return isinstance(data, DataSource)
+    return any(check_library(cls, 'intake') for cls in type(data).mro())
 
 def is_ibis(data):
     if not check_library(data, 'ibis'):
