@@ -279,6 +279,12 @@ class TestGeoPandas(TestCase):
         assert points.kdims == ['x', 'y']
         assert points.vdims == ['name']
 
+    def test_points_project_xlim_and_ylim(self):
+        points = self.cities.hvplot(geo=True, xlim=(-10, 10), ylim=(-20, -10))
+        opts = hv.Store.lookup_options('bokeh', points, 'plot').options
+        assert opts['xlim'] == (-10, 10)
+        assert opts['ylim'] == (-20, -10)
+
     @pytest.mark.xfail(
         reason='Waiting for upstream fix https://github.com/holoviz/holoviews/pull/5325',
         raises=KeyError,
