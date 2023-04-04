@@ -107,6 +107,11 @@ class TestProjections(TestGeo):
         with self.assertRaisesRegex(ValueError, "Projection must be defined"):
             self.da.hvplot.image('x', 'y', projection='foo')
 
+    def test_plot_with_projection_raises_an_error_when_tiles_set(self):
+        da = self.da.copy()
+        with self.assertRaisesRegex(ValueError, "Tiles can only be used with output projection"):
+            da.hvplot.image('x', 'y', crs=self.crs, projection='Robinson', tiles=True)
+
 
 class TestGeoAnnotation(TestCase):
 
