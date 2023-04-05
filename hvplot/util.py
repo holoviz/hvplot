@@ -230,10 +230,16 @@ def process_crs(crs):
     """
     try:
         import cartopy.crs as ccrs
+    except ImportError:
+        raise ImportError('Geographic projection support requires cartopy.')
+    try:
         import geoviews as gv # noqa
+    except ImportError:
+        raise ImportError('Geographic projection support requires geoviews.')
+    try:
         import pyproj
     except ImportError:
-        raise ImportError('Geographic projection support requires geoviews, pyproj and cartopy.')
+        raise ImportError('Geographic projection support requires pyproj.')
 
     if crs is None:
         return ccrs.PlateCarree()
