@@ -261,6 +261,13 @@ class TestGeoPandas(TestCase):
         assert points.kdims == ['x', 'y']
         assert points.vdims == ['index']
 
+    def test_points_hover_cols_positional_arg_sets_color(self):
+        points = self.cities.hvplot('name')
+        assert points.kdims == ['x', 'y']
+        assert points.vdims == ['name']
+        opts = hv.Store.lookup_options('bokeh', points, 'style').kwargs
+        assert opts['color'] == 'name'
+
     def test_points_hover_cols_with_c_set_to_name(self):
         points = self.cities.hvplot(c='name')
         assert points.kdims == ['x', 'y']
