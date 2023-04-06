@@ -2232,9 +2232,12 @@ class HoloViewsConverter:
         for opts_ in [cur_opts, compat_opts]:
             if 'color' in opts_ and opts_['color'] in vdims:
                 opts_['color'] = hv.dim(opts_['color'])
+            # if there is nothing to put in hover, turn it off
+            if 'tools' in opts_ and kind in ["polygons", "paths"] and not vdims:
+                opts_["tools"] = [t for t in opts_["tools"] if t != "hover"]
         if self.geo: params['crs'] = self.crs
         if self.by:
-            obj = Dataset(data).to(element, kdims, vdims, self.by, **params)
+            obj = Dataset(data, self.by+kdims, vdims).to(element, kdims, vdims, self.by, **params)
             if self.subplots:
                 obj = obj.layout(sort=False)
             else:
