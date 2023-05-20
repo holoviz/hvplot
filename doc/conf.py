@@ -28,12 +28,12 @@ html_theme_options.update({
         {
             "name": "Twitter",
             "url": "https://twitter.com/HoloViews",
-            "icon": "fab fa-twitter-square",
+            "icon": "fa-brands fa-twitter-square",
         },
         {
             "name": "Discourse",
             "url": "https://discourse.holoviz.org/c/hvplot",
-            "icon": "fab fa-discourse",
+            "icon": "fa-brands fa-discourse",
         },
         {
             "name": "Discord",
