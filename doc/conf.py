@@ -17,8 +17,7 @@ nbbuild_cell_timeout = 600
 
 html_static_path += ['_static']
 
-html_css_files = [
-    'nbsite.css',
+html_css_files += [
     'custom.css'
 ]
 
@@ -41,7 +40,8 @@ html_theme_options.update({
             "icon": "fa-brands fa-discord",
         },
     ],
-    "analytics": {"google_analytics_id": "UA-154795830-5"}
+    "analytics": {"google_analytics_id": "UA-154795830-5"},
+    "pygment_dark_style": "material",
 })
 
 html_theme = "pydata_sphinx_theme"
