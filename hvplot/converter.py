@@ -717,6 +717,10 @@ class HoloViewsConverter:
                     kind = 'polygons'
                 elif geom_type in ('LineString', 'LineRing', 'Line'):
                     kind = 'paths'
+            # if only one arg is provided, treat it like color
+            if x is not None and y is None:
+                kwds['color'] = kwds.pop('color', kwds.pop('c', x))
+                x = None
         elif isinstance(data, pd.DataFrame):
             datatype = 'pandas'
             self.data = data
