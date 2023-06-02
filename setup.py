@@ -86,23 +86,14 @@ extras_require['examples'] = [
     'pooch >=1.6.0',
     'fiona',
     'rioxarray',
-    # Extra dependency of cartopy on Python 3.6 only
-    'pyepsg',
     'matplotlib',
     'plotly',
     'pygraphviz',
-    'ipykernel <6.18.0',  # temporary
-    'numpy < 1.24', # temporary, for a numba error
     'ipywidgets',
+    'numba >=0.51.0',
+    'datashader >=0.6.5',
+    'spatialpandas >=0.4.3',
 ]
-
-# Packages not working on python 3.11 because of numba
-if sys.version_info < (3, 11):
-    extras_require['examples'] += [
-        'numba >=0.51.0',
-        'datashader >=0.6.5',
-        'spatialpandas >=0.4.3',
-    ]
 
 # Run the example tests by installing examples_tests together with tests
 extras_require["examples_tests"] = extras_require["examples"] + extras_require['tests_nb']
@@ -142,8 +133,6 @@ setup_args = dict(
     classifiers = [
         "License :: OSI Approved :: BSD License",
         "Development Status :: 5 - Production/Stable",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
@@ -154,7 +143,7 @@ setup_args = dict(
         "Natural Language :: English",
         "Topic :: Scientific/Engineering",
         "Topic :: Software Development :: Libraries"],
-    python_requires=">=3.6",
+    python_requires=">=3.8",
     install_requires=install_requires,
     extras_require=extras_require,
     tests_require=extras_require['tests'],
