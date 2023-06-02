@@ -230,6 +230,9 @@ class HoloViewsConverter:
         Whether to project the data before plotting (adds initial
         overhead but avoids projecting data when plot is dynamically
         updated).
+    projection (default=None): str or Cartopy CRS
+        Coordinate reference system of the plot specified as Cartopy
+        CRS object or class name.
     tiles (default=False):
         Whether to overlay the plot on a tile source. Tiles sources
         can be selected by name or a tiles object or class can be passed,
@@ -255,7 +258,8 @@ class HoloViewsConverter:
     ]
 
     _geo_options = [
-        'geo', 'crs', 'features', 'project', 'coastline', 'tiles'
+        'geo', 'crs', 'features', 'project', 'coastline', 'tiles',
+        'projection', 'global_extents'
     ]
 
     _axis_options = [
@@ -393,7 +397,7 @@ class HoloViewsConverter:
         )
 
         self.dynamic = dynamic
-        self.geo = any([geo, crs, global_extent, projection, project, coastline, features])
+        self.geo = any([geo, crs, global_extent, projection, project, coastline, features, tiles])
         self.crs = self._process_crs(data, crs) if self.geo else None
         self.project = project
         self.coastline = coastline
@@ -412,7 +416,7 @@ class HoloViewsConverter:
                                   'install -c pyviz geoviews')
         if self.geo:
             if self.kind not in self._geo_types:
-                param.main.warning(
+                param.main.param.warning(
                     "geo option cannot be used with kind=%r plot "
                     "type. Geographic plots are only supported for "
                     "following plot types: %r" % (self.kind, self._geo_types))
@@ -434,13 +438,20 @@ class HoloViewsConverter:
                         "Projection must be defined as cartopy CRS or "
                         "one of the following CRS string:\n {}".format(all_crs))
 
-            proj_crs = projection or ccrs.GOOGLE_MERCATOR
-            if self.crs != proj_crs:
+            projection = projection or (ccrs.GOOGLE_MERCATOR if tiles else self.crs)
+            if tiles and projection != ccrs.GOOGLE_MERCATOR:
+                raise ValueError(
+                    "Tiles can only be used with output projection of "
+                    "`cartopy.crs.GOOGLE_MERCATOR`. To get rid of this error "
+                    "remove `projection=` or `tiles=`"
+                )
+
+            if self.crs != projection:
                 px0, py0, px1, py1 = ccrs.GOOGLE_MERCATOR.boundary.bounds
                 x0, x1 = xlim or (px0, px1)
                 y0, y1 = ylim or (py0, py1)
                 extents = (x0, y0, x1, y1)
-                x0, y0, x1, y1 = project_extents(extents, self.crs, proj_crs)
+                x0, y0, x1, y1 = project_extents(extents, self.crs, projection)
                 if xlim:
                     xlim = (x0, x1)
                 if ylim:
@@ -606,7 +617,7 @@ class HoloViewsConverter:
         if debug:
             kwds = dict(x=self.x, y=self.y, by=self.by, kind=self.kind,
                         groupby=self.groupby, grid=self.grid)
-            param.main.warning('Plotting {kind} plot with parameters x: {x}, '
+            param.main.param.warning('Plotting {kind} plot with parameters x: {x}, '
                                'y: {y}, by: {by}, groupby: {groupby}, row/col: {grid}'.format(**kwds))
 
     def _process_symmetric(self, symmetric, clim, check_symmetric_max):

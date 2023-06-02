@@ -665,7 +665,7 @@ def test_interactive_pandas_frame_bind_out_widgets(df):
 
 
 def test_interactive_pandas_frame_bind_operator_out_widgets(df):
-    select = pn.widgets.Select(default='A', options=list(df.columns))
+    select = pn.widgets.Select(value='A', options=list(df.columns))
 
     def sel_col(col):
         return df[col]

@@ -320,7 +320,7 @@ def is_dask(data):
     return isinstance(data, (dd.DataFrame, dd.Series))
 
 def is_intake(data):
-    if not check_library(data, 'intake'):
+    if "intake" not in sys.modules:
         return False
     from intake.source.base import DataSource
     return isinstance(data, DataSource)
