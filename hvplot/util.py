@@ -10,6 +10,7 @@ from functools import wraps
 from packaging.version import Version
 from types import FunctionType
 
+import bokeh
 import numpy as np
 import pandas as pd
 import param
@@ -21,6 +22,8 @@ except:
     panel_available = False
 
 hv_version = Version(hv.__version__)
+bokeh_version = Version(bokeh.__version__)
+bokeh3 = bokeh_version >= Version("3.0")
 
 
 def with_hv_extension(func, extension='bokeh', logo=False):
