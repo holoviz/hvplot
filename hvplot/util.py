@@ -228,18 +228,21 @@ def process_crs(crs):
       3. cartopy.crs.CRS instance
       4. None defaults to crs.PlateCaree
     """
+    missing = []
     try:
         import cartopy.crs as ccrs
     except ImportError:
-        raise ImportError('Geographic projection support requires cartopy.')
+        missing.append('cartopy')
     try:
         import geoviews as gv # noqa
     except ImportError:
-        raise ImportError('Geographic projection support requires geoviews.')
+        missing.append('geoviews')
     try:
         import pyproj
     except ImportError:
-        raise ImportError('Geographic projection support requires pyproj.')
+        missing.append('pyproj')
+    if missing:
+        raise ImportError(f'Geographic projection support requires: {", ".join(missing)}.')
 
     if crs is None:
         return ccrs.PlateCarree()
