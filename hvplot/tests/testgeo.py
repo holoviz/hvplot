@@ -7,7 +7,6 @@ from packaging.version import Version
 import numpy as np
 import pandas as pd
 import holoviews as hv
-import pytest
 
 from hvplot.util import proj_to_cartopy
 
@@ -280,11 +279,14 @@ class TestGeoPandas(TestCase):
         opts = hv.Store.lookup_options('bokeh', points, 'style').kwargs
         assert opts['color'] == 'name'
 
-    @pytest.mark.xfail
     def test_points_hover_cols_with_by_set_to_name(self):
         points = self.cities.hvplot(by='name')
-        assert points.kdims == ['x', 'y']
-        assert points.vdims == ['name']
+        assert isinstance(points, hv.core.overlay.NdOverlay)
+        assert points.kdims == ['name']
+        assert points.vdims == []
+        for element in points.values():
+            assert element.kdims == ['x', 'y']
+            assert element.vdims == []
 
     def test_points_project_xlim_and_ylim(self):
         points = self.cities.hvplot(geo=True, xlim=(-10, 10), ylim=(-20, -10))
@@ -292,10 +294,11 @@ class TestGeoPandas(TestCase):
         assert opts['xlim'] == (-10, 10)
         assert opts['ylim'] == (-20, -10)
 
-    @pytest.mark.xfail(
-        reason='Waiting for upstream fix https://github.com/holoviz/holoviews/pull/5325',
-        raises=KeyError,
-    )
     def test_polygons_by_subplots(self):
         polygons = self.polygons.hvplot(geo=True, by="name", subplots=True)
         assert isinstance(polygons, hv.core.layout.NdLayout)
+
+    def test_polygons_turns_off_hover_when_there_are_no_fields_to_include(self):
+        polygons = self.polygons.hvplot(geo=True)
+        opts = hv.Store.lookup_options('bokeh', polygons, 'plot').kwargs
+        assert 'hover' not in opts.get('tools')
