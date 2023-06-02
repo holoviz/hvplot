@@ -107,6 +107,11 @@ class TestProjections(TestGeo):
         with self.assertRaisesRegex(ValueError, "Projection must be defined"):
             self.da.hvplot.image('x', 'y', projection='foo')
 
+    def test_plot_with_projection_raises_an_error_when_tiles_set(self):
+        da = self.da.copy()
+        with self.assertRaisesRegex(ValueError, "Tiles can only be used with output projection"):
+            da.hvplot.image('x', 'y', crs=self.crs, projection='Robinson', tiles=True)
+
 
 class TestGeoAnnotation(TestCase):
 
@@ -273,6 +278,12 @@ class TestGeoPandas(TestCase):
         points = self.cities.hvplot(by='name')
         assert points.kdims == ['x', 'y']
         assert points.vdims == ['name']
+
+    def test_points_project_xlim_and_ylim(self):
+        points = self.cities.hvplot(geo=True, xlim=(-10, 10), ylim=(-20, -10))
+        opts = hv.Store.lookup_options('bokeh', points, 'plot').options
+        assert opts['xlim'] == (-10, 10)
+        assert opts['ylim'] == (-20, -10)
 
     @pytest.mark.xfail(
         reason='Waiting for upstream fix https://github.com/holoviz/holoviews/pull/5325',
