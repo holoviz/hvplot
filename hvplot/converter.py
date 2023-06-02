@@ -412,7 +412,7 @@ class HoloViewsConverter:
                                   'install -c pyviz geoviews')
         if self.geo:
             if self.kind not in self._geo_types:
-                param.main.warning(
+                param.main.param.warning(
                     "geo option cannot be used with kind=%r plot "
                     "type. Geographic plots are only supported for "
                     "following plot types: %r" % (self.kind, self._geo_types))
@@ -606,7 +606,7 @@ class HoloViewsConverter:
         if debug:
             kwds = dict(x=self.x, y=self.y, by=self.by, kind=self.kind,
                         groupby=self.groupby, grid=self.grid)
-            param.main.warning('Plotting {kind} plot with parameters x: {x}, '
+            param.main.param.warning('Plotting {kind} plot with parameters x: {x}, '
                                'y: {y}, by: {by}, groupby: {groupby}, row/col: {grid}'.format(**kwds))
 
     def _process_symmetric(self, symmetric, clim, check_symmetric_max):

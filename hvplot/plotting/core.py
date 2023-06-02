@@ -113,7 +113,7 @@ class hvPlotBase:
         if name in plots:
             plot_opts = plots[name]
             if "kind" in plot_opts and name in HoloViewsConverter._kind_mapping:
-                param.main.warning(
+                param.main.param.warning(
                     "Custom options for existing plot types should not "
                     "declare the 'kind' argument. The .%s plot method "
                     "was unexpectedly customized with kind=%r." % (plot_opts["kind"], name)
