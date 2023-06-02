@@ -57,7 +57,7 @@ class hvPlotBase:
 
         if isinstance(kind, str) and kind not in self.__all__:
             raise NotImplementedError(
-                "kind='{kind}' for data of type {type}".format(kind=kind, type=type(self._data))
+                f"kind='{kind}' for data of type {type(self._data)}"
             )
 
         if panel_available:

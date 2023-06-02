@@ -227,7 +227,7 @@ class Interactive:
         for subcls in cls.__subclasses__():
             if subcls.applies(obj):
                 clss = subcls
-        inst = super(Interactive, cls).__new__(clss)
+        inst = super().__new__(clss)
         inst._shared_obj = kwargs.get('_shared_obj', [obj])
         inst._fn = fn
         return inst
