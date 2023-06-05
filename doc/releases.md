@@ -10,13 +10,13 @@ The 0.8.4 release brings a number of bugfixes and documentation improvements. Ma
 
 Bug fixes:
 
-* Implement bokeh3 compatible layout ([1076](https://github.com/holoviz/hvplot/pull/1076))
+* Fix `.interactive` layout compatibility with Bokeh 3 ([1076](https://github.com/holoviz/hvplot/pull/1076))
 * Fix usage with intake ([1052](https://github.com/holoviz/hvplot/pull/1052))
-* Various updates in preparation of Param 2.0 ([1064](https://github.com/holoviz/hvplot/pull/1064))
+* Fix deprecated usage of Param 2.0 ([1064](https://github.com/holoviz/hvplot/pull/1064))
 * Fix projection when `xlim`/`ylim` provided ([1053](https://github.com/holoviz/hvplot/pull/1053))
-* For geopandas, when passing a positional arg it is interpretted as `color` ([1056](https://github.com/holoviz/hvplot/pull/1056))
-* Improve the missing import error message for geo dependencies ([1054](https://github.com/holoviz/hvplot/pull/1054))
-* Improve `hover` for geometries - make it less likely to fail ([1055](https://github.com/holoviz/hvplot/pull/1055))
+* Fix interpretation of positional arg with geopandas, now used as `color` ([1056](https://github.com/holoviz/hvplot/pull/1056))
+* Fix import error messages for geo dependencies ([1054](https://github.com/holoviz/hvplot/pull/1054))
+* Fix usage of `hover` for geometries - make it less likely to fail ([1055](https://github.com/holoviz/hvplot/pull/1055))
 
 Documentation:
 
