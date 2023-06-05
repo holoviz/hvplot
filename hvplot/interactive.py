@@ -782,7 +782,7 @@ class Interactive:
                 components = [HSpacer(), panel, HSpacer()]
             else:
                 components = [panel]
-            return Row(*components)
+            return Row(*components, **kwargs)
 
         items = (widget_box, panel) if widget_first else (panel, widget_box)
         sizing_mode = kwargs.get('sizing_mode')
