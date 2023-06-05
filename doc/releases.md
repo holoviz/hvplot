@@ -2,6 +2,31 @@
 
 See [the HoloViz blog](https://blog.holoviz.org/tag/hvplot.html) for a visual summary of the major features added in a selection of releases.
 
+## Version 0.8.4
+
+**June 5th, 2023**
+
+The 0.8.4 release brings a number of bugfixes and documentation improvements.   Many thanks to @kthyng (first contribution!), @raybellwaves, @jsignell , @Hoxbro, @maximlt and  @philippjfr for contributing.
+
+Bug fixes:
+
+* Implement bokeh3 compatible layout ([1076](https://github.com/holoviz/hvplot/pull/1076))
+* Fix usage with intake ([1052](https://github.com/holoviz/hvplot/pull/1052))
+* Various updates in preparation of Param 2.0 ([1064](https://github.com/holoviz/hvplot/pull/1064))
+* Fix projection when `xlim`/`ylim` provided ([1053](https://github.com/holoviz/hvplot/pull/1053))
+* For geopandas, when passing a positional arg it is interpretted as `color` ([1056](https://github.com/holoviz/hvplot/pull/1056))
+* Improve the missing import error message for geo dependencies ([1054](https://github.com/holoviz/hvplot/pull/1054))
+* Improve `hover` for geometries - make it less likely to fail ([1055](https://github.com/holoviz/hvplot/pull/1055))
+
+Documentation:
+
+* Update to latest nbsite & pydata-sphinx-theme ([1070](https://github.com/holoviz/hvplot/pull/1070))
+* Update to Google Analytics4 ([1075](https://github.com/holoviz/hvplot/pull/1075))
+
+Maintenance:
+
+* Add ipywidgets to the examples deps ([1048](https://github.com/holoviz/hvplot/pull/1048))
+
 ## Version 0.8.3
 
 **March 17, 2023**
