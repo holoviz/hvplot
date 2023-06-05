@@ -49,7 +49,8 @@ html_logo = "_static/logo_horizontal.svg"
 html_favicon = "_static/favicon.ico"
 
 extensions += [
-    'nbsite.gallery'
+    'nbsite.gallery',
+    'sphinx_copybutton',
 ]
 
 myst_enable_extensions = ["colon_fence"]
