@@ -6,7 +6,7 @@ See [the HoloViz blog](https://blog.holoviz.org/tag/hvplot.html) for a visual su
 
 **June 5th, 2023**
 
-The 0.8.4 release brings a number of bugfixes and documentation improvements.   Many thanks to @kthyng (first contribution!), @raybellwaves, @jsignell , @Hoxbro, @maximlt and  @philippjfr for contributing.
+The 0.8.4 release brings a number of bugfixes and documentation improvements. Many thanks to @kthyng (first contribution!), @raybellwaves, @jsignell , @Hoxbro, @maximlt and  @philippjfr for contributing.
 
 Bug fixes:
 
