@@ -111,6 +111,11 @@ jobs:
           # - Install importlib_resources to fix tqdm that missed adding it as a dependency
           # for 3.6 (https://github.com/conda-forge/tqdm-feedstock/pull/114)
           conda install "panel=0.12" "importlib_resources" --no-update-deps
+      - name: Add Holoviews branch
+        run: |
+          conda activate test-environment
+          conda uninstall holoviews -y --offline --force || echo already uninstalled
+          pip install "git+https://github.com/holoviz/holoviews.git@xarray_improve"
       - name: doit env_capture
         run: |
           conda activate test-environment
