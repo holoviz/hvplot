@@ -397,7 +397,7 @@ class HoloViewsConverter:
         )
 
         self.dynamic = dynamic
-        self.geo = any([geo, crs, global_extent, projection, project, coastline, features, tiles])
+        self.geo = any([geo, crs, global_extent, projection, project, coastline, features])
         self.crs = self._process_crs(data, crs) if self.geo else None
         self.project = project
         self.coastline = coastline
