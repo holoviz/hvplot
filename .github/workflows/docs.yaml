@@ -40,7 +40,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           mamba-version: "*"
-          channels: pyviz/label/dev,conda-forge,nodefaults
+          channels: pyviz/label/dev,conda-forge
       - name: Fetch unshallow
         run: git fetch --prune --tags --unshallow -f
       - name: Set and echo git ref
@@ -50,6 +50,7 @@ jobs:
           echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
       - name: conda setup
         run: |
+          conda config --remove channels defaults
           conda create -n test-environment python=3.8 pyctdev
       - name: doit develop_install
         run: |
