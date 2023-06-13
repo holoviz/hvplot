@@ -754,7 +754,9 @@ class HoloViewsConverter:
                     raise ValueError("Cannot plot an empty xarray.Dataset object.")
             if z is None:
                 if isinstance(data, xr.Dataset):
-                    z = list(data.data_vars)[0]
+                    z = [k for k in data.data_vars if k not in (x, y)]
+                    if len(z) > 0:
+                        z = z[0]
                 else:
                     z = data.name or label or value_label
             if gridded and isinstance(data, xr.Dataset) and not isinstance(z, list):
@@ -1236,7 +1238,9 @@ class HoloViewsConverter:
                 elif self.datatype == 'xarray':
                     import xarray as xr
                     if isinstance(data, xr.Dataset):
-                        dataset = Dataset(data, self.indexes)
+                        kdims = self.indexes
+                        vdims = [vd for vd in data.data_vars.variables if vd not in kdims]
+                        dataset = Dataset(data, kdims=kdims, vdims=vdims)
                     else:
                         name = data.name or self.label or self.value_label
                         dataset = Dataset(data, self.indexes, name)
@@ -2241,7 +2245,7 @@ class HoloViewsConverter:
         redim = self._merge_redim({self._color_dim: self._dim_ranges['c']} if self._color_dim else {})
         kdims, vdims = self._get_dimensions([x, y], [])
         if self.gridded_data:
-            vdims = Dataset(data).vdims
+            vdims = [vd for vd in Dataset(data).vdims if vd not in kdims]
         element = self._get_element(kind)
         cur_opts, compat_opts = self._get_compat_opts(element.name)
         for opts_ in [cur_opts, compat_opts]:
