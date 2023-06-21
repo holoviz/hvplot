@@ -117,7 +117,6 @@ def proj_to_cartopy(proj):
     a cartopy.crs.Projection object
     """
 
-    import cartopy
     import cartopy.crs as ccrs
     try:
         from osgeo import osr
@@ -200,7 +199,7 @@ def proj_to_cartopy(proj):
     if cl.__name__ == 'Mercator':
         kw_proj.pop('false_easting', None)
         kw_proj.pop('false_northing', None)
-        if Version(cartopy.__version__) < Version('0.15'):
+        if "scale_factor" in kw_proj:
             kw_proj.pop('latitude_true_scale', None)
     elif cl.__name__ == 'Stereographic':
         kw_proj.pop('scale_factor', None)
