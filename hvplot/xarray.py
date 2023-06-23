@@ -8,7 +8,7 @@ from .interactive import Interactive
 class XArrayInteractive(Interactive):
 
     @classmethod
-    def applies(cls, obj):
+    def _applies(cls, obj):
         return isinstance(obj, (xr.DataArray, xr.Dataset))
 
     def sel(self, **kwargs):
