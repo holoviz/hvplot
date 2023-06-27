@@ -4,7 +4,6 @@ from panel.widgets import Widget
 
 from .interactive import Interactive
 
-
 class XArrayInteractive(Interactive):
 
     @classmethod
