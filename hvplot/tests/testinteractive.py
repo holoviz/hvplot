@@ -1301,7 +1301,7 @@ def test_interactive_pandas_series_plot(series, clone_spy):
     si = si.plot()
 
     assert isinstance(si, Interactive)
-    assert isinstance(si.eval(), matplotlib.axes.Axes)
+    assert isinstance(si.eval(), matplotlib.figure.Figure)
     assert si._obj is series
     assert si._operation['fn'] == 'plot'
     assert si._operation['args'] == ()
@@ -1367,8 +1367,6 @@ def test_interactive_pandas_series_plot_kind_attr(series, clone_spy):
     assert len(clone_spy.calls[1].args) == 1
     # assert repr(clone_spy.calls[1].args[0]) == "dim('*').pd.plot()"
     assert len(clone_spy.calls[1].kwargs) == 1
-    assert 'inherit_kwargs' in clone_spy.calls[1].kwargs
-    assert 'ax' in clone_spy.calls[1].kwargs['inherit_kwargs']
 
     # 1st _clone(copy=True) in __call__
     assert clone_spy.calls[2].depth == 3

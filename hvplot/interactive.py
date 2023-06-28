@@ -14,7 +14,7 @@ import holoviews as hv
 from panel.react import react
 
 from .converter import HoloViewsConverter
-from .util import is_tabular
+from .util import is_tabular, is_xarray
 
 
 class Interactive(react):
@@ -152,4 +152,6 @@ class _hvplot:
         return self._interactive._obj.hvplot.__all__
 
 
-react.register_accessor('hvplot', _hvplot)
+react.register_accessor(
+    'hvplot', _hvplot, predicate=lambda obj: is_tabular(obj) or is_xarray(obj)
+)
