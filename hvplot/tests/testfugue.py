@@ -3,9 +3,9 @@ import pytest
 
 try:
     import pandas as pd
-    import hvplot.pandas
+    import hvplot.pandas  # noqa: F401
     import fugue.api as fa
-    from hvplot.fugue import _parse_hvplot
+    from hvplot.fugue import _parse_hvplot # noqa: F401
 except:
     pytest.skip(allow_module_level=True)
 
