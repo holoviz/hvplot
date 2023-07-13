@@ -21,7 +21,7 @@ class _Visualize(Outputter):
     def process(self, dfs: DataFrames) -> None:
         """
         Process the dataframes and output the result as
-        pn.Column or pn.pane.HoloViews.
+        a pn.Column.
 
         Parameters:
         -----------
