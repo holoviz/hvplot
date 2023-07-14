@@ -213,9 +213,11 @@ class HoloViewsConverter:
         returning an aggregated Image (to be colormapped by the
         plotting backend) instead of individual points
     op_threshold (default=None):
-        The threshold before applying the operation (datashade / rasterize);
-        if the number of points is below this value, the plot will
-        not be rasterized or datashaded.
+        The threshold before toggling the operation (datashade / rasterize);
+        if the number of individual points exceeds this value, the plot will
+        be rasterized or datashaded; else the plot with the original points
+        will be returned instead. If this is unset, the operation
+        will always be applied.
     x_sampling/y_sampling (default=None):
         Specifies the smallest allowed sampling interval along the x/y axis.
 
