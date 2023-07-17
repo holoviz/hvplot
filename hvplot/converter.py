@@ -1388,10 +1388,9 @@ class HoloViewsConverter:
             return data_size > self.aggregation_threshold
 
         if self.aggregation_threshold is not None:
-            operation_instance = operation.instance(**opts)
             processed = apply_when(
                 obj,
-                operation=operation_instance,
+                operation=partial(operation, **opts),
                 predicate=exceeds_aggregation_threshold
             )
         else:
