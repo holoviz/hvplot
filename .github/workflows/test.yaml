@@ -99,7 +99,7 @@ jobs:
       run:
         shell: bash -l {0}
     steps:
-      - uses: holoviz-dev/holoviz_tasks/install@v0.1a15
+      - uses: holoviz-dev/holoviz_tasks/install@v0.1a14
         with:
           name: unit_test_suite_36
           python-version: ${{ matrix.python-version }}
@@ -108,6 +108,7 @@ jobs:
           envs: "-o tests"
           cache: true
           conda-update: true
+          conda-mamba: mamba
         id: install
       - name: doit develop_install py
         if: steps.install.outputs.cache-hit != 'true'
