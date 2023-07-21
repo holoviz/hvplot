@@ -45,7 +45,7 @@ jobs:
       run:
         shell: bash -el {0}
     steps:
-      - uses: holoviz-dev/holoviz_tasks/install@v0.1a12
+      - uses: holoviz-dev/holoviz_tasks/install@v0.1a15
         with:
           name: unit_test_suite
           python-version: ${{ matrix.python-version }}
@@ -54,13 +54,12 @@ jobs:
           envs: "-o examples_tests -o tests"
           cache: true
           conda-update: true
-          conda-mamba: mamba
         id: install
       - name: patch fiona/geostack on Python 3.7 / Macos
         if: steps.install.outputs.cache-hit != 'true' && contains(matrix.os, 'macos') && matrix.python-version == '3.7'
         run: |
           conda activate test-environment
-          mamba install "fiona=1.8" "gdal=3.3"
+          conda install "fiona=1.8" "gdal=3.3"
       - name: doit test_unit
         run: |
           conda activate test-environment
@@ -90,7 +89,7 @@ jobs:
       run:
         shell: bash -l {0}
     steps:
-      - uses: holoviz-dev/holoviz_tasks/install@v0.1a12
+      - uses: holoviz-dev/holoviz_tasks/install@v0.1a15
         with:
           name: unit_test_suite_36
           python-version: ${{ matrix.python-version }}
@@ -99,7 +98,6 @@ jobs:
           envs: "-o tests"
           cache: true
           conda-update: true
-          conda-mamba: mamba
         id: install
       - name: doit develop_install py
         if: steps.install.outputs.cache-hit != 'true'
