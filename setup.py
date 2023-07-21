@@ -91,18 +91,11 @@ extras_require['examples'] = [
     'matplotlib',
     'plotly',
     'pygraphviz',
-    'ipykernel <6.18.0',  # temporary
-    'numpy < 1.24', # temporary, for a numba error
     'ipywidgets',
+    'numba >=0.51.0',
+    'datashader >=0.6.5',
+    'spatialpandas >=0.4.3',
 ]
-
-# Packages not working on python 3.11 because of numba
-if sys.version_info < (3, 11):
-    extras_require['examples'] += [
-        'numba >=0.51.0',
-        'datashader >=0.6.5',
-        'spatialpandas >=0.4.3',
-    ]
 
 # Run the example tests by installing examples_tests together with tests
 extras_require["examples_tests"] = extras_require["examples"] + extras_require['tests_nb']
