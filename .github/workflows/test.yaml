@@ -60,6 +60,11 @@ jobs:
         run: |
           conda activate test-environment
           conda install "zarr <2.15.0"
+      - name: patch holoviews
+        if: steps.install.outputs.cache-hit != 'true'
+        run: |
+          conda activate test-environment
+          conda install "holoviews <= 1.17.0a2"
       - name: patch fiona/geostack on Python 3.7 / Macos
         if: steps.install.outputs.cache-hit != 'true' && contains(matrix.os, 'macos') && matrix.python-version == '3.7'
         run: |
