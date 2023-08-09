@@ -194,6 +194,17 @@ class TestDatashader(ComparisonTestCase):
         actual = plot.callback.inputs[0].callback.operation.p['rescale_discrete_levels']
         assert actual is expected
 
+    def test_datashade_x_range(self):
+        expected = (0, 10)
+        plot = self.df.hvplot(x='x', y='y', datashade=True, xlim=expected)
+        actual = plot.callback.inputs[0].callback.operation.p['x_range']
+        assert actual == expected
+
+    def test_datashade_y_range(self):
+        expected = (0, 10)
+        plot = self.df.hvplot(x='x', y='y', datashade=True, ylim=expected)
+        actual = plot.callback.inputs[0].callback.operation.p['y_range']
+        assert actual == expected
 
 class TestChart2D(ComparisonTestCase):
 

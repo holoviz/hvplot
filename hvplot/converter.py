@@ -1336,6 +1336,10 @@ class HoloViewsConverter:
             if self._dim_ranges.get('c', (None, None)) != (None, None):
                 style['clim'] = self._dim_ranges['c']
 
+        if 'xlim' in self._plot_opts:
+            opts['x_range'] = self._plot_opts['xlim']
+        if 'ylim' in self._plot_opts:
+            opts['y_range'] = self._plot_opts['ylim']
         processed = operation(obj, **opts)
 
         if self.dynspread:
