@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import panel as _pn
 import param
 import holoviews as _hv
@@ -8,7 +10,7 @@ output = _hv.output
 
 save = _hv.save
 
-def show(obj, title=None, port=0, **kwargs):
+def show(obj, title=None, port=0, **kwargs) -> _pn.io.server.Server | _pn.io.server.StoppableThread:
     """
     Displays HoloViews objects in and outside the notebook
 
@@ -24,7 +26,7 @@ def show(obj, title=None, port=0, **kwargs):
         Additional keyword arguments passed to Panel show method.
     Returns
     -------
-    a Server | threading.Thread (if threaded=true)
+    a panel.io.server.Server | panel.io.server.StoppableThread (if threaded=true)
     """
     if not isinstance(obj, _hv.core.Dimensioned):
         raise ValueError('%s type object not recognized and cannot be shown.' %
