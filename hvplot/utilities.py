@@ -10,7 +10,7 @@ output = _hv.output
 
 save = _hv.save
 
-def show(obj, title=None, port=0, **kwargs) -> _pn.io.server.Server | _pn.io.server.StoppableThread:
+def show(obj, title=None, port=0, **kwargs):
     """
     Displays HoloViews objects in and outside the notebook
 
