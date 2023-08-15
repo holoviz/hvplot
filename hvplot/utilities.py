@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import panel as _pn
 import param
 import holoviews as _hv
