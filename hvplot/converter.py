@@ -182,7 +182,7 @@ class HoloViewsConverter:
     check_symmetric_max (default=1000000):
         Size above which to stop checking for symmetry by default on the data.
 
-    Datashader options
+    Downsampling options
     ------------------
     aggregator (default=None):
         Aggregator to use when applying rasterize or datashade operation
@@ -197,6 +197,10 @@ class HoloViewsConverter:
         Whether to apply rasterization and shading (colormapping) using
         the Datashader library, returning an RGB object instead of
         individual points
+    downsample (default=False):
+        Whether to apply LTTB (Largest Triangle Three Buckets)
+        downsampling to the element (note this is only well behaved for
+        timeseries data).
     dynspread (default=False):
         For plots generated with datashade=True or rasterize=True,
         automatically increase the point size when the data is sparse
@@ -375,10 +379,10 @@ class HoloViewsConverter:
         title=None, xlim=None, ylim=None, clim=None, symmetric=None,
         logx=None, logy=None, loglog=None, hover=None, subplots=False,
         label=None, invert=False, stacked=False, colorbar=None,
-        datashade=False, rasterize=False, row=None, col=None,
-        debug=False, framewise=True, aggregator=None,
-        projection=None, global_extent=None, geo=False,
-        precompute=False, flip_xaxis=None, flip_yaxis=None,
+        datashade=False, rasterize=False, downsample=None,
+        row=None, col=None, debug=False, framewise=True,
+        aggregator=None, projection=None, global_extent=None,
+        geo=False, precompute=False, flip_xaxis=None, flip_yaxis=None,
         dynspread=False, hover_cols=[], x_sampling=None,
         y_sampling=None, project=False, tools=[], attr_labels=None,
         coastline=False, tiles=False, sort_date=True,
@@ -460,6 +464,7 @@ class HoloViewsConverter:
         # Operations
         self.datashade = datashade
         self.rasterize = rasterize
+        self.downsample = downsample
         self.dynspread = dynspread
         self.aggregator = aggregator
         self.precompute = precompute
@@ -1256,10 +1261,28 @@ class HoloViewsConverter:
             projection = self._plot_opts.get('projection', ccrs.GOOGLE_MERCATOR)
             obj = project(obj, projection=projection)
 
-        if not (self.datashade or self.rasterize):
+        if not (self.datashade or self.rasterize or self.downsample):
             layers = self._apply_layers(obj)
             layers = _transfer_opts_cur_backend(layers)
             return layers
+
+        opts = dict(dynamic=self.dynamic)
+        if self._plot_opts.get('width') is not None:
+            opts['width'] = self._plot_opts['width']
+        if self._plot_opts.get('height') is not None:
+            opts['height'] = self._plot_opts['height']
+
+        if self.downsample:
+            from holoviews.operation.downsample import downsample1d
+
+            if self.x_sampling:
+                opts['x_sampling'] = self.x_sampling
+            if self._plot_opts.get('xlim') is not None:
+                opts['x_range'] = self._plot_opts['xlim']
+            layers = downsample1d(obj, **opts)
+            layers = _transfer_opts_cur_backend(layers)
+            return layers
+
         try:
             from holoviews.operation.datashader import datashade, rasterize, dynspread
             from datashader import reductions
@@ -1268,12 +1291,6 @@ class HoloViewsConverter:
                     'the Datashader library must be available. '
                     'It can be installed with:\n  conda '
                     'install -c pyviz datashader')
-
-        opts = dict(dynamic=self.dynamic)
-        if self._plot_opts.get('width') is not None:
-            opts['width'] = self._plot_opts['width']
-        if self._plot_opts.get('height') is not None:
-            opts['height'] = self._plot_opts['height']
 
         categorical = False
         if self.by and not self.subplots:
@@ -1304,8 +1321,6 @@ class HoloViewsConverter:
             opts['x_range'] = self._plot_opts['xlim']
         if self._plot_opts.get('ylim') is not None:
             opts['y_range'] = self._plot_opts['ylim']
-        if not self.dynamic:
-            opts['dynamic'] = self.dynamic
 
         if 'cmap' in self._style_opts and self.datashade:
             levels = self._plot_opts.get('color_levels')
