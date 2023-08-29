@@ -195,10 +195,6 @@ class TestGridPlots(ComparisonTestCase):
         assert p.kdims[1].name == 'lat'
 
     def test_symmetric_dataset_not_in_memory(self):
-        # Give the following: numpy.ndarray size changed,
-        # may indicate binary incompatibility. Expected 16 from C header, got 96 from PyObject
-        raise SkipTest("Could be a reason for core dump on *NIX-system")
-
         # Creating a netcdf file and loading it as to get an non in memory
         # DataArray.
         da = xr.DataArray(
