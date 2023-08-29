@@ -10,6 +10,7 @@ from functools import wraps
 from packaging.version import Version
 from types import FunctionType
 
+import bokeh
 import numpy as np
 import pandas as pd
 import param
@@ -21,6 +22,8 @@ except:
     panel_available = False
 
 hv_version = Version(hv.__version__)
+bokeh_version = Version(bokeh.__version__)
+bokeh3 = bokeh_version >= Version("3.0")
 
 
 def with_hv_extension(func, extension='bokeh', logo=False):
@@ -228,12 +231,21 @@ def process_crs(crs):
       3. cartopy.crs.CRS instance
       4. None defaults to crs.PlateCaree
     """
+    missing = []
     try:
         import cartopy.crs as ccrs
+    except ImportError:
+        missing.append('cartopy')
+    try:
         import geoviews as gv # noqa
+    except ImportError:
+        missing.append('geoviews')
+    try:
         import pyproj
     except ImportError:
-        raise ImportError('Geographic projection support requires geoviews, pyproj and cartopy.')
+        missing.append('pyproj')
+    if missing:
+        raise ImportError(f'Geographic projection support requires: {", ".join(missing)}.')
 
     if crs is None:
         return ccrs.PlateCarree()

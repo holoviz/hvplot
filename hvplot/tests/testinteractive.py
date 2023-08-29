@@ -14,6 +14,10 @@ from holoviews.util.transform import dim
 from hvplot import bind
 from hvplot.interactive import Interactive
 from hvplot.xarray import XArrayInteractive
+from hvplot.util import bokeh3
+
+is_bokeh2 = pytest.mark.skipif(bokeh3, reason="requires bokeh 2.x")
+is_bokeh3 = pytest.mark.skipif(not bokeh3, reason="requires bokeh 3.x")
 
 
 @pytest.fixture(scope='module')
@@ -1247,6 +1251,7 @@ def test_interactive_pandas_layout_default_no_widgets_kwargs(df):
     assert layout.width == 200
 
 
+@is_bokeh2
 def test_interactive_pandas_layout_default_with_widgets(df):
     w = pn.widgets.IntSlider(value=2, start=1, end=5)
     dfi = Interactive(df)
@@ -1270,6 +1275,27 @@ def test_interactive_pandas_layout_default_with_widgets(df):
     assert isinstance(layout[0][0][1], pn.layout.HSpacer)
 
 
+@is_bokeh3
+def test_interactive_pandas_layout_default_with_widgets_bk3(df):
+    w = pn.widgets.IntSlider(value=2, start=1, end=5)
+    dfi = Interactive(df)
+    dfi = dfi.head(w)
+
+    assert dfi._center is False
+    assert dfi._loc == 'top_left'
+
+    layout = dfi.layout()
+
+    assert isinstance(layout, pn.Row)
+    assert len(layout) == 1
+    assert isinstance(layout[0], pn.Column)
+    assert len(layout[0]) == 2
+    assert isinstance(layout[0][0], pn.Column)
+    assert isinstance(layout[0][1], pn.pane.PaneBase)
+    assert len(layout[0][0]) == 1
+    assert isinstance(layout[0][0][0], pn.widgets.IntSlider)
+
+@is_bokeh2
 def test_interactive_pandas_layout_center_with_widgets(df):
     w = pn.widgets.IntSlider(value=2, start=1, end=5)
     dfi = df.interactive(center=True)
@@ -1298,6 +1324,7 @@ def test_interactive_pandas_layout_center_with_widgets(df):
     assert isinstance(layout[1][1][2], pn.layout.HSpacer)
 
 
+@is_bokeh2
 def test_interactive_pandas_layout_loc_with_widgets(df):
     w = pn.widgets.IntSlider(value=2, start=1, end=5)
     dfi = df.interactive(loc='top_right')

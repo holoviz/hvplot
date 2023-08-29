@@ -112,7 +112,7 @@ from panel.widgets.base import Widget
 
 from .converter import HoloViewsConverter
 from .util import (
-    _flatten, is_tabular, is_xarray, is_xarray_dataarray,
+    _flatten, bokeh3, is_tabular, is_xarray, is_xarray_dataarray,
     _convert_col_names_to_str,
 )
 
@@ -709,6 +709,11 @@ class Interactive:
         to the center and widget location specified in the
         interactive call.
         """
+        if bokeh3:
+            return self._layout_bk3(**kwargs)
+        return self._layout_bk2(**kwargs)
+
+    def _layout_bk2(self, **kwargs):
         widget_box = self.widgets()
         panel = self.output()
         loc = self._loc
@@ -749,6 +754,49 @@ class Interactive:
                 components = [Column(widgets, panel)]
             elif loc.startswith('bottom'):
                 components = [Column(panel, widgets)]
+        return Row(*components, **kwargs)
+
+    def _layout_bk3(self, **kwargs):
+        widget_box = self.widgets()
+        panel = self.output()
+        loc = self._loc
+        center = self._center
+        alignments = {
+            'left': (Row, ('start', 'center'), True),
+            'right': (Row, ('end', 'center'), False),
+            'top': (Column, ('center', 'start'), True),
+            'bottom': (Column, ('center', 'end'), False),
+            'top_left': (Column, 'start', True),
+            'top_right': (Column, ('end', 'start'), True),
+            'bottom_left': (Column, ('start', 'end'), False),
+            'bottom_right': (Column, 'end', False),
+            'left_top': (Row, 'start', True),
+            'left_bottom': (Row, ('start', 'end'), True),
+            'right_top': (Row, ('end', 'start'), False),
+            'right_bottom': (Row, 'end', False)
+        }
+        layout, align, widget_first = alignments[loc]
+        widget_box.align = align
+        if not len(widget_box):
+            if center:
+                components = [HSpacer(), panel, HSpacer()]
+            else:
+                components = [panel]
+            return Row(*components, **kwargs)
+
+        items = (widget_box, panel) if widget_first else (panel, widget_box)
+        sizing_mode = kwargs.get('sizing_mode')
+        if not center:
+            if layout is Row:
+                components = list(items)
+            else:
+                components = [layout(*items, sizing_mode=sizing_mode)]
+        elif layout is Column:
+            components = [HSpacer(), layout(*items, sizing_mode=sizing_mode), HSpacer()]
+        elif loc.startswith('left'):
+            components = [widget_box, HSpacer(), panel, HSpacer()]
+        else:
+            components = [HSpacer(), panel, HSpacer(), widget_box]
         return Row(*components, **kwargs)
 
     def holoviews(self):

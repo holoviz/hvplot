@@ -21,6 +21,10 @@ html_css_files += [
     'custom.css'
 ]
 
+html_js_files = [
+    'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js',
+]
+
 html_theme_options.update({
     "github_url": "https://github.com/holoviz/hvplot",
     "icon_links": [
@@ -49,7 +53,8 @@ html_logo = "_static/logo_horizontal.svg"
 html_favicon = "_static/favicon.ico"
 
 extensions += [
-    'nbsite.gallery'
+    'nbsite.gallery',
+    'sphinx_copybutton',
 ]
 
 myst_enable_extensions = ["colon_fence"]
