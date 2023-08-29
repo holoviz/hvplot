@@ -93,6 +93,9 @@ extras_require['examples'] = [
     'numba >=0.51.0',
     'datashader >=0.6.5',
     'spatialpandas >=0.4.3',
+]
+
+extras_require['examples_conda'] = [
     'hdf5 !=1.14.1',  # Gives coredump in test suite on Linux and Mac
 ]
 
