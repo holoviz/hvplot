@@ -577,7 +577,7 @@ class hvPlotExplorer(Viewer):
         """
         settings = {}
         for controller in self._controllers.values():
-            params = set(controller.param) - set(['name', 'explorer'])
+            params = set(controller.param) - {'name', 'explorer'}
             for p in params:
                 value = getattr(controller, p)
                 if value != controller.param[p].default:

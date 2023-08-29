@@ -69,7 +69,7 @@ def check_crs(crs):
     try:
         crs_type = pyproj.crs.CRS
     except AttributeError:
-        class Dummy():
+        class Dummy:
             pass
         crs_type = Dummy
 
