@@ -23,16 +23,19 @@ class hvPlotTabularPolars(hvPlotTabular):
 
         # Find columns which should be converted for LazyDataFrame and DataFrame
         if isinstance(self._data, (pl.LazyFrame, pl.DataFrame)):
-            possible_columns = [
-                [v] if isinstance(v, str) else v
-                for v in params.values()
-                if isinstance(v, (str, list))
-            ]
-            columns = (
-                set(self._data.columns) & set(itertools.chain(*possible_columns))
-            ) or {self._data.columns[0]}
-            columns |= {x, y}
-            columns.discard(None)
+            if params.get("hover_cols") == "all":
+                columns = list(self._data.columns)
+            else:
+                possible_columns = [
+                    [v] if isinstance(v, str) else v
+                    for v in params.values()
+                    if isinstance(v, (str, list))
+                ]
+                columns = (
+                    set(self._data.columns) & set(itertools.chain(*possible_columns))
+                ) or {self._data.columns[0]}
+                columns |= {x, y}
+                columns.discard(None)
 
         if isinstance(self._data, pl.DataFrame):
             data = self._data.select(columns).to_pandas()
