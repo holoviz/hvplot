@@ -413,7 +413,7 @@ class HoloViewsConverter:
                 raise ImportError('In order to use geo-related features '
                                   'the geoviews library must be available. '
                                   'It can be installed with:\n  conda '
-                                  'install -c pyviz geoviews')
+                                  'install geoviews')
         if self.geo:
             if self.kind not in self._geo_types:
                 param.main.param.warning(
@@ -1267,7 +1267,7 @@ class HoloViewsConverter:
             raise ImportError('In order to use datashading features '
                     'the Datashader library must be available. '
                     'It can be installed with:\n  conda '
-                    'install -c pyviz datashader')
+                    'install datashader')
 
         opts = dict(dynamic=self.dynamic)
         if self._plot_opts.get('width') is not None:
