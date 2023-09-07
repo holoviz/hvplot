@@ -2,6 +2,7 @@ import itertools
 
 from hvplot import hvPlotTabular, post_patch
 from hvplot.converter import HoloViewsConverter
+from hvplot.util import is_list_like
 
 try:
     import polars as pl
@@ -34,7 +35,9 @@ class hvPlotTabularPolars(hvPlotTabular):
                 columns = (
                     set(self._data.columns) & set(itertools.chain(*possible_columns))
                 ) or {self._data.columns[0]}
-                columns |= {x, y}
+                xs = x if is_list_like(x) else (x,)
+                ys = y if is_list_like(y) else (y,)
+                columns |= {*xs, *ys}
                 columns.discard(None)
 
         if isinstance(self._data, pl.DataFrame):
