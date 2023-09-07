@@ -1,8 +1,9 @@
 import numpy as np
 import pandas as pd
 import hvplot.pandas  # noqa
-
 import pytest
+
+from hvplot import hvPlotTabular
 
 try:
     import polars as pl
@@ -16,8 +17,11 @@ except ImportError:
     skip_polar = True
 
 
-FRAME_IGNORE_TYPES = {"bivariate", "heatmap", "hexbin", "labels", "vectorfield"}
-SERIES_IGNORE_TYPES = {*FRAME_IGNORE_TYPES, "points", "polygons", "ohlc", "paths"}
+TYPES = {t for t in dir(hvPlotTabular) if not t.startswith("_")}
+FRAME_TYPES = TYPES - {"bivariate", "heatmap", "hexbin", "labels", "vectorfield"}
+SERIES_TYPES = FRAME_TYPES - {"points", "polygons", "ohlc", "paths"}
+frame_kinds = pytest.mark.parametrize("kind", FRAME_TYPES)
+series_kinds = pytest.mark.parametrize("kind", SERIES_TYPES)
 
 y_combinations = pytest.mark.parametrize("y", (
     ["A", "B", "C", "D"],
@@ -30,42 +34,33 @@ y_combinations = pytest.mark.parametrize("y", (
     ids=lambda x: type(x).__name__
 )
 
+
+@frame_kinds
 @y_combinations
-def test_diffent_input_types_pandas(y):
+def test_dataframe_pandas(kind, y):
     df = pd._testing.makeDataFrame()
-    types = {t for t in dir(df.hvplot) if not t.startswith("_")}
-
-    for t in types - FRAME_IGNORE_TYPES:
-        df.hvplot(y=y, kind=t)
+    df.hvplot(y=y, kind=kind)
 
 
-def test_series_pandas():
+@series_kinds
+def test_series_pandas(kind):
     ser = pd.Series(np.random.rand(10), name="A")
-    assert isinstance(ser, pd.Series)
-
-    types = {t for t in dir(ser.hvplot) if not t.startswith("_")}
-    for t in types - SERIES_IGNORE_TYPES:
-        ser.hvplot(kind=t)
-
+    ser.hvplot(kind=kind)
 
 
 @pytest.mark.skipif(skip_polar, reason="polars not installed")
 @pytest.mark.parametrize("cast", (pl.DataFrame, pl.LazyFrame))
+@frame_kinds
 @y_combinations
-def test_diffent_input_types_polars(y, cast):
+def test_dataframe_polars(kind, y, cast):
     df = cast(pd._testing.makeDataFrame())
     assert isinstance(df, cast)
-
-    types = {t for t in dir(df.hvplot) if not t.startswith("_")}
-    for t in types - FRAME_IGNORE_TYPES:
-        df.hvplot(y=y, kind=t)
+    df.hvplot(y=y, kind=kind)
 
 
 @pytest.mark.skipif(skip_polar, reason="polars not installed")
-def test_series_polars():
+@series_kinds
+def test_series_polars(kind):
     ser = pl.Series(values=np.random.rand(10), name="A")
     assert isinstance(ser, pl.Series)
-
-    types = {t for t in dir(ser.hvplot) if not t.startswith("_")}
-    for t in types - SERIES_IGNORE_TYPES:
-        ser.hvplot(kind=t)
+    ser.hvplot(kind=kind)
