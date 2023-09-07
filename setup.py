@@ -60,6 +60,7 @@ extras_require['tests'] = [
     'pooch',
     'scipy',
     'ipywidgets',
+    'polars',
 ]
 
 # Dependencies required to run the notebooks

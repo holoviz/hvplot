@@ -7,8 +7,13 @@ import pytest
 try:
     import polars as pl
     import hvplot.polars  # noqa
+    skip_polar = False
 except ImportError:
-    pl = None
+    class pl:
+        DataFrame = None
+        LazyFrame = None
+        Series = None
+    skip_polar = True
 
 
 FRAME_IGNORE_TYPES = {"bivariate", "heatmap", "hexbin", "labels", "vectorfield"}
@@ -44,7 +49,7 @@ def test_series_pandas():
 
 
 
-@pytest.mark.skipif(pl is None, reason="polars not installed")
+@pytest.mark.skipif(skip_polar, reason="polars not installed")
 @pytest.mark.parametrize("cast", (pl.DataFrame, pl.LazyFrame))
 @y_combinations
 def test_diffent_input_types_polars(y, cast):
@@ -56,7 +61,7 @@ def test_diffent_input_types_polars(y, cast):
         df.hvplot(y=y, kind=t)
 
 
-@pytest.mark.skipif(pl is None, reason="polars not installed")
+@pytest.mark.skipif(skip_polar, reason="polars not installed")
 def test_series_polars():
     ser = pl.Series(values=np.random.rand(10), name="A")
     assert isinstance(ser, pl.Series)
