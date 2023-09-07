@@ -1883,7 +1883,7 @@ class HoloViewsConverter:
         else:
             ranges = {self.value_label: xlim}
             data = data[y]
-            df = pd.melt(data, var_name=self.group_label, value_name=self.value_label)
+            df = data.melt(var_name=self.group_label, value_name=self.value_label)
             ds = Dataset(df)
             if len(df):
                 dists = ds.to(Distribution, self.value_label)
