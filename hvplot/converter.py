@@ -468,7 +468,10 @@ class HoloViewsConverter:
 
         # By type
         self.subplots = subplots
-        self._by_type = NdLayout if subplots else NdOverlay
+        if subplots:
+            self._by_type = NdLayout
+        else:
+            self._by_type = NdOverlay
 
         self._backend = Store.current_backend
         if hvplot_extension.compatibility is None:
@@ -1330,11 +1333,12 @@ class HoloViewsConverter:
                 opts['rescale_discrete_levels'] = self._plot_opts['rescale_discrete_levels']
         else:
             operation = rasterize
-            eltype = 'Image'
+            eltype = 'ImageStack' if self.by else 'Image'
             if 'cmap' in self._style_opts:
                 style['cmap'] = self._style_opts['cmap']
             if self._dim_ranges.get('c', (None, None)) != (None, None):
                 style['clim'] = self._dim_ranges['c']
+            print(style)
 
         processed = operation(obj, **opts)
 
@@ -1510,10 +1514,12 @@ class HoloViewsConverter:
         cur_opts = {
             element.name: cur_el_opts,
             'NdOverlay': filter_opts('NdOverlay', dict(self._overlay_opts, batched=False), backend='bokeh'),
+            'ImageStack': filter_opts('ImageStack', dict(self._overlay_opts, batched=False), backend='bokeh'),
         }
         compat_opts = {
             element.name: compat_el_opts,
             'NdOverlay': filter_opts('NdOverlay', dict(self._overlay_opts), backend=self._backend_compat),
+            'ImageStack': filter_opts('ImageStack', dict(self._overlay_opts), backend=self._backend_compat),
         }
 
         ys = [y]
@@ -1537,6 +1543,7 @@ class HoloViewsConverter:
             chart = Dataset(data, self.by+kdims, vdims).to(
                 element, kdims, vdims, self.by).relabel(**self._relabel)
             chart = chart.layout() if self.subplots else chart.overlay(sort=False)
+            print(type(chart), "PROBLEM ABOVE ^^^")
         else:
             chart = element(data, kdims, vdims).relabel(**self._relabel)
         return (chart.redim(**self._redim)
