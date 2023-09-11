@@ -1,12 +1,14 @@
 import pathlib
 import sys
 
-from unittest import TestCase, SkipTest, expectedFailure
+from unittest import TestCase, SkipTest
 
 from packaging.version import Version
 import numpy as np
 import pandas as pd
 import holoviews as hv
+
+from hvplot.util import proj_to_cartopy
 
 
 class TestGeo(TestCase):
@@ -15,18 +17,19 @@ class TestGeo(TestCase):
         if sys.platform == "win32":
             raise SkipTest("Skip geo tests on windows for now")
         try:
-            import xarray as xr
+            import xarray as xr  # noqa
             import rasterio  # noqa
             import geoviews  # noqa
-            import cartopy.crs as ccrs
+            import cartopy.crs as ccrs  # noqa
+            import rioxarray as rxr
         except:
-            raise SkipTest('xarray, rasterio, geoviews, or cartopy not available')
+            raise SkipTest('xarray, rasterio, geoviews, cartopy, or rioxarray not available')
         import hvplot.xarray  # noqa
         import hvplot.pandas  # noqa
-        self.da = xr.open_rasterio(
+        self.da = rxr.open_rasterio(
            pathlib.Path(__file__).parent / 'data' / 'RGB-red.byte.tif'
-        ).sel(band=1)
-        self.crs = ccrs.epsg(self.da.crs.split('epsg:')[1])
+        ).isel(band=0)
+        self.crs = proj_to_cartopy(self.da.spatial_ref.attrs['crs_wkt'])
 
     def assertCRS(self, plot, proj='utm'):
         import cartopy
@@ -46,9 +49,12 @@ class TestCRSInference(TestGeo):
         if sys.platform == "win32":
             raise SkipTest("Skip CRS inference on Windows")
         super().setUp()
-        
+
     def test_plot_with_crs_as_proj_string(self):
-        plot = self.da.hvplot.image('x', 'y', crs=self.da.crs)
+        da = self.da.copy()
+        da.rio._crs = False  # To not treat it as a rioxarray
+
+        plot = self.da.hvplot.image('x', 'y', crs="epsg:32618")
         self.assertCRS(plot)
 
     def test_plot_with_geo_as_true_crs_undefined(self):
@@ -64,19 +70,24 @@ class TestProjections(TestGeo):
 
     def test_plot_with_crs_as_attr_str(self):
         da = self.da.copy()
+        da.rio._crs = False  # To not treat it as a rioxarray
         da.attrs = {'bar': self.crs}
         plot = da.hvplot.image('x', 'y', crs='bar')
         self.assertCRS(plot)
 
     def test_plot_with_crs_as_nonexistent_attr_str(self):
+        da = self.da.copy()
+        da.rio._crs = False  # To not treat it as a rioxarray
+
         # Used to test crs='foo' but this is parsed under-the-hood
         # by PROJ (projinfo) which matches a geographic projection named
         # 'Amersfoort'
         with self.assertRaisesRegex(ValueError, "'name_of_some_invalid_projection' must be"):
-            self.da.hvplot.image('x', 'y', crs='name_of_some_invalid_projection')
+            da.hvplot.image('x', 'y', crs='name_of_some_invalid_projection')
 
     def test_plot_with_geo_as_true_crs_no_crs_on_data_returns_default(self):
         da = self.da.copy()
+        da.rio._crs = False  # To not treat it as a rioxarray
         da.attrs = {'bar': self.crs}
         plot = da.hvplot.image('x', 'y', geo=True)
         self.assertCRS(plot, 'eqc')
@@ -94,6 +105,11 @@ class TestProjections(TestGeo):
     def test_plot_with_projection_as_invalid_string(self):
         with self.assertRaisesRegex(ValueError, "Projection must be defined"):
             self.da.hvplot.image('x', 'y', projection='foo')
+
+    def test_plot_with_projection_raises_an_error_when_tiles_set(self):
+        da = self.da.copy()
+        with self.assertRaisesRegex(ValueError, "Tiles can only be used with output projection"):
+            da.hvplot.image('x', 'y', crs=self.crs, projection='Robinson', tiles=True)
 
 
 class TestGeoAnnotation(TestCase):
@@ -206,17 +222,28 @@ class TestGeoPandas(TestCase):
             import geopandas as gpd  # noqa
             import geoviews  # noqa
             import cartopy.crs as ccrs # noqa
+            import shapely  # noqa
         except:
-            raise SkipTest('geopandas, geoviews, or cartopy not available')
+            raise SkipTest('geopandas, geoviews, shapely or cartopy not available')
         import hvplot.pandas  # noqa
 
-        geometry = gpd.points_from_xy(
+
+        from shapely.geometry import Polygon
+
+        p_geometry = gpd.points_from_xy(
             x=[12.45339, 12.44177, 9.51667, 6.13000, 158.14997],
             y=[41.90328, 43.93610, 47.13372, 49.61166, 6.91664],
             crs='EPSG:4326'
         )
-        names = ['Vatican City', 'San Marino', 'Vaduz', 'Luxembourg', 'Palikir']
-        self.cities = gpd.GeoDataFrame(dict(name=names), geometry=geometry)
+        p_names = ['Vatican City', 'San Marino', 'Vaduz', 'Luxembourg', 'Palikir']
+        self.cities = gpd.GeoDataFrame(dict(name=p_names), geometry=p_geometry)
+
+        pg_geometry = [
+            Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0))),
+            Polygon(((2, 2), (2, 3), (3, 3), (3, 2), (2, 2))),
+        ]
+        pg_names = ['A', 'B']
+        self.polygons = gpd.GeoDataFrame(dict(name=pg_names), geometry=pg_geometry)
 
     def test_points_hover_cols_is_empty_by_default(self):
         points = self.cities.hvplot()
@@ -238,6 +265,13 @@ class TestGeoPandas(TestCase):
         assert points.kdims == ['x', 'y']
         assert points.vdims == ['index']
 
+    def test_points_hover_cols_positional_arg_sets_color(self):
+        points = self.cities.hvplot('name')
+        assert points.kdims == ['x', 'y']
+        assert points.vdims == ['name']
+        opts = hv.Store.lookup_options('bokeh', points, 'style').kwargs
+        assert opts['color'] == 'name'
+
     def test_points_hover_cols_with_c_set_to_name(self):
         points = self.cities.hvplot(c='name')
         assert points.kdims == ['x', 'y']
@@ -245,8 +279,26 @@ class TestGeoPandas(TestCase):
         opts = hv.Store.lookup_options('bokeh', points, 'style').kwargs
         assert opts['color'] == 'name'
 
-    @expectedFailure
     def test_points_hover_cols_with_by_set_to_name(self):
         points = self.cities.hvplot(by='name')
-        assert points.kdims == ['x', 'y']
-        assert points.vdims == ['name']
+        assert isinstance(points, hv.core.overlay.NdOverlay)
+        assert points.kdims == ['name']
+        assert points.vdims == []
+        for element in points.values():
+            assert element.kdims == ['x', 'y']
+            assert element.vdims == []
+
+    def test_points_project_xlim_and_ylim(self):
+        points = self.cities.hvplot(geo=True, xlim=(-10, 10), ylim=(-20, -10))
+        opts = hv.Store.lookup_options('bokeh', points, 'plot').options
+        assert opts['xlim'] == (-10, 10)
+        assert opts['ylim'] == (-20, -10)
+
+    def test_polygons_by_subplots(self):
+        polygons = self.polygons.hvplot(geo=True, by="name", subplots=True)
+        assert isinstance(polygons, hv.core.layout.NdLayout)
+
+    def test_polygons_turns_off_hover_when_there_are_no_fields_to_include(self):
+        polygons = self.polygons.hvplot(geo=True)
+        opts = hv.Store.lookup_options('bokeh', polygons, 'plot').kwargs
+        assert 'hover' not in opts.get('tools')

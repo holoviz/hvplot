@@ -9,7 +9,10 @@ import pytest
 
 from unittest import TestCase, SkipTest
 
-from hvplot.util import check_crs, is_list_like, process_xarray
+from hvplot.util import (
+    check_crs, is_list_like, process_crs, process_xarray,
+    _convert_col_names_to_str,
+)
 
 
 class TestProcessXarray(TestCase):
@@ -278,6 +281,28 @@ def test_check_crs():
     assert p is None
 
 
+@pytest.mark.parametrize("input", [
+    "+init=epsg:26911",
+    "4326",
+    4326,
+    "epsg:4326",
+    "EPSG: 4326",
+])
+def test_process_crs(input):
+    pytest.importorskip("pyproj")
+    ccrs = pytest.importorskip("cartopy.crs")
+    crs = process_crs(input)
+
+    assert isinstance(crs, ccrs.CRS)
+
+
+def test_process_crs_raises_error():
+    pytest.importorskip("pyproj")
+    pytest.importorskip("cartopy.crs")
+    with pytest.raises(ValueError, match="must be defined as a EPSG code, proj4 string"):
+        process_crs(43823)
+
+
 def test_is_list_like():
     assert not is_list_like(0)
     assert not is_list_like('string')
@@ -288,3 +313,10 @@ def test_is_list_like():
     assert is_list_like(pd.Series(['a', 'b']))
     assert is_list_like(pd.Index(['a', 'b']))
     assert is_list_like(np.array(['a', 'b']))
+
+
+def test_convert_col_names_to_str():
+    df = pd.DataFrame(np.random.random((10, 2)))
+    assert all(not isinstance(col, str) for col in df.columns)
+    df = _convert_col_names_to_str(df)
+    assert all(isinstance(col, str) for col in df.columns)

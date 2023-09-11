@@ -4,10 +4,13 @@ Provides utilities to convert data and projections
 
 import sys
 
+from collections.abc import Hashable
+
 from functools import wraps
 from packaging.version import Version
 from types import FunctionType
 
+import bokeh
 import numpy as np
 import pandas as pd
 import param
@@ -19,6 +22,8 @@ except:
     panel_available = False
 
 hv_version = Version(hv.__version__)
+bokeh_version = Version(bokeh.__version__)
+bokeh3 = bokeh_version >= Version("3.0")
 
 
 def with_hv_extension(func, extension='bokeh', logo=False):
@@ -64,7 +69,7 @@ def check_crs(crs):
     try:
         crs_type = pyproj.crs.CRS
     except AttributeError:
-        class Dummy():
+        class Dummy:
             pass
         crs_type = Dummy
 
@@ -149,9 +154,9 @@ def proj_to_cartopy(proj):
     km_std = {'lat_1': 'lat_1',
               'lat_2': 'lat_2',
               }
-    kw_proj = dict()
-    kw_globe = dict()
-    kw_std = dict()
+    kw_proj = {}
+    kw_globe = {}
+    kw_std = {}
     for s in srs.split('+'):
         s = s.split('=')
         if len(s) != 2:
@@ -226,31 +231,47 @@ def process_crs(crs):
       3. cartopy.crs.CRS instance
       4. None defaults to crs.PlateCaree
     """
+    missing = []
     try:
         import cartopy.crs as ccrs
+    except ImportError:
+        missing.append('cartopy')
+    try:
         import geoviews as gv # noqa
+    except ImportError:
+        missing.append('geoviews')
+    try:
         import pyproj
     except ImportError:
-        raise ImportError('Geographic projection support requires GeoViews and cartopy.')
+        missing.append('pyproj')
+    if missing:
+        raise ImportError(f'Geographic projection support requires: {", ".join(missing)}.')
 
     if crs is None:
         return ccrs.PlateCarree()
 
+    errors = []
     if isinstance(crs, str) and crs.lower().startswith('epsg'):
         try:
-            crs = ccrs.epsg(crs[5:].lstrip().rstrip())
-        except:
-            raise ValueError("Could not parse EPSG code as CRS, must be of the format 'EPSG: {code}.'")
-    elif isinstance(crs, int):
-        crs = ccrs.epsg(crs)
-    elif isinstance(crs, (str, pyproj.Proj)):
+            crs = crs[5:].lstrip().rstrip()
+            return ccrs.epsg(crs)
+        except Exception as e:
+            errors.append(e)
+    if isinstance(crs, int):
         try:
-            crs = proj_to_cartopy(crs)
-        except:
-            raise ValueError("Could not parse EPSG code as CRS, must be of the format 'proj4: {proj4 string}.'")
-    elif not isinstance(crs, ccrs.CRS):
-        raise ValueError("Projection must be defined as a EPSG code, proj4 string, cartopy CRS or pyproj.Proj.")
-    return crs
+            return ccrs.epsg(crs)
+        except Exception as e:
+            crs = str(crs)
+            errors.append(e)
+    if isinstance(crs, (str, pyproj.Proj)):
+        try:
+            return proj_to_cartopy(crs)
+        except Exception as e:
+            errors.append(e)
+    if isinstance(crs, ccrs.CRS):
+        return crs
+
+    raise ValueError("Projection must be defined as a EPSG code, proj4 string, cartopy CRS or pyproj.Proj.") from Exception(*errors)
 
 
 def is_list_like(obj):
@@ -311,7 +332,7 @@ def is_dask(data):
     return isinstance(data, (dd.DataFrame, dd.Series))
 
 def is_intake(data):
-    if not check_library(data, 'intake'):
+    if "intake" not in sys.modules:
         return False
     from intake.source.base import DataSource
     return isinstance(data, DataSource)
@@ -541,3 +562,22 @@ def _flatten(line):
             yield from _flatten(element)
         else:
             yield element
+
+
+def _convert_col_names_to_str(data):
+    """
+    Convert column names to string.
+    """
+    # There's no generic way to rename columns across tabular object types.
+    # `columns` could refer to anything else on the object, e.g. a dim
+    # on an xarray DataArray. So this may need to be stricter.
+    if not hasattr(data, 'columns') or not hasattr(data, 'rename'):
+        return data
+    renamed = {
+        c: str(c)
+        for c in data.columns
+        if not isinstance(c, str) and isinstance(c, Hashable)
+    }
+    if renamed:
+        data = data.rename(columns=renamed)
+    return data

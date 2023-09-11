@@ -8,7 +8,7 @@ from packaging.version import Version
 
 from ..backend_transforms import _transfer_opts_cur_backend
 from ..converter import HoloViewsConverter
-from ..util import with_hv_extension
+from ..util import with_hv_extension, _convert_col_names_to_str
 
 
 @with_hv_extension
@@ -51,19 +51,19 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
         Keyword options for the diagonal plots
     datashade (default=False):
         Whether to apply rasterization and shading (colormapping) using
-        the Datashader library, returning an RGB object instead of 
+        the Datashader library, returning an RGB object instead of
         individual points
     rasterize (default=False):
         Whether to apply rasterization using the Datashader library,
-        returning an aggregated Image (to be colormapped by the 
+        returning an aggregated Image (to be colormapped by the
         plotting backend) instead of individual points
     dynspread (default=False):
-        For plots generated with datashade=True or rasterize=True, 
+        For plots generated with datashade=True or rasterize=True,
         automatically increase the point size when the data is sparse
         so that individual points become more visible.
         kwds supported include ``max_px``, ``threshold``,  ``shape``, ``how`` and ``mask``.
     spread (default=False):
-        Make plots generated with datashade=True or rasterize=True 
+        Make plots generated with datashade=True or rasterize=True
         increase the point size to make points more visible, by
         applying a fixed spreading of a certain number of cells/pixels. kwds
         supported include: ``px``, ``shape``, ``how`` and ``mask``.
@@ -78,15 +78,13 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
     --------
         :func:`pandas.plotting.scatter_matrix` : Equivalent pandas function.
     """
-    
-    data = _hv.Dataset(data)
+
+    data = _hv.Dataset(_convert_col_names_to_str(data))
     supported = list(HoloViewsConverter._kind_mapping)
     if diagonal not in supported:
-        raise ValueError('diagonal type must be one of: %s, found %s' %
-                         (supported, diagonal))
+        raise ValueError(f'diagonal type must be one of: {supported}, found {diagonal}')
     if chart not in supported:
-        raise ValueError('Chart type must be one of: %s, found %s' %
-                         (supported, chart))
+        raise ValueError(f'Chart type must be one of: {supported}, found {chart}')
     diagonal = HoloViewsConverter._kind_mapping[diagonal]
     chart = HoloViewsConverter._kind_mapping[chart]
 
@@ -103,7 +101,7 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
                 "dynamic update of rasterized/datashaded scatter matrix. "
                 "Update holoviews to a newer version."
             )
-    
+
     if rasterize and datashade:
         raise ValueError("Choose to either rasterize or "
                          "datashade the scatter matrix, not both.")
@@ -122,7 +120,7 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
 
     #remove datashade kwds
     if datashade or rasterize:
-        import holoviews.operation.datashader as hd 
+        import holoviews.operation.datashader as hd
 
         ds_kwds = {}
         if 'aggregator' in kwds:
@@ -194,7 +192,7 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
         {chart.__name__: chart_opts, diagonal.__name__: diagonal_opts},
         backend='bokeh',
     )
-    
+
     # Perform datashade options after all the coloring is finished.
     if datashade or rasterize:
         aggregatefn = hd.datashade if datashade else hd.rasterize
@@ -203,6 +201,6 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
             spreadfn = hd.dynspread if dynspread else (hd.spread if spread else lambda z, **_: z)
             eltype = _hv.RGB if datashade else _hv.Image
             grid = grid.map(partial(spreadfn, **sp_kwds), specs=eltype)
- 
+
     grid = _transfer_opts_cur_backend(grid)
     return grid

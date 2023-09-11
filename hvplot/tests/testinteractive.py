@@ -1,3 +1,5 @@
+from packaging.version import Version
+
 import holoviews as hv
 import hvplot.pandas  # noqa
 import hvplot.xarray  # noqa
@@ -12,6 +14,10 @@ from holoviews.util.transform import dim
 from hvplot import bind
 from hvplot.interactive import Interactive
 from hvplot.xarray import XArrayInteractive
+from hvplot.util import bokeh3
+
+is_bokeh2 = pytest.mark.skipif(bokeh3, reason="requires bokeh 2.x")
+is_bokeh3 = pytest.mark.skipif(not bokeh3, reason="requires bokeh 3.x")
 
 
 @pytest.fixture(scope='module')
@@ -97,7 +103,7 @@ def test_spy(clone_spy, series):
     assert clone_spy.calls[0].is_empty()
 
     si._clone(x='X')
-    
+
     assert clone_spy.count == 2
     assert not clone_spy.calls[1].is_empty()
     assert clone_spy.calls[1].kwargs == dict(x='X')
@@ -187,6 +193,47 @@ def test_interactive_xarray_function(dataset):
     assert dsi._transform == dim('air2')
 
 
+def test_interactive_nested_widgets():
+    df = pd._testing.makeDataFrame()
+    w = pn.widgets.RadioButtonGroup(value="A", options=list("ABC"))
+
+    idf = Interactive(df)
+    pipeline = idf.groupby(["D", w]).mean()
+    ioutput = pipeline.panel().object().object
+    iw = pipeline.widgets()
+
+    output = df.groupby(["D", "A"]).mean()
+
+    pd.testing.assert_frame_equal(ioutput, output)
+    assert len(iw) == 1
+    assert iw[0] == w
+
+
+@pytest.mark.skipif(
+    Version(hv.__version__) < Version("1.15.1"),
+    reason="Needs holoviews 1.15.1",
+)
+def test_interactive_slice():
+    df = pd._testing.makeDataFrame()
+    w = pn.widgets.IntSlider(start=10, end=40)
+
+    idf = Interactive(df)
+    pipeline = idf.iloc[:w]
+    ioutput = pipeline.panel().object().object
+    iw = pipeline.widgets()
+
+    output = df.iloc[:10]
+
+    pd.testing.assert_frame_equal(ioutput, output)
+    assert len(iw) == 1
+    assert iw[0] == w
+
+    w.value = 15
+    ioutput = pipeline.panel().object().object
+    output = df.iloc[:15]
+    pd.testing.assert_frame_equal(ioutput, output)
+
+
 def test_interactive_pandas_dataframe_hvplot_accessor(df):
     dfi = df.interactive()
 
@@ -205,12 +252,11 @@ def test_interactive_xarray_dataset_hvplot_accessor(dataarray):
         dai.hvplot.line(kind="area")
 
 
-@pytest.mark.xfail(reason='Not sure?')
 def test_interactive_pandas_dataframe_hvplot_accessor_dmap(df):
     dfi = df.interactive()
     dfi = dfi.hvplot.line(y='A')
 
-    # TODO: Not sure about the logic 
+    # TODO: Not sure about the logic
     assert dfi._dmap is True
 
 
@@ -219,7 +265,7 @@ def test_interactive_pandas_dataframe_hvplot_accessor_dmap_kind_widget(df):
     dfi = df.interactive()
     dfi = dfi.hvplot(kind=w, y='A')
 
-    assert dfi._dmap is True
+    assert dfi._dmap is False
 
 
 def test_interactive_with_bound_function_calls():
@@ -440,7 +486,7 @@ def test_interactive_pandas_frame_attrib(df, clone_spy):
 
 def test_interactive_pandas_series_operator_and_method(series, clone_spy):
     si = Interactive(series)
-    
+
     si = (si + 2).head(2)
 
     assert isinstance(si, Interactive)
@@ -596,7 +642,7 @@ def test_interactive_pandas_series_operator_and_method_out_widgets(series):
     w1 = pn.widgets.FloatSlider(value=2., start=1., end=5.)
     w2 = pn.widgets.IntSlider(value=2, start=1, end=5)
     si = Interactive(series)
-    
+
     si = (si + w1).head(w2)
 
     widgets = si.widgets()
@@ -623,7 +669,7 @@ def test_interactive_pandas_frame_bind_out_widgets(df):
 
 
 def test_interactive_pandas_frame_bind_operator_out_widgets(df):
-    select = pn.widgets.Select(default='A', options=list(df.columns))
+    select = pn.widgets.Select(value='A', options=list(df.columns))
 
     def sel_col(col):
         return df[col]
@@ -641,6 +687,17 @@ def test_interactive_pandas_frame_bind_operator_out_widgets(df):
     assert widgets[1] is w
 
 
+def test_interactive_reevaluate_uses_cached_value(series):
+    w = pn.widgets.FloatSlider(value=2., start=1., end=5.)
+    si = Interactive(series)
+    si = si + w
+
+    w.value = 3.
+    assert repr(si._transform) == "dim('*').pd+FloatSlider(end=5.0, start=1.0, value=3.0)"
+
+    assert si._callback().object is si._callback().object
+
+
 def test_interactive_pandas_series_operator_widget_update(series):
     w = pn.widgets.FloatSlider(value=2., start=1., end=5.)
     si = Interactive(series)
@@ -648,8 +705,9 @@ def test_interactive_pandas_series_operator_widget_update(series):
 
     w.value = 3.
     assert repr(si._transform) == "dim('*').pd+FloatSlider(end=5.0, start=1.0, value=3.0)"
-    
+
     out = si._callback()
+    assert out.object is si.eval()
     assert isinstance(out, pn.pane.DataFrame)
     pd.testing.assert_series_equal(out.object.A, series + 3.)
 
@@ -661,8 +719,9 @@ def test_interactive_pandas_series_method_widget_update(series):
 
     w.value = 3
     assert repr(si._transform) =="dim('*').pd.head(IntSlider(end=5, start=1, value=3))"
-    
+
     out = si._callback()
+    assert out.object is si.eval()
     assert isinstance(out, pn.pane.DataFrame)
     pd.testing.assert_series_equal(out.object.A, series.head(3))
 
@@ -679,6 +738,7 @@ def test_interactive_pandas_series_operator_and_method_widget_update(series):
     assert repr(si._transform) == "(dim('*').pd+FloatSlider(end=5.0, start=1.0, value=3.0)).head(IntSlider(end=5, start=1, value=3))"
 
     out = si._callback()
+    assert out.object is si.eval()
     assert isinstance(out, pn.pane.DataFrame)
     pd.testing.assert_series_equal(out.object.A, (series + 3.).head(3))
 
@@ -840,7 +900,6 @@ def test_interactive_pandas_out_frame(series):
     pd.testing.assert_frame_equal(out.object, si._current)
 
 
-@pytest.mark.xfail(reason='Bug: max_rows is not propagated to the next instance')
 def test_interactive_pandas_out_frame_max_rows(series):
     si = Interactive(series, max_rows=5)
     si = si.head(2)
@@ -852,15 +911,37 @@ def test_interactive_pandas_out_frame_max_rows(series):
     assert out.max_rows == 5
 
 
-def test_interactive_pandas_out_frame_kwargs(series):
-    si = Interactive(series, width=100)
+def test_interactive_pandas_out_frame_max_rows_accessor_called(series):
+    si = series.interactive(max_rows=5)
     si = si.head(2)
 
     # Equivalent to eval
     out = si._callback()
 
     assert isinstance(out, pn.pane.DataFrame)
-    assert out.width == 100
+    assert out.max_rows == 5
+
+
+def test_interactive_pandas_out_frame_kwargs(series):
+    si = Interactive(series, width=111)
+    si = si.head(2)
+
+    # Equivalent to eval
+    out = si._callback()
+
+    assert isinstance(out, pn.pane.DataFrame)
+    assert out.width == 111
+
+
+def test_interactive_pandas_out_frame_kwargs_accessor_called(series):
+    si = series.interactive(width=111)
+    si = si.head(2)
+
+    # Equivalent to eval
+    out = si._callback()
+
+    assert isinstance(out, pn.pane.DataFrame)
+    assert out.width == 111
 
 
 def test_interactive_pandas_out_frame_attrib(df):
@@ -956,7 +1037,6 @@ def test_interactive_pandas_series_operator_binary(series, op):
     assert si._method is None
 
 
-@pytest.mark.xfail()
 @pytest.mark.parametrize('op', [
     '+',  # __radd__
     '&',  # __rand__
@@ -1081,7 +1161,7 @@ def test_interactive_pandas_series_plot_kind_attr(series, clone_spy):
     # _clone in _resolve_accessor in __getattribute__(name='line')
     assert clone_spy.calls[1].depth == 2
     assert len(clone_spy.calls[1].args) == 1
-    # assert repr(clone_spy.calls[1].args[0]) == "dim('*').pd.plot()" 
+    # assert repr(clone_spy.calls[1].args[0]) == "dim('*').pd.plot()"
     assert len(clone_spy.calls[1].kwargs) == 1
     assert 'inherit_kwargs' in clone_spy.calls[1].kwargs
     assert 'ax' in clone_spy.calls[1].kwargs['inherit_kwargs']
@@ -1171,6 +1251,7 @@ def test_interactive_pandas_layout_default_no_widgets_kwargs(df):
     assert layout.width == 200
 
 
+@is_bokeh2
 def test_interactive_pandas_layout_default_with_widgets(df):
     w = pn.widgets.IntSlider(value=2, start=1, end=5)
     dfi = Interactive(df)
@@ -1194,6 +1275,27 @@ def test_interactive_pandas_layout_default_with_widgets(df):
     assert isinstance(layout[0][0][1], pn.layout.HSpacer)
 
 
+@is_bokeh3
+def test_interactive_pandas_layout_default_with_widgets_bk3(df):
+    w = pn.widgets.IntSlider(value=2, start=1, end=5)
+    dfi = Interactive(df)
+    dfi = dfi.head(w)
+
+    assert dfi._center is False
+    assert dfi._loc == 'top_left'
+
+    layout = dfi.layout()
+
+    assert isinstance(layout, pn.Row)
+    assert len(layout) == 1
+    assert isinstance(layout[0], pn.Column)
+    assert len(layout[0]) == 2
+    assert isinstance(layout[0][0], pn.Column)
+    assert isinstance(layout[0][1], pn.pane.PaneBase)
+    assert len(layout[0][0]) == 1
+    assert isinstance(layout[0][0][0], pn.widgets.IntSlider)
+
+@is_bokeh2
 def test_interactive_pandas_layout_center_with_widgets(df):
     w = pn.widgets.IntSlider(value=2, start=1, end=5)
     dfi = df.interactive(center=True)
@@ -1222,6 +1324,7 @@ def test_interactive_pandas_layout_center_with_widgets(df):
     assert isinstance(layout[1][1][2], pn.layout.HSpacer)
 
 
+@is_bokeh2
 def test_interactive_pandas_layout_loc_with_widgets(df):
     w = pn.widgets.IntSlider(value=2, start=1, end=5)
     dfi = df.interactive(loc='top_right')
@@ -1291,3 +1394,32 @@ def test_interactive_pandas_series_widget_value(series):
     assert isinstance(widgets, pn.Column)
     assert len(widgets) == 1
     assert widgets[0] is w
+
+
+def test_clones_dont_reexecute_transforms():
+    # Fixes https://github.com/holoviz/hvplot/issues/832
+    df = pd.DataFrame()
+    msgs = []
+
+    def piped(df, msg):
+        msgs.append(msg)
+        return df
+
+    df.interactive.pipe(piped, msg="1").pipe(piped, msg="2")
+
+    assert len(msgs) == 3
+
+
+def test_interactive_accept_non_str_columnar_data():
+    df = pd.DataFrame(np.random.random((10, 2)))
+    assert all(not isinstance(col, str) for col in df.columns)
+    dfi = Interactive(df)
+
+    w = pn.widgets.FloatSlider(start=0, end=1, step=0.05)
+
+    # Column names converted as string so can no longer use dfi[1]
+    dfi = dfi['1'] + w.param.value
+
+    w.value = 0.5
+
+    pytest.approx(dfi.eval().sum(), (df[1] + 0.5).sum())

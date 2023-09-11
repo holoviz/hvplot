@@ -17,7 +17,7 @@ def parallel_coordinates(data, class_column, cols=None, alpha=0.5,
     consisting of n parallel lines. A point in n-dimensional space is
     represented as a polyline with vertices on the parallel axes; the
     position of the vertex on the i-th axis corresponds to the i-th coordinate
-    of the point. 
+    of the point.
 
     Parameters
     ----------

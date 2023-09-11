@@ -22,11 +22,14 @@ def show(obj, title=None, port=0, **kwargs):
         Allows specifying a specific port
     **kwargs: dict
         Additional keyword arguments passed to Panel show method.
+    Returns
+    -------
+    a panel.io.server.Server | panel.io.server.StoppableThread (if threaded=true)
     """
     if not isinstance(obj, _hv.core.Dimensioned):
         raise ValueError('%s type object not recognized and cannot be shown.' %
                          type(obj).__name__)
-    _pn.pane.HoloViews(obj).show(title, port, **kwargs)
+    return _pn.pane.HoloViews(obj).show(title, port, **kwargs)
 
 
 class hvplot_extension(_hv.extension):
