@@ -60,7 +60,7 @@ def _clean_url(url: str):
 
 def _find_urls(text):
     url = re.findall(URL_REGEX, text)
-    return set(_clean_url(x[0]) for x in url if not _skip_url(x[0]))
+    return {_clean_url(x[0]) for x in url if not _skip_url(x[0])}
 
 
 def _request_a_response(url):

@@ -281,10 +281,6 @@ def test_check_crs():
     assert p is None
 
 
-@pytest.mark.skipif(
-    sys.version_info < (3, 8),
-    reason="PyProj is no longer releasing for Python 3.7",
-)
 @pytest.mark.parametrize("input", [
     "+init=epsg:26911",
     "4326",
