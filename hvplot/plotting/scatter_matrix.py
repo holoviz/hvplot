@@ -82,11 +82,9 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
     data = _hv.Dataset(_convert_col_names_to_str(data))
     supported = list(HoloViewsConverter._kind_mapping)
     if diagonal not in supported:
-        raise ValueError('diagonal type must be one of: %s, found %s' %
-                         (supported, diagonal))
+        raise ValueError(f'diagonal type must be one of: {supported}, found {diagonal}')
     if chart not in supported:
-        raise ValueError('Chart type must be one of: %s, found %s' %
-                         (supported, chart))
+        raise ValueError(f'Chart type must be one of: {supported}, found {chart}')
     diagonal = HoloViewsConverter._kind_mapping[diagonal]
     chart = HoloViewsConverter._kind_mapping[chart]
 
