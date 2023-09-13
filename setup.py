@@ -97,7 +97,6 @@ extras_require['examples'] = [
 
 extras_require['examples_conda'] = [
     'hdf5 !=1.14.1',  # Gives coredump in test suite on Linux and Mac
-    'gdal !=3.7.1',
 ]
 
 # Run the example tests by installing examples_tests together with tests
