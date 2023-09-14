@@ -141,27 +141,55 @@ class TestGeoAnnotation(TestCase):
     def test_plot_with_coastline_scale(self):
         plot = self.df.hvplot.points('x', 'y', geo=True, coastline='10m')
         opts = plot.get(1).opts.get('plot')
-        self.assertEqual(opts.kwargs, {'scale': '10m'})
+        assert opts.kwargs["scale"] == '10m'
 
     def test_plot_with_tiles(self):
-        plot = self.df.hvplot.points('x', 'y', geo=True, tiles=True)
+        plot = self.df.hvplot.points('x', 'y', geo=False, tiles=True)
         self.assertEqual(len(plot), 2)
         self.assertIsInstance(plot.get(0), hv.Tiles)
         self.assertIn('openstreetmap', plot.get(0).data)
 
+    def test_plot_with_tiles_with_geo(self):
+        import geoviews as gv
+
+        plot = self.df.hvplot.points('x', 'y', geo=True, tiles=True)
+        self.assertEqual(len(plot), 2)
+        self.assertIsInstance(plot.get(0), gv.element.WMTS)
+        self.assertIn('openstreetmap', plot.get(0).data)
+
     def test_plot_with_specific_tiles(self):
-        plot = self.df.hvplot.points('x', 'y', geo=True, tiles='ESRI')
+        plot = self.df.hvplot.points('x', 'y', geo=False, tiles='ESRI')
         self.assertEqual(len(plot), 2)
         self.assertIsInstance(plot.get(0), hv.Tiles)
+        self.assertIn('ArcGIS', plot.get(0).data)
+
+    def test_plot_with_specific_tiles_geo(self):
+        import geoviews as gv
+        plot = self.df.hvplot.points('x', 'y', geo=True, tiles='ESRI')
+        self.assertEqual(len(plot), 2)
+        self.assertIsInstance(plot.get(0), gv.element.WMTS)
         self.assertIn('ArcGIS', plot.get(0).data)
 
     def test_plot_with_specific_tile_class(self):
-        plot = self.df.hvplot.points('x', 'y', geo=True, tiles=hv.element.tiles.EsriImagery)
+        plot = self.df.hvplot.points('x', 'y', geo=False, tiles=hv.element.tiles.EsriImagery)
         self.assertEqual(len(plot), 2)
         self.assertIsInstance(plot.get(0), hv.Tiles)
         self.assertIn('ArcGIS', plot.get(0).data)
 
+    def test_plot_with_specific_tile_class_with_geo(self):
+        import geoviews as gv
+        plot = self.df.hvplot.points('x', 'y', geo=True, tiles=gv.tile_sources.EsriImagery)
+        self.assertEqual(len(plot), 2)
+        self.assertIsInstance(plot.get(0), gv.element.WMTS)
+        self.assertIn('ArcGIS', plot.get(0).data)
+
     def test_plot_with_specific_tile_obj(self):
+        plot = self.df.hvplot.points('x', 'y', geo=False, tiles=hv.element.tiles.EsriImagery())
+        self.assertEqual(len(plot), 2)
+        self.assertIsInstance(plot.get(0), hv.Tiles)
+        self.assertIn('ArcGIS', plot.get(0).data)
+
+    def test_plot_with_specific_tile_obj_with_geo(self):
         plot = self.df.hvplot.points('x', 'y', geo=True, tiles=hv.element.tiles.EsriImagery())
         self.assertEqual(len(plot), 2)
         self.assertIsInstance(plot.get(0), hv.Tiles)
@@ -289,10 +317,16 @@ class TestGeoPandas(TestCase):
             assert element.vdims == []
 
     def test_points_project_xlim_and_ylim(self):
+        points = self.cities.hvplot(geo=False, xlim=(-10, 10), ylim=(-20, -10))
+        opts = hv.Store.lookup_options('bokeh', points, 'plot').options
+        np.testing.assert_equal(opts['xlim'], (-10, 10))
+        np.testing.assert_equal(opts['ylim'], (-20, -10))
+
+    def test_points_project_xlim_and_ylim_with_geo(self):
         points = self.cities.hvplot(geo=True, xlim=(-10, 10), ylim=(-20, -10))
         opts = hv.Store.lookup_options('bokeh', points, 'plot').options
-        assert opts['xlim'] == (-10, 10)
-        assert opts['ylim'] == (-20, -10)
+        np.testing.assert_allclose(opts['xlim'], (-10, 10))
+        np.testing.assert_allclose(opts['ylim'], (-20, -10))
 
     def test_polygons_by_subplots(self):
         polygons = self.polygons.hvplot(geo=True, by="name", subplots=True)
