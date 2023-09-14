@@ -79,8 +79,11 @@ def check_crs(crs):
         out = pyproj.Proj(crs.to_wkt(), preserve_units=True)
     elif isinstance(crs, dict) or isinstance(crs, str):
         if isinstance(crs, str):
-            # quick fix for https://github.com/pyproj4/pyproj/issues/345
-            crs = crs.replace(' ', '').replace('+', ' +')
+            try:
+                crs = pyproj.CRS.from_wkt(crs)
+            except RuntimeError:
+                # quick fix for https://github.com/pyproj4/pyproj/issues/345
+                crs = crs.replace(' ', '').replace('+', ' +')
         try:
             out = pyproj.Proj(crs, preserve_units=True)
         except RuntimeError:
