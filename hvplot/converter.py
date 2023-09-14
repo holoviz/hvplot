@@ -438,20 +438,19 @@ class HoloViewsConverter:
                         "Projection must be defined as cartopy CRS or "
                         f"one of the following CRS string:\n {all_crs}")
 
-            projection = projection or (ccrs.GOOGLE_MERCATOR if tiles else self.crs)
-            if tiles and projection != ccrs.GOOGLE_MERCATOR:
+            self.proj_crs = projection or (ccrs.GOOGLE_MERCATOR if tiles else self.crs)
+            if tiles and self.proj_crs != ccrs.GOOGLE_MERCATOR:
                 raise ValueError(
                     "Tiles can only be used with output projection of "
                     "`cartopy.crs.GOOGLE_MERCATOR`. To get rid of this error "
                     "remove `projection=` or `tiles=`"
                 )
-
-            if self.crs != projection:
+            if self.crs != projection and (xlim or ylim):
                 px0, py0, px1, py1 = ccrs.GOOGLE_MERCATOR.boundary.bounds
                 x0, x1 = xlim or (px0, px1)
                 y0, y1 = ylim or (py0, py1)
                 extents = (x0, y0, x1, y1)
-                x0, y0, x1, y1 = project_extents(extents, self.crs, projection)
+                x0, y0, x1, y1 = project_extents(extents, self.crs, self.proj_crs)
                 if xlim:
                     xlim = (x0, x1)
                 if ylim:
@@ -1362,7 +1361,7 @@ class HoloViewsConverter:
                 param.main.param.warning(
                     "coastline scale of %s not recognized, must be one "
                     "'10m', '50m' or '110m'." % self.coastline)
-            obj = obj * coastline
+            obj = obj * coastline.opts(projection=self.proj_crs)
 
         if self.features:
             import geoviews as gv
@@ -1383,29 +1382,39 @@ class HoloViewsConverter:
                         scale)
                     else:
                         feature_obj = feature_obj.opts(scale=scale)
-                obj = feature_obj * obj
+                obj = feature_obj.opts(projection=self.proj_crs) * obj
 
-        if self.tiles:
-            tile_source = 'EsriImagery' if self.tiles == 'ESRI' else self.tiles
-            warning = ("{} tiles not recognized, must be one of: {} or a tile object".format(tile_source, sorted(hv.element.tile_sources)))
-            if tile_source is True:
-                tiles = hv.element.tiles.OSM()
-            elif tile_source in hv.element.tile_sources.keys():
-                tiles = hv.element.tile_sources[tile_source]()
-            elif tile_source in hv.element.tile_sources.values():
-                tiles = tile_source()
-            elif isinstance(tile_source, hv.element.tiles.Tiles):
-                tiles = tile_source
-            elif self.geo:
-                from geoviews.element import WMTS
-                if isinstance(tile_source, WMTS):
-                    tiles = tile_source
-                else:
-                    param.main.param.warning(warning)
-            else:
-                param.main.param.warning(warning)
+        if self.tiles and not self.geo:
+            tiles = self._get_tiles(
+                self.tiles,
+                hv.element.tile_sources,
+                hv.element.tiles.Tiles
+            )
             obj = tiles * obj
+        elif self.tiles and self.geo:
+            import geoviews as gv
+            tiles = self._get_tiles(
+                self.tiles,
+                gv.tile_sources.tile_sources,
+                (gv.element.WMTS, hv.element.tiles.Tiles),
+            )
+            obj = tiles.opts(projection=self.proj_crs) * obj
         return obj
+
+    def _get_tiles(self, source, sources, types):
+        tile_source = 'EsriImagery' if self.tiles == 'ESRI' else self.tiles
+        warning = f"{tile_source} tiles not recognized, must be one of: {sorted(sources)} or a tile object"
+        if tile_source is True:
+            tiles = sources["OSM"]()
+        elif tile_source in sources:
+            tiles = sources[tile_source]()
+        elif tile_source in sources.values():
+            tiles = tile_source()
+        elif isinstance(tile_source, types):
+            tiles = tile_source
+        else:
+            raise ValueError(warning)
+        return tiles
 
     def _merge_redim(self, ranges, attr='range'):
         redim = dict(self._redim)
