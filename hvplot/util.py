@@ -264,6 +264,8 @@ def process_crs(crs):
             crs = str(crs)
             errors.append(e)
     if isinstance(crs, (str, pyproj.Proj)):
+        if isinstance(crs, str):
+            crs = pyproj.CRS.from_wkt(crs)
         try:
             return proj_to_cartopy(crs)
         except Exception as e:
