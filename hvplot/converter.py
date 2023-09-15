@@ -1,3 +1,4 @@
+import re
 import difflib
 from functools import partial
 
@@ -2042,6 +2043,17 @@ class HoloViewsConverter:
         data, x, y = self._process_chart_args(data, x, y, single_y=True)
 
         text = self.kwds.get('text', [c for c in data.columns if c not in (x, y)][0])
+        text_cols = re.findall(r"\{(\w+)\}", text)
+        if text_cols:
+            template_str = text
+            text = "label"
+            missing_cols = set(text_cols) - set(data.columns)
+            if len(missing_cols) > 0:
+                raise ValueError(f"Variables {missing_cols} not found in data")
+            data[text] = data[text_cols].apply(
+                lambda row: template_str.format(**row), axis=1
+            )
+
         kdims, vdims = self._get_dimensions([x, y], [text])
         cur_opts, compat_opts = self._get_compat_opts('Labels')
         element = self._get_element('labels')
