@@ -2042,7 +2042,9 @@ class HoloViewsConverter:
         self.use_index = False
         data, x, y = self._process_chart_args(data, x, y, single_y=True)
 
-        text = self.kwds.get('text', [c for c in data.columns if c not in (x, y)][0])
+        text = self.kwds.get('text')
+        if not text:
+            text = [c for c in data.columns if c not in (x, y)][0]
         text_cols = re.findall(r"\{(\w+)\}", text)
         if text_cols:
             template_str = text

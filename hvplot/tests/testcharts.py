@@ -347,6 +347,11 @@ class TestChart1D(ComparisonTestCase):
         bkplot = Store.renderers['bokeh'].get_plot(plot)
         assert not bkplot.tools
 
+    def test_labels_format(self):
+        plot = self.df.hvplot("x", "y", text="({x}, {y})", kind="labels")
+        print(plot)
+        # assert list(plot.dimensions()) == ['x', 'y', 'labels']
+        # assert plot.data['labels'].tolist() == ['(1, 2)', '(3, 4)', '(5, 6)']
 
 class TestChart1DDask(TestChart1D):
 
