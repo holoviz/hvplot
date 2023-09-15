@@ -130,9 +130,6 @@ def proj_to_cartopy(proj):
 
     proj = check_crs(proj)
 
-    if proj_is_latlong(proj):
-        return ccrs.PlateCarree()
-
     srs = proj.srs
     if has_gdal:
         # this is more robust, as srs could be anything (espg, etc.)
