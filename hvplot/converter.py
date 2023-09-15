@@ -1398,7 +1398,7 @@ class HoloViewsConverter:
                 gv.tile_sources.tile_sources,
                 (gv.element.WMTS, hv.element.tiles.Tiles),
             )
-            obj = tiles.opts(projection=self.proj_crs) * obj
+            obj = tiles * obj
         return obj
 
     def _get_tiles(self, source, sources, types):
