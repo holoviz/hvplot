@@ -331,7 +331,7 @@ class hvPlotExplorer(Viewer):
 
     y = param.Selector()
 
-    y_multi = param.ListSelector(default=[], label='y')
+    y_multi = param.ListSelector(default=[], label='Y Multi')
 
     by = param.ListSelector(default=[])
 
@@ -358,8 +358,7 @@ class hvPlotExplorer(Viewer):
             # cls = hvGeomExplorer
             raise TypeError('GeoDataFrame objects not yet supported.')
         elif is_xarray(data):
-            # cls = hvGridExplorer
-            raise TypeError('Xarray objects not yet supported.')
+            cls = hvGridExplorer
         else:
             cls = hvDataFrameExplorer
         return cls(data, **params)
@@ -416,7 +415,7 @@ class hvPlotExplorer(Viewer):
             cls.name.lower(): cls(df, explorer=self, **cparams)
             for cls, cparams in controller_params.items()
         }
-        self.param.set_param(**self._controllers)
+        self.param.update(**self._controllers)
         self.param.watch(self._plot, list(self.param))
         for controller in self._controllers.values():
             controller.param.watch(self._plot, list(controller.param))
@@ -669,6 +668,40 @@ class hvGridExplorer(hvPlotExplorer):
             y = [y]
         values = (self._data[y] for y in y)
         return max_range([(np.nanmin(vs), np.nanmax(vs)) for vs in values])
+
+    def _populate(self):
+        variables = self._converter.variables
+        indexes = getattr(self._converter, "indexes", [])
+        variables_no_index = [v for v in variables if v not in indexes]
+        is_gridded_kind = self.kind in GRIDDED_KINDS
+        print(self.kind)
+        for pname in self.param:
+            if pname == 'kind':
+                continue
+            p = self.param[pname]
+            if isinstance(p, param.Selector) and is_gridded_kind:
+                if pname in ["x", "y", "groupby"]:
+                    p.objects = indexes
+                elif pname == "by":
+                    p.objects = []
+                else:
+                    p.objects = variables_no_index
+
+                # Setting the default value if not set
+                if (pname == "x" or pname == "y") and getattr(self, pname, None) is None:
+                    setattr(self, pname, p.objects[0])
+                elif pname == "groupby" and len(getattr(self, pname, [])) == 0:
+                    setattr(self, pname, p.objects[-1:])
+            elif isinstance(p, param.Selector):
+                # TODO: update this when self.kind is updated
+                if pname == "x":
+                    p.objects = variables
+                else:
+                    p.objects = variables_no_index
+
+                # Setting the default value if not set
+                if (pname == "x" or pname == "y") and getattr(self, pname, None) is None:
+                    setattr(self, pname, p.objects[0])
 
 
 class hvDataFrameExplorer(hvPlotExplorer):
