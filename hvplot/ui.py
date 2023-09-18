@@ -10,7 +10,7 @@ from panel.viewable import Viewer
 
 from .converter import HoloViewsConverter as _hvConverter
 from .plotting import hvPlot as _hvPlot
-from .util import is_geodataframe, is_xarray
+from .util import is_geodataframe, is_xarray, instantiate_crs_str
 
 # Defaults
 KINDS = {
@@ -248,6 +248,12 @@ class Geo(Controls):
     crs_kwargs = param.Dict(default={}, doc="""
         Keyword arguments to pass to selected CRS.""")
 
+    projection = param.ObjectSelector(default=None, doc="""
+        Projection to use for cartographic plots.""")
+
+    projection_kwargs = param.Dict(default={}, doc="""
+        Keyword arguments to pass to selected projection.""")
+
     global_extent = param.Boolean(default=False, doc="""
         Whether to expand the plot extent to span the whole globe.""")
 
@@ -267,10 +273,12 @@ class Geo(Controls):
         the default is 'Wikipedia'.""")
 
     @param.depends('geo', 'project', 'features', watch=True, on_init=True)
-    def _update_crs(self):
+    def _update_crs_projection(self):
         enabled = bool(self.geo or self.project or self.features)
         self.param.crs.constant = not enabled
         self.param.crs_kwargs.constant = not enabled
+        self.param.projection.constant = not enabled
+        self.param.projection_kwargs.constant = not enabled
         self.geo = enabled
         if not enabled:
             return
@@ -279,9 +287,10 @@ class Geo(Controls):
             k: v for k, v in param.concrete_descendents(CRS).items()
             if not k.startswith('_') and k != 'CRS'
         }
-        crs['WebMercator'] = GOOGLE_MERCATOR
+        crs["-"] = ""
+        crs['GOOGLE_MERCATOR'] = GOOGLE_MERCATOR
         self.param.crs.objects = crs
-
+        self.param.projection.objects = crs
 
 
 class Operations(Controls):
@@ -348,8 +357,7 @@ class hvPlotExplorer(Viewer):
 
     labels = param.ClassSelector(class_=Labels)
 
-    # Hide the geo tab until it's better supported
-    # geo = param.ClassSelector(class_=Geo)
+    geo = param.ClassSelector(class_=Geo)
 
     operations = param.ClassSelector(class_=Operations)
 
@@ -388,7 +396,7 @@ class hvPlotExplorer(Viewer):
         self._converter = converter
         groups = {group: KINDS[group] for group in self._groups}
         self._controls = pn.Param(
-            self.param, parameters=['kind', 'x', 'y', 'by', 'groupby'],
+            self.param, parameters=['kind', 'x', 'y', 'groupby', 'by'],
             sizing_mode='stretch_width', show_name=False,
             widgets={"kind": {"options": [], "groups": groups}}
         )
@@ -477,11 +485,15 @@ class hvPlotExplorer(Viewer):
             if isinstance(v, Controls):
                 kwargs.update(v.kwargs)
 
-        # Initialize CRS
-        crs_kwargs = kwargs.pop('crs_kwargs', {})
-        if 'crs' in kwargs:
-            if isinstance(kwargs['crs'], type):
-                kwargs['crs'] = kwargs['crs'](**crs_kwargs)
+        if kwargs.get("geo"):
+            for key in ["crs", "projection"]:
+                if key in kwargs:
+                    crs_kwargs = kwargs.pop(f"{key}_kwargs", {})
+                    kwargs[key] = instantiate_crs_str(kwargs.pop(key), **crs_kwargs)
+        else:
+            # Always remove these intermediate keys from kwargs
+            kwargs.pop('crs_kwargs', {})
+            kwargs.pop('projection_kwargs', {})
 
         kwargs['min_height'] = 300
         df = self._data
@@ -544,7 +556,7 @@ class hvPlotExplorer(Viewer):
                 }, show_name=False)),
                 ('Style', self.style),
                 ('Operations', self.operations),
-                # ('Geo', self.geo)
+                ('Geo', self.geo)
             ]
             if event and event.new not in ('area', 'kde', 'line', 'ohlc', 'rgb', 'step'):
                 tabs.insert(5, ('Colormapping', self.colormapping))
