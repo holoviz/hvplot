@@ -19,7 +19,7 @@ def test_explorer_basic():
 def test_explorer_settings():
     explorer = hvplot.explorer(df)
 
-    explorer.param.set_param(
+    explorer.param.update(
         kind='scatter',
         x='bill_length_mm',
         y_multi=['bill_depth_mm'],
@@ -39,7 +39,7 @@ def test_explorer_settings():
 def test_explorer_plot_code():
     explorer = hvplot.explorer(df)
 
-    explorer.param.set_param(
+    explorer.param.update(
         kind='scatter',
         x='bill_length_mm',
         y_multi=['bill_depth_mm'],
@@ -58,7 +58,7 @@ def test_explorer_plot_code():
 def test_explorer_hvplot():
     explorer = hvplot.explorer(df)
 
-    explorer.param.set_param(
+    explorer.param.update(
         kind='scatter',
         x='bill_length_mm',
         y_multi=['bill_depth_mm'],
@@ -74,7 +74,7 @@ def test_explorer_hvplot():
 def test_explorer_save(tmp_path):
     explorer = hvplot.explorer(df)
 
-    explorer.param.set_param(
+    explorer.param.update(
         kind='scatter',
         x='bill_length_mm',
         y_multi=['bill_depth_mm'],
