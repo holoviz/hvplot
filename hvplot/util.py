@@ -121,6 +121,7 @@ def proj_to_cartopy(proj):
     import cartopy.crs as ccrs
     try:
         from osgeo import osr
+        getattr(osr, "UseExceptions", lambda: None)()
         has_gdal = True
     except ImportError:
         has_gdal = False
