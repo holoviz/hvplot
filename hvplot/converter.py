@@ -1330,7 +1330,10 @@ class HoloViewsConverter:
                 opts['rescale_discrete_levels'] = self._plot_opts['rescale_discrete_levels']
         else:
             operation = rasterize
-            eltype = 'ImageStack' if self.by else 'Image'
+            if hv.__version__ < '1.18.0':
+                eltype = 'Image'
+            else:
+                eltype = 'ImageStack' if self.by else 'Image'
             if 'cmap' in self._style_opts:
                 style['cmap'] = self._style_opts['cmap']
             if self._dim_ranges.get('c', (None, None)) != (None, None):
