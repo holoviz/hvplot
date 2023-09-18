@@ -89,7 +89,6 @@ class Controls(Viewer):
                 widget_kwargs[p] = {'throttled': True}
         self._controls = pn.Param(
             self.param,
-            max_width=300,
             show_name=False,
             sizing_mode='stretch_width',
             widgets=widget_kwargs,
@@ -169,7 +168,7 @@ class Axes(Controls):
 
     width = param.Integer(default=None, bounds=(0, None))
 
-    responsive = param.Boolean(default=False)
+    responsive = param.Boolean(default=True)
 
     shared_axes = param.Boolean(default=True)
 
@@ -396,7 +395,7 @@ class hvPlotExplorer(Viewer):
         groups = {group: KINDS[group] for group in self._groups}
         self._controls = pn.Param(
             self.param, parameters=['kind', 'x', 'y', 'by', 'groupby'],
-            sizing_mode='stretch_width', max_width=300, show_name=False,
+            sizing_mode='stretch_width', show_name=False,
             widgets={"kind": {"options": [], "groups": groups}}
         )
         self.param.watch(self._toggle_controls, 'kind')
@@ -404,7 +403,7 @@ class hvPlotExplorer(Viewer):
         self.param.watch(self._check_by, 'by')
         self._populate()
         self._tabs = pn.Tabs(
-            tabs_location='left', width=450
+            tabs_location='left', width=425
         )
         controls = [
             p.class_
@@ -434,17 +433,16 @@ class hvPlotExplorer(Viewer):
         self._alert = pn.pane.Alert(
             alert_type='danger', visible=False, sizing_mode='stretch_width'
         )
-        self._refresh_control = pn.widgets.Toggle(value=True, name="Auto-refresh", sizing_mode="stretch_width")
+        self._refresh_control = pn.widgets.Toggle(value=True, name="Auto-refresh plot", sizing_mode="stretch_width")
         self._refresh_control.param.watch(self._refresh, 'value')
-        self._hv_pane = pn.pane.HoloViews(sizing_mode='stretch_both', margin=(0, 20, 0, 20))
+        self._hv_pane = pn.pane.HoloViews(sizing_mode='stretch_width', margin=(5, 20, 5, 20))
         self._layout = pn.Column(
             self._alert,
             self._refresh_control,
             pn.Row(
                 self._tabs,
-                pn.layout.HSpacer(),
                 self._hv_pane,
-                sizing_mode='stretch_width'
+                sizing_mode="stretch_width",
             ),
             pn.layout.HSpacer(),
             sizing_mode='stretch_both'
@@ -454,6 +452,9 @@ class hvPlotExplorer(Viewer):
         self.param.trigger("kind")
 
     def _populate(self):
+        """
+        Populates the options of the controls based on the data type.
+        """
         variables = self._converter.variables
         indexes = getattr(self._converter, "indexes", [])
         variables_no_index = [v for v in variables if v not in indexes]
@@ -504,7 +505,7 @@ class hvPlotExplorer(Viewer):
             self._hv_pane.object = self._hvplot
             self._alert.visible = False
         except Exception as e:
-            self._alert.param.set_param(
+            self._alert.param.update(
                 object=f'**Rendering failed with following error**: {e}',
                 visible=True
             )
@@ -705,16 +706,13 @@ class hvGridExplorer(hvPlotExplorer):
         variables = self._converter.variables
         indexes = getattr(self._converter, "indexes", [])
         variables_no_index = [v for v in variables if v not in indexes]
-        is_gridded_kind = self.kind in KINDS['gridded']
         for pname in self.param:
             if pname == 'kind':
                 continue
             p = self.param[pname]
-            if isinstance(p, param.Selector) and is_gridded_kind:
-                if pname in ["x", "y", "groupby"]:
+            if isinstance(p, param.Selector):
+                if pname in ["x", "y", "groupby", "by"]:
                     p.objects = indexes
-                elif pname == "by":
-                    p.objects = []
                 else:
                     p.objects = variables_no_index
 
@@ -723,16 +721,6 @@ class hvGridExplorer(hvPlotExplorer):
                     setattr(self, pname, p.objects[0])
                 elif pname == "groupby" and len(getattr(self, pname, [])) == 0:
                     setattr(self, pname, p.objects[-1:])
-            elif isinstance(p, param.Selector):
-                # TODO: update this when self.kind is updated
-                if pname == "x":
-                    p.objects = variables
-                else:
-                    p.objects = variables_no_index
-
-                # Setting the default value if not set
-                if (pname == "x" or pname == "y") and getattr(self, pname, None) is None:
-                    setattr(self, pname, p.objects[0])
 
 
 class hvDataFrameExplorer(hvPlotExplorer):
