@@ -13,11 +13,21 @@ from .plotting import hvPlot as _hvPlot
 from .util import is_geodataframe, is_xarray
 
 # Defaults
-DATAFRAME_KINDS = sorted(set(_hvConverter._kind_mapping) - set(_hvConverter._gridded_types))
-GRIDDED_KINDS = sorted(_hvConverter._kind_mapping)
-GEOM_KINDS = ['paths', 'polygons', 'points']
-STATS_KINDS = ['hist', 'kde', 'boxwhisker', 'violin', 'heatmap', 'bar', 'barh']
-TWOD_KINDS = ['bivariate', 'heatmap', 'hexbin', 'labels', 'vectorfield'] + GEOM_KINDS
+KINDS = {
+    # these are for the kind selector
+    "dataframe": sorted(
+        set(_hvConverter._kind_mapping) -
+        set(_hvConverter._gridded_types) -
+        set(_hvConverter._geom_types)
+    ),
+    "gridded": sorted(set(_hvConverter._gridded_types) - set(["dataset"])),
+    "geom": _hvConverter._geom_types,
+}
+
+KINDS["2d"] = ['bivariate', 'heatmap', 'hexbin', 'labels', 'vectorfield', 'points'] + KINDS["gridded"] + KINDS["geom"]
+KINDS["stats"] = ['hist', 'kde', 'boxwhisker', 'violin', 'heatmap', 'bar', 'barh']
+KINDS["all"] = sorted(set(KINDS["dataframe"] + KINDS["gridded"] + KINDS["geom"]))
+
 CMAPS = [cm for cm in list_cmaps() if not cm.endswith('_r_r')]
 DEFAULT_CMAPS = _hvConverter._default_cmaps
 GEO_FEATURES = [
@@ -377,16 +387,18 @@ class hvPlotExplorer(Viewer):
         super().__init__(**params)
         self._data = df
         self._converter = converter
+        groups = {group: KINDS[group] for group in self._groups}
         self._controls = pn.Param(
             self.param, parameters=['kind', 'x', 'y', 'by', 'groupby'],
             sizing_mode='stretch_width', max_width=300, show_name=False,
+            widgets={"kind": {"options": [], "groups": groups}}
         )
         self.param.watch(self._toggle_controls, 'kind')
         self.param.watch(self._check_y, 'y_multi')
         self.param.watch(self._check_by, 'by')
         self._populate()
         self._tabs = pn.Tabs(
-            tabs_location='left', width=400
+            tabs_location='left', width=450
         )
         controls = [
             p.class_
@@ -416,18 +428,24 @@ class hvPlotExplorer(Viewer):
         self._alert = pn.pane.Alert(
             alert_type='danger', visible=False, sizing_mode='stretch_width'
         )
+        self._refresh_control = pn.widgets.Toggle(value=True, name="Auto-refresh", sizing_mode="stretch_width")
+        self._refresh_control.param.watch(self._refresh, 'value')
+        self._hv_pane = pn.pane.HoloViews(sizing_mode='stretch_both', margin=(0, 20, 0, 20))
         self._layout = pn.Column(
             self._alert,
+            self._refresh_control,
             pn.Row(
                 self._tabs,
                 pn.layout.HSpacer(),
+                self._hv_pane,
                 sizing_mode='stretch_width'
             ),
             pn.layout.HSpacer(),
             sizing_mode='stretch_both'
         )
-        self._toggle_controls()
-        self._plot()
+
+        # initialize
+        self.param.trigger("kind")
 
     def _populate(self):
         variables = self._converter.variables
@@ -448,6 +466,8 @@ class hvPlotExplorer(Viewer):
                     setattr(self, pname, p.objects[0])
 
     def _plot(self, *events):
+        if not self._refresh_control.value:
+            return
         y = self.y_multi if 'y_multi' in self._controls.parameters else self.y
         if isinstance(y, list) and len(y) == 1:
             y = y[0]
@@ -464,17 +484,14 @@ class hvPlotExplorer(Viewer):
 
         kwargs['min_height'] = 300
         df = self._data
-        if len(df) > MAX_ROWS and not (self.kind in STATS_KINDS or kwargs.get('rasterize') or kwargs.get('datashade')):
+        if len(df) > MAX_ROWS and not (self.kind in KINDS["stats"] or kwargs.get('rasterize') or kwargs.get('datashade')):
             df = df.sample(n=MAX_ROWS)
         self._layout.loading = True
         try:
             self._hvplot = _hvPlot(df)(
                 kind=self.kind, x=self.x, y=y, by=self.by, groupby=self.groupby, **kwargs
             )
-            self._hvpane = pn.pane.HoloViews(
-                self._hvplot, sizing_mode='stretch_width', margin=(0, 20, 0, 20)
-            ).layout
-            self._layout[1][1] = self._hvpane
+            self._hv_pane.object = self._hvplot
             self._alert.visible = False
         except Exception as e:
             self._alert.param.set_param(
@@ -484,11 +501,19 @@ class hvPlotExplorer(Viewer):
         finally:
             self._layout.loading = False
 
+    def _refresh(self, event):
+        if event.new:
+            self._plot()
+
     @property
     def _single_y(self):
-        if self.kind in ['labels', 'hexbin', 'heatmap', 'bivariate'] + GRIDDED_KINDS:
+        if self.kind in KINDS["2d"]:
             return True
         return False
+
+    @property
+    def _groups(self):
+        raise NotImplementedError('Must be implemented by subclasses.')
 
     def _toggle_controls(self, event=None):
         # Control high-level parameters
@@ -496,7 +521,7 @@ class hvPlotExplorer(Viewer):
         if event and event.new in ('table', 'dataset'):
             parameters = ['kind', 'columns']
             visible = False
-        elif event and event.new in TWOD_KINDS:
+        elif event and event.new in KINDS['2d']:
             parameters = ['kind', 'x', 'y', 'by', 'groupby']
         elif event and event.new in ('hist', 'kde', 'density'):
             self.x = None
@@ -603,7 +628,7 @@ class hvPlotExplorer(Viewer):
 
 class hvGeomExplorer(hvPlotExplorer):
 
-    kind = param.Selector(default=None, objects=sorted(GEOM_KINDS))
+    kind = param.Selector(default=None, objects=KINDS["all"])
 
     @property
     def _single_y(self):
@@ -625,10 +650,13 @@ class hvGeomExplorer(hvPlotExplorer):
     def ylim(self):
         pass
 
+    @property
+    def _groups(self):
+        return ["gridded", "dataframe"]
 
 class hvGridExplorer(hvPlotExplorer):
 
-    kind = param.Selector(default=None, objects=sorted(GRIDDED_KINDS))
+    kind = param.Selector(default="image", objects=KINDS['all'])
 
     @property
     def _x(self):
@@ -659,12 +687,15 @@ class hvGridExplorer(hvPlotExplorer):
         values = (self._data[y] for y in y)
         return max_range([(np.nanmin(vs), np.nanmax(vs)) for vs in values])
 
+    @property
+    def _groups(self):
+        return ["gridded", "dataframe", "geom"]
+
     def _populate(self):
         variables = self._converter.variables
         indexes = getattr(self._converter, "indexes", [])
         variables_no_index = [v for v in variables if v not in indexes]
-        is_gridded_kind = self.kind in GRIDDED_KINDS
-        print(self.kind)
+        is_gridded_kind = self.kind in KINDS['gridded']
         for pname in self.param:
             if pname == 'kind':
                 continue
@@ -698,7 +729,7 @@ class hvDataFrameExplorer(hvPlotExplorer):
 
     z = param.Selector()
 
-    kind = param.Selector(default='line', objects=sorted(DATAFRAME_KINDS))
+    kind = param.Selector(default='line', objects=KINDS["all"])
 
     @property
     def xcat(self):
@@ -722,6 +753,10 @@ class hvDataFrameExplorer(hvPlotExplorer):
         if isinstance(y, list) and len(y) == 1:
             y = y[0]
         return y
+
+    @property
+    def _groups(self):
+        return ["dataframe"]
 
     @param.depends('x')
     def xlim(self):
