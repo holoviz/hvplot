@@ -14,3 +14,14 @@ norecursedirs = "doc .git dist build _build .ipynb_checkpoints"
 # to collect files like `test_geo.py`. This setting allows
 # to avoid renaming all the test files.
 python_files = "test*.py"
+filterwarnings = [
+    # 2023-09: See https://github.com/matplotlib/matplotlib/issues/25244
+    "ignore:Deprecated call to `pkg_resources.+?'mpl_toolkits:DeprecationWarning",
+    "ignore:Deprecated call to `pkg_resources.+?'sphinxcontrib:DeprecationWarning",
+    # 2023-09: See https://github.com/ibis-project/ibis/pull/6973
+    "ignore:.+? is deprecated and will be removed in a future version:FutureWarning:ibis.formats.pandas",
+    # 2023-09: See https://github.com/Unidata/MetPy/pull/3117
+    "ignore: 'xdrlib' is deprecated and slated for removal in Python 3.13:DeprecationWarning:metpy.io.nexrad",
+    # 2023-09: See https://github.com/python-streamz/streamz/issues/460
+    "ignore: pkg_resources is deprecated as an API:DeprecationWarning:streamz.plugins",
+]
