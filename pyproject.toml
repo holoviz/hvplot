@@ -4,3 +4,13 @@ requires = [
     "pyct >=0.4.4",
     "setuptools >=30.3.0"
 ]
+
+
+[tool.pytest.ini_options]
+addopts = "-v --pyargs"
+norecursedirs = "doc .git dist build _build .ipynb_checkpoints"
+# The test suite used to be run with nosetests which collected
+# by default files like `testgeo.py` while pytest's default is
+# to collect files like `test_geo.py`. This setting allows
+# to avoid renaming all the test files.
+python_files = "test*.py"
