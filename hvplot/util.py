@@ -217,8 +217,6 @@ def proj_to_cartopy(proj):
     else:
         kw_proj.pop('latitude_true_scale', None)
 
-    print(kw_proj)
-
     try:
         return cl(globe=globe, **kw_proj)
     except TypeError:
