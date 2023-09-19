@@ -493,10 +493,9 @@ class hvPlotExplorer(Viewer):
                 kwargs.update(v.kwargs)
 
         if kwargs.get("geo"):
-            print("geo")
             for key in ["crs", "projection"]:
+                crs_kwargs = kwargs.pop(f"{key}_kwargs", {})
                 if key in kwargs:
-                    crs_kwargs = kwargs.pop(f"{key}_kwargs", {})
                     kwargs[key] = instantiate_crs_str(kwargs.pop(key), **crs_kwargs)
 
             feature_scale = kwargs.pop("feature_scale", None)
