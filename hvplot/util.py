@@ -128,6 +128,8 @@ def proj_to_cartopy(proj):
         has_gdal = False
 
     proj = check_crs(proj)
+    if proj is None:
+        raise ValueError(f"proj must be a valid pyproj.Proj object {proj}")
 
     srs = proj.srs
     if has_gdal:
