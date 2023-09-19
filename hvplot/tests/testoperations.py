@@ -196,6 +196,8 @@ class TestDatashader(ComparisonTestCase):
         assert actual is expected
 
     def test_rasterize_by(self):
+        if Version(hv.__version__) < Version('1.18.0a1'):
+            raise SkipTest('hv.ImageStack introduced after 1.18.0a1')
         expected = 'category'
         plot = self.df.hvplot(x='x', y='y', by=expected, rasterize=True, dynamic=False)
         assert isinstance(plot, ImageStack)
