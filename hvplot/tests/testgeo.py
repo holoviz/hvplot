@@ -138,6 +138,12 @@ class TestGeoAnnotation(TestCase):
         coastline = plot.get(1)
         self.assertIsInstance(coastline, gv.Feature)
 
+    def test_plot_with_features_properly_overlaid_underlaid(self):
+        # land should be under, borders should be over
+        plot = self.df.hvplot.points('x', 'y', features=["land", "borders"])
+        assert plot.get(0).group == "Land"
+        assert plot.get(2).group == "Borders"
+
     def test_plot_with_coastline_scale(self):
         plot = self.df.hvplot.points('x', 'y', geo=True, coastline='10m')
         opts = plot.get(1).opts.get('plot')

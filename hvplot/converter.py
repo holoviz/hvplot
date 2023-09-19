@@ -1383,7 +1383,10 @@ class HoloViewsConverter:
                         scale)
                     else:
                         feature_obj = feature_obj.opts(scale=scale)
-                obj = feature_obj * obj
+                if feature_obj.group in ["Land", "Ocean"]:
+                    obj = feature_obj * obj  # Underlay land/ocean
+                else:
+                    obj = obj * feature_obj  # overlay everything else
 
         if self.tiles:
             tile_source = 'EsriImagery' if self.tiles == 'ESRI' else self.tiles
