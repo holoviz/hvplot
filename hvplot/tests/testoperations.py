@@ -4,6 +4,7 @@ from unittest import SkipTest
 from parameterized import parameterized
 
 import colorcet as cc
+import holoviews as hv
 import hvplot.pandas  # noqa
 import numpy as np
 import pandas as pd
@@ -12,6 +13,7 @@ from holoviews import Store
 from holoviews.element import Image, QuadMesh, ImageStack
 from holoviews.element.comparison import ComparisonTestCase
 from hvplot.converter import HoloViewsConverter
+from packaging.version import Version
 
 
 class TestDatashader(ComparisonTestCase):
