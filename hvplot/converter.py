@@ -1330,7 +1330,7 @@ class HoloViewsConverter:
                 opts['rescale_discrete_levels'] = self._plot_opts['rescale_discrete_levels']
         else:
             operation = rasterize
-            if hv.__version__ < '1.18.0':
+            if Version(hv.__version__) < Version('1.18.0a1'):
                 eltype = 'Image'
             else:
                 eltype = 'ImageStack' if self.by else 'Image'
