@@ -267,6 +267,9 @@ class Geo(Controls):
         at which to render it. Available features include 'borders',
         'coastline', 'lakes', 'land', 'ocean', 'rivers' and 'states'.""")
 
+    feature_scale = param.ObjectSelector(default="110m", objects=["110m", "50m", "10m"], doc="""
+        The scale at which to render the features.""")
+
     tiles = param.ObjectSelector(default=None, objects=GEO_TILES, doc="""
         Whether to overlay the plot on a tile source. Tiles sources
         can be selected by name or a tiles object or class can be passed,
@@ -490,16 +493,22 @@ class hvPlotExplorer(Viewer):
                 kwargs.update(v.kwargs)
 
         if kwargs.get("geo"):
+            print("geo")
             for key in ["crs", "projection"]:
                 if key in kwargs:
                     crs_kwargs = kwargs.pop(f"{key}_kwargs", {})
                     kwargs[key] = instantiate_crs_str(kwargs.pop(key), **crs_kwargs)
+
+            feature_scale = kwargs.pop("feature_scale", None)
+            kwargs['features'] = {feature: feature_scale for feature in kwargs.pop("features", [])}
         else:
             # Always remove these intermediate keys from kwargs
+            kwargs.pop('geo')
             kwargs.pop('crs_kwargs', {})
             kwargs.pop('projection_kwargs', {})
+            kwargs.pop('feature_scale', None)
 
-        kwargs['min_height'] = 300
+        kwargs['min_height'] = 600
         df = self._data
         if len(df) > MAX_ROWS and not (self.kind in KINDS["stats"] or kwargs.get('rasterize') or kwargs.get('datashade')):
             df = df.sample(n=MAX_ROWS)
@@ -545,7 +554,10 @@ class hvPlotExplorer(Viewer):
             parameters = ['kind', 'y_multi', 'by', 'groupby']
         else:
             parameters = ['kind', 'x', 'y_multi', 'by', 'groupby']
-        self._controls.parameters = parameters
+        with param.batch_watch(self):
+            self._controls.parameters = parameters
+            if 'y_multi' in self._controls.parameters:
+                self.y_multi = self.param["y_multi"].objects[:1]
 
         # Control other tabs
         tabs = [('Fields', self._controls)]
