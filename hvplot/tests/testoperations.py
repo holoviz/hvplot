@@ -3,12 +3,13 @@ import sys
 from unittest import SkipTest
 from parameterized import parameterized
 
+import colorcet as cc
 import hvplot.pandas  # noqa
 import numpy as np
 import pandas as pd
 
 from holoviews import Store
-from holoviews.element import Image, QuadMesh
+from holoviews.element import Image, QuadMesh, ImageStack
 from holoviews.element.comparison import ComparisonTestCase
 from hvplot.converter import HoloViewsConverter
 
@@ -194,6 +195,11 @@ class TestDatashader(ComparisonTestCase):
         actual = plot.callback.inputs[0].callback.operation.p['rescale_discrete_levels']
         assert actual is expected
 
+    def test_rasterize_by(self):
+        expected = 'category'
+        plot = self.df.hvplot(x='x', y='y', by=expected, rasterize=True, dynamic=False)
+        assert isinstance(plot, ImageStack)
+        assert plot.opts["cmap"] == cc.palette['glasbey_category10']
 
 class TestChart2D(ComparisonTestCase):
 

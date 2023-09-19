@@ -582,7 +582,7 @@ class HoloViewsConverter:
                     symmetric = self._process_symmetric(symmetric, clim, check_symmetric_max)
                 if self._style_opts.get('cmap') is None:
                     # Default to categorical camp if we detect categorical shading
-                    if (self.datashade and (self.aggregator is None or 'count_cat' in str(self.aggregator)) and
+                    if ((self.datashade or self.rasterize) and (self.aggregator is None or 'count_cat' in str(self.aggregator)) and
                         ((self.by and not self.subplots) or
                          (isinstance(self.y, list) or (self.y is None and len(set(self.variables) - set(self.indexes)) > 1)))):
                         self._style_opts['cmap'] = self._default_cmaps['categorical']
@@ -1330,7 +1330,10 @@ class HoloViewsConverter:
                 opts['rescale_discrete_levels'] = self._plot_opts['rescale_discrete_levels']
         else:
             operation = rasterize
-            eltype = 'Image'
+            if Version(hv.__version__) < Version('1.18.0a1'):
+                eltype = 'Image'
+            else:
+                eltype = 'ImageStack' if self.by else 'Image'
             if 'cmap' in self._style_opts:
                 style['cmap'] = self._style_opts['cmap']
             if self._dim_ranges.get('c', (None, None)) != (None, None):
