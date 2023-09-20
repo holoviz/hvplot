@@ -84,6 +84,9 @@ class HoloViewsConverter:
     """
     Generic options
     ---------------
+    autorange (default=None): Literal['x', 'y'] | None
+        Whether to enable auto-ranging along the x- or y-axis when
+        zooming.
     clim: tuple
         Lower and upper bound of the color scale
     cnorm (default='linear'): str
@@ -383,7 +386,8 @@ class HoloViewsConverter:
         y_sampling=None, project=False, tools=[], attr_labels=None,
         coastline=False, tiles=False, sort_date=True,
         check_symmetric_max=1000000, transforms={}, stream=None,
-        cnorm=None, features=None, rescale_discrete_levels=None, **kwds
+        cnorm=None, features=None, rescale_discrete_levels=None,
+        autorange=None, **kwds
     ):
         # Process data and related options
         self._redim = fields
@@ -484,6 +488,8 @@ class HoloViewsConverter:
             plot_opts['xlim'] = tuple(xlim)
         if ylim is not None:
             plot_opts['ylim'] = tuple(ylim)
+
+        plot_opts['autorange'] = autorange
 
         self.invert = invert
         if loglog is not None:
