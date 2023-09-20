@@ -1,5 +1,9 @@
+import re
+
 import holoviews as hv
 import hvplot.pandas
+
+import pytest
 
 from bokeh.sampledata import penguins
 from hvplot.ui import hvDataFrameExplorer
@@ -85,3 +89,17 @@ def test_explorer_save(tmp_path):
     explorer.save(outfile)
 
     assert outfile.exists()
+
+
+def test_explorer_kwargs_controls():
+    explorer = hvplot.explorer(df, title='Dummy title', width=200)
+
+    assert explorer.labels.title == 'Dummy title'
+    assert explorer.axes.width == 200
+
+
+def test_explorer_kwargs_controls_error_not_supported():
+    with pytest.raises(
+        TypeError, match=re.escape("__init__() got unexpected keyword(s): {'not_a_control_kwarg': None}")
+    ):
+        hvplot.explorer(df, title='Dummy title', not_a_control_kwarg=None)
