@@ -127,9 +127,10 @@ def proj_to_cartopy(proj):
     except ImportError:
         has_gdal = False
 
-    proj = check_crs(proj)
+    input_proj = proj
+    proj = check_crs(input_proj)
     if proj is None:
-        raise ValueError(f"Invalid proj projection {proj!r}")
+        raise ValueError(f"Invalid proj projection {input_proj!r}")
 
     srs = proj.srs
     if has_gdal:
@@ -269,7 +270,10 @@ def process_crs(crs):
             crs = str(crs)
             errors.append(e)
     if isinstance(crs, (str, pyproj.Proj)):
-        return proj_to_cartopy(crs)
+        try:
+            return proj_to_cartopy(crs)
+        except Exception as e:
+            errors.append(e)
     if isinstance(crs, ccrs.CRS):
         return crs
 
