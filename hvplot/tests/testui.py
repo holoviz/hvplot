@@ -100,6 +100,6 @@ def test_explorer_kwargs_controls():
 
 def test_explorer_kwargs_controls_error_not_supported():
     with pytest.raises(
-        TypeError, match=re.escape("__init__() got unexpected keyword(s): {'not_a_control_kwarg': None}")
+        TypeError, match=re.escape("__init__() got keyword(s) not supported by any control: {'not_a_control_kwarg': None}")
     ):
         hvplot.explorer(df, title='Dummy title', not_a_control_kwarg=None)

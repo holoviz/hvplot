@@ -403,7 +403,9 @@ class hvPlotExplorer(Viewer):
                 if k in cls.param
             }
         if extras:
-            raise TypeError(f'__init__() got unexpected keyword(s): {extras}')
+            raise TypeError(
+                f'__init__() got keyword(s) not supported by any control: {extras}'
+            )
         self._controllers = {
             cls.name.lower(): cls(df, explorer=self, **cparams)
             for cls, cparams in controller_params.items()
