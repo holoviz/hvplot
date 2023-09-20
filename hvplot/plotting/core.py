@@ -57,7 +57,7 @@ class hvPlotBase:
 
         if isinstance(kind, str) and kind not in self.__all__:
             raise NotImplementedError(
-                "kind='{kind}' for data of type {type}".format(kind=kind, type=type(self._data))
+                f"kind='{kind}' for data of type {type(self._data)}"
             )
 
         if panel_available:
@@ -115,8 +115,8 @@ class hvPlotBase:
             if "kind" in plot_opts and name in HoloViewsConverter._kind_mapping:
                 param.main.param.warning(
                     "Custom options for existing plot types should not "
-                    "declare the 'kind' argument. The .%s plot method "
-                    "was unexpectedly customized with kind=%r." % (plot_opts["kind"], name)
+                    "declare the 'kind' argument. The .{} plot method "
+                    "was unexpectedly customized with kind={!r}.".format(plot_opts["kind"], name)
                 )
                 plot_opts["kind"] = name
             return hvPlotBase(self._data, **dict(self._metadata, **plot_opts))
