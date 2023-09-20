@@ -417,13 +417,13 @@ class HoloViewsConverter:
                 raise ImportError('In order to use geo-related features '
                                   'the geoviews library must be available. '
                                   'It can be installed with:\n  conda '
-                                  'install -c pyviz geoviews')
+                                  'install geoviews')
         if self.geo:
             if self.kind not in self._geo_types:
                 param.main.param.warning(
-                    "geo option cannot be used with kind=%r plot "
+                    f"geo option cannot be used with kind={self.kind!r} plot "
                     "type. Geographic plots are only supported for "
-                    "following plot types: %r" % (self.kind, self._geo_types))
+                    f"following plot types: {self._geo_types!r}")
             from cartopy import crs as ccrs
             from geoviews.util import project_extents
 
@@ -440,7 +440,7 @@ class HoloViewsConverter:
                 else:
                     raise ValueError(
                         "Projection must be defined as cartopy CRS or "
-                        "one of the following CRS string:\n {}".format(all_crs))
+                        f"one of the following CRS string:\n {all_crs}")
 
             projection = projection or (ccrs.GOOGLE_MERCATOR if tiles else self.crs)
             if tiles and projection != ccrs.GOOGLE_MERCATOR:
@@ -587,7 +587,7 @@ class HoloViewsConverter:
                     symmetric = self._process_symmetric(symmetric, clim, check_symmetric_max)
                 if self._style_opts.get('cmap') is None:
                     # Default to categorical camp if we detect categorical shading
-                    if (self.datashade and (self.aggregator is None or 'count_cat' in str(self.aggregator)) and
+                    if ((self.datashade or self.rasterize) and (self.aggregator is None or 'count_cat' in str(self.aggregator)) and
                         ((self.by and not self.subplots) or
                          (isinstance(self.y, list) or (self.y is None and len(set(self.variables) - set(self.indexes)) > 1)))):
                         self._style_opts['cmap'] = self._default_cmaps['categorical']
@@ -669,8 +669,8 @@ class HoloViewsConverter:
             # only raise error if crs was specified in kwargs
             if crs:
                 raise ValueError(
-                    "'{}' must be either a valid crs or an reference to "
-                    "a `data.attr` containing a valid crs.".format(crs))
+                    f"'{crs}' must be either a valid crs or an reference to "
+                    "a `data.attr` containing a valid crs.")
 
     def _process_data(self, kind, data, x, y, by, groupby, row, col,
                       use_dask, persist, backlog, label, group_label,
@@ -856,14 +856,14 @@ class HoloViewsConverter:
                                 groupby.append(data_dim)
             self.variables = list(data.coords) + data_vars
             if groupby and not_found:
-                raise ValueError('The supplied groupby dimension(s) %s '
+                raise ValueError(f'The supplied groupby dimension(s) {not_found} '
                                  'could not be found, expected one or '
-                                 'more of: %s' % (not_found, list(data.coords)))
+                                 f'more of: {list(data.coords)}')
         else:
             if gridded and kind not in ('points', 'dataset'):
-                raise ValueError('%s plot type requires gridded data, '
+                raise ValueError(f'{kind} plot type requires gridded data, '
                                  'e.g. a NumPy array or xarray Dataset, '
-                                 'found %s type' % (kind, type(self.data).__name__))
+                                 f'found {type(self.data).__name__} type')
 
             if hasattr(data, 'columns') and hasattr(data.columns, 'name') and data.columns.name and not group_label:
                 group_label = data.columns.name
@@ -908,9 +908,9 @@ class HoloViewsConverter:
             not_found = [g for g in groupby+by_cols if g not in list(self.data.columns)+indexes]
             not_found, self.data = process_derived_datetime_pandas(self.data, not_found, indexes)
             if groupby and not_found:
-                raise ValueError('The supplied groupby dimension(s) %s '
+                raise ValueError(f'The supplied groupby dimension(s) {not_found} '
                                  'could not be found, expected one or '
-                                 'more of: %s' % (not_found, list(self.data.columns)))
+                                 f'more of: {list(self.data.columns)}')
 
         if transforms:
             self.data = Dataset(self.data, indexes).transform(**transforms).data
@@ -972,7 +972,7 @@ class HoloViewsConverter:
             except Exception as e:
                 if attr_labels is True:
                     param.main.param.warning('Unable to auto label using xarray attrs '
-                                       'because {e}'.format(e=e))
+                                       f'because {e}')
 
     def _process_plot(self):
         kind = self.kind
@@ -1290,7 +1290,7 @@ class HoloViewsConverter:
             raise ImportError('In order to use datashading features '
                     'the Datashader library must be available. '
                     'It can be installed with:\n  conda '
-                    'install -c pyviz datashader')
+                    'install datashader')
 
         categorical = False
         if self.by and not self.subplots:
@@ -1345,7 +1345,10 @@ class HoloViewsConverter:
                 opts['rescale_discrete_levels'] = self._plot_opts['rescale_discrete_levels']
         else:
             operation = rasterize
-            eltype = 'Image'
+            if Version(hv.__version__) < Version('1.18.0a1'):
+                eltype = 'Image'
+            else:
+                eltype = 'ImageStack' if self.by else 'Image'
             if 'cmap' in self._style_opts:
                 style['cmap'] = self._style_opts['cmap']
             if self._dim_ranges.get('c', (None, None)) != (None, None):
@@ -1402,8 +1405,7 @@ class HoloViewsConverter:
 
         if self.tiles:
             tile_source = 'EsriImagery' if self.tiles == 'ESRI' else self.tiles
-            warning = ("%s tiles not recognized, must be one of: %s or a tile object" %
-                       (tile_source, sorted(hv.element.tile_sources)))
+            warning = ("{} tiles not recognized, must be one of: {} or a tile object".format(tile_source, sorted(hv.element.tile_sources)))
             if tile_source is True:
                 tiles = hv.element.tiles.OSM()
             elif tile_source in hv.element.tile_sources.keys():
