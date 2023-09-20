@@ -95,10 +95,6 @@ extras_require['examples'] = [
     'spatialpandas >=0.4.3',
 ]
 
-# extras_require['examples_conda'] = [
-#     'hdf5 !=1.14.1',  # Gives coredump in test suite on Linux and Mac
-# ]
-
 # Run the example tests by installing examples_tests together with tests
 extras_require["examples_tests"] = extras_require["examples"] + extras_require['tests_nb']
 
