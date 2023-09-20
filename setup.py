@@ -32,7 +32,7 @@ install_requires = [
     'colorcet >=2',
     'holoviews >=1.11.0',
     'pandas',
-    'numpy>=1.15',
+    'numpy >=1.15',
     'packaging',
     'panel >=0.11.0',
     'param >=1.9.0',
@@ -95,16 +95,16 @@ extras_require['examples'] = [
     'spatialpandas >=0.4.3',
 ]
 
-extras_require['examples_conda'] = [
-    'hdf5 !=1.14.1',  # Gives coredump in test suite on Linux and Mac
-]
+# extras_require['examples_conda'] = [
+#     'hdf5 !=1.14.1',  # Gives coredump in test suite on Linux and Mac
+# ]
 
 # Run the example tests by installing examples_tests together with tests
 extras_require["examples_tests"] = extras_require["examples"] + extras_require['tests_nb']
 
 # Additional packages required to build the docs
 extras_require['doc'] = extras_require['examples'] + [
-    'nbsite >=0.8.0rc33',
+    'nbsite >=0.8.2',
 ]
 
 # until pyproject.toml/equivalent is widely supported (setup_requires
