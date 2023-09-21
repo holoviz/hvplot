@@ -671,12 +671,12 @@ class HoloViewsConverter:
 
         try:
             return process_crs(_crs)
-        except ValueError:
+        except ValueError as e:
             # only raise error if crs was specified in kwargs
             if crs:
                 raise ValueError(
                     f"'{crs}' must be either a valid crs or an reference to "
-                    "a `data.attr` containing a valid crs.")
+                    f"a `data.attr` containing a valid crs: {e}")
 
     def _process_data(self, kind, data, x, y, by, groupby, row, col,
                       use_dask, persist, backlog, label, group_label,

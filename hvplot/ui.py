@@ -286,18 +286,27 @@ class Geo(Controls):
         self.geo = enabled
         if not enabled:
             return
+
         from cartopy.crs import CRS
-        crs = sorted(
+        crs_list = sorted(
             k for k in param.concrete_descendents(CRS).keys()
             if not k.startswith('_') and k != 'CRS'
         )
-        crs.insert(0, "GOOGLE_MERCATOR")
-        crs.insert(0, "PlateCarree")
-        crs.remove("PlateCarree")
-        self.param.crs.objects = crs
-        self.param.projection.objects = crs
+        crs_list.insert(0, "GOOGLE_MERCATOR")
+        crs_list.insert(0, "PlateCarree")
+        crs_list.remove("PlateCarree")
+
+        self.param.crs.objects = crs_list
+        if self.crs is None:
+            self.crs = crs_list[0]
+
+        self.param.projection.objects = crs_list
+        if self.projection is None:
+            self.projection = crs_list[0]
+
         if self.global_extent is None:
             self.global_extent = True
+
         if self.features is None:
             self.features = ["coastline"]
 
@@ -348,9 +357,9 @@ class hvPlotExplorer(Viewer):
 
     kind = param.Selector()
 
-    x = param.Selector()
+    x = param.Selector(default="x")
 
-    y = param.Selector()
+    y = param.Selector(default="y")
 
     y_multi = param.ListSelector(default=[], label='Y')
 
@@ -515,7 +524,6 @@ class hvPlotExplorer(Viewer):
             df = df.sample(n=MAX_ROWS)
         self._layout.loading = True
         try:
-            print(kwargs, self.kind, self.x, y, self.by, self.groupby)
             self._hvplot = _hvPlot(df)(
                 kind=self.kind, x=self.x, y=y, by=self.by, groupby=self.groupby, **kwargs
             )
