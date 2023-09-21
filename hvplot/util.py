@@ -62,7 +62,7 @@ def check_crs(crs):
 
     Returns
     -------
-    A valid crs if possible, otherwise raises an error.
+    A valid crs if possible, otherwise None.
     """
     import pyproj
 
