@@ -167,4 +167,10 @@ def test_explorer_hvplot_gridded_dataarray():
     assert explorer.x == "lat"
     assert explorer.y == "lon"
     assert explorer.by == []
-    assert explorer.groupby == ["time"]
+    assert explorer.groupby == ['time']
+
+
+def test_explorer_hvplot_gridded_options():
+    ds = xr.tutorial.open_dataset("air_temperature")
+    explorer = hvplot.explorer(ds)
+    assert explorer._controls[0].groups.keys() == {"dataframe", "gridded", "geom"}
