@@ -49,7 +49,7 @@ def explorer(data, **kwargs):
 
     Parameters
     ----------
-    data : pandas.DataFrame
+    data : pandas.DataFrame | xarray.Dataset
         Data structure to explore.
     kwargs : optional
         Arguments that `data.hvplot()` would also accept like `kind='bar'`.
@@ -553,10 +553,7 @@ class hvPlotExplorer(Viewer):
             parameters = ['kind', 'y_multi', 'by', 'groupby']
         else:
             parameters = ['kind', 'x', 'y_multi', 'by', 'groupby']
-        with param.batch_watch(self):
-            self._controls.parameters = parameters
-            if 'y_multi' in self._controls.parameters:
-                self.y_multi = self.param["y_multi"].objects[:1]
+        self._controls.parameters = parameters
 
         # Control other tabs
         tabs = [('Fields', self._controls)]
@@ -686,6 +683,18 @@ class hvGridExplorer(hvPlotExplorer):
 
     kind = param.Selector(default="image", objects=KINDS['all'])
 
+    def __init__(self, ds, **params):
+        import xarray as xr
+        if isinstance(ds, xr.Dataset):
+            data_vars = list(ds.data_vars)
+            if len(data_vars) == 1:
+                ds = ds[data_vars[0]]
+            else:
+                ds = ds.to_array('variable').transpose(..., "variable")
+        if "kind" not in params:
+            params["kind"] = "image"
+        super().__init__(ds, **params)
+
     @property
     def _x(self):
         return (self._converter.x or self._converter.indexes[0]) if self.x is None else self.x
@@ -696,13 +705,10 @@ class hvGridExplorer(hvPlotExplorer):
 
     @param.depends('x')
     def xlim(self):
-        if self._x == 'index':
-            values = self._data.index.values
-        else:
-            try:
-                values = self._data[self._x]
-            except:
-                return 0, 1
+        try:
+            values = self._data[self._x]
+        except:
+            return 0, 1
         if values.dtype.kind in 'OSU':
             return None
         return (np.nanmin(values), np.nanmax(values))
@@ -734,10 +740,12 @@ class hvGridExplorer(hvPlotExplorer):
                     p.objects = variables_no_index
 
                 # Setting the default value if not set
-                if (pname == "x" or pname == "y") and getattr(self, pname, None) is None:
+                if pname == "x" and getattr(self, pname, None) is None:
                     setattr(self, pname, p.objects[0])
-                elif pname == "groupby" and len(getattr(self, pname, [])) == 0:
-                    setattr(self, pname, p.objects[-1:])
+                elif pname == "y" and getattr(self, pname, None) is None:
+                    setattr(self, pname, p.objects[1])
+                elif pname == "groupby" and len(getattr(self, pname, [])) == 0 and len(p.objects) > 2:
+                    setattr(self, pname, p.objects[2:])
 
 
 class hvDataFrameExplorer(hvPlotExplorer):
