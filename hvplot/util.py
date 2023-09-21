@@ -256,26 +256,20 @@ def process_crs(crs):
 
     if crs is None:
         return ccrs.PlateCarree()
+    elif isinstance(crs, ccrs.CRS):
+        return crs
 
     errors = []
-    if isinstance(crs, str) and crs.lower().startswith('epsg'):
+    if isinstance(crs, (str, int)):  # epsg codes
         try:
             crs = pyproj.CRS.from_epsg(crs).to_wkt()
         except Exception as e:
             errors.append(e)
-    if isinstance(crs, int):
-        try:
-            crs = pyproj.CRS.from_epsg(crs).to_wkt()
-        except Exception as e:
-            crs = str(crs)
-            errors.append(e)
-    if isinstance(crs, (str, pyproj.Proj)):
+    if isinstance(crs, (str, pyproj.Proj)):  # proj4/wkt strings
         try:
             return proj_to_cartopy(crs)
         except Exception as e:
             errors.append(e)
-    if isinstance(crs, ccrs.CRS):
-        return crs
 
     raise ValueError(
         "Projection must be defined as a EPSG code, proj4 string, "
