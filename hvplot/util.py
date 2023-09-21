@@ -62,7 +62,7 @@ def check_crs(crs):
 
     Returns
     -------
-    A valid crs if possible, otherwise None
+    A valid crs if possible, otherwise raises an error.
     """
     import pyproj
 
@@ -235,6 +235,7 @@ def process_crs(crs):
       1. EPSG codes:   Defined as string of the form "EPSG: {code}" or an integer
       2. proj.4 string: Defined as string of the form "{proj.4 string}"
       3. cartopy.crs.CRS instance
+      3. pyproj.Proj or pyproj.CRS instance
       4. WKT string:    Defined as string of the form "{WKT string}"
       5. None defaults to crs.PlateCaree
     """
@@ -258,6 +259,8 @@ def process_crs(crs):
         return ccrs.PlateCarree()
     elif isinstance(crs, ccrs.CRS):
         return crs
+    elif isinstance(crs, pyproj.CRS):
+        crs = crs.to_wkt()
 
     errors = []
     if isinstance(crs, (str, int)):  # epsg codes
@@ -273,7 +276,7 @@ def process_crs(crs):
 
     raise ValueError(
         "Projection must be defined as a EPSG code, proj4 string, "
-        "WKT string, cartopy CRS, or pyproj.Proj."
+        "WKT string, cartopy CRS, pyproj.Proj, or pyproj.CRS."
     ) from Exception(*errors)
 
 
