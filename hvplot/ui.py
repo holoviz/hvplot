@@ -18,7 +18,8 @@ KINDS = {
     "dataframe": sorted(
         set(_hvConverter._kind_mapping) -
         set(_hvConverter._gridded_types) -
-        set(_hvConverter._geom_types)
+        set(_hvConverter._geom_types) |
+        set(["points"])
     ),
     "gridded": sorted(set(_hvConverter._gridded_types) - set(["dataset"])),
     "geom": _hvConverter._geom_types,
@@ -34,7 +35,7 @@ GEO_FEATURES = [
     'borders', 'coastline', 'land', 'lakes', 'ocean', 'rivers',
     'states', 'grid'
 ]
-GEO_TILES = list(tile_sources)
+GEO_TILES = [None] + sorted(tile_sources)
 AGGREGATORS = [None, 'count', 'min', 'max', 'mean', 'sum', 'any']
 MAX_ROWS = 10000
 
@@ -254,7 +255,7 @@ class Geo(Controls):
     projection_kwargs = param.Dict(default={}, doc="""
         Keyword arguments to pass to selected projection.""")
 
-    global_extent = param.Boolean(default=False, doc="""
+    global_extent = param.Boolean(default=None, doc="""
         Whether to expand the plot extent to span the whole globe.""")
 
     project = param.Boolean(default=False, doc="""
@@ -262,7 +263,7 @@ class Geo(Controls):
         overhead but avoids projecting data when plot is dynamically
         updated).""")
 
-    features = param.ListSelector(default=[], objects=GEO_FEATURES, doc="""
+    features = param.ListSelector(default=None, objects=GEO_FEATURES, doc="""
         A list of features or a dictionary of features and the scale
         at which to render it. Available features include 'borders',
         'coastline', 'lakes', 'land', 'ocean', 'rivers' and 'states'.""")
@@ -275,9 +276,9 @@ class Geo(Controls):
         can be selected by name or a tiles object or class can be passed,
         the default is 'Wikipedia'.""")
 
-    @param.depends('geo', 'project', 'features', watch=True, on_init=True)
+    @param.depends('geo', 'project', watch=True, on_init=True)
     def _update_crs_projection(self):
-        enabled = bool(self.geo or self.project or self.features)
+        enabled = bool(self.geo or self.project)
         self.param.crs.constant = not enabled
         self.param.crs_kwargs.constant = not enabled
         self.param.projection.constant = not enabled
@@ -285,15 +286,20 @@ class Geo(Controls):
         self.geo = enabled
         if not enabled:
             return
-        from cartopy.crs import CRS, GOOGLE_MERCATOR
-        crs = {
-            k: v for k, v in param.concrete_descendents(CRS).items()
+        from cartopy.crs import CRS
+        crs = sorted(
+            k for k in param.concrete_descendents(CRS).keys()
             if not k.startswith('_') and k != 'CRS'
-        }
-        crs["-"] = ""
-        crs['GOOGLE_MERCATOR'] = GOOGLE_MERCATOR
+        )
+        crs.insert(0, "GOOGLE_MERCATOR")
+        crs.insert(0, "PlateCarree")
+        crs.remove("PlateCarree")
         self.param.crs.objects = crs
         self.param.projection.objects = crs
+        if self.global_extent is None:
+            self.global_extent = True
+        if self.features is None:
+            self.features = ["coastline"]
 
 
 class Operations(Controls):
@@ -346,7 +352,7 @@ class hvPlotExplorer(Viewer):
 
     y = param.Selector()
 
-    y_multi = param.ListSelector(default=[], label='Y Multi')
+    y_multi = param.ListSelector(default=[], label='Y')
 
     by = param.ListSelector(default=[])
 
@@ -509,6 +515,7 @@ class hvPlotExplorer(Viewer):
             df = df.sample(n=MAX_ROWS)
         self._layout.loading = True
         try:
+            print(kwargs, self.kind, self.x, y, self.by, self.groupby)
             self._hvplot = _hvPlot(df)(
                 kind=self.kind, x=self.x, y=y, by=self.by, groupby=self.groupby, **kwargs
             )
