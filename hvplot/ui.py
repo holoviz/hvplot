@@ -236,7 +236,7 @@ class Labels(Controls):
         number of degrees.""")
 
 
-class Geo(Controls):
+class Geographic(Controls):
 
     geo = param.Boolean(default=False, doc="""
         Whether the plot should be treated as geographic (and assume
@@ -357,9 +357,9 @@ class hvPlotExplorer(Viewer):
 
     kind = param.Selector()
 
-    x = param.Selector(default="x")
+    x = param.Selector()
 
-    y = param.Selector(default="y")
+    y = param.Selector()
 
     y_multi = param.ListSelector(default=[], label='Y')
 
@@ -375,7 +375,7 @@ class hvPlotExplorer(Viewer):
 
     labels = param.ClassSelector(class_=Labels)
 
-    geo = param.ClassSelector(class_=Geo)
+    geographic = param.ClassSelector(class_=Geographic)
 
     operations = param.ClassSelector(class_=Operations)
 
@@ -583,7 +583,7 @@ class hvPlotExplorer(Viewer):
                 }, show_name=False)),
                 ('Style', self.style),
                 ('Operations', self.operations),
-                ('Geo', self.geo)
+                ('Geographic', self.geographic)
             ]
             if event and event.new not in ('area', 'kde', 'line', 'ohlc', 'rgb', 'step'):
                 tabs.insert(5, ('Colormapping', self.colormapping))

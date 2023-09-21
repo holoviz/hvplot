@@ -1,6 +1,7 @@
 import re
 
 import holoviews as hv
+import pandas as pd
 import hvplot.pandas
 import hvplot.xarray
 import xarray as xr
@@ -174,3 +175,13 @@ def test_explorer_hvplot_gridded_options():
     ds = xr.tutorial.open_dataset("air_temperature")
     explorer = hvplot.explorer(ds)
     assert explorer._controls[0].groups.keys() == {"dataframe", "gridded", "geom"}
+
+
+def test_explorer_hvplot_geo():
+    df = pd.DataFrame({"x": [-9796115.18980811], "y": [4838471.398061159]})
+    explorer = hvplot.explorer(df, geo=True)
+    assert explorer.geographic.geo
+    assert explorer.geographic.global_extent
+    assert explorer.geographic.features == ["coastline"]
+    assert explorer.geographic.crs == "GOOGLE_MERCATOR"
+    assert explorer.geographic.projection == "GOOGLE_MERCATOR"
