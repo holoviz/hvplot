@@ -186,7 +186,7 @@ def proj_to_cartopy(proj):
             elif v == 'ob_tran':
                 cl = ccrs.RotatedPole
             else:
-                raise NotImplementedError('Unknown projection {}'.format(v))
+                raise NotImplementedError(f'Unknown projection {v}')
         if k in km_proj:
             if k == 'zone':
                 v = int(v)
