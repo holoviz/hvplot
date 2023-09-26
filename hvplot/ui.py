@@ -453,12 +453,13 @@ class hvPlotExplorer(Viewer):
         self._refresh_control = pn.widgets.Toggle(value=True, name="Auto-refresh plot", sizing_mode="stretch_width")
         self._refresh_control.param.watch(self._refresh, 'value')
         self._hv_pane = pn.pane.HoloViews(sizing_mode='stretch_width', margin=(5, 20, 5, 20))
+        self._code_pane = pn.pane.Markdown(sizing_mode='stretch_width', margin=(5, 20, 0, 20))
         self._layout = pn.Column(
             self._alert,
             self._refresh_control,
             pn.Row(
                 self._tabs,
-                self._hv_pane,
+                pn.Tabs(("Plot", self._hv_pane), ("Code", self._code_pane)),
                 sizing_mode="stretch_width",
             ),
             pn.layout.HSpacer(),
@@ -503,8 +504,8 @@ class hvPlotExplorer(Viewer):
         if kwargs.get("geo"):
             if "crs" not in kwargs:
                 xmax = np.max(np.abs(self.xlim()))
-                self.crs = "PlateCarree" if xmax <= 360 else "GOOGLE_MERCATOR"
-                kwargs["crs"] = self.crs
+                self.geographic.crs = "PlateCarree" if xmax <= 360 else "GOOGLE_MERCATOR"
+                kwargs["crs"] = self.geographic.crs
             for key in ["crs", "projection"]:
                 crs_kwargs = kwargs.pop(f"{key}_kwargs", {})
                 kwargs[key] = instantiate_crs_str(kwargs.pop(key), **crs_kwargs)
@@ -528,6 +529,7 @@ class hvPlotExplorer(Viewer):
                 kind=self.kind, x=self.x, y=y, by=self.by, groupby=self.groupby, **kwargs
             )
             self._hv_pane.object = self._hvplot
+            self._code_pane.object = f"```python\n{self.plot_code()}\n```"
             self._alert.visible = False
         except Exception as e:
             self._alert.param.update(
@@ -619,9 +621,9 @@ class hvPlotExplorer(Viewer):
         args = ''
         if settings:
             for k, v in settings.items():
-                args += f'{k}={v!r}, '
+                args += f'    {k}={v!r},\n'
             args = args[:-2]
-        return f'{var_name}.hvplot({args})'
+        return f'{var_name}.hvplot(\n{args}\n)'
 
     def save(self, filename, **kwargs):
         """Save the plot to file.
