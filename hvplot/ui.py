@@ -288,7 +288,7 @@ class Operations(Controls):
     aggregator = param.Selector(default=None, objects=AGGREGATORS, doc="""
         Aggregator to use when applying rasterize or datashade operation.""")
 
-    dynspread = param.Boolean(default=False, doc="""
+    dynspread = param.Boolean(default=True, doc="""
         Allows plots generated with datashade=True or rasterize=True
         to increase the point size to make sparse regions more visible.""")
 
