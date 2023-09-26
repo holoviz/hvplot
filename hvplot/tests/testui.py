@@ -103,3 +103,40 @@ def test_explorer_kwargs_controls_error_not_supported():
         TypeError, match=re.escape("__init__() got keyword(s) not supported by any control: {'not_a_control_kwarg': None}")
     ):
         hvplot.explorer(df, title='Dummy title', not_a_control_kwarg=None)
+
+
+def test_explorer_method_basic():
+    explorer = df.hvplot.explorer()
+
+    assert isinstance(explorer, hvDataFrameExplorer)
+    assert explorer.kind == 'line'
+    assert explorer.x == 'index'
+    assert explorer.y == 'species'
+
+
+def test_explorer_method_kind():
+    explorer = df.hvplot.explorer(kind="scatter")
+
+    assert isinstance(explorer, hvDataFrameExplorer)
+    assert explorer.kind == 'scatter'
+    assert explorer.x == 'index'
+    assert explorer.y == 'species'
+
+
+def test_explorer_method_as_kind():
+    explorer = df.hvplot(kind="explorer")
+
+    assert isinstance(explorer, hvDataFrameExplorer)
+    assert explorer.kind == 'line'
+    assert explorer.x == 'index'
+    assert explorer.y == 'species'
+
+
+def test_explorer_method_propagates_kwargs():
+    explorer = df.hvplot.explorer(title="Dummy title", x="bill_length_mm")
+
+    assert isinstance(explorer, hvDataFrameExplorer)
+    assert explorer.kind == 'line'
+    assert explorer.x == 'bill_length_mm'
+    assert explorer.y == 'species'
+    assert explorer.labels.title == 'Dummy title'

@@ -343,7 +343,7 @@ class HoloViewsConverter:
         'step': Curve,
         'table': Table,
         'vectorfield': VectorField,
-        'violin': Violin
+        'violin': Violin,
     }
 
     # Types which have a colorbar by default
@@ -488,7 +488,7 @@ class HoloViewsConverter:
         self.stacked = stacked
 
         plot_opts = dict(self._default_plot_opts,
-                         **self._process_plot())
+                         **self._process_plot(kwds))
         if xlim is not None:
             plot_opts['xlim'] = tuple(xlim)
         if ylim is not None:
@@ -980,8 +980,14 @@ class HoloViewsConverter:
                     param.main.param.warning('Unable to auto label using xarray attrs '
                                        f'because {e}')
 
-    def _process_plot(self):
-        kind = self.kind
+    def _replace_explorer_kind(self, kwds):
+        kind = kwds.get("_explorer_kind", self.kind)
+        if kind == "explorer":
+            kind = "line"
+        return kind
+
+    def _process_plot(self, kwds):
+        kind = self._replace_explorer_kind(kwds)
         options = Store.options(backend='bokeh')
         elname = self._kind_mapping[kind].__name__
         plot_opts = options[elname].groups['plot'].options if elname in options else {}
@@ -997,7 +1003,7 @@ class HoloViewsConverter:
         return plot_opts
 
     def _process_style(self, kwds, plot_opts):
-        kind = self.kind
+        kind = self._replace_explorer_kind(kwds)
         eltype = self._kind_mapping[kind]
         registry =  Store.registry[self._backend_compat]
 
@@ -1107,15 +1113,15 @@ class HoloViewsConverter:
         return style_opts, plot_opts, kwds
 
     def _validate_kwds(self, kwds):
-        kind_opts = self._kind_options.get(self.kind, [])
-        kind = self.kind
+        kind = self._replace_explorer_kind(kwds)
+        kind_opts = self._kind_options.get(kind, [])
         eltype = self._kind_mapping[kind]
         if eltype in Store.registry[self._backend_compat]:
             valid_opts = Store.registry[self._backend_compat][eltype].style_opts
         else:
             valid_opts = []
         ds_opts = ['max_px', 'threshold']
-        mismatches = sorted(k for k in kwds if k not in kind_opts+ds_opts+valid_opts)
+        mismatches = sorted(k for k in kwds if k not in kind_opts + ds_opts + valid_opts + ["_explorer_kind", "_explorer_kwds"])
         if not mismatches:
             return
 
@@ -1152,6 +1158,8 @@ class HoloViewsConverter:
     def __call__(self, kind, x, y):
         kind = self.kind or kind
         method = getattr(self, kind)
+        if kind == "explorer":
+            method = partial(method, self.data)
 
         groups = self.groupby
         zs = self.kwds.get('z', [])
@@ -1509,6 +1517,18 @@ class HoloViewsConverter:
             raise NotImplementedError(
                 f'{kind!r} plot not supported by the {self._backend!r} backend.'
             )
+
+    ##########################
+    #     Explorer           #
+    ##########################
+
+    def explorer(self, data, x=None, y=None):
+        # import here to prevent circular imports
+        from .ui import explorer as ui_explorer
+        kwargs = self.kwds.pop("_explorer_kwds", {})
+        if "_explorer_kind" in self.kwds:
+            kwargs["kind"] = self.kwds.pop("_explorer_kind")
+        return ui_explorer(data, x=x, y=y, **kwargs)
 
     ##########################
     #     Simple charts      #
