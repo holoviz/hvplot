@@ -297,9 +297,6 @@ class Geographic(Controls):
         crs_list.remove("PlateCarree")
 
         self.param.crs.objects = crs_list
-        if self.crs is None:
-            self.crs = crs_list[0]
-
         self.param.projection.objects = crs_list
         if self.projection is None:
             self.projection = crs_list[0]
@@ -508,10 +505,13 @@ class hvPlotExplorer(Viewer):
                 kwargs.update(v.kwargs)
 
         if kwargs.get("geo"):
+            if "crs" not in kwargs:
+                xmax = np.max(np.abs(self.xlim()))
+                self.crs = "PlateCarree" if xmax <= 360 else "GOOGLE_MERCATOR"
+                kwargs["crs"] = self.crs
             for key in ["crs", "projection"]:
                 crs_kwargs = kwargs.pop(f"{key}_kwargs", {})
-                if key in kwargs:
-                    kwargs[key] = instantiate_crs_str(kwargs.pop(key), **crs_kwargs)
+                kwargs[key] = instantiate_crs_str(kwargs.pop(key), **crs_kwargs)
 
             feature_scale = kwargs.pop("feature_scale", None)
             kwargs['features'] = {feature: feature_scale for feature in kwargs.pop("features", [])}
