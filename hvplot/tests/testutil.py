@@ -291,7 +291,7 @@ def test_check_crs():
 
 @pytest.mark.parametrize("input", [
     "+init=epsg:26911",
-], ids=lambda x: str(x)[:20])
+])
 def test_process_crs(input):
     pytest.importorskip("pyproj")
     ccrs = pytest.importorskip("cartopy.crs")
