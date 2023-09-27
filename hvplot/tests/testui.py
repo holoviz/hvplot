@@ -199,6 +199,17 @@ def test_explorer_code_dataframe():
             y='species'
         )"""
     )
+    assert explorer._code_pane.object == dedent("""\
+        ```python
+        import hvplot.pandas
+
+        df.hvplot(
+            kind='points',
+            x='bill_length_mm',
+            y='species'
+        )
+        ```"""
+    )
 
 
 def test_explorer_code_gridded():
@@ -214,3 +225,17 @@ def test_explorer_code_gridded():
             x='lon',
             y='lat'
         )""")
+
+    assert explorer._code_pane.object == dedent("""\
+        ```python
+        import hvplot.xarray
+
+        ds.hvplot(
+            colorbar=True,
+            groupby=['time'],
+            kind='image',
+            x='lon',
+            y='lat'
+        )
+        ```"""
+    )

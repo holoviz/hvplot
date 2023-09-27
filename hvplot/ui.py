@@ -743,6 +743,10 @@ class hvGridExplorer(hvPlotExplorer):
         return "ds"
 
     @property
+    def _backend(self):
+        return "xarray"
+
+    @property
     def _x(self):
         return (self._converter.x or self._converter.indexes[0]) if self.x is None else self.x
 
