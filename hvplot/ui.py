@@ -521,12 +521,6 @@ class hvPlotExplorer(Viewer):
 
             feature_scale = kwargs.pop("feature_scale", None)
             kwargs['features'] = {feature: feature_scale for feature in kwargs.pop("features", [])}
-        else:
-            # Always remove these intermediate keys from kwargs
-            kwargs.pop('geo')
-            kwargs.pop('crs_kwargs', {})
-            kwargs.pop('projection_kwargs', {})
-            kwargs.pop('feature_scale', None)
 
         kwargs['min_height'] = 600
         df = self._data
