@@ -8,8 +8,6 @@ import xarray as xr
 
 import pytest
 
-import pytest
-
 from bokeh.sampledata import penguins
 from hvplot.ui import hvDataFrameExplorer, hvGridExplorer
 
