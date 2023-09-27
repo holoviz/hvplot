@@ -276,7 +276,7 @@ class Geographic(Controls):
         can be selected by name or a tiles object or class can be passed,
         the default is 'Wikipedia'.""")
 
-    @param.depends('geo', 'project', watch=True, on_init=True)
+    @param.depends('geo',  watch=True, on_init=True)
     def _update_crs_projection(self):
         enabled = bool(self.geo or self.project)
         self.param.crs.constant = not enabled
@@ -502,15 +502,19 @@ class hvPlotExplorer(Viewer):
         if isinstance(y, list) and len(y) == 1:
             y = y[0]
         kwargs = {}
-        for p, v in self.param.values().items():
+        for v in self.param.values().values():
+            # Geo is not enabled so not adding it to kwargs
+            if isinstance(v, Geographic) and not v.geo:
+                continue
+
             if isinstance(v, Controls):
                 kwargs.update(v.kwargs)
 
         if kwargs.get("geo"):
             if "crs" not in kwargs:
                 xmax = np.max(np.abs(self.xlim()))
-                self.crs = "PlateCarree" if xmax <= 360 else "GOOGLE_MERCATOR"
-                kwargs["crs"] = self.crs
+                self.geographic.crs = "PlateCarree" if xmax <= 360 else "GOOGLE_MERCATOR"
+                kwargs["crs"] = self.geographic.crs
             for key in ["crs", "projection"]:
                 crs_kwargs = kwargs.pop(f"{key}_kwargs", {})
                 kwargs[key] = instantiate_crs_str(kwargs.pop(key), **crs_kwargs)
