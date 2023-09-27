@@ -378,6 +378,9 @@ class hvPlotExplorer(Viewer):
 
     style = param.ClassSelector(class_=Style)
 
+    code = param.String(precedence=-1, doc="""
+        Code to generate the plot.""")
+
     @classmethod
     def from_data(cls, data, **params):
         if is_geodataframe(data):
@@ -444,7 +447,9 @@ class hvPlotExplorer(Viewer):
             for cls, cparams in controller_params.items()
         }
         self.param.update(**self._controllers)
-        self.param.watch(self._plot, list(self.param))
+        params_to_watch = list(self.param)
+        params_to_watch.remove("code")
+        self.param.watch(self._plot, params_to_watch)
         for controller in self._controllers.values():
             controller.param.watch(self._plot, list(controller.param))
         self._alert = pn.pane.Alert(
@@ -529,7 +534,6 @@ class hvPlotExplorer(Viewer):
                 kind=self.kind, x=self.x, y=y, by=self.by, groupby=self.groupby, **kwargs
             )
             self._hv_pane.object = self._hvplot
-            self._code_pane.object = f"```python\n{self.plot_code()}\n```"
             self._alert.visible = False
         except Exception as e:
             self._alert.param.update(
@@ -539,9 +543,22 @@ class hvPlotExplorer(Viewer):
         finally:
             self._layout.loading = False
 
+    def _code(self):
+        self.code = self._build_code_snippet()
+        self._code_pane.object = f"""```python\nimport hvplot.{self._backend}\n\n{self.code}\n```"""
+
     def _refresh(self, event):
         if event.new:
             self._plot()
+            self._code()
+
+    @property
+    def _var_name(self):
+        return "data"
+
+    @property
+    def _backend(self):
+        return "pandas"
 
     @property
     def _single_y(self):
@@ -581,7 +598,7 @@ class hvPlotExplorer(Viewer):
                 }, show_name=False)),
                 ('Style', self.style),
                 ('Operations', self.operations),
-                ('Geographic', self.geographic)
+                ('Geographic', self.geographic),
             ]
             if event and event.new not in ('area', 'kde', 'line', 'ohlc', 'rgb', 'step'):
                 tabs.insert(5, ('Colormapping', self.colormapping))
@@ -594,6 +611,15 @@ class hvPlotExplorer(Viewer):
     def _check_by(self, event):
         if event.new and 'y_multi' in self._controls.parameters and self.y_multi and len(self.y_multi) > 1:
             self.by = []
+
+    def _build_code_snippet(self):
+        settings = self.settings()
+        args = ''
+        if settings:
+            for k, v in settings.items():
+                args += f'    {k}={v!r},\n'
+            args = args[:-2]
+        return f'{self._var_name}.hvplot(\n{args}\n)'
 
     #----------------------------------------------------------------
     # Public API
@@ -621,9 +647,9 @@ class hvPlotExplorer(Viewer):
         args = ''
         if settings:
             for k, v in settings.items():
-                args += f'    {k}={v!r},\n'
+                args += f'{k}={v!r}, '
             args = args[:-2]
-        return f'{var_name}.hvplot(\n{args}\n)'
+        return f'{var_name}.hvplot({args})'
 
     def save(self, filename, **kwargs):
         """Save the plot to file.
@@ -656,7 +682,7 @@ class hvPlotExplorer(Viewer):
                     settings[p] = value
         for p in self._controls.parameters:
             value = getattr(self, p)
-            if value != self.param[p].default:
+            if value != self.param[p].default or p == "kind":
                 settings[p] = value
         if 'y_multi' in settings:
             settings['y'] = settings.pop('y_multi')
@@ -667,6 +693,10 @@ class hvPlotExplorer(Viewer):
 class hvGeomExplorer(hvPlotExplorer):
 
     kind = param.Selector(default=None, objects=KINDS["all"])
+
+    @property
+    def _var_name(self):
+        return "gdf"
 
     @property
     def _single_y(self):
@@ -707,6 +737,10 @@ class hvGridExplorer(hvPlotExplorer):
         if "kind" not in params:
             params["kind"] = "image"
         super().__init__(ds, **params)
+
+    @property
+    def _var_name(self):
+        return "ds"
 
     @property
     def _x(self):
@@ -766,6 +800,10 @@ class hvDataFrameExplorer(hvPlotExplorer):
     z = param.Selector()
 
     kind = param.Selector(default='line', objects=KINDS["all"])
+
+    @property
+    def _var_name(self):
+        return "df"
 
     @property
     def xcat(self):

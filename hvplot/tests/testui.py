@@ -1,4 +1,5 @@
 import re
+from textwrap import dedent
 
 import holoviews as hv
 import pandas as pd
@@ -185,3 +186,31 @@ def test_explorer_hvplot_geo():
     assert explorer.geographic.features == ["coastline"]
     assert explorer.geographic.crs == "GOOGLE_MERCATOR"
     assert explorer.geographic.projection == "GOOGLE_MERCATOR"
+
+
+def test_explorer_code_dataframe():
+    explorer = hvplot.explorer(df, x="bill_length_mm", kind="points")
+    explorer._code()
+    code = explorer.code
+    assert code == dedent("""\
+        df.hvplot(
+            kind='points',
+            x='bill_length_mm',
+            y='species'
+        )"""
+    )
+
+
+def test_explorer_code_gridded():
+    ds = xr.tutorial.open_dataset("air_temperature")
+    explorer = hvplot.explorer(ds, x="lon", y="lat", kind="image")
+    explorer._code()
+    code = explorer.code
+    assert code == dedent("""\
+        ds.hvplot(
+            colorbar=True,
+            groupby=['time'],
+            kind='image',
+            x='lon',
+            y='lat'
+        )""")
