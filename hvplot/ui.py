@@ -743,7 +743,6 @@ class hvGridExplorer(hvPlotExplorer):
 
     @property
     def _var_name(self):
-        print(self._var_name_suffix)
         if self._var_name_suffix:
             return f"ds{self._var_name_suffix}"
         else:
