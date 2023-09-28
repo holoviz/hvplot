@@ -60,6 +60,7 @@ extras_require['tests'] = [
     'pooch',
     'scipy',
     'ipywidgets',
+    'dask'
     'polars',
 ]
 
