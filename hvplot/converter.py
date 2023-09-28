@@ -203,7 +203,7 @@ class HoloViewsConverter:
     downsample (default=False):
         Whether to apply LTTB (Largest Triangle Three Buckets)
         downsampling to the element (note this is only well behaved for
-        timeseries data).
+        timeseries data). Requires HoloViews >= 1.16.
     dynspread (default=False):
         For plots generated with datashade=True or rasterize=True,
         automatically increase the point size when the data is sparse
