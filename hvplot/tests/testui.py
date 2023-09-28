@@ -218,7 +218,7 @@ def test_explorer_code_gridded():
     explorer._code()
     code = explorer.code
     assert code == dedent("""\
-        ds.hvplot(
+        ds['air'].hvplot(
             colorbar=True,
             groupby=['time'],
             kind='image',
@@ -230,7 +230,36 @@ def test_explorer_code_gridded():
         ```python
         import hvplot.xarray
 
-        ds.hvplot(
+        ds['air'].hvplot(
+            colorbar=True,
+            groupby=['time'],
+            kind='image',
+            x='lon',
+            y='lat'
+        )
+        ```"""
+    )
+
+
+def test_explorer_code_gridded_dataarray():
+    ds = xr.tutorial.open_dataset("air_temperature")["air"]
+    explorer = hvplot.explorer(ds, x="lon", y="lat", kind="image")
+    explorer._code()
+    code = explorer.code
+    assert code == dedent("""\
+        da.hvplot(
+            colorbar=True,
+            groupby=['time'],
+            kind='image',
+            x='lon',
+            y='lat'
+        )""")
+
+    assert explorer._code_pane.object == dedent("""\
+        ```python
+        import hvplot.xarray
+
+        da.hvplot(
             colorbar=True,
             groupby=['time'],
             kind='image',

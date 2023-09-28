@@ -412,6 +412,7 @@ class hvPlotExplorer(Viewer):
         super().__init__(**params)
         self._data = df
         self._converter = converter
+        self._var_name_suffix = ""
         groups = {group: KINDS[group] for group in self._groups}
         self._controls = pn.Param(
             self.param, parameters=['kind', 'x', 'y', 'groupby', 'by'],
@@ -726,19 +727,27 @@ class hvGridExplorer(hvPlotExplorer):
 
     def __init__(self, ds, **params):
         import xarray as xr
+        var_name_suffix = ""
         if isinstance(ds, xr.Dataset):
             data_vars = list(ds.data_vars)
             if len(data_vars) == 1:
                 ds = ds[data_vars[0]]
+                var_name_suffix = f"['{data_vars[0]}']"
             else:
                 ds = ds.to_array('variable').transpose(..., "variable")
+                var_name_suffix = ".to_array('variable').transpose(..., 'variable')"
         if "kind" not in params:
             params["kind"] = "image"
         super().__init__(ds, **params)
+        self._var_name_suffix = var_name_suffix
 
     @property
     def _var_name(self):
-        return "ds"
+        print(self._var_name_suffix)
+        if self._var_name_suffix:
+            return f"ds{self._var_name_suffix}"
+        else:
+            return "da"
 
     @property
     def _backend(self):
