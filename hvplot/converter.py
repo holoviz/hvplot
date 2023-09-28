@@ -1279,7 +1279,10 @@ class HoloViewsConverter:
             opts['height'] = self._plot_opts['height']
 
         if self.downsample:
-            from holoviews.operation.downsample import downsample1d
+            try:
+                from holoviews.operation.downsample import downsample1d
+            except ImportError:
+                raise ImportError('Downsampling requires HoloViews >=1.16')
 
             if self.x_sampling:
                 opts['x_sampling'] = self.x_sampling
