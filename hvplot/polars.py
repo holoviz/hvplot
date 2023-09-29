@@ -1,3 +1,4 @@
+"""Adds the `.hvplot` method to pl.DataFrame, pl.LazyFrame and pl.Series"""
 import itertools
 
 from hvplot import hvPlotTabular, post_patch
