@@ -182,6 +182,11 @@ class TestGeoAnnotation(TestCase):
         self.assertEqual(len(plot), 2)
         self.assertIsInstance(plot.get(0), gv.element.WMTS)
 
+    def test_plot_with_features_properly_overlaid_underlaid(self):
+        # land should be under, borders should be over
+        plot = self.df.hvplot.points('x', 'y', features=["land", "borders"])
+        assert plot.get(0).group == "Land"
+        assert plot.get(2).group == "Borders"
 
 class TestAnnotationNotGeo:
 

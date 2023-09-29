@@ -84,6 +84,9 @@ class HoloViewsConverter:
     """
     Generic options
     ---------------
+    autorange (default=None): Literal['x', 'y'] | None
+        Whether to enable auto-ranging along the x- or y-axis when
+        zooming.
     clim: tuple
         Lower and upper bound of the color scale
     cnorm (default='linear'): str
@@ -182,7 +185,7 @@ class HoloViewsConverter:
     check_symmetric_max (default=1000000):
         Size above which to stop checking for symmetry by default on the data.
 
-    Datashader options
+    Downsampling options
     ------------------
     aggregator (default=None):
         Aggregator to use when applying rasterize or datashade operation
@@ -197,6 +200,10 @@ class HoloViewsConverter:
         Whether to apply rasterization and shading (colormapping) using
         the Datashader library, returning an RGB object instead of
         individual points
+    downsample (default=False):
+        Whether to apply LTTB (Largest Triangle Three Buckets)
+        downsampling to the element (note this is only well behaved for
+        timeseries data).
     dynspread (default=False):
         For plots generated with datashade=True or rasterize=True,
         automatically increase the point size when the data is sparse
@@ -375,15 +382,16 @@ class HoloViewsConverter:
         title=None, xlim=None, ylim=None, clim=None, symmetric=None,
         logx=None, logy=None, loglog=None, hover=None, subplots=False,
         label=None, invert=False, stacked=False, colorbar=None,
-        datashade=False, rasterize=False, row=None, col=None,
-        debug=False, framewise=True, aggregator=None,
-        projection=None, global_extent=None, geo=False,
-        precompute=False, flip_xaxis=None, flip_yaxis=None,
+        datashade=False, rasterize=False, downsample=None,
+        row=None, col=None, debug=False, framewise=True,
+        aggregator=None, projection=None, global_extent=None,
+        geo=False, precompute=False, flip_xaxis=None, flip_yaxis=None,
         dynspread=False, hover_cols=[], x_sampling=None,
         y_sampling=None, project=False, tools=[], attr_labels=None,
         coastline=False, tiles=False, sort_date=True,
         check_symmetric_max=1000000, transforms={}, stream=None,
-        cnorm=None, features=None, rescale_discrete_levels=None, **kwds
+        cnorm=None, features=None, rescale_discrete_levels=None,
+        autorange=None, **kwds
     ):
         # Process data and related options
         self._redim = fields
@@ -460,6 +468,7 @@ class HoloViewsConverter:
         # Operations
         self.datashade = datashade
         self.rasterize = rasterize
+        self.downsample = downsample
         self.dynspread = dynspread
         self.aggregator = aggregator
         self.precompute = precompute
@@ -484,6 +493,8 @@ class HoloViewsConverter:
             plot_opts['xlim'] = tuple(xlim)
         if ylim is not None:
             plot_opts['ylim'] = tuple(ylim)
+
+        plot_opts['autorange'] = autorange
 
         self.invert = invert
         if loglog is not None:
@@ -582,7 +593,7 @@ class HoloViewsConverter:
                     symmetric = self._process_symmetric(symmetric, clim, check_symmetric_max)
                 if self._style_opts.get('cmap') is None:
                     # Default to categorical camp if we detect categorical shading
-                    if (self.datashade and (self.aggregator is None or 'count_cat' in str(self.aggregator)) and
+                    if ((self.datashade or self.rasterize) and (self.aggregator is None or 'count_cat' in str(self.aggregator)) and
                         ((self.by and not self.subplots) or
                          (isinstance(self.y, list) or (self.y is None and len(set(self.variables) - set(self.indexes)) > 1)))):
                         self._style_opts['cmap'] = self._default_cmaps['categorical']
@@ -1256,10 +1267,28 @@ class HoloViewsConverter:
             projection = self._plot_opts.get('projection', ccrs.GOOGLE_MERCATOR)
             obj = project(obj, projection=projection)
 
-        if not (self.datashade or self.rasterize):
+        if not (self.datashade or self.rasterize or self.downsample):
             layers = self._apply_layers(obj)
             layers = _transfer_opts_cur_backend(layers)
             return layers
+
+        opts = dict(dynamic=self.dynamic)
+        if self._plot_opts.get('width') is not None:
+            opts['width'] = self._plot_opts['width']
+        if self._plot_opts.get('height') is not None:
+            opts['height'] = self._plot_opts['height']
+
+        if self.downsample:
+            from holoviews.operation.downsample import downsample1d
+
+            if self.x_sampling:
+                opts['x_sampling'] = self.x_sampling
+            if self._plot_opts.get('xlim') is not None:
+                opts['x_range'] = self._plot_opts['xlim']
+            layers = downsample1d(obj, **opts)
+            layers = _transfer_opts_cur_backend(layers)
+            return layers
+
         try:
             from holoviews.operation.datashader import datashade, rasterize, dynspread
             from datashader import reductions
@@ -1268,12 +1297,6 @@ class HoloViewsConverter:
                     'the Datashader library must be available. '
                     'It can be installed with:\n  conda '
                     'install datashader')
-
-        opts = dict(dynamic=self.dynamic)
-        if self._plot_opts.get('width') is not None:
-            opts['width'] = self._plot_opts['width']
-        if self._plot_opts.get('height') is not None:
-            opts['height'] = self._plot_opts['height']
 
         categorical = False
         if self.by and not self.subplots:
@@ -1304,8 +1327,6 @@ class HoloViewsConverter:
             opts['x_range'] = self._plot_opts['xlim']
         if self._plot_opts.get('ylim') is not None:
             opts['y_range'] = self._plot_opts['ylim']
-        if not self.dynamic:
-            opts['dynamic'] = self.dynamic
 
         if 'cmap' in self._style_opts and self.datashade:
             levels = self._plot_opts.get('color_levels')
@@ -1330,7 +1351,10 @@ class HoloViewsConverter:
                 opts['rescale_discrete_levels'] = self._plot_opts['rescale_discrete_levels']
         else:
             operation = rasterize
-            eltype = 'Image'
+            if Version(hv.__version__) < Version('1.18.0a1'):
+                eltype = 'Image'
+            else:
+                eltype = 'ImageStack' if self.by else 'Image'
             if 'cmap' in self._style_opts:
                 style['cmap'] = self._style_opts['cmap']
             if self._dim_ranges.get('c', (None, None)) != (None, None):
@@ -1383,7 +1407,10 @@ class HoloViewsConverter:
                         scale)
                     else:
                         feature_obj = feature_obj.opts(scale=scale)
-                obj = feature_obj * obj
+                if feature_obj.group in ["Land", "Ocean"]:
+                    obj = feature_obj * obj  # Underlay land/ocean
+                else:
+                    obj = obj * feature_obj  # overlay everything else
 
         if self.tiles:
             tile_source = 'EsriImagery' if self.tiles == 'ESRI' else self.tiles
