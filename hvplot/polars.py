@@ -56,8 +56,6 @@ class hvPlotTabularPolars(hvPlotTabular):
 
 
 def patch(name="hvplot", extension="bokeh", logo=False):
-    import hvplot.pandas  # noqa
-
     post_patch(extension, logo)
 
 
