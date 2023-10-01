@@ -539,6 +539,7 @@ class hvPlotExplorer(Viewer):
 
             feature_scale = kwargs.pop("feature_scale", None)
             kwargs['features'] = {feature: feature_scale for feature in kwargs.pop("features", [])}
+        kwargs.pop('refresh_plot', None)
 
         kwargs['min_height'] = 600
         df = self._data
