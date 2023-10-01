@@ -472,7 +472,7 @@ class hvPlotExplorer(Viewer):
             controller.param.watch(self._update_refresh_plot, "refresh_plot")
             params_to_watch = list(controller.param)
             params_to_watch.remove("refresh_plot")
-            controller.param.watch(self._plot, params_to_watch)
+            controller.param.watch(self._refresh, params_to_watch)
         self._alert = pn.pane.Alert(
             alert_type='danger', visible=False, sizing_mode='stretch_width'
         )
