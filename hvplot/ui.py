@@ -77,6 +77,12 @@ def explorer(data, **kwargs):
 
 class Controls(Viewer):
 
+    refresh_plot = param.Boolean(
+        default=True,
+        precedence=0,
+        doc="Whether to automatically refresh the plot when a param is changed",
+    )
+
     explorer = param.ClassSelector(class_=Viewer, precedence=-1)
 
     __abstract = True
@@ -352,6 +358,8 @@ class Operations(Controls):
 
 class hvPlotExplorer(Viewer):
 
+    refresh_plot = param.Boolean(default=True)
+
     kind = param.Selector()
 
     x = param.Selector()
@@ -415,7 +423,7 @@ class hvPlotExplorer(Viewer):
         self._var_name_suffix = ""
         groups = {group: KINDS[group] for group in self._groups}
         self._controls = pn.Param(
-            self.param, parameters=['kind', 'x', 'y', 'groupby', 'by'],
+            self.param, parameters=['refresh_plot', 'kind', 'x', 'y', 'groupby', 'by'],
             sizing_mode='stretch_width', show_name=False,
             widgets={"kind": {"options": [], "groups": groups}}
         )
@@ -456,13 +464,11 @@ class hvPlotExplorer(Viewer):
         self._alert = pn.pane.Alert(
             alert_type='danger', visible=False, sizing_mode='stretch_width'
         )
-        self._refresh_control = pn.widgets.Toggle(value=True, name="Auto-refresh plot", sizing_mode="stretch_width")
-        self._refresh_control.param.watch(self._refresh, 'value')
+
         self._hv_pane = pn.pane.HoloViews(sizing_mode='stretch_width', margin=(5, 20, 5, 20))
         self._code_pane = pn.pane.Markdown(sizing_mode='stretch_width', margin=(5, 20, 0, 20))
         self._layout = pn.Column(
             self._alert,
-            self._refresh_control,
             pn.Row(
                 self._tabs,
                 pn.Tabs(("Plot", self._hv_pane), ("Code", self._code_pane)),
@@ -497,8 +503,6 @@ class hvPlotExplorer(Viewer):
                     setattr(self, pname, p.objects[0])
 
     def _plot(self, *events):
-        if not self._refresh_control.value:
-            return
         y = self.y_multi if 'y_multi' in self._controls.parameters else self.y
         if isinstance(y, list) and len(y) == 1:
             y = y[0]
@@ -573,15 +577,15 @@ class hvPlotExplorer(Viewer):
         # Control high-level parameters
         visible = True
         if event and event.new in ('table', 'dataset'):
-            parameters = ['kind', 'columns']
+            parameters = ['refresh_plot', 'kind', 'columns']
             visible = False
         elif event and event.new in KINDS['2d']:
-            parameters = ['kind', 'x', 'y', 'by', 'groupby']
+            parameters = ['refresh_plot', 'kind', 'x', 'y', 'by', 'groupby']
         elif event and event.new in ('hist', 'kde', 'density'):
             self.x = None
-            parameters = ['kind', 'y_multi', 'by', 'groupby']
+            parameters = ['refresh_plot', 'kind', 'y_multi', 'by', 'groupby']
         else:
-            parameters = ['kind', 'x', 'y_multi', 'by', 'groupby']
+            parameters = ['refresh_plot', 'kind', 'x', 'y_multi', 'by', 'groupby']
         self._controls.parameters = parameters
 
         # Control other tabs
