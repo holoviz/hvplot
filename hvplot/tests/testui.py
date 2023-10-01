@@ -175,7 +175,7 @@ def test_explorer_hvplot_gridded_dataarray():
 def test_explorer_hvplot_gridded_options():
     ds = xr.tutorial.open_dataset("air_temperature")
     explorer = hvplot.explorer(ds)
-    assert explorer._controls[0].groups.keys() == {"dataframe", "gridded", "geom"}
+    assert explorer._controls[1].groups.keys() == {"dataframe", "gridded", "geom"}
 
 
 def test_explorer_hvplot_geo():
