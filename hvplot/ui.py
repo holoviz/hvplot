@@ -109,6 +109,10 @@ class Controls(Viewer):
         return {k: v for k, v in self.param.values().items()
                 if k not in ('name', 'explorer') and v is not None and v != ''}
 
+    @param.depends("explorer.refresh_plot", watch=True)
+    def _update_refresh_plot(self):
+        self.refresh_plot = self.explorer.refresh_plot
+
 
 class Colormapping(Controls):
 
@@ -358,7 +362,10 @@ class Operations(Controls):
 
 class hvPlotExplorer(Viewer):
 
-    refresh_plot = param.Boolean(default=True)
+    refresh_plot = param.Boolean(
+        default=True,
+        doc="Whether to automatically refresh the plot when a param is changed",
+    )
 
     kind = param.Selector()
 
@@ -460,7 +467,10 @@ class hvPlotExplorer(Viewer):
         params_to_watch.remove("code")
         self.param.watch(self._plot, params_to_watch)
         for controller in self._controllers.values():
-            controller.param.watch(self._plot, list(controller.param))
+            controller.param.watch(self._update_refresh_plot, "refresh_plot")
+            params_to_watch = list(controller.param)
+            params_to_watch.remove("refresh_plot")
+            controller.param.watch(self._plot, params_to_watch)
         self._alert = pn.pane.Alert(
             alert_type='danger', visible=False, sizing_mode='stretch_width'
         )
@@ -503,6 +513,9 @@ class hvPlotExplorer(Viewer):
                     setattr(self, pname, p.objects[0])
 
     def _plot(self, *events):
+        if not self.refresh_plot:
+            return
+
         y = self.y_multi if 'y_multi' in self._controls.parameters else self.y
         if isinstance(y, list) and len(y) == 1:
             y = y[0]
@@ -562,6 +575,9 @@ class hvPlotExplorer(Viewer):
     @property
     def _backend(self):
         return "pandas"
+
+    def _update_refresh_plot(self, event):
+        self.refresh_plot = event.new
 
     @property
     def _single_y(self):
