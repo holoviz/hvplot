@@ -6,11 +6,12 @@ import pandas as pd
 import hvplot.pandas
 import hvplot.xarray
 import xarray as xr
+import param
 
 import pytest
 
 from bokeh.sampledata import penguins
-from hvplot.ui import hvDataFrameExplorer, hvGridExplorer
+from hvplot.ui import hvDataFrameExplorer, hvGridExplorer, Controls
 
 df = penguins.data
 
@@ -187,7 +188,6 @@ def test_explorer_hvplot_geo():
     assert explorer.geographic.crs == "GOOGLE_MERCATOR"
     assert explorer.geographic.projection == "GOOGLE_MERCATOR"
 
-
 def test_explorer_code_dataframe():
     explorer = hvplot.explorer(df, x="bill_length_mm", kind="points")
     explorer._code()
@@ -268,3 +268,25 @@ def test_explorer_code_gridded_dataarray():
         )
         ```"""
     )
+
+def test_explorer_refresh_plot_linked():
+    explorer = hvplot.explorer(df)
+    controls = [
+        p.name
+        for p in explorer.param.objects().values()
+        if isinstance(p, param.ClassSelector)
+        and issubclass(p.class_, Controls)
+    ]
+    # by default
+    for control in controls:
+        assert explorer.refresh_plot == getattr(explorer, control).refresh_plot
+
+    # toggle top level
+    explorer.refresh_plot = False
+    for control in controls:
+        assert explorer.refresh_plot == getattr(explorer, control).refresh_plot
+
+    # toggle axes
+    explorer.axes.refresh_plot = True
+    for control in controls:
+        assert explorer.refresh_plot == getattr(explorer, control).refresh_plot

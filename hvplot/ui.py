@@ -469,20 +469,18 @@ class hvPlotExplorer(Viewer):
         params_to_watch.remove("code")
         self.param.watch(self._plot, params_to_watch)
         for controller in self._controllers.values():
-            controller.param.watch(self._update_refresh_plot, "refresh_plot")
             params_to_watch = list(controller.param)
             params_to_watch.remove("refresh_plot")
-            controller.param.watch(self._refresh, params_to_watch)
+            controller.param.watch(self._plot, params_to_watch)
+            controller.param.watch(self._update_refresh_plot, "refresh_plot")
         self._alert = pn.pane.Alert(
             alert_type='danger', visible=False, sizing_mode='stretch_width'
         )
-
         self._hv_pane = pn.pane.HoloViews(sizing_mode='stretch_width', margin=(5, 20, 5, 20))
         self._code_pane = pn.pane.Markdown(sizing_mode='stretch_width', margin=(5, 20, 0, 20))
         self._layout = pn.Column(
             self._alert,
             pn.Row(
-                self._tabs,
                 pn.Tabs(("Plot", self._hv_pane), ("Code", self._code_pane)),
                 sizing_mode="stretch_width",
             ),
@@ -578,6 +576,9 @@ class hvPlotExplorer(Viewer):
     @property
     def _backend(self):
         return "pandas"
+
+    def _update_refresh_plot(self, event):
+        self.refresh_plot = event.new
 
     def _update_refresh_plot(self, event):
         self.refresh_plot = event.new
