@@ -187,6 +187,10 @@ def test_explorer_hvplot_geo():
     assert explorer.geographic.crs == "GOOGLE_MERCATOR"
     assert explorer.geographic.projection == "GOOGLE_MERCATOR"
 
+def test_explorer_hvplot_opts():
+    ds = xr.tutorial.open_dataset("air_temperature").isel(time=0)
+    explorer = hvplot.explorer(ds, opts={"color_levels": 3})
+    assert explorer.hvplot().opts["color_levels"] == 3
 
 def test_explorer_code_dataframe():
     explorer = hvplot.explorer(df, x="bill_length_mm", kind="points")
@@ -265,6 +269,41 @@ def test_explorer_code_gridded_dataarray():
             kind='image',
             x='lon',
             y='lat'
+        )
+        ```"""
+    )
+
+
+def test_explorer_code_opts():
+    ds = xr.tutorial.open_dataset("air_temperature")["air"]
+    explorer = hvplot.explorer(ds, x="lon", y="lat", kind="image", opts={"color_levels": 3})
+    explorer._code()
+    code = explorer.code
+    assert code == dedent("""\
+        da.hvplot(
+            colorbar=True,
+            groupby=['time'],
+            kind='image',
+            opts={'color_levels': 3},
+            x='lon',
+            y='lat'
+        ).opts(
+            color_levels=3
+        )""")
+
+    assert explorer._code_pane.object == dedent("""\
+        ```python
+        import hvplot.xarray
+
+        da.hvplot(
+            colorbar=True,
+            groupby=['time'],
+            kind='image',
+            opts={'color_levels': 3},
+            x='lon',
+            y='lat'
+        ).opts(
+            color_levels=3
         )
         ```"""
     )

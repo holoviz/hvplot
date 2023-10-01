@@ -362,6 +362,11 @@ class Operations(Controls):
         self.param.aggregator.constant = not enabled
 
 
+class Options(Controls):
+
+    opts = param.Dict(default={})
+
+
 class hvPlotExplorer(Viewer):
 
     refresh_plot = param.Boolean(
@@ -394,6 +399,8 @@ class hvPlotExplorer(Viewer):
     operations = param.ClassSelector(class_=Operations)
 
     style = param.ClassSelector(class_=Style)
+
+    options = param.ClassSelector(class_=Options)
 
     code = param.String(precedence=-1, doc="""
         Code to generate the plot.""")
@@ -527,7 +534,9 @@ class hvPlotExplorer(Viewer):
             if isinstance(v, Geographic) and not v.geo:
                 continue
 
-            if isinstance(v, Controls):
+            if isinstance(v, Options):
+                opts_kwargs = v.kwargs.get("opts", {})
+            elif isinstance(v, Controls):
                 kwargs.update(v.kwargs)
 
         if kwargs.get("geo"):
@@ -542,8 +551,9 @@ class hvPlotExplorer(Viewer):
             feature_scale = kwargs.pop("feature_scale", None)
             kwargs['features'] = {feature: feature_scale for feature in kwargs.pop("features", [])}
         kwargs.pop('refresh_plot', None)
-
+        kwargs.pop('opts', None)
         kwargs['min_height'] = 600
+
         df = self._data
         if len(df) > MAX_ROWS and not (self.kind in KINDS["stats"] or kwargs.get('rasterize') or kwargs.get('datashade')):
             df = df.sample(n=MAX_ROWS)
@@ -551,7 +561,7 @@ class hvPlotExplorer(Viewer):
         try:
             self._hvplot = _hvPlot(df)(
                 kind=self.kind, x=self.x, y=y, by=self.by, groupby=self.groupby, **kwargs
-            )
+            ).opts(**opts_kwargs)
             self._hv_pane.object = self._hvplot
             self._alert.visible = False
         except Exception as e:
@@ -621,6 +631,7 @@ class hvPlotExplorer(Viewer):
                 ('Style', self.style),
                 ('Operations', self.operations),
                 ('Geographic', self.geographic),
+                ('Options', self.options),
             ]
             if event and event.new not in ('area', 'kde', 'line', 'ohlc', 'rgb', 'step'):
                 tabs.insert(5, ('Colormapping', self.colormapping))
@@ -636,12 +647,24 @@ class hvPlotExplorer(Viewer):
 
     def _build_code_snippet(self):
         settings = self.settings()
-        args = ''
+        settings_args = ""
         if settings:
-            for k, v in settings.items():
+            settings_args = self._build_kwargs_string(settings)
+
+        snippet = f'{self._var_name}.hvplot(\n{settings_args}\n)'
+        opts = self.opts()
+        if opts:
+            opts_args = self._build_kwargs_string(opts)
+            snippet += f'.opts(\n{opts_args}\n)'
+        return snippet
+
+    def _build_kwargs_string(self, kwargs):
+        args = ''
+        if kwargs:
+            for k, v in kwargs.items():
                 args += f'    {k}={v!r},\n'
             args = args[:-2]
-        return f'{self._var_name}.hvplot(\n{args}\n)'
+        return args
 
     #----------------------------------------------------------------
     # Public API
@@ -710,6 +733,10 @@ class hvPlotExplorer(Viewer):
             settings['y'] = settings.pop('y_multi')
         settings = {k: v for k, v in sorted(list(settings.items()))}
         return settings
+
+    def opts(self):
+        """Return a dictionary of the added opts."""
+        return self.options.opts
 
 
 class hvGeomExplorer(hvPlotExplorer):
