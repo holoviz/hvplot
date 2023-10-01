@@ -36,6 +36,10 @@ GEO_FEATURES = [
     'states', 'grid'
 ]
 GEO_TILES = [None] + sorted(tile_sources)
+GEO_KEYS = [
+    'crs', 'crs_kwargs', 'projection', 'projection_kwargs',
+    'global_extent', 'project', 'features', 'feature_scale', 'tiles'
+]
 AGGREGATORS = [None, 'count', 'min', 'max', 'mean', 'sum', 'any']
 MAX_ROWS = 10000
 
@@ -289,10 +293,8 @@ class Geographic(Controls):
     @param.depends('geo',  watch=True, on_init=True)
     def _update_crs_projection(self):
         enabled = bool(self.geo or self.project)
-        self.param.crs.constant = not enabled
-        self.param.crs_kwargs.constant = not enabled
-        self.param.projection.constant = not enabled
-        self.param.projection_kwargs.constant = not enabled
+        for key in GEO_KEYS:
+            getattr(self.param, key).constant = not enabled
         self.geo = enabled
         if not enabled:
             return
