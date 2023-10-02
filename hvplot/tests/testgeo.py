@@ -111,6 +111,17 @@ class TestProjections(TestGeo):
         with self.assertRaisesRegex(ValueError, "Tiles can only be used with output projection"):
             da.hvplot.image('x', 'y', crs=self.crs, projection='Robinson', tiles=True)
 
+    def test_overlay_with_projection(self):
+        # Regression test for https://github.com/holoviz/hvplot/issues/1090
+        df = pd.DataFrame({"lon": [0, 10], "lat": [40, 50], "v": [0, 1]})
+
+        plot1 = df.hvplot.points(x="lon", y="lat", s=200, c="y", geo=True, tiles="CartoLight")
+        plot2 = df.hvplot.points(x="lon", y="lat", c="v", geo=True)
+
+        # This should work without erroring
+        plot = plot1 * plot2
+        hv.renderer("bokeh").get_plot(plot)
+
 
 class TestGeoAnnotation(TestCase):
 
