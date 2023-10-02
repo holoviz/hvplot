@@ -122,6 +122,32 @@ class TestProjections(TestGeo):
         plot = plot1 * plot2
         hv.renderer("bokeh").get_plot(plot)
 
+    def test_geo_with_rasterize(self):
+        import xarray as xr
+        import cartopy.crs as ccrs
+        import geoviews as gv
+        try:
+            from holoviews.operation.datashader import rasterize
+        except:
+            raise SkipTest('datashader not available')
+
+        ds = xr.tutorial.open_dataset("air_temperature")
+        hvplot_output = ds.isel(time=0).hvplot.points(
+            "lon",
+            "lat",
+            crs=ccrs.PlateCarree(),
+            projection=ccrs.LambertConformal(),
+            rasterize=True,
+            dynamic=False,
+            aggregator="max",
+        )
+
+        p1 = gv.Points(ds.isel(time=0), kdims=["lon", "lat"], crs=ccrs.PlateCarree())
+        p2 = gv.project(p1, projection=ccrs.LambertConformal())
+        expected = rasterize(p2, dynamic=False, aggregator="max")
+
+        xr.testing.assert_allclose(hvplot_output.data, expected.data)
+
 
 class TestGeoAnnotation(TestCase):
 
