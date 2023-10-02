@@ -1435,7 +1435,6 @@ class HoloViewsConverter:
 
     def _get_tiles(self, source, sources, types):
         tile_source = 'EsriImagery' if self.tiles == 'ESRI' else self.tiles
-        warning = f"{tile_source} tiles not recognized, must be one of: {sorted(sources)} or a tile object"
         if tile_source is True:
             tiles = sources["OSM"]()
         elif tile_source in sources:
@@ -1445,7 +1444,10 @@ class HoloViewsConverter:
         elif isinstance(tile_source, types):
             tiles = tile_source
         else:
-            raise ValueError(warning)
+            msg = (
+                f"{tile_source} tiles not recognized, must be one of: {sorted(sources)} or a tile object"
+            )
+            raise ValueError(msg)
         return tiles
 
     def _merge_redim(self, ranges, attr='range'):
