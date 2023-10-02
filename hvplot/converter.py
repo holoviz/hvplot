@@ -1362,6 +1362,10 @@ class HoloViewsConverter:
             if self._dim_ranges.get('c', (None, None)) != (None, None):
                 style['clim'] = self._dim_ranges['c']
 
+        if self.geo:
+            import geoviews as gv
+            obj = gv.project(obj, projection=self.proj_crs)
+
         processed = operation(obj, **opts)
 
         if self.dynspread:
