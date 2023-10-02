@@ -13,9 +13,6 @@ except:
     )
 
 
-@pl.api.register_dataframe_namespace("hvplot")
-@pl.api.register_series_namespace("hvplot")
-@pl.api.register_lazyframe_namespace("hvplot")
 class hvPlotTabularPolars(hvPlotTabular):
     def _get_converter(self, x=None, y=None, kind=None, **kwds):
         params = dict(self._metadata, **kwds)
@@ -56,6 +53,10 @@ class hvPlotTabularPolars(hvPlotTabular):
 
 
 def patch(name="hvplot", extension="bokeh", logo=False):
+    pl.api.register_dataframe_namespace(name)(hvPlotTabularPolars)
+    pl.api.register_series_namespace(name)(hvPlotTabularPolars)
+    pl.api.register_lazyframe_namespace(name)(hvPlotTabularPolars)
+
     post_patch(extension, logo)
 
 
