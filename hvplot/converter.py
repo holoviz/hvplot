@@ -86,7 +86,7 @@ class HoloViewsConverter:
     ---------------
     autorange (default=None): Literal['x', 'y'] | None
         Whether to enable auto-ranging along the x- or y-axis when
-        zooming.
+        zooming. Requires HoloViews >= 1.16.
     clim: tuple
         Lower and upper bound of the color scale
     cnorm (default='linear'): str
@@ -494,7 +494,10 @@ class HoloViewsConverter:
         if ylim is not None:
             plot_opts['ylim'] = tuple(ylim)
 
-        plot_opts['autorange'] = autorange
+        if autorange is not None and hv_version < Version('1.16.0'):
+            param.main.param.warning('autorange option requires HoloViews >= 1.16')
+        else:
+            plot_opts['autorange'] = autorange
 
         self.invert = invert
         if loglog is not None:
@@ -1415,7 +1418,10 @@ class HoloViewsConverter:
                         scale)
                     else:
                         feature_obj = feature_obj.opts(scale=scale)
-                obj = feature_obj * obj
+                if feature_obj.group in ["Land", "Ocean"]:
+                    obj = feature_obj * obj  # Underlay land/ocean
+                else:
+                    obj = obj * feature_obj  # overlay everything else
 
         if self.tiles:
             tile_source = 'EsriImagery' if self.tiles == 'ESRI' else self.tiles
