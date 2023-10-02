@@ -446,8 +446,8 @@ class HoloViewsConverter:
                         "Projection must be defined as cartopy CRS or "
                         f"one of the following CRS string:\n {all_crs}")
 
-            self.proj_crs = projection or (ccrs.GOOGLE_MERCATOR if tiles else self.crs)
-            if tiles and self.proj_crs != ccrs.GOOGLE_MERCATOR:
+            self.output_projection = projection or (ccrs.GOOGLE_MERCATOR if tiles else self.crs)
+            if tiles and self.output_projection != ccrs.GOOGLE_MERCATOR:
                 raise ValueError(
                     "Tiles can only be used with output projection of "
                     "`cartopy.crs.GOOGLE_MERCATOR`. To get rid of this error "
@@ -458,7 +458,7 @@ class HoloViewsConverter:
                 x0, x1 = xlim or (px0, px1)
                 y0, y1 = ylim or (py0, py1)
                 extents = (x0, y0, x1, y1)
-                x0, y0, x1, y1 = project_extents(extents, self.crs, self.proj_crs)
+                x0, y0, x1, y1 = project_extents(extents, self.crs, self.output_projection)
                 if xlim:
                     xlim = (x0, x1)
                 if ylim:
@@ -1364,7 +1364,7 @@ class HoloViewsConverter:
 
         if self.geo:
             import geoviews as gv
-            obj = gv.project(obj, projection=self.proj_crs)
+            obj = gv.project(obj, projection=self.output_projection)
 
         processed = operation(obj, **opts)
 
@@ -1392,7 +1392,7 @@ class HoloViewsConverter:
                 param.main.param.warning(
                     "coastline scale of %s not recognized, must be one "
                     "'10m', '50m' or '110m'." % self.coastline)
-            obj = obj * coastline.opts(projection=self.proj_crs)
+            obj = obj * coastline.opts(projection=self.output_projection)
 
         if self.features:
             import geoviews as gv
@@ -1415,10 +1415,10 @@ class HoloViewsConverter:
                         feature_obj = feature_obj.opts(scale=scale)
                 if feature_obj.group in ["Land", "Ocean"]:
                     # Underlay land/ocean
-                    obj = feature_obj.opts(projection=self.proj_crs) * obj
+                    obj = feature_obj.opts(projection=self.output_projection) * obj
                 else:
                     # overlay everything else
-                    obj = obj * feature_obj.opts(projection=self.proj_crs)
+                    obj = obj * feature_obj.opts(projection=self.output_projection)
 
         if self.tiles and not self.geo:
             tiles = self._get_tiles(
