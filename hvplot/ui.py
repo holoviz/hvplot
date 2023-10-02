@@ -590,9 +590,6 @@ class hvPlotExplorer(Viewer):
     def _update_refresh_plot(self, event):
         self.refresh_plot = event.new
 
-    def _update_refresh_plot(self, event):
-        self.refresh_plot = event.new
-
     @property
     def _single_y(self):
         if self.kind in KINDS["2d"]:
