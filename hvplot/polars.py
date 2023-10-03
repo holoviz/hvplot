@@ -1,22 +1,15 @@
+"""Adds the `.hvplot` method to pl.DataFrame, pl.LazyFrame and pl.Series"""
 import itertools
 
 from hvplot import hvPlotTabular, post_patch
 from hvplot.converter import HoloViewsConverter
 from hvplot.util import is_list_like
 
-try:
-    import polars as pl
-except:
-    raise ImportError(
-        "Could not patch plotting API onto Polars. Polars could not be imported."
-    )
 
-
-@pl.api.register_dataframe_namespace("hvplot")
-@pl.api.register_series_namespace("hvplot")
-@pl.api.register_lazyframe_namespace("hvplot")
 class hvPlotTabularPolars(hvPlotTabular):
     def _get_converter(self, x=None, y=None, kind=None, **kwds):
+        import polars as pl
+
         params = dict(self._metadata, **kwds)
         x = x or params.pop("x", None)
         y = y or params.pop("y", None)
@@ -55,7 +48,15 @@ class hvPlotTabularPolars(hvPlotTabular):
 
 
 def patch(name="hvplot", extension="bokeh", logo=False):
-    import hvplot.pandas  # noqa
+    try:
+        import polars as pl
+    except:
+        raise ImportError(
+            "Could not patch plotting API onto Polars. Polars could not be imported."
+        )
+    pl.api.register_dataframe_namespace(name)(hvPlotTabularPolars)
+    pl.api.register_series_namespace(name)(hvPlotTabularPolars)
+    pl.api.register_lazyframe_namespace(name)(hvPlotTabularPolars)
 
     post_patch(extension, logo)
 
