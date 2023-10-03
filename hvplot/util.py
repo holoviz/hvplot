@@ -62,7 +62,7 @@ def check_crs(crs):
 
     Returns
     -------
-    A valid crs if possible, otherwise None
+    A valid crs if possible, otherwise None.
     """
     import pyproj
 
@@ -79,8 +79,11 @@ def check_crs(crs):
         out = pyproj.Proj(crs.to_wkt(), preserve_units=True)
     elif isinstance(crs, dict) or isinstance(crs, str):
         if isinstance(crs, str):
-            # quick fix for https://github.com/pyproj4/pyproj/issues/345
-            crs = crs.replace(' ', '').replace('+', ' +')
+            try:
+                crs = pyproj.CRS.from_wkt(crs)
+            except RuntimeError:
+                # quick fix for https://github.com/pyproj4/pyproj/issues/345
+                crs = crs.replace(' ', '').replace('+', ' +')
         try:
             out = pyproj.Proj(crs, preserve_units=True)
         except RuntimeError:
@@ -117,7 +120,6 @@ def proj_to_cartopy(proj):
     a cartopy.crs.Projection object
     """
 
-    import cartopy
     import cartopy.crs as ccrs
     try:
         from osgeo import osr
@@ -126,10 +128,10 @@ def proj_to_cartopy(proj):
     except ImportError:
         has_gdal = False
 
-    proj = check_crs(proj)
-
-    if proj_is_latlong(proj):
-        return ccrs.PlateCarree()
+    input_proj = proj
+    proj = check_crs(input_proj)
+    if proj is None:
+        raise ValueError(f"Invalid proj projection {input_proj!r}")
 
     srs = proj.srs
     if has_gdal:
@@ -169,19 +171,23 @@ def proj_to_cartopy(proj):
         except:
             pass
         if k == 'proj':
-            if v == 'tmerc':
+            if v == "longlat":
+                cl = ccrs.PlateCarree
+            elif v == 'tmerc':
                 cl = ccrs.TransverseMercator
                 kw_proj['approx'] = True
-            if v == 'lcc':
+            elif v == 'lcc':
                 cl = ccrs.LambertConformal
-            if v == 'merc':
+            elif v == 'merc':
                 cl = ccrs.Mercator
-            if v == 'utm':
+            elif v == 'utm':
                 cl = ccrs.UTM
-            if v == 'stere':
+            elif v == 'stere':
                 cl = ccrs.Stereographic
-            if v == 'ob_tran':
+            elif v == 'ob_tran':
                 cl = ccrs.RotatedPole
+            else:
+                raise NotImplementedError(f'Unknown projection {v}')
         if k in km_proj:
             if k == 'zone':
                 v = int(v)
@@ -201,7 +207,7 @@ def proj_to_cartopy(proj):
     if cl.__name__ == 'Mercator':
         kw_proj.pop('false_easting', None)
         kw_proj.pop('false_northing', None)
-        if Version(cartopy.__version__) < Version('0.15'):
+        if "scale_factor" in kw_proj:
             kw_proj.pop('latitude_true_scale', None)
     elif cl.__name__ == 'Stereographic':
         kw_proj.pop('scale_factor', None)
@@ -230,7 +236,9 @@ def process_crs(crs):
       1. EPSG codes:   Defined as string of the form "EPSG: {code}" or an integer
       2. proj.4 string: Defined as string of the form "{proj.4 string}"
       3. cartopy.crs.CRS instance
-      4. None defaults to crs.PlateCaree
+      3. pyproj.Proj or pyproj.CRS instance
+      4. WKT string:    Defined as string of the form "{WKT string}"
+      5. None defaults to crs.PlateCaree
     """
     missing = []
     try:
@@ -250,29 +258,27 @@ def process_crs(crs):
 
     if crs is None:
         return ccrs.PlateCarree()
+    elif isinstance(crs, ccrs.CRS):
+        return crs
+    elif isinstance(crs, pyproj.CRS):
+        crs = crs.to_wkt()
 
     errors = []
-    if isinstance(crs, str) and crs.lower().startswith('epsg'):
+    if isinstance(crs, (str, int)):  # epsg codes
         try:
-            crs = crs[5:].lstrip().rstrip()
-            return ccrs.epsg(crs)
+            crs = pyproj.CRS.from_epsg(crs).to_wkt()
         except Exception as e:
             errors.append(e)
-    if isinstance(crs, int):
-        try:
-            return ccrs.epsg(crs)
-        except Exception as e:
-            crs = str(crs)
-            errors.append(e)
-    if isinstance(crs, (str, pyproj.Proj)):
+    if isinstance(crs, (str, pyproj.Proj)):  # proj4/wkt strings
         try:
             return proj_to_cartopy(crs)
         except Exception as e:
             errors.append(e)
-    if isinstance(crs, ccrs.CRS):
-        return crs
 
-    raise ValueError("Projection must be defined as a EPSG code, proj4 string, cartopy CRS or pyproj.Proj.") from Exception(*errors)
+    raise ValueError(
+        "Projection must be defined as a EPSG code, proj4 string, "
+        "WKT string, cartopy CRS, pyproj.Proj, or pyproj.CRS."
+    ) from Exception(*errors)
 
 
 def is_list_like(obj):
