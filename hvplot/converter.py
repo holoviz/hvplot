@@ -2045,7 +2045,8 @@ class HoloViewsConverter:
         if not text:
             text = [c for c in data.columns if c not in (x, y)][0]
         elif text not in data.columns:
-            data["label"] = data.apply(lambda row: text.format(**row), axis=1)
+            template_str = text  # needed for dask lazy compute
+            data["label"] = data.apply(lambda row: template_str.format(**row), axis=1)
             text = "label"
 
         kdims, vdims = self._get_dimensions([x, y], [text])
