@@ -1124,7 +1124,7 @@ class HoloViewsConverter:
         else:
             valid_opts = []
         ds_opts = ['max_px', 'threshold']
-        mismatches = sorted(k for k in kwds if k not in kind_opts + ds_opts + valid_opts + ["_explorer_kind", "_explorer_kwds"])
+        mismatches = sorted(k for k in kwds if k not in kind_opts + ds_opts + valid_opts)
         if not mismatches:
             return
 
@@ -1531,10 +1531,7 @@ class HoloViewsConverter:
     def explorer(self, data, x=None, y=None):
         # import here to prevent circular imports
         from .ui import explorer as ui_explorer
-        kwargs = self.kwds.pop("_explorer_kwds", {})
-        if "_explorer_kind" in self.kwds:
-            kwargs["kind"] = self.kwds.pop("_explorer_kind")
-        return ui_explorer(data, x=x, y=y, **kwargs)
+        return ui_explorer(data, x=x, y=y)
 
     ##########################
     #     Simple charts      #

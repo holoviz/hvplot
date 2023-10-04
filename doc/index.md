@@ -386,7 +386,7 @@ The *Explorer* is a [Panel](https://panel.holoviz.org) web application that can 
 import hvplot.pandas
 from bokeh.sampledata.penguins import data as df
 
-hvexplorer = hvplot.explorer(df)
+hvexplorer = df.hvplot.explorer()
 hvexplorer
 ```
 ```{image} ./_static/home/explorer.gif

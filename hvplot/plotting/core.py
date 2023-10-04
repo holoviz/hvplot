@@ -1853,11 +1853,8 @@ class hvPlotTabular(hvPlotBase):
             )
             df.hvplot.explorer()
         """
-        explorer_kwds = {"_explorer_kwds": kwds}
-        explorer_kind = kwds.pop("kind", None)
-        if explorer_kind:
-            explorer_kwds["_explorer_kind"] = explorer_kind
-        return self(x, y, kind="explorer", **explorer_kwds)
+        from ..ui import explorer as ui_explorer
+        return ui_explorer(self._data, x=x, y=y, **kwds)
 
 
 class hvPlot(hvPlotTabular):
