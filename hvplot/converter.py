@@ -1,4 +1,3 @@
-import re
 import difflib
 from functools import partial
 
@@ -2045,18 +2044,9 @@ class HoloViewsConverter:
         text = self.kwds.get('text')
         if not text:
             text = [c for c in data.columns if c not in (x, y)][0]
-        text_cols = re.findall(r"\{([^{}]+)\}", text)
-        if text_cols:
-            template_str = text
-            text_cols = [col.split(":")[0] for col in text_cols]
-            missing_cols = set(text_cols) - set(data.columns)
-            if len(missing_cols) > 0 and len(text_cols) > 1:
-                raise ValueError(f"Variables {missing_cols} not found in data")
-            elif len(missing_cols) == 0:
-                text = "label"
-                data[text] = data[text_cols].apply(
-                    lambda row: template_str.format(**row), axis=1
-                )
+        elif text not in data.columns:
+            data["label"] = data.apply(lambda row: text.format(**row), axis=1)
+            text = "label"
 
         kdims, vdims = self._get_dimensions([x, y], [text])
         cur_opts, compat_opts = self._get_compat_opts('Labels')
