@@ -2045,9 +2045,10 @@ class HoloViewsConverter:
         text = self.kwds.get('text')
         if not text:
             text = [c for c in data.columns if c not in (x, y)][0]
-        text_cols = re.findall(r"\{(\w+)\}", text)
+        text_cols = re.findall(r"\{([^{}]+)\}", text)
         if text_cols:
             template_str = text
+            text_cols = [col.split(":")[0] for col in text_cols]
             missing_cols = set(text_cols) - set(data.columns)
             if len(missing_cols) > 0 and len(text_cols) > 1:
                 raise ValueError(f"Variables {missing_cols} not found in data")
