@@ -25,6 +25,11 @@ class TestChart2D(ComparisonTestCase):
         self.time_df = pd.DataFrame({
             'time': pd.date_range('1/1/2000', periods=5*24, freq='1H', tz='UTC'),
             'temp': np.sin(np.linspace(0, 5*2*np.pi, 5*24)).cumsum()})
+        self.edge_df = pd.DataFrame({
+            "Latitude": [-34.58, -15.78, -33.45],
+            "Longitude": [-58.66, -47.91, -70.66],
+            "Volume {m3}": ["1", "2", "3"],
+        })
 
     @parameterized.expand([('points', Points), ('paths', Path)])
     def test_2d_defaults(self, kind, element):
@@ -352,6 +357,11 @@ class TestChart1D(ComparisonTestCase):
         plot = self.df.hvplot("x", "y", text="({x}, {y})", kind="labels")
         assert list(plot.dimensions()) == [Dimension('x'), Dimension('y'), Dimension('label')]
         assert list(plot.data["label"]) == ['(1, 2)', '(3, 4)', '(5, 6)']
+
+    def test_labels_no_format_edge_case(self):
+        plot = self.edge_df.hvplot.labels("Longitude", "Latitude")
+        assert list(plot.dimensions()) == [Dimension('x'), Dimension('y'), Dimension('label')]
+        assert list(plot.data["Volume {m3}"]) == ['1', '2', '3']
 
 class TestChart1DDask(TestChart1D):
 

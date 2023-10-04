@@ -2048,13 +2048,14 @@ class HoloViewsConverter:
         text_cols = re.findall(r"\{(\w+)\}", text)
         if text_cols:
             template_str = text
-            text = "label"
             missing_cols = set(text_cols) - set(data.columns)
-            if len(missing_cols) > 0:
+            if len(missing_cols) > 0 and len(text_cols) > 1:
                 raise ValueError(f"Variables {missing_cols} not found in data")
-            data[text] = data[text_cols].apply(
-                lambda row: template_str.format(**row), axis=1
-            )
+            elif len(missing_cols) == 0:
+                text = "label"
+                data[text] = data[text_cols].apply(
+                    lambda row: template_str.format(**row), axis=1
+                )
 
         kdims, vdims = self._get_dimensions([x, y], [text])
         cur_opts, compat_opts = self._get_compat_opts('Labels')
