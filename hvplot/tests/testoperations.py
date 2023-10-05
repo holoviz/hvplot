@@ -248,6 +248,7 @@ class TestDownsample(ComparisonTestCase):
         plot = self.df.hvplot.line(downsample=True)
 
         assert isinstance(plot.callback.operation, downsample1d)
+        assert plot.callback.operation.algorithm == "lttb"
 
     def test_downsample_opts(self):
         plot = self.df.hvplot.line(downsample=True, width=100, height=50, x_sampling=5, xlim=(0, 5))
