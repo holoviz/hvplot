@@ -26,8 +26,8 @@ except ImportError:
 TYPES = {t for t in dir(hvPlotTabular) if not t.startswith("_")}
 FRAME_TYPES = TYPES - {"bivariate", "heatmap", "hexbin", "labels", "vectorfield"}
 SERIES_TYPES = FRAME_TYPES - {"points", "polygons", "ohlc", "paths"}
-frame_kinds = pytest.mark.parametrize("kind", FRAME_TYPES)
-series_kinds = pytest.mark.parametrize("kind", SERIES_TYPES)
+frame_kinds = pytest.mark.parametrize("kind", sorted(FRAME_TYPES))
+series_kinds = pytest.mark.parametrize("kind", sorted(SERIES_TYPES))
 
 y_combinations = pytest.mark.parametrize("y", (
     ["A", "B", "C", "D"],
