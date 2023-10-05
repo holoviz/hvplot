@@ -216,8 +216,9 @@ class HoloViewsConverter:
         The threshold before toggling the operation (datashade / rasterize);
         if the number of individual points exceeds this value, the plot will
         be rasterized or datashaded; else the plot with the original points
-        will be returned instead. If this is unset, the operation
-        will always be applied.
+        will be returned instead. If this is unset and rasterize/datashade=True,
+        the plot will be rasterized or datashaded, regardless of the number of
+        points.
     x_sampling/y_sampling (default=None):
         Specifies the smallest allowed sampling interval along the x/y axis.
 
@@ -292,7 +293,7 @@ class HoloViewsConverter:
 
     _op_options = [
         'datashade', 'rasterize', 'x_sampling', 'y_sampling',
-        'aggregator', "aggregation_threshold"
+        'downsample', 'aggregator', 'aggregation_threshold'
     ]
 
     # Options specific to a particular plot type
