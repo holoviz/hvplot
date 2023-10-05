@@ -407,6 +407,7 @@ class HoloViewsConverter:
         self.dynamic = dynamic
         self.geo = any([geo, crs, global_extent, projection, project, coastline, features])
         self.crs = self._process_crs(data, crs) if self.geo else None
+        self.output_projection = self.crs
         self.project = project
         self.coastline = coastline
         self.features = features
@@ -584,6 +585,8 @@ class HoloViewsConverter:
 
         if self.crs and global_extent:
             plot_opts['global_extent'] = global_extent
+        if projection:
+            plot_opts['projection'] = self.output_projection
         title = title if title is not None else getattr(self, '_title', None)
         if title is not None:
             plot_opts['title'] = title
@@ -1260,12 +1263,10 @@ class HoloViewsConverter:
                 obj = method(x, y)
                 obj._dataset = dataset
 
-        if self.geo and self.crs != self.output_projection:
+        if self.crs and self.project:
+            # Apply projection before rasterizing
             import geoviews as gv
-            if isinstance(obj, gv.element.geo._Element):
-                obj.opts(projection=self.output_projection)
-            else:
-                obj = gv.project(obj, projection=self.output_projection)
+            obj = gv.project(obj, projection=self.output_projection)
 
         if not (self.datashade or self.rasterize or self.downsample):
             layers = self._apply_layers(obj)
