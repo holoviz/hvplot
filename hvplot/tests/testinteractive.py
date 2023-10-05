@@ -14,7 +14,7 @@ from holoviews.util.transform import dim
 from hvplot import bind
 from hvplot.interactive import Interactive
 from hvplot.xarray import XArrayInteractive
-from hvplot.util import bokeh3
+from hvplot.util import bokeh3, param2
 
 is_bokeh2 = pytest.mark.skipif(bokeh3, reason="requires bokeh 2.x")
 is_bokeh3 = pytest.mark.skipif(not bokeh3, reason="requires bokeh 3.x")
@@ -1382,7 +1382,10 @@ def test_interactive_pandas_series_widget_value(series):
     assert isinstance(si._current, pd.DataFrame)
     pd.testing.assert_series_equal(si._current.A, series + w.value)
     assert si._obj is series
-    assert "dim('*').pd+<param.Number object" in repr(si._transform)
+    if param2:
+        assert "dim('*').pd+<param.parameters.Number object" in repr(si._transform)
+    else:
+        assert "dim('*').pd+<param.Number object" in repr(si._transform)
     assert si._depth == 2
     assert si._method is None
 
