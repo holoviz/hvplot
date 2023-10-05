@@ -472,6 +472,7 @@ class HoloViewsConverter:
                     ylim = (y0, y1)
 
         # Operations
+        self.aggregation_threshold = aggregation_threshold
         self.datashade = datashade
         self.rasterize = rasterize
         self.downsample = downsample
@@ -480,7 +481,6 @@ class HoloViewsConverter:
         self.precompute = precompute
         self.x_sampling = x_sampling
         self.y_sampling = y_sampling
-        self.aggregation_threshold = aggregation_threshold
 
         # By type
         self.subplots = subplots

@@ -9,8 +9,11 @@ import hvplot.pandas  # noqa
 import numpy as np
 import pandas as pd
 
-from holoviews import Store
+from holoviews import Store, render
 from holoviews.element import Image, QuadMesh, ImageStack
+from holoviews.core.spaces import DynamicMap
+from holoviews.core.overlay import Overlay
+from holoviews.element.chart import Scatter
 from holoviews.element.comparison import ComparisonTestCase
 from hvplot.converter import HoloViewsConverter
 from packaging.version import Version
@@ -204,6 +207,27 @@ class TestDatashader(ComparisonTestCase):
         plot = self.df.hvplot(x='x', y='y', by=expected, rasterize=True, dynamic=False)
         assert isinstance(plot, ImageStack)
         assert plot.opts["cmap"] == cc.palette['glasbey_category10']
+
+    @parameterized.expand([('rasterize',), ('datashade',)])
+    def test_aggregation_threshold(self, operation):
+        df = pd.DataFrame(
+            np.random.multivariate_normal((0, 0), [[0.1, 0.1], [0.1, 1.0]], (5000,))
+        )
+        dmap = df.hvplot.scatter("0", "1", aggregation_threshold=1000)
+        assert isinstance(dmap, DynamicMap)
+
+        render(dmap)  # trigger dynamicmap
+        overlay = dmap.items()[0][1]
+        assert isinstance(overlay, Overlay)
+
+        image = overlay.get(0)
+        assert isinstance(image, Image)
+        assert image.data["0_1 Count"].size
+
+        scatter = overlay.get(1)
+        assert isinstance(scatter, Scatter)
+        assert len(scatter.data) == 0
+
 
 class TestChart2D(ComparisonTestCase):
 
