@@ -22,7 +22,7 @@ from holoviews.element import (
 )
 from holoviews.plotting.bokeh import OverlayPlot, colormap_generator
 from holoviews.plotting.util import process_cmap
-from holoviews.operation import histogram
+from holoviews.operation import histogram, apply_when
 from holoviews.streams import Buffer, Pipe
 from holoviews.util.transform import dim
 from packaging.version import Version
@@ -212,6 +212,10 @@ class HoloViewsConverter:
         Whether to apply rasterization using the Datashader library,
         returning an aggregated Image (to be colormapped by the
         plotting backend) instead of individual points
+    op_threshold (default=None):
+        The threshold before applying the operation (datashade / rasterize);
+        if the number of points is below this value, the plot will
+        not be rasterized or datashaded.
     x_sampling/y_sampling (default=None):
         Specifies the smallest allowed sampling interval along the x/y axis.
 
@@ -286,7 +290,7 @@ class HoloViewsConverter:
 
     _op_options = [
         'datashade', 'rasterize', 'x_sampling', 'y_sampling',
-        'aggregator'
+        'aggregator', "op_threshold"
     ]
 
     # Options specific to a particular plot type
@@ -383,9 +387,10 @@ class HoloViewsConverter:
         logx=None, logy=None, loglog=None, hover=None, subplots=False,
         label=None, invert=False, stacked=False, colorbar=None,
         datashade=False, rasterize=False, downsample=None,
-        row=None, col=None, debug=False, framewise=True,
-        aggregator=None, projection=None, global_extent=None,
-        geo=False, precompute=False, flip_xaxis=None, flip_yaxis=None,
+        op_threshold=None, row=None, col=None,
+        debug=False, framewise=True, aggregator=None,
+        projection=None, global_extent=None, geo=False,
+        precompute=False, flip_xaxis=None, flip_yaxis=None,
         dynspread=False, hover_cols=[], x_sampling=None,
         y_sampling=None, project=False, tools=[], attr_labels=None,
         coastline=False, tiles=False, sort_date=True,
@@ -473,6 +478,7 @@ class HoloViewsConverter:
         self.precompute = precompute
         self.x_sampling = x_sampling
         self.y_sampling = y_sampling
+        self.op_threshold = op_threshold
 
         # By type
         self.subplots = subplots
@@ -1362,11 +1368,11 @@ class HoloViewsConverter:
             if self._dim_ranges.get('c', (None, None)) != (None, None):
                 style['clim'] = self._dim_ranges['c']
 
-        if self.geo and self.crs != self.output_projection:
-            import geoviews as gv
-            obj = gv.project(obj, projection=self.output_projection)
-
-        processed = operation(obj, **opts)
+        if self.op_threshold is not None:
+            operation_instance = operation.instance(**opts)
+            processed = apply_when(obj, operation=operation_instance, predicate=lambda x: len(x) > self.op_threshold)
+        else:
+            processed = operation(obj, **opts)
 
         if self.dynspread:
             processed = dynspread(processed, max_px=self.kwds.get('max_px', 3),
