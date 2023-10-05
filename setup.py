@@ -54,7 +54,7 @@ extras_require['tests'] = [
     'parameterized',
     'pytest',
     'pytest-cov',
-    'matplotlib <3.8',
+    'matplotlib',
     'plotly',
     'xarray',
     'pooch',
