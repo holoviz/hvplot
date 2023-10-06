@@ -203,7 +203,7 @@ class HoloViewsConverter:
     downsample (default=False):
         Whether to apply LTTB (Largest Triangle Three Buckets)
         downsampling to the element (note this is only well behaved for
-        timeseries data).
+        timeseries data). Requires HoloViews >= 1.16.
     dynspread (default=False):
         For plots generated with datashade=True or rasterize=True,
         automatically increase the point size when the data is sparse
@@ -1280,7 +1280,10 @@ class HoloViewsConverter:
             opts['height'] = self._plot_opts['height']
 
         if self.downsample:
-            from holoviews.operation.downsample import downsample1d
+            try:
+                from holoviews.operation.downsample import downsample1d
+            except ImportError:
+                raise ImportError('Downsampling requires HoloViews >=1.16')
 
             if self.x_sampling:
                 opts['x_sampling'] = self.x_sampling
