@@ -2086,7 +2086,14 @@ class HoloViewsConverter:
         self.use_index = False
         data, x, y = self._process_chart_args(data, x, y, single_y=True)
 
-        text = self.kwds.get('text', [c for c in data.columns if c not in (x, y)][0])
+        text = self.kwds.get('text')
+        if not text:
+            text = [c for c in data.columns if c not in (x, y)][0]
+        elif text not in data.columns:
+            template_str = text  # needed for dask lazy compute
+            data["label"] = data.apply(lambda row: template_str.format(**row), axis=1)
+            text = "label"
+
         kdims, vdims = self._get_dimensions([x, y], [text])
         cur_opts, compat_opts = self._get_compat_opts('Labels')
         element = self._get_element('labels')
