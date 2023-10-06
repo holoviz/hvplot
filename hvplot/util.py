@@ -123,7 +123,11 @@ def proj_to_cartopy(proj):
     import cartopy.crs as ccrs
     try:
         from osgeo import osr
-        getattr(osr, "UseExceptions", lambda: None)()
+        if not getattr(osr, "_UserHasSpecifiedIfUsingExceptions", lambda: True)():
+            # _UserHasSpecifiedIfUsingExceptions wil be 0 if osr.UseExceptions or
+            # osr.DontUseExceptions has not been called. So we will call it here.
+            # To mute the warning.
+            osr.UseExceptions()
         has_gdal = True
     except ImportError:
         has_gdal = False
