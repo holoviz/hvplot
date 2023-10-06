@@ -369,19 +369,12 @@ class hvPlotExplorer(Viewer):
             df, x, y,
             **{k: v for k, v in params.items() if k not in ('x', 'y', 'y_multi')}
         )
-        controller_params = {}
-        # Assumes the controls aren't passed on instantiation.
-        controls = [
-            p.class_
-            for p in self.param.objects().values()
-            if isinstance(p, param.ClassSelector)
-            and issubclass(p.class_, Controls)
-        ]
-        for cls in controls:
-            controller_params[cls] = {
-                k: params.pop(k) for k, v in dict(params).items()
-                if k in cls.param
-            }
+        # Collect kwargs passed to the constructor but meant for the controls
+        extras = {
+            k: params.pop(k)
+            for k in params.copy()
+            if k not in self.param
+        }
         super().__init__(**params)
         self._data = df
         self._converter = converter
@@ -396,11 +389,28 @@ class hvPlotExplorer(Viewer):
         self._tabs = pn.Tabs(
             tabs_location='left', width=400
         )
+        controls = [
+            p.class_
+            for p in self.param.objects().values()
+            if isinstance(p, param.ClassSelector)
+            and issubclass(p.class_, Controls)
+        ]
+        controller_params = {}
+        for cls in controls:
+            controller_params[cls] = {
+                k: extras.pop(k)
+                for k in extras.copy()
+                if k in cls.param
+            }
+        if extras:
+            raise TypeError(
+                f'__init__() got keyword(s) not supported by any control: {extras}'
+            )
         self._controllers = {
-            cls.name.lower(): cls(df, explorer=self, **params)
-            for cls, params in controller_params.items()
+            cls.name.lower(): cls(df, explorer=self, **cparams)
+            for cls, cparams in controller_params.items()
         }
-        self.param.set_param(**self._controllers)
+        self.param.update(**self._controllers)
         self.param.watch(self._plot, list(self.param))
         for controller in self._controllers.values():
             controller.param.watch(self._plot, list(controller.param))
@@ -468,7 +478,7 @@ class hvPlotExplorer(Viewer):
             self._layout[1][1] = self._hvpane
             self._alert.visible = False
         except Exception as e:
-            self._alert.param.set_param(
+            self._alert.param.update(
                 object=f'**Rendering failed with following error**: {e}',
                 visible=True
             )
