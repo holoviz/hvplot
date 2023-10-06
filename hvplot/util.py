@@ -24,6 +24,7 @@ except:
 hv_version = Version(hv.__version__)
 bokeh_version = Version(bokeh.__version__)
 bokeh3 = bokeh_version >= Version("3.0")
+param2 = Version(param.__version__) >= Version("2.0rc4")
 
 
 def with_hv_extension(func, extension='bokeh', logo=False):
