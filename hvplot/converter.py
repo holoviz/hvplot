@@ -86,7 +86,7 @@ class HoloViewsConverter:
     ---------------
     autorange (default=None): Literal['x', 'y'] | None
         Whether to enable auto-ranging along the x- or y-axis when
-        zooming.
+        zooming. Requires HoloViews >= 1.16.
     clim: tuple
         Lower and upper bound of the color scale
     cnorm (default='linear'): str
@@ -446,20 +446,19 @@ class HoloViewsConverter:
                         "Projection must be defined as cartopy CRS or "
                         f"one of the following CRS string:\n {all_crs}")
 
-            projection = projection or (ccrs.GOOGLE_MERCATOR if tiles else self.crs)
-            if tiles and projection != ccrs.GOOGLE_MERCATOR:
+            self.output_projection = projection or (ccrs.GOOGLE_MERCATOR if tiles else self.crs)
+            if tiles and self.output_projection != ccrs.GOOGLE_MERCATOR:
                 raise ValueError(
                     "Tiles can only be used with output projection of "
                     "`cartopy.crs.GOOGLE_MERCATOR`. To get rid of this error "
                     "remove `projection=` or `tiles=`"
                 )
-
-            if self.crs != projection:
+            if self.crs != projection and (xlim or ylim):
                 px0, py0, px1, py1 = ccrs.GOOGLE_MERCATOR.boundary.bounds
                 x0, x1 = xlim or (px0, px1)
                 y0, y1 = ylim or (py0, py1)
                 extents = (x0, y0, x1, y1)
-                x0, y0, x1, y1 = project_extents(extents, self.crs, projection)
+                x0, y0, x1, y1 = project_extents(extents, self.crs, self.output_projection)
                 if xlim:
                     xlim = (x0, x1)
                 if ylim:
@@ -494,7 +493,10 @@ class HoloViewsConverter:
         if ylim is not None:
             plot_opts['ylim'] = tuple(ylim)
 
-        plot_opts['autorange'] = autorange
+        if autorange is not None and hv_version < Version('1.16.0'):
+            param.main.param.warning('autorange option requires HoloViews >= 1.16')
+        else:
+            plot_opts['autorange'] = autorange
 
         self.invert = invert
         if loglog is not None:
@@ -1363,6 +1365,10 @@ class HoloViewsConverter:
             if self._dim_ranges.get('c', (None, None)) != (None, None):
                 style['clim'] = self._dim_ranges['c']
 
+        if self.geo and self.crs != self.output_projection:
+            import geoviews as gv
+            obj = gv.project(obj, projection=self.output_projection)
+
         processed = operation(obj, **opts)
 
         if self.dynspread:
@@ -1389,7 +1395,7 @@ class HoloViewsConverter:
                 param.main.param.warning(
                     "coastline scale of %s not recognized, must be one "
                     "'10m', '50m' or '110m'." % self.coastline)
-            obj = obj * coastline
+            obj = obj * coastline.opts(projection=self.output_projection)
 
         if self.features:
             import geoviews as gv
@@ -1411,31 +1417,45 @@ class HoloViewsConverter:
                     else:
                         feature_obj = feature_obj.opts(scale=scale)
                 if feature_obj.group in ["Land", "Ocean"]:
-                    obj = feature_obj * obj  # Underlay land/ocean
+                    # Underlay land/ocean
+                    obj = feature_obj.opts(projection=self.output_projection) * obj
                 else:
-                    obj = obj * feature_obj  # overlay everything else
+                    # overlay everything else
+                    obj = obj * feature_obj.opts(projection=self.output_projection)
 
-        if self.tiles:
-            tile_source = 'EsriImagery' if self.tiles == 'ESRI' else self.tiles
-            warning = ("{} tiles not recognized, must be one of: {} or a tile object".format(tile_source, sorted(hv.element.tile_sources)))
-            if tile_source is True:
-                tiles = hv.element.tiles.OSM()
-            elif tile_source in hv.element.tile_sources.keys():
-                tiles = hv.element.tile_sources[tile_source]()
-            elif tile_source in hv.element.tile_sources.values():
-                tiles = tile_source()
-            elif isinstance(tile_source, hv.element.tiles.Tiles):
-                tiles = tile_source
-            elif self.geo:
-                from geoviews.element import WMTS
-                if isinstance(tile_source, WMTS):
-                    tiles = tile_source
-                else:
-                    param.main.param.warning(warning)
-            else:
-                param.main.param.warning(warning)
+        if self.tiles and not self.geo:
+            tiles = self._get_tiles(
+                self.tiles,
+                hv.element.tile_sources,
+                hv.element.tiles.Tiles
+            )
+            obj = tiles * obj
+        elif self.tiles and self.geo:
+            import geoviews as gv
+            tiles = self._get_tiles(
+                self.tiles,
+                gv.tile_sources.tile_sources,
+                (gv.element.WMTS, hv.element.tiles.Tiles),
+            )
             obj = tiles * obj
         return obj
+
+    def _get_tiles(self, source, sources, types):
+        tile_source = 'EsriImagery' if self.tiles == 'ESRI' else self.tiles
+        if tile_source is True:
+            tiles = sources["OSM"]()
+        elif tile_source in sources:
+            tiles = sources[tile_source]()
+        elif tile_source in sources.values():
+            tiles = tile_source()
+        elif isinstance(tile_source, types):
+            tiles = tile_source
+        else:
+            msg = (
+                f"{tile_source} tiles not recognized, must be one of: {sorted(sources)} or a tile object"
+            )
+            raise ValueError(msg)
+        return tiles
 
     def _merge_redim(self, ranges, attr='range'):
         redim = dict(self._redim)
@@ -1913,7 +1933,7 @@ class HoloViewsConverter:
         else:
             ranges = {self.value_label: xlim}
             data = data[y]
-            df = pd.melt(data, var_name=self.group_label, value_name=self.value_label)
+            df = data.melt(var_name=self.group_label, value_name=self.value_label)
             ds = Dataset(df)
             if len(df):
                 dists = ds.to(Distribution, self.value_label)

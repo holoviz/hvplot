@@ -100,3 +100,28 @@ class TestPatchStreamz(TestCase):
         from streamz.dataframe import Random
         random_df = Random()
         self.assertIsInstance(random_df.groupby('x').sum().y.hvplot, hvPlotTabular)
+
+
+class TestPatchPolars(TestCase):
+
+    def setUp(self):
+        try:
+            import polars as pl # noqa
+        except:
+            raise SkipTest('Polars not available')
+        import hvplot.polars   # noqa
+
+    def test_polars_series_patched(self):
+        import polars as pl
+        pseries = pl.Series([0, 1, 2])
+        self.assertIsInstance(pseries.hvplot, hvPlotTabular)
+
+    def test_polars_dataframe_patched(self):
+        import polars as pl
+        pdf = pl.DataFrame({'x': [1, 3, 5], 'y': [2, 4, 6]})
+        self.assertIsInstance(pdf.hvplot, hvPlotTabular)
+
+    def test_polars_lazyframe_patched(self):
+        import polars as pl
+        pldf = pl.LazyFrame({'x': [1, 3, 5], 'y': [2, 4, 6]})
+        self.assertIsInstance(pldf.hvplot, hvPlotTabular)
