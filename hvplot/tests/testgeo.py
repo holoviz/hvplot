@@ -140,6 +140,7 @@ class TestProjections(TestGeo):
             rasterize=True,
             dynamic=False,
             aggregator="max",
+            project=True,
         )
 
         p1 = gv.Points(ds.isel(time=0), kdims=["lon", "lat"], crs=ccrs.PlateCarree())
