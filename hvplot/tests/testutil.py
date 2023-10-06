@@ -11,7 +11,7 @@ from unittest import TestCase, SkipTest
 
 from hvplot.util import (
     check_crs, is_list_like, process_crs, process_xarray,
-    _convert_col_names_to_str,
+    _convert_col_names_to_str
 )
 
 
@@ -217,6 +217,14 @@ class TestGeoUtil(TestCase):
 
         assert isinstance(crs, self.ccrs.CRS)
 
+    def test_proj_to_cartopy_wkt_string(self):
+        from ..util import proj_to_cartopy
+        crs = proj_to_cartopy('GEOGCRS["unnamed",BASEGEOGCRS["unknown",DATUM["unknown",ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1,ID["EPSG",9001]]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8901]]],DERIVINGCONVERSION["unknown",METHOD["PROJ ob_tran o_proj=latlon"],PARAMETER["o_lon_p",0,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],PARAMETER["o_lat_p",37.5,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],PARAMETER["lon_0",357.5,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]]],CS[ellipsoidal,2],AXIS["longitude",east,ORDER[1],ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],AXIS["latitude",north,ORDER[2],ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]]]')  # noqa: E501
+
+        assert isinstance(crs, self.ccrs.RotatedPole)
+        assert crs.proj4_params["lon_0"] == 357.5
+        assert crs.proj4_params["o_lat_p"] == 37.5
+
 
 class TestDynamicArgs(TestCase):
 
@@ -281,24 +289,70 @@ def test_check_crs():
     assert p is None
 
 
-@pytest.mark.skipif(
-    sys.version_info < (3, 8),
-    reason="PyProj is no longer releasing for Python 3.7",
-)
 @pytest.mark.parametrize("input", [
     "+init=epsg:26911",
-    "4326",
-    4326,
-    "epsg:4326",
-    "EPSG: 4326",
 ])
 def test_process_crs(input):
     pytest.importorskip("pyproj")
     ccrs = pytest.importorskip("cartopy.crs")
     crs = process_crs(input)
-
     assert isinstance(crs, ccrs.CRS)
 
+
+def test_process_crs_pyproj_crs():
+    pyproj = pytest.importorskip("pyproj")
+    ccrs = pytest.importorskip("cartopy.crs")
+    crs = process_crs(pyproj.CRS.from_epsg(4326))
+    assert isinstance(crs, ccrs.PlateCarree)
+
+
+def test_process_crs_pyproj_proj():
+    pyproj = pytest.importorskip("pyproj")
+    ccrs = pytest.importorskip("cartopy.crs")
+    crs = process_crs(pyproj.Proj(init='epsg:4326'))
+    assert isinstance(crs, ccrs.PlateCarree)
+
+
+@pytest.mark.parametrize("input", [
+    "4326",
+    4326,
+    "epsg:4326",
+    "EPSG: 4326",
+    "+init=epsg:4326",
+    # Created with pyproj.CRS("EPSG:4326").to_wkt()
+    'GEOGCRS["WGS 84",ENSEMBLE["World Geodetic System 1984 ensemble",MEMBER["World Geodetic System 1984 (Transit)"],MEMBER["World Geodetic System 1984 (G730)"],MEMBER["World Geodetic System 1984 (G873)"],MEMBER["World Geodetic System 1984 (G1150)"],MEMBER["World Geodetic System 1984 (G1674)"],MEMBER["World Geodetic System 1984 (G1762)"],MEMBER["World Geodetic System 1984 (G2139)"],ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[2.0]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],CS[ellipsoidal,2],AXIS["geodetic latitude (Lat)",north,ORDER[1],ANGLEUNIT["degree",0.0174532925199433]],AXIS["geodetic longitude (Lon)",east,ORDER[2],ANGLEUNIT["degree",0.0174532925199433]],USAGE[SCOPE["Horizontal component of 3D system."],AREA["World."],BBOX[-90,-180,90,180]],ID["EPSG",4326]]',
+], ids=lambda x: str(x)[:20])
+def test_process_crs_platecarree(input):
+    pytest.importorskip("pyproj")
+    ccrs = pytest.importorskip("cartopy.crs")
+    crs = process_crs(input)
+    assert isinstance(crs, ccrs.PlateCarree)
+
+
+@pytest.mark.parametrize("input", [
+    "3857",
+    3857,
+    "epsg:3857",
+    "EPSG: 3857",
+    "+init=epsg:3857",
+    'PROJCS["WGS 84 / Pseudo-Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Mercator_1SP"],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],EXTENSION["PROJ4","+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs"],AUTHORITY["EPSG","3857"]]',
+    # Created with pyproj.CRS("EPSG:3857").to_wkt()
+    'PROJCRS["WGS 84 / Pseudo-Mercator",BASEGEOGCRS["WGS 84",ENSEMBLE["World Geodetic System 1984 ensemble",MEMBER["World Geodetic System 1984 (Transit)"],MEMBER["World Geodetic System 1984 (G730)"],MEMBER["World Geodetic System 1984 (G873)"],MEMBER["World Geodetic System 1984 (G1150)"],MEMBER["World Geodetic System 1984 (G1674)"],MEMBER["World Geodetic System 1984 (G1762)"],MEMBER["World Geodetic System 1984 (G2139)"],ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[2.0]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["Popular Visualisation Pseudo-Mercator",METHOD["Popular Visualisation Pseudo Mercator",ID["EPSG",1024]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["False easting",0,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["easting (X)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["northing (Y)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["Web mapping and visualisation."],AREA["World between 85.06°S and 85.06°N."],BBOX[-85.06,-180,85.06,180]],ID["EPSG",3857]]',
+], ids=lambda x: str(x)[:20])
+def test_process_crs_mercator(input):
+    pytest.importorskip("pyproj")
+    ccrs = pytest.importorskip("cartopy.crs")
+    crs = process_crs(input)
+    assert isinstance(crs, ccrs.Mercator)
+
+
+def test_process_crs_rasterio():
+    pytest.importorskip("pyproj")
+    rcrs = pytest.importorskip("rasterio.crs")
+    ccrs = pytest.importorskip("cartopy.crs")
+    input = rcrs.CRS.from_epsg(4326).to_wkt()
+    crs = process_crs(input)
+    assert isinstance(crs, ccrs.CRS)
 
 def test_process_crs_raises_error():
     pytest.importorskip("pyproj")

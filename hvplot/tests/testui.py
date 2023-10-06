@@ -1,20 +1,14 @@
+import re
+
 import holoviews as hv
 import hvplot.pandas
+
 import pytest
 
-try:
-    from bokeh.sampledata import penguins
-except ImportError:
-    penguins = None
-
+from bokeh.sampledata import penguins
 from hvplot.ui import hvDataFrameExplorer
 
-pytestmark = pytest.mark.skipif(
-    penguins is None,
-    reason='Penguins dataset not available on Python 3.6',
-)
-
-df = penguins.data if penguins is not None else None
+df = penguins.data
 
 
 def test_explorer_basic():
@@ -29,7 +23,7 @@ def test_explorer_basic():
 def test_explorer_settings():
     explorer = hvplot.explorer(df)
 
-    explorer.param.set_param(
+    explorer.param.update(
         kind='scatter',
         x='bill_length_mm',
         y_multi=['bill_depth_mm'],
@@ -49,7 +43,7 @@ def test_explorer_settings():
 def test_explorer_plot_code():
     explorer = hvplot.explorer(df)
 
-    explorer.param.set_param(
+    explorer.param.update(
         kind='scatter',
         x='bill_length_mm',
         y_multi=['bill_depth_mm'],
@@ -68,7 +62,7 @@ def test_explorer_plot_code():
 def test_explorer_hvplot():
     explorer = hvplot.explorer(df)
 
-    explorer.param.set_param(
+    explorer.param.update(
         kind='scatter',
         x='bill_length_mm',
         y_multi=['bill_depth_mm'],
@@ -84,7 +78,7 @@ def test_explorer_hvplot():
 def test_explorer_save(tmp_path):
     explorer = hvplot.explorer(df)
 
-    explorer.param.set_param(
+    explorer.param.update(
         kind='scatter',
         x='bill_length_mm',
         y_multi=['bill_depth_mm'],
@@ -95,3 +89,17 @@ def test_explorer_save(tmp_path):
     explorer.save(outfile)
 
     assert outfile.exists()
+
+
+def test_explorer_kwargs_controls():
+    explorer = hvplot.explorer(df, title='Dummy title', width=200)
+
+    assert explorer.labels.title == 'Dummy title'
+    assert explorer.axes.width == 200
+
+
+def test_explorer_kwargs_controls_error_not_supported():
+    with pytest.raises(
+        TypeError, match=re.escape("__init__() got keyword(s) not supported by any control: {'not_a_control_kwarg': None}")
+    ):
+        hvplot.explorer(df, title='Dummy title', not_a_control_kwarg=None)

@@ -3,6 +3,7 @@ import numpy as np
 from unittest import SkipTest, expectedFailure
 from parameterized import parameterized
 
+from holoviews.core.dimension import Dimension
 from holoviews import NdOverlay, Store, dim, render
 from holoviews.element import Curve, Area, Scatter, Points, Path, HeatMap
 from holoviews.element.comparison import ComparisonTestCase
@@ -128,6 +129,11 @@ class TestChart1D(ComparisonTestCase):
             'time': pd.date_range('1/1/2000', periods=10, tz='UTC'),
             'A': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             'B': list('abcdefghij')})
+        self.edge_df = pd.DataFrame({
+            "Latitude": [-34.58, -15.78, -33.45],
+            "Longitude": [-58.66, -47.91, -70.66],
+            "Volume {m3}": ["1", "2", "3"],
+        })
 
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
     def test_wide_chart(self, kind, element):
@@ -347,6 +353,20 @@ class TestChart1D(ComparisonTestCase):
         bkplot = Store.renderers['bokeh'].get_plot(plot)
         assert not bkplot.tools
 
+    def test_labels_format(self):
+        plot = self.df.hvplot("x", "y", text="({x}, {y})", kind="labels")
+        assert list(plot.dimensions()) == [Dimension('x'), Dimension('y'), Dimension('label')]
+        assert list(plot.data["label"]) == ['(1, 2)', '(3, 4)', '(5, 6)']
+
+    def test_labels_no_format_edge_case(self):
+        plot = self.edge_df.hvplot.labels("Longitude", "Latitude")
+        assert list(plot.dimensions()) == [Dimension('Longitude'), Dimension('Latitude'), Dimension('Volume {m3}')]
+        assert list(plot.data["Volume {m3}"]) == ['1', '2', '3']
+
+    def test_labels_format_float(self):
+        plot = self.edge_df.hvplot.labels("Longitude", "Latitude", text="{Longitude:.1f}E {Latitude:.2f}N")
+        assert list(plot.dimensions()) == [Dimension('Longitude'), Dimension('Latitude'), Dimension('label')]
+        assert list(plot.data["label"]) == ['-58.7E -34.58N', '-47.9E -15.78N', '-70.7E -33.45N']
 
 class TestChart1DDask(TestChart1D):
 
