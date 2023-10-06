@@ -62,6 +62,7 @@ extras_require['tests'] = [
     'ipywidgets',
     'dask',
     'polars',
+    'fugue',
 ]
 
 # Dependencies required to run the notebooks

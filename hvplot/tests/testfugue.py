@@ -1,11 +1,15 @@
+"""Fugue test suite"""
+
+import hvplot
+import pandas as pd
 import pytest
 
+# Patch required before importing hvplot.fugue
+hvplot.util._fugue_ipython = True
 
 try:
-    import pandas as pd
-    import hvplot.pandas  # noqa: F401
     import fugue.api as fa
-    from hvplot.fugue import _parse_hvplot # noqa: F401
+    import hvplot.fugue  # noqa: F401
 except:
     pytest.skip(allow_module_level=True)
 
@@ -22,7 +26,7 @@ def table():
     return df
 
 
-def test_can_hvplot(table, capsys):
+def test_fugure_ipython_line(table, capsys):
     """hvplot works with Fugue"""
     fa.fugue_sql(
         """
@@ -36,11 +40,7 @@ def test_can_hvplot(table, capsys):
         """
     )
     # Check that the output contains the following:
-    # :NdOverlay   [g]
-    #     :Curve   [x]   (y)
+    # Column
+    #     [0] HoloViews(NdOverlay)
     output = capsys.readouterr().out
-    assert ":NdOverlay" in output
-    assert ":Curve" in output
-    assert "[g]" in output
-    assert "[x]" in output
-    assert "(y)" in output
+    assert output == 'Column\n    [0] HoloViews(NdOverlay)\n'
