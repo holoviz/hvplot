@@ -124,11 +124,6 @@ def proj_to_cartopy(proj):
     import cartopy.crs as ccrs
     try:
         from osgeo import osr
-        if not getattr(osr, "_UserHasSpecifiedIfUsingExceptions", lambda: True)():
-            # _UserHasSpecifiedIfUsingExceptions wil be 0 if osr.UseExceptions or
-            # osr.DontUseExceptions has not been called. So we will call it here.
-            # To mute the warning.
-            osr.UseExceptions()
         has_gdal = True
     except ImportError:
         has_gdal = False
@@ -140,11 +135,21 @@ def proj_to_cartopy(proj):
 
     srs = proj.srs
     if has_gdal:
-        # this is more robust, as srs could be anything (espg, etc.)
-        s1 = osr.SpatialReference()
-        s1.ImportFromProj4(proj.srs)
-        if s1.ExportToProj4():
-            srs = s1.ExportToProj4()
+        import warnings
+        with warnings.catch_warnings():
+            # Avoiding this warning could be done by setting osr.UseExceptions(),
+            # except there might be a risk to break the code of users leveraging
+            # GDAL on their side or through other libraries. So we just silence it.
+            warnings.filterwarnings('ignore', category=FutureWarning, message=
+                r'Neither osr\.UseExceptions\(\) nor osr\.DontUseExceptions\(\) has '
+                r'been explicitly called\. In GDAL 4\.0, exceptions will be enabled '
+                'by default'
+            )
+            # this is more robust, as srs could be anything (espg, etc.)
+            s1 = osr.SpatialReference()
+            s1.ImportFromProj4(proj.srs)
+            if s1.ExportToProj4():
+                srs = s1.ExportToProj4()
 
     km_proj = {'lon_0': 'central_longitude',
                'lat_0': 'central_latitude',
