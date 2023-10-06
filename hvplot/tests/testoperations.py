@@ -209,11 +209,11 @@ class TestDatashader(ComparisonTestCase):
         assert plot.opts["cmap"] == cc.palette['glasbey_category10']
 
     @parameterized.expand([('rasterize',), ('datashade',)])
-    def test_aggregation_threshold(self, operation):
+    def test_apply_when(self, operation):
         df = pd.DataFrame(
             np.random.multivariate_normal((0, 0), [[0.1, 0.1], [0.1, 1.0]], (5000,))
         )
-        dmap = df.hvplot.scatter("0", "1", aggregation_threshold=1000)
+        dmap = df.hvplot.scatter("0", "1", apply_when=1000)
         assert isinstance(dmap, DynamicMap)
 
         render(dmap)  # trigger dynamicmap

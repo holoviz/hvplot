@@ -212,7 +212,7 @@ class HoloViewsConverter:
         Whether to apply rasterization using the Datashader library,
         returning an aggregated Image (to be colormapped by the
         plotting backend) instead of individual points
-    aggregation_threshold (default=None):
+    resample_when (default=None):
         The threshold before toggling the operation (datashade / rasterize);
         if the number of individual points exceeds this value, the plot will
         be rasterized or datashaded; else the plot with the original points
@@ -293,7 +293,7 @@ class HoloViewsConverter:
 
     _op_options = [
         'datashade', 'rasterize', 'x_sampling', 'y_sampling',
-        'downsample', 'aggregator', 'aggregation_threshold'
+        'downsample', 'aggregator', 'resample_when'
     ]
 
     # Options specific to a particular plot type
@@ -390,7 +390,7 @@ class HoloViewsConverter:
         logx=None, logy=None, loglog=None, hover=None, subplots=False,
         label=None, invert=False, stacked=False, colorbar=None,
         datashade=False, rasterize=False, downsample=None,
-        aggregation_threshold=None, row=None, col=None,
+        resample_when=None, row=None, col=None,
         debug=False, framewise=True, aggregator=None,
         projection=None, global_extent=None, geo=False,
         precompute=False, flip_xaxis=None, flip_yaxis=None,
@@ -474,7 +474,7 @@ class HoloViewsConverter:
                     ylim = (y0, y1)
 
         # Operations
-        self.aggregation_threshold = aggregation_threshold
+        self.resample_when = resample_when
         self.datashade = datashade
         self.rasterize = rasterize
         self.downsample = downsample
@@ -1373,7 +1373,7 @@ class HoloViewsConverter:
             if self._dim_ranges.get('c', (None, None)) != (None, None):
                 style['clim'] = self._dim_ranges['c']
 
-        processed = self._aggregate_obj(operation, obj, opts)
+        processed = self._resample_obj(operation, obj, opts)
         if self.dynspread:
             processed = dynspread(processed, max_px=self.kwds.get('max_px', 3),
                                   threshold=self.kwds.get('threshold', 0.5))
@@ -1383,18 +1383,18 @@ class HoloViewsConverter:
         layers = _transfer_opts_cur_backend(layers)
         return layers
 
-    def _aggregate_obj(self, operation, obj, opts):
-        def exceeds_aggregation_threshold(plot):
+    def _resample_obj(self, operation, obj, opts):
+        def exceeds_resample_when(plot):
             vdim = plot.vdims[0].name
             data = plot.data[vdim]
             data_size = np.size(data)
-            return data_size > self.aggregation_threshold
+            return data_size > self.resample_when
 
-        if self.aggregation_threshold is not None:
+        if self.resample_when is not None:
             processed = apply_when(
                 obj,
                 operation=partial(operation, **opts),
-                predicate=exceeds_aggregation_threshold
+                predicate=exceeds_resample_when
             )
         else:
             processed = operation(obj, **opts)
