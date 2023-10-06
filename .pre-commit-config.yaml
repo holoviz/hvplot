@@ -3,6 +3,10 @@
 
 default_stages: [commit]
 repos:
+-   repo: https://github.com/nbQA-dev/nbQA
+    rev: 1.6.3
+    hooks:
+    -   id: nbqa-flake8
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.3.0
     hooks:
@@ -21,3 +25,7 @@ repos:
     -   id: flake8  # See 'setup.cfg' for args
         args: [hvplot]
         files: hvplot/
+-   repo: https://github.com/hoxbro/clean_notebook
+    rev: v0.1.10
+    hooks:
+    - id: clean-notebook
