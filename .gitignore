@@ -129,5 +129,3 @@ hvplot/.version
 
 # Examples artefacts
 examples/user_guide/plot.html
-*duckdb.db*
-trip-data.duckdb*
