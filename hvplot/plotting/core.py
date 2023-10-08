@@ -1772,7 +1772,9 @@ class hvPlotTabular(hvPlotBase):
         y : string, optional
             The coordinate variable along the y-axis
         text : string, optional
-            The column to draw the text labels from
+            The column to draw the text labels from; it's also possible to
+            provide a template string containing the column names to
+            automatically format the text, e.g. "{col1}, {col2}".
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('labels')`.
 

@@ -203,7 +203,7 @@ class HoloViewsConverter:
     downsample (default=False):
         Whether to apply LTTB (Largest Triangle Three Buckets)
         downsampling to the element (note this is only well behaved for
-        timeseries data).
+        timeseries data). Requires HoloViews >= 1.16.
     dynspread (default=False):
         For plots generated with datashade=True or rasterize=True,
         automatically increase the point size when the data is sparse
@@ -407,6 +407,7 @@ class HoloViewsConverter:
         self.dynamic = dynamic
         self.geo = any([geo, crs, global_extent, projection, project, coastline, features])
         self.crs = self._process_crs(data, crs) if self.geo else None
+        self.output_projection = self.crs
         self.project = project
         self.coastline = coastline
         self.features = features
@@ -585,7 +586,7 @@ class HoloViewsConverter:
         if self.crs and global_extent:
             plot_opts['global_extent'] = global_extent
         if projection:
-            plot_opts['projection'] = process_crs(projection)
+            plot_opts['projection'] = self.output_projection
         title = title if title is not None else getattr(self, '_title', None)
         if title is not None:
             plot_opts['title'] = title
@@ -1264,10 +1265,8 @@ class HoloViewsConverter:
 
         if self.crs and self.project:
             # Apply projection before rasterizing
-            import cartopy.crs as ccrs
-            from geoviews import project
-            projection = self._plot_opts.get('projection', ccrs.GOOGLE_MERCATOR)
-            obj = project(obj, projection=projection)
+            import geoviews as gv
+            obj = gv.project(obj, projection=self.output_projection)
 
         if not (self.datashade or self.rasterize or self.downsample):
             layers = self._apply_layers(obj)
@@ -1281,7 +1280,10 @@ class HoloViewsConverter:
             opts['height'] = self._plot_opts['height']
 
         if self.downsample:
-            from holoviews.operation.downsample import downsample1d
+            try:
+                from holoviews.operation.downsample import downsample1d
+            except ImportError:
+                raise ImportError('Downsampling requires HoloViews >=1.16')
 
             if self.x_sampling:
                 opts['x_sampling'] = self.x_sampling
@@ -1361,10 +1363,6 @@ class HoloViewsConverter:
                 style['cmap'] = self._style_opts['cmap']
             if self._dim_ranges.get('c', (None, None)) != (None, None):
                 style['clim'] = self._dim_ranges['c']
-
-        if self.geo and self.crs != self.output_projection:
-            import geoviews as gv
-            obj = gv.project(obj, projection=self.output_projection)
 
         processed = operation(obj, **opts)
 
@@ -1939,7 +1937,7 @@ class HoloViewsConverter:
         else:
             ranges = {self.value_label: xlim}
             data = data[y]
-            df = pd.melt(data, var_name=self.group_label, value_name=self.value_label)
+            df = data.melt(var_name=self.group_label, value_name=self.value_label)
             ds = Dataset(df)
             if len(df):
                 dists = ds.to(Distribution, self.value_label)
@@ -2097,7 +2095,14 @@ class HoloViewsConverter:
         self.use_index = False
         data, x, y = self._process_chart_args(data, x, y, single_y=True)
 
-        text = self.kwds.get('text', [c for c in data.columns if c not in (x, y)][0])
+        text = self.kwds.get('text')
+        if not text:
+            text = [c for c in data.columns if c not in (x, y)][0]
+        elif text not in data.columns:
+            template_str = text  # needed for dask lazy compute
+            data["label"] = data.apply(lambda row: template_str.format(**row), axis=1)
+            text = "label"
+
         kdims, vdims = self._get_dimensions([x, y], [text])
         cur_opts, compat_opts = self._get_compat_opts('Labels')
         element = self._get_element('labels')
