@@ -25,7 +25,7 @@ hv_version = Version(hv.__version__)
 bokeh_version = Version(bokeh.__version__)
 bokeh3 = bokeh_version >= Version("3.0")
 param2 = Version(param.__version__) >= Version("2.0rc4")
-
+_fugue_ipython = None  # To be set to True in tests to mock ipython
 
 def with_hv_extension(func, extension='bokeh', logo=False):
     """If hv.extension is not loaded, load before calling function"""
