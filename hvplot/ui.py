@@ -410,7 +410,7 @@ class hvPlotExplorer(Viewer):
             cls.name.lower(): cls(df, explorer=self, **cparams)
             for cls, cparams in controller_params.items()
         }
-        self.param.set_param(**self._controllers)
+        self.param.update(**self._controllers)
         self.param.watch(self._plot, list(self.param))
         for controller in self._controllers.values():
             controller.param.watch(self._plot, list(controller.param))
@@ -478,7 +478,7 @@ class hvPlotExplorer(Viewer):
             self._layout[1][1] = self._hvpane
             self._alert.visible = False
         except Exception as e:
-            self._alert.param.set_param(
+            self._alert.param.update(
                 object=f'**Rendering failed with following error**: {e}',
                 visible=True
             )

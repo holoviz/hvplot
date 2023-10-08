@@ -235,3 +235,25 @@ class TestChart2D(ComparisonTestCase):
                               x_sampling=5, y_sampling=2)
         assert all(plot.data.x.diff('x').round(0) == 5)
         assert all(plot.data.y.diff('y').round(0) == 2)
+
+
+class TestDownsample(ComparisonTestCase):
+    def setUp(self):
+        import hvplot.pandas # noqa
+        self.df = pd.DataFrame(np.random.random(100))
+
+    def test_downsample_default(self):
+        from holoviews.operation.downsample import downsample1d
+
+        plot = self.df.hvplot.line(downsample=True)
+
+        assert isinstance(plot.callback.operation, downsample1d)
+        assert plot.callback.operation.algorithm == "lttb"
+
+    def test_downsample_opts(self):
+        plot = self.df.hvplot.line(downsample=True, width=100, height=50, x_sampling=5, xlim=(0, 5))
+
+        assert plot.callback.operation.p.width == 100
+        assert plot.callback.operation.p.height == 50
+        assert plot.callback.operation.p.x_sampling == 5
+        assert plot.callback.operation.p.x_range == (0, 5)
