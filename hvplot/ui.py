@@ -294,7 +294,7 @@ class Geographic(Controls):
     def _update_crs_projection(self):
         enabled = bool(self.geo or self.project)
         for key in GEO_KEYS:
-            getattr(self.param, key).constant = not enabled
+            self.param[key]constant = not enabled
         self.geo = enabled
         if not enabled:
             return
