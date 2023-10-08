@@ -63,7 +63,7 @@ extras_require['tests'] = [
     'dask',
     'polars',
     'fugue',
-    'ibis-framework',  # ibis-framework-core on conda
+    'ibis-framework',  # ibis-sqlite on conda
 ]
 
 # Dependencies required to run the notebooks

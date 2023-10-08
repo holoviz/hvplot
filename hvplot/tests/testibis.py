@@ -9,6 +9,8 @@ try:
     import ibis
 except ImportError:
     pytest.skip(allow_module_level=True)
+else:
+    ibis.set_backend('sqlite')
 
 
 def test_ibis_hist():
