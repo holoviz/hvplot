@@ -1,7 +1,7 @@
 import pathlib
 import sys
 
-from unittest import TestCase, SkipTest, expectedFailure
+from unittest import TestCase, SkipTest
 
 from packaging.version import Version
 import numpy as np
@@ -106,6 +106,49 @@ class TestProjections(TestGeo):
         with self.assertRaisesRegex(ValueError, "Projection must be defined"):
             self.da.hvplot.image('x', 'y', projection='foo')
 
+    def test_plot_with_projection_raises_an_error_when_tiles_set(self):
+        da = self.da.copy()
+        with self.assertRaisesRegex(ValueError, "Tiles can only be used with output projection"):
+            da.hvplot.image('x', 'y', crs=self.crs, projection='Robinson', tiles=True)
+
+    def test_overlay_with_projection(self):
+        # Regression test for https://github.com/holoviz/hvplot/issues/1090
+        df = pd.DataFrame({"lon": [0, 10], "lat": [40, 50], "v": [0, 1]})
+
+        plot1 = df.hvplot.points(x="lon", y="lat", s=200, c="y", geo=True, tiles="CartoLight")
+        plot2 = df.hvplot.points(x="lon", y="lat", c="v", geo=True)
+
+        # This should work without erroring
+        plot = plot1 * plot2
+        hv.renderer("bokeh").get_plot(plot)
+
+    def test_geo_with_rasterize(self):
+        import xarray as xr
+        import cartopy.crs as ccrs
+        import geoviews as gv
+        try:
+            from holoviews.operation.datashader import rasterize
+        except:
+            raise SkipTest('datashader not available')
+
+        ds = xr.tutorial.open_dataset("air_temperature")
+        hvplot_output = ds.isel(time=0).hvplot.points(
+            "lon",
+            "lat",
+            crs=ccrs.PlateCarree(),
+            projection=ccrs.LambertConformal(),
+            rasterize=True,
+            dynamic=False,
+            aggregator="max",
+            project=True,
+        )
+
+        p1 = gv.Points(ds.isel(time=0), kdims=["lon", "lat"], crs=ccrs.PlateCarree())
+        p2 = gv.project(p1, projection=ccrs.LambertConformal())
+        expected = rasterize(p2, dynamic=False, aggregator="max")
+
+        xr.testing.assert_allclose(hvplot_output.data, expected.data)
+
 
 class TestGeoAnnotation(TestCase):
 
@@ -136,27 +179,55 @@ class TestGeoAnnotation(TestCase):
     def test_plot_with_coastline_scale(self):
         plot = self.df.hvplot.points('x', 'y', geo=True, coastline='10m')
         opts = plot.get(1).opts.get('plot')
-        self.assertEqual(opts.kwargs, {'scale': '10m'})
+        assert opts.kwargs["scale"] == '10m'
 
     def test_plot_with_tiles(self):
-        plot = self.df.hvplot.points('x', 'y', geo=True, tiles=True)
+        plot = self.df.hvplot.points('x', 'y', geo=False, tiles=True)
         self.assertEqual(len(plot), 2)
         self.assertIsInstance(plot.get(0), hv.Tiles)
         self.assertIn('openstreetmap', plot.get(0).data)
 
+    def test_plot_with_tiles_with_geo(self):
+        import geoviews as gv
+
+        plot = self.df.hvplot.points('x', 'y', geo=True, tiles=True)
+        self.assertEqual(len(plot), 2)
+        self.assertIsInstance(plot.get(0), gv.element.WMTS)
+        self.assertIn('openstreetmap', plot.get(0).data)
+
     def test_plot_with_specific_tiles(self):
-        plot = self.df.hvplot.points('x', 'y', geo=True, tiles='ESRI')
+        plot = self.df.hvplot.points('x', 'y', geo=False, tiles='ESRI')
         self.assertEqual(len(plot), 2)
         self.assertIsInstance(plot.get(0), hv.Tiles)
+        self.assertIn('ArcGIS', plot.get(0).data)
+
+    def test_plot_with_specific_tiles_geo(self):
+        import geoviews as gv
+        plot = self.df.hvplot.points('x', 'y', geo=True, tiles='ESRI')
+        self.assertEqual(len(plot), 2)
+        self.assertIsInstance(plot.get(0), gv.element.WMTS)
         self.assertIn('ArcGIS', plot.get(0).data)
 
     def test_plot_with_specific_tile_class(self):
-        plot = self.df.hvplot.points('x', 'y', geo=True, tiles=hv.element.tiles.EsriImagery)
+        plot = self.df.hvplot.points('x', 'y', geo=False, tiles=hv.element.tiles.EsriImagery)
         self.assertEqual(len(plot), 2)
         self.assertIsInstance(plot.get(0), hv.Tiles)
         self.assertIn('ArcGIS', plot.get(0).data)
 
+    def test_plot_with_specific_tile_class_with_geo(self):
+        import geoviews as gv
+        plot = self.df.hvplot.points('x', 'y', geo=True, tiles=gv.tile_sources.EsriImagery)
+        self.assertEqual(len(plot), 2)
+        self.assertIsInstance(plot.get(0), gv.element.WMTS)
+        self.assertIn('ArcGIS', plot.get(0).data)
+
     def test_plot_with_specific_tile_obj(self):
+        plot = self.df.hvplot.points('x', 'y', geo=False, tiles=hv.element.tiles.EsriImagery())
+        self.assertEqual(len(plot), 2)
+        self.assertIsInstance(plot.get(0), hv.Tiles)
+        self.assertIn('ArcGIS', plot.get(0).data)
+
+    def test_plot_with_specific_tile_obj_with_geo(self):
         plot = self.df.hvplot.points('x', 'y', geo=True, tiles=hv.element.tiles.EsriImagery())
         self.assertEqual(len(plot), 2)
         self.assertIsInstance(plot.get(0), hv.Tiles)
@@ -168,6 +239,11 @@ class TestGeoAnnotation(TestCase):
         self.assertEqual(len(plot), 2)
         self.assertIsInstance(plot.get(0), gv.element.WMTS)
 
+    def test_plot_with_features_properly_overlaid_underlaid(self):
+        # land should be under, borders should be over
+        plot = self.df.hvplot.points('x', 'y', features=["land", "borders"])
+        assert plot.get(0).group == "Land"
+        assert plot.get(2).group == "Borders"
 
 class TestGeoElements(TestCase):
 
@@ -217,17 +293,28 @@ class TestGeoPandas(TestCase):
             import geopandas as gpd  # noqa
             import geoviews  # noqa
             import cartopy.crs as ccrs # noqa
+            import shapely  # noqa
         except:
-            raise SkipTest('geopandas, geoviews, or cartopy not available')
+            raise SkipTest('geopandas, geoviews, shapely or cartopy not available')
         import hvplot.pandas  # noqa
 
-        geometry = gpd.points_from_xy(
+
+        from shapely.geometry import Polygon
+
+        p_geometry = gpd.points_from_xy(
             x=[12.45339, 12.44177, 9.51667, 6.13000, 158.14997],
             y=[41.90328, 43.93610, 47.13372, 49.61166, 6.91664],
             crs='EPSG:4326'
         )
-        names = ['Vatican City', 'San Marino', 'Vaduz', 'Luxembourg', 'Palikir']
-        self.cities = gpd.GeoDataFrame(dict(name=names), geometry=geometry)
+        p_names = ['Vatican City', 'San Marino', 'Vaduz', 'Luxembourg', 'Palikir']
+        self.cities = gpd.GeoDataFrame(dict(name=p_names), geometry=p_geometry)
+
+        pg_geometry = [
+            Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0))),
+            Polygon(((2, 2), (2, 3), (3, 3), (3, 2), (2, 2))),
+        ]
+        pg_names = ['A', 'B']
+        self.polygons = gpd.GeoDataFrame(dict(name=pg_names), geometry=pg_geometry)
 
     def test_points_hover_cols_is_empty_by_default(self):
         points = self.cities.hvplot()
@@ -249,6 +336,13 @@ class TestGeoPandas(TestCase):
         assert points.kdims == ['x', 'y']
         assert points.vdims == ['index']
 
+    def test_points_hover_cols_positional_arg_sets_color(self):
+        points = self.cities.hvplot('name')
+        assert points.kdims == ['x', 'y']
+        assert points.vdims == ['name']
+        opts = hv.Store.lookup_options('bokeh', points, 'style').kwargs
+        assert opts['color'] == 'name'
+
     def test_points_hover_cols_with_c_set_to_name(self):
         points = self.cities.hvplot(c='name')
         assert points.kdims == ['x', 'y']
@@ -256,8 +350,32 @@ class TestGeoPandas(TestCase):
         opts = hv.Store.lookup_options('bokeh', points, 'style').kwargs
         assert opts['color'] == 'name'
 
-    @expectedFailure
     def test_points_hover_cols_with_by_set_to_name(self):
         points = self.cities.hvplot(by='name')
-        assert points.kdims == ['x', 'y']
-        assert points.vdims == ['name']
+        assert isinstance(points, hv.core.overlay.NdOverlay)
+        assert points.kdims == ['name']
+        assert points.vdims == []
+        for element in points.values():
+            assert element.kdims == ['x', 'y']
+            assert element.vdims == []
+
+    def test_points_project_xlim_and_ylim(self):
+        points = self.cities.hvplot(geo=False, xlim=(-10, 10), ylim=(-20, -10))
+        opts = hv.Store.lookup_options('bokeh', points, 'plot').options
+        np.testing.assert_equal(opts['xlim'], (-10, 10))
+        np.testing.assert_equal(opts['ylim'], (-20, -10))
+
+    def test_points_project_xlim_and_ylim_with_geo(self):
+        points = self.cities.hvplot(geo=True, xlim=(-10, 10), ylim=(-20, -10))
+        opts = hv.Store.lookup_options('bokeh', points, 'plot').options
+        np.testing.assert_allclose(opts['xlim'], (-10, 10))
+        np.testing.assert_allclose(opts['ylim'], (-20, -10))
+
+    def test_polygons_by_subplots(self):
+        polygons = self.polygons.hvplot(geo=True, by="name", subplots=True)
+        assert isinstance(polygons, hv.core.layout.NdLayout)
+
+    def test_polygons_turns_off_hover_when_there_are_no_fields_to_include(self):
+        polygons = self.polygons.hvplot(geo=True)
+        opts = hv.Store.lookup_options('bokeh', polygons, 'plot').kwargs
+        assert 'hover' not in opts.get('tools')

@@ -101,6 +101,20 @@ alt: Works with GeoPandas
 align: center
 ---
 :::
+:::{tab-item} Polars
+```python
+import polars
+import hvplot.polars
+
+df_polars = polars.from_pandas(df)
+df_polars.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
+```
+```{image} ./_static/home/dask.gif
+---
+alt: Works with Polars
+align: center
+---
+:::
 
 :::{tab-item} Intake
 ```python
@@ -296,7 +310,7 @@ align: center
 
 **`.interactive()` to turn data pipelines into widget-based interactive applications**
 
-By starting a data pipeline with [`.interactive()`](https://pyviz-dev.github.io/hvplot/getting_started/interactive.html) you can then inject widgets into an extract and transform data pipeline. The pipeline output dynamically updates with widget changes, making data exploration in Jupyter notebooks in particular a lot more efficient.
+By starting a data pipeline with [`.interactive()`](getting_started/interactive.html) you can then inject widgets into an extract and transform data pipeline. The pipeline output dynamically updates with widget changes, making data exploration in Jupyter notebooks in particular a lot more efficient.
 
 ::::{tab-set}
 

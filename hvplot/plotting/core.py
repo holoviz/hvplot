@@ -57,7 +57,7 @@ class hvPlotBase:
 
         if isinstance(kind, str) and kind not in self.__all__:
             raise NotImplementedError(
-                "kind='{kind}' for data of type {type}".format(kind=kind, type=type(self._data))
+                f"kind='{kind}' for data of type {type(self._data)}"
             )
 
         if panel_available:
@@ -113,10 +113,10 @@ class hvPlotBase:
         if name in plots:
             plot_opts = plots[name]
             if "kind" in plot_opts and name in HoloViewsConverter._kind_mapping:
-                param.main.warning(
+                param.main.param.warning(
                     "Custom options for existing plot types should not "
-                    "declare the 'kind' argument. The .%s plot method "
-                    "was unexpectedly customized with kind=%r." % (plot_opts["kind"], name)
+                    "declare the 'kind' argument. The .{} plot method "
+                    "was unexpectedly customized with kind={!r}.".format(plot_opts["kind"], name)
                 )
                 plot_opts["kind"] = name
             return hvPlotBase(self._data, **dict(self._metadata, **plot_opts))
@@ -303,7 +303,7 @@ class hvPlotTabular(hvPlotBase):
         .. code-block::
 
             markers = df.hvplot.scatter(
-                x="numerical", y=["actual", "forecast"], color=["#f16a6f", "#1e85f7"], size=50
+                x="numerical", y=["actual", "forecast"], color=["steelblue", "teal"], size=50
             )
             line * markers
 
@@ -962,10 +962,8 @@ class hvPlotTabular(hvPlotBase):
 
         A `bar` plot represents categorical data with rectangular bars
         with heights proportional to the values that they represent. The x-axis
-        plots categories and the y axis represents the value scale.
+        represents the categories and the y axis represents the value scale.
         The bars are of equal width which allows for instant comparison of data.
-
-        `bar` can be used on dataframes with regular Index or MultiIndex.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/bar.html
 
@@ -981,13 +979,14 @@ class hvPlotTabular(hvPlotBase):
         color : str or array-like, optional.
             The color for each of the series. Possible values are:
 
+            The name of the field to draw the colors from. The field can contain numerical values or strings
+            representing colors.
+
             A single color string referred to by name, RGB or RGBA code, for instance 'red' or
             '#a98d19'.
 
             A sequence of color strings referred to by name, RGB or RGBA code, which will be used
-            for each series recursively. For instance ['green','yellow'] each field’s line will be
-            filled in green or yellow, alternatively. If there is only a single series to be
-            plotted, then only the first color from the color list will be used.
+            for each series recursively. For instance ['red', 'green','blue'].
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('bar')`.
 
@@ -1244,7 +1243,7 @@ class hvPlotTabular(hvPlotBase):
 
     def hist(self, y=None, by=None, **kwds):
         """
-        A `histogram` displays an approximate representation of the distribution of numerical data.
+        A `histogram` displays an approximate representation of the distribution of continous data.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/hist.html
 
@@ -1252,6 +1251,7 @@ class hvPlotTabular(hvPlotBase):
         ----------
         y : string or sequence
             Field(s) in the *wide* data to compute the distribution(s) from.
+            Please note the fields should contain continuous data. Not categorical.
         by : string or sequence
             Field(s) in the *long* data to group by.
         bins : int, optional
@@ -1294,6 +1294,20 @@ class hvPlotTabular(hvPlotBase):
             df = pd.DataFrame(np.random.randint(1, 7, 6000), columns = ['one'])
             df['two'] = df['one'] + np.random.randint(1, 7, 6000)
             df.hvplot.hist(bins=12, alpha=0.5, color=["lightgreen", "pink"])
+
+        If you want to show the distribution of the values of a categorical column,
+        you can use Pandas' method `value_counts` and `bar` as shown below
+
+        .. code-block::
+
+            import hvplot.pandas
+            import pandas as pd
+
+            data = pd.DataFrame({
+                "library": ["bokeh", "plotly", "matplotlib", "bokeh", "matplotlib", "matplotlib"]
+            })
+
+            data["library"].value_counts().hvplot.bar()
 
         References
         ----------
@@ -1757,7 +1771,9 @@ class hvPlotTabular(hvPlotBase):
         y : string, optional
             The coordinate variable along the y-axis
         text : string, optional
-            The column to draw the text labels from
+            The column to draw the text labels from; it's also possible to
+            provide a template string containing the column names to
+            automatically format the text, e.g. "{col1}, {col2}".
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('labels')`.
 

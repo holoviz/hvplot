@@ -4,10 +4,13 @@ Provides utilities to convert data and projections
 
 import sys
 
+from collections.abc import Hashable
+
 from functools import wraps
 from packaging.version import Version
 from types import FunctionType
 
+import bokeh
 import numpy as np
 import pandas as pd
 import param
@@ -19,7 +22,10 @@ except:
     panel_available = False
 
 hv_version = Version(hv.__version__)
-
+bokeh_version = Version(bokeh.__version__)
+bokeh3 = bokeh_version >= Version("3.0")
+param2 = Version(param.__version__) >= Version("2.0rc4")
+_fugue_ipython = None  # To be set to True in tests to mock ipython
 
 def with_hv_extension(func, extension='bokeh', logo=False):
     """If hv.extension is not loaded, load before calling function"""
@@ -57,14 +63,14 @@ def check_crs(crs):
 
     Returns
     -------
-    A valid crs if possible, otherwise None
+    A valid crs if possible, otherwise None.
     """
     import pyproj
 
     try:
         crs_type = pyproj.crs.CRS
     except AttributeError:
-        class Dummy():
+        class Dummy:
             pass
         crs_type = Dummy
 
@@ -74,8 +80,11 @@ def check_crs(crs):
         out = pyproj.Proj(crs.to_wkt(), preserve_units=True)
     elif isinstance(crs, dict) or isinstance(crs, str):
         if isinstance(crs, str):
-            # quick fix for https://github.com/pyproj4/pyproj/issues/345
-            crs = crs.replace(' ', '').replace('+', ' +')
+            try:
+                crs = pyproj.CRS.from_wkt(crs)
+            except RuntimeError:
+                # quick fix for https://github.com/pyproj4/pyproj/issues/345
+                crs = crs.replace(' ', '').replace('+', ' +')
         try:
             out = pyproj.Proj(crs, preserve_units=True)
         except RuntimeError:
@@ -112,7 +121,6 @@ def proj_to_cartopy(proj):
     a cartopy.crs.Projection object
     """
 
-    import cartopy
     import cartopy.crs as ccrs
     try:
         from osgeo import osr
@@ -120,18 +128,28 @@ def proj_to_cartopy(proj):
     except ImportError:
         has_gdal = False
 
-    proj = check_crs(proj)
-
-    if proj_is_latlong(proj):
-        return ccrs.PlateCarree()
+    input_proj = proj
+    proj = check_crs(input_proj)
+    if proj is None:
+        raise ValueError(f"Invalid proj projection {input_proj!r}")
 
     srs = proj.srs
     if has_gdal:
-        # this is more robust, as srs could be anything (espg, etc.)
-        s1 = osr.SpatialReference()
-        s1.ImportFromProj4(proj.srs)
-        if s1.ExportToProj4():
-            srs = s1.ExportToProj4()
+        import warnings
+        with warnings.catch_warnings():
+            # Avoiding this warning could be done by setting osr.UseExceptions(),
+            # except there might be a risk to break the code of users leveraging
+            # GDAL on their side or through other libraries. So we just silence it.
+            warnings.filterwarnings('ignore', category=FutureWarning, message=
+                r'Neither osr\.UseExceptions\(\) nor osr\.DontUseExceptions\(\) has '
+                r'been explicitly called\. In GDAL 4\.0, exceptions will be enabled '
+                'by default'
+            )
+            # this is more robust, as srs could be anything (espg, etc.)
+            s1 = osr.SpatialReference()
+            s1.ImportFromProj4(proj.srs)
+            if s1.ExportToProj4():
+                srs = s1.ExportToProj4()
 
     km_proj = {'lon_0': 'central_longitude',
                'lat_0': 'central_latitude',
@@ -163,19 +181,23 @@ def proj_to_cartopy(proj):
         except:
             pass
         if k == 'proj':
-            if v == 'tmerc':
+            if v == "longlat":
+                cl = ccrs.PlateCarree
+            elif v == 'tmerc':
                 cl = ccrs.TransverseMercator
                 kw_proj['approx'] = True
-            if v == 'lcc':
+            elif v == 'lcc':
                 cl = ccrs.LambertConformal
-            if v == 'merc':
+            elif v == 'merc':
                 cl = ccrs.Mercator
-            if v == 'utm':
+            elif v == 'utm':
                 cl = ccrs.UTM
-            if v == 'stere':
+            elif v == 'stere':
                 cl = ccrs.Stereographic
-            if v == 'ob_tran':
+            elif v == 'ob_tran':
                 cl = ccrs.RotatedPole
+            else:
+                raise NotImplementedError(f'Unknown projection {v}')
         if k in km_proj:
             if k == 'zone':
                 v = int(v)
@@ -195,7 +217,7 @@ def proj_to_cartopy(proj):
     if cl.__name__ == 'Mercator':
         kw_proj.pop('false_easting', None)
         kw_proj.pop('false_northing', None)
-        if Version(cartopy.__version__) < Version('0.15'):
+        if "scale_factor" in kw_proj:
             kw_proj.pop('latitude_true_scale', None)
     elif cl.__name__ == 'Stereographic':
         kw_proj.pop('scale_factor', None)
@@ -224,33 +246,49 @@ def process_crs(crs):
       1. EPSG codes:   Defined as string of the form "EPSG: {code}" or an integer
       2. proj.4 string: Defined as string of the form "{proj.4 string}"
       3. cartopy.crs.CRS instance
-      4. None defaults to crs.PlateCaree
+      3. pyproj.Proj or pyproj.CRS instance
+      4. WKT string:    Defined as string of the form "{WKT string}"
+      5. None defaults to crs.PlateCaree
     """
+    missing = []
     try:
         import cartopy.crs as ccrs
+    except ImportError:
+        missing.append('cartopy')
+    try:
         import geoviews as gv # noqa
+    except ImportError:
+        missing.append('geoviews')
+    try:
         import pyproj
     except ImportError:
-        raise ImportError('Geographic projection support requires GeoViews, pyproj and cartopy.')
+        missing.append('pyproj')
+    if missing:
+        raise ImportError(f'Geographic projection support requires: {", ".join(missing)}.')
 
     if crs is None:
         return ccrs.PlateCarree()
+    elif isinstance(crs, ccrs.CRS):
+        return crs
+    elif isinstance(crs, pyproj.CRS):
+        crs = crs.to_wkt()
 
-    if isinstance(crs, str) and crs.lower().startswith('epsg'):
+    errors = []
+    if isinstance(crs, (str, int)):  # epsg codes
         try:
-            crs = ccrs.epsg(crs[5:].lstrip().rstrip())
-        except:
-            raise ValueError("Could not parse EPSG code as CRS, must be of the format 'EPSG: {code}.'")
-    elif isinstance(crs, int):
-        crs = ccrs.epsg(crs)
-    elif isinstance(crs, (str, pyproj.Proj)):
+            crs = pyproj.CRS.from_epsg(crs).to_wkt()
+        except Exception as e:
+            errors.append(e)
+    if isinstance(crs, (str, pyproj.Proj)):  # proj4/wkt strings
         try:
-            crs = proj_to_cartopy(crs)
-        except:
-            raise ValueError("Could not parse EPSG code as CRS, must be of the format 'proj4: {proj4 string}.'")
-    elif not isinstance(crs, ccrs.CRS):
-        raise ValueError("Projection must be defined as a EPSG code, proj4 string, cartopy CRS or pyproj.Proj.")
-    return crs
+            return proj_to_cartopy(crs)
+        except Exception as e:
+            errors.append(e)
+
+    raise ValueError(
+        "Projection must be defined as a EPSG code, proj4 string, "
+        "WKT string, cartopy CRS, pyproj.Proj, or pyproj.CRS."
+    ) from Exception(*errors)
 
 
 def is_list_like(obj):
@@ -311,7 +349,7 @@ def is_dask(data):
     return isinstance(data, (dd.DataFrame, dd.Series))
 
 def is_intake(data):
-    if not check_library(data, 'intake'):
+    if "intake" not in sys.modules:
         return False
     from intake.source.base import DataSource
     return isinstance(data, DataSource)
@@ -541,3 +579,22 @@ def _flatten(line):
             yield from _flatten(element)
         else:
             yield element
+
+
+def _convert_col_names_to_str(data):
+    """
+    Convert column names to string.
+    """
+    # There's no generic way to rename columns across tabular object types.
+    # `columns` could refer to anything else on the object, e.g. a dim
+    # on an xarray DataArray. So this may need to be stricter.
+    if not hasattr(data, 'columns') or not hasattr(data, 'rename'):
+        return data
+    renamed = {
+        c: str(c)
+        for c in data.columns
+        if not isinstance(c, str) and isinstance(c, Hashable)
+    }
+    if renamed:
+        data = data.rename(columns=renamed)
+    return data

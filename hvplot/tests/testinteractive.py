@@ -14,6 +14,10 @@ from holoviews.util.transform import dim
 from hvplot import bind
 from hvplot.interactive import Interactive
 from hvplot.xarray import XArrayInteractive
+from hvplot.util import bokeh3, param2
+
+is_bokeh2 = pytest.mark.skipif(bokeh3, reason="requires bokeh 2.x")
+is_bokeh3 = pytest.mark.skipif(not bokeh3, reason="requires bokeh 3.x")
 
 
 @pytest.fixture(scope='module')
@@ -665,7 +669,7 @@ def test_interactive_pandas_frame_bind_out_widgets(df):
 
 
 def test_interactive_pandas_frame_bind_operator_out_widgets(df):
-    select = pn.widgets.Select(default='A', options=list(df.columns))
+    select = pn.widgets.Select(value='A', options=list(df.columns))
 
     def sel_col(col):
         return df[col]
@@ -683,6 +687,17 @@ def test_interactive_pandas_frame_bind_operator_out_widgets(df):
     assert widgets[1] is w
 
 
+def test_interactive_reevaluate_uses_cached_value(series):
+    w = pn.widgets.FloatSlider(value=2., start=1., end=5.)
+    si = Interactive(series)
+    si = si + w
+
+    w.value = 3.
+    assert repr(si._transform) == "dim('*').pd+FloatSlider(end=5.0, start=1.0, value=3.0)"
+
+    assert si._callback().object is si._callback().object
+
+
 def test_interactive_pandas_series_operator_widget_update(series):
     w = pn.widgets.FloatSlider(value=2., start=1., end=5.)
     si = Interactive(series)
@@ -692,6 +707,7 @@ def test_interactive_pandas_series_operator_widget_update(series):
     assert repr(si._transform) == "dim('*').pd+FloatSlider(end=5.0, start=1.0, value=3.0)"
 
     out = si._callback()
+    assert out.object is si.eval()
     assert isinstance(out, pn.pane.DataFrame)
     pd.testing.assert_series_equal(out.object.A, series + 3.)
 
@@ -705,6 +721,7 @@ def test_interactive_pandas_series_method_widget_update(series):
     assert repr(si._transform) =="dim('*').pd.head(IntSlider(end=5, start=1, value=3))"
 
     out = si._callback()
+    assert out.object is si.eval()
     assert isinstance(out, pn.pane.DataFrame)
     pd.testing.assert_series_equal(out.object.A, series.head(3))
 
@@ -721,6 +738,7 @@ def test_interactive_pandas_series_operator_and_method_widget_update(series):
     assert repr(si._transform) == "(dim('*').pd+FloatSlider(end=5.0, start=1.0, value=3.0)).head(IntSlider(end=5, start=1, value=3))"
 
     out = si._callback()
+    assert out.object is si.eval()
     assert isinstance(out, pn.pane.DataFrame)
     pd.testing.assert_series_equal(out.object.A, (series + 3.).head(3))
 
@@ -1233,6 +1251,7 @@ def test_interactive_pandas_layout_default_no_widgets_kwargs(df):
     assert layout.width == 200
 
 
+@is_bokeh2
 def test_interactive_pandas_layout_default_with_widgets(df):
     w = pn.widgets.IntSlider(value=2, start=1, end=5)
     dfi = Interactive(df)
@@ -1256,6 +1275,27 @@ def test_interactive_pandas_layout_default_with_widgets(df):
     assert isinstance(layout[0][0][1], pn.layout.HSpacer)
 
 
+@is_bokeh3
+def test_interactive_pandas_layout_default_with_widgets_bk3(df):
+    w = pn.widgets.IntSlider(value=2, start=1, end=5)
+    dfi = Interactive(df)
+    dfi = dfi.head(w)
+
+    assert dfi._center is False
+    assert dfi._loc == 'top_left'
+
+    layout = dfi.layout()
+
+    assert isinstance(layout, pn.Row)
+    assert len(layout) == 1
+    assert isinstance(layout[0], pn.Column)
+    assert len(layout[0]) == 2
+    assert isinstance(layout[0][0], pn.Column)
+    assert isinstance(layout[0][1], pn.pane.PaneBase)
+    assert len(layout[0][0]) == 1
+    assert isinstance(layout[0][0][0], pn.widgets.IntSlider)
+
+@is_bokeh2
 def test_interactive_pandas_layout_center_with_widgets(df):
     w = pn.widgets.IntSlider(value=2, start=1, end=5)
     dfi = df.interactive(center=True)
@@ -1284,6 +1324,7 @@ def test_interactive_pandas_layout_center_with_widgets(df):
     assert isinstance(layout[1][1][2], pn.layout.HSpacer)
 
 
+@is_bokeh2
 def test_interactive_pandas_layout_loc_with_widgets(df):
     w = pn.widgets.IntSlider(value=2, start=1, end=5)
     dfi = df.interactive(loc='top_right')
@@ -1341,7 +1382,10 @@ def test_interactive_pandas_series_widget_value(series):
     assert isinstance(si._current, pd.DataFrame)
     pd.testing.assert_series_equal(si._current.A, series + w.value)
     assert si._obj is series
-    assert "dim('*').pd+<param.Number object" in repr(si._transform)
+    if param2:
+        assert "dim('*').pd+<param.parameters.Number object" in repr(si._transform)
+    else:
+        assert "dim('*').pd+<param.Number object" in repr(si._transform)
     assert si._depth == 2
     assert si._method is None
 
@@ -1367,3 +1411,18 @@ def test_clones_dont_reexecute_transforms():
     df.interactive.pipe(piped, msg="1").pipe(piped, msg="2")
 
     assert len(msgs) == 3
+
+
+def test_interactive_accept_non_str_columnar_data():
+    df = pd.DataFrame(np.random.random((10, 2)))
+    assert all(not isinstance(col, str) for col in df.columns)
+    dfi = Interactive(df)
+
+    w = pn.widgets.FloatSlider(start=0, end=1, step=0.05)
+
+    # Column names converted as string so can no longer use dfi[1]
+    dfi = dfi['1'] + w.param.value
+
+    w.value = 0.5
+
+    pytest.approx(dfi.eval().sum(), (df[1] + 0.5).sum())

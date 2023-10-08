@@ -1,3 +1,4 @@
+"""Adds the `.hvplot` method to pd.DataFrame and pd.Series"""
 from .interactive  import Interactive
 
 def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=False):

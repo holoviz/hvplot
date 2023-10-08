@@ -8,7 +8,7 @@ from packaging.version import Version
 
 from ..backend_transforms import _transfer_opts_cur_backend
 from ..converter import HoloViewsConverter
-from ..util import with_hv_extension
+from ..util import with_hv_extension, _convert_col_names_to_str
 
 
 @with_hv_extension
@@ -79,14 +79,12 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
         :func:`pandas.plotting.scatter_matrix` : Equivalent pandas function.
     """
 
-    data = _hv.Dataset(data)
+    data = _hv.Dataset(_convert_col_names_to_str(data))
     supported = list(HoloViewsConverter._kind_mapping)
     if diagonal not in supported:
-        raise ValueError('diagonal type must be one of: %s, found %s' %
-                         (supported, diagonal))
+        raise ValueError(f'diagonal type must be one of: {supported}, found {diagonal}')
     if chart not in supported:
-        raise ValueError('Chart type must be one of: %s, found %s' %
-                         (supported, chart))
+        raise ValueError(f'Chart type must be one of: {supported}, found {chart}')
     diagonal = HoloViewsConverter._kind_mapping[diagonal]
     chart = HoloViewsConverter._kind_mapping[chart]
 
