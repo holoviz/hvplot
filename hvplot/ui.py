@@ -663,17 +663,25 @@ class hvPlotExplorer(Viewer):
             Data variable name by which the returned string will start.
         """
         settings = self.settings()
-        args = ''
+        settings_args = ''
         if settings:
-            for k, v in settings.items():
-                args += f'    {k}={v!r},\n'
-            args = args[:-2]
-        snippet = f'{var_name or self._var_name}.hvplot(\n{args}\n)'
+            settings_args = self._build_kwargs_string(settings)
+        snippet = f'{var_name or self._var_name}.hvplot(\n{settings_args}\n)'
+
         opts = self.options.opts
         if opts:
             opts_args = self._build_kwargs_string(opts)
             snippet += f'.opts(\n{opts_args}\n)'
+
         return snippet
+
+    def _build_kwargs_string(self, kwargs):
+        args = ''
+        if kwargs:
+            for k, v in kwargs.items():
+                args += f'    {k}={v!r},\n'
+            args = args[:-2]
+        return args
 
     def save(self, filename, **kwargs):
         """Save the plot to file.
@@ -711,6 +719,7 @@ class hvPlotExplorer(Viewer):
         if 'y_multi' in settings:
             settings['y'] = settings.pop('y_multi')
         settings = {k: v for k, v in sorted(list(settings.items()))}
+        settings.pop("opts", None)
         return settings
 
     def opts(self):
