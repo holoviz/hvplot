@@ -983,7 +983,7 @@ class HoloViewsConverter:
                     param.main.param.warning('Unable to auto label using xarray attrs '
                                        f'because {e}')
 
-    def _process_plot(self, kwds):
+    def _process_plot(self):
         kind = self.kind
         options = Store.options(backend='bokeh')
         elname = self._kind_mapping[kind].__name__
