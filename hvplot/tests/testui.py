@@ -337,3 +337,35 @@ def test_explorer_refresh_plot_linked():
     explorer.axes.refresh_plot = True
     for control in controls:
         assert explorer.refresh_plot == getattr(explorer, control).refresh_plot
+
+def test_explorer_code_opts():
+    ds = xr.tutorial.open_dataset("air_temperature")["air"]
+    explorer = hvplot.explorer(ds, x="lon", y="lat", kind="image", opts={"color_levels": 3})
+    explorer._code()
+    code = explorer.code
+    assert code == dedent("""\
+        da.hvplot(
+            colorbar=True,
+            groupby=['time'],
+            kind='image',
+            x='lon',
+            y='lat'
+        ).opts(
+            color_levels=3
+        )""")
+
+    assert explorer._code_pane.object == dedent("""\
+        ```python
+        import hvplot.xarray
+
+        da.hvplot(
+            colorbar=True,
+            groupby=['time'],
+            kind='image',
+            x='lon',
+            y='lat'
+        ).opts(
+            color_levels=3
+        )
+        ```"""
+    )

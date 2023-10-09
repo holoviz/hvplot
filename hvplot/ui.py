@@ -668,7 +668,12 @@ class hvPlotExplorer(Viewer):
             for k, v in settings.items():
                 args += f'    {k}={v!r},\n'
             args = args[:-2]
-        return f'{var_name or self._var_name}.hvplot(\n{args}\n)'
+        snippet = f'{var_name or self._var_name}.hvplot(\n{args}\n)'
+        opts = self.options.opts
+        if opts:
+            opts_args = self._build_kwargs_string(opts)
+            snippet += f'.opts(\n{opts_args}\n)'
+        return snippet
 
     def save(self, filename, **kwargs):
         """Save the plot to file.
