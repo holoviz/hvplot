@@ -348,6 +348,7 @@ class hvPlotExplorer(Viewer):
 
     @classmethod
     def from_data(cls, data, **params):
+        print(data)
         if is_geodataframe(data):
             # cls = hvGeomExplorer
             raise TypeError('GeoDataFrame objects not yet supported.')

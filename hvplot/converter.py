@@ -79,7 +79,6 @@ class StreamingCallable(Callable):
             raise Exception('PeriodicCallback not running.')
 
 
-
 class HoloViewsConverter:
     """
     Generic options
@@ -393,6 +392,10 @@ class HoloViewsConverter:
         cnorm=None, features=None, rescale_discrete_levels=None,
         autorange=None, **kwds
     ):
+        # prevent circular import
+        from hvplot.ui import explorer
+        self._kind_mapping['explorer'] = explorer
+
         # Process data and related options
         self._redim = fields
         self.use_index = use_index
@@ -1260,7 +1263,11 @@ class HoloViewsConverter:
                     except Exception:
                         dataset = Dataset(data)
                     dataset = dataset.redim(**self._redim)
-                obj = method(x, y)
+
+                if kind == "explorer":
+                    obj = method(x=x, y=y, data=data)
+                else:
+                    obj = method(x, y)
                 obj._dataset = dataset
 
         if self.crs and self.project:
@@ -1535,7 +1542,7 @@ class HoloViewsConverter:
     #     Explorer           #
     ##########################
 
-    def explorer(self, data, x=None, y=None):
+    def explorer(self, x=None, y=None, data=None):
         # import here to prevent circular imports
         from .ui import explorer as ui_explorer
         return ui_explorer(data, x=x, y=y)
