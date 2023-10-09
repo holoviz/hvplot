@@ -982,8 +982,11 @@ class HoloViewsConverter:
                     param.main.param.warning('Unable to auto label using xarray attrs '
                                        f'because {e}')
 
+    def _replace_explorer_kind(self, kind):
+        return kind if kind != "explorer" else 'line'
+
     def _process_plot(self):
-        kind = self.kind if self.kind != "explorer" else 'line'
+        kind = self._replace_explorer_kind(self.kind)
         options = Store.options(backend='bokeh')
         elname = self._kind_mapping[kind].__name__
         plot_opts = options[elname].groups['plot'].options if elname in options else {}
@@ -999,7 +1002,7 @@ class HoloViewsConverter:
         return plot_opts
 
     def _process_style(self, kwds, plot_opts):
-        kind = self.kind if self.kind != "explorer" else 'line'
+        kind = self._replace_explorer_kind(self.kind)
         eltype = self._kind_mapping[kind]
         registry =  Store.registry[self._backend_compat]
 
@@ -1109,7 +1112,7 @@ class HoloViewsConverter:
         return style_opts, plot_opts, kwds
 
     def _validate_kwds(self, kwds):
-        kind = self.kind if self.kind != "explorer" else 'line'
+        kind = self._replace_explorer_kind(self.kind)
         kind_opts = self._kind_options.get(self.kind, [])
         eltype = self._kind_mapping[kind]
         if eltype in Store.registry[self._backend_compat]:

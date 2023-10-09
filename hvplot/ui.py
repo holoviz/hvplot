@@ -348,7 +348,6 @@ class hvPlotExplorer(Viewer):
 
     @classmethod
     def from_data(cls, data, **params):
-        print(data)
         if is_geodataframe(data):
             # cls = hvGeomExplorer
             raise TypeError('GeoDataFrame objects not yet supported.')
@@ -700,6 +699,7 @@ class hvDataFrameExplorer(hvPlotExplorer):
                 values = self._data[self._x]
             except:
                 return 0, 1
+        # for dask series; else it cannot get length
         if hasattr(values, "compute_chunk_sizes"):
             values = values.compute_chunk_sizes()
         if values.dtype.kind in 'OSU':
