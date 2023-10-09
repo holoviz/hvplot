@@ -203,7 +203,7 @@ class HoloViewsConverter:
     downsample (default=False):
         Whether to apply LTTB (Largest Triangle Three Buckets)
         downsampling to the element (note this is only well behaved for
-        timeseries data).
+        timeseries data). Requires HoloViews >= 1.16.
     dynspread (default=False):
         For plots generated with datashade=True or rasterize=True,
         automatically increase the point size when the data is sparse
@@ -407,6 +407,7 @@ class HoloViewsConverter:
         self.dynamic = dynamic
         self.geo = any([geo, crs, global_extent, projection, project, coastline, features])
         self.crs = self._process_crs(data, crs) if self.geo else None
+        self.output_projection = self.crs
         self.project = project
         self.coastline = coastline
         self.features = features
@@ -446,20 +447,19 @@ class HoloViewsConverter:
                         "Projection must be defined as cartopy CRS or "
                         f"one of the following CRS string:\n {all_crs}")
 
-            projection = projection or (ccrs.GOOGLE_MERCATOR if tiles else self.crs)
-            if tiles and projection != ccrs.GOOGLE_MERCATOR:
+            self.output_projection = projection or (ccrs.GOOGLE_MERCATOR if tiles else self.crs)
+            if tiles and self.output_projection != ccrs.GOOGLE_MERCATOR:
                 raise ValueError(
                     "Tiles can only be used with output projection of "
                     "`cartopy.crs.GOOGLE_MERCATOR`. To get rid of this error "
                     "remove `projection=` or `tiles=`"
                 )
-
-            if self.crs != projection:
+            if self.crs != projection and (xlim or ylim):
                 px0, py0, px1, py1 = ccrs.GOOGLE_MERCATOR.boundary.bounds
                 x0, x1 = xlim or (px0, px1)
                 y0, y1 = ylim or (py0, py1)
                 extents = (x0, y0, x1, y1)
-                x0, y0, x1, y1 = project_extents(extents, self.crs, projection)
+                x0, y0, x1, y1 = project_extents(extents, self.crs, self.output_projection)
                 if xlim:
                     xlim = (x0, x1)
                 if ylim:
@@ -586,7 +586,7 @@ class HoloViewsConverter:
         if self.crs and global_extent:
             plot_opts['global_extent'] = global_extent
         if projection:
-            plot_opts['projection'] = process_crs(projection)
+            plot_opts['projection'] = self.output_projection
         title = title if title is not None else getattr(self, '_title', None)
         if title is not None:
             plot_opts['title'] = title
@@ -1265,10 +1265,8 @@ class HoloViewsConverter:
 
         if self.crs and self.project:
             # Apply projection before rasterizing
-            import cartopy.crs as ccrs
-            from geoviews import project
-            projection = self._plot_opts.get('projection', ccrs.GOOGLE_MERCATOR)
-            obj = project(obj, projection=projection)
+            import geoviews as gv
+            obj = gv.project(obj, projection=self.output_projection)
 
         if not (self.datashade or self.rasterize or self.downsample):
             layers = self._apply_layers(obj)
@@ -1282,7 +1280,10 @@ class HoloViewsConverter:
             opts['height'] = self._plot_opts['height']
 
         if self.downsample:
-            from holoviews.operation.downsample import downsample1d
+            try:
+                from holoviews.operation.downsample import downsample1d
+            except ImportError:
+                raise ImportError('Downsampling requires HoloViews >=1.16')
 
             if self.x_sampling:
                 opts['x_sampling'] = self.x_sampling
@@ -1389,7 +1390,7 @@ class HoloViewsConverter:
                 param.main.param.warning(
                     "coastline scale of %s not recognized, must be one "
                     "'10m', '50m' or '110m'." % self.coastline)
-            obj = obj * coastline
+            obj = obj * coastline.opts(projection=self.output_projection)
 
         if self.features:
             import geoviews as gv
@@ -1411,31 +1412,45 @@ class HoloViewsConverter:
                     else:
                         feature_obj = feature_obj.opts(scale=scale)
                 if feature_obj.group in ["Land", "Ocean"]:
-                    obj = feature_obj * obj  # Underlay land/ocean
+                    # Underlay land/ocean
+                    obj = feature_obj.opts(projection=self.output_projection) * obj
                 else:
-                    obj = obj * feature_obj  # overlay everything else
+                    # overlay everything else
+                    obj = obj * feature_obj.opts(projection=self.output_projection)
 
-        if self.tiles:
-            tile_source = 'EsriImagery' if self.tiles == 'ESRI' else self.tiles
-            warning = ("{} tiles not recognized, must be one of: {} or a tile object".format(tile_source, sorted(hv.element.tile_sources)))
-            if tile_source is True:
-                tiles = hv.element.tiles.OSM()
-            elif tile_source in hv.element.tile_sources.keys():
-                tiles = hv.element.tile_sources[tile_source]()
-            elif tile_source in hv.element.tile_sources.values():
-                tiles = tile_source()
-            elif isinstance(tile_source, hv.element.tiles.Tiles):
-                tiles = tile_source
-            elif self.geo:
-                from geoviews.element import WMTS
-                if isinstance(tile_source, WMTS):
-                    tiles = tile_source
-                else:
-                    param.main.param.warning(warning)
-            else:
-                param.main.param.warning(warning)
+        if self.tiles and not self.geo:
+            tiles = self._get_tiles(
+                self.tiles,
+                hv.element.tile_sources,
+                hv.element.tiles.Tiles
+            )
+            obj = tiles * obj
+        elif self.tiles and self.geo:
+            import geoviews as gv
+            tiles = self._get_tiles(
+                self.tiles,
+                gv.tile_sources.tile_sources,
+                (gv.element.WMTS, hv.element.tiles.Tiles),
+            )
             obj = tiles * obj
         return obj
+
+    def _get_tiles(self, source, sources, types):
+        tile_source = 'EsriImagery' if self.tiles == 'ESRI' else self.tiles
+        if tile_source is True:
+            tiles = sources["OSM"]()
+        elif tile_source in sources:
+            tiles = sources[tile_source]()
+        elif tile_source in sources.values():
+            tiles = tile_source()
+        elif isinstance(tile_source, types):
+            tiles = tile_source
+        else:
+            msg = (
+                f"{tile_source} tiles not recognized, must be one of: {sorted(sources)} or a tile object"
+            )
+            raise ValueError(msg)
+        return tiles
 
     def _merge_redim(self, ranges, attr='range'):
         redim = dict(self._redim)
@@ -1913,7 +1928,7 @@ class HoloViewsConverter:
         else:
             ranges = {self.value_label: xlim}
             data = data[y]
-            df = pd.melt(data, var_name=self.group_label, value_name=self.value_label)
+            df = data.melt(var_name=self.group_label, value_name=self.value_label)
             ds = Dataset(df)
             if len(df):
                 dists = ds.to(Distribution, self.value_label)
@@ -2071,7 +2086,14 @@ class HoloViewsConverter:
         self.use_index = False
         data, x, y = self._process_chart_args(data, x, y, single_y=True)
 
-        text = self.kwds.get('text', [c for c in data.columns if c not in (x, y)][0])
+        text = self.kwds.get('text')
+        if not text:
+            text = [c for c in data.columns if c not in (x, y)][0]
+        elif text not in data.columns:
+            template_str = text  # needed for dask lazy compute
+            data["label"] = data.apply(lambda row: template_str.format(**row), axis=1)
+            text = "label"
+
         kdims, vdims = self._get_dimensions([x, y], [text])
         cur_opts, compat_opts = self._get_compat_opts('Labels')
         element = self._get_element('labels')

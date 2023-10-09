@@ -101,6 +101,20 @@ alt: Works with GeoPandas
 align: center
 ---
 :::
+:::{tab-item} Polars
+```python
+import polars
+import hvplot.polars
+
+df_polars = polars.from_pandas(df)
+df_polars.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
+```
+```{image} ./_static/home/dask.gif
+---
+alt: Works with Polars
+align: center
+---
+:::
 
 :::{tab-item} Intake
 ```python
