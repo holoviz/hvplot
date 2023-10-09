@@ -392,10 +392,6 @@ class HoloViewsConverter:
         cnorm=None, features=None, rescale_discrete_levels=None,
         autorange=None, **kwds
     ):
-        # prevent circular import
-        from hvplot.ui import explorer
-        self._kind_mapping['explorer'] = explorer
-
         # Process data and related options
         self._redim = fields
         self.use_index = use_index
@@ -987,7 +983,7 @@ class HoloViewsConverter:
                                        f'because {e}')
 
     def _process_plot(self):
-        kind = self.kind
+        kind = self.kind if self.kind != "explorer" else 'line'
         options = Store.options(backend='bokeh')
         elname = self._kind_mapping[kind].__name__
         plot_opts = options[elname].groups['plot'].options if elname in options else {}
@@ -1003,7 +999,7 @@ class HoloViewsConverter:
         return plot_opts
 
     def _process_style(self, kwds, plot_opts):
-        kind = self.kind
+        kind = self.kind if self.kind != "explorer" else 'line'
         eltype = self._kind_mapping[kind]
         registry =  Store.registry[self._backend_compat]
 
@@ -1113,8 +1109,8 @@ class HoloViewsConverter:
         return style_opts, plot_opts, kwds
 
     def _validate_kwds(self, kwds):
+        kind = self.kind if self.kind != "explorer" else 'line'
         kind_opts = self._kind_options.get(self.kind, [])
-        kind = self.kind
         eltype = self._kind_mapping[kind]
         if eltype in Store.registry[self._backend_compat]:
             valid_opts = Store.registry[self._backend_compat][eltype].style_opts
