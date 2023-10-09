@@ -1300,6 +1300,7 @@ class HoloViewsConverter:
                 opts['x_range'] = self._plot_opts['xlim']
             layers = downsample1d(obj, **opts)
             layers = _transfer_opts_cur_backend(layers)
+            processed = self._resample_obj(downsample1d, obj, opts)
             return layers
 
         try:
@@ -1362,7 +1363,7 @@ class HoloViewsConverter:
                 opts['cnorm'] = self._plot_opts['cnorm']
             if 'rescale_discrete_levels' in self._plot_opts:
                 opts['rescale_discrete_levels'] = self._plot_opts['rescale_discrete_levels']
-        else:
+        elif self.rasterize:
             operation = rasterize
             if Version(hv.__version__) < Version('1.18.0a1'):
                 eltype = 'Image'

@@ -208,12 +208,12 @@ class TestDatashader(ComparisonTestCase):
         assert isinstance(plot, ImageStack)
         assert plot.opts["cmap"] == cc.palette['glasbey_category10']
 
-    @parameterized.expand([('rasterize',), ('datashade',)])
-    def test_apply_when(self, operation):
+    @parameterized.expand([('rasterize',), ('datashade',), ('downsample',)])
+    def test_resample_when(self, operation):
         df = pd.DataFrame(
             np.random.multivariate_normal((0, 0), [[0.1, 0.1], [0.1, 1.0]], (5000,))
         )
-        dmap = df.hvplot.scatter("0", "1", apply_when=1000)
+        dmap = df.hvplot.scatter("0", "1", resample_when=1000, **{operation: True})
         assert isinstance(dmap, DynamicMap)
 
         render(dmap)  # trigger dynamicmap
