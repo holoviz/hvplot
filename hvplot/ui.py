@@ -362,9 +362,17 @@ class Operations(Controls):
         self.param.aggregator.constant = not enabled
 
 
-class Options(Controls):
+class Advanced(Controls):
 
-    opts = param.Dict(default={})
+    opts = param.Dict(
+        default={}, doc="""
+        Additional styling options to include.
+        Examples:
+        - Image: {"color_levels": 11}
+        - Line: {"line_style": "dashed"}
+        - Scatter: {'size': 5, 'marker': '^'}
+        """
+    )
 
 
 class hvPlotExplorer(Viewer):
@@ -400,7 +408,7 @@ class hvPlotExplorer(Viewer):
 
     style = param.ClassSelector(class_=Style)
 
-    options = param.ClassSelector(class_=Options)
+    advanced = param.ClassSelector(class_=Advanced)
 
     code = param.String(precedence=-1, doc="""
         Code to generate the plot.""")
@@ -532,7 +540,7 @@ class hvPlotExplorer(Viewer):
             if isinstance(v, Geographic) and not v.geo:
                 continue
 
-            if isinstance(v, Options):
+            if isinstance(v, Advanced):
                 opts_kwargs = v.kwargs.get("opts", {})
             elif isinstance(v, Controls):
                 kwargs.update(v.kwargs)
@@ -626,7 +634,7 @@ class hvPlotExplorer(Viewer):
                 ('Style', self.style),
                 ('Operations', self.operations),
                 ('Geographic', self.geographic),
-                ('Options', self.options),
+                ('Advanced', self.advanced),
             ]
             if event and event.new not in ('area', 'kde', 'line', 'ohlc', 'rgb', 'step'):
                 tabs.insert(5, ('Colormapping', self.colormapping))
@@ -668,7 +676,7 @@ class hvPlotExplorer(Viewer):
             settings_args = self._build_kwargs_string(settings)
         snippet = f'{var_name or self._var_name}.hvplot(\n{settings_args}\n)'
 
-        opts = self.options.opts
+        opts = self.advanced.opts
         if opts:
             opts_args = self._build_kwargs_string(opts)
             snippet += f'.opts(\n{opts_args}\n)'
@@ -724,7 +732,7 @@ class hvPlotExplorer(Viewer):
 
     def opts(self):
         """Return a dictionary of the added opts."""
-        return self.options.opts
+        return self.advanced.opts
 
 
 class hvGeomExplorer(hvPlotExplorer):
