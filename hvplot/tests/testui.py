@@ -58,15 +58,27 @@ def test_explorer_plot_code():
     hvplot_code = explorer.plot_code()
 
     assert (
-        hvplot_code
-        == "df.hvplot(by=['species'], kind='scatter', x='bill_length_mm', y=['bill_depth_mm'])"
+        hvplot_code == (
+            "df.hvplot(\n"
+            "    by=['species'],\n"
+            "    kind='scatter',\n"
+            "    x='bill_length_mm',\n"
+            "    y=['bill_depth_mm']\n"
+            ")"
+        )
     )
 
     hvplot_code = explorer.plot_code(var_name="othername")
 
     assert (
-        hvplot_code
-        == "othername.hvplot(by=['species'], kind='scatter', x='bill_length_mm', y=['bill_depth_mm'])"
+        hvplot_code == (
+            "othername.hvplot(\n"
+            "    by=['species'],\n"
+            "    kind='scatter',\n"
+            "    x='bill_length_mm',\n"
+            "    y=['bill_depth_mm']\n"
+            ")"
+        )
     )
 
 
@@ -195,9 +207,7 @@ def test_explorer_hvplot_opts():
 
 def test_explorer_code_dataframe():
     explorer = hvplot.explorer(df, x="bill_length_mm", kind="points")
-    explorer._code()
-    code = explorer.code
-    assert code == dedent("""\
+    assert explorer.code == dedent("""\
         df.hvplot(
             kind='points',
             x='bill_length_mm',
@@ -220,7 +230,6 @@ def test_explorer_code_dataframe():
 def test_explorer_code_gridded():
     ds = xr.tutorial.open_dataset("air_temperature")
     explorer = hvplot.explorer(ds, x="lon", y="lat", kind="image")
-    explorer._code()
     code = explorer.code
     assert code == dedent("""\
         ds['air'].hvplot(
@@ -249,7 +258,6 @@ def test_explorer_code_gridded():
 def test_explorer_code_gridded_dataarray():
     ds = xr.tutorial.open_dataset("air_temperature")["air"]
     explorer = hvplot.explorer(ds, x="lon", y="lat", kind="image")
-    explorer._code()
     code = explorer.code
     assert code == dedent("""\
         da.hvplot(
