@@ -114,7 +114,7 @@ class Controls(Viewer):
                 if k not in ('name', 'explorer') and v is not None and v != ''}
 
     @param.depends("explorer.refresh_plot", watch=True)
-    def _update_refresh_plot(self):
+    def _link_refresh_plot(self):
         self.refresh_plot = self.explorer.refresh_plot
 
 
@@ -429,7 +429,6 @@ class hvPlotExplorer(Viewer):
         super().__init__(**params)
         self._data = df
         self._converter = converter
-        self._var_name_suffix = ""
         groups = {group: KINDS[group] for group in self._groups}
         self._controls = pn.Param(
             self.param, parameters=['refresh_plot', 'kind', 'x', 'y', 'groupby', 'by'],
@@ -440,7 +439,7 @@ class hvPlotExplorer(Viewer):
         self.param.watch(self._check_y, 'y_multi')
         self.param.watch(self._check_by, 'by')
         self._populate()
-        self._tabs = pn.Tabs(
+        self._control_tabs = pn.Tabs(
             tabs_location='left', width=425
         )
         controls = [
@@ -467,12 +466,12 @@ class hvPlotExplorer(Viewer):
         self.param.update(**self._controllers)
         params_to_watch = list(self.param)
         params_to_watch.remove("code")
-        self.param.watch(self._plot, params_to_watch)
+        self.param.watch(self._refresh, params_to_watch)
         for controller in self._controllers.values():
+            controller.param.watch(self._link_refresh_plot, "refresh_plot")
             params_to_watch = list(controller.param)
             params_to_watch.remove("refresh_plot")
-            controller.param.watch(self._plot, params_to_watch)
-            controller.param.watch(self._update_refresh_plot, "refresh_plot")
+            controller.param.watch(self._refresh, params_to_watch)
         self._alert = pn.pane.Alert(
             alert_type='danger', visible=False, sizing_mode='stretch_width'
         )
@@ -481,6 +480,7 @@ class hvPlotExplorer(Viewer):
         self._layout = pn.Column(
             self._alert,
             pn.Row(
+                self._control_tabs,
                 pn.Tabs(("Plot", self._hv_pane), ("Code", self._code_pane)),
                 sizing_mode="stretch_width",
             ),
@@ -560,14 +560,11 @@ class hvPlotExplorer(Viewer):
         finally:
             self._layout.loading = False
 
-    def _code(self):
-        self.code = self._build_code_snippet()
+    def _refresh(self, *events):
+        self._plot()
+        self.code = self.plot_code()
         self._code_pane.object = f"""```python\nimport hvplot.{self._backend}\n\n{self.code}\n```"""
 
-    def _refresh(self, event):
-        if event.new:
-            self._plot()
-            self._code()
 
     @property
     def _var_name(self):
@@ -577,7 +574,7 @@ class hvPlotExplorer(Viewer):
     def _backend(self):
         return "pandas"
 
-    def _update_refresh_plot(self, event):
+    def _link_refresh_plot(self, event):
         self.refresh_plot = event.new
 
     @property
@@ -622,7 +619,7 @@ class hvPlotExplorer(Viewer):
             ]
             if event and event.new not in ('area', 'kde', 'line', 'ohlc', 'rgb', 'step'):
                 tabs.insert(5, ('Colormapping', self.colormapping))
-        self._tabs[:] = tabs
+        self._control_tabs[:] = tabs
 
     def _check_y(self, event):
         if len(event.new) > 1 and self.by:
@@ -631,15 +628,6 @@ class hvPlotExplorer(Viewer):
     def _check_by(self, event):
         if event.new and 'y_multi' in self._controls.parameters and self.y_multi and len(self.y_multi) > 1:
             self.by = []
-
-    def _build_code_snippet(self):
-        settings = self.settings()
-        args = ''
-        if settings:
-            for k, v in settings.items():
-                args += f'    {k}={v!r},\n'
-            args = args[:-2]
-        return f'{self._var_name}.hvplot(\n{args}\n)'
 
     #----------------------------------------------------------------
     # Public API
@@ -650,7 +638,7 @@ class hvPlotExplorer(Viewer):
         """
         return self._hvplot.clone()
 
-    def plot_code(self, var_name='df'):
+    def plot_code(self, var_name=None):
         """Return a string representation that can be easily copy-pasted
         in a notebook cell to create a plot from a call to the `.hvplot`
         accessor, and that includes all the customized settings of the explorer.
@@ -667,9 +655,9 @@ class hvPlotExplorer(Viewer):
         args = ''
         if settings:
             for k, v in settings.items():
-                args += f'{k}={v!r}, '
+                args += f'    {k}={v!r},\n'
             args = args[:-2]
-        return f'{var_name}.hvplot({args})'
+        return f'{var_name or self._var_name}.hvplot(\n{args}\n)'
 
     def save(self, filename, **kwargs):
         """Save the plot to file.
@@ -759,8 +747,8 @@ class hvGridExplorer(hvPlotExplorer):
                 var_name_suffix = ".to_array('variable').transpose(..., 'variable')"
         if "kind" not in params:
             params["kind"] = "image"
-        super().__init__(ds, **params)
         self._var_name_suffix = var_name_suffix
+        super().__init__(ds, **params)
 
     @property
     def _var_name(self):
