@@ -208,12 +208,12 @@ class TestDatashader(ComparisonTestCase):
         assert isinstance(plot, ImageStack)
         assert plot.opts["cmap"] == cc.palette['glasbey_category10']
 
-    @parameterized.expand([('rasterize',), ('datashade',), ('downsample',)])
-    def test_resample_when(self, operation):
+    @parameterized.expand([('rasterize',), ('datashade',)])
+    def test_operation_resample_when(self, operation):
         df = pd.DataFrame(
             np.random.multivariate_normal((0, 0), [[0.1, 0.1], [0.1, 1.0]], (5000,))
-        )
-        dmap = df.hvplot.scatter("0", "1", resample_when=1000, **{operation: True})
+        ).rename({0: "x", 1: "y"}, axis=1)
+        dmap = df.hvplot.scatter("x", "y", resample_when=1000, **{operation: True})
         assert isinstance(dmap, DynamicMap)
 
         render(dmap)  # trigger dynamicmap
@@ -222,7 +222,26 @@ class TestDatashader(ComparisonTestCase):
 
         image = overlay.get(0)
         assert isinstance(image, Image)
-        assert image.data["0_1 Count"].size
+        assert len(image.data) > 0
+
+        scatter = overlay.get(1)
+        assert isinstance(scatter, Scatter)
+        assert len(scatter.data) == 0
+
+    def test_downsample_resample_when(self):
+        df = pd.DataFrame(
+            np.random.multivariate_normal((0, 0), [[0.1, 0.1], [0.1, 1.0]], (5000,))
+        ).rename({0: "x", 1: "y"}, axis=1)
+        dmap = df.hvplot.scatter("x", "y", resample_when=1000, downsample=True)
+        assert isinstance(dmap, DynamicMap)
+
+        render(dmap)  # trigger dynamicmap
+        overlay = dmap.items()[0][1]
+        assert isinstance(overlay, Overlay)
+
+        downsampled = overlay.get(0)
+        assert isinstance(downsampled, Scatter)
+        assert len(downsampled.data) > 0
 
         scatter = overlay.get(1)
         assert isinstance(scatter, Scatter)

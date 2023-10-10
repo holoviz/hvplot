@@ -1298,9 +1298,8 @@ class HoloViewsConverter:
                 opts['x_sampling'] = self.x_sampling
             if self._plot_opts.get('xlim') is not None:
                 opts['x_range'] = self._plot_opts['xlim']
-            layers = downsample1d(obj, **opts)
+            layers = self._resample_obj(downsample1d, obj, opts)
             layers = _transfer_opts_cur_backend(layers)
-            processed = self._resample_obj(downsample1d, obj, opts)
             return layers
 
         try:
