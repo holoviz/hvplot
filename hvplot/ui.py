@@ -369,7 +369,7 @@ class Advanced(Controls):
         Additional styling options to include.
         Examples:
         - Image: {"color_levels": 11}
-        - Line: {"line_style": "dashed"}
+        - Line: {"line_dash": "dashed"}
         - Scatter: {'size': 5, 'marker': '^'}
         """
     )
