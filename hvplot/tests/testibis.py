@@ -1,22 +1,19 @@
-"""Ibis works with hvplot"""
+"""Basic ibis tests"""
+
+import numpy as np
+import pandas as pd
 import pytest
 
 try:
+    import hvplot.ibis  # noqa
     import ibis
-    import hvplot.ibis # noqa
-    import pandas as pd
-except:
+except ImportError:
     pytest.skip(allow_module_level=True)
+else:
+    ibis.set_backend('sqlite')
 
 
-@pytest.fixture
-def table():
-    df = pd.DataFrame({
-        "x": [pd.Timestamp("2022-01-01"), pd.Timestamp("2022-01-02")], "y": [1,2]
-    })
-    con = ibis.pandas.connect({"df": df})
-    return con.table("df")
-
-def test_can_hvplot(table):
-    """hvplot works with Ibis"""
-    table.hvplot(x="x", y="y")
+def test_ibis_hist():
+    df = pd.DataFrame(dict(x=np.arange(10)))
+    table = ibis.memtable(df)
+    table.hvplot.hist('x')
