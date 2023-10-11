@@ -8,6 +8,7 @@ import holoviews as hv
 import hvplot.pandas  # noqa
 import numpy as np
 import pandas as pd
+import pytest
 
 from holoviews import Store, render
 from holoviews.element import Image, QuadMesh, ImageStack, Points
@@ -207,6 +208,13 @@ class TestDatashader(ComparisonTestCase):
         plot = self.df.hvplot(x='x', y='y', by=expected, rasterize=True, dynamic=False)
         assert isinstance(plot, ImageStack)
         assert plot.opts["cmap"] == cc.palette['glasbey_category10']
+
+    def test_resample_when_error_unset_operation(self):
+        with pytest.raises(
+            ValueError,
+            match='At least one resampling operation'
+        ):
+            self.df.hvplot(x='x', y='y', resample_when=10)
 
     @parameterized.expand([('rasterize',), ('datashade',)])
     def test_operation_resample_when(self, operation):

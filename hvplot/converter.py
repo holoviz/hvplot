@@ -474,6 +474,11 @@ class HoloViewsConverter:
                     ylim = (y0, y1)
 
         # Operations
+        if resample_when is not None and not any([rasterize, datashade, downsample]):
+            raise ValueError(
+                'At least one resampling operation (rasterize, datashader, '
+                'downsample) must be enabled when resample_when is set.'
+            )
         self.resample_when = resample_when
         self.datashade = datashade
         self.rasterize = rasterize
