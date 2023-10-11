@@ -1385,10 +1385,7 @@ class HoloViewsConverter:
 
     def _resample_obj(self, operation, obj, opts):
         def exceeds_resample_when(plot):
-            vdim = plot.vdims[0].name
-            data = plot.data[vdim]
-            data_size = np.size(data)
-            return data_size > self.resample_when
+            return len(plot) > self.resample_when
 
         if self.resample_when is not None:
             processed = apply_when(
