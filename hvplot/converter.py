@@ -185,7 +185,7 @@ class HoloViewsConverter:
     check_symmetric_max (default=1000000):
         Size above which to stop checking for symmetry by default on the data.
 
-    Downsampling options
+    Resampling options
     ------------------
     aggregator (default=None):
         Aggregator to use when applying rasterize or datashade operation
@@ -213,12 +213,9 @@ class HoloViewsConverter:
         returning an aggregated Image (to be colormapped by the
         plotting backend) instead of individual points
     resample_when (default=None):
-        The threshold before toggling the operation (datashade / rasterize);
-        if the number of individual points exceeds this value, the plot will
-        be rasterized or datashaded; else the plot with the original points
-        will be returned instead. If this is unset and rasterize/datashade=True,
-        the plot will be rasterized or datashaded, regardless of the number of
-        points.
+        Applies a resampling operation (datashade, rasterize or downsample) if
+        the number of individual data points present in the current zoom range
+        is above this threshold. The raw plot is displayed otherwise.
     x_sampling/y_sampling (default=None):
         Specifies the smallest allowed sampling interval along the x/y axis.
 
