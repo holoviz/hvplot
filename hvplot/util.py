@@ -24,7 +24,8 @@ except:
 hv_version = Version(hv.__version__)
 bokeh_version = Version(bokeh.__version__)
 bokeh3 = bokeh_version >= Version("3.0")
-
+param2 = Version(param.__version__) >= Version("2.0rc4")
+_fugue_ipython = None  # To be set to True in tests to mock ipython
 
 def with_hv_extension(func, extension='bokeh', logo=False):
     """If hv.extension is not loaded, load before calling function"""
@@ -134,11 +135,21 @@ def proj_to_cartopy(proj):
 
     srs = proj.srs
     if has_gdal:
-        # this is more robust, as srs could be anything (espg, etc.)
-        s1 = osr.SpatialReference()
-        s1.ImportFromProj4(proj.srs)
-        if s1.ExportToProj4():
-            srs = s1.ExportToProj4()
+        import warnings
+        with warnings.catch_warnings():
+            # Avoiding this warning could be done by setting osr.UseExceptions(),
+            # except there might be a risk to break the code of users leveraging
+            # GDAL on their side or through other libraries. So we just silence it.
+            warnings.filterwarnings('ignore', category=FutureWarning, message=
+                r'Neither osr\.UseExceptions\(\) nor osr\.DontUseExceptions\(\) has '
+                r'been explicitly called\. In GDAL 4\.0, exceptions will be enabled '
+                'by default'
+            )
+            # this is more robust, as srs could be anything (espg, etc.)
+            s1 = osr.SpatialReference()
+            s1.ImportFromProj4(proj.srs)
+            if s1.ExportToProj4():
+                srs = s1.ExportToProj4()
 
     km_proj = {'lon_0': 'central_longitude',
                'lat_0': 'central_latitude',
@@ -594,6 +605,6 @@ def instantiate_crs_str(crs_str: str, **kwargs):
     Instantiate a cartopy.crs.Projection from a string.
     """
     import cartopy.crs as ccrs
-    if crs_str.upper() == "GOOGLE_MERCATOR":
+    if crs_str.upper() == 'GOOGLE_MERCATOR':
         return ccrs.GOOGLE_MERCATOR
     return getattr(ccrs, crs_str)(**kwargs)

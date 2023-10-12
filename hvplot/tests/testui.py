@@ -6,14 +6,14 @@ import pandas as pd
 import hvplot.pandas
 import hvplot.xarray
 import xarray as xr
-import param
 
 import pytest
 
 from bokeh.sampledata import penguins
-from hvplot.ui import hvDataFrameExplorer, hvGridExplorer, Controls
+from hvplot.ui import hvDataFrameExplorer, hvGridExplorer
 
 df = penguins.data
+ds_air_temperature = xr.tutorial.open_dataset('air_temperature')
 
 
 def test_explorer_basic():
@@ -28,11 +28,11 @@ def test_explorer_basic():
 def test_explorer_settings():
     explorer = hvplot.explorer(df)
 
-    explorer.param.set_param(
-        kind="scatter",
-        x="bill_length_mm",
-        y_multi=["bill_depth_mm"],
-        by=["species"],
+    explorer.param.update(
+        kind='scatter',
+        x='bill_length_mm',
+        y_multi=['bill_depth_mm'],
+        by=['species'],
     )
 
     settings = explorer.settings()
@@ -48,11 +48,11 @@ def test_explorer_settings():
 def test_explorer_plot_code():
     explorer = hvplot.explorer(df)
 
-    explorer.param.set_param(
-        kind="scatter",
-        x="bill_length_mm",
-        y_multi=["bill_depth_mm"],
-        by=["species"],
+    explorer.param.update(
+        kind='scatter',
+        x='bill_length_mm',
+        y_multi=['bill_depth_mm'],
+        by=['species'],
     )
 
     hvplot_code = explorer.plot_code()
@@ -85,10 +85,10 @@ def test_explorer_plot_code():
 def test_explorer_hvplot():
     explorer = hvplot.explorer(df)
 
-    explorer.param.set_param(
-        kind="scatter",
-        x="bill_length_mm",
-        y_multi=["bill_depth_mm"],
+    explorer.param.update(
+        kind='scatter',
+        x='bill_length_mm',
+        y_multi=['bill_depth_mm'],
     )
 
     plot = explorer.hvplot()
@@ -101,10 +101,10 @@ def test_explorer_hvplot():
 def test_explorer_save(tmp_path):
     explorer = hvplot.explorer(df)
 
-    explorer.param.set_param(
-        kind="scatter",
-        x="bill_length_mm",
-        y_multi=["bill_depth_mm"],
+    explorer.param.update(
+        kind='scatter',
+        x='bill_length_mm',
+        y_multi=['bill_depth_mm'],
     )
 
     outfile = tmp_path / "plot.html"
@@ -128,80 +128,148 @@ def test_explorer_kwargs_controls_error_not_supported():
             "__init__() got keyword(s) not supported by any control: {'not_a_control_kwarg': None}"
         ),
     ):
-        hvplot.explorer(df, title="Dummy title", not_a_control_kwarg=None)
+        hvplot.explorer(df, title='Dummy title', not_a_control_kwarg=None)
 
 
 def test_explorer_hvplot_gridded_basic():
-    ds = xr.tutorial.open_dataset("air_temperature")
-    explorer = hvplot.explorer(ds)
+    explorer = hvplot.explorer(ds_air_temperature)
 
     assert isinstance(explorer, hvGridExplorer)
     assert isinstance(explorer._data, xr.DataArray)
-    assert explorer.kind == "image"
-    assert explorer.x == "lat"
-    assert explorer.y == "lon"
+    assert explorer.kind == 'image'
+    assert explorer.x == 'lat'
+    assert explorer.y == 'lon'
     assert explorer.by == []
-    assert explorer.groupby == ["time"]
+    assert explorer.groupby == ['time']
 
 
 def test_explorer_hvplot_gridded_2d():
-    ds = xr.tutorial.open_dataset("air_temperature").isel(time=0)
+    ds = ds_air_temperature.isel(time=0)
     explorer = hvplot.explorer(ds)
 
     assert isinstance(explorer, hvGridExplorer)
     assert isinstance(explorer._data, xr.DataArray)
-    assert explorer.kind == "image"
-    assert explorer.x == "lat"
-    assert explorer.y == "lon"
+    assert explorer.kind == 'image'
+    assert explorer.x == 'lat'
+    assert explorer.y == 'lon'
     assert explorer.by == []
     assert explorer.groupby == []
 
 
 def test_explorer_hvplot_gridded_two_variables():
-    ds = xr.tutorial.open_dataset("air_temperature")
-    ds["airx2"] = ds["air"] * 2
+    ds = ds_air_temperature.copy()
+    ds['airx2'] = ds['air'] * 2
     explorer = hvplot.explorer(ds)
 
     assert isinstance(explorer, hvGridExplorer)
     assert isinstance(explorer._data, xr.DataArray)
-    assert list(explorer._data["variable"]) == ["air", "airx2"]
-    assert explorer.kind == "image"
-    assert explorer.x == "lat"
-    assert explorer.y == "lon"
+    assert list(explorer._data['variable']) == ['air', 'airx2']
+    assert explorer.kind == 'image'
+    assert explorer.x == 'lat'
+    assert explorer.y == 'lon'
     assert explorer.by == []
-    assert explorer.groupby == ["time", "variable"]
+    assert explorer.groupby == ['time', 'variable']
 
 
 def test_explorer_hvplot_gridded_dataarray():
-    da = xr.tutorial.open_dataset("air_temperature")["air"]
+    da = ds_air_temperature['air']
     explorer = hvplot.explorer(da)
 
     assert isinstance(explorer, hvGridExplorer)
     assert isinstance(explorer._data, xr.DataArray)
-    assert explorer.kind == "image"
-    assert explorer.x == "lat"
-    assert explorer.y == "lon"
+    assert explorer.kind == 'image'
+    assert explorer.x == 'lat'
+    assert explorer.y == 'lon'
     assert explorer.by == []
     assert explorer.groupby == ['time']
 
 
 def test_explorer_hvplot_gridded_options():
-    ds = xr.tutorial.open_dataset("air_temperature")
-    explorer = hvplot.explorer(ds)
-    assert explorer._controls[1].groups.keys() == {"dataframe", "gridded", "geom"}
+    explorer = hvplot.explorer(ds_air_temperature)
+    assert explorer._controls[0].groups.keys() == {'dataframe', 'gridded', 'geom'}
 
 
 def test_explorer_hvplot_geo():
-    df = pd.DataFrame({"x": [-9796115.18980811], "y": [4838471.398061159]})
-    explorer = hvplot.explorer(df, x="x", geo=True, kind="points")
+    df = pd.DataFrame({'x': [-9796115.18980811], 'y': [4838471.398061159]})
+    explorer = hvplot.explorer(df, x='x', geo=True, kind='points')
     assert explorer.geographic.geo
     assert explorer.geographic.global_extent
-    assert explorer.geographic.features == ["coastline"]
-    assert explorer.geographic.crs == "GOOGLE_MERCATOR"
-    assert explorer.geographic.projection == "GOOGLE_MERCATOR"
+    assert explorer.geographic.features == ['coastline']
+    assert explorer.geographic.crs == 'GOOGLE_MERCATOR'
+    assert explorer.geographic.projection == 'GOOGLE_MERCATOR'
+
+
+def test_explorer_live_update_init():
+    explorer = hvplot.explorer(df)
+    assert explorer.statusbar.live_update is True
+
+    explorer = hvplot.explorer(df, live_update=False)
+    assert explorer._hv_pane.object is None
+    assert 'live_update' not in explorer.settings()
+
+
+def test_explorer_live_update_after_init():
+    explorer = hvplot.explorer(df)
+    assert explorer._hv_pane.object.type is hv.Curve
+    explorer.kind = 'scatter'
+    assert explorer._hv_pane.object.type is hv.Scatter
+
+    explorer.statusbar.live_update = False
+    explorer.kind = 'line'
+    assert explorer._hv_pane.object.type is hv.Scatter
+
+    explorer.statusbar.live_update = True
+    assert explorer._hv_pane.object.type is hv.Curve
+
+
+def test_explorer_method_dataframe():
+    explorer = df.hvplot.explorer()
+
+    assert isinstance(explorer, hvDataFrameExplorer)
+    assert explorer.kind == 'line'
+    assert explorer.x == 'index'
+    assert explorer.y == 'species'
+
+
+def test_explorer_method_grid():
+    explorer = ds_air_temperature.hvplot.explorer()
+
+    assert isinstance(explorer, hvGridExplorer)
+    assert explorer.kind == 'image'
+    assert explorer.x == 'lat'
+    assert explorer.y == 'lon'
+
+
+def test_explorer_method_kind():
+    explorer = df.hvplot.explorer(kind="scatter")
+
+    assert isinstance(explorer, hvDataFrameExplorer)
+    assert explorer.kind == 'scatter'
+    assert explorer.x == 'index'
+    assert explorer.y == 'species'
+
+
+def test_explorer_method_as_kind():
+    explorer = df.hvplot(kind="explorer")
+
+    assert isinstance(explorer, hvDataFrameExplorer)
+    assert explorer.kind == 'line'
+    assert explorer.x == 'index'
+    assert explorer.y == 'species'
+
+
+def test_explorer_method_propagates_kwargs():
+    explorer = df.hvplot.explorer(title="Dummy title", x="bill_length_mm")
+
+    assert isinstance(explorer, hvDataFrameExplorer)
+    assert explorer.kind == 'line'
+    assert explorer.x == 'bill_length_mm'
+    assert explorer.y == 'species'
+    assert explorer.labels.title == 'Dummy title'
+
 
 def test_explorer_code_dataframe():
-    explorer = hvplot.explorer(df, x="bill_length_mm", kind="points")
+    explorer = hvplot.explorer(df, x='bill_length_mm', kind='points')
     assert explorer.code == dedent("""\
         df.hvplot(
             kind='points',
@@ -223,8 +291,8 @@ def test_explorer_code_dataframe():
 
 
 def test_explorer_code_gridded():
-    ds = xr.tutorial.open_dataset("air_temperature")
-    explorer = hvplot.explorer(ds, x="lon", y="lat", kind="image")
+    ds = xr.tutorial.open_dataset('air_temperature')
+    explorer = hvplot.explorer(ds, x='lon', y='lat', kind='image')
     code = explorer.code
     assert code == dedent("""\
         ds['air'].hvplot(
@@ -251,8 +319,8 @@ def test_explorer_code_gridded():
 
 
 def test_explorer_code_gridded_dataarray():
-    ds = xr.tutorial.open_dataset("air_temperature")["air"]
-    explorer = hvplot.explorer(ds, x="lon", y="lat", kind="image")
+    ds = xr.tutorial.open_dataset('air_temperature')['air']
+    explorer = hvplot.explorer(ds, x='lon', y='lat', kind='image')
     code = explorer.code
     assert code == dedent("""\
         da.hvplot(
@@ -276,25 +344,3 @@ def test_explorer_code_gridded_dataarray():
         )
         ```"""
     )
-
-def test_explorer_refresh_plot_linked():
-    explorer = hvplot.explorer(df)
-    controls = [
-        p.name
-        for p in explorer.param.objects().values()
-        if isinstance(p, param.ClassSelector)
-        and issubclass(p.class_, Controls)
-    ]
-    # by default
-    for control in controls:
-        assert explorer.refresh_plot == getattr(explorer, control).refresh_plot
-
-    # toggle top level
-    explorer.refresh_plot = False
-    for control in controls:
-        assert explorer.refresh_plot == getattr(explorer, control).refresh_plot
-
-    # toggle axes
-    explorer.axes.refresh_plot = True
-    for control in controls:
-        assert explorer.refresh_plot == getattr(explorer, control).refresh_plot

@@ -60,6 +60,10 @@ extras_require['tests'] = [
     'pooch',
     'scipy',
     'ipywidgets',
+    'dask',
+    'polars',
+    'fugue',
+    'ibis-framework',  # ibis-sqlite on conda
 ]
 
 # Dependencies required to run the notebooks

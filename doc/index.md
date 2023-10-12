@@ -101,6 +101,20 @@ alt: Works with GeoPandas
 align: center
 ---
 :::
+:::{tab-item} Polars
+```python
+import polars
+import hvplot.polars
+
+df_polars = polars.from_pandas(df)
+df_polars.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
+```
+```{image} ./_static/home/dask.gif
+---
+alt: Works with Polars
+align: center
+---
+:::
 
 :::{tab-item} Intake
 ```python
@@ -372,7 +386,7 @@ The *Explorer* is a [Panel](https://panel.holoviz.org) web application that can 
 import hvplot.pandas
 from bokeh.sampledata.penguins import data as df
 
-hvexplorer = hvplot.explorer(df)
+hvexplorer = df.hvplot.explorer()
 hvexplorer
 ```
 ```{image} ./_static/home/explorer.gif

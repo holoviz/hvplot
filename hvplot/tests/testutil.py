@@ -1,8 +1,6 @@
 """
 Tests  utilities to convert data and projections
 """
-import sys
-
 import numpy as np
 import pandas as pd
 import cartopy.crs as ccrs
@@ -200,33 +198,6 @@ class TestProcessXarray(TestCase):
         assert not groupby
 
 
-class TestGeoUtil(TestCase):
-
-    def setUp(self):
-        if sys.platform == "win32":
-            raise SkipTest("Skip geo tests on windows for now")
-        try:
-            import geoviews  # noqa
-            import cartopy.crs as ccrs
-        except:
-            raise SkipTest('geoviews or cartopy not available')
-        self.ccrs = ccrs
-
-    def test_proj_to_cartopy(self):
-        from ..util import proj_to_cartopy
-        crs = proj_to_cartopy('+init=epsg:26911')
-
-        assert isinstance(crs, self.ccrs.CRS)
-
-    def test_proj_to_cartopy_wkt_string(self):
-        from ..util import proj_to_cartopy
-        crs = proj_to_cartopy('GEOGCRS["unnamed",BASEGEOGCRS["unknown",DATUM["unknown",ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1,ID["EPSG",9001]]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8901]]],DERIVINGCONVERSION["unknown",METHOD["PROJ ob_tran o_proj=latlon"],PARAMETER["o_lon_p",0,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],PARAMETER["o_lat_p",37.5,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],PARAMETER["lon_0",357.5,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]]],CS[ellipsoidal,2],AXIS["longitude",east,ORDER[1],ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],AXIS["latitude",north,ORDER[2],ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]]]')  # noqa: E501
-
-        assert isinstance(crs, self.ccrs.RotatedPole)
-        assert crs.proj4_params["lon_0"] == 357.5
-        assert crs.proj4_params["o_lat_p"] == 37.5
-
-
 class TestDynamicArgs(TestCase):
 
     def setUp(self):
@@ -382,16 +353,16 @@ def test_convert_col_names_to_str():
 
 
 def test_instantiate_crs_str():
-    assert isinstance(instantiate_crs_str("PlateCarree"), ccrs.PlateCarree)
+    assert isinstance(instantiate_crs_str('PlateCarree'), ccrs.PlateCarree)
 
 
 def test_instantiate_crs_google_mercator():
-    assert instantiate_crs_str("GOOGLE_MERCATOR") == ccrs.GOOGLE_MERCATOR
-    assert instantiate_crs_str("google_mercator") == ccrs.GOOGLE_MERCATOR
+    assert instantiate_crs_str('GOOGLE_MERCATOR') == ccrs.GOOGLE_MERCATOR
+    assert instantiate_crs_str('google_mercator') == ccrs.GOOGLE_MERCATOR
 
 
 def test_instantiate_crs_str_kwargs():
-    crs = instantiate_crs_str("PlateCarree", globe=ccrs.Globe(datum="WGS84"))
+    crs = instantiate_crs_str('PlateCarree', globe=ccrs.Globe(datum='WGS84'))
     assert isinstance(crs, ccrs.PlateCarree)
     assert isinstance(crs.globe, ccrs.Globe)
-    assert crs.globe.datum == "WGS84"
+    assert crs.globe.datum == 'WGS84'

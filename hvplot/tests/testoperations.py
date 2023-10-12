@@ -8,9 +8,13 @@ import holoviews as hv
 import hvplot.pandas  # noqa
 import numpy as np
 import pandas as pd
+import pytest
 
-from holoviews import Store
-from holoviews.element import Image, QuadMesh, ImageStack
+from holoviews import Store, render
+from holoviews.element import Image, QuadMesh, ImageStack, Points
+from holoviews.core.spaces import DynamicMap
+from holoviews.core.overlay import Overlay
+from holoviews.element.chart import Scatter
 from holoviews.element.comparison import ComparisonTestCase
 from hvplot.converter import HoloViewsConverter
 from packaging.version import Version
@@ -205,6 +209,54 @@ class TestDatashader(ComparisonTestCase):
         assert isinstance(plot, ImageStack)
         assert plot.opts["cmap"] == cc.palette['glasbey_category10']
 
+    def test_resample_when_error_unset_operation(self):
+        with pytest.raises(
+            ValueError,
+            match='At least one resampling operation'
+        ):
+            self.df.hvplot(x='x', y='y', resample_when=10)
+
+    @parameterized.expand([('rasterize',), ('datashade',)])
+    def test_operation_resample_when(self, operation):
+        df = pd.DataFrame(
+            np.random.multivariate_normal((0, 0), [[0.1, 0.1], [0.1, 1.0]], (5000,))
+        ).rename({0: "x", 1: "y"}, axis=1)
+        dmap = df.hvplot.scatter("x", "y", resample_when=1000, **{operation: True})
+        assert isinstance(dmap, DynamicMap)
+
+        render(dmap)  # trigger dynamicmap
+        overlay = dmap.items()[0][1]
+        assert isinstance(overlay, Overlay)
+
+        image = overlay.get(0)
+        assert isinstance(image, Image)
+        assert len(image.data) > 0
+
+        scatter = overlay.get(1)
+        assert isinstance(scatter, Scatter)
+        assert len(scatter.data) == 0
+
+    @parameterized.expand([('points', Points), ('scatter', Scatter)])
+    def test_downsample_resample_when(self, kind, eltype):
+        df = pd.DataFrame(
+            np.random.multivariate_normal((0, 0), [[0.1, 0.1], [0.1, 1.0]], (5000,))
+        ).rename({0: "x", 1: "y"}, axis=1)
+        dmap = df.hvplot(kind=kind, x="x", y="y", resample_when=1000, downsample=True)
+        assert isinstance(dmap, DynamicMap)
+
+        render(dmap)  # trigger dynamicmap
+        overlay = dmap.items()[0][1]
+        assert isinstance(overlay, Overlay)
+
+        downsampled = overlay.get(0)
+        assert isinstance(downsampled, eltype)
+        assert len(downsampled) > 0
+
+        element = overlay.get(1)
+        assert isinstance(element, eltype)
+        assert len(element) == 0
+
+
 class TestChart2D(ComparisonTestCase):
 
     def setUp(self):
@@ -235,3 +287,25 @@ class TestChart2D(ComparisonTestCase):
                               x_sampling=5, y_sampling=2)
         assert all(plot.data.x.diff('x').round(0) == 5)
         assert all(plot.data.y.diff('y').round(0) == 2)
+
+
+class TestDownsample(ComparisonTestCase):
+    def setUp(self):
+        import hvplot.pandas # noqa
+        self.df = pd.DataFrame(np.random.random(100))
+
+    def test_downsample_default(self):
+        from holoviews.operation.downsample import downsample1d
+
+        plot = self.df.hvplot.line(downsample=True)
+
+        assert isinstance(plot.callback.operation, downsample1d)
+        assert plot.callback.operation.algorithm == "lttb"
+
+    def test_downsample_opts(self):
+        plot = self.df.hvplot.line(downsample=True, width=100, height=50, x_sampling=5, xlim=(0, 5))
+
+        assert plot.callback.operation.p.width == 100
+        assert plot.callback.operation.p.height == 50
+        assert plot.callback.operation.p.x_sampling == 5
+        assert plot.callback.operation.p.x_range == (0, 5)
