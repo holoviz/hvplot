@@ -22,7 +22,7 @@ from holoviews.element import (
 )
 from holoviews.plotting.bokeh import OverlayPlot, colormap_generator
 from holoviews.plotting.util import process_cmap
-from holoviews.operation import histogram
+from holoviews.operation import histogram, apply_when
 from holoviews.streams import Buffer, Pipe
 from holoviews.util.transform import dim
 from packaging.version import Version
@@ -185,7 +185,7 @@ class HoloViewsConverter:
     check_symmetric_max (default=1000000):
         Size above which to stop checking for symmetry by default on the data.
 
-    Downsampling options
+    Resampling options
     ------------------
     aggregator (default=None):
         Aggregator to use when applying rasterize or datashade operation
@@ -212,6 +212,10 @@ class HoloViewsConverter:
         Whether to apply rasterization using the Datashader library,
         returning an aggregated Image (to be colormapped by the
         plotting backend) instead of individual points
+    resample_when (default=None):
+        Applies a resampling operation (datashade, rasterize or downsample) if
+        the number of individual data points present in the current zoom range
+        is above this threshold. The raw plot is displayed otherwise.
     x_sampling/y_sampling (default=None):
         Specifies the smallest allowed sampling interval along the x/y axis.
 
@@ -286,7 +290,7 @@ class HoloViewsConverter:
 
     _op_options = [
         'datashade', 'rasterize', 'x_sampling', 'y_sampling',
-        'aggregator'
+        'downsample', 'aggregator', 'resample_when'
     ]
 
     # Options specific to a particular plot type
@@ -383,9 +387,10 @@ class HoloViewsConverter:
         logx=None, logy=None, loglog=None, hover=None, subplots=False,
         label=None, invert=False, stacked=False, colorbar=None,
         datashade=False, rasterize=False, downsample=None,
-        row=None, col=None, debug=False, framewise=True,
-        aggregator=None, projection=None, global_extent=None,
-        geo=False, precompute=False, flip_xaxis=None, flip_yaxis=None,
+        resample_when=None, row=None, col=None,
+        debug=False, framewise=True, aggregator=None,
+        projection=None, global_extent=None, geo=False,
+        precompute=False, flip_xaxis=None, flip_yaxis=None,
         dynspread=False, hover_cols=[], x_sampling=None,
         y_sampling=None, project=False, tools=[], attr_labels=None,
         coastline=False, tiles=False, sort_date=True,
@@ -466,6 +471,12 @@ class HoloViewsConverter:
                     ylim = (y0, y1)
 
         # Operations
+        if resample_when is not None and not any([rasterize, datashade, downsample]):
+            raise ValueError(
+                'At least one resampling operation (rasterize, datashader, '
+                'downsample) must be enabled when resample_when is set.'
+            )
+        self.resample_when = resample_when
         self.datashade = datashade
         self.rasterize = rasterize
         self.downsample = downsample
@@ -1289,7 +1300,7 @@ class HoloViewsConverter:
                 opts['x_sampling'] = self.x_sampling
             if self._plot_opts.get('xlim') is not None:
                 opts['x_range'] = self._plot_opts['xlim']
-            layers = downsample1d(obj, **opts)
+            layers = self._resample_obj(downsample1d, obj, opts)
             layers = _transfer_opts_cur_backend(layers)
             return layers
 
@@ -1353,7 +1364,7 @@ class HoloViewsConverter:
                 opts['cnorm'] = self._plot_opts['cnorm']
             if 'rescale_discrete_levels' in self._plot_opts:
                 opts['rescale_discrete_levels'] = self._plot_opts['rescale_discrete_levels']
-        else:
+        elif self.rasterize:
             operation = rasterize
             if Version(hv.__version__) < Version('1.18.0a1'):
                 eltype = 'Image'
@@ -1364,8 +1375,7 @@ class HoloViewsConverter:
             if self._dim_ranges.get('c', (None, None)) != (None, None):
                 style['clim'] = self._dim_ranges['c']
 
-        processed = operation(obj, **opts)
-
+        processed = self._resample_obj(operation, obj, opts)
         if self.dynspread:
             processed = dynspread(processed, max_px=self.kwds.get('max_px', 3),
                                   threshold=self.kwds.get('threshold', 0.5))
@@ -1374,6 +1384,20 @@ class HoloViewsConverter:
         layers = self._apply_layers(processed).opts(eltype, **opts, backend='bokeh')
         layers = _transfer_opts_cur_backend(layers)
         return layers
+
+    def _resample_obj(self, operation, obj, opts):
+        def exceeds_resample_when(plot):
+            return len(plot) > self.resample_when
+
+        if self.resample_when is not None:
+            processed = apply_when(
+                obj,
+                operation=partial(operation, **opts),
+                predicate=exceeds_resample_when
+            )
+        else:
+            processed = operation(obj, **opts)
+        return processed
 
     def _get_opts(self, eltype, backend='bokeh', **custom):
         opts = dict(self._plot_opts, **dict(self._style_opts, **self._norm_opts))
