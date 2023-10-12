@@ -46,8 +46,8 @@ extras_require['tests_nb'] = [
     'nbval',
 ]
 
-# Required to run the unit tests
-extras_require['tests'] = [
+# Test requirements
+extras_require['tests_core'] = [
     'codecov',
     'flake8',
     'pre-commit',
@@ -61,6 +61,12 @@ extras_require['tests'] = [
     'scipy',
     'ipywidgets',
     'dask',
+]
+
+# Optional tests dependencies, i.e. one should be able
+# to run and pass the test suite without installing any
+# of those.
+extras_require['tests'] = extras_require['tests_core'] + [
     'polars',
     'fugue',
     'ibis-framework',  # ibis-sqlite on conda

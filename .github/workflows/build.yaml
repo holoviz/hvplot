@@ -92,7 +92,7 @@ jobs:
       - name: env setup
         run: |
           conda activate test-environment
-          doit develop_install $CHANS_DEV
+          doit develop_install $CHANS_DEV -o tests_core
           doit pip_on_conda
       - name: pip build
         run: |
