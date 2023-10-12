@@ -79,7 +79,6 @@ class StreamingCallable(Callable):
             raise Exception('PeriodicCallback not running.')
 
 
-
 class HoloViewsConverter:
     """
     Generic options
@@ -1271,6 +1270,7 @@ class HoloViewsConverter:
                     except Exception:
                         dataset = Dataset(data)
                     dataset = dataset.redim(**self._redim)
+
                 obj = method(x, y)
                 obj._dataset = dataset
 

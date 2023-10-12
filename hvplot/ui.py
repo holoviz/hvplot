@@ -809,6 +809,9 @@ class hvDataFrameExplorer(hvPlotExplorer):
                 values = self._data[self._x]
             except:
                 return 0, 1
+        # for dask series; else it cannot get length
+        if hasattr(values, "compute_chunk_sizes"):
+            values = values.compute_chunk_sizes()
         if values.dtype.kind in 'OSU':
             return None
         elif not len(values):

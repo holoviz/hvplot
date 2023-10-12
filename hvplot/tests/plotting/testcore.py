@@ -23,7 +23,7 @@ except ImportError:
     dd = None
 
 
-TYPES = {t for t in dir(hvPlotTabular) if not t.startswith("_")}
+TYPES = {t for t in dir(hvPlotTabular) if not t.startswith("_") and t != "explorer"}
 FRAME_TYPES = TYPES - {"bivariate", "heatmap", "hexbin", "labels", "vectorfield"}
 SERIES_TYPES = FRAME_TYPES - {"points", "polygons", "ohlc", "paths"}
 frame_kinds = pytest.mark.parametrize("kind", sorted(FRAME_TYPES))
