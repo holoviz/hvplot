@@ -530,7 +530,7 @@ class hvPlotExplorer(Viewer):
             feature_scale = kwargs.pop('feature_scale', None)
             kwargs['features'] = {feature: feature_scale for feature in kwargs.pop('features', [])}
 
-        kwargs['min_height'] = 600
+        kwargs['min_height'] = 400
         df = self._data
         if len(df) > MAX_ROWS and not (self.kind in KINDS["stats"] or kwargs.get('rasterize') or kwargs.get('datashade')):
             df = df.sample(n=MAX_ROWS)
