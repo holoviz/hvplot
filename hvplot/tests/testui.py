@@ -1,4 +1,5 @@
 import re
+from textwrap import dedent
 
 import holoviews as hv
 import pandas as pd
@@ -19,9 +20,9 @@ def test_explorer_basic():
     explorer = hvplot.explorer(df)
 
     assert isinstance(explorer, hvDataFrameExplorer)
-    assert explorer.kind == 'line'
-    assert explorer.x == 'index'
-    assert explorer.y == 'species'
+    assert explorer.kind == "line"
+    assert explorer.x == "index"
+    assert explorer.y == "species"
 
 
 def test_explorer_settings():
@@ -37,10 +38,10 @@ def test_explorer_settings():
     settings = explorer.settings()
 
     assert settings == dict(
-        by=['species'],
-        kind='scatter',
-        x='bill_length_mm',
-        y=['bill_depth_mm'],
+        by=["species"],
+        kind="scatter",
+        x="bill_length_mm",
+        y=["bill_depth_mm"],
     )
 
 
@@ -56,11 +57,29 @@ def test_explorer_plot_code():
 
     hvplot_code = explorer.plot_code()
 
-    assert hvplot_code == "df.hvplot(by=['species'], kind='scatter', x='bill_length_mm', y=['bill_depth_mm'])"
+    assert (
+        hvplot_code == (
+            "df.hvplot(\n"
+            "    by=['species'],\n"
+            "    kind='scatter',\n"
+            "    x='bill_length_mm',\n"
+            "    y=['bill_depth_mm']\n"
+            ")"
+        )
+    )
 
-    hvplot_code = explorer.plot_code(var_name='othername')
+    hvplot_code = explorer.plot_code(var_name="othername")
 
-    assert hvplot_code == "othername.hvplot(by=['species'], kind='scatter', x='bill_length_mm', y=['bill_depth_mm'])"
+    assert (
+        hvplot_code == (
+            "othername.hvplot(\n"
+            "    by=['species'],\n"
+            "    kind='scatter',\n"
+            "    x='bill_length_mm',\n"
+            "    y=['bill_depth_mm']\n"
+            ")"
+        )
+    )
 
 
 def test_explorer_hvplot():
@@ -75,8 +94,8 @@ def test_explorer_hvplot():
     plot = explorer.hvplot()
 
     assert isinstance(plot, hv.Scatter)
-    assert plot.kdims[0].name == 'bill_length_mm'
-    assert plot.vdims[0].name == 'bill_depth_mm'
+    assert plot.kdims[0].name == "bill_length_mm"
+    assert plot.vdims[0].name == "bill_depth_mm"
 
 
 def test_explorer_save(tmp_path):
@@ -88,7 +107,7 @@ def test_explorer_save(tmp_path):
         y_multi=['bill_depth_mm'],
     )
 
-    outfile = tmp_path / 'plot.html'
+    outfile = tmp_path / "plot.html"
 
     explorer.save(outfile)
 
@@ -96,15 +115,18 @@ def test_explorer_save(tmp_path):
 
 
 def test_explorer_kwargs_controls():
-    explorer = hvplot.explorer(df, title='Dummy title', width=200)
+    explorer = hvplot.explorer(df, title="Dummy title", width=200)
 
-    assert explorer.labels.title == 'Dummy title'
+    assert explorer.labels.title == "Dummy title"
     assert explorer.axes.width == 200
 
 
 def test_explorer_kwargs_controls_error_not_supported():
     with pytest.raises(
-        TypeError, match=re.escape("__init__() got keyword(s) not supported by any control: {'not_a_control_kwarg': None}")
+        TypeError,
+        match=re.escape(
+            "__init__() got keyword(s) not supported by any control: {'not_a_control_kwarg': None}"
+        ),
     ):
         hvplot.explorer(df, title='Dummy title', not_a_control_kwarg=None)
 
@@ -244,3 +266,75 @@ def test_explorer_method_propagates_kwargs():
     assert explorer.x == 'bill_length_mm'
     assert explorer.y == 'species'
     assert explorer.labels.title == 'Dummy title'
+
+
+def test_explorer_code_dataframe():
+    explorer = hvplot.explorer(df, x='bill_length_mm', kind='points')
+    assert explorer.code == dedent("""\
+        df.hvplot(
+            kind='points',
+            x='bill_length_mm',
+            y='species'
+        )"""
+    )
+    assert explorer._code_pane.object == dedent("""\
+        ```python
+        df.hvplot(
+            kind='points',
+            x='bill_length_mm',
+            y='species'
+        )
+        ```"""
+    )
+
+
+def test_explorer_code_gridded():
+    ds = xr.tutorial.open_dataset('air_temperature')
+    explorer = hvplot.explorer(ds, x='lon', y='lat', kind='image')
+    code = explorer.code
+    assert code == dedent("""\
+        ds['air'].hvplot(
+            colorbar=True,
+            groupby=['time'],
+            kind='image',
+            x='lon',
+            y='lat'
+        )""")
+
+    assert explorer._code_pane.object == dedent("""\
+        ```python
+        ds['air'].hvplot(
+            colorbar=True,
+            groupby=['time'],
+            kind='image',
+            x='lon',
+            y='lat'
+        )
+        ```"""
+    )
+
+
+def test_explorer_code_gridded_dataarray():
+    ds = xr.tutorial.open_dataset('air_temperature')['air']
+    explorer = hvplot.explorer(ds, x='lon', y='lat', kind='image')
+    code = explorer.code
+    assert code == dedent("""\
+        da.hvplot(
+            colorbar=True,
+            groupby=['time'],
+            kind='image',
+            x='lon',
+            y='lat'
+        )""")
+
+    assert explorer._code_pane.object == dedent("""\
+        ```python
+        da.hvplot(
+            colorbar=True,
+            groupby=['time'],
+            kind='image',
+            x='lon',
+            y='lat'
+        )
+        ```"""
+    )

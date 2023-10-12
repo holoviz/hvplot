@@ -36,6 +36,10 @@ GEO_FEATURES = [
     'states', 'grid'
 ]
 GEO_TILES = [None] + sorted(tile_sources)
+GEO_KEYS = [
+    'crs', 'crs_kwargs', 'projection', 'projection_kwargs',
+    'global_extent', 'project', 'features', 'feature_scale', 'tiles'
+]
 AGGREGATORS = [None, 'count', 'min', 'max', 'mean', 'sum', 'any']
 MAX_ROWS = 10000
 
@@ -212,7 +216,7 @@ class Axes(Controls):
         """
 
         if isinstance(val[0], datetime_types) and isinstance(val[1], datetime_types):
-            val = (dt_to_int(val[0], "ms"), dt_to_int(val[1], "ms"))
+            val = (dt_to_int(val[0], 'ms'), dt_to_int(val[1], 'ms'))
 
         return val
 
@@ -279,10 +283,8 @@ class Geographic(Controls):
     @param.depends('geo',  watch=True, on_init=True)
     def _update_crs_projection(self):
         enabled = bool(self.geo or self.project)
-        self.param.crs.constant = not enabled
-        self.param.crs_kwargs.constant = not enabled
-        self.param.projection.constant = not enabled
-        self.param.projection_kwargs.constant = not enabled
+        for key in GEO_KEYS:
+            self.param[key].constant = not enabled
         self.geo = enabled
         if not enabled:
             return
@@ -386,6 +388,9 @@ class hvPlotExplorer(Viewer):
 
     style = param.ClassSelector(class_=Style)
 
+    code = param.String(precedence=-1, doc="""
+        Code to generate the plot.""")
+
     @classmethod
     def from_data(cls, data, **params):
         if is_geodataframe(data):
@@ -432,7 +437,7 @@ class hvPlotExplorer(Viewer):
         self.param.watch(self._check_y, 'y_multi')
         self.param.watch(self._check_by, 'by')
         self._populate()
-        self._tabs = pn.Tabs(
+        self._control_tabs = pn.Tabs(
             tabs_location='left', width=425
         )
         self.statusbar = StatusBar(**statusbar_params)
@@ -459,19 +464,20 @@ class hvPlotExplorer(Viewer):
             for cls, cparams in controller_params.items()
         }
         self.param.update(**self._controllers)
-        self.param.watch(self._plot, list(self.param))
+        self.param.watch(self._refresh, list(self.param))
         for controller in self._controllers.values():
-            controller.param.watch(self._plot, list(controller.param))
-        self.statusbar.param.watch(self._plot, list(self.statusbar.param))
+            controller.param.watch(self._refresh, list(controller.param))
+        self.statusbar.param.watch(self._refresh, list(self.statusbar.param))
         self._alert = pn.pane.Alert(
             alert_type='danger', visible=False, sizing_mode='stretch_width'
         )
         self._hv_pane = pn.pane.HoloViews(sizing_mode='stretch_width', margin=(5, 20, 5, 20))
+        self._code_pane = pn.pane.Markdown(sizing_mode='stretch_width', margin=(5, 20, 0, 20))
         self._layout = pn.Column(
             self._alert,
             pn.Row(
-                self._tabs,
-                self._hv_pane,
+                self._control_tabs,
+                pn.Tabs(('Plot', self._hv_pane), ('Code', self._code_pane)),
                 sizing_mode='stretch_width',
             ),
             self._statusbar,
@@ -487,20 +493,20 @@ class hvPlotExplorer(Viewer):
         Populates the options of the controls based on the data type.
         """
         variables = self._converter.variables
-        indexes = getattr(self._converter, "indexes", [])
+        indexes = getattr(self._converter, 'indexes', [])
         variables_no_index = [v for v in variables if v not in indexes]
         for pname in self.param:
             if pname == 'kind':
                 continue
             p = self.param[pname]
             if isinstance(p, param.Selector):
-                if pname == "x":
+                if pname == 'x':
                     p.objects = variables
                 else:
                     p.objects = variables_no_index
 
                 # Setting the default value if not set
-                if (pname == "x" or pname == "y") and getattr(self, pname, None) is None:
+                if (pname == 'x' or pname == 'y') and getattr(self, pname, None) is None:
                     setattr(self, pname, p.objects[0])
 
     def _plot(self, *events):
@@ -532,7 +538,7 @@ class hvPlotExplorer(Viewer):
 
         kwargs['min_height'] = 400
         df = self._data
-        if len(df) > MAX_ROWS and not (self.kind in KINDS["stats"] or kwargs.get('rasterize') or kwargs.get('datashade')):
+        if len(df) > MAX_ROWS and not (self.kind in KINDS['stats'] or kwargs.get('rasterize') or kwargs.get('datashade')):
             df = df.sample(n=MAX_ROWS)
         self._layout.loading = True
         try:
@@ -549,9 +555,19 @@ class hvPlotExplorer(Viewer):
         finally:
             self._layout.loading = False
 
+    def _refresh(self, *events):
+        self._plot()
+        with param.parameterized.discard_events(self):
+            self.code = self.plot_code()
+        self._code_pane.object = f"""```python\n{self.code}\n```"""
+
+    @property
+    def _var_name(self):
+        return 'data'
+
     @property
     def _single_y(self):
-        if self.kind in KINDS["2d"]:
+        if self.kind in KINDS['2d']:
             return True
         return False
 
@@ -587,11 +603,11 @@ class hvPlotExplorer(Viewer):
                 }, show_name=False)),
                 ('Style', self.style),
                 ('Operations', self.operations),
-                ('Geographic', self.geographic)
+                ('Geographic', self.geographic),
             ]
             if event and event.new not in ('area', 'kde', 'line', 'ohlc', 'rgb', 'step'):
                 tabs.insert(5, ('Colormapping', self.colormapping))
-        self._tabs[:] = tabs
+        self._control_tabs[:] = tabs
 
     def _check_y(self, event):
         if len(event.new) > 1 and self.by:
@@ -610,7 +626,7 @@ class hvPlotExplorer(Viewer):
         """
         return self._hvplot.clone()
 
-    def plot_code(self, var_name='df'):
+    def plot_code(self, var_name=None):
         """Return a string representation that can be easily copy-pasted
         in a notebook cell to create a plot from a call to the `.hvplot`
         accessor, and that includes all the customized settings of the explorer.
@@ -627,9 +643,9 @@ class hvPlotExplorer(Viewer):
         args = ''
         if settings:
             for k, v in settings.items():
-                args += f'{k}={v!r}, '
+                args += f'    {k}={v!r},\n'
             args = args[:-2]
-        return f'{var_name}.hvplot({args})'
+        return f'{var_name or self._var_name}.hvplot(\n{args}\n)'
 
     def save(self, filename, **kwargs):
         """Save the plot to file.
@@ -662,7 +678,7 @@ class hvPlotExplorer(Viewer):
                     settings[p] = value
         for p in self._controls.parameters:
             value = getattr(self, p)
-            if value != self.param[p].default:
+            if value != self.param[p].default or p == 'kind':
                 settings[p] = value
         if 'y_multi' in settings:
             settings['y'] = settings.pop('y_multi')
@@ -673,6 +689,10 @@ class hvPlotExplorer(Viewer):
 class hvGeomExplorer(hvPlotExplorer):
 
     kind = param.Selector(default=None, objects=KINDS['all'])
+
+    @property
+    def _var_name(self):
+        return 'gdf'
 
     @property
     def _single_y(self):
@@ -704,15 +724,26 @@ class hvGridExplorer(hvPlotExplorer):
 
     def __init__(self, ds, **params):
         import xarray as xr
+        var_name_suffix = ''
         if isinstance(ds, xr.Dataset):
             data_vars = list(ds.data_vars)
             if len(data_vars) == 1:
                 ds = ds[data_vars[0]]
+                var_name_suffix = f"['{data_vars[0]}']"
             else:
                 ds = ds.to_array('variable').transpose(..., 'variable')
+                var_name_suffix = ".to_array('variable').transpose(..., 'variable')"
         if 'kind' not in params:
             params['kind'] = 'image'
+        self._var_name_suffix = var_name_suffix
         super().__init__(ds, **params)
+
+    @property
+    def _var_name(self):
+        if self._var_name_suffix:
+            return f'ds{self._var_name_suffix}'
+        else:
+            return 'da'
 
     @property
     def _x(self):
@@ -774,6 +805,10 @@ class hvDataFrameExplorer(hvPlotExplorer):
     kind = param.Selector(default='line', objects=KINDS['all'])
 
     @property
+    def _var_name(self):
+        return 'df'
+
+    @property
     def xcat(self):
         if self.kind in ('bar', 'box', 'violin'):
             return False
@@ -810,7 +845,7 @@ class hvDataFrameExplorer(hvPlotExplorer):
             except:
                 return 0, 1
         # for dask series; else it cannot get length
-        if hasattr(values, "compute_chunk_sizes"):
+        if hasattr(values, 'compute_chunk_sizes'):
             values = values.compute_chunk_sizes()
         if values.dtype.kind in 'OSU':
             return None
