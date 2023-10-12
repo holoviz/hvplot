@@ -672,7 +672,7 @@ class hvPlotExplorer(Viewer):
         if kwargs:
             for k, v in kwargs.items():
                 args += f'    {k}={v!r},\n'
-            args = args[:-2]
+            args = args[:-1]
         return args
 
     def save(self, filename, **kwargs):

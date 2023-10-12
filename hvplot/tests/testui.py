@@ -63,7 +63,7 @@ def test_explorer_plot_code():
             "    by=['species'],\n"
             "    kind='scatter',\n"
             "    x='bill_length_mm',\n"
-            "    y=['bill_depth_mm']\n"
+            "    y=['bill_depth_mm'],\n"
             ")"
         )
     )
@@ -76,7 +76,7 @@ def test_explorer_plot_code():
             "    by=['species'],\n"
             "    kind='scatter',\n"
             "    x='bill_length_mm',\n"
-            "    y=['bill_depth_mm']\n"
+            "    y=['bill_depth_mm'],\n"
             ")"
         )
     )
@@ -274,7 +274,7 @@ def test_explorer_code_dataframe():
         df.hvplot(
             kind='points',
             x='bill_length_mm',
-            y='species'
+            y='species',
         )"""
     )
     assert explorer._code_pane.object == dedent("""\
@@ -282,7 +282,7 @@ def test_explorer_code_dataframe():
         df.hvplot(
             kind='points',
             x='bill_length_mm',
-            y='species'
+            y='species',
         )
         ```"""
     )
@@ -297,7 +297,7 @@ def test_explorer_code_gridded():
             groupby=['time'],
             kind='image',
             x='lon',
-            y='lat'
+            y='lat',
         )""")
 
     assert explorer._code_pane.object == dedent("""\
@@ -307,7 +307,7 @@ def test_explorer_code_gridded():
             groupby=['time'],
             kind='image',
             x='lon',
-            y='lat'
+            y='lat',
         )
         ```"""
     )
@@ -323,7 +323,7 @@ def test_explorer_code_gridded_dataarray():
             groupby=['time'],
             kind='image',
             x='lon',
-            y='lat'
+            y='lat',
         )""")
 
     assert explorer._code_pane.object == dedent("""\
@@ -333,15 +333,15 @@ def test_explorer_code_gridded_dataarray():
             groupby=['time'],
             kind='image',
             x='lon',
-            y='lat'
+            y='lat',
         )
         ```"""
     )
 
 
 def test_explorer_code_opts():
-    da = ds_air_temperature["air"]
-    explorer = hvplot.explorer(da, x="lon", y="lat", kind="image", opts={"color_levels": 3})
+    da = ds_air_temperature['air']
+    explorer = hvplot.explorer(da, x='lon', y='lat', kind='image', opts={'color_levels': 3})
     code = explorer.code
     assert code == dedent("""\
         da.hvplot(
@@ -349,9 +349,9 @@ def test_explorer_code_opts():
             groupby=['time'],
             kind='image',
             x='lon',
-            y='lat'
+            y='lat',
         ).opts(
-            color_levels=3
+            color_levels=3,
         )""")
 
     assert explorer._code_pane.object == dedent("""\
@@ -361,9 +361,9 @@ def test_explorer_code_opts():
             groupby=['time'],
             kind='image',
             x='lon',
-            y='lat'
+            y='lat',
         ).opts(
-            color_levels=3
+            color_levels=3,
         )
         ```"""
     )
