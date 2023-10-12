@@ -1,12 +1,15 @@
 import re
 
 import holoviews as hv
+import pandas as pd
 import hvplot.pandas
+import hvplot.xarray
+import xarray as xr
 
 import pytest
 
 from bokeh.sampledata import penguins
-from hvplot.ui import hvDataFrameExplorer
+from hvplot.ui import hvDataFrameExplorer, hvGridExplorer
 
 df = penguins.data
 
@@ -103,6 +106,99 @@ def test_explorer_kwargs_controls_error_not_supported():
         TypeError, match=re.escape("__init__() got keyword(s) not supported by any control: {'not_a_control_kwarg': None}")
     ):
         hvplot.explorer(df, title='Dummy title', not_a_control_kwarg=None)
+
+
+def test_explorer_hvplot_gridded_basic():
+    ds = xr.tutorial.open_dataset('air_temperature')
+    explorer = hvplot.explorer(ds)
+
+    assert isinstance(explorer, hvGridExplorer)
+    assert isinstance(explorer._data, xr.DataArray)
+    assert explorer.kind == 'image'
+    assert explorer.x == 'lat'
+    assert explorer.y == 'lon'
+    assert explorer.by == []
+    assert explorer.groupby == ['time']
+
+
+def test_explorer_hvplot_gridded_2d():
+    ds = xr.tutorial.open_dataset('air_temperature').isel(time=0)
+    explorer = hvplot.explorer(ds)
+
+    assert isinstance(explorer, hvGridExplorer)
+    assert isinstance(explorer._data, xr.DataArray)
+    assert explorer.kind == 'image'
+    assert explorer.x == 'lat'
+    assert explorer.y == 'lon'
+    assert explorer.by == []
+    assert explorer.groupby == []
+
+
+def test_explorer_hvplot_gridded_two_variables():
+    ds = xr.tutorial.open_dataset('air_temperature')
+    ds['airx2'] = ds['air'] * 2
+    explorer = hvplot.explorer(ds)
+
+    assert isinstance(explorer, hvGridExplorer)
+    assert isinstance(explorer._data, xr.DataArray)
+    assert list(explorer._data['variable']) == ['air', 'airx2']
+    assert explorer.kind == 'image'
+    assert explorer.x == 'lat'
+    assert explorer.y == 'lon'
+    assert explorer.by == []
+    assert explorer.groupby == ['time', 'variable']
+
+
+def test_explorer_hvplot_gridded_dataarray():
+    da = xr.tutorial.open_dataset('air_temperature')['air']
+    explorer = hvplot.explorer(da)
+
+    assert isinstance(explorer, hvGridExplorer)
+    assert isinstance(explorer._data, xr.DataArray)
+    assert explorer.kind == 'image'
+    assert explorer.x == 'lat'
+    assert explorer.y == 'lon'
+    assert explorer.by == []
+    assert explorer.groupby == ['time']
+
+
+def test_explorer_hvplot_gridded_options():
+    ds = xr.tutorial.open_dataset('air_temperature')
+    explorer = hvplot.explorer(ds)
+    assert explorer._controls[0].groups.keys() == {'dataframe', 'gridded', 'geom'}
+
+
+def test_explorer_hvplot_geo():
+    df = pd.DataFrame({'x': [-9796115.18980811], 'y': [4838471.398061159]})
+    explorer = hvplot.explorer(df, x='x', geo=True, kind='points')
+    assert explorer.geographic.geo
+    assert explorer.geographic.global_extent
+    assert explorer.geographic.features == ['coastline']
+    assert explorer.geographic.crs == 'GOOGLE_MERCATOR'
+    assert explorer.geographic.projection == 'GOOGLE_MERCATOR'
+
+
+def test_explorer_live_update_init():
+    explorer = hvplot.explorer(df)
+    assert explorer.statusbar.live_update is True
+
+    explorer = hvplot.explorer(df, live_update=False)
+    assert explorer._hv_pane.object is None
+    assert 'live_update' not in explorer.settings()
+
+
+def test_explorer_live_update_after_init():
+    explorer = hvplot.explorer(df)
+    assert explorer._hv_pane.object.type is hv.Curve
+    explorer.kind = 'scatter'
+    assert explorer._hv_pane.object.type is hv.Scatter
+
+    explorer.statusbar.live_update = False
+    explorer.kind = 'line'
+    assert explorer._hv_pane.object.type is hv.Scatter
+
+    explorer.statusbar.live_update = True
+    assert explorer._hv_pane.object.type is hv.Curve
 
 
 def test_explorer_method_basic():
