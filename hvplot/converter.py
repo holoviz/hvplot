@@ -993,11 +993,8 @@ class HoloViewsConverter:
                     param.main.param.warning('Unable to auto label using xarray attrs '
                                        f'because {e}')
 
-    def _replace_explorer_kind(self, kind):
-        return kind if kind != "explorer" else 'line'
-
     def _process_plot(self):
-        kind = self._replace_explorer_kind(self.kind)
+        kind = self.kind
         options = Store.options(backend='bokeh')
         elname = self._kind_mapping[kind].__name__
         plot_opts = options[elname].groups['plot'].options if elname in options else {}
@@ -1013,7 +1010,7 @@ class HoloViewsConverter:
         return plot_opts
 
     def _process_style(self, kwds, plot_opts):
-        kind = self._replace_explorer_kind(self.kind)
+        kind = self.kind
         eltype = self._kind_mapping[kind]
         registry =  Store.registry[self._backend_compat]
 
@@ -1123,8 +1120,8 @@ class HoloViewsConverter:
         return style_opts, plot_opts, kwds
 
     def _validate_kwds(self, kwds):
-        kind = self._replace_explorer_kind(self.kind)
         kind_opts = self._kind_options.get(self.kind, [])
+        kind = self.kind
         eltype = self._kind_mapping[kind]
         if eltype in Store.registry[self._backend_compat]:
             valid_opts = Store.registry[self._backend_compat][eltype].style_opts
@@ -1274,10 +1271,7 @@ class HoloViewsConverter:
                         dataset = Dataset(data)
                     dataset = dataset.redim(**self._redim)
 
-                if kind == "explorer":
-                    obj = method(x=x, y=y, data=data)
-                else:
-                    obj = method(x, y)
+                obj = method(x, y)
                 obj._dataset = dataset
 
         if self.crs and self.project:
@@ -1560,15 +1554,6 @@ class HoloViewsConverter:
             raise NotImplementedError(
                 f'{kind!r} plot not supported by the {self._backend!r} backend.'
             )
-
-    ##########################
-    #     Explorer           #
-    ##########################
-
-    def explorer(self, x=None, y=None, data=None):
-        # import here to prevent circular imports
-        from .ui import explorer as ui_explorer
-        return ui_explorer(data, x=x, y=y)
 
     ##########################
     #     Simple charts      #

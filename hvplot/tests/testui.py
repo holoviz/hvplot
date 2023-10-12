@@ -12,6 +12,7 @@ from bokeh.sampledata import penguins
 from hvplot.ui import hvDataFrameExplorer, hvGridExplorer
 
 df = penguins.data
+ds_air_temperature = xr.tutorial.open_dataset('air_temperature')
 
 
 def test_explorer_basic():
@@ -109,8 +110,7 @@ def test_explorer_kwargs_controls_error_not_supported():
 
 
 def test_explorer_hvplot_gridded_basic():
-    ds = xr.tutorial.open_dataset('air_temperature')
-    explorer = hvplot.explorer(ds)
+    explorer = hvplot.explorer(ds_air_temperature)
 
     assert isinstance(explorer, hvGridExplorer)
     assert isinstance(explorer._data, xr.DataArray)
@@ -122,7 +122,7 @@ def test_explorer_hvplot_gridded_basic():
 
 
 def test_explorer_hvplot_gridded_2d():
-    ds = xr.tutorial.open_dataset('air_temperature').isel(time=0)
+    ds = ds_air_temperature.isel(time=0)
     explorer = hvplot.explorer(ds)
 
     assert isinstance(explorer, hvGridExplorer)
@@ -135,7 +135,7 @@ def test_explorer_hvplot_gridded_2d():
 
 
 def test_explorer_hvplot_gridded_two_variables():
-    ds = xr.tutorial.open_dataset('air_temperature')
+    ds = ds_air_temperature.copy()
     ds['airx2'] = ds['air'] * 2
     explorer = hvplot.explorer(ds)
 
@@ -150,7 +150,7 @@ def test_explorer_hvplot_gridded_two_variables():
 
 
 def test_explorer_hvplot_gridded_dataarray():
-    da = xr.tutorial.open_dataset('air_temperature')['air']
+    da = ds_air_temperature['air']
     explorer = hvplot.explorer(da)
 
     assert isinstance(explorer, hvGridExplorer)
@@ -163,8 +163,7 @@ def test_explorer_hvplot_gridded_dataarray():
 
 
 def test_explorer_hvplot_gridded_options():
-    ds = xr.tutorial.open_dataset('air_temperature')
-    explorer = hvplot.explorer(ds)
+    explorer = hvplot.explorer(ds_air_temperature)
     assert explorer._controls[0].groups.keys() == {'dataframe', 'gridded', 'geom'}
 
 
@@ -201,13 +200,22 @@ def test_explorer_live_update_after_init():
     assert explorer._hv_pane.object.type is hv.Curve
 
 
-def test_explorer_method_basic():
+def test_explorer_method_dataframe():
     explorer = df.hvplot.explorer()
 
     assert isinstance(explorer, hvDataFrameExplorer)
     assert explorer.kind == 'line'
     assert explorer.x == 'index'
     assert explorer.y == 'species'
+
+
+def test_explorer_method_grid():
+    explorer = ds_air_temperature.hvplot.explorer()
+
+    assert isinstance(explorer, hvGridExplorer)
+    assert explorer.kind == 'image'
+    assert explorer.x == 'lat'
+    assert explorer.y == 'lon'
 
 
 def test_explorer_method_kind():
