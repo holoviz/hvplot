@@ -217,9 +217,11 @@ def test_explorer_live_update_after_init():
     explorer.statusbar.live_update = False
     explorer.kind = 'line'
     assert explorer._hv_pane.object.type is hv.Scatter
+    assert 'line' not in explorer.code
 
     explorer.statusbar.live_update = True
     assert explorer._hv_pane.object.type is hv.Curve
+    assert 'line' in explorer.code
 
 
 def test_explorer_method_dataframe():

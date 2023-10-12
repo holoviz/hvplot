@@ -522,8 +522,6 @@ class hvPlotExplorer(Viewer):
                     setattr(self, pname, p.objects[0])
 
     def _plot(self, *events):
-        if not self.statusbar.live_update:
-            return
         y = self.y_multi if 'y_multi' in self._controls.parameters else self.y
         if isinstance(y, list) and len(y) == 1:
             y = y[0]
@@ -572,6 +570,8 @@ class hvPlotExplorer(Viewer):
             self._layout.loading = False
 
     def _refresh(self, *events):
+        if not self.statusbar.live_update:
+            return
         self._plot()
         with param.parameterized.discard_events(self):
             self.code = self.plot_code()
