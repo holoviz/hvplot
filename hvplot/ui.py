@@ -559,15 +559,11 @@ class hvPlotExplorer(Viewer):
         self._plot()
         with param.parameterized.discard_events(self):
             self.code = self.plot_code()
-        self._code_pane.object = f"""```python\nimport hvplot.{self._backend}\n\n{self.code}\n```"""
+        self._code_pane.object = f"""```python\n{self.code}\n```"""
 
     @property
     def _var_name(self):
         return 'data'
-
-    @property
-    def _backend(self):
-        return 'pandas'
 
     @property
     def _single_y(self):
@@ -748,10 +744,6 @@ class hvGridExplorer(hvPlotExplorer):
             return f'ds{self._var_name_suffix}'
         else:
             return 'da'
-
-    @property
-    def _backend(self):
-        return 'xarray'
 
     @property
     def _x(self):

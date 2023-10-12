@@ -279,8 +279,6 @@ def test_explorer_code_dataframe():
     )
     assert explorer._code_pane.object == dedent("""\
         ```python
-        import hvplot.pandas
-
         df.hvplot(
             kind='points',
             x='bill_length_mm',
@@ -305,8 +303,6 @@ def test_explorer_code_gridded():
 
     assert explorer._code_pane.object == dedent("""\
         ```python
-        import hvplot.xarray
-
         ds['air'].hvplot(
             colorbar=True,
             groupby=['time'],
@@ -333,8 +329,6 @@ def test_explorer_code_gridded_dataarray():
 
     assert explorer._code_pane.object == dedent("""\
         ```python
-        import hvplot.xarray
-
         da.hvplot(
             colorbar=True,
             groupby=['time'],
