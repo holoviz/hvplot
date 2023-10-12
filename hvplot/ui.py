@@ -50,7 +50,7 @@ def explorer(data, **kwargs):
 
     Parameters
     ----------
-    data : pandas.DataFrame | xarray.Dataset
+    data : pandas.DataFrame | xarray.DataArray | xarray.Dataset
         Data structure to explore.
     kwargs : optional
         Arguments that `data.hvplot()` would also accept like `kind='bar'`.
