@@ -551,10 +551,6 @@ class hvPlotExplorer(Viewer):
         finally:
             self._layout.loading = False
 
-    def _refresh(self, event):
-        if event.new:
-            self._plot()
-
     def _update_refresh_plot(self, event):
         self.refresh_plot = event.new
 
