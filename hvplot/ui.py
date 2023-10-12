@@ -15,19 +15,19 @@ from .util import is_geodataframe, is_xarray, instantiate_crs_str
 # Defaults
 KINDS = {
     # these are for the kind selector
-    "dataframe": sorted(
+    'dataframe': sorted(
         set(_hvConverter._kind_mapping) -
         set(_hvConverter._gridded_types) -
         set(_hvConverter._geom_types) |
-        set(["points"])
+        set(['points'])
     ),
-    "gridded": sorted(set(_hvConverter._gridded_types) - set(["dataset"])),
-    "geom": _hvConverter._geom_types,
+    'gridded': sorted(set(_hvConverter._gridded_types) - set(['dataset'])),
+    'geom': _hvConverter._geom_types,
 }
 
-KINDS["2d"] = ['bivariate', 'heatmap', 'hexbin', 'labels', 'vectorfield', 'points'] + KINDS["gridded"] + KINDS["geom"]
-KINDS["stats"] = ['hist', 'kde', 'boxwhisker', 'violin', 'heatmap', 'bar', 'barh']
-KINDS["all"] = sorted(set(KINDS["dataframe"] + KINDS["gridded"] + KINDS["geom"]))
+KINDS['2d'] = ['bivariate', 'heatmap', 'hexbin', 'labels', 'vectorfield', 'points'] + KINDS['gridded'] + KINDS['geom']
+KINDS['stats'] = ['hist', 'kde', 'boxwhisker', 'violin', 'heatmap', 'bar', 'barh']
+KINDS['all'] = sorted(set(KINDS['dataframe'] + KINDS['gridded'] + KINDS['geom']))
 
 CMAPS = [cm for cm in list_cmaps() if not cm.endswith('_r_r')]
 DEFAULT_CMAPS = _hvConverter._default_cmaps
@@ -80,7 +80,7 @@ class Controls(Viewer):
     refresh_plot = param.Boolean(
         default=True,
         precedence=0,
-        doc="Whether to automatically refresh the plot when a param is changed",
+        doc='Whether to automatically refresh the plot when a param is changed',
     )
 
     explorer = param.ClassSelector(class_=Viewer, precedence=-1)
@@ -109,7 +109,7 @@ class Controls(Viewer):
         return {k: v for k, v in self.param.values().items()
                 if k not in ('name', 'explorer') and v is not None and v != ''}
 
-    @param.depends("explorer.refresh_plot", watch=True)
+    @param.depends('explorer.refresh_plot', watch=True)
     def _update_refresh_plot(self):
         self.refresh_plot = self.explorer.refresh_plot
 
@@ -278,7 +278,7 @@ class Geographic(Controls):
         at which to render it. Available features include 'borders',
         'coastline', 'lakes', 'land', 'ocean', 'rivers' and 'states'.""")
 
-    feature_scale = param.ObjectSelector(default="110m", objects=["110m", "50m", "10m"], doc="""
+    feature_scale = param.ObjectSelector(default='110m', objects=['110m', '50m', '10m'], doc="""
         The scale at which to render the features.""")
 
     tiles = param.ObjectSelector(default=None, objects=GEO_TILES, doc="""
@@ -302,9 +302,9 @@ class Geographic(Controls):
             k for k in param.concrete_descendents(CRS).keys()
             if not k.startswith('_') and k != 'CRS'
         )
-        crs_list.insert(0, "GOOGLE_MERCATOR")
-        crs_list.insert(0, "PlateCarree")
-        crs_list.remove("PlateCarree")
+        crs_list.insert(0, 'GOOGLE_MERCATOR')
+        crs_list.insert(0, 'PlateCarree')
+        crs_list.remove('PlateCarree')
 
         self.param.crs.objects = crs_list
         self.param.projection.objects = crs_list
@@ -315,7 +315,7 @@ class Geographic(Controls):
             self.global_extent = True
 
         if self.features is None:
-            self.features = ["coastline"]
+            self.features = ['coastline']
 
 
 class Operations(Controls):
@@ -364,7 +364,7 @@ class hvPlotExplorer(Viewer):
 
     refresh_plot = param.Boolean(
         default=True,
-        doc="Whether to automatically refresh the plot when a param is changed",
+        doc='Whether to automatically refresh the plot when a param is changed',
     )
 
     kind = param.Selector()
@@ -428,7 +428,7 @@ class hvPlotExplorer(Viewer):
         self._controls = pn.Param(
             self.param, parameters=['refresh_plot', 'kind', 'x', 'y', 'groupby', 'by'],
             sizing_mode='stretch_width', show_name=False,
-            widgets={"kind": {"options": [], "groups": groups}}
+            widgets={'kind': {'options': [], 'groups': groups}}
         )
         self.param.watch(self._toggle_controls, 'kind')
         self.param.watch(self._check_y, 'y_multi')
@@ -462,9 +462,9 @@ class hvPlotExplorer(Viewer):
         self.param.watch(self._plot, list(self.param))
         for controller in self._controllers.values():
             params_to_watch = list(controller.param)
-            params_to_watch.remove("refresh_plot")
+            params_to_watch.remove('refresh_plot')
             controller.param.watch(self._plot, params_to_watch)
-            controller.param.watch(self._update_refresh_plot, "refresh_plot")
+            controller.param.watch(self._update_refresh_plot, 'refresh_plot')
         self._alert = pn.pane.Alert(
             alert_type='danger', visible=False, sizing_mode='stretch_width'
         )
@@ -474,14 +474,14 @@ class hvPlotExplorer(Viewer):
             pn.Row(
                 self._tabs,
                 self._hv_pane,
-                sizing_mode="stretch_width",
+                sizing_mode='stretch_width',
             ),
             pn.layout.HSpacer(),
             sizing_mode='stretch_both'
         )
 
         # initialize
-        self.param.trigger("kind")
+        self.param.trigger('kind')
 
     def _populate(self):
         """
@@ -519,17 +519,17 @@ class hvPlotExplorer(Viewer):
             if isinstance(v, Controls):
                 kwargs.update(v.kwargs)
 
-        if kwargs.get("geo"):
-            if "crs" not in kwargs:
+        if kwargs.get('geo'):
+            if 'crs' not in kwargs:
                 xmax = np.max(np.abs(self.xlim()))
-                self.geographic.crs = "PlateCarree" if xmax <= 360 else "GOOGLE_MERCATOR"
-                kwargs["crs"] = self.geographic.crs
-            for key in ["crs", "projection"]:
-                crs_kwargs = kwargs.pop(f"{key}_kwargs", {})
+                self.geographic.crs = 'PlateCarree' if xmax <= 360 else 'GOOGLE_MERCATOR'
+                kwargs['crs'] = self.geographic.crs
+            for key in ['crs', 'projection']:
+                crs_kwargs = kwargs.pop(f'{key}_kwargs', {})
                 kwargs[key] = instantiate_crs_str(kwargs.pop(key), **crs_kwargs)
 
-            feature_scale = kwargs.pop("feature_scale", None)
-            kwargs['features'] = {feature: feature_scale for feature in kwargs.pop("features", [])}
+            feature_scale = kwargs.pop('feature_scale', None)
+            kwargs['features'] = {feature: feature_scale for feature in kwargs.pop('features', [])}
         kwargs.pop('refresh_plot', None)
 
         kwargs['min_height'] = 600
@@ -681,7 +681,7 @@ class hvPlotExplorer(Viewer):
 
 class hvGeomExplorer(hvPlotExplorer):
 
-    kind = param.Selector(default=None, objects=KINDS["all"])
+    kind = param.Selector(default=None, objects=KINDS['all'])
 
     @property
     def _single_y(self):
@@ -705,11 +705,11 @@ class hvGeomExplorer(hvPlotExplorer):
 
     @property
     def _groups(self):
-        return ["gridded", "dataframe"]
+        return ['gridded', 'dataframe']
 
 class hvGridExplorer(hvPlotExplorer):
 
-    kind = param.Selector(default="image", objects=KINDS['all'])
+    kind = param.Selector(default='image', objects=KINDS['all'])
 
     def __init__(self, ds, **params):
         import xarray as xr
@@ -718,9 +718,9 @@ class hvGridExplorer(hvPlotExplorer):
             if len(data_vars) == 1:
                 ds = ds[data_vars[0]]
             else:
-                ds = ds.to_array('variable').transpose(..., "variable")
-        if "kind" not in params:
-            params["kind"] = "image"
+                ds = ds.to_array('variable').transpose(..., 'variable')
+        if 'kind' not in params:
+            params['kind'] = 'image'
         super().__init__(ds, **params)
 
     @property
@@ -751,28 +751,28 @@ class hvGridExplorer(hvPlotExplorer):
 
     @property
     def _groups(self):
-        return ["gridded", "dataframe", "geom"]
+        return ['gridded', 'dataframe', 'geom']
 
     def _populate(self):
         variables = self._converter.variables
-        indexes = getattr(self._converter, "indexes", [])
+        indexes = getattr(self._converter, 'indexes', [])
         variables_no_index = [v for v in variables if v not in indexes]
         for pname in self.param:
             if pname == 'kind':
                 continue
             p = self.param[pname]
             if isinstance(p, param.Selector):
-                if pname in ["x", "y", "groupby", "by"]:
+                if pname in ['x', 'y', 'groupby', 'by']:
                     p.objects = indexes
                 else:
                     p.objects = variables_no_index
 
                 # Setting the default value if not set
-                if pname == "x" and getattr(self, pname, None) is None:
+                if pname == 'x' and getattr(self, pname, None) is None:
                     setattr(self, pname, p.objects[0])
-                elif pname == "y" and getattr(self, pname, None) is None:
+                elif pname == 'y' and getattr(self, pname, None) is None:
                     setattr(self, pname, p.objects[1])
-                elif pname == "groupby" and len(getattr(self, pname, [])) == 0 and len(p.objects) > 2:
+                elif pname == 'groupby' and len(getattr(self, pname, [])) == 0 and len(p.objects) > 2:
                     setattr(self, pname, p.objects[2:])
 
 
@@ -780,7 +780,7 @@ class hvDataFrameExplorer(hvPlotExplorer):
 
     z = param.Selector()
 
-    kind = param.Selector(default='line', objects=KINDS["all"])
+    kind = param.Selector(default='line', objects=KINDS['all'])
 
     @property
     def xcat(self):
@@ -807,7 +807,7 @@ class hvDataFrameExplorer(hvPlotExplorer):
 
     @property
     def _groups(self):
-        return ["dataframe"]
+        return ['dataframe']
 
     @param.depends('x')
     def xlim(self):

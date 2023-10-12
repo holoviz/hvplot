@@ -382,16 +382,16 @@ def test_convert_col_names_to_str():
 
 
 def test_instantiate_crs_str():
-    assert isinstance(instantiate_crs_str("PlateCarree"), ccrs.PlateCarree)
+    assert isinstance(instantiate_crs_str('PlateCarree'), ccrs.PlateCarree)
 
 
 def test_instantiate_crs_google_mercator():
-    assert instantiate_crs_str("GOOGLE_MERCATOR") == ccrs.GOOGLE_MERCATOR
-    assert instantiate_crs_str("google_mercator") == ccrs.GOOGLE_MERCATOR
+    assert instantiate_crs_str('GOOGLE_MERCATOR') == ccrs.GOOGLE_MERCATOR
+    assert instantiate_crs_str('google_mercator') == ccrs.GOOGLE_MERCATOR
 
 
 def test_instantiate_crs_str_kwargs():
-    crs = instantiate_crs_str("PlateCarree", globe=ccrs.Globe(datum="WGS84"))
+    crs = instantiate_crs_str('PlateCarree', globe=ccrs.Globe(datum='WGS84'))
     assert isinstance(crs, ccrs.PlateCarree)
     assert isinstance(crs.globe, ccrs.Globe)
-    assert crs.globe.datum == "WGS84"
+    assert crs.globe.datum == 'WGS84'
