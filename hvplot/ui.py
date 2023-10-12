@@ -352,6 +352,16 @@ class Operations(Controls):
         self.param.aggregator.constant = not enabled
 
 
+class Advanced(Controls):
+
+    opts = param.Dict(default={}, label='HoloViews .opts()', doc="""
+        Options applied via HoloViews .opts().
+        Examples:
+        - image: {"color_levels": 11}
+        - line: {"line_dash": "dashed"}
+        - scatter: {'size': 5, 'marker': '^'}""")
+
+
 class StatusBar(param.Parameterized):
 
     live_update = param.Boolean(default=True, doc="""
@@ -387,6 +397,8 @@ class hvPlotExplorer(Viewer):
     statusbar = param.ClassSelector(class_=StatusBar)
 
     style = param.ClassSelector(class_=Style)
+
+    advanced = param.ClassSelector(class_=Advanced)
 
     code = param.String(precedence=-1, doc="""
         Code to generate the plot.""")
@@ -521,7 +533,9 @@ class hvPlotExplorer(Viewer):
             if isinstance(v, Geographic) and not v.geo:
                 continue
 
-            if isinstance(v, Controls):
+            if isinstance(v, Advanced):
+                opts_kwargs = v.kwargs.get('opts', {})
+            elif isinstance(v, Controls):
                 kwargs.update(v.kwargs)
 
         if kwargs.get('geo'):
@@ -545,6 +559,8 @@ class hvPlotExplorer(Viewer):
             self._hvplot = _hvPlot(df)(
                 kind=self.kind, x=self.x, y=y, by=self.by, groupby=self.groupby, **kwargs
             )
+            if opts_kwargs:
+                self._hvplot.opts(**opts_kwargs)
             self._hv_pane.object = self._hvplot
             self._alert.visible = False
         except Exception as e:
@@ -604,6 +620,7 @@ class hvPlotExplorer(Viewer):
                 ('Style', self.style),
                 ('Operations', self.operations),
                 ('Geographic', self.geographic),
+                ('Advanced', self.advanced),
             ]
             if event and event.new not in ('area', 'kde', 'line', 'ohlc', 'rgb', 'step'):
                 tabs.insert(5, ('Colormapping', self.colormapping))
@@ -640,12 +657,23 @@ class hvPlotExplorer(Viewer):
             Data variable name by which the returned string will start.
         """
         settings = self.settings()
-        args = ''
+        settings_args = ''
         if settings:
-            for k, v in settings.items():
+            settings_args = self._build_kwargs_string(settings)
+        snippet = f'{var_name or self._var_name}.hvplot(\n{settings_args}\n)'
+        opts = self.advanced.opts
+        if opts:
+            opts_args = self._build_kwargs_string(opts)
+            snippet += f'.opts(\n{opts_args}\n)'
+        return snippet
+
+    def _build_kwargs_string(self, kwargs):
+        args = ''
+        if kwargs:
+            for k, v in kwargs.items():
                 args += f'    {k}={v!r},\n'
             args = args[:-2]
-        return f'{var_name or self._var_name}.hvplot(\n{args}\n)'
+        return args
 
     def save(self, filename, **kwargs):
         """Save the plot to file.
@@ -682,6 +710,7 @@ class hvPlotExplorer(Viewer):
                 settings[p] = value
         if 'y_multi' in settings:
             settings['y'] = settings.pop('y_multi')
+        settings.pop('opts', None)
         settings = {k: v for k, v in sorted(list(settings.items()))}
         return settings
 

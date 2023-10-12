@@ -289,8 +289,7 @@ def test_explorer_code_dataframe():
 
 
 def test_explorer_code_gridded():
-    ds = xr.tutorial.open_dataset('air_temperature')
-    explorer = hvplot.explorer(ds, x='lon', y='lat', kind='image')
+    explorer = hvplot.explorer(ds_air_temperature, x='lon', y='lat', kind='image')
     code = explorer.code
     assert code == dedent("""\
         ds['air'].hvplot(
@@ -315,8 +314,8 @@ def test_explorer_code_gridded():
 
 
 def test_explorer_code_gridded_dataarray():
-    ds = xr.tutorial.open_dataset('air_temperature')['air']
-    explorer = hvplot.explorer(ds, x='lon', y='lat', kind='image')
+    da = ds_air_temperature['air']
+    explorer = hvplot.explorer(da, x='lon', y='lat', kind='image')
     code = explorer.code
     assert code == dedent("""\
         da.hvplot(
@@ -335,6 +334,36 @@ def test_explorer_code_gridded_dataarray():
             kind='image',
             x='lon',
             y='lat'
+        )
+        ```"""
+    )
+
+
+def test_explorer_code_opts():
+    da = ds_air_temperature["air"]
+    explorer = hvplot.explorer(da, x="lon", y="lat", kind="image", opts={"color_levels": 3})
+    code = explorer.code
+    assert code == dedent("""\
+        da.hvplot(
+            colorbar=True,
+            groupby=['time'],
+            kind='image',
+            x='lon',
+            y='lat'
+        ).opts(
+            color_levels=3
+        )""")
+
+    assert explorer._code_pane.object == dedent("""\
+        ```python
+        da.hvplot(
+            colorbar=True,
+            groupby=['time'],
+            kind='image',
+            x='lon',
+            y='lat'
+        ).opts(
+            color_levels=3
         )
         ```"""
     )
