@@ -5,12 +5,11 @@ import pandas as pd
 import hvplot.pandas
 import hvplot.xarray
 import xarray as xr
-import param
 
 import pytest
 
 from bokeh.sampledata import penguins
-from hvplot.ui import hvDataFrameExplorer, hvGridExplorer, Controls
+from hvplot.ui import hvDataFrameExplorer, hvGridExplorer
 
 df = penguins.data
 
@@ -166,7 +165,7 @@ def test_explorer_hvplot_gridded_dataarray():
 def test_explorer_hvplot_gridded_options():
     ds = xr.tutorial.open_dataset('air_temperature')
     explorer = hvplot.explorer(ds)
-    assert explorer._controls[1].groups.keys() == {'dataframe', 'gridded', 'geom'}
+    assert explorer._controls[0].groups.keys() == {'dataframe', 'gridded', 'geom'}
 
 
 def test_explorer_hvplot_geo():
@@ -178,24 +177,25 @@ def test_explorer_hvplot_geo():
     assert explorer.geographic.crs == 'GOOGLE_MERCATOR'
     assert explorer.geographic.projection == 'GOOGLE_MERCATOR'
 
-def test_explorer_refresh_plot_linked():
+
+def test_explorer_live_update_init():
     explorer = hvplot.explorer(df)
-    controls = [
-        p.name
-        for p in explorer.param.objects().values()
-        if isinstance(p, param.ClassSelector)
-        and issubclass(p.class_, Controls)
-    ]
-    # by default
-    for control in controls:
-        assert explorer.refresh_plot == getattr(explorer, control).refresh_plot
+    assert explorer.statusbar.live_update is True
 
-    # toggle top level
-    explorer.refresh_plot = False
-    for control in controls:
-        assert explorer.refresh_plot == getattr(explorer, control).refresh_plot
+    explorer = hvplot.explorer(df, live_update=False)
+    assert explorer._hv_pane.object is None
+    assert 'live_update' not in explorer.settings()
 
-    # toggle axes
-    explorer.axes.refresh_plot = True
-    for control in controls:
-        assert explorer.refresh_plot == getattr(explorer, control).refresh_plot
+
+def test_explorer_live_update_after_init():
+    explorer = hvplot.explorer(df)
+    assert explorer._hv_pane.object.type is hv.Curve
+    explorer.kind = 'scatter'
+    assert explorer._hv_pane.object.type is hv.Scatter
+
+    explorer.statusbar.live_update = False
+    explorer.kind = 'line'
+    assert explorer._hv_pane.object.type is hv.Scatter
+
+    explorer.statusbar.live_update = True
+    assert explorer._hv_pane.object.type is hv.Curve
