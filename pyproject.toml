@@ -27,6 +27,6 @@ filterwarnings = [
 ]
 
 [tool.codespell]
-# ignore-words-list = "lod,nd,nodes,re-enabled,spread,when"
+ignore-words-list = "ser"
 skip = "doc/generate_modules.py"
 write-changes = true

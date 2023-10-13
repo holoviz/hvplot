@@ -80,7 +80,7 @@ Please note that hvPlot is not yet compatible with Bokeh 3.
   - Convert `DataFrame` columns with type `RangeIndex` to strings to ensure compatibility with `HoloViews` ([#932](https://github.com/holoviz/hvplot/pull/932))
   - Ensure that `xarray` dataset metadata propagates to `NdOverlays` ([#930](https://github.com/holoviz/hvplot/pull/930))
   - Support `rioxarray` ([#905](https://github.com/holoviz/hvplot/pull/905))
-  - Improve error message mentionning `pyproj` ([#950](https://github.com/holoviz/hvplot/pull/950))
+  - Improve error message mentioning `pyproj` ([#950](https://github.com/holoviz/hvplot/pull/950))
 - Explorer:
   - Don't error on datetime-like axis ([#968](https://github.com/holoviz/hvplot/pull/968))
   - Don't use xlim/ylim slider if start and end values are identical ([#966](https://github.com/holoviz/hvplot/pull/966))
@@ -194,7 +194,7 @@ Features:
 
 - Improved `.interactive` Dataframe support: max_rows display, column
   access ([#640](https://github.com/holoviz/hvplot/pull/640))
-- Improved accesssor and attribute behavior for `.interactive`
+- Improved accessor and attribute behavior for `.interactive`
   ([#633](https://github.com/holoviz/hvplot/pull/633),
   [#635](https://github.com/holoviz/hvplot/pull/635),
   [#641](https://github.com/holoviz/hvplot/pull/641),

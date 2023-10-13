@@ -177,7 +177,7 @@ class _PatchHvplotDocstrings:
 
     def __init__(self):
         # Store the original signatures because the method signatures
-        # are going to be patched everytime an extension is changed.
+        # are going to be patched every time an extension is changed.
         signatures = {}
         for cls in [hvPlot, hvPlotTabular]:
             for _kind in HoloViewsConverter._kind_mapping:
