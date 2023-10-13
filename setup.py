@@ -35,7 +35,7 @@ install_requires = [
     'numpy >=1.15',
     'packaging',
     'panel >=0.11.0',
-    'param >=1.9.0',
+    'param >=1.9.0,<3.0',
 ]
 
 extras_require = {}
