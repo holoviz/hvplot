@@ -1,1 +1,0 @@
-- Did I have to set `geo=True` for GeoDataFrames before?
