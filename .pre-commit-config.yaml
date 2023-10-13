@@ -29,3 +29,10 @@ repos:
     rev: v0.1.10
     hooks:
     - id: clean-notebook
+-   repo: https://github.com/codespell-project/codespell
+    rev: v2.2.6
+    hooks:
+    - id: codespell
+      exclude: (\.min\.js$|\.svg$|\.html$)
+      additional_dependencies:
+      - tomli

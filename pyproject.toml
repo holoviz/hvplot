@@ -25,3 +25,8 @@ filterwarnings = [
     # 2023-09: See https://github.com/python-streamz/streamz/issues/460
     "ignore: pkg_resources is deprecated as an API:DeprecationWarning:streamz.plugins",
 ]
+
+[tool.codespell]
+# ignore-words-list = "lod,nd,nodes,re-enabled,spread,when"
+skip = "doc/generate_modules.py"
+write-changes = true
