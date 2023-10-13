@@ -69,7 +69,7 @@ extras_require['tests_core'] = [
 extras_require['tests'] = extras_require['tests_core'] + [
     'polars',
     'fugue',
-    'ibis-framework',  # ibis-sqlite on conda
+    'ibis-framework',  # ibis-duckdb on conda
 ]
 
 # Dependencies required to run the notebooks
@@ -139,7 +139,7 @@ setup_args = dict(
     include_package_data=True,
     platforms=['Windows', 'Mac OS X', 'Linux'],
     license='BSD',
-    url='https://hvplot.pyviz.org',
+    url='https://hvplot.holoviz.org',
     classifiers = [
         "License :: OSI Approved :: BSD License",
         "Development Status :: 5 - Production/Stable",

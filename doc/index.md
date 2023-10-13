@@ -378,7 +378,7 @@ align: center
 ---
 ```
 
-**`explorer()` to explore data in a web application**
+**`.hvplot.explorer()` to explore data in a web application**
 
 The *Explorer* is a [Panel](https://panel.holoviz.org) web application that can be displayed in a Jupyter notebook and that can be used to quickly create customized plots.
 

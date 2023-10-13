@@ -216,8 +216,7 @@ def draw(G, pos=None, **kwargs):
         except ImportError:
             raise ImportError('In order to use geo-related features '
                               'the geoviews library must be available. '
-                              'It can be installed with:\n  conda '
-                              'install -c pyviz geoviews')
+                              'It can be installed with pip or conda.')
         crs = process_crs(kwargs.get('crs'))
         label_element = geoviews.Labels
         params['cls'] = geoviews.Graph
