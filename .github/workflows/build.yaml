@@ -97,9 +97,7 @@ jobs:
       - name: pip build
         run: |
           conda activate test-environment
-          # HACK!
-          cp hvplot/tests/conftest.py conftest.py
-          doit ecosystem=pip package_build
+          doit ecosystem=pip package_build --test-group=simple
       - name: pip upload
         if: github.event_name == 'push'
         run: |
