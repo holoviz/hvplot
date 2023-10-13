@@ -172,7 +172,7 @@ class hvPlotTabular(hvPlotBase):
     The plotting method: `df.hvplot(...)` creates a plot similarly to the familiar Pandas
     `df.plot` method.
 
-    For more detailed options use a specific ploting method, e.g. `df.hvplot.line`.
+    For more detailed options use a specific plotting method, e.g. `df.hvplot.line`.
 
     Reference: https://hvplot.holoviz.org/reference/index.html
 
@@ -273,7 +273,7 @@ class hvPlotTabular(hvPlotBase):
 
     def line(self, x=None, y=None, **kwds):
         """
-        The `line` plot connects the points with a continous curve.
+        The `line` plot connects the points with a continuous curve.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/line.html
 
@@ -281,7 +281,7 @@ class hvPlotTabular(hvPlotBase):
         ----------
         x : string, optional
             Field name(s) to draw x-positions from. If not specified, the index is
-            used. Can refer to continous and categorical data.
+            used. Can refer to continuous and categorical data.
         y : string or list, optional
             Field name(s) to draw y-positions from. If not specified, all numerical
             fields are used.
@@ -381,7 +381,7 @@ class hvPlotTabular(hvPlotBase):
         ----------
         x : string, optional
             Field name(s) to draw x-positions from. If not specified, the index is
-            used. Must refer to continous data. Not categorical data.
+            used. Must refer to continuous data. Not categorical data.
         y : string or list, optional
             Field name(s) to draw y-positions from. If not specified, all numerical
             fields are used.
@@ -480,7 +480,7 @@ class hvPlotTabular(hvPlotBase):
         ----------
         x : string, optional
             Field name(s) to draw x-positions from. If not specified, the index is
-            used. Can refer to continous and categorical data.
+            used. Can refer to continuous and categorical data.
         y : string or list, optional
             Field name(s) to draw y-positions from. If not specified, all numerical
             fields are used.
@@ -585,7 +585,7 @@ class hvPlotTabular(hvPlotBase):
         ----------
         x : string, optional
             Field name(s) to draw x-positions from. If not specified, the index is
-            used. Can refer to continous and categorical data.
+            used. Can refer to continuous and categorical data.
         y : string, optional
             Field name to draw the first y-position from
         y2 : string, optional
@@ -657,7 +657,7 @@ class hvPlotTabular(hvPlotBase):
     def errorbars(self, x=None, y=None, yerr1=None, yerr2=None, **kwds):
         """
         `errorbars` provide a visual indicator for the variability of the plotted data on a graph.
-        They are usually overlayed with other plots such as `scatter` , `line` or `bar` plots to
+        They are usually overlaid with other plots such as `scatter` , `line` or `bar` plots to
         indicate the variability.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/errorbars.html
@@ -666,7 +666,7 @@ class hvPlotTabular(hvPlotBase):
         ----------
         x : string, optional
             Field name to draw the x-position from. If not specified, the index is
-            used. Can refer to continous and categorical data.
+            used. Can refer to continuous and categorical data.
         y : string, optional
             Field name to draw the y-position from
         yerr1 : string, optional
@@ -810,9 +810,9 @@ class hvPlotTabular(hvPlotBase):
         ----------
         x : string, optional
             Field name to draw x coordinates from. If not specified, the index is used. Can refer
-            to continous and categorical data.
+            to continuous and categorical data.
         y : string
-            Field name to draw y-positions from. Can refer to continous and categorical data.
+            Field name to draw y-positions from. Can refer to continuous and categorical data.
         C : string, optional
             Field to draw heatmap color from. If not specified a simple count will be used.
         colorbar: boolean, optional
@@ -1288,7 +1288,7 @@ class hvPlotTabular(hvPlotBase):
 
     def hist(self, y=None, by=None, **kwds):
         """
-        A `histogram` displays an approximate representation of the distribution of continous data.
+        A `histogram` displays an approximate representation of the distribution of continuous data.
 
         Reference: https://hvplot.holoviz.org/reference/pandas/hist.html
 
@@ -1867,7 +1867,7 @@ class hvPlot(hvPlotTabular):
     The plotting method: `df.hvplot(...)` creates a plot similarly to the familiar Pandas
     `df.plot` method.
 
-    For more detailed options use a specific ploting method, e.g. `df.hvplot.line`.
+    For more detailed options use a specific plotting method, e.g. `df.hvplot.line`.
 
     Reference: https://hvplot.holoviz.org/reference/index.html
 

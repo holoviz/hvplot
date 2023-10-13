@@ -43,7 +43,7 @@ class hvplot_extension(_hv.extension):
     def __call__(self, *args, **params):
         # importing e.g. hvplot.pandas always loads the bokeh extension.
         # so hvplot.extension('matplotlib', compatibility='bokeh') doesn't
-        # require the user or the code to explicitely load bokeh.
+        # require the user or the code to explicitly load bokeh.
         compatibility = params.pop('compatibility', None)
         super().__call__(*args, **params)
         backend = _hv.Store.current_backend

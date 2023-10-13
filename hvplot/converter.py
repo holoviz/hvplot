@@ -1150,7 +1150,7 @@ class HoloViewsConverter:
         combined_opts = (self._data_options + self._axis_options +
                          self._op_options +
                          self._geo_options + kind_opts + valid_opts)
-        # Only add the gloabl styling options in the suggestions for bokeh
+        # Only add the global styling options in the suggestions for bokeh
         # since they may not be supported by all the backends.
         # See e.g. alpha for Area plots with plotly:
         # https://github.com/holoviz/holoviews/issues/5226

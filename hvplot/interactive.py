@@ -31,7 +31,7 @@ object, `Interactive` implements on top of `__getattribute__` and
 - `__getitem__`
 - `__array_ufunc__`
 
-The `_depth` attribute starts at 0 and is incremented by 1 everytime
+The `_depth` attribute starts at 0 and is incremented by 1 every time
 a new `Interactive` instance is created part of a chain.
 The root instance in an expression has a `_depth` of 0. An expression can
 consist of multiple chains, such as `dfi[dfi.A > 1]`, as the `Interactive`
@@ -52,7 +52,7 @@ another HoloViews object that is a wrapper around common data structures
 such as Pandas/Dask/... Dataframes/Series, Xarray Dataset/DataArray, etc.
 For instance a Python expression such as `(series + 2).head()` can be
 expressed with a dim transform whose repr will be `(dim('*').pd+2).head(2)`,
-effectively showing that the dim transfom has recorded the different
+effectively showing that the dim transform has recorded the different
 operations that are meant to be applied to the data.
 The `_transform` attribute stores the dim transform.
 
@@ -236,7 +236,7 @@ class Interactive:
     def applies(cls, obj):
         """
         Subclasses must implement applies and return a boolean to indicate
-        wheter the subclass should apply or not to the obj.
+        whether the subclass should apply or not to the obj.
         """
         return True
 

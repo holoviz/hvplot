@@ -45,7 +45,7 @@ class CallCtxt:
         for k, v in kwargs.items():
             if k in ['args', 'kwargs']:
                 raise ValueError(
-                    '**kwargs passed to CallCtxt cant be named args or kwargs'
+                    "**kwargs passed to CallCtxt can't be named args or kwargs"
                 )
             setattr(self, k, v)
         self.args = call_args

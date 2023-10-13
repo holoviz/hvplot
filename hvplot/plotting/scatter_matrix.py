@@ -97,7 +97,7 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
         from ..util import hv_version
         if hv_version <= Version('1.14.6'):
             warnings.warn(
-                "Versions of holoviews before 1.14.7 did not suppport "
+                "Versions of holoviews before 1.14.7 did not support "
                 "dynamic update of rasterized/datashaded scatter matrix. "
                 "Update holoviews to a newer version."
             )
