@@ -39,11 +39,11 @@ Learn how to turn data pipelines into widget-based interactive applications with
 [Learn more »](interactive)
 :::
 
-:::{grid-item-card} {octicon}`browser;2.5em;sd-mr-1` `explorer()`
+:::{grid-item-card} {octicon}`browser;2.5em;sd-mr-1` `.explorer()`
 :link: explorer
 :link-type: doc
 
-Start to use `explorer()` to explore data in a web application.
+Start to use `.hvplot.explorer()` to explore data in a web application.
 
 +++
 [Learn more »](explorer)

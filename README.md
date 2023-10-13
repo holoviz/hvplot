@@ -46,7 +46,7 @@ Head over to the [getting started guide](https://hvplot.holoviz.org/getting_star
 hvPlot can be installed on Linux, Windows, or Mac with ``conda``:
 
 ```bash
-conda install -c pyviz hvplot
+conda install hvplot
 ```
 
 or with ``pip``:
@@ -125,12 +125,14 @@ hvPlot is completely free and open-source. It is licensed under the [BSD 3-Claus
 
 ## Support & Feedback
 
-Get support from or provide feedback to the [HoloViz Community](https://holoviz.org/community.html).
+- Usage questions and showcases -> [HoloViz Community](https://holoviz.org/community.html)
+- Bug reports and feature requests -> [Github](https://github.com/holoviz/hvplot)
+- Developer discussions -> [Discord](https://discord.gg/rb6gPXbdAr)
+
+For more detail check out the [HoloViz Community Guide](https://holoviz.org/community.html).
 
 ## Contributions
 
 We would love to work with you no matter whether you want to contribute to issue management, PRs, documentation, blog posts, community support or social media communication.
 
 To get started with the code or docs check out the [Developer Guide](https://hvplot.holoviz.org/developer_guide/index.html).
-
-Reach out on [Gitter](https://gitter.im/pyviz/pyviz) to discuss with the developers, join the weekly triaging or join the bi-weekly HoloViz call.

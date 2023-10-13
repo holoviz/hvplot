@@ -133,7 +133,7 @@ setup_args = dict(
     include_package_data=True,
     platforms=['Windows', 'Mac OS X', 'Linux'],
     license='BSD',
-    url='https://hvplot.pyviz.org',
+    url='https://hvplot.holoviz.org',
     classifiers = [
         "License :: OSI Approved :: BSD License",
         "Development Status :: 5 - Production/Stable",
