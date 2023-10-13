@@ -504,10 +504,11 @@ class HoloViewsConverter:
         if ylim is not None:
             plot_opts['ylim'] = tuple(ylim)
 
-        if autorange is not None and hv_version < Version('1.16.0'):
-            param.main.param.warning('autorange option requires HoloViews >= 1.16')
-        else:
-            plot_opts['autorange'] = autorange
+        if autorange is not None:
+            if hv_version < Version('1.16.0'):
+                param.main.param.warning('autorange option requires HoloViews >= 1.16')
+            else:
+                plot_opts['autorange'] = autorange
 
         self.invert = invert
         if loglog is not None:
