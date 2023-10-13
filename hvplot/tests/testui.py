@@ -190,6 +190,7 @@ def test_explorer_hvplot_gridded_options():
 
 
 def test_explorer_hvplot_geo():
+    pytest.importorskip('geoviews')
     df = pd.DataFrame({'x': [-9796115.18980811], 'y': [4838471.398061159]})
     explorer = hvplot.explorer(df, x='x', geo=True, kind='points')
     assert explorer.geographic.geo
