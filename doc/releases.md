@@ -4,13 +4,13 @@ See [the HoloViz blog](https://blog.holoviz.org/tag/hvplot.html) for a visual su
 
 ## Version 0.9.0
 
-The 0.9.0 release is a minor release with some exciting new features and a large number of bug fixes and enhancements. Many thanks to @rdesai9 (first contribution!), @dogbunny (first contribution!), @bikegeek (first contribution!), @ahuang11, @droumis, @Hoxbro, @MarcSkovMadsen, @maximlt  and @philippjfr for their contributions. A special thanks to @ahuang11 and @Hoxbro in particular without who these release notes would be much shorter!
+The 0.9.0 release is a minor release with some exciting new features and a large number of bug fixes and enhancements. Many thanks to @rdesai9 (first contribution!), @dogbunny (first contribution!), @bikegeek (first contribution!), @ahuang11, @droumis, @Hoxbro, @MarcSkovMadsen, @maximlt  and @philippjfr for their contributions. A special thanks to @ahuang11 and @Hoxbro without who these release notes would be much shorter!
 
 New features:
 
-- The Explorer has been extended with the following features:
-  - Support for Xarray data, enhanced geographic support and add a "live update" checkbox ([#1141](https://github.com/holoviz/hvplot/pull/1141))
-  - Display the output code within a tab ([#1156](https://github.com/holoviz/hvplot/pull/1156))
+- The *Explorer* has been extended with the following features:
+  - Support for Xarray data, enhanced geographic support and add a *live update* checkbox ([#1141](https://github.com/holoviz/hvplot/pull/1141))
+  - Display the code snippet within a tab ([#1156](https://github.com/holoviz/hvplot/pull/1156))
   - Allow defining options passed to `plot.opts()` ([#1171](https://github.com/holoviz/hvplot/pull/1171))
 - Add experimental Fugue integration ([#1102](https://github.com/holoviz/hvplot/pull/1102))
 - Add basic Polars integration ([#1129](https://github.com/holoviz/hvplot/pull/1129))
@@ -37,7 +37,7 @@ Bug fixes:
 
 Documentation:
 
-- Various docs improvements and addition of an *Integrations* guide ([#1084](https://github.com/holoviz/hvplot/pull/1084), [#1173](https://github.com/holoviz/hvplot/pull/1173))
+- Various docs improvements and addition of an *Integrations* guide ([#1084](https://github.com/holoviz/hvplot/pull/1084), [#1173](https://github.com/holoviz/hvplot/pull/1173), [#1177](https://github.com/holoviz/hvplot/pull/1177))
 - Extending the reference gallery ([#999](https://github.com/holoviz/hvplot/pull/999))
 - Added extra `size` parameter to scatter plot example ([#1118](https://github.com/holoviz/hvplot/pull/1118))
 
