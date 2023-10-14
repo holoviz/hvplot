@@ -2,6 +2,61 @@
 
 See [the HoloViz blog](https://blog.holoviz.org/tag/hvplot.html) for a visual summary of the major features added in a selection of releases.
 
+## Version 0.9.0
+
+The 0.9.0 release is a minor release with some exciting new features and a large number of bug fixes and enhancements. Many thanks to @rdesai9 (first contribution!), @dogbunny (first contribution!), @bikegeek (first contribution!), @ahuang11, @droumis, @Hoxbro, @MarcSkovMadsen, @maximlt  and @philippjfr for their contributions. A special thanks to @ahuang11 and @Hoxbro without who these release notes would be much shorter!
+
+New features:
+
+- The *Explorer* has been extended with the following features:
+  - Support for Xarray data, enhanced geographic support and add a *live update* checkbox ([#1141](https://github.com/holoviz/hvplot/pull/1141))
+  - Display the code snippet within a tab ([#1156](https://github.com/holoviz/hvplot/pull/1156))
+  - Allow defining options passed to `plot.opts()` ([#1171](https://github.com/holoviz/hvplot/pull/1171))
+- Add experimental Fugue integration ([#1102](https://github.com/holoviz/hvplot/pull/1102))
+- Add basic Polars integration ([#1129](https://github.com/holoviz/hvplot/pull/1129))
+
+Enhancements:
+
+- Add `.hvplot.explorer()` as an alternate entry point to create an explorer ([#1154](https://github.com/holoviz/hvplot/pull/1154))
+- Add the `resample_when` option to dynamically enable datashade/rasterize/downsample ([#1103](https://github.com/holoviz/hvplot/pull/1103))
+- Expose the HoloViews timeseries downsampling algorithm (LTTB) with the `downsample` option ([#1127](https://github.com/holoviz/hvplot/pull/1127), [#1157](https://github.com/holoviz/hvplot/pull/1157))
+- Expose the HoloViews `autorange` option ([#1128](https://github.com/holoviz/hvplot/pull/1128), [#1158](https://github.com/holoviz/hvplot/pull/1158), [#1174](https://github.com/holoviz/hvplot/pull/1174))
+- Allow string formatting for *labels* plots ([#1140](https://github.com/holoviz/hvplot/pull/1140))
+- Support plots that use `by` with `rasterize` with HoloViews `ImageStack` ([#1132](https://github.com/holoviz/hvplot/pull/1132), [#1144](https://github.com/holoviz/hvplot/pull/1144))
+- Update `show` to return the configured Server or StoppableThread ([#1121](https://github.com/holoviz/hvplot/pull/1121))
+
+Bug fixes:
+
+- Do not force `geo=True` if tiles are provided ([#1083](https://github.com/holoviz/hvplot/pull/1083), [#1113](https://github.com/holoviz/hvplot/pull/1113))
+- Fix x-limit, y-limit, and rasterize support for geo features  ([#1135](https://github.com/holoviz/hvplot/pull/1135), [#1163](https://github.com/holoviz/hvplot/pull/1163))
+- Fix handling WKT strings and add `pyproj.CRS` support ([#1092](https://github.com/holoviz/hvplot/pull/1092), [#1139](https://github.com/holoviz/hvplot/pull/1139))
+- Underlay land and ocean features ([#1151](https://github.com/holoviz/hvplot/pull/1151))
+- Fix `.hist` for the Ibis data source ([#997](https://github.com/holoviz/hvplot/pull/997))
+- No longer suggest installing datashader and geoviews from the `pyviz` channel ([#1130](https://github.com/holoviz/hvplot/pull/1130))
+- Silence GDAL exceptions warning ([#1142](https://github.com/holoviz/hvplot/pull/1142))
+
+Documentation:
+
+- Various docs improvements and addition of an *Integrations* guide ([#1084](https://github.com/holoviz/hvplot/pull/1084), [#1173](https://github.com/holoviz/hvplot/pull/1173), [#1177](https://github.com/holoviz/hvplot/pull/1177))
+- Extending the reference gallery ([#999](https://github.com/holoviz/hvplot/pull/999))
+- Added extra `size` parameter to scatter plot example ([#1118](https://github.com/holoviz/hvplot/pull/1118))
+
+Compatibility:
+
+- Preparations before the release of Param 2.0 ([#1146](https://github.com/holoviz/hvplot/pull/1146), [#1164](https://github.com/holoviz/hvplot/pull/1164))
+- Pin `Param` to `<3.0` ([#1175](https://github.com/holoviz/hvplot/pull/1175))
+- Drop Python 3.6 and 3.7 ([#1077](https://github.com/holoviz/hvplot/pull/1077))
+
+Infrastructure / Tests:
+
+- Add Dask DataFrame plot test ([#1131](https://github.com/holoviz/hvplot/pull/1131))
+- Add codespell to pre-commit ([#1172](https://github.com/holoviz/hvplot/pull/1172))
+- Add OpenCollective sponsor link on the repo page ([#1123](https://github.com/holoviz/hvplot/pull/1123))
+
+
+[Full changelog](https://github.com/holoviz/hvplot/compare/v0.8.4...v0.9.0)
+
+
 ## Version 0.8.4
 
 **June 5th, 2023**
