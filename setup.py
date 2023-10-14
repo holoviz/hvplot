@@ -103,6 +103,9 @@ extras_require['examples'] = [
     'numba >=0.51.0',
     'datashader >=0.6.5',
     'spatialpandas >=0.4.3',
+    'polars',
+    'fugue',
+    'ibis-framework',  # ibis-duckdb on conda
 ]
 
 # Run the example tests by installing examples_tests together with tests

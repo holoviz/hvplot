@@ -75,7 +75,6 @@ development versions of the other HoloViz packages, such as HoloViews or Panel.
 
 .. code-block:: sh
 
-    conda install mamba -c conda-forge
     conda create -n hvplot_dev
     conda activate hvplot_dev
     conda config --env --append channels pyviz/label/dev --append channels conda-forge
@@ -94,14 +93,14 @@ version installed, then try with a more recent version of Python.
 
 .. code-block:: sh
 
-    mamba install python=3.x pyctdev
+    conda install python=3.x pyctdev
 
 Finally to install the dependencies required to run the full unit test
 suite and all the examples:
 
 .. code-block:: sh
 
-    doit develop_install -o tests -o examples --conda-mode mamba
+    doit develop_install -o examples_tests -o tests -o examples_conda
 
 Add ``-o doc`` if you want to install the dependencies required to build
 the website.
@@ -123,32 +122,7 @@ This will ensure that every time you make a commit linting will automatically be
 Commands
 --------
 
-You can list the available `doit` commands with `doit list`.
-
-.. code-block:: sh
-
-    $ doit list
-    build_docs             build docs
-    develop_install        python develop install, with specified optional groups of dependencies (installed by conda only).
-    ecosystem_setup        Common conda setup (must be run in base env).
-    env_capture            Report all information required to recreate current conda environment
-    env_create             Create named environment if it doesn't already exist
-    env_dependency_graph   Write out dependency graph of named environment.
-    env_export             Generate a pinned environment.yaml from specified env, filtering
-    env_export2
-    list_envs
-    miniconda_download     Download Miniconda3-latest
-    miniconda_install      Install Miniconda3-latest to location if not already present
-    package_build          Build and then test conda.recipe/ (or specified alternative).
-    package_test           Test existing package
-    package_upload         Upload package built from conda.recipe/ (or specified alternative).
-    pip_on_conda           Experimental: provide pip build env via conda
-    test_all               Run all tests
-    test_examples          Test that default examples run
-    test_flakes            Flake check python and notebooks
-    test_unit              Run unit tests with coverage
-
-You can learn more about using `doit` on the `DoIt`_ web site.
+You can list the available `doit` commands with ``doit list``.
 
 Next Steps
 ----------
