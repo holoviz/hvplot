@@ -489,7 +489,9 @@ class hvPlotExplorer(Viewer):
             self._alert,
             pn.Row(
                 self._control_tabs,
-                pn.Tabs(('Plot', self._hv_pane), ('Code', self._code_pane)),
+                # Using .layout on the HoloViews pane to display the widgets
+                # https://github.com/holoviz/panel/issues/5628#issuecomment-1763443895
+                pn.Tabs(('Plot', self._hv_pane.layout), ('Code', self._code_pane)),
                 sizing_mode='stretch_width',
             ),
             self._statusbar,
