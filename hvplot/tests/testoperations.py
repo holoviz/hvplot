@@ -11,7 +11,7 @@ import pandas as pd
 import pytest
 
 from holoviews import Store, render
-from holoviews.element import Image, QuadMesh, ImageStack, Points
+from holoviews.element import Image, QuadMesh, Points
 from holoviews.core.spaces import DynamicMap
 from holoviews.core.overlay import Overlay
 from holoviews.element.chart import Scatter
@@ -204,6 +204,9 @@ class TestDatashader(ComparisonTestCase):
     def test_rasterize_by(self):
         if Version(hv.__version__) < Version('1.18.0a1'):
             raise SkipTest('hv.ImageStack introduced after 1.18.0a1')
+
+        from holoviews.element import ImageStack
+
         expected = 'category'
         plot = self.df.hvplot(x='x', y='y', by=expected, rasterize=True, dynamic=False)
         assert isinstance(plot, ImageStack)
