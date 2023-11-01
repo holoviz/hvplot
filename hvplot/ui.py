@@ -450,7 +450,7 @@ class hvPlotExplorer(Viewer):
         self.param.watch(self._check_by, 'by')
         self._populate()
         self._control_tabs = pn.Tabs(
-            tabs_location='left', width=425
+            tabs_location='left', width=325
         )
         self.statusbar = StatusBar(**statusbar_params)
         self._statusbar = pn.Param(self.statusbar, show_name=False, default_layout=pn.Row)
