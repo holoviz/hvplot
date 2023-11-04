@@ -38,7 +38,7 @@ GEO_FEATURES = [
 GEO_TILES = [None] + sorted(tile_sources)
 GEO_KEYS = [
     'crs', 'crs_kwargs', 'projection', 'projection_kwargs',
-    'global_extent', 'project', 'features', 'feature_scale', 'tiles'
+    'global_extent', 'project', 'features', 'feature_scale',
 ]
 AGGREGATORS = [None, 'count', 'min', 'max', 'mean', 'sum', 'any']
 MAX_ROWS = 10000
@@ -110,20 +110,31 @@ class Controls(Viewer):
 
 class Colormapping(Controls):
 
-    clim = param.Range()
+    clim = param.Range(label="Colorbar Limits")
 
-    cnorm = param.Selector(default='linear', objects=['linear', 'log', 'eq_hist'])
+    cnorm = param.Selector(
+        default='linear', objects=['linear', 'log', 'eq_hist'], label="Color Scaling"
+    )
 
     color = param.String(default=None)
 
-    colorbar = param.Boolean(default=None)
+    colorbar = param.Boolean(default=None, label="Show Colorbar")
 
-    cmap = param.Selector(default=DEFAULT_CMAPS['linear'],
-                          label='Colormap', objects=CMAPS)
+    cmap = param.Selector(default=DEFAULT_CMAPS['linear'], label='Colormap', objects=CMAPS)
 
-    rescale_discrete_levels = param.Boolean(default=True)
+    rescale_discrete_levels = param.Boolean(default=True, doc="""
+        If `cnorm='eq_hist'` and there are only a few discrete values,
+        then `rescale_discrete_levels=True` (the default) decreases
+        the lower limit of the autoranged span so that the values are
+        rendering towards the (more visible) top of the `cmap` range,
+        thus avoiding washout of the lower values.  Has no effect if
+        `cnorm!=`eq_hist`."""
+    )
 
-    symmetric = param.Boolean(default=False)
+    symmetric = param.Boolean(default=False, doc="""
+        Whether the data are symmetric around zero. If left unset, the data
+        will be checked for symmetry as long as the size is less than
+        ``check_symmetric_max``.""")
 
     def __init__(self, data, **params):
         super().__init__(data, **params)
@@ -181,10 +192,6 @@ class Axes(Controls):
 
     ylim = param.Range()
 
-    logx = param.Boolean(default=False)
-
-    logy = param.Boolean(default=False)
-
     def __init__(self, data, **params):
         super().__init__(data, **params)
         self._update_ranges()
@@ -225,22 +232,27 @@ class Labels(Controls):
 
     title = param.String(doc="Title for the plot")
 
-    xlabel = param.String(doc="Axis labels for the x-axis.")
+    xlabel = param.String(doc="Axis labels for the x-axis.", label="X-Axis Label")
 
-    ylabel = param.String(doc="Axis labels for the y-axis.")
+    ylabel = param.String(doc="Axis labels for the y-axis.", label="Y-Axis Label")
 
-    clabel = param.String(doc="Axis labels for the colorbar.")
+    clabel = param.String(doc="Axis labels for the colorbar.", label="Colorbar Label")
 
     fontscale = param.Number(default=1, doc="""
         Scales the size of all fonts by the same amount, e.g. fontscale=1.5
         enlarges all fonts (title, xticks, labels etc.) by 50%.""")
 
-    rot = param.Integer(default=0, bounds=(0, 360), doc="""
+    rot = param.Integer(default=0, bounds=(0, 360), label="X-Axis Labels Rotation", doc="""
         Rotates the axis ticks along the x-axis by the specified
         number of degrees.""")
 
 
 class Geographic(Controls):
+
+    tiles = param.ObjectSelector(default=None, objects=GEO_TILES, doc="""
+        Whether to overlay the plot on a tile source. Tiles sources
+        can be selected by name or a tiles object or class can be passed,
+        the default is 'Wikipedia'.""")
 
     geo = param.Boolean(default=False, doc="""
         Whether the plot should be treated as geographic (and assume
@@ -274,11 +286,6 @@ class Geographic(Controls):
 
     feature_scale = param.ObjectSelector(default='110m', objects=['110m', '50m', '10m'], doc="""
         The scale at which to render the features.""")
-
-    tiles = param.ObjectSelector(default=None, objects=GEO_TILES, doc="""
-        Whether to overlay the plot on a tile source. Tiles sources
-        can be selected by name or a tiles object or class can be passed,
-        the default is 'Wikipedia'.""")
 
     @param.depends('geo',  watch=True, on_init=True)
     def _update_crs_projection(self):
@@ -450,10 +457,15 @@ class hvPlotExplorer(Viewer):
         self.param.watch(self._check_by, 'by')
         self._populate()
         self._control_tabs = pn.Tabs(
-            tabs_location='left', width=325
+            tabs_location='left', sizing_mode="stretch_width", max_width=300,
         )
         self.statusbar = StatusBar(**statusbar_params)
-        self._statusbar = pn.Param(self.statusbar, show_name=False, default_layout=pn.Row)
+        self._statusbar = pn.Param(
+            self.statusbar,
+            show_name=False,
+            default_layout=pn.Row,
+            margin=(5, 56)
+        )
         controls = [
             p.class_
             for p in self.param.objects().values()
@@ -483,18 +495,17 @@ class hvPlotExplorer(Viewer):
         self._alert = pn.pane.Alert(
             alert_type='danger', visible=False, sizing_mode='stretch_width'
         )
-        self._hv_pane = pn.pane.HoloViews(sizing_mode='stretch_width', margin=(5, 20, 5, 20))
+        self._plot_layout = pn.Column(sizing_mode='stretch_width', margin=(5, 20, 5, 20))
         self._code_pane = pn.pane.Markdown(sizing_mode='stretch_width', margin=(5, 20, 0, 20))
         self._layout = pn.Column(
             self._alert,
+            self._statusbar,
             pn.Row(
                 self._control_tabs,
-                # Using .layout on the HoloViews pane to display the widgets
-                # https://github.com/holoviz/panel/issues/5628#issuecomment-1763443895
-                pn.Tabs(('Plot', self._hv_pane.layout), ('Code', self._code_pane)),
+                pn.HSpacer(max_width=100),
+                pn.Tabs(('Plot', self._plot_layout), ('Code', self._code_pane)),
                 sizing_mode='stretch_width',
             ),
-            self._statusbar,
             pn.layout.HSpacer(),
             sizing_mode='stretch_both'
         )
@@ -556,12 +567,18 @@ class hvPlotExplorer(Viewer):
             df = df.sample(n=MAX_ROWS)
         self._layout.loading = True
         try:
-            self._hvplot = _hvPlot(df)(
-                kind=self.kind, x=self.x, y=y, by=self.by, groupby=self.groupby, **kwargs
+            hvplot_output = _hvPlot(df)(
+                kind=self.kind, x=self.x, y=y, by=self.by, groupby=self.groupby,
+                widget_location="bottom", **kwargs
             )
+            if isinstance(hvplot_output, pn.Column):
+                self._hvplot = hvplot_output.objects[0].object
+                plot_widgets = hvplot_output.objects[1]
+                plot_widgets.margin = (5, 5, 5, 15)
+                self._control_tabs.append(("Plot Widgets", plot_widgets))
             if opts_kwargs:
                 self._hvplot.opts(**opts_kwargs)
-            self._hv_pane.object = self._hvplot
+            self._plot_layout.objects[:] = [hvplot_output.objects[0]]
             self._alert.visible = False
         except Exception as e:
             self._alert.param.update(
