@@ -1,14 +1,13 @@
-import holoviews as hv
+import numpy as np
 
 from packaging.version import Version
 
 
 collect_ignore_glob = []
 
-
-# 2023-10: https://github.com/holoviz/hvplot/pull/1164
-if Version(hv.__version__) == Version("1.18.0a6"):
+# 2023-11: Newer version of numpy renames amin/amax to min/max
+# This can be removed when we drop Python 3.8 support
+if Version(np.__version__) < Version("1.26"):
     collect_ignore_glob += [
-        "reference/xarray/contourf.ipynb",
-        "user_guide/Geographic_Data.ipynb",
+        "user_guide/Plotting*.ipynb",
     ]
