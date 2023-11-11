@@ -467,7 +467,7 @@ class hvPlotExplorer(Viewer):
             self.statusbar,
             show_name=False,
             default_layout=pn.Row,
-            margin=(0, 56)
+            margin=(5, 56, 0, 56)
         )
         controls = [
             p.class_
