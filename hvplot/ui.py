@@ -379,9 +379,9 @@ class hvPlotExplorer(Viewer):
 
     y_multi = param.ListSelector(default=[], label='Y')
 
-    by = param.ListSelector(default=[])
+    by = param.ListSelector(default=[NONE_PLACEHOLDER])
 
-    groupby = param.ListSelector(default=[])
+    groupby = param.ListSelector(default=[NONE_PLACEHOLDER])
 
     # Controls that will show up as new tabs, must be ClassSelector
 
@@ -554,8 +554,8 @@ class hvPlotExplorer(Viewer):
                 self._exclude_none_placeholder(kwargs.pop('features', []))
             }
 
-        kwargs["by"] = [v for v in self.by if v != NONE_PLACEHOLDER]
-        kwargs["groupby"] = [v for v in self.groupby if v != NONE_PLACEHOLDER]
+        kwargs["by"] = self._exclude_none_placeholder(self.by)
+        kwargs["groupby"] = self._exclude_none_placeholder(self.groupby)
         kwargs['min_height'] = 400
         df = self._data
         if len(df) > MAX_ROWS and not (self.kind in KINDS['stats'] or kwargs.get('rasterize') or kwargs.get('datashade')):
@@ -695,12 +695,15 @@ class hvPlotExplorer(Viewer):
         _hv.save(self._hvplot, filename, **kwargs)
 
     def _exclude_none_placeholder(self, value):
-        if isinstance(value, list):
-            return [v for v in value if v != NONE_PLACEHOLDER]
-        elif value == NONE_PLACEHOLDER:
+        if value == NONE_PLACEHOLDER:
             return
-        else:
-            return value
+
+        if isinstance(value, list):
+            value = [v for v in value if v != NONE_PLACEHOLDER]
+            if len(value) == 0:
+                return
+
+        return value
 
     def settings(self):
         """Return a dictionary of the customized settings.
