@@ -42,6 +42,7 @@ def test_explorer_settings():
         kind="scatter",
         x="bill_length_mm",
         y=["bill_depth_mm"],
+        groupby=None
     )
 
 
@@ -139,8 +140,8 @@ def test_explorer_hvplot_gridded_basic():
     assert explorer.kind == 'image'
     assert explorer.x == 'lat'
     assert explorer.y == 'lon'
-    assert explorer.by == []
-    assert explorer.groupby == ['time']
+    assert explorer.by == ["<null>"]
+    assert explorer.groupby == ["<null>"]
 
 
 def test_explorer_hvplot_gridded_2d():
@@ -152,8 +153,8 @@ def test_explorer_hvplot_gridded_2d():
     assert explorer.kind == 'image'
     assert explorer.x == 'lat'
     assert explorer.y == 'lon'
-    assert explorer.by == []
-    assert explorer.groupby == []
+    assert explorer.by == ["<null>"]
+    assert explorer.groupby == ["<null>"]
 
 
 def test_explorer_hvplot_gridded_two_variables():
@@ -167,8 +168,8 @@ def test_explorer_hvplot_gridded_two_variables():
     assert explorer.kind == 'image'
     assert explorer.x == 'lat'
     assert explorer.y == 'lon'
-    assert explorer.by == []
-    assert explorer.groupby == ['time', 'variable']
+    assert explorer.by == ["<null>"]
+    assert explorer.groupby == ["<null>"]
 
 
 def test_explorer_hvplot_gridded_dataarray():
@@ -180,8 +181,8 @@ def test_explorer_hvplot_gridded_dataarray():
     assert explorer.kind == 'image'
     assert explorer.x == 'lat'
     assert explorer.y == 'lon'
-    assert explorer.by == []
-    assert explorer.groupby == ['time']
+    assert explorer.by == ["<null>"]
+    assert explorer.groupby == ["<null>"]
 
 
 def test_explorer_hvplot_gridded_options():
@@ -297,7 +298,6 @@ def test_explorer_code_gridded():
     assert code == dedent("""\
         ds['air'].hvplot(
             colorbar=True,
-            groupby=['time'],
             kind='image',
             x='lon',
             y='lat',
@@ -307,7 +307,6 @@ def test_explorer_code_gridded():
         ```python
         ds['air'].hvplot(
             colorbar=True,
-            groupby=['time'],
             kind='image',
             x='lon',
             y='lat',
@@ -323,7 +322,6 @@ def test_explorer_code_gridded_dataarray():
     assert code == dedent("""\
         da.hvplot(
             colorbar=True,
-            groupby=['time'],
             kind='image',
             x='lon',
             y='lat',
@@ -333,7 +331,6 @@ def test_explorer_code_gridded_dataarray():
         ```python
         da.hvplot(
             colorbar=True,
-            groupby=['time'],
             kind='image',
             x='lon',
             y='lat',
@@ -349,7 +346,6 @@ def test_explorer_code_opts():
     assert code == dedent("""\
         da.hvplot(
             colorbar=True,
-            groupby=['time'],
             kind='image',
             x='lon',
             y='lat',
@@ -361,7 +357,6 @@ def test_explorer_code_opts():
         ```python
         da.hvplot(
             colorbar=True,
-            groupby=['time'],
             kind='image',
             x='lon',
             y='lat',

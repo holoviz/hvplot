@@ -677,6 +677,8 @@ class hvPlotExplorer(Viewer):
         args = ''
         if kwargs:
             for k, v in kwargs.items():
+                if v is None:
+                    continue
                 args += f'    {k}={v!r},\n'
             args = args[:-1]
         return args
@@ -723,7 +725,7 @@ class hvPlotExplorer(Viewer):
                     settings[p] = value
         for p in self._controls.parameters:
             value = self._exclude_none_placeholder(getattr(self, p))
-            if (value != self.param[p].default or p == 'kind'):
+            if value != self.param[p].default or p == 'kind':
                 settings[p] = value
         if 'y_multi' in settings:
             settings['y'] = settings.pop('y_multi')
