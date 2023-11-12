@@ -414,10 +414,18 @@ class hvPlotExplorer(Viewer):
             cls = hvDataFrameExplorer
         return cls(data, **params)
 
+    def _exception_handler(self, exc):
+        self._alert.param.update(
+            object=f'**Rendering failed with following error**: {exc}',
+            visible=True
+        )
+
     def __panel__(self):
         return self._layout
 
     def __init__(self, df, **params):
+        pn.config.exception_handler = self._exception_handler
+
         x, y = params.get('x'), params.get('y')
         if 'y' in params:
             params['y_multi'] = params.pop('y') if isinstance(params['y'], list) else [params['y']]
