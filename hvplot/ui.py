@@ -517,8 +517,10 @@ class hvPlotExplorer(Viewer):
         self._alert = pn.pane.Alert(
             alert_type='danger', visible=False, sizing_mode='stretch_width'
         )
-        self._hv_pane = pn.pane.HoloViews(sizing_mode='stretch_width', margin=(5, 20, 5, 20))
-        self._code_pane = pn.pane.Markdown(sizing_mode='stretch_width', margin=(5, 20, 0, 20))
+        self._hv_pane = pn.pane.HoloViews(
+            sizing_mode='stretch_both', min_height=250, margin=(5, 5, 5, 20), widget_location="bottom")
+        self._code_pane = pn.pane.Markdown(
+            sizing_mode='stretch_both', min_height=250, margin=(5, 5, 0, 20))
         self._layout = pn.Column(
             self._alert,
             self._statusbar,
@@ -528,7 +530,7 @@ class hvPlotExplorer(Viewer):
                 # Using .layout on the HoloViews pane to display the widgets
                 # https://github.com/holoviz/panel/issues/5628#issuecomment-1763443895
                 pn.Tabs(('Plot', self._hv_pane.layout), ('Code', self._code_pane)),
-                sizing_mode='stretch_width',
+                sizing_mode='stretch_both', min_height=1000
             ),
             sizing_mode='stretch_both'
         )
@@ -696,6 +698,7 @@ class hvPlotExplorer(Viewer):
             Data variable name by which the returned string will start.
         """
         settings = self.settings()
+        settings["widget_location"] = "bottom"
         settings_args = ''
         if settings:
             settings_args = self._build_kwargs_string(settings)
