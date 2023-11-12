@@ -1,3 +1,5 @@
+from functools import partial
+
 import holoviews as _hv
 import numpy as np
 import panel as pn
@@ -414,18 +416,21 @@ class hvPlotExplorer(Viewer):
             cls = hvDataFrameExplorer
         return cls(data, **params)
 
-    def _exception_handler(self, exc):
+    def _explorer_exception_handler(self, other_exception_handler, exc):
         self._alert.param.update(
-            object=f'**Rendering failed with following error**: {exc}',
+            object=(
+                f'**The plot may not update as expected until this error is resolved**: '
+                f'{exc}'
+            ),
             visible=True
         )
+        if other_exception_handler is not None:
+            other_exception_handler(exc)
 
     def __panel__(self):
         return self._layout
 
     def __init__(self, df, **params):
-        pn.config.exception_handler = self._exception_handler
-
         x, y = params.get('x'), params.get('y')
         if 'y' in params:
             params['y_multi'] = params.pop('y') if isinstance(params['y'], list) else [params['y']]
@@ -508,6 +513,8 @@ class hvPlotExplorer(Viewer):
         )
 
         # initialize
+        explorer_exception_handler = partial(self._explorer_exception_handler, pn.config.exception_handler)
+        pn.config.exception_handler = explorer_exception_handler
         self.param.trigger('kind')
 
     def _populate(self):
