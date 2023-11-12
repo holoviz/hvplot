@@ -42,6 +42,7 @@ GEO_KEYS = [
 ]
 AGGREGATORS = [None, 'count', 'min', 'max', 'mean', 'sum', 'any']
 MAX_ROWS = 10000
+CONTROLS_WIDTH = 200
 
 
 def explorer(data, **kwargs):
@@ -95,8 +96,9 @@ class Controls(Viewer):
         self._controls = pn.Param(
             self.param,
             show_name=False,
-            sizing_mode='stretch_width',
             widgets=widget_kwargs,
+            width=CONTROLS_WIDTH - 50,
+            sizing_mode="fixed"
         )
 
     def __panel__(self):
@@ -452,15 +454,14 @@ class hvPlotExplorer(Viewer):
         groups = {group: KINDS[group] for group in self._groups}
         self._controls = pn.Param(
             self.param, parameters=['kind', 'x', 'y', 'groupby', 'by'],
-            sizing_mode='stretch_width', show_name=False,
-            widgets={'kind': {'options': [], 'groups': groups}}
-        )
+            show_name=False, widgets={'kind': {'options': [], 'groups': groups}},
+        )  # the widths will get updated in toggle_controls
         self.param.watch(self._toggle_controls, 'kind')
         self.param.watch(self._check_y, 'y_multi')
         self.param.watch(self._check_by, 'by')
         self._populate()
         self._control_tabs = pn.Tabs(
-            tabs_location='left', width=425
+            tabs_location='left', width=CONTROLS_WIDTH + 150
         )
         self.statusbar = StatusBar(**statusbar_params)
         self._statusbar = pn.Param(
@@ -608,6 +609,12 @@ class hvPlotExplorer(Viewer):
     def _groups(self):
         raise NotImplementedError('Must be implemented by subclasses.')
 
+    def _create_param(self, *param_args, width=CONTROLS_WIDTH, **param_kwargs):
+        widgets = pn.Param(*param_args, width=width, **param_kwargs)
+        for widget in widgets:
+            widget.width = width
+        return widgets
+
     def _toggle_controls(self, event=None):
         # Control high-level parameters
         visible = True
@@ -622,29 +629,38 @@ class hvPlotExplorer(Viewer):
         else:
             parameters = ['kind', 'x', 'y_multi', 'by', 'groupby']
         self._controls.parameters = parameters
+        for widget in self._controls:
+            widget.width = CONTROLS_WIDTH
 
         # Control other tabs
         tabs = [('Fields', self._controls)]
         if visible:
+            axes_params = self._create_param(self.axes, widgets={
+                'xlim': {'throttled': True},
+                'ylim': {'throttled': True}
+            }, show_name=False)
+            labels_params = self._create_param(self.labels, widgets={
+                'rot': {'throttled': True}
+            }, show_name=False)
+            styles_params = self._create_param(self.style)
+            operations_params = self._create_param(self.operations)
+            geographic_params = self._create_param(self.geographic)
+            advanced_params = self._create_param(self.advanced, widgets={
+                "opts": {"placeholder": "{'size': 5, 'marker': '^'}"}
+            })
             tabs += [
-                ('Axes', pn.Param(self.axes, widgets={
-                    'xlim': {'throttled': True},
-                    'ylim': {'throttled': True}
-                }, show_name=False)),
-                ('Labels', pn.Param(self.labels, widgets={
-                    'rot': {'throttled': True}
-                }, show_name=False)),
-                ('Style', pn.Param(self.style)),
-                ('Operations', pn.Param(self.operations)),
-                ('Geographic', pn.Param(self.geographic)),
-                ('Advanced', pn.Param(self.advanced, widgets={
-                    "opts": {"placeholder": "{'size': 5, 'marker': '^'}"}
-                })),
+                ('Axes', axes_params),
+                ('Labels', labels_params),
+                ('Style', styles_params),
+                ('Operations', operations_params),
+                ('Geographic', geographic_params),
+                ('Advanced', advanced_params),
             ]
             if event and event.new not in ('area', 'kde', 'line', 'ohlc', 'rgb', 'step'):
-                tabs.insert(5, ('Colormapping', pn.Param(self.colormapping, widgets={
+                colormapping_params = self._create_param(self.colormapping, widgets={
                     "clim": {"placeholder": "(min, max)"},
-                })))
+                })
+                tabs.insert(5, ('Colormapping', colormapping_params))
         self._control_tabs[:] = tabs
 
     def _check_y(self, event):
