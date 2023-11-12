@@ -571,11 +571,6 @@ class hvPlotExplorer(Viewer):
                 self._hvplot.opts(**opts_kwargs)
             self._hv_pane.object = self._hvplot
             self._alert.visible = False
-        except Exception as e:
-            self._alert.param.update(
-                object=f'**Rendering failed with following error**: {e}',
-                visible=True
-            )
         finally:
             self._layout.loading = False
 
