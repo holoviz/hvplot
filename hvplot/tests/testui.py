@@ -10,7 +10,7 @@ import xarray as xr
 import pytest
 
 from bokeh.sampledata import penguins
-from hvplot.ui import hvDataFrameExplorer, hvGridExplorer
+from hvplot.ui import hvDataFrameExplorer, hvGridExplorer, NONE_PLACEHOLDER
 
 df = penguins.data
 ds_air_temperature = xr.tutorial.open_dataset('air_temperature')
@@ -370,3 +370,30 @@ def test_explorer_code_opts():
         )
         ```"""
     )
+
+
+def test_explorer_hvplot_none_placeholder_no_effect():
+    explorer = hvplot.explorer(df)
+
+    explorer.param.update(
+        kind='scatter',
+        x='bill_length_mm',
+        y_multi=['bill_depth_mm'],
+        by=[NONE_PLACEHOLDER],
+    )
+
+    plot = explorer.hvplot()
+
+    assert explorer._code_pane.object == dedent("""\
+        ```python
+        df.hvplot(
+            kind='scatter',
+            x='bill_length_mm',
+            y=['bill_depth_mm'],
+        )
+        ```"""
+    )
+
+    assert isinstance(plot, hv.Scatter)
+    assert plot.kdims[0].name == "bill_length_mm"
+    assert plot.vdims[0].name == "bill_depth_mm"

@@ -13,6 +13,8 @@ from .plotting import hvPlot as _hvPlot
 from .util import is_geodataframe, is_xarray, instantiate_crs_str
 
 # Defaults
+NONE_PLACEHOLDER = "<null>"
+
 KINDS = {
     # these are for the kind selector
     'dataframe': sorted(
@@ -29,18 +31,17 @@ KINDS['2d'] = ['bivariate', 'heatmap', 'hexbin', 'labels', 'vectorfield', 'point
 KINDS['stats'] = ['hist', 'kde', 'boxwhisker', 'violin', 'heatmap', 'bar', 'barh']
 KINDS['all'] = sorted(set(KINDS['dataframe'] + KINDS['gridded'] + KINDS['geom']))
 
-CMAPS = [cm for cm in list_cmaps() if not cm.endswith('_r_r')]
+CMAPS = [NONE_PLACEHOLDER] + [cm for cm in list_cmaps() if not cm.endswith('_r_r')]
 DEFAULT_CMAPS = _hvConverter._default_cmaps
 GEO_FEATURES = [
-    'borders', 'coastline', 'land', 'lakes', 'ocean', 'rivers',
-    'states', 'grid'
+    NONE_PLACEHOLDER, 'borders', 'coastline', 'land', 'lakes', 'ocean', 'rivers', 'states', 'grid'
 ]
-GEO_TILES = [None] + sorted(tile_sources)
+GEO_TILES = [NONE_PLACEHOLDER] + sorted(tile_sources)
 GEO_KEYS = [
     'crs', 'crs_kwargs', 'projection', 'projection_kwargs',
     'global_extent', 'project', 'features', 'feature_scale', 'tiles'
 ]
-AGGREGATORS = [None, 'count', 'min', 'max', 'mean', 'sum', 'any']
+AGGREGATORS = ['count', 'min', 'max', 'mean', 'sum', 'any']
 MAX_ROWS = 10000
 
 
@@ -105,7 +106,7 @@ class Controls(Viewer):
     @property
     def kwargs(self):
         return {k: v for k, v in self.param.values().items()
-                if k not in ('name', 'explorer') and v is not None and v != ''}
+                if k not in ('name', 'explorer') and v is not None and v != "" and v != NONE_PLACEHOLDER}
 
 
 class Colormapping(Controls):
@@ -548,17 +549,20 @@ class hvPlotExplorer(Viewer):
                 kwargs[key] = instantiate_crs_str(kwargs.pop(key), **crs_kwargs)
 
             feature_scale = kwargs.pop('feature_scale', None)
-            kwargs['features'] = {feature: feature_scale for feature in kwargs.pop('features', [])}
+            kwargs['features'] = {
+                feature: feature_scale for feature in
+                self._exclude_none_placeholder(kwargs.pop('features', []))
+            }
 
+        kwargs["by"] = [v for v in self.by if v != NONE_PLACEHOLDER]
+        kwargs["groupby"] = [v for v in self.groupby if v != NONE_PLACEHOLDER]
         kwargs['min_height'] = 400
         df = self._data
         if len(df) > MAX_ROWS and not (self.kind in KINDS['stats'] or kwargs.get('rasterize') or kwargs.get('datashade')):
             df = df.sample(n=MAX_ROWS)
         self._layout.loading = True
         try:
-            self._hvplot = _hvPlot(df)(
-                kind=self.kind, x=self.x, y=y, by=self.by, groupby=self.groupby, **kwargs
-            )
+            self._hvplot = _hvPlot(df)(kind=self.kind, x=self.x, y=y, **kwargs)
             if opts_kwargs:
                 self._hvplot.opts(**opts_kwargs)
             self._hv_pane.object = self._hvplot
@@ -690,6 +694,14 @@ class hvPlotExplorer(Viewer):
         """
         _hv.save(self._hvplot, filename, **kwargs)
 
+    def _exclude_none_placeholder(self, value):
+        if isinstance(value, list):
+            return [v for v in value if v != NONE_PLACEHOLDER]
+        elif value == NONE_PLACEHOLDER:
+            return
+        else:
+            return value
+
     def settings(self):
         """Return a dictionary of the customized settings.
 
@@ -703,12 +715,12 @@ class hvPlotExplorer(Viewer):
         for controller in self._controllers.values():
             params = set(controller.param) - {'name', 'explorer'}
             for p in params:
-                value = getattr(controller, p)
+                value = self._exclude_none_placeholder(getattr(controller, p))
                 if value != controller.param[p].default:
                     settings[p] = value
         for p in self._controls.parameters:
-            value = getattr(self, p)
-            if value != self.param[p].default or p == 'kind':
+            value = self._exclude_none_placeholder(getattr(self, p))
+            if (value != self.param[p].default or p == 'kind'):
                 settings[p] = value
         if 'y_multi' in settings:
             settings['y'] = settings.pop('y_multi')
@@ -815,7 +827,9 @@ class hvGridExplorer(hvPlotExplorer):
                 continue
             p = self.param[pname]
             if isinstance(p, param.Selector):
-                if pname in ['x', 'y', 'groupby', 'by']:
+                if pname in ('x', 'y'):
+                    p.objects = indexes
+                elif pname in ('groupby', 'by'):
                     p.objects = indexes
                 else:
                     p.objects = variables_no_index
@@ -828,6 +842,7 @@ class hvGridExplorer(hvPlotExplorer):
                 elif pname == 'groupby' and len(getattr(self, pname, [])) == 0 and len(p.objects) > 2:
                     setattr(self, pname, p.objects[2:])
 
+                p.objects = [NONE_PLACEHOLDER] + p.objects
 
 class hvDataFrameExplorer(hvPlotExplorer):
 
