@@ -492,7 +492,7 @@ class Interactive:
 
         Examples
         --------
-        >>> widget = panel.wid7ugets.IntSlider(value=1, start=1, end=5)
+        >>> widget = panel.widgets.IntSlider(value=1, start=1, end=5)
         >>> dfi = df.interactive(width=200)
         >>> dfi.head(widget)
         """
