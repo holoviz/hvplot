@@ -13,7 +13,7 @@ from .plotting import hvPlot as _hvPlot
 from .util import is_geodataframe, is_xarray, instantiate_crs_str
 
 # Defaults
-NONE_PLACEHOLDER = "<null>"
+NONE_PLACEHOLDER = "<no selection>"
 
 KINDS = {
     # these are for the kind selector

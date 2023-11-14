@@ -140,8 +140,8 @@ def test_explorer_hvplot_gridded_basic():
     assert explorer.kind == 'image'
     assert explorer.x == 'lat'
     assert explorer.y == 'lon'
-    assert explorer.by == ["<null>"]
-    assert explorer.groupby == ["<null>"]
+    assert explorer.by == ["<no selection>"]
+    assert explorer.groupby == ["<no selection>"]
 
 
 def test_explorer_hvplot_gridded_2d():
@@ -153,8 +153,8 @@ def test_explorer_hvplot_gridded_2d():
     assert explorer.kind == 'image'
     assert explorer.x == 'lat'
     assert explorer.y == 'lon'
-    assert explorer.by == ["<null>"]
-    assert explorer.groupby == ["<null>"]
+    assert explorer.by == ["<no selection>"]
+    assert explorer.groupby == ["<no selection>"]
 
 
 def test_explorer_hvplot_gridded_two_variables():
@@ -168,8 +168,8 @@ def test_explorer_hvplot_gridded_two_variables():
     assert explorer.kind == 'image'
     assert explorer.x == 'lat'
     assert explorer.y == 'lon'
-    assert explorer.by == ["<null>"]
-    assert explorer.groupby == ["<null>"]
+    assert explorer.by == ["<no selection>"]
+    assert explorer.groupby == ["<no selection>"]
 
 
 def test_explorer_hvplot_gridded_dataarray():
@@ -181,8 +181,8 @@ def test_explorer_hvplot_gridded_dataarray():
     assert explorer.kind == 'image'
     assert explorer.x == 'lat'
     assert explorer.y == 'lon'
-    assert explorer.by == ["<null>"]
-    assert explorer.groupby == ["<null>"]
+    assert explorer.by == ["<no selection>"]
+    assert explorer.groupby == ["<no selection>"]
 
 
 def test_explorer_hvplot_gridded_options():
