@@ -383,6 +383,8 @@ class hvPlotExplorer(Viewer):
 
     groupby = param.ListSelector(default=[NONE_PLACEHOLDER])
 
+    _by_groupby_objects = param.List()
+
     # Controls that will show up as new tabs, must be ClassSelector
 
     axes = param.ClassSelector(class_=Axes)
@@ -449,7 +451,12 @@ class hvPlotExplorer(Viewer):
         self.param.watch(self._toggle_controls, 'kind')
         self.param.watch(self._check_y, 'y_multi')
         self.param.watch(self._check_by, 'by')
+        self.param.watch(self._next_x_selection, 'y')
+        self.param.watch(self._next_y_selection, 'x')
+        self.param.watch(self._exclude_groupby_selections, 'groupby')
+        self.param.watch(self._exclude_by_selections, 'by')
         self._populate()
+        self._by_groupby_objects = self.param["groupby"].objects
         self._control_tabs = pn.Tabs(
             tabs_location='left', width=425
         )
@@ -501,7 +508,7 @@ class hvPlotExplorer(Viewer):
         )
 
         # initialize
-        self.param.trigger('kind')
+        self.param.trigger('kind', "groupby", "by")
 
     def _populate(self):
         """
@@ -639,6 +646,35 @@ class hvPlotExplorer(Viewer):
     def _check_by(self, event):
         if event.new and 'y_multi' in self._controls.parameters and self.y_multi and len(self.y_multi) > 1:
             self.by = []
+
+    def _next_x_selection(self, event):
+        for value in self.param["x"].objects:
+            if value != event.new:
+                self.x = value
+                break
+        self.param.trigger("by", "groupby")
+
+    def _next_y_selection(self, event):
+        for value in self.param["y"].objects:
+            if value != event.new:
+                self.y = value
+                break
+        self.param.trigger("by", "groupby")
+
+    def _exclude_selections(self, event, key):
+        objects = self._by_groupby_objects.copy()
+        for value in event.new + [self.x, self.y]:
+            if value == NONE_PLACEHOLDER:
+                continue
+            elif value in objects:
+                objects.remove(value)
+        self.param[key].objects = objects
+
+    def _exclude_groupby_selections(self, event):
+        self._exclude_selections(event, 'by')
+
+    def _exclude_by_selections(self, event):
+        self._exclude_selections(event, 'groupby')
 
     #----------------------------------------------------------------
     # Public API
@@ -847,7 +883,8 @@ class hvGridExplorer(hvPlotExplorer):
                 elif pname == 'groupby' and len(getattr(self, pname, [])) == 0 and len(p.objects) > 2:
                     setattr(self, pname, p.objects[2:])
 
-                p.objects = [NONE_PLACEHOLDER] + p.objects
+                if pname not in ('x', 'y'):
+                    p.objects = [NONE_PLACEHOLDER] + p.objects
 
 class hvDataFrameExplorer(hvPlotExplorer):
 
