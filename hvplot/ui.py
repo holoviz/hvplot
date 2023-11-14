@@ -110,9 +110,14 @@ class Controls(Viewer):
 
 class Colormapping(Controls):
 
-    clim = param.Range()
+    clim = param.Range(label="Colorbar Limits (clim)", doc="""
+        Upper and lower limits of the colorbar.""")
 
-    cnorm = param.Selector(default='linear', objects=['linear', 'log', 'eq_hist'])
+    cnorm = param.Selector(
+        label="Colorbar Normalization (cnorm)",
+        default='linear',
+        objects=['linear', 'log', 'eq_hist']
+    )
 
     color = param.String(default=None)
 
@@ -123,7 +128,8 @@ class Colormapping(Controls):
 
     rescale_discrete_levels = param.Boolean(default=True)
 
-    symmetric = param.Boolean(default=False)
+    symmetric = param.Boolean(default=False, doc="""
+        Whether the data are symmetric around zero.""")
 
     def __init__(self, data, **params):
         super().__init__(data, **params)
@@ -229,18 +235,25 @@ class Labels(Controls):
 
     ylabel = param.String(doc="Axis labels for the y-axis.")
 
-    clabel = param.String(doc="Axis labels for the colorbar.")
+    clabel = param.String(label="Colorbar Label (clabel)", doc="""
+        Axis labels for the colorbar.""")
 
     fontscale = param.Number(default=1, doc="""
         Scales the size of all fonts by the same amount, e.g. fontscale=1.5
         enlarges all fonts (title, xticks, labels etc.) by 50%.""")
 
-    rot = param.Integer(default=0, bounds=(0, 360), doc="""
+    rot = param.Integer(
+        default=0, bounds=(0, 360), label="X Tick Labels Rotation (rot)", doc="""
         Rotates the axis ticks along the x-axis by the specified
         number of degrees.""")
 
 
 class Geographic(Controls):
+
+    tiles = param.ObjectSelector(default=None, objects=GEO_TILES, doc="""
+        Whether to overlay the plot on a tile source. Tiles sources
+        can be selected by name or a tiles object or class can be passed,
+        the default is 'Wikipedia'.""")
 
     geo = param.Boolean(default=False, doc="""
         Whether the plot should be treated as geographic (and assume
@@ -275,15 +288,12 @@ class Geographic(Controls):
     feature_scale = param.ObjectSelector(default='110m', objects=['110m', '50m', '10m'], doc="""
         The scale at which to render the features.""")
 
-    tiles = param.ObjectSelector(default=None, objects=GEO_TILES, doc="""
-        Whether to overlay the plot on a tile source. Tiles sources
-        can be selected by name or a tiles object or class can be passed,
-        the default is 'Wikipedia'.""")
-
     @param.depends('geo',  watch=True, on_init=True)
     def _update_crs_projection(self):
         enabled = bool(self.geo or self.project)
         for key in GEO_KEYS:
+            if key == "tiles":
+                continue
             self.param[key].constant = not enabled
         self.geo = enabled
         if not enabled:
@@ -354,7 +364,7 @@ class Operations(Controls):
 
 class Advanced(Controls):
 
-    opts = param.Dict(default={}, label='HoloViews .opts()', doc="""
+    opts = param.Dict(label='HoloViews .opts()', doc="""
         Options applied via HoloViews .opts().
         Examples:
         - image: {"color_levels": 11}
@@ -453,7 +463,12 @@ class hvPlotExplorer(Viewer):
             tabs_location='left', width=425
         )
         self.statusbar = StatusBar(**statusbar_params)
-        self._statusbar = pn.Param(self.statusbar, show_name=False, default_layout=pn.Row)
+        self._statusbar = pn.Param(
+            self.statusbar,
+            show_name=False,
+            default_layout=pn.Row,
+            margin=(5, 56, 0, 56)
+        )
         controls = [
             p.class_
             for p in self.param.objects().values()
@@ -487,6 +502,8 @@ class hvPlotExplorer(Viewer):
         self._code_pane = pn.pane.Markdown(sizing_mode='stretch_width', margin=(5, 20, 0, 20))
         self._layout = pn.Column(
             self._alert,
+            self._statusbar,
+            pn.layout.Divider(),
             pn.Row(
                 self._control_tabs,
                 # Using .layout on the HoloViews pane to display the widgets
@@ -494,8 +511,6 @@ class hvPlotExplorer(Viewer):
                 pn.Tabs(('Plot', self._hv_pane.layout), ('Code', self._code_pane)),
                 sizing_mode='stretch_width',
             ),
-            self._statusbar,
-            pn.layout.HSpacer(),
             sizing_mode='stretch_both'
         )
 
@@ -619,13 +634,17 @@ class hvPlotExplorer(Viewer):
                 ('Labels', pn.Param(self.labels, widgets={
                     'rot': {'throttled': True}
                 }, show_name=False)),
-                ('Style', self.style),
-                ('Operations', self.operations),
-                ('Geographic', self.geographic),
-                ('Advanced', self.advanced),
+                ('Style', pn.Param(self.style)),
+                ('Operations', pn.Param(self.operations)),
+                ('Geographic', pn.Param(self.geographic)),
+                ('Advanced', pn.Param(self.advanced, widgets={
+                    "opts": {"placeholder": "{'size': 5, 'marker': '^'}"}
+                })),
             ]
             if event and event.new not in ('area', 'kde', 'line', 'ohlc', 'rgb', 'step'):
-                tabs.insert(5, ('Colormapping', self.colormapping))
+                tabs.insert(5, ('Colormapping', pn.Param(self.colormapping, widgets={
+                    "clim": {"placeholder": "(min, max)"},
+                })))
         self._control_tabs[:] = tabs
 
     def _check_y(self, event):
