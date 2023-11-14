@@ -847,7 +847,8 @@ class hvGridExplorer(hvPlotExplorer):
                 elif pname == 'groupby' and len(getattr(self, pname, [])) == 0 and len(p.objects) > 2:
                     setattr(self, pname, p.objects[2:])
 
-                p.objects = [NONE_PLACEHOLDER] + p.objects
+                if pname not in ('x', 'y'):
+                    p.objects = [NONE_PLACEHOLDER] + p.objects
 
 class hvDataFrameExplorer(hvPlotExplorer):
 
