@@ -80,29 +80,43 @@ def explorer(data, **kwargs):
     return hvPlotExplorer.from_data(data, **kwargs)
 
 
+def _create_param_pane(inst, widgets_kwargs=None, parameters=None):
+    widgets_kwargs = widgets_kwargs or {}
+    # Augment widgets kwargs by default, throttling all Number/Range parameters
+    # and setting their sizing mode.
+    for pname in inst.param:
+        if pname == 'name':
+            continue
+        if pname not in widgets_kwargs:
+            widgets_kwargs[pname] = {}
+        if isinstance(inst.param[pname], (param.Number, param.Range)):
+            widgets_kwargs[pname]['throttled'] = True
+        widgets_kwargs[pname]['sizing_mode'] = 'stretch_width'
+    kwargs = {
+        'show_name': False,
+        'widgets': widgets_kwargs,
+        'width': CONTROLS_WIDTH,
+    }
+    if parameters:
+        kwargs['parameters'] = parameters
+    pane = pn.Param(inst.param, **kwargs)
+    return pane
+
+
 class Controls(Viewer):
 
     explorer = param.ClassSelector(class_=Viewer, precedence=-1)
+
+    _widgets_kwargs = {}
 
     __abstract = True
 
     def __init__(self, df, **params):
         self._data = df
         super().__init__(**params)
-        widget_kwargs = {}
-        for p in self.param:
-            if isinstance(self.param[p], (param.Number, param.Range)):
-                widget_kwargs[p] = {'throttled': True}
-        self._controls = pn.Param(
-            self.param,
-            show_name=False,
-            widgets=widget_kwargs,
-            width=CONTROLS_WIDTH - 50,
-            sizing_mode="fixed"
-        )
 
     def __panel__(self):
-        return self._controls
+        return _create_param_pane(self, widgets_kwargs=self._widgets_kwargs)
 
     @property
     def kwargs(self):
@@ -132,6 +146,8 @@ class Colormapping(Controls):
 
     symmetric = param.Boolean(default=False, doc="""
         Whether the data are symmetric around zero.""")
+
+    _widgets_kwargs = {'clim': {'placeholder': '(min, max)'}}
 
     def __init__(self, data, **params):
         super().__init__(data, **params)
@@ -373,6 +389,8 @@ class Advanced(Controls):
         - line: {"line_dash": "dashed"}
         - scatter: {'size': 5, 'marker': '^'}""")
 
+    _widgets_kwargs = {'opts': {'placeholder': "{'size': 5, 'marker': '^'}"}}
+
 
 class StatusBar(param.Parameterized):
 
@@ -452,17 +470,17 @@ class hvPlotExplorer(Viewer):
         self._data = df
         self._converter = converter
         groups = {group: KINDS[group] for group in self._groups}
-        self._controls = pn.Param(
-            self.param, parameters=['kind', 'x', 'y', 'groupby', 'by'],
-            show_name=False, widgets={'kind': {'options': [], 'groups': groups}},
-        )  # the widths will get updated in toggle_controls
+        # Create pane for the main controls as done by the Controls instances.
+        self._controls = _create_param_pane(
+            self,
+            parameters=['kind', 'x', 'y', 'groupby', 'by'],
+            widgets_kwargs={'kind': {'options': [], 'groups': groups}},
+        )
         self.param.watch(self._toggle_controls, 'kind')
         self.param.watch(self._check_y, 'y_multi')
         self.param.watch(self._check_by, 'by')
         self._populate()
-        self._control_tabs = pn.Tabs(
-            tabs_location='left', width=CONTROLS_WIDTH + 150
-        )
+        self._control_tabs = pn.Tabs(tabs_location='left')
         self.statusbar = StatusBar(**statusbar_params)
         self._statusbar = pn.Param(
             self.statusbar,
@@ -609,12 +627,6 @@ class hvPlotExplorer(Viewer):
     def _groups(self):
         raise NotImplementedError('Must be implemented by subclasses.')
 
-    def _create_param(self, *param_args, width=CONTROLS_WIDTH, **param_kwargs):
-        widgets = pn.Param(*param_args, width=width, **param_kwargs)
-        for widget in widgets:
-            widget.width = width
-        return widgets
-
     def _toggle_controls(self, event=None):
         # Control high-level parameters
         visible = True
@@ -629,38 +641,19 @@ class hvPlotExplorer(Viewer):
         else:
             parameters = ['kind', 'x', 'y_multi', 'by', 'groupby']
         self._controls.parameters = parameters
-        for widget in self._controls:
-            widget.width = CONTROLS_WIDTH
-
         # Control other tabs
         tabs = [('Fields', self._controls)]
         if visible:
-            axes_params = self._create_param(self.axes, widgets={
-                'xlim': {'throttled': True},
-                'ylim': {'throttled': True}
-            }, show_name=False)
-            labels_params = self._create_param(self.labels, widgets={
-                'rot': {'throttled': True}
-            }, show_name=False)
-            styles_params = self._create_param(self.style)
-            operations_params = self._create_param(self.operations)
-            geographic_params = self._create_param(self.geographic)
-            advanced_params = self._create_param(self.advanced, widgets={
-                "opts": {"placeholder": "{'size': 5, 'marker': '^'}"}
-            })
             tabs += [
-                ('Axes', axes_params),
-                ('Labels', labels_params),
-                ('Style', styles_params),
-                ('Operations', operations_params),
-                ('Geographic', geographic_params),
-                ('Advanced', advanced_params),
+                ('Axes', self.axes),
+                ('Labels', self.labels),
+                ('Style', self.style),
+                ('Operations', self.operations),
+                ('Geographic', self.geographic),
+                ('Advanced', self.advanced),
             ]
             if event and event.new not in ('area', 'kde', 'line', 'ohlc', 'rgb', 'step'):
-                colormapping_params = self._create_param(self.colormapping, widgets={
-                    "clim": {"placeholder": "(min, max)"},
-                })
-                tabs.insert(5, ('Colormapping', colormapping_params))
+                tabs.insert(5, ('Colormapping', self.colormapping))
         self._control_tabs[:] = tabs
 
     def _check_y(self, event):
