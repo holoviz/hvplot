@@ -42,6 +42,7 @@ GEO_KEYS = [
 ]
 AGGREGATORS = [None, 'count', 'min', 'max', 'mean', 'sum', 'any']
 MAX_ROWS = 10000
+CONTROLS_WIDTH = 200
 
 
 def explorer(data, **kwargs):
@@ -79,28 +80,43 @@ def explorer(data, **kwargs):
     return hvPlotExplorer.from_data(data, **kwargs)
 
 
+def _create_param_pane(inst, widgets_kwargs=None, parameters=None):
+    widgets_kwargs = widgets_kwargs or {}
+    # Augment widgets kwargs by default, throttling all Number/Range parameters
+    # and setting their sizing mode.
+    for pname in inst.param:
+        if pname == 'name':
+            continue
+        if pname not in widgets_kwargs:
+            widgets_kwargs[pname] = {}
+        if isinstance(inst.param[pname], (param.Number, param.Range)):
+            widgets_kwargs[pname]['throttled'] = True
+        widgets_kwargs[pname]['sizing_mode'] = 'stretch_width'
+    kwargs = {
+        'show_name': False,
+        'widgets': widgets_kwargs,
+        'width': CONTROLS_WIDTH,
+    }
+    if parameters:
+        kwargs['parameters'] = parameters
+    pane = pn.Param(inst.param, **kwargs)
+    return pane
+
+
 class Controls(Viewer):
 
     explorer = param.ClassSelector(class_=Viewer, precedence=-1)
+
+    _widgets_kwargs = {}
 
     __abstract = True
 
     def __init__(self, df, **params):
         self._data = df
         super().__init__(**params)
-        widget_kwargs = {}
-        for p in self.param:
-            if isinstance(self.param[p], (param.Number, param.Range)):
-                widget_kwargs[p] = {'throttled': True}
-        self._controls = pn.Param(
-            self.param,
-            show_name=False,
-            sizing_mode='stretch_width',
-            widgets=widget_kwargs,
-        )
 
     def __panel__(self):
-        return self._controls
+        return _create_param_pane(self, widgets_kwargs=self._widgets_kwargs)
 
     @property
     def kwargs(self):
@@ -130,6 +146,8 @@ class Colormapping(Controls):
 
     symmetric = param.Boolean(default=False, doc="""
         Whether the data are symmetric around zero.""")
+
+    _widgets_kwargs = {'clim': {'placeholder': '(min, max)'}}
 
     def __init__(self, data, **params):
         super().__init__(data, **params)
@@ -371,6 +389,8 @@ class Advanced(Controls):
         - line: {"line_dash": "dashed"}
         - scatter: {'size': 5, 'marker': '^'}""")
 
+    _widgets_kwargs = {'opts': {'placeholder': "{'size': 5, 'marker': '^'}"}}
+
 
 class StatusBar(param.Parameterized):
 
@@ -450,18 +470,17 @@ class hvPlotExplorer(Viewer):
         self._data = df
         self._converter = converter
         groups = {group: KINDS[group] for group in self._groups}
-        self._controls = pn.Param(
-            self.param, parameters=['kind', 'x', 'y', 'groupby', 'by'],
-            sizing_mode='stretch_width', show_name=False,
-            widgets={'kind': {'options': [], 'groups': groups}}
+        # Create pane for the main controls as done by the Controls instances.
+        self._controls = _create_param_pane(
+            self,
+            parameters=['kind', 'x', 'y', 'groupby', 'by'],
+            widgets_kwargs={'kind': {'options': [], 'groups': groups}},
         )
         self.param.watch(self._toggle_controls, 'kind')
         self.param.watch(self._check_y, 'y_multi')
         self.param.watch(self._check_by, 'by')
         self._populate()
-        self._control_tabs = pn.Tabs(
-            tabs_location='left', width=425
-        )
+        self._control_tabs = pn.Tabs(tabs_location='left')
         self.statusbar = StatusBar(**statusbar_params)
         self._statusbar = pn.Param(
             self.statusbar,
@@ -622,29 +641,19 @@ class hvPlotExplorer(Viewer):
         else:
             parameters = ['kind', 'x', 'y_multi', 'by', 'groupby']
         self._controls.parameters = parameters
-
         # Control other tabs
         tabs = [('Fields', self._controls)]
         if visible:
             tabs += [
-                ('Axes', pn.Param(self.axes, widgets={
-                    'xlim': {'throttled': True},
-                    'ylim': {'throttled': True}
-                }, show_name=False)),
-                ('Labels', pn.Param(self.labels, widgets={
-                    'rot': {'throttled': True}
-                }, show_name=False)),
-                ('Style', pn.Param(self.style)),
-                ('Operations', pn.Param(self.operations)),
-                ('Geographic', pn.Param(self.geographic)),
-                ('Advanced', pn.Param(self.advanced, widgets={
-                    "opts": {"placeholder": "{'size': 5, 'marker': '^'}"}
-                })),
+                ('Axes', self.axes),
+                ('Labels', self.labels),
+                ('Style', self.style),
+                ('Operations', self.operations),
+                ('Geographic', self.geographic),
+                ('Advanced', self.advanced),
             ]
             if event and event.new not in ('area', 'kde', 'line', 'ohlc', 'rgb', 'step'):
-                tabs.insert(5, ('Colormapping', pn.Param(self.colormapping, widgets={
-                    "clim": {"placeholder": "(min, max)"},
-                })))
+                tabs.insert(5, ('Colormapping', self.colormapping))
         self._control_tabs[:] = tabs
 
     def _check_y(self, event):
