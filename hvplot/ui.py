@@ -627,6 +627,12 @@ class hvPlotExplorer(Viewer):
     def _groups(self):
         raise NotImplementedError('Must be implemented by subclasses.')
 
+    def _create_param(self, *param_args, width=CONTROLS_WIDTH, **param_kwargs):
+        widgets = pn.Param(*param_args, width=width, **param_kwargs)
+        for widget in widgets:
+            widget.width = width
+        return widgets
+
     def _toggle_controls(self, event=None):
         # Control high-level parameters
         visible = True
@@ -653,9 +659,10 @@ class hvPlotExplorer(Viewer):
                 ('Advanced', self.advanced),
             ]
             if event and event.new not in ('area', 'kde', 'line', 'ohlc', 'rgb', 'step'):
-                tabs.insert(5, ('Colormapping', pn.Param(self.colormapping, widgets={
+                colormapping_params = self._create_param(self.colormapping, widgets={
                     "clim": {"placeholder": "(min, max)"},
-                })))
+                })
+                tabs.insert(5, ('Colormapping', colormapping_params))
         self._control_tabs[:] = tabs
 
     def _check_y(self, event):
