@@ -533,7 +533,8 @@ class hvPlotExplorer(Viewer):
                 pn.Tabs(('Plot', self._hv_pane.layout), ('Code', self._code_pane)),
                 sizing_mode='stretch_both'
             ),
-            sizing_mode='stretch_both'
+            sizing_mode='stretch_width',
+            height=600
         )
 
         # initialize
