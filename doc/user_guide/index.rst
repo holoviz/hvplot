@@ -89,7 +89,7 @@ rather than Matplotlib.
 * `Timeseries Data <Timeseries_Data.html>`_
   Using hvPlot when working with timeseries data.
 
-* `Large Timeseries Data <visualizing_large_timeseries.html>`_
+* `Large Timeseries Data <Large_Timeseries.html>`_
   Using hvPlot when working with large timeseries data.
 
 * `Statistical Plots <Statistical_Plots.html>`_
@@ -120,6 +120,6 @@ rather than Matplotlib.
     Network Graphs <NetworkX>
     Geographic Data <Geographic_Data>
     Timeseries Data <Timeseries_Data>
-    Large Timeseries Data <visualizing_large_timeseries>
+    Large Timeseries <Large_Timeseries>
     Statistical Plots <Statistical_Plots>
     Pandas API <Pandas_API>
