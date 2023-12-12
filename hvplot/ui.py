@@ -662,10 +662,7 @@ class hvPlotExplorer(Viewer):
                 ('Advanced', self.advanced),
             ]
             if event and event.new not in ('area', 'kde', 'line', 'ohlc', 'rgb', 'step'):
-                colormapping_params = self._create_param(self.colormapping, widgets={
-                    "clim": {"placeholder": "(min, max)"},
-                })
-                tabs.insert(5, ('Colormapping', colormapping_params))
+                tabs.insert(5, ('Colormapping', self.colormapping))
         self._control_tabs[:] = tabs
 
     def _check_y(self, event):
