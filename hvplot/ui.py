@@ -518,7 +518,8 @@ class hvPlotExplorer(Viewer):
             alert_type='danger', visible=False, sizing_mode='stretch_width'
         )
         self._hv_pane = pn.pane.HoloViews(
-            sizing_mode='stretch_both', min_height=250, margin=(5, 5, 5, 20), widget_location="bottom")
+            sizing_mode='stretch_both', min_height=250, margin=(5, 5, 5, 20),
+            widget_location="bottom", widget_layout=pn.Row)
         self._code_pane = pn.pane.Markdown(
             sizing_mode='stretch_both', min_height=250, margin=(5, 5, 0, 20))
         self._layout = pn.Column(
