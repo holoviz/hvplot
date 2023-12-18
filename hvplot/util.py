@@ -348,6 +348,12 @@ def is_dask(data):
     import dask.dataframe as dd
     return isinstance(data, (dd.DataFrame, dd.Series))
 
+def is_polars(data):
+    if not check_library(data, 'polars'):
+        return False
+    import polars as pl
+    return isinstance(data, (pl.DataFrame, pl.Series))
+
 def is_intake(data):
     if "intake" not in sys.modules:
         return False
