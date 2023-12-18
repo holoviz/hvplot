@@ -352,7 +352,7 @@ def is_polars(data):
     if not check_library(data, 'polars'):
         return False
     import polars as pl
-    return isinstance(data, (pl.DataFrame, pl.Series))
+    return isinstance(data, (pl.DataFrame, pl.Series, pl.LazyFrame))
 
 def is_intake(data):
     if "intake" not in sys.modules:
