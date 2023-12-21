@@ -582,7 +582,7 @@ class hvPlotExplorer(Viewer):
                 if (pname == 'x' or pname == 'y') and getattr(self, pname, None) is None:
                     setattr(self, pname, p.objects[0])
 
-    def _plot(self, *events):
+    def _plot(self):
         y = self.y_multi if 'y_multi' in self._controls.parameters else self.y
         if isinstance(y, list) and len(y) == 1:
             y = y[0]
