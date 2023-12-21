@@ -213,6 +213,7 @@ class TestDatashader(ComparisonTestCase):
         assert plot.opts["cmap"] == cc.palette['glasbey_category10']
 
     def test_rasterize_single_y_in_list_linear_cmap(self):
+        # Regression, see https://github.com/holoviz/hvplot/issues/1210
         plot = self.df.hvplot.line(y=['y'], rasterize=True)
         opts = Store.lookup_options('bokeh', plot[()], 'style').kwargs
         assert opts.get('cmap') == 'kbc_r'
