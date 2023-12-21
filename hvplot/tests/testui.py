@@ -20,7 +20,7 @@ def test_explorer_basic():
     explorer = hvplot.explorer(df)
 
     assert isinstance(explorer, hvDataFrameExplorer)
-    assert explorer.kind == "line"
+    assert explorer.kind == "scatter"
     assert explorer.x == "index"
     assert explorer.y == "species"
 
@@ -215,25 +215,25 @@ def test_explorer_live_update_init():
 
 def test_explorer_live_update_after_init():
     explorer = hvplot.explorer(df)
-    assert explorer._hv_pane.object.type is hv.Curve
-    explorer.kind = 'scatter'
     assert explorer._hv_pane.object.type is hv.Scatter
+    explorer.kind = 'line'
+    assert explorer._hv_pane.object.type is hv.Curve
 
     explorer.statusbar.live_update = False
-    explorer.kind = 'line'
-    assert explorer._hv_pane.object.type is hv.Scatter
-    assert 'line' not in explorer.code
+    explorer.kind = 'scatter'
+    assert explorer._hv_pane.object.type is hv.Curve
+    assert 'scatter' not in explorer.code
 
     explorer.statusbar.live_update = True
-    assert explorer._hv_pane.object.type is hv.Curve
-    assert 'line' in explorer.code
+    assert explorer._hv_pane.object.type is hv.Scatter
+    assert 'scatter' in explorer.code
 
 
 def test_explorer_method_dataframe():
     explorer = df.hvplot.explorer()
 
     assert isinstance(explorer, hvDataFrameExplorer)
-    assert explorer.kind == 'line'
+    assert explorer.kind == 'scatter'
     assert explorer.x == 'index'
     assert explorer.y == 'species'
 
@@ -260,7 +260,7 @@ def test_explorer_method_as_kind():
     explorer = df.hvplot(kind="explorer")
 
     assert isinstance(explorer, hvDataFrameExplorer)
-    assert explorer.kind == 'line'
+    assert explorer.kind == 'scatter'
     assert explorer.x == 'index'
     assert explorer.y == 'species'
 
@@ -269,7 +269,7 @@ def test_explorer_method_propagates_kwargs():
     explorer = df.hvplot.explorer(title="Dummy title", x="bill_length_mm")
 
     assert isinstance(explorer, hvDataFrameExplorer)
-    assert explorer.kind == 'line'
+    assert explorer.kind == 'scatter'
     assert explorer.x == 'bill_length_mm'
     assert explorer.y == 'species'
     assert explorer.labels.title == 'Dummy title'
