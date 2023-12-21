@@ -10,12 +10,12 @@ save = _hv.save
 
 def show(obj, title=None, port=0, **kwargs):
     """
-    Displays HoloViews objects in and outside the notebook
+    Displays hvplot plots in and outside the notebook
 
     Parameters
     ----------
-    obj : HoloViews object
-        HoloViews object to export
+    obj : HoloViews/Panel object
+        HoloViews/Panel object to show
     title : str
         A string title to give the Document (if served as an app)
     port: int (optional, default=0)
@@ -26,10 +26,13 @@ def show(obj, title=None, port=0, **kwargs):
     -------
     a panel.io.server.Server | panel.io.server.StoppableThread (if threaded=true)
     """
-    if not isinstance(obj, _hv.core.Dimensioned):
+    if isinstance(obj, _hv.core.Dimensioned):
+        return _pn.pane.HoloViews(obj).show(title, port, **kwargs)
+    elif isinstance(obj, _pn.viewable.Viewable):
+        return obj.show(title, port, **kwargs)
+    else:
         raise ValueError('%s type object not recognized and cannot be shown.' %
                          type(obj).__name__)
-    return _pn.pane.HoloViews(obj).show(title, port, **kwargs)
 
 
 class hvplot_extension(_hv.extension):
