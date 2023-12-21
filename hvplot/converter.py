@@ -2060,7 +2060,11 @@ class HoloViewsConverter:
             o, h, l, c = y
         neg, pos = self.kwds.get('neg_color', 'red'), self.kwds.get('pos_color', 'green')
         color_exp = (dim(o)>dim(c)).categorize({True: neg, False: pos})
-        ds = Dataset(data, [x], [o, h, l, c])
+        ohlc_cols = [o, h, l, c]
+        if x in self.hover_cols:
+            self.hover_cols.remove(x)
+        vdims = list(dict.fromkeys(ohlc_cols + self.hover_cols))
+        ds = Dataset(data, [x], vdims)
         if ds.data[x].dtype.kind in 'SUO':
             rects = Rectangles(ds, [x, o, x, c])
         else:
@@ -2078,9 +2082,9 @@ class HoloViewsConverter:
         tools = seg_cur_opts.pop('tools', [])
         if 'hover' in tools:
             tools[tools.index('hover')] = HoverTool(tooltips=[
-                (x, '@{%s}' % x), ('Open', '@{%s}' % o), ('High', '@{%s}' % h),
-                ('Low', '@{%s}' % l), ('Close', '@{%s}' % c)
-            ])
+                (x, f'@{x}'), ('Open', f'@{o}'), ('High', f'@{h}'),
+                ('Low', f'@{l}'), ('Close', f'@{c}')
+            ] + [(hc, f'@{hc}') for hc in vdims[4:]])
         seg_cur_opts['tools'] = tools
         seg_cur_opts ['color'] = self.kwds.get('line_color', 'black')
         if 'xlabel' not in seg_cur_opts:

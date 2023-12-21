@@ -1,5 +1,5 @@
 import holoviews as hv
-from ..util import with_hv_extension
+from ..util import with_hv_extension, is_polars
 
 from .core import hvPlot, hvPlotTabular   # noqa
 
@@ -30,6 +30,9 @@ def plot(data, kind, **kwargs):
         if v is not None:
             no_none_kwargs[k] = v
 
+    if is_polars(data):
+        from hvplot.polars import hvPlotTabularPolars
+        return hvPlotTabularPolars(data)(kind=kind, **no_none_kwargs)
     return hvPlotTabular(data)(kind=kind, **no_none_kwargs)
 
 
