@@ -13,13 +13,6 @@ from parameterized import parameterized
 from hvplot.converter import HoloViewsConverter
 from hvplot.plotting import plot
 
-try:
-    import polars as pl
-    skip_polar = False
-except ImportError:
-    skip_polar = True
-
-
 no_args = ['line', 'area', 'hist', 'box', 'kde', 'density', 'bar', 'barh']
 x_y = ['scatter', 'hexbin']
 
@@ -70,8 +63,8 @@ class TestPandasHvplotPlotting(TestPandasHoloviewsPlotting):
         pd.options.plotting.backend = 'hvplot'
 
 
-@pytest.mark.skipif(skip_polar, reason="polars not installed")
 def test_plot_supports_polars():
+    pl = pytest.importorskip("polars")
     dfp = pl.DataFrame(pd._testing.makeDataFrame())
     out = plot(dfp, 'line')
     assert isinstance(out, hv.Curve)
