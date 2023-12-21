@@ -872,7 +872,7 @@ class hvDataFrameExplorer(hvPlotExplorer):
 
     z = param.Selector()
 
-    kind = param.Selector(default='line', objects=KINDS['all'])
+    kind = param.Selector(default='scatter', objects=KINDS['all'])
 
     @property
     def _var_name(self):
