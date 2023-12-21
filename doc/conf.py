@@ -53,6 +53,7 @@ html_favicon = "_static/favicon.ico"
 
 extensions += [
     'nbsite.gallery',
+    'nbsite.analytics',
     'sphinx_copybutton',
 ]
 
@@ -74,6 +75,10 @@ nbsite_gallery_conf = {
             ]
         }
     },
+}
+
+nbsite_analytics = {
+    'goatcounter_holoviz': True,
 }
 
 html_context.update({
