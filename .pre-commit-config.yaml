@@ -26,9 +26,10 @@ repos:
         args: [hvplot]
         files: hvplot/
 -   repo: https://github.com/hoxbro/clean_notebook
-    rev: v0.1.10
+    rev: v0.1.14
     hooks:
     - id: clean-notebook
+      args: [-i, tags]
 -   repo: https://github.com/codespell-project/codespell
     rev: v2.2.6
     hooks:
