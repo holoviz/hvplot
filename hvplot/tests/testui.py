@@ -64,6 +64,7 @@ def test_explorer_plot_code():
             "    kind='scatter',\n"
             "    x='bill_length_mm',\n"
             "    y=['bill_depth_mm'],\n"
+            "    legend='bottom_right',\n"
             "    widget_location='bottom',\n"
             ")"
         )
@@ -78,6 +79,7 @@ def test_explorer_plot_code():
             "    kind='scatter',\n"
             "    x='bill_length_mm',\n"
             "    y=['bill_depth_mm'],\n"
+            "    legend='bottom_right',\n"
             "    widget_location='bottom',\n"
             ")"
         )
@@ -280,6 +282,7 @@ def test_explorer_code_dataframe():
             kind='points',
             x='bill_length_mm',
             y='species',
+            legend='bottom_right',
             widget_location='bottom',
         )"""
     )
@@ -289,6 +292,7 @@ def test_explorer_code_dataframe():
             kind='points',
             x='bill_length_mm',
             y='species',
+            legend='bottom_right',
             widget_location='bottom',
         )
         ```"""
@@ -305,6 +309,7 @@ def test_explorer_code_gridded():
             kind='image',
             x='lon',
             y='lat',
+            legend='bottom_right',
             widget_location='bottom',
         )""")
 
@@ -316,6 +321,7 @@ def test_explorer_code_gridded():
             kind='image',
             x='lon',
             y='lat',
+            legend='bottom_right',
             widget_location='bottom',
         )
         ```"""
@@ -333,6 +339,7 @@ def test_explorer_code_gridded_dataarray():
             kind='image',
             x='lon',
             y='lat',
+            legend='bottom_right',
             widget_location='bottom',
         )""")
 
@@ -344,6 +351,7 @@ def test_explorer_code_gridded_dataarray():
             kind='image',
             x='lon',
             y='lat',
+            legend='bottom_right',
             widget_location='bottom',
         )
         ```"""
@@ -361,6 +369,7 @@ def test_explorer_code_opts():
             kind='image',
             x='lon',
             y='lat',
+            legend='bottom_right',
             widget_location='bottom',
         ).opts(
             color_levels=3,
@@ -374,6 +383,7 @@ def test_explorer_code_opts():
             kind='image',
             x='lon',
             y='lat',
+            legend='bottom_right',
             widget_location='bottom',
         ).opts(
             color_levels=3,

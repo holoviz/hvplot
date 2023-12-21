@@ -187,7 +187,7 @@ class Style(Controls):
 
 class Axes(Controls):
 
-    legend = param.Selector(default='right', objects=_hvConverter._legend_positions)
+    legend = param.Selector(default='bottom_right', objects=_hvConverter._legend_positions)
 
     logx = param.Boolean(default=False)
 
@@ -697,6 +697,8 @@ class hvPlotExplorer(Viewer):
             Data variable name by which the returned string will start.
         """
         settings = self.settings()
+        if "legend" not in settings:
+            settings["legend"] = "bottom_right"
         settings["widget_location"] = "bottom"
         settings_args = ''
         if settings:
