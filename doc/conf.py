@@ -44,7 +44,6 @@ html_theme_options.update({
             "icon": "fa-brands fa-discord",
         },
     ],
-    "analytics": {"google_analytics_id": "G-FV5FQGDK24"},
     "pygment_dark_style": "material",
 })
 
@@ -54,6 +53,7 @@ html_favicon = "_static/favicon.ico"
 
 extensions += [
     'nbsite.gallery',
+    'nbsite.analytics',
     'sphinx_copybutton',
 ]
 
@@ -75,6 +75,10 @@ nbsite_gallery_conf = {
             ]
         }
     },
+}
+
+nbsite_analytics = {
+    'goatcounter_holoviz': True,
 }
 
 html_context.update({
