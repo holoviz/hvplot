@@ -631,12 +631,6 @@ class hvPlotExplorer(Viewer):
     def _groups(self):
         raise NotImplementedError('Must be implemented by subclasses.')
 
-    def _create_param(self, *param_args, width=CONTROLS_WIDTH, **param_kwargs):
-        widgets = pn.Param(*param_args, width=width, **param_kwargs)
-        for widget in widgets:
-            widget.width = width
-        return widgets
-
     def _toggle_controls(self, event=None):
         # Control high-level parameters
         visible = True
