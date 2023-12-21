@@ -38,7 +38,7 @@ GEO_FEATURES = [
 GEO_TILES = [None] + sorted(tile_sources)
 GEO_KEYS = [
     'crs', 'crs_kwargs', 'projection', 'projection_kwargs',
-    'global_extent', 'project', 'features', 'feature_scale', 'tiles'
+    'global_extent', 'project', 'features', 'feature_scale',
 ]
 AGGREGATORS = [None, 'count', 'min', 'max', 'mean', 'sum', 'any']
 MAX_ROWS = 10000
@@ -275,7 +275,7 @@ class Geographic(Controls):
 
     geo = param.Boolean(default=False, doc="""
         Whether the plot should be treated as geographic (and assume
-        PlateCarree, i.e. lat/lon coordinates).""")
+        PlateCarree, i.e. lat/lon coordinates). Require GeoViews.""")
 
     crs = param.Selector(default=None, doc="""
         Coordinate reference system of the data specified as Cartopy
@@ -306,12 +306,34 @@ class Geographic(Controls):
     feature_scale = param.ObjectSelector(default='110m', objects=['110m', '50m', '10m'], doc="""
         The scale at which to render the features.""")
 
-    @param.depends('geo',  watch=True, on_init=True)
+    _widgets_kwargs = {'geo': {'type': pn.widgets.Toggle}}
+
+    def __init__(self, data,  **params):
+        self._gv_available = False
+        try:
+            import geoviews  # noqa
+            self._gv_available = True
+        except ImportError:
+            pass
+
+        geo_params = GEO_KEYS + ['geo']
+        if not self._gv_available and  any(p in params for p in geo_params):
+            raise ImportError(
+                'GeoViews must be installed to enable the geographic options.'
+            )
+        super().__init__(data, **params)
+        if not self._gv_available:
+            for p in geo_params:
+                self.param[p].constant = True
+            # Workaround: Checkbox widgets don't yet have a tooltip
+            self.param['geo'].label = 'geo (require GeoViews)'
+        else:
+            self._update_crs_projection()
+
+    @param.depends('geo', watch=True)
     def _update_crs_projection(self):
         enabled = bool(self.geo or self.project)
         for key in GEO_KEYS:
-            if key == "tiles":
-                continue
             self.param[key].constant = not enabled
         self.geo = enabled
         if not enabled:
