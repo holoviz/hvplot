@@ -1,13 +1,23 @@
 """
 Tests pandas.options.backend setting
 """
-from packaging.version import Version
 from unittest import TestCase, SkipTest
-import pandas as pd
 
+import holoviews as hv
+import pandas as pd
+import pytest
+
+from packaging.version import Version
 from parameterized import parameterized
 
-from ..converter import HoloViewsConverter
+from hvplot.converter import HoloViewsConverter
+from hvplot.plotting import plot
+
+try:
+    import polars as pl
+    skip_polar = False
+except ImportError:
+    skip_polar = True
 
 
 no_args = ['line', 'area', 'hist', 'box', 'kde', 'density', 'bar', 'barh']
@@ -58,3 +68,10 @@ class TestPandasHvplotPlotting(TestPandasHoloviewsPlotting):
             raise SkipTest('entrypoints for plotting.backends was added '
                            'in pandas 0.25.1')
         pd.options.plotting.backend = 'hvplot'
+
+
+@pytest.mark.skipif(skip_polar, reason="polars not installed")
+def test_plot_supports_polars():
+    dfp = pl.DataFrame(pd._testing.makeDataFrame())
+    out = plot(dfp, 'line')
+    assert isinstance(out, hv.Curve)
