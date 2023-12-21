@@ -350,14 +350,17 @@ class Geographic(Controls):
 
         self.param.crs.objects = crs_list
         self.param.projection.objects = crs_list
+        updates = {}
         if self.projection is None:
-            self.projection = crs_list[0]
+            updates['projection'] = crs_list[0]
 
         if self.global_extent is None:
-            self.global_extent = True
+            updates['global_extent'] = True
 
         if self.features is None:
-            self.features = ['coastline']
+            updates['features'] = ['coastline']
+
+        self.param.update(**updates)
 
 
 class Operations(Controls):
