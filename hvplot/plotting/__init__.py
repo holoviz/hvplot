@@ -31,7 +31,7 @@ def plot(data, kind, **kwargs):
             no_none_kwargs[k] = v
 
     if is_polars(data):
-        from hvplot.polars import hvPlotTabularPolars
+        from .core import hvPlotTabularPolars
         return hvPlotTabularPolars(data)(kind=kind, **no_none_kwargs)
     return hvPlotTabular(data)(kind=kind, **no_none_kwargs)
 
