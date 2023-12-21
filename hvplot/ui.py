@@ -600,6 +600,12 @@ class hvPlotExplorer(Viewer):
             if opts_kwargs:
                 self._hvplot.opts(**opts_kwargs)
             self._hv_pane.object = self._hvplot
+            # Working around a Panel issue that cause the widgets not to
+            # be well aligned when in a Row layout.
+            # See https://github.com/holoviz/panel/issues/6110
+            if len(self._hv_pane.widget_box) > 1:
+                for w in self._hv_pane.widget_box:
+                    w.margin = (20, 5, 5, 5)
             self._alert.visible = False
         except Exception as e:
             self._alert.param.update(
