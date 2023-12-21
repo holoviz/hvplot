@@ -609,7 +609,7 @@ class HoloViewsConverter:
                     # Default to categorical camp if we detect categorical shading
                     if ((self.datashade or self.rasterize) and (self.aggregator is None or 'count_cat' in str(self.aggregator)) and
                         ((self.by and not self.subplots) or
-                         (isinstance(self.y, list) or (self.y is None and len(set(self.variables) - set(self.indexes)) > 1)))):
+                         ((isinstance(self.y, list) and len(self.y) > 1) or (self.y is None and len(set(self.variables) - set(self.indexes)) > 1)))):
                         self._style_opts['cmap'] = self._default_cmaps['categorical']
                     elif symmetric:
                         self._style_opts['cmap'] = self._default_cmaps['diverging']
