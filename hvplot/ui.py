@@ -309,20 +309,20 @@ class Geographic(Controls):
     _widgets_kwargs = {'geo': {'type': pn.widgets.Toggle}}
 
     def __init__(self, data,  **params):
-        self._gv_available = False
+        gv_available = False
         try:
             import geoviews  # noqa
-            self._gv_available = True
+            gv_available = True
         except ImportError:
             pass
 
         geo_params = GEO_KEYS + ['geo']
-        if not self._gv_available and  any(p in params for p in geo_params):
+        if not gv_available and any(p in params for p in geo_params):
             raise ImportError(
                 'GeoViews must be installed to enable the geographic options.'
             )
         super().__init__(data, **params)
-        if not self._gv_available:
+        if not gv_available:
             for p in geo_params:
                 self.param[p].constant = True
             # Workaround: Checkbox widgets don't yet have a tooltip
