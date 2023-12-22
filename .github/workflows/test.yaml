@@ -99,7 +99,7 @@ jobs:
           channel-priority: strict
           channels: pyviz/label/dev,conda-forge,nodefaults
           envs: "-o examples_tests -o tests -o examples_conda"
-          cache: ${{ github.event.inputs.cache }}
+          cache: ${{ github.event.inputs.cache || github.event.inputs.cache == '' }}
           conda-update: true
         id: install
       - name: doit test_unit
@@ -140,7 +140,7 @@ jobs:
       #     # channel-priority: strict
       #     channels: pyviz/label/dev,conda-forge,nodefaults
       #     envs: "-o tests_core -o tests_ci"
-      #     cache: ${{ github.event.inputs.cache }}
+      #     cache: ${{ github.event.inputs.cache || github.event.inputs.cache == '' }}
       #     conda-update: true
       #     id: install
       - uses: actions/checkout@v3
