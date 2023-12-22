@@ -7,6 +7,19 @@ on:
     branches:
     - '*'
   workflow_dispatch:
+    inputs:
+      target:
+        description: "How much of the test suite to run"
+        type: choice
+        default: default
+        options:
+          - default
+          - full
+          - downstream
+      cache:
+        description: "Use cache"
+        type: boolean
+        default: true
   schedule:
     - cron: '0 15 * * SUN'
 
@@ -20,16 +33,60 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
       - uses: holoviz-dev/holoviz_tasks/pre-commit@v0.1a17
+  setup:
+    name: Setup workflow
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ env.MATRIX }}
+    steps:
+      - name: Set matrix option
+        run: |
+          if [[ '${{ github.event_name }}' == 'workflow_dispatch' ]]; then
+            OPTION=${{ github.event.inputs.target }}
+          elif [[ '${{ github.event_name }}' == 'schedule' ]]; then
+            OPTION="full"
+          elif [[ '${{ github.event_name }}' == 'push' && '${{ github.ref_type }}' == 'tag' ]]; then
+            OPTION="full"
+          else
+            OPTION="default"
+          fi
+          echo "MATRIX_OPTION=$OPTION" >> $GITHUB_ENV
+      - name: Set test matrix with 'default' option
+        if: env.MATRIX_OPTION == 'default'
+        run: |
+          MATRIX=$(jq -nsc '{
+              "os": ["ubuntu-latest", "macos-latest", "windows-latest"],
+              "python-version": ["3.8", "3.11"],
+              "include": [
+                  {"os": "ubuntu-latest", "python-version": "3.9"},
+                  {"os": "ubuntu-latest", "python-version": "3.10"}
+              ]
+          }')
+          echo "MATRIX=$MATRIX" >> $GITHUB_ENV
+      - name: Set test matrix with 'full' option
+        if: env.MATRIX_OPTION == 'full'
+        run: |
+          MATRIX=$(jq -nsc '{
+              "os": ["ubuntu-latest", "macos-latest", "windows-latest"],
+              "python-version": ["3.8", "3.9", "3.10", "3.11"]
+          }')
+          echo "MATRIX=$MATRIX" >> $GITHUB_ENV
+      - name: Set test matrix with 'downstream' option
+        if: env.MATRIX_OPTION == 'downstream'
+        run: |
+          MATRIX=$(jq -nsc '{
+              "os": ["ubuntu-latest"],
+              "python-version": ["3.11"]
+          }')
+          echo "MATRIX=$MATRIX" >> $GITHUB_ENV
+
   test_suite:
     name: Pytest on ${{ matrix.os }} with Python ${{ matrix.python-version }}
-    needs: [pre_commit]
+    needs: [pre_commit, setup]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-      matrix:
-        os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
-        # Run on the full set on schedule, workflow_dispatch and push&tags events, otherwise on a subset.
-        python-version: ${{ ( github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || ( github.event_name == 'push' && github.ref_type == 'tag' ) ) && fromJSON('["3.8", "3.9", "3.10", "3.11"]') || fromJSON('["3.8", "3.11"]') }}
+      matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
     timeout-minutes: 90
     defaults:
       run:
@@ -42,7 +99,7 @@ jobs:
           channel-priority: strict
           channels: pyviz/label/dev,conda-forge,nodefaults
           envs: "-o examples_tests -o tests -o examples_conda"
-          cache: true
+          cache: ${{ github.event.inputs.cache }}
           conda-update: true
         id: install
       - name: doit test_unit
@@ -60,7 +117,7 @@ jobs:
           codecov
   core_test_suite:
     name: Core tests on Python ${{ matrix.python-version }}, ${{ matrix.os }}
-    needs: [pre_commit]
+    needs: [pre_commit, setup]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -83,7 +140,7 @@ jobs:
       #     # channel-priority: strict
       #     channels: pyviz/label/dev,conda-forge,nodefaults
       #     envs: "-o tests_core -o tests_ci"
-      #     cache: true
+      #     cache: ${{ github.event.inputs.cache }}
       #     conda-update: true
       #     id: install
       - uses: actions/checkout@v3
