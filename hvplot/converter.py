@@ -1595,7 +1595,7 @@ class HoloViewsConverter:
             ys += [self.kwds['yerr1']]
         kdims, vdims = self._get_dimensions([x], ys)
 
-        if self.by:
+        if self.by and not self.datashade:
             if element is Bars and not self.subplots:
                 if any(y in self.indexes for y in ys):
                     data = data.reset_index()
