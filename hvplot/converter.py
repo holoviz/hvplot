@@ -2335,7 +2335,7 @@ class HoloViewsConverter:
             if 'tools' in opts_ and kind in ["polygons", "paths"] and not vdims:
                 opts_["tools"] = [t for t in opts_["tools"] if t != "hover"]
         if self.geo: params['crs'] = self.crs
-        if self.by:
+        if self.by and not self.datashade:
             obj = Dataset(data, self.by+kdims, vdims).to(element, kdims, vdims, self.by, **params)
             if self.subplots:
                 obj = obj.layout(sort=False)
