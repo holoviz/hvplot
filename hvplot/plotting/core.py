@@ -1868,8 +1868,16 @@ class hvPlotTabularPolars(hvPlotTabular):
         import polars as pl
 
         params = dict(self._metadata, **kwds)
-        x = x or params.pop("x", None)
-        y = y or params.pop("y", None)
+        x = (
+            x
+            or params.pop("x", None)
+            or self._data.select(pl.col(pl.NUMERIC_DTYPES)).columns
+        )
+        y = (
+            y
+            or params.pop("y", None)
+            or self._data.select(pl.col(pl.NUMERIC_DTYPES)).columns
+        )
         kind = kind or params.pop("kind", None)
 
         # Find columns which should be converted for LazyDataFrame and DataFrame
