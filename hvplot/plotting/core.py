@@ -1886,7 +1886,7 @@ class hvPlotTabularPolars(hvPlotTabular):
                 columns = (
                     set(self._data.columns) & set(itertools.chain(*possible_columns))
                 ) or {self._data.columns[0]}
-                if x is None or y is None:
+                if y is None:
                     columns |= set(self._data.select(pl.col(pl.NUMERIC_DTYPES)).columns)
                 xs = x if is_list_like(x) else (x,)
                 ys = y if is_list_like(y) else (y,)
