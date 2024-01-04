@@ -67,7 +67,7 @@ extras_require['tests_core'] = [
 # to run and pass the test suite without installing any
 # of those.
 extras_require['tests'] = extras_require['tests_core'] + [
-    'polars',
+    'polars==0.20.2',
     'fugue',
     'ibis-framework',  # ibis-duckdb on conda
 ]
@@ -103,7 +103,7 @@ extras_require['examples'] = [
     'numba >=0.51.0',
     'datashader >=0.6.5',
     'spatialpandas >=0.4.3',
-    'polars',
+    'polars==0.20.2',
     'fugue',
     'ibis-framework',  # ibis-duckdb on conda
 ]
