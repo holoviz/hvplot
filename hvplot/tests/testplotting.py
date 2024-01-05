@@ -67,4 +67,4 @@ def test_plot_supports_polars():
     pl = pytest.importorskip("polars")
     dfp = pl.DataFrame(pd._testing.makeDataFrame())
     out = plot(dfp, 'line')
-    assert isinstance(out, hv.Curve)
+    assert isinstance(out, hv.NdOverlay)
