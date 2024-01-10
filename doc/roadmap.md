@@ -18,13 +18,13 @@ hvPlot's website currently has the following structure:
 hvPlot users have repeatedly complained about the quality of its documentation, which seems to mostly stem from:
 
 - The API is not being documented.
-- The API is not being enough demonstrated in a single place, users have to assemble examples from different pages.
+- The API is not being enough demonstrated in a single place; users have to assemble examples from different pages.
 - An implicit reliance on HoloViews' documentation (e.g. for the options) that itself isn't in great shape.
 - The difficulty to run locally all or parts of the documentation (that relies on somewhat complex datasets and many libraries).
 
 ### Goals
 
-The main priority of the hvPlot project should be to improve its documentation. ). Some of the guiding principles of the documentation update should be:
+The main priority of the hvPlot project should be to improve its documentation. Some of the guiding principles of the documentation update should be:
 
 - To adopt the [Diataxis framework](https://diataxis.fr). [Panel](https://panel.holoviz.org/) recently overhauled part of its documentation, dividing the documentation into tutorials, how-to guides, explanations, and references. Note however that the experience from Panel revealed that changes need to happen gradually and that existing documentation should be removed when newer documentation is in place.
 - The code on the website should be easy to execute locally, using simple datasets to fetch and not relying on special libraries.
@@ -33,12 +33,12 @@ The main priority of the hvPlot project should be to improve its documentation. 
     - The API should be fully and automatically documented, see for example how [Plotly](https://plotly.com/python-api-reference/generated/plotly.express.line) and [Pandas](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.line.html) document their `line` function.
     - The plot methods should be documented with many more examples, Plotly again does this in a great way, collecting on a [single page many examples](https://plotly.com/python/line-charts/) which allow the user to quickly find. These examples should be automatically built for the three supported plotting backends (Bokeh, Matplotlib, Plotly).
     - The style options should all be documented automatically, for each plotting backend.
-2. hvPlot users very often come from another library (Pandas, GeoPandas, Xarray, Polars, etc.), the documentation should guide them better and help them to migrate:
+2. hvPlot users very often come from another library (Pandas, GeoPandas, Xarray, Polars, etc.), and the documentation should guide them better and help them to migrate:
     - Dedicated entry points should be created for these users, in the form of tutorials.
     - The landing page should point them to these tutorials.
-3. An advanced plotting tutorial should be created, that users would follow once they have completed the Getting Started and/or Migration tutorials, to deepen their understanding of hvPlot.
+3. An advanced plotting tutorial should be created, which users would follow once they have completed the Getting Started and/or Migration tutorials, to deepen their understanding of hvPlot.
 4. hvPlot is not just a plotting library, it is a platform for advanced data analysis through visualization. Some of the more advanced concepts, such as the processing done by Datashader, should be explained in a new top-level *Explanation* section.
-5. The previous tasks should often need to reuse content from the *User Guides*, once they are completed it should appear more clearly how to re-structure them.
+5. The previous tasks should often need to reuse content from the *User Guides*. Once they are completed it should appear more clearly how to re-structure them.
 
 ## 2. Streamline the developer experience
 
@@ -53,7 +53,7 @@ hvPlot provides already many (many!) features to its users. However, it also has
 
 1. hvPlot's development should favor bug fixes vs. new features or feature enhancements.
 2. hvPlot's test suite should be re-factored and improved to catch bugs before users have to report them and to prevent potential regressions.
-3. Bugs reported by hvPlot users regularly come from one of its dependencies and in that case, it is mostly from HoloViews. It should be made easy for hvPlot users to find these bugs on GitHub. These bugs should be fixed too.
+3. Bugs reported by hvPlot users regularly come from one of its dependencies, typically HoloViews. It should be made easy for hvPlot users to find these bugs on GitHub. These bugs should be fixed too.
 
 ## 4. Figure out the future of the `.interactive` API
 
