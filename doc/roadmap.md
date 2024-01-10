@@ -1,10 +1,6 @@
 # Roadmap
 
-This page describes a tentative roadmap for hvPlot in 2024. The overall goals are to:
-
-- Improve the user experience
-- Gain more adoption
-- Prepare for a `1.0` release in 2025
+This page describes a tentative roadmap for hvPlot in 2024
 
 ## 1. Documentation, documentation, documentation
 
