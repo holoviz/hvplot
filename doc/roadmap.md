@@ -1,6 +1,6 @@
 # Roadmap
 
-This page describes a tentative roadmap for hvPlot in 2024
+This page includes an ambitious roadmap for hvPlot for 2024.
 
 ## 1. Documentation, documentation, documentation
 
