@@ -115,10 +115,6 @@ In a notebook or ipython environment the usual
 - `help` and `?` will provide you with documentation.
 - `TAB` and `SHIFT+TAB` completion will help you navigate.
 
-## Examples
-
-[<img src="http://blog.holoviz.org/images/hvplot_collage.png" style="max-height:400px;border-radius:2%;">](https://hvplot.holoviz.org/topics.html)
-
 ## License
 
 hvPlot is completely free and open-source. It is licensed under the [BSD 3-Clause License](https://opensource.org/licenses/BSD-3-Clause).
