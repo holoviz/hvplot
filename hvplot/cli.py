@@ -1,9 +1,26 @@
 import argparse
 import os
-import difflib
 
-import hvplot
 import panel as pn
+
+HELP_DESCRIPTION = """
+This command-line tool allows for quick and easy visualization of various
+data file formats using HoloViews and hvPlot, including CSV, JSON, HTML, Excel,
+Parquet, NetCDF, and HDF5, and more.
+
+The tool will automatically determine the appropriate reader for the file
+extension and use it to load the data. Ensure the correct dependencies for
+file format support are installed (e.g., pandas for CSV, xarray for NetCDF).
+
+All of the keywords supported by hvPlot can be passed as arguments to the
+command-line tool. See the hvPlot customization docs for available kwargs:
+https://hvplot.holoviz.org/user_guide/Customization.html
+
+Examples:
+    hvplot iris.csv
+    hvplot air.nc x=lon y=lat groupby=time,level geo=true
+    hvplot detrend.nino34.ascii.txt x=YR y=ANOM -r pandas.read_csv -rk delimiter='\s+'
+"""
 
 _MODULES_KWARGS = {
     "xarray": {
@@ -61,26 +78,13 @@ def setup_extension_readers(extension):
             break
 
 
-def ensure_variable_exists(data, input_, variables):
-    if input_ is None:
-        return
-
-    if input_ not in variables:
-        fuzzy_matches = difflib.get_close_matches(input_, variables, n=1)
-        if fuzzy_matches:
-            print(f"Using {fuzzy_matches[0]} instead of {input_!r}")
-            input_ = fuzzy_matches[0]
-        else:
-            raise ValueError(
-                f"{input_!r} not in data, available variables are {variables!r}"
-            )
-    return input_
-
-
 def parse_inputs(inputs):
     kwargs = {}
     if not inputs:
         return kwargs
+
+    if isinstance(inputs, str):
+        inputs = [inputs]
 
     for input_ in inputs:
         key, value = input_.split("=")
@@ -93,7 +97,9 @@ def parse_inputs(inputs):
 
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(description="hvPlot CLI")
+    parser = argparse.ArgumentParser(
+        description=HELP_DESCRIPTION, formatter_class=argparse.RawTextHelpFormatter
+    )
     parser.add_argument("file_path", type=str, help="Path to the data file")
     parser.add_argument(
         "hvplot_kwargs", nargs="*", help="HoloViews options in 'key=value' format"
@@ -102,6 +108,13 @@ def parse_arguments():
         "--opts", nargs="*", help="HoloViews plot options in 'key=value' format"
     )
     parser.add_argument(
+        "-r",
+        "--reader",
+        type=str,
+        help="Fully-qualified name of the reader function to use, e.g. pandas.read_csv",
+    )
+    parser.add_argument(
+        "-rk",
         "--reader_kwargs",
         type=str,
         help="Reader options in 'key=value' format",
@@ -110,8 +123,11 @@ def parse_arguments():
         "--port",
         type=int,
         default=5006,
+        help="Port to use for displaying the plot",
     )
-    parser.add_argument("--output_path", type=str, help="Path to save the output file")
+    parser.add_argument(
+        "-o", "--output_path", type=str, help="Path to save the output file"
+    )
     return parser.parse_args()
 
 
@@ -123,7 +139,11 @@ def main():
     setup_extension_readers(extension)
 
     # Determine and use the appropriate file reader
-    reader_kwargs = {}
+    if args.reader:
+        module_name, reader_name = args.reader.rsplit(".", 1)
+        import_and_register_module(
+            module_name, extensions=[extension], default_reader=reader_name
+        )
     try:
         reader, reader_kwargs = _EXTENSION_READERS[extension]
     except KeyError:
