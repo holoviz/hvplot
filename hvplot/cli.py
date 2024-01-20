@@ -128,7 +128,7 @@ def main():
         reader, reader_kwargs = _EXTENSION_READERS[extension]
     except KeyError:
         raise NotImplementedError(f"Extension {extension} not supported")
-
+    reader_kwargs.update(parse_inputs(args.reader_kwargs))
     data = reader(args.file_path, **reader_kwargs)
 
     # Process hvplot kwargs
