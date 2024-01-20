@@ -102,7 +102,7 @@ def parse_arguments():
     )
     parser.add_argument("file_path", type=str, help="Path to the data file")
     parser.add_argument(
-        "hvplot_kwargs", nargs="*", help="HoloViews options in 'key=value' format"
+        "hvplot_kwargs", nargs="*", help="hvPlot arguments in 'key=value' format"
     )
     parser.add_argument(
         "--opts", nargs="*", help="HoloViews plot options in 'key=value' format"
@@ -111,7 +111,7 @@ def parse_arguments():
         "-r",
         "--reader",
         type=str,
-        help="Fully-qualified name of the reader function to use, e.g. pandas.read_csv",
+        help="Fully-qualified name of the data-reader function to use, e.g. pandas.read_csv",
     )
     parser.add_argument(
         "-rk",
