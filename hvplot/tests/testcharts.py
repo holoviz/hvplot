@@ -23,7 +23,7 @@ class TestChart2D(ComparisonTestCase):
         self.cat_df = pd.DataFrame([[1, 2, 'A'], [3, 4, 'B'], [5, 6, 'C']],
                                    columns=['x', 'y', 'category'])
         self.time_df = pd.DataFrame({
-            'time': pd.date_range('1/1/2000', periods=5*24, freq='1H', tz='UTC'),
+            'time': pd.date_range('1/1/2000', periods=5*24, freq='1h', tz='UTC'),
             'temp': np.sin(np.linspace(0, 5*2*np.pi, 5*24)).cumsum()})
 
     @parameterized.expand([('points', Points), ('paths', Path)])
