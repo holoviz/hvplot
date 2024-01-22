@@ -4,6 +4,7 @@ import hvplot.pandas  # noqa
 import pytest
 
 from hvplot import hvPlotTabular
+from hvplot.tests.util import makeDataFrame
 
 try:
     import polars as pl
@@ -44,7 +45,7 @@ y_combinations = pytest.mark.parametrize("y", (
 @frame_kinds
 @y_combinations
 def test_dataframe_pandas(kind, y):
-    df = pd._testing.makeDataFrame()
+    df = makeDataFrame()
     df.hvplot(y=y, kind=kind)
 
 
@@ -58,7 +59,7 @@ def test_series_pandas(kind):
 @frame_kinds
 @y_combinations
 def test_dataframe_dask(kind, y):
-    df = dd.from_pandas(pd._testing.makeDataFrame(), npartitions=2)
+    df = dd.from_pandas(makeDataFrame(), npartitions=2)
     assert isinstance(df, dd.DataFrame)
     df.hvplot(y=y, kind=kind)
 
@@ -76,7 +77,7 @@ def test_series_dask(kind):
 @frame_kinds
 @y_combinations
 def test_dataframe_polars(kind, y, cast):
-    df = cast(pd._testing.makeDataFrame())
+    df = cast(makeDataFrame())
     assert isinstance(df, cast)
     df.hvplot(y=y, kind=kind)
 
