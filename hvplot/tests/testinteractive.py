@@ -13,6 +13,7 @@ import xarray as xr
 from holoviews.util.transform import dim
 from hvplot import bind
 from hvplot.interactive import Interactive
+from hvplot.tests.util import makeDataFrame, makeMixedDataFrame
 from hvplot.xarray import XArrayInteractive
 from hvplot.util import bokeh3, param2
 
@@ -27,7 +28,7 @@ def series():
 
 @pytest.fixture(scope='module')
 def df():
-    return pd._testing.makeMixedDataFrame()
+    return makeMixedDataFrame()
 
 
 @pytest.fixture(scope='module')
@@ -194,7 +195,7 @@ def test_interactive_xarray_function(dataset):
 
 
 def test_interactive_nested_widgets():
-    df = pd._testing.makeDataFrame()
+    df = makeDataFrame()
     w = pn.widgets.RadioButtonGroup(value="A", options=list("ABC"))
 
     idf = Interactive(df)
@@ -214,7 +215,7 @@ def test_interactive_nested_widgets():
     reason="Needs holoviews 1.15.1",
 )
 def test_interactive_slice():
-    df = pd._testing.makeDataFrame()
+    df = makeDataFrame()
     w = pn.widgets.IntSlider(start=10, end=40)
 
     idf = Interactive(df)

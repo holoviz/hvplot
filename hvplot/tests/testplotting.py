@@ -12,6 +12,7 @@ from parameterized import parameterized
 
 from hvplot.converter import HoloViewsConverter
 from hvplot.plotting import plot
+from hvplot.tests.util import makeDataFrame
 
 no_args = ['line', 'area', 'hist', 'box', 'kde', 'density', 'bar', 'barh']
 x_y = ['scatter', 'hexbin']
@@ -65,6 +66,6 @@ class TestPandasHvplotPlotting(TestPandasHoloviewsPlotting):
 
 def test_plot_supports_polars():
     pl = pytest.importorskip("polars")
-    dfp = pl.DataFrame(pd._testing.makeDataFrame())
+    dfp = pl.DataFrame(makeDataFrame())
     out = plot(dfp, 'line')
     assert isinstance(out, hv.Curve)

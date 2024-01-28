@@ -17,6 +17,7 @@ from holoviews.core.overlay import Overlay
 from holoviews.element.chart import Scatter
 from holoviews.element.comparison import ComparisonTestCase
 from hvplot.converter import HoloViewsConverter
+from hvplot.tests.util import makeTimeDataFrame
 from packaging.version import Version
 
 
@@ -152,15 +153,15 @@ class TestDatashader(ComparisonTestCase):
 
     @parameterized.expand([('scatter',), ('line',), ('area',)])
     def test_wide_charts_categorically_shaded_explicit_ys(self, kind):
-        df = pd._testing.makeTimeDataFrame()
-        plot = pd._testing.makeTimeDataFrame().hvplot(y=list(df.columns), datashade=True, kind=kind)
+        df = makeTimeDataFrame()
+        plot = makeTimeDataFrame().hvplot(y=list(df.columns), datashade=True, kind=kind)
         expected_cmap = HoloViewsConverter._default_cmaps['categorical']
         assert plot.callback.inputs[0].callback.operation.p.cmap == expected_cmap
         assert  plot.callback.inputs[0].callback.operation.p.aggregator.column == 'Variable'
 
     @parameterized.expand([('scatter',), ('line',), ('area',)])
     def test_wide_charts_categorically_shaded_implicit_ys(self, kind):
-        plot = pd._testing.makeTimeDataFrame().hvplot(datashade=True, kind=kind)
+        plot = makeTimeDataFrame().hvplot(datashade=True, kind=kind)
         expected_cmap = HoloViewsConverter._default_cmaps['categorical']
         assert plot.callback.inputs[0].callback.operation.p.cmap == expected_cmap
         assert  plot.callback.inputs[0].callback.operation.p.aggregator.column == 'Variable'
