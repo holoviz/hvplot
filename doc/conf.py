@@ -68,7 +68,7 @@ nbsite_gallery_conf = {
             'intro': (
                 'Find the list of supported libraries on the `Integrations <../user_guide/Integrations.html>`_ page.'),
             'sections': [
-                'pandas',
+                'tabular',
                 'geopandas',
                 'xarray',
             ]
