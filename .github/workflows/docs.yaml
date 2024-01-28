@@ -34,33 +34,20 @@ jobs:
       MOZ_HEADLESS: 1
       DISPLAY: ":99.0"
     steps:
-      - uses: actions/checkout@v3
+      - uses: holoviz-dev/holoviz_tasks/install@v0.1a19
         with:
-          fetch-depth: "100"
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          mamba-version: "*"
-          channels: pyviz/label/dev,conda-forge
-      - name: Fetch unshallow
-        run: git fetch --prune --tags --unshallow -f
+          name: Documentation
+          python-version: "3.11"
+          channel-priority: strict
+          channels: pyviz,conda-forge,nodefaults
+          envs: "-o doc -o examples"
+          cache: true
+          conda-update: true
       - name: Set and echo git ref
         id: vars
         run: |
           echo "Deploying from ref ${GITHUB_REF#refs/*/}"
           echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
-      - name: conda setup
-        run: |
-          conda config --remove channels defaults
-          conda create -n test-environment python=3.8 pyctdev
-      - name: doit develop_install
-        run: |
-          conda activate test-environment
-          conda list
-          doit develop_install -o doc -o examples --conda-mode=mamba
-      - name: doit env_capture
-        run: |
-          conda activate test-environment
-          doit env_capture
       - name: bokeh sampledata
         run: |
           conda activate test-environment
