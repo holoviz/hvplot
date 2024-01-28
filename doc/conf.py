@@ -66,8 +66,7 @@ nbsite_gallery_conf = {
         'reference': {
             'title': 'Reference Gallery',
             'intro': (
-                'Incomplete Reference Gallery containing some small '
-                'examples of different plot types.'),
+                'Find the list of supported libraries on the `Integrations <../user_guide/Integrations.html>`_ page.'),
             'sections': [
                 'pandas',
                 'geopandas',
