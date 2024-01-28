@@ -55,6 +55,7 @@ extensions += [
     'nbsite.gallery',
     'nbsite.analytics',
     'sphinx_copybutton',
+    'sphinxext.rediraffe',
 ]
 
 myst_enable_extensions = ["colon_fence"]
