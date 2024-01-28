@@ -23,7 +23,7 @@ The API is based on the familiar Pandas `.plot` API and the innovative `.interac
 
 hvPlot
 
-- supports a wide range of data sources including [Pandas](http://pandas.pydata.org), [XArray](http://xarray.pydata.org), [Dask](http://dask.pydata.org), [Streamz](http://streamz.readthedocs.io), [Intake](http://github.com/ContinuumIO/intake), [GeoPandas](http://geopandas.org) and [NetworkX](https://networkx.github.io/documentation/stable/).
+- supports a wide range of data sources including [Pandas](http://pandas.pydata.org), [Polars](https://docs.pola.rs/), [XArray](http://xarray.pydata.org), [Dask](http://dask.pydata.org), [Streamz](http://streamz.readthedocs.io), [Intake](http://github.com/ContinuumIO/intake), [GeoPandas](http://geopandas.org) and [NetworkX](https://networkx.github.io/documentation/stable/).
 - supports the plotting backends [Bokeh](https://docs.bokeh.org/en/latest/), [Matplotlib](https://matplotlib.org/) and [Plotly](https://plotly.com/python/).
 - exposes the powerful tools from the [HoloViz](https://holoviz.org/) ecosystem in a familiar and convenient API.
 
