@@ -1895,6 +1895,8 @@ class hvPlotTabularPolars(hvPlotTabular):
                 ys = y if is_list_like(y) else (y,)
                 columns |= {*xs, *ys}
                 columns.discard(None)
+                # Reorder the columns as in the data.
+                columns = sorted(columns, key=lambda c: self._data.columns.index(c))
 
         if isinstance(self._data, pl.DataFrame):
             data = self._data.select(columns).to_pandas()

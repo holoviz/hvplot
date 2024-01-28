@@ -68,3 +68,4 @@ def test_plot_supports_polars():
     dfp = pl.DataFrame(pd._testing.makeDataFrame())
     out = plot(dfp, 'line')
     assert isinstance(out, hv.NdOverlay)
+    assert out.keys() == dfp.columns
