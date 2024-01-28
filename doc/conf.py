@@ -57,6 +57,7 @@ extensions += [
     'nbsite.gallery',
     'nbsite.analytics',
     'sphinx_copybutton',
+    'sphinxext.rediraffe',
 ]
 
 myst_enable_extensions = ["colon_fence"]
@@ -68,10 +69,9 @@ nbsite_gallery_conf = {
         'reference': {
             'title': 'Reference Gallery',
             'intro': (
-                'Incomplete Reference Gallery containing some small '
-                'examples of different plot types.'),
+                'Find the list of supported libraries on the `Integrations <../user_guide/Integrations.html>`_ page.'),
             'sections': [
-                'pandas',
+                'tabular',
                 'geopandas',
                 'xarray',
             ]
@@ -82,6 +82,31 @@ nbsite_gallery_conf = {
 
 nbsite_analytics = {
     'goatcounter_holoviz': True,
+}
+
+rediraffe_redirects = {
+    # When the pandas section was renamed tabular:
+    'reference/pandas/andrewscurves': 'reference/tabular/andrewscurves',
+    'reference/pandas/area': 'reference/tabular/area',
+    'reference/pandas/bar': 'reference/tabular/bar',
+    'reference/pandas/barh': 'reference/tabular/barh',
+    'reference/pandas/bivariate': 'reference/tabular/bivariate',
+    'reference/pandas/box': 'reference/tabular/box',
+    'reference/pandas/errorbars': 'reference/tabular/errorbars',
+    'reference/pandas/heatmap': 'reference/tabular/heatmap',
+    'reference/pandas/hexbin': 'reference/tabular/hexbin',
+    'reference/pandas/hist': 'reference/tabular/hist',
+    'reference/pandas/kde': 'reference/tabular/kde',
+    'reference/pandas/labels': 'reference/tabular/labels',
+    'reference/pandas/lagplot': 'reference/tabular/lagplot',
+    'reference/pandas/line': 'reference/tabular/line',
+    'reference/pandas/ohlc': 'reference/tabular/ohlc',
+    'reference/pandas/parallelcoordinates': 'reference/tabular/parallelcoordinates',
+    'reference/pandas/scatter': 'reference/tabular/scatter',
+    'reference/pandas/scattermatrix': 'reference/tabular/scattermatrix',
+    'reference/pandas/step': 'reference/tabular/step',
+    'reference/pandas/table': 'reference/tabular/table',
+    'reference/pandas/violin': 'reference/tabular/violin',
 }
 
 html_context.update({

@@ -114,6 +114,7 @@ extras_require["examples_tests"] = extras_require["examples"] + extras_require['
 # Additional packages required to build the docs
 extras_require['doc'] = extras_require['examples'] + [
     'nbsite >=0.8.4',
+    'sphinxext-rediraffe',
 ]
 
 # until pyproject.toml/equivalent is widely supported (setup_requires
