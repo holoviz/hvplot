@@ -15,6 +15,8 @@ import hvplot
 version = release  = base_version(hvplot.__version__)
 nbbuild_cell_timeout = 600
 
+exclude_patterns = ['governance']
+
 html_static_path += ['_static']
 
 html_css_files += [
@@ -75,6 +77,7 @@ nbsite_gallery_conf = {
             ]
         }
     },
+    'thumbnail_url': 'https://assets.holoviz.org/hvplot/thumbnails',
 }
 
 nbsite_analytics = {
