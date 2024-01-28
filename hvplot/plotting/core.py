@@ -276,7 +276,7 @@ class hvPlotTabular(hvPlotBase):
         """
         The `line` plot connects the points with a continuous curve.
 
-        Reference: https://hvplot.holoviz.org/reference/pandas/line.html
+        Reference: https://hvplot.holoviz.org/reference/tabular/line.html
 
         Parameters
         ----------
@@ -376,7 +376,7 @@ class hvPlotTabular(hvPlotBase):
         The `step` plot can be used pretty much anytime the `line` plot might be used, and has many
         of the same options available.
 
-        Reference: https://hvplot.holoviz.org/reference/pandas/step.html
+        Reference: https://hvplot.holoviz.org/reference/tabular/step.html
 
         Parameters
         ----------
@@ -475,7 +475,7 @@ class hvPlotTabular(hvPlotBase):
 
         The `scatter` plot is a good first way to plot data with non continuous axes.
 
-        Reference: https://hvplot.holoviz.org/reference/pandas/scatter.html
+        Reference: https://hvplot.holoviz.org/reference/tabular/scatter.html
 
         Parameters
         ----------
@@ -580,7 +580,7 @@ class hvPlotTabular(hvPlotBase):
         The `area` plot can be used to color the area under a line or to color the space between two
         lines.
 
-        Reference: https://hvplot.holoviz.org/reference/pandas/area.html
+        Reference: https://hvplot.holoviz.org/reference/tabular/area.html
 
         Parameters
         ----------
@@ -661,7 +661,7 @@ class hvPlotTabular(hvPlotBase):
         They are usually overlaid with other plots such as `scatter` , `line` or `bar` plots to
         indicate the variability.
 
-        Reference: https://hvplot.holoviz.org/reference/pandas/errorbars.html
+        Reference: https://hvplot.holoviz.org/reference/tabular/errorbars.html
 
         Parameters
         ----------
@@ -746,7 +746,7 @@ class hvPlotTabular(hvPlotBase):
         """
         The `ohlc` plot visualizes the open, high, low and close prices of stocks and other assets.
 
-        Reference: https://hvplot.holoviz.org/reference/pandas/ohlc.html
+        Reference: https://hvplot.holoviz.org/reference/tabular/ohlc.html
 
         Parameters
         ----------
@@ -805,7 +805,7 @@ class hvPlotTabular(hvPlotBase):
         This allows spotting correlations in multivariate data and provides a high-level overview
         of how the two variables are plotted.
 
-        Reference: https://hvplot.holoviz.org/reference/pandas/heatmap.html
+        Reference: https://hvplot.holoviz.org/reference/tabular/heatmap.html
 
         Parameters
         ----------
@@ -869,7 +869,7 @@ class hvPlotTabular(hvPlotBase):
 
         `hexbin` offers a straightforward method for plotting dense data.
 
-        Reference: https://hvplot.holoviz.org/reference/pandas/hexbin.html
+        Reference: https://hvplot.holoviz.org/reference/tabular/hexbin.html
 
         Parameters
         ----------
@@ -938,7 +938,7 @@ class hvPlotTabular(hvPlotBase):
         `bivariate` plots can be a useful alternative to scatter plots, if your data are too dense
         to plot each point individually.
 
-        Reference: https://hvplot.holoviz.org/reference/pandas/bivariate.html
+        Reference: https://hvplot.holoviz.org/reference/tabular/bivariate.html
 
         Parameters
         ----------
@@ -1011,7 +1011,7 @@ class hvPlotTabular(hvPlotBase):
         represents the categories and the y axis represents the value scale.
         The bars are of equal width which allows for instant comparison of data.
 
-        Reference: https://hvplot.holoviz.org/reference/pandas/bar.html
+        Reference: https://hvplot.holoviz.org/reference/tabular/bar.html
 
         Parameters
         ----------
@@ -1102,7 +1102,7 @@ class hvPlotTabular(hvPlotBase):
 
         `barh` can be used on dataframes with regular Index or MultiIndex.
 
-        Reference: https://hvplot.holoviz.org/reference/pandas/barh.html
+        Reference: https://hvplot.holoviz.org/reference/tabular/barh.html
 
         Parameters
         ----------
@@ -1162,7 +1162,7 @@ class hvPlotTabular(hvPlotBase):
 
         `box` plots are most useful when grouped by additional dimensions.
 
-        Reference: https://hvplot.holoviz.org/reference/pandas/box.html
+        Reference: https://hvplot.holoviz.org/reference/tabular/box.html
 
         Parameters
         ----------
@@ -1228,7 +1228,7 @@ class hvPlotTabular(hvPlotBase):
 
         Note that `violin` plots depend on the `scipy` library.
 
-        Reference: https://hvplot.holoviz.org/reference/pandas/violin.html
+        Reference: https://hvplot.holoviz.org/reference/tabular/violin.html
 
         Parameters
         ----------
@@ -1291,7 +1291,7 @@ class hvPlotTabular(hvPlotBase):
         """
         A `histogram` displays an approximate representation of the distribution of continuous data.
 
-        Reference: https://hvplot.holoviz.org/reference/pandas/hist.html
+        Reference: https://hvplot.holoviz.org/reference/tabular/hist.html
 
         Parameters
         ----------
@@ -1374,7 +1374,7 @@ class hvPlotTabular(hvPlotBase):
 
         The `kde` and `density` plots are the same.
 
-        Reference: https://hvplot.holoviz.org/reference/pandas/kde.html
+        Reference: https://hvplot.holoviz.org/reference/tabular/kde.html
 
         Parameters
         ----------
@@ -1452,7 +1452,7 @@ class hvPlotTabular(hvPlotBase):
 
         The `kde` and `density` plots are the same.
 
-        Reference: https://hvplot.holoviz.org/reference/pandas/kde.html
+        Reference: https://hvplot.holoviz.org/reference/tabular/kde.html
 
         Parameters
         ----------
@@ -1528,7 +1528,7 @@ class hvPlotTabular(hvPlotBase):
         """
         Displays a 'table'.
 
-        Reference: https://hvplot.holoviz.org/reference/pandas/table.html
+        Reference: https://hvplot.holoviz.org/reference/tabular/table.html
 
         Parameters
         ----------
@@ -1808,7 +1808,7 @@ class hvPlotTabular(hvPlotBase):
         `labels` are mostly useful when overlaid on top of other plots using the `*`
         operator.
 
-        Reference: https://hvplot.holoviz.org/reference/pandas/labels.html
+        Reference: https://hvplot.holoviz.org/reference/tabular/labels.html
 
         Parameters
         ----------
