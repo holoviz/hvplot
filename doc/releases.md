@@ -2,6 +2,29 @@
 
 See [the HoloViz blog](https://blog.holoviz.org/#category=hvplot) for a visual summary of the major features added in a selection of releases.
 
+## Version 0.9.2 (2024-01-29)
+
+The 0.9.1 release is a patch release that brings a few bugfixes and documentation improvements, improving `Polars` support and documentation. Many thanks to @kevinheavey (first contribution!), @MarcoGorelli, @Hoxbro, and @maximlt for their contributions.
+
+Bug fixes:
+
+- Correctly fall back to all numeric Polars columns when `y` is not specified ([#1247](https://github.com/holoviz/hvplot/pull/1247))
+
+Documentation:
+
+- Better expose Polars support ([#1262](https://github.com/holoviz/hvplot/pull/1262))
+- Rename the `Pandas` reference section to `Tabular` ([#1260](https://github.com/holoviz/hvplot/pull/1260))
+- Add roadmap for 2024 ([#1253](https://github.com/holoviz/hvplot/pull/1253))
+- Various small changes ([#1255](https://github.com/holoviz/hvplot/pull/1255) and [#1261](https://github.com/holoviz/hvplot/pull/1261))
+
+Infrastructure / Tests:
+
+- Add downstream Polars test ([#1243](https://github.com/holoviz/hvplot/pull/1243))
+- Compatibility with Pandas 2.2 ([#1257](https://github.com/holoviz/hvplot/pull/1257))
+- Dynamically generate the unit test matrix and add a cache option ([#1235](https://github.com/holoviz/hvplot/pull/1235))
+
+[Full Changelog](https://github.com/holoviz/hvplot/compare/v0.9.1...v0.9.2)
+
 ## Version 0.9.1 (2023-12-22)
 
 The 0.9.1 release brings a number of enhancements, bugfixes and documentation improvements. Many thanks to @iuryt (first contribution!), @MarcoGorelli (first contribution!), @ahuang11, @Hoxbro and @maximlt for their contributions.
