@@ -11,3 +11,4 @@ The hvPlot Project’s equivalently named documents take precedence over any ext
 | Philipp Rudiger | Project Director | [philippjfr](https://github.com/philippjfr) |
 | Maxime Liquet | Lead Maintainer | [maximlt](https://github.com/maximlt) |
 | Simon Høxbro Hansen | Maintainer | [hoxbro](https://github.com/hoxbro) |
+| Andrew Huang | Maintainer | [ahuang11](https://github.com/ahuang11) |
