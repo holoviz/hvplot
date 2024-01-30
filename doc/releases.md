@@ -4,7 +4,7 @@ See [the HoloViz blog](https://blog.holoviz.org/#category=hvplot) for a visual s
 
 ## Version 0.9.2 (2024-01-29)
 
-The 0.9.1 release is a patch release that brings a few bugfixes and documentation improvements, improving `Polars` support and documentation. Many thanks to @kevinheavey (first contribution!), @MarcoGorelli, @Hoxbro, and @maximlt for their contributions.
+The 0.9.2 release is a patch release that brings a few bugfixes and documentation improvements, improving `Polars` support and documentation. Many thanks to @kevinheavey (first contribution!), @MarcoGorelli, @Hoxbro, and @maximlt for their contributions.
 
 Bug fixes:
 
