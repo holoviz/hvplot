@@ -2,6 +2,7 @@
 
 |    |    |
 | --- | --- |
+| Downloads | ![https://pypistats.org/packages/hvplot](https://img.shields.io/pypi/dm/hvplot?label=pypi) ![https://anaconda.org/pyviz/hvplot](https://pyviz.org/_static/cache/hvplot_conda_downloads_badge.svg)
 | Build Status | [![Build Status](https://github.com/holoviz/hvplot/workflows/tests/badge.svg?query=branch%3Amain)](https://github.com/holoviz/hvplot/actions?query=workflow%3Atests+branch%3Amain) |
 | Coverage | [![codecov](https://codecov.io/gh/holoviz/hvplot/branch/main/graph/badge.svg)](https://codecov.io/gh/holoviz/hvplot) |
 | Latest dev release | [![Github tag](https://img.shields.io/github/tag/holoviz/hvplot.svg?label=tag&colorB=11ccbb)](https://github.com/holoviz/hvplot/tags) [![dev-site](https://img.shields.io/website-up-down-green-red/https/holoviz-dev.github.io/hvplot.svg?label=dev%20website)](https://holoviz-dev.github.io/hvplot/) |
