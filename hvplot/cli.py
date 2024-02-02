@@ -105,6 +105,9 @@ def parse_arguments():
         "hvplot_kwargs", nargs="*", help="hvPlot arguments in 'key=value' format"
     )
     parser.add_argument(
+        "-var", "--variable", type=str, help="Variable to plot (for xarray DataArrays)"
+    )
+    parser.add_argument(
         "--opts", nargs="*", help="HoloViews plot options in 'key=value' format"
     )
     parser.add_argument(
@@ -150,6 +153,9 @@ def main():
         raise NotImplementedError(f"Extension {extension} not supported")
     reader_kwargs.update(parse_inputs(args.reader_kwargs))
     data = reader(args.file_path, **reader_kwargs)
+    
+    if args.variable:
+        data = data[args.variable]
 
     # Process hvplot kwargs
     hvplot_kwargs = parse_inputs(args.hvplot_kwargs)
