@@ -140,7 +140,7 @@ jobs:
       - name: unit tests
         run: pytest -v hvplot --cov=hvplot --cov-append
       - name: examples tests
-        run: pytest examples --nbsmoke-run -k ".ipynb"
+        run: pytest -n auto --dist loadscope --nbval-lax -p no:python
   # core_test_suite:
   #   name: Core tests on Python ${{ matrix.python-version }}, ${{ matrix.os }}
   #   needs: [pre_commit, setup]
