@@ -105,7 +105,7 @@ extras_require['examples'] = [
     'spatialpandas >=0.4.3',
     'polars',
     'fugue',
-    'ibis-framework',  # ibis-duckdb on conda
+    'ibis-framework[duckdb]',  # ibis-duckdb on conda
 ]
 
 # Run the example tests by installing examples_tests together with tests
