@@ -98,7 +98,7 @@ extras_require['examples'] = [
     'rioxarray',
     'matplotlib',
     'plotly',
-    'pygraphviz',
+    # 'pygraphviz',
     'ipywidgets',
     'numba >=0.51.0',
     'datashader >=0.6.5',
