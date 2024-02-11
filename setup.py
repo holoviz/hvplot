@@ -30,7 +30,8 @@ def get_setup_version(reponame):
 install_requires = [
     'bokeh >=1.0.0',
     'colorcet >=2',
-    'holoviews >=1.11.0',
+    # Temporary <1.18.2 pin, see https://github.com/holoviz/holoviews/issues/6101
+    'holoviews >=1.11.0,<1.18.2',
     'pandas',
     'numpy >=1.15',
     'packaging',
