@@ -93,7 +93,7 @@ extras_require['examples'] = [
     'pillow >=8.2.0',
     'selenium >=3.141.0',
     'scikit-image >=0.17.2',
-    'python-snappy >=0.6.0',
+    # 'python-snappy >=0.6.0',
     'pooch >=1.6.0',
     'fiona',
     'rioxarray',
