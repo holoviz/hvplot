@@ -135,8 +135,10 @@ jobs:
           import sys
           print(sys.version_info)
         shell: python
-      - name: python3 --verson
-        run: pip3 install ."[tests, examples_tests]"
+      - name: install
+        run: pip install ."[tests, examples_tests]"
+      - name: pip list
+        run: pip list
       - name: bokeh sampledata
         run: bokeh sampledata
       - name: unit tests
