@@ -137,6 +137,8 @@ jobs:
         shell: python
       - name: python3 --verson
         run: pip3 install ."[tests, examples_tests]"
+      - name: bokeh sampledata
+        run: bokeh sampledata
       - name: unit tests
         run: pytest -v hvplot --cov=hvplot --cov-append
       - name: examples tests
