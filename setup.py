@@ -61,6 +61,7 @@ extras_require['tests_core'] = [
     'scipy',
     'ipywidgets',
     'dask',
+    'holoviews <1.18.0a0',  # Should be removed when we switch to 1.18
 ]
 
 # Optional tests dependencies, i.e. one should be able
