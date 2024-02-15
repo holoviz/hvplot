@@ -98,6 +98,11 @@ jobs:
           cache: ${{ github.event.inputs.cache || github.event.inputs.cache == '' }}
           conda-update: true
         id: install
+      - name: install branch holoviews branch pandas_index_support
+        run: |
+          conda activate test-environment
+          conda uninstall --force --offline --yes holoviews
+          python -m pip install git+https://github.com/holoviz/holoviews.git@pandas_index_support
       - name: doit test_unit
         run: |
           conda activate test-environment
