@@ -307,15 +307,15 @@ class TestChart1D(ComparisonTestCase):
         df = self.time_df.set_index('time')
         scrambled = df.sample(frac=1)
         plot = scrambled.hvplot()
-        assert (plot.data['time'] == df.index).all()
-        assert len(plot.data.time.unique()) == len(plot.data.time)
+        assert (plot.data.index == df.index).all()
+        assert len(plot.data.index.unique()) == len(plot.data.index)
 
     def test_time_df_does_not_sort_on_plot_if_sort_date_off_using_index_as_x(self):
         df = self.time_df.set_index('time')
         scrambled = df.sample(frac=1)
         plot = scrambled.hvplot(sort_date=False)
-        assert (plot.data.time == scrambled.index).all().all()
-        assert len(plot.data.time.unique()) == len(plot.data.time)
+        assert (plot.data.index == scrambled.index).all().all()
+        assert len(plot.data.index.unique()) == len(plot.data.index)
 
     def test_time_df_with_groupby_as_derived_datetime(self):
         plot = self.time_df.hvplot(groupby='time.dayofweek', dynamic=False)
