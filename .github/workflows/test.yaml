@@ -156,8 +156,7 @@ jobs:
           python -m pip install -ve '.[tests_core]'
       - name: install branch holoviews branch pandas_index_support
         run: |
-          conda activate test-environment
-          conda uninstall --force --offline --yes holoviews
+          python -m pip uninstall holoviews -y
           python -m pip install git+https://github.com/holoviz/holoviews.git@pandas_index_support
       - name: bokeh sampledata
         run: |
