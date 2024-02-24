@@ -2,7 +2,7 @@
 
 Examples of what can be done with hvPlot.
 
-To learn how to use hvPlot, see the [User Guide](user_guide/index.html).
+To learn how to use hvPlot, see the [User Guide](user_guide/index.md).
 
 NOTE: This is a list of links to examples on external sites. Most
 examples are on <https://examples.holoviz.org>.

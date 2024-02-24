@@ -14,7 +14,7 @@ regarding the continuous testing infrastructure.
 ## Running Tests Locally
 
 Before attempting to run hvPlot tests, make sure you have successfully
-run through all of the instructions in the {ref}`devguide_setup`
+run through all of the instructions in the {ref}`devguide-setup`
 section of the Developer's Guide.
 
 ### Test Selection
