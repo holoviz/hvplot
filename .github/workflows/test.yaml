@@ -120,8 +120,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
-        os: ['macos-latest']
+        os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
+        # os: ['macos-latest']
         # python-version: ['3.8', '3.10', '3.12']
         # python-version: ['3.10']
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
@@ -140,8 +140,12 @@ jobs:
           import sys
           print(sys.version_info)
         shell: python
-      - name: install
+      - name: install without geo
+        if: matrix.python-version == '3.8' &&  contains(fromJSON('["ubuntu-latest", "windows-latest"]'), matrix.os)
         run: pip install ."[tests, examples_tests]"
+      - name: install with geo
+        if: !(matrix.python-version == '3.8' &&  contains(fromJSON('["ubuntu-latest", "windows-latest"]'), matrix.os))
+        run: pip install ."[tests, examples_tests, geo]"
       - name: pip list
         run: pip list
       - name: bokeh sampledata
