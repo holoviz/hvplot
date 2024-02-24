@@ -15,6 +15,11 @@ import hvplot
 version = release  = base_version(hvplot.__version__)
 nbbuild_cell_timeout = 600
 
+# mystnb
+nb_execution_excludepatterns = [
+    'user_guide/Streaming.ipynb',
+]
+
 exclude_patterns = ['governance']
 
 html_static_path += ['_static']
