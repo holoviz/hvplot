@@ -57,7 +57,7 @@ jobs:
         run: |
           MATRIX=$(jq -nsc '{
               "os": ["ubuntu-latest", "macos-latest", "windows-latest"],
-              "python-version": ["3.8", "3.11"]
+              "python-version": ["3.8", "3.12"]
           }')
           echo "MATRIX=$MATRIX" >> $GITHUB_ENV
       - name: Set test matrix with 'full' option
@@ -65,7 +65,7 @@ jobs:
         run: |
           MATRIX=$(jq -nsc '{
               "os": ["ubuntu-latest", "macos-latest", "windows-latest"],
-              "python-version": ["3.8", "3.9", "3.10", "3.11"]
+              "python-version": ["3.8", "3.9", "3.10", "3.11", "3.12"]
           }')
           echo "MATRIX=$MATRIX" >> $GITHUB_ENV
       - name: Set test matrix with 'downstream' option
@@ -73,7 +73,7 @@ jobs:
         run: |
           MATRIX=$(jq -nsc '{
               "os": ["ubuntu-latest"],
-              "python-version": ["3.11"]
+              "python-version": ["3.12"]
           }')
           echo "MATRIX=$MATRIX" >> $GITHUB_ENV
 
