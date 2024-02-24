@@ -78,7 +78,7 @@ jobs:
           echo "MATRIX=$MATRIX" >> $GITHUB_ENV
 
   conda_suite:
-    name: Pytest on ${{ matrix.os }} with Python ${{ matrix.python-version }}
+    name: conda tests:${{ matrix.os }}:${{ matrix.python-version }}
     needs: [pre_commit, setup]
     if: needs.setup.outputs.matrix_option != 'default'
     runs-on: ${{ matrix.os }}
@@ -110,6 +110,8 @@ jobs:
           bokeh sampledata
           doit test_examples
   pip_test:
+    name: pip tests:${{ matrix.os }}:${{ matrix.python-version }}
+    needs: [pre_commit, setup]
     timeout-minutes: 90
     runs-on: ${{ matrix.os }}
     strategy:
