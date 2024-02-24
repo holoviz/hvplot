@@ -45,7 +45,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: install
-        run: pip install ."[doc, examples]"
+        run: pip install ."[doc, examples, geo]"
       - name: pip list
         run: pip list
       - name: Set and echo git ref
