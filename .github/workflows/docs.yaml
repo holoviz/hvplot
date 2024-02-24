@@ -21,14 +21,9 @@ on:
     - cron: '0 15 * * SUN'
 
 jobs:
-  build_docs:
-    name: Documentation
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        # os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
-        os: ['windows-latest']
+  conda_build_docs:
+    name: Documentation:conda
+    runs-on: 'ubuntu-latest'
     timeout-minutes: 120
     defaults:
       run:
@@ -39,18 +34,14 @@ jobs:
       MOZ_HEADLESS: 1
       DISPLAY: ":99.0"
     steps:
-      - uses: actions/checkout@v4
+      - uses: holoviz-dev/holoviz_tasks/install@v0.1a19
         with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: install
-        run: pip install ."[doc, examples, geo]"
-      - name: debug nbsite
-        run: pip install git+https://github.com/holoviz-dev/nbsite.git@set_encoding
-      - name: pip list
-        run: pip list
+          name: Documentation
+          python-version: "3.11"
+          channels: pyviz,conda-forge,nodefaults
+          envs: "-o doc -o examples"
+          cache: true
+          conda-update: true
       - name: Set and echo git ref
         id: vars
         run: |
@@ -91,3 +82,46 @@ jobs:
           publish_dir: ./builtdocs
           cname: hvplot.holoviz.org
           force_orphan: true
+  pip_build_docs:
+    name: Documentation:pip
+    runs-on: 'ubuntu-latest'
+    timeout-minutes: 120
+    defaults:
+      run:
+        shell: bash -l {0}
+    env:
+      DESC: "Documentation build"
+      MPLBACKEND: "Agg"
+      MOZ_HEADLESS: 1
+      DISPLAY: ":99.0"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: install
+        run: pip install ."[doc, examples, geo]"
+      - name: pip list
+        run: pip list
+      - name: Set and echo git ref
+        id: vars
+        run: |
+          echo "Deploying from ref ${GITHUB_REF#refs/*/}"
+          echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+      - name: bokeh sampledata
+        run: |
+          conda activate test-environment
+          bokeh sampledata
+      - name: generate rst
+        run: |
+          conda activate test-environment
+          nbsite generate-rst --org holoviz --project-name hvplot
+      - name: build docs
+        run: |
+          conda activate test-environment
+          nbsite build --what=html --output=builtdocs --org holoviz --project-name hvplot
+      - name: report failure
+        if: failure()
+        run: cat /tmp/sphinx-*.log | tail -n 100
