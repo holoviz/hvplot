@@ -141,10 +141,10 @@ jobs:
           print(sys.version_info)
         shell: python
       - name: install without geo
-        if: matrix.python-version == '3.8' &&  contains(fromJSON('["ubuntu-latest", "windows-latest"]'), matrix.os)
+        if: matrix.python-version == '3.8' && contains(fromJSON('["ubuntu-latest", "windows-latest"]'), matrix.os)
         run: pip install ."[tests, examples_tests]"
       - name: install with geo
-        if: !(matrix.python-version == '3.8' &&  contains(fromJSON('["ubuntu-latest", "windows-latest"]'), matrix.os))
+        if: matrix.python-version != '3.8' || !contains(fromJSON('["ubuntu-latest", "windows-latest"]'), matrix.os)
         run: pip install ."[tests, examples_tests, geo]"
       - name: pip list
         run: pip list
