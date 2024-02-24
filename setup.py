@@ -121,6 +121,19 @@ extras_require['doc'] = extras_require['examples'] + [
     'sphinxext-rediraffe',
 ]
 
+extras_require['hvdev'] = [
+    'panel >=0.0.1a1',
+    'param >=0.0.1a1',
+    'holoviews >=0.0.1a1',
+    'datashader >=0.0.1a1',
+    'colorcet >=0.0.1a1',
+    'pyviz_comms >=0.0.1a1',
+]
+
+extras_require['hvdev_geo'] = [
+    'geoviews >=0.0.1a1',
+]
+
 # until pyproject.toml/equivalent is widely supported (setup_requires
 # doesn't work well with pip)
 extras_require['build'] = [

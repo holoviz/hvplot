@@ -142,10 +142,10 @@ jobs:
         shell: python
       - name: install without geo
         if: matrix.python-version == '3.8' && contains(fromJSON('["ubuntu-latest", "windows-latest"]'), matrix.os)
-        run: pip install ."[tests, examples_tests]"
+        run: pip install ."[tests, examples_tests, hvdev]"
       - name: install with geo
         if: matrix.python-version != '3.8' || !contains(fromJSON('["ubuntu-latest", "windows-latest"]'), matrix.os)
-        run: pip install ."[tests, examples_tests, geo]"
+        run: pip install ."[tests, examples_tests, geo, hvdev, hvdev_geo]"
       - name: pip list
         run: pip list
       - name: bokeh sampledata
