@@ -53,14 +53,10 @@ jobs:
           bokeh sampledata
       - name: debug nbsite
         run: pip install git+https://github.com/holoviz-dev/nbsite.git@gallery_skip_rst_nb_directive
-      - name: generate rst
-        run: |
-          conda activate test-environment
-          nbsite generate-rst --org holoviz --project-name hvplot
       - name: build docs
         run: |
           conda activate test-environment
-          nbsite build --what=html --output=builtdocs --org holoviz --project-name hvplot
+          sphinx-build -b html doc builtdocs
       - name: report failure
         if: failure()
         run: cat /tmp/sphinx-*.log | tail -n 100
@@ -115,17 +111,9 @@ jobs:
           echo "Deploying from ref ${GITHUB_REF#refs/*/}"
           echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
       - name: bokeh sampledata
-        run: |
-          conda activate test-environment
-          bokeh sampledata
-      - name: generate rst
-        run: |
-          conda activate test-environment
-          nbsite generate-rst --org holoviz --project-name hvplot
+        run: bokeh sampledata
       - name: build docs
-        run: |
-          conda activate test-environment
-          nbsite build --what=html --output=builtdocs --org holoviz --project-name hvplot
+        run: sphinx-build -b html doc builtdocs
       - name: report failure
         if: failure()
         run: cat /tmp/sphinx-*.log | tail -n 100
