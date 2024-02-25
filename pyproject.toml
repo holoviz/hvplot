@@ -8,7 +8,7 @@ requires = [
 
 [tool.pytest.ini_options]
 addopts = "-v --pyargs"
-norecursedirs = "doc .git dist build _build .ipynb_checkpoints"
+norecursedirs = ".git dist build _build .ipynb_checkpoints"
 # The test suite used to be run with nosetests which collected
 # by default files like `testgeo.py` while pytest's default is
 # to collect files like `test_geo.py`. This setting allows
