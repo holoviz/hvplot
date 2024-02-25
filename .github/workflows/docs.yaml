@@ -51,8 +51,10 @@ jobs:
         run: |
           conda activate test-environment
           bokeh sampledata
-      - name: debug nbsite
-        run: pip install git+https://github.com/holoviz-dev/nbsite.git@gallery_skip_rst_nb_directive
+      - name: install dev nbsite
+        run: conda install pyviz/label/dev::nbsite
+      - name: conda list
+        run: conda list
       - name: build docs
         run: |
           conda activate test-environment
@@ -103,8 +105,8 @@ jobs:
           python-version: '3.11'
       - name: install
         run: pip install ."[doc, examples, geo]"
-      - name: debug nbsite
-        run: pip install git+https://github.com/holoviz-dev/nbsite.git@gallery_skip_rst_nb_directive
+      - name: install dev nbsite
+        run: pip install --pre -U nbsite
       - name: pip list
         run: pip list
       - name: Set and echo git ref
