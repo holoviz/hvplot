@@ -39,7 +39,7 @@ jobs:
           name: Documentation
           python-version: "3.11"
           channels: pyviz,conda-forge,nodefaults
-          envs: "-o doc -o examples"
+          envs: "-o doc -o examples -o geo -o graphviz"
           cache: true
           conda-update: true
       - name: Set and echo git ref

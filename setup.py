@@ -83,6 +83,11 @@ extras_require['geo'] = [
     'spatialpandas >=0.4.3',
 ]
 
+# graphviz is difficult to install with pip, ok with conda.
+extras_require['graphviz'] = [
+    'pygraphviz',
+]
+
 # Dependencies required to run the notebooks
 extras_require['examples'] = [
     'xarray >=0.18.2',
