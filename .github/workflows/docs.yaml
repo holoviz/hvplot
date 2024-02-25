@@ -70,6 +70,7 @@ jobs:
           external_repository: holoviz-dev/hvplot
           publish_dir: ./builtdocs
           force_orphan: true
+          exclude_assets: '.doctrees'
       - name: Deploy main
         if: |
           (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'main') ||
@@ -80,6 +81,7 @@ jobs:
           publish_dir: ./builtdocs
           cname: hvplot.holoviz.org
           force_orphan: true
+          exclude_assets: '.doctrees'
   pip_build_docs:
     name: Documentation:pip
     runs-on: 'ubuntu-latest'
