@@ -72,10 +72,24 @@ extras_require['tests'] = extras_require['tests_core'] + [
     'ibis-framework',  # ibis-duckdb on conda
 ]
 
+extras_require['geo'] = [
+    'cartopy',
+    'fiona',
+    'geopandas',
+    'geoviews >=1.9.0',
+    'pyproj',
+    'rasterio',
+    'rioxarray',
+    'spatialpandas >=0.4.3',
+]
+
+# graphviz is difficult to install with pip, ok with conda.
+extras_require['graphviz'] = [
+    'pygraphviz',
+]
+
 # Dependencies required to run the notebooks
 extras_require['examples'] = [
-    'geoviews >=1.9.0',
-    'geopandas',
     'xarray >=0.18.2',
     'networkx >=2.6.3',
     'streamz >=0.3.0',
@@ -84,28 +98,20 @@ extras_require['examples'] = [
     'intake-xarray >=0.5.0',
     'dask >=2021.3.0',
     'notebook >=5.4',
-    'rasterio',
-    'cartopy',
-    'pyproj',
     's3fs >=2022.1.0',
     'scipy >=1.5.3',
     'pillow >=8.2.0',
     'selenium >=3.141.0',
     'scikit-image >=0.17.2',
-    'python-snappy >=0.6.0',
     'pooch >=1.6.0',
-    'fiona',
-    'rioxarray',
     'matplotlib',
     'plotly',
-    'pygraphviz',
     'ipywidgets',
     'numba >=0.51.0',
     'datashader >=0.6.5',
-    'spatialpandas >=0.4.3',
     'polars',
     'fugue',
-    'ibis-framework',  # ibis-duckdb on conda
+    'ibis-framework[duckdb]',  # ibis-duckdb on conda
 ]
 
 # Run the example tests by installing examples_tests together with tests
@@ -115,6 +121,19 @@ extras_require["examples_tests"] = extras_require["examples"] + extras_require['
 extras_require['doc'] = extras_require['examples'] + [
     'nbsite >=0.8.4',
     'sphinxext-rediraffe',
+]
+
+extras_require['hvdev'] = [
+    'panel >=0.0.1a1',
+    'param >=0.0.1a1',
+    'holoviews >=0.0.1a1',
+    'datashader >=0.0.1a1',
+    'colorcet >=0.0.1a1',
+    'pyviz_comms >=0.0.1a1',
+]
+
+extras_require['hvdev_geo'] = [
+    'geoviews >=0.0.1a1',
 ]
 
 # until pyproject.toml/equivalent is widely supported (setup_requires

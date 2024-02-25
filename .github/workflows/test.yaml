@@ -32,12 +32,13 @@ jobs:
     name: Run pre-commit
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: holoviz-dev/holoviz_tasks/pre-commit@v0.1a17
+      - uses: holoviz-dev/holoviz_tasks/pre-commit@v0.1a19
   setup:
     name: Setup workflow
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ env.MATRIX }}
+      matrix_option: ${{ env.MATRIX_OPTION }}
     steps:
       - name: Set matrix option
         run: |
@@ -56,7 +57,7 @@ jobs:
         run: |
           MATRIX=$(jq -nsc '{
               "os": ["ubuntu-latest", "macos-latest", "windows-latest"],
-              "python-version": ["3.8", "3.11"]
+              "python-version": ["3.8", "3.12"]
           }')
           echo "MATRIX=$MATRIX" >> $GITHUB_ENV
       - name: Set test matrix with 'full' option
@@ -64,7 +65,7 @@ jobs:
         run: |
           MATRIX=$(jq -nsc '{
               "os": ["ubuntu-latest", "macos-latest", "windows-latest"],
-              "python-version": ["3.8", "3.9", "3.10", "3.11"]
+              "python-version": ["3.8", "3.9", "3.10", "3.11", "3.12"]
           }')
           echo "MATRIX=$MATRIX" >> $GITHUB_ENV
       - name: Set test matrix with 'downstream' option
@@ -72,13 +73,14 @@ jobs:
         run: |
           MATRIX=$(jq -nsc '{
               "os": ["ubuntu-latest"],
-              "python-version": ["3.11"]
+              "python-version": ["3.12"]
           }')
           echo "MATRIX=$MATRIX" >> $GITHUB_ENV
 
-  test_suite:
-    name: Pytest on ${{ matrix.os }} with Python ${{ matrix.python-version }}
+  conda_suite:
+    name: conda tests:${{ matrix.os }}:${{ matrix.python-version }}
     needs: [pre_commit, setup]
+    if: needs.setup.outputs.matrix_option != 'default'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -88,13 +90,13 @@ jobs:
       run:
         shell: bash -el {0}
     steps:
-      - uses: holoviz-dev/holoviz_tasks/install@v0.1a17
+      - uses: holoviz-dev/holoviz_tasks/install@v0.1a19
         with:
           name: unit_test_suite
           python-version: ${{ matrix.python-version }}
           channel-priority: strict
           channels: pyviz/label/dev,conda-forge,nodefaults
-          envs: "-o examples_tests -o tests -o examples_conda"
+          envs: "-o examples_tests -o tests -o geo -o graphviz"
           cache: ${{ github.event.inputs.cache || github.event.inputs.cache == '' }}
           conda-update: true
         id: install
@@ -107,53 +109,38 @@ jobs:
           conda activate test-environment
           bokeh sampledata
           doit test_examples
-      - name: codecov
-        run: |
-          conda activate test-environment
-          codecov
-  core_test_suite:
-    name: Core tests on Python ${{ matrix.python-version }}, ${{ matrix.os }}
+  pip_test:
+    name: pip tests:${{ matrix.os }}:${{ matrix.python-version }}
     needs: [pre_commit, setup]
+    timeout-minutes: 90
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-      matrix:
-        os: ['ubuntu-latest']
-        python-version: ['3.12']
-    timeout-minutes: 120
+      matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
     defaults:
       run:
-        shell: bash -el {0}
-    env:
-      DESC: "Python ${{ matrix.python-version }}, ${{ matrix.os }} core tests"
-      PYTHON_VERSION: ${{ matrix.python-version }}
+        shell: bash -l {0}
     steps:
-      # Add back when this works on Python 3.12
-      # - uses: holoviz-dev/holoviz_tasks/install@v0.1a17
-      #   with:
-      #     name: core_test_suite
-      #     python-version: ${{ matrix.python-version }}
-      #     # channel-priority: strict
-      #     channels: pyviz/label/dev,conda-forge,nodefaults
-      #     envs: "-o tests_core -o tests_ci"
-      #     cache: ${{ github.event.inputs.cache || github.event.inputs.cache == '' }}
-      #     conda-update: true
-      #     id: install
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: "100"
-      - name: Fetch unshallow
-        run: git fetch --prune --tags --unshallow -f
-      - uses: actions/setup-python@v4
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
         with:
-          python-version: 3.12
-      - run: |
-          python -m pip install -ve '.[tests_core]'
+          python-version: ${{ matrix.python-version }}
+      - name: install without geo
+        # Because cartopy cannot be installed on Python 3.8 on these platforms
+        if: matrix.python-version == '3.8' && contains(fromJSON('["ubuntu-latest", "windows-latest"]'), matrix.os)
+        run: pip install ."[tests, examples_tests, hvdev]"
+      - name: install with geo
+        if: matrix.python-version != '3.8' || !contains(fromJSON('["ubuntu-latest", "windows-latest"]'), matrix.os)
+        run: pip install ."[tests, examples_tests, geo, hvdev, hvdev_geo]"
+      - name: pip list
+        run: pip list
       - name: bokeh sampledata
-        run: |
-          # conda activate test-environment
-          bokeh sampledata
-      - name: doit test_unit
-        run: |
-          # conda activate test-environment
-          pytest hvplot
+        run: bokeh sampledata
+      - name: unit tests
+        run: pytest -v hvplot --cov=hvplot --cov-append
+      - name: examples tests
+        run: pytest -n auto --dist loadscope --nbval-lax -p no:python
+      - name: codecov
+        run: codecov
