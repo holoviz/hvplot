@@ -52,7 +52,7 @@ jobs:
           conda activate test-environment
           bokeh sampledata
       - name: install dev nbsite
-        run: conda install pyviz/label/dev::nbsite
+        run: pip install --pre -U nbsite
       - name: conda list
         run: conda list
       - name: build docs
