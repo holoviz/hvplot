@@ -191,13 +191,4 @@ setup_args = dict(
 
 
 if __name__ == '__main__':
-    example_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                'hvplot','examples')
-
-    if 'develop' not in sys.argv and 'egg_info' not in sys.argv:
-        pyct.build.examples(example_path, __file__, force=True)
-
     setup(**setup_args)
-
-    if os.path.isdir(example_path):
-        shutil.rmtree(example_path)

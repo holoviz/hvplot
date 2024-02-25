@@ -51,14 +51,18 @@ jobs:
         run: |
           conda activate test-environment
           bokeh sampledata
-      - name: generate rst
+      - name: install dev nbsite
         run: |
           conda activate test-environment
-          nbsite generate-rst --org holoviz --project-name hvplot
+          pip install --pre -U nbsite
+      - name: conda list
+        run: |
+          conda activate test-environment
+          conda list
       - name: build docs
         run: |
           conda activate test-environment
-          nbsite build --what=html --output=builtdocs --org holoviz --project-name hvplot
+          sphinx-build -b html doc builtdocs
       - name: report failure
         if: failure()
         run: cat /tmp/sphinx-*.log | tail -n 100
@@ -72,6 +76,7 @@ jobs:
           external_repository: holoviz-dev/hvplot
           publish_dir: ./builtdocs
           force_orphan: true
+          exclude_assets: '.doctrees'
       - name: Deploy main
         if: |
           (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'main') ||
@@ -82,6 +87,7 @@ jobs:
           publish_dir: ./builtdocs
           cname: hvplot.holoviz.org
           force_orphan: true
+          exclude_assets: '.doctrees'
   pip_build_docs:
     name: Documentation:pip
     runs-on: 'ubuntu-latest'
@@ -103,6 +109,8 @@ jobs:
           python-version: '3.11'
       - name: install
         run: pip install ."[doc, examples, geo]"
+      - name: install dev nbsite
+        run: pip install --pre -U nbsite
       - name: pip list
         run: pip list
       - name: Set and echo git ref
@@ -111,17 +119,9 @@ jobs:
           echo "Deploying from ref ${GITHUB_REF#refs/*/}"
           echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
       - name: bokeh sampledata
-        run: |
-          conda activate test-environment
-          bokeh sampledata
-      - name: generate rst
-        run: |
-          conda activate test-environment
-          nbsite generate-rst --org holoviz --project-name hvplot
+        run: bokeh sampledata
       - name: build docs
-        run: |
-          conda activate test-environment
-          nbsite build --what=html --output=builtdocs --org holoviz --project-name hvplot
+        run: sphinx-build -b html doc builtdocs
       - name: report failure
         if: failure()
         run: cat /tmp/sphinx-*.log | tail -n 100

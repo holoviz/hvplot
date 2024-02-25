@@ -130,4 +130,4 @@ hvplot/.version
 .DS_Store
 
 # Examples artefacts
-examples/user_guide/plot.html
+doc/user_guide/plot.html
