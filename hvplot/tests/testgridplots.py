@@ -79,6 +79,18 @@ class TestGridPlots(ComparisonTestCase):
         rgb = self.da_rgb.to_dataset(name='z').hvplot.rgb(z='z')
         self.assertEqual(rgb, RGB(([0, 1], [0, 1])+tuple(self.da_rgb.values)))
 
+    def test_rgb_dataset_robust(self):
+        rgb = self.da_rgb.to_dataset(name='z').hvplot.rgb(robust=True)
+        self.assertEqual(rgb, RGB(([0, 1], [0, 1])+tuple(
+            [[[ -5,  18],
+            [ 42,  67]],
+            [[ 91, 115],
+            [139, 163]],
+            [[187, 212],
+            [236, 260]]]
+        )))
+        self.assertNotEqual(rgb, RGB(([0, 1], [0, 1])+tuple(self.da_rgb.values)))
+
     def test_rgb_dataarray_groupby_explicit(self):
         rgb = self.da_rgb_by_time.hvplot.rgb('x', 'y', groupby='time')
         self.assertEqual(rgb[0], RGB(([0, 1], [0, 1])+tuple(self.da_rgb_by_time.values[0])))
@@ -92,6 +104,10 @@ class TestGridPlots(ComparisonTestCase):
     def test_img_dataarray_infers_correct_other_dims(self):
         img = self.da_img_by_time[0].hvplot()
         self.assertEqual(img, Image(self.da_img_by_time[0], ['lon', 'lat'], ['value']))
+
+    def test_img_dataarray_robust_to_clim_percentile(self):
+        img = self.da_img_by_time[0].hvplot(robust=True)
+        assert img.opts["clim_percentile"] is True
 
     def test_img_dataarray_groupby_infers_correct_other_dims(self):
         img = self.da_img_by_time.hvplot(groupby='time')
