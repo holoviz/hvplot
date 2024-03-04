@@ -837,7 +837,6 @@ class HoloViewsConverter:
                 data[z] = (
                     ((data[z].astype("f8") - vmin) / (vmax - vmin)) * 255
                 ).astype(int)
-                print(data[z])
 
             if kind not in self._stats_types:
                 if by is None: by = by_new
