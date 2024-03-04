@@ -819,7 +819,7 @@ class HoloViewsConverter:
                 if 'bands' in kwds:
                     other_dims = [kwds['bands']]
                 else:
-                    other_dims = [d for d in data.coords if d not in (groupby or [])][0]                    
+                    other_dims = [d for d in data.coords if d not in (groupby or [])][0]
             else:
                 other_dims = []
             da = data
