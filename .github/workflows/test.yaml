@@ -93,7 +93,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
-          environment-file: envs/py${{ matrix.python-version }}-tests.yml
+          environment-file: envs/py${{ matrix.python-version }}-tests.yaml
           activate-environment: hvplottests
       - name: conda list
         run: conda list

@@ -37,7 +37,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
-          environment-file: envs/py3.11-docs.yml
+          environment-file: envs/py3.11-docs.yaml
           activate-environment: hvplotdocs
       - name: Set and echo git ref
         id: vars
