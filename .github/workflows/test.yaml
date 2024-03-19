@@ -123,15 +123,17 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - name: upgrade pip / setuptools
+        run: pip install -U pip setuptools
       - name: install without geo
         # Because cartopy cannot be installed on Python 3.8 on these platforms
         if: matrix.python-version == '3.8' && contains(fromJSON('["ubuntu-latest", "windows-latest"]'), matrix.os)
-        run: python -m pip install -ve '.[tests, examples_tests, hvdev]'
+        run: pip install -ve '.[tests, examples-tests, hvdev]'
       - name: install with geo
         if: matrix.python-version != '3.8' || !contains(fromJSON('["ubuntu-latest", "windows-latest"]'), matrix.os)
-        run: python -m pip install -ve '.[tests, examples_tests, geo, hvdev, hvdev_geo]'
+        run: pip install -ve '.[tests, examples-tests, geo, hvdev, hvdev-geo]'
       - name: pip list
-        run: python -m pip list
+        run: pip list
       - name: bokeh sampledata
         run: bokeh sampledata
       - name: unit tests

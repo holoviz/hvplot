@@ -53,7 +53,7 @@ Source = "http://github.com/holoviz/hvplot"
 HoloViz = "https://holoviz.org/"
 
 [project.optional-dependencies]
-tests_core = [
+tests-core = [
     "codecov",
     "dask",
     "flake8",
@@ -72,7 +72,7 @@ tests_core = [
 # to run and pass the test suite without installing any
 # of those.
 tests = [
-    "hvplot[tests_core]",
+    "hvplot[tests-core]",
     "fugue",
     "ibis-framework[duckdb]",  # ibis-duckdb on conda
     "polars",
@@ -116,14 +116,14 @@ examples = [
     "streamz >=0.3.0",
     "xarray >=0.18.2",
 ]
-tests_nb = [
+tests-nb = [
     "pytest-xdist",
     "nbval",
 ]
 # Run the example tests by installing examples_tests together with tests
-examples_tests = [
+examples-tests = [
     "hvplot[examples]",
-    "hvplot[tests_nb]",
+    "hvplot[tests-nb]",
 ]
 # Additional packages required to build the docs
 doc = [
@@ -140,7 +140,7 @@ hvdev = [
     "param >=0.0.1a1",
     "pyviz_comms >=0.0.1a1",
 ]
-hvdev_geo = [
+hvdev-geo = [
     "geoviews >=0.0.1a1",
 ]
 
@@ -198,7 +198,7 @@ ibis-framework = { skip = true, packages = "ibis-duckdb" }
 [tool.pyproject2conda.envs."tests"]
 channels = ["nodefaults", "conda-forge", "pyviz/label/dev"]
 python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
-extras = ["tests", "examples_tests", "geo", "graphviz"]
+extras = ["tests", "examples-tests", "geo", "graphviz"]
 name = "hvplottests"
 # reqs = ["-e .."]  # Doesn't work
 
