@@ -55,7 +55,7 @@ HoloViz = "https://holoviz.org/"
 [project.optional-dependencies]
 tests-core = [
     "codecov",
-    "dask",
+    "dask[dataframe]",
     "flake8",
     "ipywidgets",
     "matplotlib",
@@ -93,7 +93,7 @@ graphviz = [
 ]
 # Dependencies required to run the notebooks
 examples = [
-    "dask >=2021.3.0",
+    "dask[dataframe] >=2021.3.0",
     "datashader >=0.6.5",
     "fugue",
     "ibis-framework[duckdb] >=7.0.0",  # ibis-duckdb on conda
