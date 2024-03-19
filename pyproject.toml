@@ -74,7 +74,7 @@ tests-core = [
 tests = [
     "hvplot[tests-core]",
     "fugue",
-    "ibis-framework[duckdb] >=8.0.0",  # ibis-duckdb on conda
+    "ibis-framework[duckdb] >=7.0.0",  # ibis-duckdb on conda
     "polars",
 ]
 geo = [
@@ -96,7 +96,7 @@ examples = [
     "dask >=2021.3.0",
     "datashader >=0.6.5",
     "fugue",
-    "ibis-framework[duckdb] >=8.0.0",  # ibis-duckdb on conda
+    "ibis-framework[duckdb] >=7.0.0",  # ibis-duckdb on conda
     "intake-parquet >=0.2.3",
     "intake-xarray >=0.5.0",
     "intake >=0.6.5,<2.0.0",
@@ -193,7 +193,7 @@ write-changes = true
 [tool.pyproject2conda.dependencies]
 geoviews = { skip = true, packages = "geoviews-core" }
 # It should be ibis-framework[duckdb], but it works anyway.
-ibis-framework = { skip = true, packages = "ibis-duckdb  >=8.0.0" }
+ibis-framework = { skip = true, packages = "ibis-duckdb  >=7.0.0" }
 
 [tool.pyproject2conda.envs."tests"]
 channels = ["nodefaults", "conda-forge", "pyviz/label/dev"]
