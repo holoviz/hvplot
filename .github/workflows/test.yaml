@@ -80,7 +80,7 @@ jobs:
   conda_suite:
     name: conda tests:${{ matrix.os }}:${{ matrix.python-version }}
     needs: [pre_commit, setup]
-    if: needs.setup.outputs.matrix_option != 'default'
+    # if: needs.setup.outputs.matrix_option != 'default'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
