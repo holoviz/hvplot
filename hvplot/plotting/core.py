@@ -86,7 +86,6 @@ class hvPlotBase:
                     for (name, fn), args in fn_args.items():
                         combined_kwds[name] = fn(*args)
                     plot = self._get_converter(xd, yd, kindd, **combined_kwds)(kindd, xd, yd)
-                    # print('CALLBACK')
                     return pn.panel(plot, **panel_dict)
 
                 return pn.panel(callback)

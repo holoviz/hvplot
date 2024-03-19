@@ -549,7 +549,6 @@ def process_dynamic_args(x, y, kind, **kwds):
             arg_deps += list(deps)
             arg_names += list(k) * len(deps)
 
-    # print('DEBUG', dynamic, arg_deps, arg_names)
     return dynamic, arg_deps, arg_names
 
 
