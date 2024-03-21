@@ -22,7 +22,7 @@ dependencies:
   - fiona
   - fugue
   - geopandas
-  - geoviews-core
+  - geoviews-core>=1.9.0
   - holoviews>=1.11.0
   - ibis-duckdb
   - intake-parquet>=0.2.3
