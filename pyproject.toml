@@ -196,14 +196,14 @@ geoviews = { skip = true, packages = "geoviews-core" }
 ibis-framework = { skip = true, packages = "ibis-duckdb" }
 
 [tool.pyproject2conda.envs."tests"]
-channels = ["nodefaults", "conda-forge", "pyviz/label/dev"]
+channels = ["nodefaults", "pyviz/label/dev", "conda-forge"]
 python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
 extras = ["tests", "examples-tests", "geo", "graphviz"]
 name = "hvplottests"
 # reqs = ["-e .."]  # Doesn't work
 
 [tool.pyproject2conda.envs."docs"]
-channels = ["nodefaults", "conda-forge", "pyviz/label/dev"]
+channels = ["nodefaults", "pyviz/label/dev", "conda-forge"]
 python = ["3.11"]
 extras = ["doc", "examples", "geo", "graphviz"]
 name = "hvplotdocs"

@@ -10,8 +10,8 @@
 name: hvplottests
 channels:
   - nodefaults
-  - conda-forge
   - pyviz/label/dev
+  - conda-forge
 dependencies:
   - python=3.8
   - bokeh>=1.0.0
