@@ -14,13 +14,7 @@ source:
 
 build:
   noarch: python
-  script: {{ PYTHON }} -m pip install . -vv
-
-# ?????
-extra:
-  channels:
-    - pyviz
-    - intake
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
 
 requirements:
   build:
@@ -38,8 +32,12 @@ requirements:
 test:
   requires:
     - pip
-    {% for dep in project['optional-dependencies']['tests_core'] %}
+    {% for dep in project['optional-dependencies']['tests-core'] %}
+    {% if dep == 'dask[dataframe]' %}
+    - dask
+    {% else %}
     - {{ dep }}
+    {% endif %}
     {% endfor %}
   source_files:
     - pyproject.toml
