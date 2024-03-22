@@ -27,6 +27,13 @@ except ModuleNotFoundError:
     ]
 
 try:
+    import ibis
+except ModuleNotFoundError:
+    collect_ignore_glob += [
+        "user_guide/Integrations.ipynb",
+    ]
+
+try:
     webdriver_control.create()
 except RuntimeError:
     # hvplot.save() with bokeh
