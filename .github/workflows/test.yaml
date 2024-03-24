@@ -104,6 +104,8 @@ jobs:
         with:
           auto-update-conda: true
           activate-environment: hvplottests
+      - name: debug conda list
+        run: conda list
       - name: Set conda environment variable
         if: needs.setup.outputs.cache == 'true'
         run: echo "CONDA=$CONDA" >> $GITHUB_ENV
