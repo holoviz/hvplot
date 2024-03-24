@@ -104,18 +104,18 @@ jobs:
         with:
           auto-update-conda: true
           activate-environment: hvplottests
-      - run: |
-          echo $CONDA
-          exit 1
-      - name: Set $TODAY
+      - name: Set conda environment variable
+        if: needs.setup.outputs.cache == 'true'
+        run: echo "CONDA=$CONDA" >> $GITHUB_ENV
+      - name: Compute today's date
         if: needs.setup.outputs.cache == 'true'
         run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-      # - name: Compute conda env path (Windows)
-      #   if: needs.setup.outputs.cache == 'true' && matrix.os == 'Windows'
-      #   run: echo "ENVS_PATH=${{ format('{0}\{1}', $CONDA, 'envs') }}" >> $GITHUB_ENV
-      # - name: Compute conda env path (Unix)
-      #   if: needs.setup.outputs.cache == 'true' && matrix.os != 'Windows'
-      #   run: echo "ENVS_PATH=${{ format('{0}/{1}', $CONDA, 'envs') }}" >> $GITHUB_ENV
+      - name: Compute conda env path (Windows)
+        if: needs.setup.outputs.cache == 'true' && matrix.os == 'Windows'
+        run: echo "ENVS_PATH=${{ format('{0}\{1}', env.CONDA, 'envs') }}" >> $GITHUB_ENV
+      - name: Compute conda env path (Unix)
+        if: needs.setup.outputs.cache == 'true' && matrix.os != 'Windows'
+        run: echo "ENVS_PATH=${{ format('{0}/{1}', env.CONDA, 'envs') }}" >> $GITHUB_ENV
       - name: Restore cached env
         if: needs.setup.outputs.cache == 'true'
         uses: actions/cache/restore@v4
