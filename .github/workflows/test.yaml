@@ -104,25 +104,30 @@ jobs:
         with:
           auto-update-conda: true
           activate-environment: hvplottests
-      - run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-        name: Set $TODAY
-      - if: matrix.os == 'Windows'
-        run: echo "ENVS_PATH=${{ format('{0}\{1}', env.CONDA, 'envs') }}" >> $GITHUB_ENV
-      - if: matrix.os != 'Windows'
-        run: echo "ENVS_PATH=${{ format('{0}/{1}', env.CONDA, 'envs') }}" >> $GITHUB_ENV
-      - if: needs.setup.outputs.cache == 'true'
+      - name: Set $TODAY
+        if: needs.setup.outputs.cache == 'true'
+        run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+      - name: Compute conda env path (Windows)
+        if: needs.setup.outputs.cache == 'true' && matrix.os == 'Windows'
+        run: echo "ENVS_PATH=${{ format('{0}\{1}', CONDA, 'envs') }}" >> $GITHUB_ENV
+      - name: Compute conda env path (Unix)
+        if: needs.setup.outputs.cache == 'true' && matrix.os != 'Windows'
+        run: echo "ENVS_PATH=${{ format('{0}/{1}', CONDA, 'envs') }}" >> $GITHUB_ENV
+      - name: Restore cached env
+        if: needs.setup.outputs.cache == 'true'
         uses: actions/cache/restore@v4
         with:
           path: ${{ env.ENVS_PATH }}
           key: test-${{ matrix.os }}-${{ hashFiles('envs/py${{ matrix.python-version }}-tests.yaml') }}-${{ env.TODAY }}
         id: cache
-      - if: needs.setup.outputs.cache != 'true' || steps.cache.outputs.cache-hit != 'true'
-        name: Install conda environment (no cache hit)
+      - name: Install conda environment (no cache hit)
+        if: needs.setup.outputs.cache != 'true' || steps.cache.outputs.cache-hit != 'true'
         run: conda env update -f envs/py${{ matrix.python-version }}-tests.yaml
-      - if: needs.setup.outputs.cache == 'true' && steps.cache.outputs.cache-hit == 'true'
-        name: Editable install (caching enabled)
+      - name: Editable install (caching enabled and cache hit)
+        if: needs.setup.outputs.cache == 'true' && steps.cache.outputs.cache-hit == 'true'
         run: pip install -e . --no-deps --no-build-isolation
-      - if: needs.setup.outputs.cache == 'true' && steps.cache.outputs.cache-hit != 'true'
+      - name: Cache conda env
+        if: needs.setup.outputs.cache == 'true' && steps.cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
           path: ${{ env.ENVS_PATH }}
