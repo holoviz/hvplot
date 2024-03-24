@@ -56,11 +56,9 @@ jobs:
       - name: Set test matrix with 'default' option
         if: env.MATRIX_OPTION == 'default'
         run: |
-          # "os": ["ubuntu-latest", "macos-latest", "windows-latest"],
-          # "python-version": ["3.8", "3.12"]
           MATRIX=$(jq -nsc '{
-              "os": ["ubuntu-latest", "windows-latest"],
-              "python-version": ["3.12"]
+              "os": ["ubuntu-latest", "macos-latest", "windows-latest"],
+              "python-version": ["3.8", "3.12"]
           }')
           echo "MATRIX=$MATRIX" >> $GITHUB_ENV
       - name: Set test matrix with 'full' option
@@ -87,7 +85,7 @@ jobs:
     name: conda tests:${{ matrix.os }}:${{ matrix.python-version }}
     needs: [pre_commit, setup]
     # TODO: uncomment line below
-    # if: needs.setup.outputs.matrix_option != 'default'
+    if: needs.setup.outputs.matrix_option != 'default'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -104,8 +102,6 @@ jobs:
         with:
           auto-update-conda: true
           activate-environment: hvplottests
-      - name: debug conda list
-        run: conda list
       - name: Set conda environment variable
         if: needs.setup.outputs.cache == 'true'
         run: echo "CONDA=$CONDA" >> $GITHUB_ENV
@@ -147,46 +143,46 @@ jobs:
         run: bokeh sampledata
       - name: unit tests
         run: pytest -v hvplot --cov=hvplot --cov-append
-      # - name: unit tests geo
-      #   run: pytest -v hvplot --geo --cov=hvplot --cov-append
-      # - name: examples tests
-      #   run: pytest -n auto --dist loadscope --nbval-lax -p no:python
-  # pip_test:
-  #   name: pip tests:${{ matrix.os }}:${{ matrix.python-version }}
-  #   needs: [pre_commit, setup]
-  #   timeout-minutes: 90
-  #   runs-on: ${{ matrix.os }}
-  #   strategy:
-  #     fail-fast: false
-  #     matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
-  #   defaults:
-  #     run:
-  #       shell: bash -l {0}
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 0
-  #     - uses: actions/setup-python@v5
-  #       with:
-  #         python-version: ${{ matrix.python-version }}
-  #     - name: upgrade pip / setuptools
-  #       run: pip install -U pip setuptools
-  #     - name: install without geo
-  #       # Because cartopy cannot be installed on Python 3.8 on these platforms
-  #       if: matrix.python-version == '3.8' && contains(fromJSON('["ubuntu-latest", "windows-latest"]'), matrix.os)
-  #       run: pip install -ve '.[tests, examples-tests, hvdev]'
-  #     - name: install with geo
-  #       if: matrix.python-version != '3.8' || !contains(fromJSON('["ubuntu-latest", "windows-latest"]'), matrix.os)
-  #       run: pip install -ve '.[tests, examples-tests, geo, hvdev, hvdev-geo]'
-  #     - name: pip list
-  #       run: pip list
-  #     - name: bokeh sampledata
-  #       run: bokeh sampledata
-  #     - name: unit tests
-  #       run: pytest -v hvplot --cov=hvplot --cov-append
-  #     - name: unit tests geo
-  #       run: pytest -v hvplot --geo --cov=hvplot --cov-append
-  #     - name: examples tests
-  #       run: pytest -n auto --dist loadscope --nbval-lax -p no:python
-  #     - name: codecov
-  #       run: codecov
+      - name: unit tests geo
+        run: pytest -v hvplot --geo --cov=hvplot --cov-append
+      - name: examples tests
+        run: pytest -n auto --dist loadscope --nbval-lax -p no:python
+  pip_test:
+    name: pip tests:${{ matrix.os }}:${{ matrix.python-version }}
+    needs: [pre_commit, setup]
+    timeout-minutes: 90
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: upgrade pip / setuptools
+        run: pip install -U pip setuptools
+      - name: install without geo
+        # Because cartopy cannot be installed on Python 3.8 on these platforms
+        if: matrix.python-version == '3.8' && contains(fromJSON('["ubuntu-latest", "windows-latest"]'), matrix.os)
+        run: pip install -ve '.[tests, examples-tests, hvdev]'
+      - name: install with geo
+        if: matrix.python-version != '3.8' || !contains(fromJSON('["ubuntu-latest", "windows-latest"]'), matrix.os)
+        run: pip install -ve '.[tests, examples-tests, geo, hvdev, hvdev-geo]'
+      - name: pip list
+        run: pip list
+      - name: bokeh sampledata
+        run: bokeh sampledata
+      - name: unit tests
+        run: pytest -v hvplot --cov=hvplot --cov-append
+      - name: unit tests geo
+        run: pytest -v hvplot --geo --cov=hvplot --cov-append
+      - name: examples tests
+        run: pytest -n auto --dist loadscope --nbval-lax -p no:python
+      - name: codecov
+        run: codecov
