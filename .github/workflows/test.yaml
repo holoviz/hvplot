@@ -107,6 +107,10 @@ jobs:
       - name: Set conda environment variable
         if: needs.setup.outputs.cache == 'true'
         run: echo "CONDA=$CONDA" >> $GITHUB_ENV
+      - name: Set conda file path
+        run: |
+          py_version=${{ matrix.python-version }}
+          echo "CONDA_ENV_PATH=envs/py$py_version-tests.yaml" >> $GITHUB_ENV
       - name: Compute today's date
         if: needs.setup.outputs.cache == 'true'
         run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
@@ -121,11 +125,11 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ${{ env.ENVS_PATH }}
-          key: test-${{ matrix.os }}-${{ hashFiles('envs/py${{ matrix.python-version }}-tests.yaml') }}-${{ env.TODAY }}
+          key: test-${{ matrix.os }}-${{ hashFiles(env.CONDA_ENV_PATH) }}-${{ env.TODAY }}
         id: cache
       - name: Install conda environment (no cache hit)
         if: needs.setup.outputs.cache != 'true' || steps.cache.outputs.cache-hit != 'true'
-        run: conda env update -f envs/py${{ matrix.python-version }}-tests.yaml
+        run: conda env update -f $CONDA_ENV_PATH
       - name: Editable install (caching enabled and cache hit)
         if: needs.setup.outputs.cache == 'true' && steps.cache.outputs.cache-hit == 'true'
         run: pip install -e . --no-deps --no-build-isolation
@@ -134,7 +138,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: ${{ env.ENVS_PATH }}
-          key: test-${{ matrix.os }}-${{ hashFiles('envs/py${{ matrix.python-version }}-tests.yaml') }}-${{ env.TODAY }}
+          key: test-${{ matrix.os }}-${{ hashFiles(env.CONDA_ENV_PATH) }}-${{ env.TODAY }}
       - name: conda list
         run: conda list
       - name: bokeh sampledata
