@@ -144,14 +144,6 @@ hvdev-geo = [
     "geoviews >=0.0.1a1",
 ]
 
-# Mapping from setup.cfg to migrate
-# ; The mapping can be removed when Numba support python 3.11
-# [tool:pyctdev.conda]
-# namespace_map =
-#     geoviews=geoviews-core
-#     ibis-framework[duckdb]=ibis-duckdb
-
-
 [tool.setuptools]
 include-package-data = true
 
@@ -185,10 +177,6 @@ filterwarnings = [
 ignore-words-list = "ser"
 skip = "doc/generate_modules.py"
 write-changes = true
-
-# [tool.pyproject2conda]
-# # ...
-# default_envs = ["tests"]
 
 [tool.pyproject2conda.dependencies]
 geoviews = { skip = true, packages = "geoviews-core >=1.9.0" }
