@@ -109,10 +109,10 @@ jobs:
         run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
       - name: Compute conda env path (Windows)
         if: needs.setup.outputs.cache == 'true' && matrix.os == 'Windows'
-        run: echo "ENVS_PATH=${{ format('{0}\{1}', CONDA, 'envs') }}" >> $GITHUB_ENV
+        run: echo "ENVS_PATH=${{ format('{0}\{1}', $CONDA, 'envs') }}" >> $GITHUB_ENV
       - name: Compute conda env path (Unix)
         if: needs.setup.outputs.cache == 'true' && matrix.os != 'Windows'
-        run: echo "ENVS_PATH=${{ format('{0}/{1}', CONDA, 'envs') }}" >> $GITHUB_ENV
+        run: echo "ENVS_PATH=${{ format('{0}/{1}', $CONDA, 'envs') }}" >> $GITHUB_ENV
       - name: Restore cached env
         if: needs.setup.outputs.cache == 'true'
         uses: actions/cache/restore@v4
