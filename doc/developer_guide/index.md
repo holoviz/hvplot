@@ -1,48 +1,45 @@
 (devguide-setup)=
 
-# Getting Set Up
+# Developer Guide
+
+```{contents}
+:depth: 3
+:local: true
+```
+
+## Set up
 
 The hvPlot library is a complex project which provides a wide range
 of data interfaces and an extensible set of plotting backends, which
 means the development and testing process involves a wide set of
 libraries.
 
-```{contents}
-:depth: 2
-:local: true
-```
+If you have any problems with the steps here, please contact the developers on [Discord](https://discord.gg/AXRHnJU6sP).
 
-% dev_guide_preliminaries:
+### Preliminaries
 
-## Preliminaries
+#### Git
 
-### Git
-
-The hvPlot source code is stored in a [Git] source control repository.
+The hvPlot source code is stored in a [Git](https://git-scm.com) source control repository.
 The first step to working on hvPlot is to install Git on to your system.
 There are different ways to do this depending on whether, you are using
 Windows, OSX, or Linux.
 
-To install Git on any platform, refer to the [Installing Git] section of
-the [Pro Git Book].
+To install Git on any platform, refer to the [Installing Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) section of
+the [Pro Git Book](https://git-scm.com/book/en/v2).
 
-### Conda
+#### Conda (optional)
 
-Developing hvPlot requires a wide range of packages that are not
-easily and quickly available using pip. To make this more manageable,
-core developers rely heavily on the [conda package manager] for the
-free [Anaconda] Python distribution. However, `conda` can also
-install non-Python package dependencies, which helps streamline hvPlot
-development greatly. It is *strongly* recommended that anyone
-developing hvPlot also use `conda`, and the remainder of the
-instructions will assume that `conda` is available.
+Developing hvPlot requires a wide range of dependencies that can all be installed with
+the [conda package manager](https://conda.io). Using `conda` is sometimes the easiest way to install
+a dependency (e.g. `graphviz`, Firefox drivers). However, these days most of the dependencies
+required to develop hvPlot can be installed with `pip`.
 
-To install Conda on any platform, see the [Download conda] section of the
-[conda documentation].
+Follow [these instructions](https://conda.io/projects/conda/user-guide/install/index.html) to download conda.
 
-## Cloning the Repository
+### Cloning the Repository
 
-The source code for the hvPlot project is hosted on [GitHub]. To clone the
+The source code for the hvPlot project is hosted on GitHub. To clone the
 source repository, issue the following command:
 
 ```sh
@@ -55,49 +52,44 @@ checkout* for the remainder of this document.
 
 (dev-guide-installing-dependencies)=
 
-## Installing Dependencies
+### Installing Dependencies
 
 hvPlot requires many additional packages for development and
 testing.
 
-### Conda Environments
+::::{tab-set}
 
-Create an empty conda environment with the name that you prefer, here we've
-chosen hvplot_dev. Activate and configure its channels to only use
-`pyviz/label/dev` and `conda-forge`. The former is used to install the
-development versions of the other HoloViz packages, such as HoloViews or Panel.
+:::{tab-item} pip
+:sync: pip
 
-```sh
-conda create -n hvplot_dev
-conda activate hvplot_dev
-conda config --env --append channels pyviz/label/dev --append channels conda-forge
-conda config --env --remove channels defaults
+Start by creating a virtual environment. For instance, on Linux/MacOs:
+
+```
+python -m venv .venv
+source .venv/bin/activate
 ```
 
-Since hvPlot interfaces with a large range of different libraries the
-full test suite requires a wide range of dependencies. To make it
-easier to install and run different parts of the test suite across
-different platforms hvPlot uses a library called `pyctdev` to make things
-more consistent and general. Specify also the desired Python version you want
-to base your environment on.
+Install the test dependencies:
 
-You will need to pick a Python version. The best practice is to choose the minimum version
-currently supported by hvPlot on the main development branch. If you cannot get the minimum
-version installed, then try with a more recent version of Python.
-
-```sh
-conda install python=3.x pyctdev
+``` bash
+pip install -e '.[tests, examples-tests, geo, hvdev, hvdev-geo]'
 ```
 
-Finally to install the dependencies required to run the full unit test
-suite and all the examples:
+:::
 
-```sh
-doit develop_install -o examples_tests -o tests -o examples_conda
+:::{tab-item} conda
+:sync: conda
+
+Create a conda environment using one of the environment files present in the `./envs` folder:
+
+``` bash
+conda env create --file envs/py3.10-tests.yaml
 ```
 
-Add `-o doc` if you want to install the dependencies required to build
-the website.
+:::
+
+::::
+
 
 ### Setting up pre-commit
 
@@ -110,32 +102,67 @@ pre-commit install
 
 This will ensure that every time you make a commit linting will automatically be applied.
 
-(devguide-python-setup)=
 
-## Commands
+## Testing
 
-You can list the available `doit` commands with `doit list`.
+This chapter describes how to run various tests locally in a
+development environment, guidelines for writing tests, and information
+regarding the continuous testing infrastructure.
 
-## Next Steps
+### Running Tests Locally
 
-If you have any problems with the steps here, please [contact the developers].
+Before attempting to run hvPlot tests, make sure you have successfully
+run through all of the instructions in the {ref}`devguide-setup`
+section of the Developer's Guide.
 
-```{toctree}
-:hidden: true
-:maxdepth: 2
-:titlesonly: true
+Currently hvPlot uses linting two types of tests: regular unit tests
+which are run with `pytest` and notebook example tests run with `pytest` and `nbval`:
 
-Getting Set up <self>
-Testing <testing>
+Run the unit tests with:
+
+```bash
+pytest hvplot
+pytest -v hvplot --geo  # include the test that require geo dependencies
 ```
 
-[anaconda]: https://anaconda.com/downloads
-[conda documentation]: https://conda.io/docs/index.html
-[conda package manager]: https://conda.io/docs/intro.html
-[contact the developers]: https://gitter.im/pyviz/pyviz
-[doit]: https://pydoit.org/
-[download conda]: https://conda.io/docs/download.html
-[git]: https://git-scm.com
-[github]: https://github.com
-[installing git]: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
-[pro git book]: https://git-scm.com/book/en/v2
+Run the example tests with:
+
+```sh
+pytest -n auto --dist loadscope --nbval-lax -p no:python
+```
+
+### Writing Tests
+
+In order to help keep hvPlot maintainable, all Pull Requests that touch
+code should normally be accompanied by relevant tests. While
+exceptions may be made for specific circumstances, the default
+assumption should be that a Pull Request without tests may not be
+merged.
+
+Python unit tests maintain the basic functionality of the Python
+portion of the hvPlot library. A few general guidelines will help you
+write Python unit tests:
+
+In order to ensure that hvPlot's unit tests as relocatable and unambiguous
+as possible, always prefer absolute imports in test files. When convenient,
+import and use the entire module under test:
+
+- **Good**: `import hvplot.pandas`
+- **Good**: `from hvplot.plotting import HvPlotTabular`
+- **Bad**: `from ..plotting import HvPlotTabular`
+
+### Continuous Integration (CI)
+
+Every push to the `main` branch or any Pull Request branch on GitHub
+automatically triggers a full test build on the [Github Action](https://github.com/holoviz/hvplot/actions) continuous
+integration service. This is most often useful for running the full hvPlot
+test suite continuously, but also triggers automated scripts for publishing
+releases when a tagged branch is pushed.
+
+When in doubt about what command to run, you can always inspect the Github
+workflow files in the `./github/workflows` folder so see what commands
+are running on the CI.
+
+Github Action provides a limited number free build workers to Open Source projects.
+Please be considerate of others and group commits into meaningful chunks of
+work before pushing to GitHub (i.e. don't push on every commit).

@@ -114,6 +114,8 @@ rediraffe_redirects = {
     'reference/pandas/step': 'reference/tabular/step',
     'reference/pandas/table': 'reference/tabular/table',
     'reference/pandas/violin': 'reference/tabular/violin',
+    # Removal of the developer testing page
+    'developer_guide/testing': 'developer_guide/index',
 }
 
 html_context.update({
@@ -122,3 +124,6 @@ html_context.update({
     "github_repo": "panel",
     "default_mode": "light",
 })
+
+
+nb_execution_mode = "off"
