@@ -60,7 +60,7 @@ extras_require['tests_core'] = [
     'pooch',
     'scipy',
     'ipywidgets',
-    'dask',
+    'dask[dataframe]',
 ]
 
 # Optional tests dependencies, i.e. one should be able
@@ -96,7 +96,7 @@ extras_require['examples'] = [
     'intake >=0.6.5,<2.0.0',
     'intake-parquet >=0.2.3',
     'intake-xarray >=0.5.0',
-    'dask >=2021.3.0',
+    'dask[dataframe] >=2021.3.0',
     'notebook >=5.4',
     's3fs >=2022.1.0',
     'scipy >=1.5.3',
