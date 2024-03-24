@@ -39,7 +39,6 @@ jobs:
     outputs:
       matrix: ${{ env.MATRIX }}
       matrix_option: ${{ env.MATRIX_OPTION }}
-      cache: ${{ env.CACHE }}
     steps:
       - name: Set matrix option
         run: |
@@ -77,14 +76,10 @@ jobs:
               "python-version": ["3.12"]
           }')
           echo "MATRIX=$MATRIX" >> $GITHUB_ENV
-      - name: Infer cache value
-        # Caching enabled by default
-        run: echo "CACHE=${{ github.event.inputs.cache || github.event.inputs.cache == '' }}" >> $GITHUB_ENV
 
   conda_suite:
     name: conda tests:${{ matrix.os }}:${{ matrix.python-version }}
     needs: [pre_commit, setup]
-    # TODO: uncomment line below
     if: needs.setup.outputs.matrix_option != 'default'
     runs-on: ${{ matrix.os }}
     strategy:
@@ -101,42 +96,8 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
+          environment-file: envs/py${{ matrix.python-version }}-tests.yaml
           activate-environment: hvplottests
-      - name: Set conda environment variable
-        if: needs.setup.outputs.cache == 'true'
-        run: echo "CONDA=$CONDA" >> $GITHUB_ENV
-      - name: Set conda file path
-        run: |
-          py_version=${{ matrix.python-version }}
-          echo "CONDA_ENV_PATH=envs/py$py_version-tests.yaml" >> $GITHUB_ENV
-      - name: Compute today's date
-        if: needs.setup.outputs.cache == 'true'
-        run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-      - name: Compute conda env path (Windows)
-        if: needs.setup.outputs.cache == 'true' && matrix.os == 'Windows'
-        run: echo "ENVS_PATH=${{ format('{0}\{1}', env.CONDA, 'envs') }}" >> $GITHUB_ENV
-      - name: Compute conda env path (Unix)
-        if: needs.setup.outputs.cache == 'true' && matrix.os != 'Windows'
-        run: echo "ENVS_PATH=${{ format('{0}/{1}', env.CONDA, 'envs') }}" >> $GITHUB_ENV
-      - name: Restore cached env
-        if: needs.setup.outputs.cache == 'true'
-        uses: actions/cache/restore@v4
-        with:
-          path: ${{ env.ENVS_PATH }}
-          key: test-${{ matrix.os }}-${{ hashFiles(env.CONDA_ENV_PATH) }}-${{ env.TODAY }}
-        id: cache
-      - name: Install conda environment (no cache hit)
-        if: needs.setup.outputs.cache != 'true' || steps.cache.outputs.cache-hit != 'true'
-        run: conda env update -f $CONDA_ENV_PATH
-      - name: Editable install (caching enabled and cache hit)
-        if: needs.setup.outputs.cache == 'true' && steps.cache.outputs.cache-hit == 'true'
-        run: pip install -e . --no-deps
-      - name: Cache conda env
-        if: needs.setup.outputs.cache == 'true' && steps.cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: ${{ env.ENVS_PATH }}
-          key: test-${{ matrix.os }}-${{ hashFiles(env.CONDA_ENV_PATH) }}-${{ env.TODAY }}
       - name: conda list
         run: conda list
       - name: bokeh sampledata
