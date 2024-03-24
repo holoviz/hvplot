@@ -134,7 +134,7 @@ jobs:
         run: conda env update -f $CONDA_ENV_PATH
       - name: Editable install (caching enabled and cache hit)
         if: needs.setup.outputs.cache == 'true' && steps.cache.outputs.cache-hit == 'true'
-        run: pip install -e . --no-deps --no-build-isolation
+        run: pip install -e . --no-deps
       - name: Cache conda env
         if: needs.setup.outputs.cache == 'true' && steps.cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
