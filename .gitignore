@@ -117,12 +117,6 @@ jupyter_execute/
 # pip
 pip-wheel-metadata/
 
-# autover
-hvplot/.version
-
-# doit
-.doit.db
-
 # IDE
 /.vscode
 
