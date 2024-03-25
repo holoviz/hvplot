@@ -828,7 +828,7 @@ class HoloViewsConverter:
                 label, value_label, other_dims, kind=kind)
             if robust:
                 # adapted from xarray
-                # https://github.com/pydata/xarray/blob/main/xarray/plot/utils.py#L729
+                # https://github.com/pydata/xarray/blob/6af547cdd9beac3b18420ccb204f801603e11519/xarray/plot/utils.py#L729
                 vmax = np.nanpercentile(data[z], 100 - 2)
                 vmin = np.nanpercentile(data[z], 2)
                 # Scale interval [vmin .. vmax] to [0 .. 1], with darray as 64-bit float
