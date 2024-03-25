@@ -54,6 +54,8 @@ jobs:
         run: bokeh sampledata
       - name: install dev nbsite
         run: pip install --pre -U nbsite
+      - name: conda info
+        run: conda info
       - name: conda list
         run: conda list
       - name: build docs

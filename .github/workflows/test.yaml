@@ -98,6 +98,8 @@ jobs:
           auto-update-conda: true
           environment-file: envs/py${{ matrix.python-version }}-tests.yaml
           activate-environment: hvplottests
+      - name: conda info
+        run: conda info
       - name: conda list
         run: conda list
       - name: bokeh sampledata
