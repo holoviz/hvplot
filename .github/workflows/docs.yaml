@@ -20,6 +20,9 @@ on:
   schedule:
     - cron: '0 15 * * SUN'
 
+env:
+  PYTHON_VERSION: "3.11"
+
 jobs:
   conda_build_docs:
     name: Documentation:conda
@@ -40,7 +43,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
-          environment-file: envs/py3.11-docs.yaml
+          environment-file: envs/py${{ env.PYTHON_VERSION }}-docs.yaml
           activate-environment: hvplotdocs
       - name: Set and echo git ref
         id: vars
@@ -98,7 +101,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: ${{ env.PYTHON_VERSION }}
       - name: install
         run: pip install ."[doc, examples, geo]"
       - name: install dev nbsite
