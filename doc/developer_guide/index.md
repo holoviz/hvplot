@@ -60,13 +60,20 @@ testing.
 ::::{tab-set}
 
 :::{tab-item} pip
-:sync: pip
 
-Start by creating a virtual environment. For instance, on Linux/MacOs:
+Start by creating a virtual environment with `venv`:
 
 ```
 python -m venv .venv
+```
+
+Activate it:
+
+```
+# Linux/MacOs
 source .venv/bin/activate
+# Windows
+.venv\Scripts\activate
 ```
 
 Install the test dependencies:
@@ -78,12 +85,13 @@ pip install -e '.[tests, examples-tests, geo, hvdev, hvdev-geo]'
 :::
 
 :::{tab-item} conda
-:sync: conda
 
-Create a conda environment using one of the environment files present in the `./envs` folder:
+Create a development conda environment using one of the environment files present
+in the `./envs` folder, and activate it:
 
 ``` bash
 conda env create --file envs/py3.10-tests.yaml
+conda activate hvplottests
 ```
 
 :::
