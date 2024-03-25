@@ -1,5 +1,3 @@
-import dask
-
 optional_markers = {
     "geo": {
         "help": "Run the tests that require GeoViews",
@@ -37,8 +35,3 @@ def pytest_collection_modifyitems(config, items):
 
     config.hook.pytest_deselected(items=skipped)
     items[:] = selected
-
-
-# From Dask 2024.3.0 they now use `dask_expr` by default
-# https://github.com/dask/dask/issues/10995
-dask.config.set({"dataframe.query-planning": False})
