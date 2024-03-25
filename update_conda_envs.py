@@ -2,13 +2,15 @@ import subprocess
 from pathlib import Path
 
 subprocess.run([
-    "pyproject2conda",
-    "project",
-    "--overwrite",
-    "force",
-    "--template-python",
-    str(Path('envs', 'py{py_version}-{env}')),
-])
+        "pyproject2conda",
+        "project",
+        "--overwrite",
+        "force",
+        "--template-python",
+        str(Path('envs', 'py{py_version}-{env}')),
+    ],
+    check=True,
+)
 
 # Hacky way to install the package in editable mode when creating the env.
 for file in Path('envs').glob('*.yaml'):
