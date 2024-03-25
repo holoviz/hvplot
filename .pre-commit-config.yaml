@@ -40,8 +40,8 @@ repos:
     hooks:
     - id: update_conda_envs
       name: Update conda envs
-      entry: python update_conda_envs.py
+      entry: python scripts/update_conda_envs.py
       language: python
       additional_dependencies: [pyproject2conda]
-      files: 'pyproject.toml'
+      files: '(pyproject.toml|update_conda_envs)'
       pass_filenames: false

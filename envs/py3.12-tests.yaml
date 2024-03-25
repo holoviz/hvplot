@@ -27,6 +27,7 @@ dependencies:
   - geopandas
   - geoviews-core>=1.9.0
   - holoviews>=1.11.0
+  - ibis-duckdb
   - intake-parquet>=0.2.3
   - intake-xarray>=0.5.0
   - intake<2.0.0,>=0.6.5
