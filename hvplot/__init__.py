@@ -58,9 +58,9 @@ To ask the community go to https://discourse.holoviz.org/.
 To report issues go to https://github.com/holoviz/holoviews.
 """
 import inspect
+import os
 import textwrap
 
-import param
 import panel as _pn
 import holoviews as _hv
 
@@ -74,8 +74,40 @@ from .plotting import (hvPlot, hvPlotTabular,  # noqa
                        andrews_curves, lag_plot,
                        parallel_coordinates, scatter_matrix, plot)
 
-__version__ = str(param.version.Version(fpath=__file__, archive_commit="$Format:%h$",
-                                        reponame="hvplot"))
+# Define '__version__'
+try:
+    # For performance reasons on imports, avoid importing setuptools_scm
+    # if not in a .git folder
+    if os.path.exists(os.path.join(os.path.dirname(__file__), "..", ".git")):
+        # If setuptools_scm is installed (e.g. in a development environment with
+        # an editable install), then use it to determine the version dynamically.
+        from setuptools_scm import get_version
+
+        # This will fail with LookupError if the package is not installed in
+        # editable mode or if Git is not installed.
+        __version__ = get_version(root="..", relative_to=__file__)
+    else:
+        raise FileNotFoundError
+except (ImportError, LookupError, FileNotFoundError):
+    # As a fallback, use the version that is hard-coded in the file.
+    try:
+        # __version__ was added in _version in setuptools-scm 7.0.0, we rely on
+        # the hopefully stable version variable.
+        from ._version import version as __version__
+    except (ModuleNotFoundError, ImportError):
+        # Either _version doesn't exist (ModuleNotFoundError) or version isn't
+        # in _version (ImportError). ModuleNotFoundError is a subclass of
+        # ImportError, let's be explicit anyway.
+
+        # Try something else:
+        from importlib.metadata import version as mversion, PackageNotFoundError
+
+        try:
+            __version__ = mversion("hvplot")
+        except PackageNotFoundError:
+            # The user is probably trying to run this without having installed
+            # the package.
+            __version__ = "0.0.0+unknown"
 
 _METHOD_DOCS = {}
 

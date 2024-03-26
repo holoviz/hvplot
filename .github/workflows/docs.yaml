@@ -20,6 +20,9 @@ on:
   schedule:
     - cron: '0 15 * * SUN'
 
+env:
+  PYTHON_VERSION: "3.11"
+
 jobs:
   conda_build_docs:
     name: Documentation:conda
@@ -34,35 +37,29 @@ jobs:
       MOZ_HEADLESS: 1
       DISPLAY: ":99.0"
     steps:
-      - uses: holoviz-dev/holoviz_tasks/install@v0.1a19
+      - uses: actions/checkout@v4
         with:
-          name: Documentation
-          python-version: "3.11"
-          channels: pyviz,conda-forge,nodefaults
-          envs: "-o doc -o examples -o geo -o graphviz"
-          cache: true
-          conda-update: true
+          fetch-depth: 0
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: true
+          environment-file: envs/py${{ env.PYTHON_VERSION }}-docs.yaml
+          activate-environment: hvplotdocs
       - name: Set and echo git ref
         id: vars
         run: |
           echo "Deploying from ref ${GITHUB_REF#refs/*/}"
           echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
       - name: bokeh sampledata
-        run: |
-          conda activate test-environment
-          bokeh sampledata
+        run: bokeh sampledata
       - name: install dev nbsite
-        run: |
-          conda activate test-environment
-          pip install --pre -U nbsite
+        run: pip install --pre -U nbsite
+      - name: conda info
+        run: conda info
       - name: conda list
-        run: |
-          conda activate test-environment
-          conda list
+        run: conda list
       - name: build docs
-        run: |
-          conda activate test-environment
-          sphinx-build -b html doc builtdocs
+        run: sphinx-build -b html doc builtdocs
       - name: report failure
         if: failure()
         run: cat /tmp/sphinx-*.log | tail -n 100
@@ -106,7 +103,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: ${{ env.PYTHON_VERSION }}
       - name: install
         run: pip install ."[doc, examples, geo]"
       - name: install dev nbsite

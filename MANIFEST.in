@@ -1,9 +1,0 @@
-include README.rst
-include LICENSE
-include hvplot/.version
-include hvplot/tests/test_data/*.tif
-include hvplot/datasets.yaml
-include hvplot/data/crime.csv
-global-exclude *.py[co]
-global-exclude *~
-global-exclude *.ipynb_checkpoints/*
