@@ -826,17 +826,19 @@ class HoloViewsConverter:
             data, x, y, by_new, groupby_new = process_xarray(
                 data, x, y, by, groupby, use_dask, persist, gridded,
                 label, value_label, other_dims, kind=kind)
-            if robust:
+            if kind == 'rgb' and robust:
                 # adapted from xarray
                 # https://github.com/pydata/xarray/blob/6af547cdd9beac3b18420ccb204f801603e11519/xarray/plot/utils.py#L729
                 vmax = np.nanpercentile(data[z], 100 - 2)
                 vmin = np.nanpercentile(data[z], 2)
                 # Scale interval [vmin .. vmax] to [0 .. 1], with darray as 64-bit float
                 # to avoid precision loss, integer over/underflow, etc with extreme inputs.
-                # After scaling, cast to 8-bit integer.
+                # After scaling, downcast to 32-bit float.  This substantially reduces
+                # memory usage
                 data[z] = (
-                    ((data[z].astype("f8") - vmin) / (vmax - vmin)) * 255
-                ).astype(int)
+                    ((data[z].astype("f8") - vmin) / (vmax - vmin))
+                ).astype("f4")
+                data[z] = np.minimum(np.maximum(data[z], 0), 1)
 
             if kind not in self._stats_types:
                 if by is None: by = by_new
