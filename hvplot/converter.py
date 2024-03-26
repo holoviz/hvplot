@@ -248,8 +248,8 @@ class HoloViewsConverter:
         can be selected by name or a tiles object or class can be passed,
         the default is 'Wikipedia'.
     tiles_opts (default=None): dict
-        Options to customize the tiles layer created when `tiles` is set
-        (e.g. `dict(alpha=0.5)`.
+        Options to customize the tiles layer created when `tiles` is set,
+        e.g. `dict(alpha=0.5)`.
     """
 
     _gridded_types = [
