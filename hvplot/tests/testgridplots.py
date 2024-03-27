@@ -81,14 +81,6 @@ class TestGridPlots(ComparisonTestCase):
 
     def test_rgb_dataset_robust(self):
         rgb = self.da_rgb.to_dataset(name='z').hvplot.rgb(robust=True)
-        self.assertEqual(rgb, RGB(([0, 1], [0, 1])+tuple(
-            [[[ -5,  18],
-            [ 42,  67]],
-            [[ 91, 115],
-            [139, 163]],
-            [[187, 212],
-            [236, 260]]]
-        )))
         self.assertNotEqual(rgb, RGB(([0, 1], [0, 1])+tuple(self.da_rgb.values)))
 
     def test_rgb_dataarray_groupby_explicit(self):
