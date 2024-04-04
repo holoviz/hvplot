@@ -144,6 +144,12 @@ class HoloViewsConverter:
         least one dimension of the plot is left undefined, e.g. when
         width and height or width and aspect are set the plot is set
         to a fixed size, ignoring any responsive option.
+    robust: bool
+        If True and clim are absent, the colormap range is computed
+        with 2nd and 98th percentiles instead of the extreme values
+        for image elements. For RGB elements, clips the "RGB", or
+        raw reflectance values between 2nd and 98th percentiles.
+        Follows the same logic as xarray's robust option.
     rot: number
         Rotates the axis ticks along the x-axis by the specified
         number of degrees.
@@ -382,7 +388,7 @@ class HoloViewsConverter:
         group_label=None, value_label='value', backlog=1000,
         persist=False, use_dask=False, crs=None, fields={},
         groupby=None, dynamic=True, grid=None, legend=None, rot=None,
-        title=None, xlim=None, ylim=None, clim=None, symmetric=None,
+        title=None, xlim=None, ylim=None, clim=None, robust=None, symmetric=None,
         logx=None, logy=None, loglog=None, hover=None, subplots=False,
         label=None, invert=False, stacked=False, colorbar=None,
         datashade=False, rasterize=False, downsample=None,
@@ -405,7 +411,7 @@ class HoloViewsConverter:
         self._process_data(
             kind, data, x, y, by, groupby, row, col, use_dask,
             persist, backlog, label, group_label, value_label,
-            hover_cols, attr_labels, transforms, stream, kwds
+            hover_cols, attr_labels, transforms, stream, robust, kwds
         )
 
         self.dynamic = dynamic
@@ -615,7 +621,8 @@ class HoloViewsConverter:
                         self._style_opts['cmap'] = self._default_cmaps['diverging']
                     else:
                         self._style_opts['cmap'] = self._default_cmaps['linear']
-
+                if robust:
+                    plot_opts['clim_percentile'] = True
                 if symmetric is not None:
                     plot_opts['symmetric'] = symmetric
             except TypeError:
@@ -695,7 +702,7 @@ class HoloViewsConverter:
     def _process_data(self, kind, data, x, y, by, groupby, row, col,
                       use_dask, persist, backlog, label, group_label,
                       value_label, hover_cols, attr_labels, transforms,
-                      stream, kwds):
+                      stream, robust, kwds):
         gridded = kind in self._gridded_types
         gridded_data = False
         da = None
@@ -819,6 +826,19 @@ class HoloViewsConverter:
             data, x, y, by_new, groupby_new = process_xarray(
                 data, x, y, by, groupby, use_dask, persist, gridded,
                 label, value_label, other_dims, kind=kind)
+            if kind == 'rgb' and robust:
+                # adapted from xarray
+                # https://github.com/pydata/xarray/blob/6af547cdd9beac3b18420ccb204f801603e11519/xarray/plot/utils.py#L729
+                vmax = np.nanpercentile(data[z], 100 - 2)
+                vmin = np.nanpercentile(data[z], 2)
+                # Scale interval [vmin .. vmax] to [0 .. 1], with darray as 64-bit float
+                # to avoid precision loss, integer over/underflow, etc with extreme inputs.
+                # After scaling, downcast to 32-bit float.  This substantially reduces
+                # memory usage
+                data[z] = (
+                    ((data[z].astype("f8") - vmin) / (vmax - vmin))
+                ).astype("f4")
+                data[z] = np.minimum(np.maximum(data[z], 0), 1)
 
             if kind not in self._stats_types:
                 if by is None: by = by_new

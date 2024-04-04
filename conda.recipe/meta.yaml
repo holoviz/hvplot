@@ -1,34 +1,56 @@
-{% set sdata = load_setup_py_data() %}
+{% set pyproject = load_file_data('../pyproject.toml', from_recipe_dir=True) %}
+{% set buildsystem = pyproject['build-system'] %}
+{% set project = pyproject['project'] %}
+
+{% set name = project['name'] %}
+{% set version = VERSION %}
 
 package:
-  name: hvplot
-  version: {{ sdata['version'] }}
+  name: {{ name|lower }}
+  version: {{ version }}
 
 source:
   path: ..
 
 build:
   noarch: python
-  script: python setup.py install --single-version-externally-managed --record=record.txt
-
-extra:
-  channels:
-    - pyviz
-    - intake
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
 
 requirements:
   build:
-    - python {{ sdata['python_requires'] }}
-    {% for dep in sdata['extras_require']['build'] %}
+    - python {{ project['requires-python'] }}
+    - pip
+    {% for dep in buildsystem['requires'] %}
     - {{ dep }}
     {% endfor %}
   run:
-    - python {{ sdata['python_requires'] }}
-    {% for dep in sdata.get('install_requires',{}) %}
+    - python {{ project['requires-python'] }}
+    {% for dep in project['dependencies'] %}
     - {{ dep }}
     {% endfor %}
 
+test:
+  requires:
+    - pip
+    {% for dep in project['optional-dependencies']['tests-core'] %}
+    {% if dep == 'dask[dataframe]' %}
+    - dask
+    {% else %}
+    - {{ dep }}
+    {% endif %}
+    {% endfor %}
+  source_files:
+    - pyproject.toml
+  imports:
+    - hvplot
+    - hvplot.pandas
+  commands:
+    - python -c "import hvplot; ver = hvplot.__version__; assert ver != '0.0.0' and ver != 'unknown'"
+    - pip check
+    - pytest hvplot
+
 about:
-  home: {{ sdata['url'] }}
-  summary: {{ sdata['description'] }}
-  license: {{ sdata['license'] }}
+  home: {{ project['urls']['Homepage'] }}
+  summary: {{ project['description'] }}
+  license: {{ project['license']['text'] }}
+  license_file: LICENSE

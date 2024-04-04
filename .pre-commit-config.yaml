@@ -36,3 +36,12 @@ repos:
       exclude: (\.min\.js$|\.svg$|\.html$)
       additional_dependencies:
       - tomli
+-   repo: local
+    hooks:
+    - id: update_conda_envs
+      name: Update conda envs
+      entry: python scripts/update_conda_envs.py
+      language: python
+      additional_dependencies: [pyproject2conda]
+      files: '(pyproject.toml|update_conda_envs)'
+      pass_filenames: false

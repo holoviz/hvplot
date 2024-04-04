@@ -1,0 +1,5 @@
+# For setuptools_scm with .git_archival.txt
+.git_archival.txt  export-subst
+# Line Endings configuration file for Git
+# Set the default behavior, in case people don't have or can't have core.autocrlf set.
+* text=auto

@@ -20,10 +20,7 @@ except:
     )
 
 _file_path = os.path.dirname(__file__)
-if os.path.isdir(os.path.join(_file_path, 'examples')):
-    _cat_path = os.path.join(_file_path, 'examples', 'datasets.yaml')
-else:
-    _cat_path = os.path.join(_file_path, '..', 'examples', 'datasets.yaml')
+_cat_path = os.path.join(_file_path, 'datasets.yaml')
 
 # Load catalogue
 catalogue = open_catalog(_cat_path)

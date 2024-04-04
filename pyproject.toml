@@ -1,14 +1,161 @@
 [build-system]
 requires = [
-    "param >=1.7.0",
-    "pyct >=0.4.4",
-    "setuptools >=30.3.0"
+    "setuptools >=30.3.0",
+    "setuptools_scm >=6",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hvplot"
+dynamic = ["version"]
+description = "A high-level plotting API for the PyData ecosystem built on HoloViews."
+readme = "README.md"
+license = { text = "BSD" }
+requires-python = ">=3.8"
+authors = [
+    { name = "Philipp Rudiger", email = "developers@holoviz.org" },
+]
+maintainers = [
+    { name = "HoloViz developers", email = "developers@holoviz.org" },
+]
+classifiers = [
+        "License :: OSI Approved :: BSD License",
+        "Development Status :: 5 - Production/Stable",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Operating System :: OS Independent",
+        "Intended Audience :: Science/Research",
+        "Intended Audience :: Developers",
+        "Natural Language :: English",
+        "Topic :: Scientific/Engineering",
+        "Topic :: Software Development :: Libraries",
+]
+dependencies = [
+    "bokeh >=1.0.0",
+    "colorcet >=2",
+    "holoviews >=1.11.0",
+    "numpy >=1.15",
+    "packaging",
+    "pandas",
+    "panel >=0.11.0",
+    "param >=1.12.0,<3.0",
 ]
 
+[project.entry-points."pandas_plotting_backends"]
+holoviews = "hvplot:plotting"
+
+[project.urls]
+Homepage = "https://hvplot.holoviz.org"
+Source = "http://github.com/holoviz/hvplot"
+HoloViz = "https://holoviz.org/"
+
+[project.optional-dependencies]
+tests-core = [
+    "codecov",
+    "dask[dataframe]",
+    "flake8",
+    "ipywidgets",
+    "matplotlib",
+    "parameterized",
+    "plotly",
+    "pooch",
+    "pre-commit",
+    "pytest-cov",
+    "pytest",
+    "scipy",
+    "xarray",
+]
+# Optional tests dependencies, i.e. one should be able
+# to run and pass the test suite without installing any
+# of those.
+tests = [
+    "hvplot[tests-core]",
+    "fugue",
+    "ibis-framework[duckdb]",  # ibis-duckdb on conda
+    "polars",
+]
+geo = [
+    "cartopy",
+    "fiona",
+    "geopandas",
+    "geoviews >=1.9.0",
+    "pyproj",
+    "rasterio",
+    "rioxarray",
+    "spatialpandas >=0.4.3",
+]
+# graphviz is difficult to install with pip, ok with conda.
+graphviz = [
+    "pygraphviz",
+]
+# Dependencies required to run the notebooks
+examples = [
+    "dask[dataframe] >=2021.3.0",
+    "datashader >=0.6.5",
+    "fugue",
+    "ibis-framework[duckdb]",  # ibis-duckdb on conda
+    "intake-parquet >=0.2.3",
+    "intake-xarray >=0.5.0",
+    "intake >=0.6.5,<2.0.0",
+    "ipywidgets",
+    "networkx >=2.6.3",
+    "matplotlib",
+    "notebook >=5.4",
+    "numba >=0.51.0",
+    "pillow >=8.2.0",
+    "plotly",
+    "polars",
+    "pooch >=1.6.0",
+    "s3fs >=2022.1.0",
+    "scikit-image >=0.17.2",
+    "scipy >=1.5.3",
+    "selenium >=3.141.0",
+    "streamz >=0.3.0",
+    "xarray >=0.18.2",
+]
+tests-nb = [
+    "pytest-xdist",
+    "nbval",
+]
+# Run the example tests by installing examples_tests together with tests
+examples-tests = [
+    "hvplot[examples]",
+    "hvplot[tests-nb]",
+]
+# Additional packages required to build the docs
+doc = [
+    "hvplot[examples]",
+    "nbsite >=0.8.4",
+    "sphinxext-rediraffe",
+]
+# Trick to let pip know we want to install dev dependencies
+hvdev = [
+    "colorcet >=0.0.1a1",
+    "datashader >=0.0.1a1",
+    "holoviews >=0.0.1a1",
+    "panel >=0.0.1a1",
+    "param >=0.0.1a1",
+    "pyviz_comms >=0.0.1a1",
+]
+hvdev-geo = [
+    "geoviews >=0.0.1a1",
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["hvplot"]
+
+[tool.setuptools_scm]
+version_file = "hvplot/_version.py"
 
 [tool.pytest.ini_options]
 addopts = "-v --pyargs"
-norecursedirs = "doc .git dist build _build .ipynb_checkpoints"
+norecursedirs = "*.egg dist build _build jupyter_execute .*"
 # The test suite used to be run with nosetests which collected
 # by default files like `testgeo.py` while pytest's default is
 # to collect files like `test_geo.py`. This setting allows
@@ -30,3 +177,21 @@ filterwarnings = [
 ignore-words-list = "ser"
 skip = "doc/generate_modules.py"
 write-changes = true
+
+[tool.pyproject2conda.dependencies]
+geoviews = { skip = true, packages = "geoviews-core >=1.9.0" }
+# It should be ibis-framework[duckdb], but it works anyway.
+ibis-framework = { skip = true, packages = "ibis-duckdb" }
+
+[tool.pyproject2conda.envs."tests"]
+channels = ["nodefaults", "pyviz/label/dev", "conda-forge"]
+python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+extras = ["tests", "examples-tests", "geo", "graphviz"]
+name = "hvplottests"
+# reqs = ["-e .."]  # Doesn't work
+
+[tool.pyproject2conda.envs."docs"]
+channels = ["nodefaults", "pyviz/label/dev", "conda-forge"]
+python = ["3.11"]
+extras = ["doc", "examples", "geo", "graphviz"]
+name = "hvplotdocs"

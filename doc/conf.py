@@ -15,6 +15,11 @@ import hvplot
 version = release  = base_version(hvplot.__version__)
 nbbuild_cell_timeout = 600
 
+# mystnb
+nb_execution_excludepatterns = [
+    'user_guide/Streaming.ipynb',
+]
+
 exclude_patterns = ['governance']
 
 html_static_path += ['_static']
@@ -65,6 +70,7 @@ myst_enable_extensions = ["colon_fence"]
 nbsite_gallery_conf = {
     'github_org': 'holoviz',
     'github_project': 'hvplot',
+    'examples_dir': '.',
     'galleries': {
         'reference': {
             'title': 'Reference Gallery',
@@ -74,7 +80,8 @@ nbsite_gallery_conf = {
                 'tabular',
                 'geopandas',
                 'xarray',
-            ]
+            ],
+            'skip_rst_notebook_directive': True,
         }
     },
     'thumbnail_url': 'https://assets.holoviz.org/hvplot/thumbnails',
@@ -107,6 +114,8 @@ rediraffe_redirects = {
     'reference/pandas/step': 'reference/tabular/step',
     'reference/pandas/table': 'reference/tabular/table',
     'reference/pandas/violin': 'reference/tabular/violin',
+    # Removal of the developer testing page
+    'developer_guide/testing': 'developer_guide/index',
 }
 
 html_context.update({
@@ -115,3 +124,6 @@ html_context.update({
     "github_repo": "panel",
     "default_mode": "light",
 })
+
+
+nb_execution_mode = "off"

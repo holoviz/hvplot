@@ -117,12 +117,6 @@ jupyter_execute/
 # pip
 pip-wheel-metadata/
 
-# autover
-hvplot/.version
-
-# doit
-.doit.db
-
 # IDE
 /.vscode
 
@@ -130,4 +124,7 @@ hvplot/.version
 .DS_Store
 
 # Examples artefacts
-examples/user_guide/plot.html
+doc/user_guide/plot.html
+
+# setuptools_scm
+hvplot/_version.py
