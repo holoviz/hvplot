@@ -137,6 +137,11 @@ jobs:
       - name: install with geo
         if: matrix.python-version != '3.8' || !contains(fromJSON('["ubuntu-latest", "windows-latest"]'), matrix.os)
         run: pip install -ve '.[tests, examples-tests, geo, hvdev, hvdev-geo]'
+      - name: install branch holoviews branch pandas_index_support
+        if: matrix.python-version != '3.8'
+        run: |
+          python -m pip uninstall holoviews -y
+          python -m pip install git+https://github.com/holoviz/holoviews.git@pandas_index_support
       - name: pip list
         run: pip list
       - name: bokeh sampledata
