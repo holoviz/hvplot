@@ -253,6 +253,9 @@ class HoloViewsConverter:
         Whether to overlay the plot on a tile source. Tiles sources
         can be selected by name or a tiles object or class can be passed,
         the default is 'Wikipedia'.
+    tiles_opts (default=None): dict
+        Options to customize the tiles layer created when `tiles` is set,
+        e.g. `dict(alpha=0.5)`.
     """
 
     _gridded_types = [
@@ -398,7 +401,7 @@ class HoloViewsConverter:
         precompute=False, flip_xaxis=None, flip_yaxis=None,
         dynspread=False, hover_cols=[], x_sampling=None,
         y_sampling=None, project=False, tools=[], attr_labels=None,
-        coastline=False, tiles=False, sort_date=True,
+        coastline=False, tiles=False, tiles_opts=None, sort_date=True,
         check_symmetric_max=1000000, transforms={}, stream=None,
         cnorm=None, features=None, rescale_discrete_levels=None,
         autorange=None, **kwds
@@ -422,6 +425,7 @@ class HoloViewsConverter:
         self.coastline = coastline
         self.features = features
         self.tiles = tiles
+        self.tiles_opts = tiles_opts or {}
         self.sort_date = sort_date
 
         # Import geoviews if geo-features requested
@@ -1463,13 +1467,13 @@ class HoloViewsConverter:
                     # overlay everything else
                     obj = obj * feature_obj.opts(projection=self.output_projection)
 
+        tiles = None
         if self.tiles and not self.geo:
             tiles = self._get_tiles(
                 self.tiles,
                 hv.element.tile_sources,
                 hv.element.tiles.Tiles
             )
-            obj = tiles * obj
         elif self.tiles and self.geo:
             import geoviews as gv
             tiles = self._get_tiles(
@@ -1477,7 +1481,8 @@ class HoloViewsConverter:
                 gv.tile_sources.tile_sources,
                 (gv.element.WMTS, hv.element.tiles.Tiles),
             )
-            obj = tiles * obj
+        if tiles is not None:
+            obj = tiles.opts(clone=True, **self.tiles_opts) * obj
         return obj
 
     def _get_tiles(self, source, sources, types):

@@ -199,6 +199,15 @@ class TestGeoAnnotation(TestCase):
         self.assertIsInstance(plot.get(0), hv.Tiles)
         self.assertIn('openstreetmap', plot.get(0).data)
 
+    def test_plot_with_tiles_with_tiles_opts(self):
+        plot = self.df.hvplot.points('x', 'y', geo=False, tiles=True, tiles_opts=dict(alpha=0.5))
+        assert len(plot) == 2
+        tiles = plot.get(0)
+        assert isinstance(tiles, hv.Tiles)
+        assert 'openstreetmap' in tiles.data
+        assert tiles.opts["alpha"] == 0.5
+
+
     def test_plot_with_tiles_with_geo(self):
         import geoviews as gv
 
@@ -206,6 +215,16 @@ class TestGeoAnnotation(TestCase):
         self.assertEqual(len(plot), 2)
         self.assertIsInstance(plot.get(0), gv.element.WMTS)
         self.assertIn('openstreetmap', plot.get(0).data)
+
+    def test_plot_with_tiles_with_tiles_opts_with_geo(self):
+        import geoviews as gv
+
+        plot = self.df.hvplot.points('x', 'y', geo=True, tiles=True, tiles_opts=dict(alpha=0.5))
+        assert len(plot) == 2
+        tiles = plot.get(0)
+        assert isinstance(tiles, gv.element.WMTS)
+        assert 'openstreetmap' in tiles.data
+        assert tiles.opts["alpha"] == 0.5
 
     def test_plot_with_specific_tiles(self):
         plot = self.df.hvplot.points('x', 'y', geo=False, tiles='ESRI')
