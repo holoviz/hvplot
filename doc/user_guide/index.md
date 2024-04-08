@@ -68,7 +68,7 @@ rather than Matplotlib.
   Using GeoViews, Cartopy, GeoPandas and spatialpandas to plot data in geographic coordinate systems.
 - [Timeseries Data](Timeseries_Data)
   Using hvPlot when working with timeseries data.
-- [Large Timeseries Data](Large_Timeseries.ipynb)
+- [Large Timeseries Data](Large_Timeseries)
   Using hvPlot when working with large timeseries data.
 - [Statistical Plots](Statistical_Plots)
   A number of statistical plot types modeled on the pandas.plotting module.
