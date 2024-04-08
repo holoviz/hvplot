@@ -419,7 +419,7 @@ class HoloViewsConverter:
         self.coastline = coastline
         self.features = features
         self.tiles = tiles
-        self.tiles_opts = {} if tiles_opts is None else tiles_opts
+        self.tiles_opts = tiles_opts or {}
         self.sort_date = sort_date
 
         # Import geoviews if geo-features requested
