@@ -105,7 +105,6 @@ ENV/
 # these files normally shouldn't be checked in as they should be
 # dynamically built from notebooks
 doc/**/*.rst
-doc/**/*.ipynb
 doc/**/*.json
 # thumbnails are downloaded on the fly
 doc/reference/*/thumbnails/
