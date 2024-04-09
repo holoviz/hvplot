@@ -87,6 +87,13 @@ class TestProjections(TestGeo):
         plot = da.hvplot.image('x', 'y', crs='bar')
         self.assertCRS(plot)
 
+    def test_plot_with_crs_as_pyproj_Proj(self):
+        import pyproj
+        da = self.da.copy()
+        da.rio._crs = False  # To not treat it as a rioxarray
+        plot = da.hvplot.image('x', 'y', crs=pyproj.Proj(self.crs))
+        self.assertCRS(plot)
+
     def test_plot_with_crs_as_nonexistent_attr_str(self):
         da = self.da.copy()
         da.rio._crs = False  # To not treat it as a rioxarray

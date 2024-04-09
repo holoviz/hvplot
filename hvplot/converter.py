@@ -690,9 +690,11 @@ class HoloViewsConverter:
         if hasattr(data, 'rio') and data.rio.crs is not None:
             # if data is a rioxarray
             _crs = data.rio.crs.to_wkt()
-        else:
-            # get the proj string: either the value of data.attrs[crs] or crs itself
+        # get the proj string: either the value of data.attrs[crs] or crs itself
+        elif isinstance(crs, str):
             _crs = getattr(data, 'attrs', {}).get(crs or 'crs', crs)
+        else:
+            _crs = crs
 
         try:
             return process_crs(_crs)
