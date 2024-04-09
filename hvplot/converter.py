@@ -909,10 +909,8 @@ class HoloViewsConverter:
                                  'e.g. a NumPy array or xarray Dataset, '
                                  f'found {type(self.data).__name__} type')
 
-            if hasattr(data, 'columns') and hasattr(data.columns, 'name') and data.columns.name and not group_label:
+            if hasattr(data, 'columns') and hasattr(data.columns, 'name') and data.columns.name and group_label is None:
                 group_label = data.columns.name
-            elif not group_label:
-                group_label = 'Variable'
 
             if isinstance(data.columns, pd.MultiIndex) and x in (None, 'index') and y is None and not by:
                 self.data = data.stack().reset_index(1).rename(columns={'level_1': group_label})
@@ -968,7 +966,7 @@ class HoloViewsConverter:
         self.gridded_data = gridded_data
         self.use_dask = use_dask
         self.indexes = indexes
-        self.group_label = group_label or 'Variable'
+        self.group_label = group_label
         if isinstance(by, (np.ndarray, pd.Series)):
             self.data = self.data.assign(_by=by)
             self.by = ['_by']
