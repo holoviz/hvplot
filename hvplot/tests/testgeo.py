@@ -33,9 +33,10 @@ class TestGeo(TestCase):
             import rasterio  # noqa
             import geoviews  # noqa
             import cartopy.crs as ccrs  # noqa
+            import pyproj  # noqa
             import rioxarray as rxr
         except:
-            raise SkipTest('xarray, rasterio, geoviews, cartopy, or rioxarray not available')
+            raise SkipTest('xarray, rasterio, geoviews, cartopy, pyproj or rioxarray not available')
         import hvplot.xarray  # noqa
         import hvplot.pandas  # noqa
         self.da = rxr.open_rasterio(
@@ -276,6 +277,14 @@ class TestGeoAnnotation(TestCase):
         plot = self.df.hvplot.points('x', 'y', geo=True, tiles=gv.tile_sources.CartoDark)
         self.assertEqual(len(plot), 2)
         self.assertIsInstance(plot.get(0), gv.element.WMTS)
+
+    def test_plot_with_xyzservices_tiles(self):
+        xyzservices = pytest.importorskip("xyzservices")
+        import geoviews as gv
+        plot = self.df.hvplot.points('x', 'y', geo=True, tiles=xyzservices.providers.Esri.WorldImagery)
+        assert len(plot) == 2
+        assert isinstance(plot.get(0), gv.element.WMTS)
+        assert isinstance(plot.get(0).data, xyzservices.TileProvider)
 
     def test_plot_with_features_properly_overlaid_underlaid(self):
         # land should be under, borders should be over

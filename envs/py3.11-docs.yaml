@@ -21,6 +21,7 @@ dependencies:
   - datashader>=0.6.5
   - fiona
   - fugue
+  - geodatasets>=2023.12.0
   - geopandas
   - geoviews-core>=1.9.0
   - holoviews>=1.11.0
@@ -55,6 +56,7 @@ dependencies:
   - sphinxext-rediraffe
   - streamz>=0.3.0
   - xarray>=0.18.2
+  - xyzservices>=2022.9.0
   - pip
   - pip:
     - -e ..

@@ -1,4 +1,5 @@
 import difflib
+import sys
 from functools import partial
 
 import param
@@ -230,8 +231,10 @@ class HoloViewsConverter:
         Whether to display a coastline on top of the plot, setting
         coastline='10m'/'50m'/'110m' specifies a specific scale.
     crs (default=None):
-        Coordinate reference system of the data specified as Cartopy
-        CRS object, proj.4 string or EPSG code.
+        Coordinate reference system of the data specified as a string
+        or integer EPSG code, a CRS or Proj pyproj object, a Cartopy
+        CRS object, a WKT string, or a proj.4 string. Defaults to
+        PlateCarree.
     features (default=None): dict or list
         A list of features or a dictionary of features and the scale
         at which to render it. Available features include 'borders',
@@ -250,9 +253,13 @@ class HoloViewsConverter:
         Coordinate reference system of the plot specified as Cartopy
         CRS object or class name.
     tiles (default=False):
-        Whether to overlay the plot on a tile source. Tiles sources
-        can be selected by name or a tiles object or class can be passed,
-        the default is 'Wikipedia'.
+        Whether to overlay the plot on a tile source:
+        - `True`: OpenStreetMap layer
+        - `xyzservices.TileProvider` instance (requires xyzservices to
+           be installed)
+        - a map string name based on one of the default layers made
+          available by HoloViews or GeoViews.
+        - a `holoviews.Tiles` or `geoviews.WMTS` instance or class
     tiles_opts (default=None): dict
         Options to customize the tiles layer created when `tiles` is set,
         e.g. `dict(alpha=0.5)`.
@@ -1469,37 +1476,48 @@ class HoloViewsConverter:
                     # overlay everything else
                     obj = obj * feature_obj.opts(projection=self.output_projection)
 
-        tiles = None
-        if self.tiles and not self.geo:
-            tiles = self._get_tiles(
-                self.tiles,
-                hv.element.tile_sources,
-                hv.element.tiles.Tiles
-            )
-        elif self.tiles and self.geo:
-            import geoviews as gv
-            tiles = self._get_tiles(
-                self.tiles,
-                gv.tile_sources.tile_sources,
-                (gv.element.WMTS, hv.element.tiles.Tiles),
-            )
-        if tiles is not None:
-            obj = tiles.opts(clone=True, **self.tiles_opts) * obj
+        if self.tiles:
+            if not self.geo:
+                tiles = self._get_tiles(self.tiles)
+            else:
+                tiles = self._get_tiles(self.tiles, lib="geoviews")
+            tiles = tiles.opts(clone=True, **self.tiles_opts)
+            obj = tiles * obj
         return obj
 
-    def _get_tiles(self, source, sources, types):
-        tile_source = 'EsriImagery' if self.tiles == 'ESRI' else self.tiles
+    def _get_tiles(self, source, lib="holoviews"):
+        if lib == "geoviews":
+            import geoviews as gv
+            sources = gv.tile_sources.tile_sources
+            kls = gv.element.WMTS
+            types = (kls, hv.element.tiles.Tiles)
+        else:
+            sources = hv.element.tile_sources
+            kls = hv.element.tiles.Tiles
+            types = kls
+
+        tile_source = 'EsriImagery' if source == 'ESRI' else source
+        tiles = None
         if tile_source is True:
             tiles = sources["OSM"]()
-        elif tile_source in sources:
+        elif isinstance(tile_source, str) and tile_source in sources:
             tiles = sources[tile_source]()
         elif tile_source in sources.values():
             tiles = tile_source()
         elif isinstance(tile_source, types):
             tiles = tile_source
-        else:
+        elif "xyzservices" in sys.modules:
+            import xyzservices
+            if isinstance(tile_source, xyzservices.TileProvider):
+                tiles = kls(tile_source)
+        if tiles is None:
             msg = (
-                f"{tile_source} tiles not recognized, must be one of: {sorted(sources)} or a tile object"
+                f"{tile_source} tiles not recognized. tiles must be either True, a "
+                "xyzservices.TileProvider instance, a HoloViews"
+                + (" or Geoviews" if lib == "geoviews" else "") + " basemap string "
+                f"(one of {', '.join(sorted(sources))}), a HoloViews Tiles instance"
+                + (", a Geoviews WMTS instance" if lib == "geoviews" else "")
+                + "."
             )
             raise ValueError(msg)
         return tiles
