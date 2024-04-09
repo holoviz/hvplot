@@ -2090,7 +2090,7 @@ class HoloViewsConverter:
             self.hover_cols.remove(x)
         vdims = list(dict.fromkeys(ohlc_cols + self.hover_cols))
         ds = Dataset(data, [x], vdims)
-        if ds.data[x].dtype.kind in 'SUO':
+        if ds.dimension_values(x).dtype.kind in 'SUO':
             rects = Rectangles(ds, [x, o, x, c])
         else:
             if len(ds):
