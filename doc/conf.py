@@ -124,6 +124,3 @@ html_context.update({
     "github_repo": "panel",
     "default_mode": "light",
 })
-
-
-nb_execution_mode = "off"
