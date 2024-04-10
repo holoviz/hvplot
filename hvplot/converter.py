@@ -86,6 +86,8 @@ class HoloViewsConverter:
     autorange (default=None): Literal['x', 'y'] | None
         Whether to enable auto-ranging along the x- or y-axis when
         zooming. Requires HoloViews >= 1.16.
+    bgcolor (default=None): str
+        Background color of the data area of the plot
     clim: tuple
         Lower and upper bound of the color scale
     cnorm (default='linear'): str
@@ -546,7 +548,7 @@ class HoloViewsConverter:
                    'height', 'width', 'frame_height', 'frame_width',
                    'min_width', 'min_height', 'max_width', 'max_height',
                    'fontsize', 'fontscale', 'responsive', 'shared_axes',
-                   'aspect', 'data_aspect']
+                   'aspect', 'data_aspect', 'bgcolor']
         for plotwd in plotwds:
             if plotwd in kwds:
                 plot_opts[plotwd] = kwds.pop(plotwd)

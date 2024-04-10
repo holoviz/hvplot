@@ -460,6 +460,11 @@ class TestOptions:
         assert opts.kwargs['cut'] == 1
         assert opts.kwargs['filled'] is True
 
+    def test_bgcolor(self, df, backend):
+        plot = df.hvplot.scatter('x', 'y', bgcolor='black')
+        opts = Store.lookup_options(backend, plot, 'plot')
+        assert opts.kwargs['bgcolor'] == 'black'
+
 
 @pytest.fixture(scope='module')
 def da():
