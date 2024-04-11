@@ -268,6 +268,10 @@ class TestChart1D(ComparisonTestCase):
         opts = Store.lookup_options('bokeh', plot, 'plot')
         self.assertEqual(opts.kwargs['legend_position'], 'left')
 
+    def test_histogram_wide_set_group_label(self):
+        plot = self.df.hvplot.hist(group_label='Test')
+        assert plot.kdims[0].name == 'Test'
+
     def test_scatter_color_internally_set_to_dim(self):
         altered_df = self.cat_df.copy().rename(columns={'category': 'red'})
         plot = altered_df.hvplot.scatter('x', 'y', c='red')

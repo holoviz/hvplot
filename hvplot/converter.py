@@ -1946,7 +1946,7 @@ class HoloViewsConverter:
         for col in y:
             hist = histogram(ds, dimension=col, **hist_opts)
             hists.append((col, hist.relabel(**self._relabel)))
-        return (self._by_type(hists, sort=False)
+        return (self._by_type(hists, self.group_label, sort=False)
                 .redim(**self._redim)
                 .opts(cur_opts, backend='bokeh')
                 .opts(compat_opts, backend=self._backend_compat))
