@@ -568,9 +568,6 @@ class HoloViewsConverter:
         if flip_yaxis:
             plot_opts['invert_yaxis'] = True
 
-        if self.geo and not plot_opts.get('data_aspect'):
-            plot_opts['data_aspect'] = 1
-
         ignore_opts = ['responsive', 'aspect', 'data_aspect', 'frame_height', 'frame_width']
         if not any(plot_opts.get(opt) for opt in ignore_opts):
             plot_opts['width'] = plot_opts.get('width', 700)
