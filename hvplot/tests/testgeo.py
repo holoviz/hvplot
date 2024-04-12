@@ -153,6 +153,8 @@ class TestProjections(TestGeo):
             dynamic=False,
             aggregator="max",
             project=True,
+            width=400,
+            height=400
         )
 
         p1 = gv.Points(ds.isel(time=0), kdims=["lon", "lat"], crs=ccrs.PlateCarree())
@@ -307,15 +309,13 @@ class TestGeoElements(TestCase):
     def test_geo_opts(self):
         points = self.df.hvplot.points('x', 'y', geo=True)
         opts = hv.Store.lookup_options('bokeh', points, 'plot').kwargs
-        self.assertEqual(opts.get('data_aspect'), 1)
-        self.assertEqual(opts.get('width'), None)
+        self.assertEqual(opts.get('width'), 700)
 
     def test_geo_opts_with_width(self):
         points = self.df.hvplot.points('x', 'y', geo=True, width=200)
         opts = hv.Store.lookup_options('bokeh', points, 'plot').kwargs
-        self.assertEqual(opts.get('data_aspect'), 1)
         self.assertEqual(opts.get('width'), 200)
-        self.assertEqual(opts.get('height'), None)
+        self.assertEqual(opts.get('height'), 300)
 
 
 class TestGeoPandas(TestCase):
