@@ -210,7 +210,7 @@ class HoloViewsConverter:
         which is particularly useful for large timeseries datasets to
         reduce the amount of data sent to browser and improve
         visualization performance. Requires HoloViews >= 1.16. Additional
-        dependencies: Installing the `tsdownsampler` library is required
+        dependencies: Installing the `tsdownsample` library is required
         for using any downsampling methods other than the default 'lttb'.
         Acceptable values:
         - False: No downsampling is applied.
@@ -219,13 +219,13 @@ class HoloViewsConverter:
         - 'lttb': Explicitly applies the Largest Triangle Three Buckets
           algorithm.
         - 'minmax': Applies the MinMax algorithm, selecting the minimum
-          and maximum values in each bin. Requires `tsdownsampler`.
+          and maximum values in each bin. Requires `tsdownsample`.
         - 'm4': Applies the M4 algorithm, selecting the minimum, maximum,
-          first, and last values in each bin. Requires `tsdownsampler`.
+          first, and last values in each bin. Requires `tsdownsample`.
         - 'minmax-lttb': Combines MinMax and LTTB algorithms for
           downsampling, first applying MinMax to reduce to a preliminary
           set of points, then LTTB for further reduction. Requires
-          `tsdownsampler`.
+          `tsdownsample`.
         Other string values corresponding to supported algorithms in
         HoloViews may also be used.
     dynspread (default=False):
