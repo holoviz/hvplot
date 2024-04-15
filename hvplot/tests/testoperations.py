@@ -326,4 +326,4 @@ class TestDownsample(ComparisonTestCase):
         plot = self.df.hvplot.line(downsample='minmax')
 
         assert isinstance(plot.callback.operation, downsample1d)
-        assert plot.callback.operation.algorithm == 'minmax'
+        assert plot.callback.operation_kwargs['algorithm'] == 'minmax'
