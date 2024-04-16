@@ -290,7 +290,7 @@ class HoloViewsConverter:
         'yaxis', 'xformatter', 'yformatter', 'xlabel', 'ylabel',
         'clabel', 'padding', 'responsive', 'max_height', 'max_width',
         'min_height', 'min_width', 'frame_height', 'frame_width',
-        'aspect', 'data_aspect', 'fontscale'
+        'aspect', 'data_aspect', 'fontscale', 'bgcolor',
     ]
 
     _style_options = [
