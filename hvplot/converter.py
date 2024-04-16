@@ -206,9 +206,28 @@ class HoloViewsConverter:
         the Datashader library, returning an RGB object instead of
         individual points
     downsample (default=False):
-        Whether to apply LTTB (Largest Triangle Three Buckets)
-        downsampling to the element (note this is only well behaved for
-        timeseries data). Requires HoloViews >= 1.16.
+        Controls the application of downsampling to the plotted data,
+        which is particularly useful for large timeseries datasets to
+        reduce the amount of data sent to browser and improve
+        visualization performance. Requires HoloViews >= 1.16. Additional
+        dependencies: Installing the `tsdownsample` library is required
+        for using any downsampling methods other than the default 'lttb'.
+        Acceptable values:
+        - False: No downsampling is applied.
+        - True: Applies downsampling using HoloViews' default algorithm
+            (LTTB - Largest Triangle Three Buckets).
+        - 'lttb': Explicitly applies the Largest Triangle Three Buckets
+          algorithm.
+        - 'minmax': Applies the MinMax algorithm, selecting the minimum
+          and maximum values in each bin. Requires `tsdownsample`.
+        - 'm4': Applies the M4 algorithm, selecting the minimum, maximum,
+          first, and last values in each bin. Requires `tsdownsample`.
+        - 'minmax-lttb': Combines MinMax and LTTB algorithms for
+          downsampling, first applying MinMax to reduce to a preliminary
+          set of points, then LTTB for further reduction. Requires
+          `tsdownsample`.
+        Other string values corresponding to supported algorithms in
+        HoloViews may also be used.
     dynspread (default=False):
         For plots generated with datashade=True or rasterize=True,
         automatically increase the point size when the data is sparse
@@ -1320,6 +1339,11 @@ class HoloViewsConverter:
                 from holoviews.operation.downsample import downsample1d
             except ImportError:
                 raise ImportError('Downsampling requires HoloViews >=1.16')
+
+            # Let HoloViews choose the default algo if 'downsample' is True.
+            # Otherwise, user-specified algorithm
+            if isinstance(self.downsample, str):
+                opts['algorithm'] = self.downsample
 
             if self.x_sampling:
                 opts['x_sampling'] = self.x_sampling

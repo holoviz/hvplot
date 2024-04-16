@@ -319,3 +319,11 @@ class TestDownsample(ComparisonTestCase):
         assert plot.callback.operation.p.height == 50
         assert plot.callback.operation.p.x_sampling == 5
         assert plot.callback.operation.p.x_range == (0, 5)
+
+    def test_downsample_algorithm_minmax(self):
+        from holoviews.operation.downsample import downsample1d
+
+        plot = self.df.hvplot.line(downsample='minmax')
+
+        assert isinstance(plot.callback.operation, downsample1d)
+        assert plot.callback.operation_kwargs['algorithm'] == 'minmax'
