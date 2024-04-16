@@ -3,7 +3,6 @@ import sys
 from unittest import SkipTest
 from parameterized import parameterized
 
-import colorcet as cc
 import holoviews as hv
 import hvplot.pandas  # noqa
 import numpy as np
@@ -37,6 +36,13 @@ class TestDatashader(ComparisonTestCase):
     def test_rasterize_by_cat(self):
         from datashader.reductions import count_cat
         dmap = self.df.hvplot.scatter('x', 'y', by='category', rasterize=True)
+        agg = dmap.callback.inputs[0].callback.operation.p.aggregator
+        self.assertIsInstance(agg, count_cat)
+        self.assertEqual(agg.column, 'category')
+
+    def test_rasterize_by_cat_agg(self):
+        from datashader.reductions import count_cat
+        dmap = self.df.hvplot.scatter('x', 'y', aggregator=count_cat('category'), rasterize=True)
         agg = dmap.callback.inputs[0].callback.operation.p.aggregator
         self.assertIsInstance(agg, count_cat)
         self.assertEqual(agg.column, 'category')
@@ -166,12 +172,30 @@ class TestDatashader(ComparisonTestCase):
         assert plot.callback.inputs[0].callback.operation.p.cmap == expected_cmap
         assert  plot.callback.inputs[0].callback.operation.p.aggregator.column == 'Variable'
 
-    def test_wide_charts_categorically_shaded_by(self):
+    def test_tidy_charts_categorically_datashade_by(self):
         cat_col = 'category'
         plot = self.df.hvplot.scatter('x', 'y', by=cat_col, datashade=True)
         expected_cmap = HoloViewsConverter._default_cmaps['categorical']
         assert  plot.callback.inputs[0].callback.operation.p.cmap == expected_cmap
         assert  plot.callback.inputs[0].callback.operation.p.aggregator.column == cat_col
+
+    def test_tidy_charts_categorically_rasterized_by(self):
+        cat_col = 'category'
+        plot = self.df.hvplot.scatter('x', 'y', by=cat_col, rasterize=True)
+        expected_cmap = HoloViewsConverter._default_cmaps['categorical']
+        opts = Store.lookup_options('bokeh', plot[()], 'style').kwargs
+        assert opts.get('cmap') == expected_cmap
+        assert  plot.callback.inputs[0].callback.operation.p.aggregator.column == cat_col
+
+    def test_tidy_charts_categorically_rasterized_aggregator_count_cat(self):
+        cat_col = 'category'
+        from datashader.reductions import count_cat
+        plot = self.df.hvplot.scatter('x', 'y', aggregator=count_cat(cat_col), rasterize=True)
+        expected_cmap = HoloViewsConverter._default_cmaps['categorical']
+        opts = Store.lookup_options('bokeh', plot[()], 'style').kwargs
+        assert opts.get('cmap') == expected_cmap
+        assert  plot.callback.inputs[0].callback.operation.p.aggregator.column == cat_col
+
     def test_rasterize_cnorm(self):
         expected = 'eq_hist'
         plot = self.df.hvplot(x='x', y='y', rasterize=True, cnorm=expected)
@@ -211,7 +235,23 @@ class TestDatashader(ComparisonTestCase):
         expected = 'category'
         plot = self.df.hvplot(x='x', y='y', by=expected, rasterize=True, dynamic=False)
         assert isinstance(plot, ImageStack)
-        assert plot.opts["cmap"] == cc.palette['glasbey_category10']
+        assert plot.opts["cmap"] == HoloViewsConverter._default_cmaps['categorical']
+
+    def test_rasterize_aggregator_count_cat(self):
+        if Version(hv.__version__) < Version('1.18.0a1'):
+            raise SkipTest('hv.ImageStack introduced after 1.18.0a1')
+
+        from holoviews.element import ImageStack
+        from datashader.reductions import count_cat
+
+        expected = 'category'
+        plot = self.df.hvplot(
+            x='x', y='y', aggregator=count_cat(expected), rasterize=True,
+            width=999, dynamic=False
+        )
+        assert isinstance(plot, ImageStack)
+        assert plot.opts["width"] == 999
+        assert plot.opts["cmap"] == HoloViewsConverter._default_cmaps['categorical']
 
     def test_rasterize_single_y_in_list_linear_cmap(self):
         # Regression, see https://github.com/holoviz/hvplot/issues/1210

@@ -35,7 +35,7 @@ from .util import (
     is_streamz, is_ibis, is_xarray, is_xarray_dataarray, process_crs,
     process_intake, process_xarray, check_library, is_geodataframe,
     process_derived_datetime_xarray, process_derived_datetime_pandas,
-    _convert_col_names_to_str,
+    _convert_col_names_to_str, import_datashader,
 )
 from .utilities import hvplot_extension
 
@@ -644,11 +644,8 @@ class HoloViewsConverter:
                 if not use_dask:
                     symmetric = self._process_symmetric(symmetric, clim, check_symmetric_max)
                 if self._style_opts.get('cmap') is None:
-                    # Default to categorical camp if we detect categorical shading
-                    if ((self.datashade or self.rasterize) and (self.aggregator is None or 'count_cat' in str(self.aggregator)) and
-                        ((self.by and not self.subplots) or
-                         ((isinstance(self.y, list) and len(self.y) > 1) or (self.y is None and len(set(self.variables) - set(self.indexes)) > 1)))):
-                        self._style_opts['cmap'] = self._default_cmaps['categorical']
+                    if self._process_categorical_datashader()[0]:
+                        self._style_opts["cmap"] = self._default_cmaps["categorical"]
                     elif symmetric:
                         self._style_opts['cmap'] = self._default_cmaps['diverging']
                     else:
@@ -683,6 +680,37 @@ class HoloViewsConverter:
                         groupby=self.groupby, grid=self.grid)
             param.main.param.warning('Plotting {kind} plot with parameters x: {x}, '
                                'y: {y}, by: {by}, groupby: {groupby}, row/col: {grid}'.format(**kwds))
+
+    def _process_categorical_datashader(self):
+        categorical, agg = False, None
+        if not (self.datashade or self.rasterize):
+            return categorical, agg
+
+        ds = import_datashader()
+
+        categorical = False
+        if self.aggregator:
+            agg = self.aggregator
+            if isinstance(agg, str) and self._color_dim:
+                categorical = agg == 'count_cat'
+                agg = getattr(ds.reductions, agg)(self._color_dim)
+            else:
+                categorical = isinstance(agg, (ds.count_cat, ds.by))
+        elif self._color_dim:
+            agg = ds.reductions.mean(self._color_dim)
+        elif self.by and not self.subplots:
+            agg = ds.reductions.count_cat(self.by[0])
+            categorical = True
+        elif (
+            (isinstance(self.y, list) and len(self.y) > 1)
+            or (self.y is None and len(set(self.variables) - set(self.indexes)) > 1)
+        ) and self.kind in ("scatter", "line", "area"):
+            agg = ds.reductions.count_cat(self.group_label)
+            categorical = True
+
+        ((isinstance(self.y, list) and len(self.y) > 1) or (self.y is None and len(set(self.variables) - set(self.indexes)) > 1))
+
+        return categorical, agg
 
     def _process_symmetric(self, symmetric, clim, check_symmetric_max):
         if symmetric is not None or clim is not None:
@@ -1364,34 +1392,13 @@ class HoloViewsConverter:
             layers = _transfer_opts_cur_backend(layers)
             return layers
 
-        try:
-            from holoviews.operation.datashader import datashade, rasterize, dynspread
-            from datashader import reductions
-        except ImportError:
-            raise ImportError('In order to use datashading features '
-                    'the Datashader library must be available. '
-                    'It can be installed with:\n  conda '
-                    'install datashader')
+        import_datashader()
+        from holoviews.operation.datashader import datashade, rasterize, dynspread
 
-        categorical = False
-        if self.by and not self.subplots:
-            opts['aggregator'] = reductions.count_cat(self.by[0])
-            categorical = True
-        elif ((isinstance(self.y, list) and len(self.y) > 1 or self.y is None and len(set(self.variables) - set(self.indexes)) > 1) and
-              self.kind in ('scatter', 'line', 'area')):
-            opts['aggregator'] = reductions.count_cat(self.group_label)
-            categorical = True
-        if self.aggregator:
-            import datashader as ds
-            agg = self.aggregator
-            if isinstance(agg, str) and self._color_dim:
-                categorical = agg == 'count_cat'
-                agg = getattr(reductions, agg)(self._color_dim)
-            else:
-                categorical = isinstance(agg, (ds.count_cat, ds.by))
+        categorical, agg = self._process_categorical_datashader()
+        if agg:
             opts['aggregator'] = agg
-        elif self._color_dim:
-            opts['aggregator'] = reductions.mean(self._color_dim)
+
         if self.precompute:
             opts['precompute'] = self.precompute
         if self.x_sampling:
@@ -1429,7 +1436,7 @@ class HoloViewsConverter:
             if Version(hv.__version__) < Version('1.18.0a1'):
                 eltype = 'Image'
             else:
-                eltype = 'ImageStack' if self.by else 'Image'
+                eltype = 'ImageStack' if categorical else 'Image'
             if 'cmap' in self._style_opts:
                 style['cmap'] = self._style_opts['cmap']
             if self._dim_ranges.get('c', (None, None)) != (None, None):
@@ -1788,7 +1795,6 @@ class HoloViewsConverter:
                 .opts(cur_opts, backend='bokeh')
                 .opts(compat_opts, backend=self._backend_compat))
 
-
     def line(self, x=None, y=None, data=None):
         self._error_if_unavailable('line')
         return self.chart(Curve, x, y, data)
@@ -1883,7 +1889,6 @@ class HoloViewsConverter:
             return (element(data, self.by, y).redim.range(**ranges).relabel(**self._relabel)
                     .apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts))
 
-
         labelled = ['y' if self.invert else 'x'] if self.group_label != 'Group' else []
         if self.value_label != 'value':
             labelled.append('x' if self.invert else 'y')
@@ -1907,7 +1912,6 @@ class HoloViewsConverter:
         redim = self._merge_redim({self.value_label: ylim})
         return (element(df, kdims, self.value_label).redim(**redim).relabel(**self._relabel)
                 .apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts))
-
 
     def box(self, x=None, y=None, data=None):
         self._error_if_unavailable('box')
