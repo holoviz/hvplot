@@ -179,12 +179,15 @@ class TestDatashader(ComparisonTestCase):
         assert  plot.callback.inputs[0].callback.operation.p.cmap == expected_cmap
         assert  plot.callback.inputs[0].callback.operation.p.aggregator.column == cat_col
 
+    @pytest.mark.xfail(reason='Assume this is fixed: https://github.com/holoviz/holoviews/issues/6187')
     def test_tidy_charts_categorically_rasterized_by(self):
         cat_col = 'category'
         plot = self.df.hvplot.scatter('x', 'y', by=cat_col, rasterize=True)
         expected_cmap = HoloViewsConverter._default_cmaps['categorical']
         opts = Store.lookup_options('bokeh', plot[()], 'style').kwargs
+        # Failing line
         assert opts.get('cmap') == expected_cmap
+
         assert  plot.callback.inputs[0].callback.operation.p.aggregator.column == cat_col
 
     def test_tidy_charts_categorically_rasterized_aggregator_count_cat(self):
