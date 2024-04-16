@@ -54,7 +54,6 @@ HoloViz = "https://holoviz.org/"
 
 [project.optional-dependencies]
 tests-core = [
-    "codecov",
     "dask[dataframe]",
     "flake8",
     "ipywidgets",

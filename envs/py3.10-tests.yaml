@@ -16,7 +16,6 @@ dependencies:
   - python=3.10
   - bokeh>=1.0.0
   - cartopy
-  - codecov
   - colorcet>=2
   - dask
   - dask>=2021.3.0
