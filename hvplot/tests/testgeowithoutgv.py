@@ -48,3 +48,12 @@ class TestAnnotationNotGeo:
         assert 'ArcGIS' in plot.get(0).data
         bk_plot = bk_renderer.get_plot(plot)
         assert bk_plot.projection == 'mercator'
+
+    def test_plot_with_xyzservices_tileprovider(self, simple_df):
+        xyzservices = pytest.importorskip("xyzservices")
+        plot = simple_df.hvplot.points('x', 'y', tiles=xyzservices.providers.Esri.WorldImagery)
+        assert len(plot) == 2
+        assert isinstance(plot.get(0), hv.Tiles)
+        assert isinstance(plot.get(0).data, xyzservices.TileProvider)
+        bk_plot = bk_renderer.get_plot(plot)
+        assert bk_plot.projection == 'mercator'
