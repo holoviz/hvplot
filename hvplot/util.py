@@ -614,3 +614,15 @@ def instantiate_crs_str(crs_str: str, **kwargs):
     if crs_str.upper() == 'GOOGLE_MERCATOR':
         return ccrs.GOOGLE_MERCATOR
     return getattr(ccrs, crs_str)(**kwargs)
+
+
+def import_datashader():
+    datashader = None
+    try:
+        import datashader
+    except ModuleNotFoundError:
+        raise ModuleNotFoundError(
+            'The `datashader` package must be installed in order to use '
+            'datashading features. Install it with pip or conda.'
+        ) from None
+    return datashader
