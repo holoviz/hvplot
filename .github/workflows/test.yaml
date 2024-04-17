@@ -147,5 +147,11 @@ jobs:
         run: pytest -v hvplot --geo --cov=hvplot --cov-append
       - name: examples tests
         run: pytest -n auto --dist loadscope --nbval-lax -p no:python
-      - name: codecov
-        run: codecov
+      - name: Upload coverage reports to Codecov
+        if: github.event_name == 'push' || github.event_name == 'pull_request'
+        uses: codecov/codecov-action@v4
+        with:
+          fail_ci_if_error: false
+          verbose: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
