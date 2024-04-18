@@ -1404,7 +1404,7 @@ class HoloViewsConverter:
         # Color
         cmap_kwds = set(cmap_opts).intersection(kwds)
         if len(cmap_kwds) > 1:
-            raise TypeError('Specify at most one of `cmap`, `colormap`, or ' '`color_key`.')
+            raise TypeError('Specify at most one of `cmap`, `colormap`, or `color_key`.')
 
         cmap = kwds.pop(cmap_kwds.pop()) if cmap_kwds else None
         color = kwds.pop('color', kwds.pop('c', None))

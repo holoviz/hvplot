@@ -8,7 +8,7 @@ def patch(name='hvplot', extension='bokeh', logo=False):
         import intake
     except ImportError:
         raise ImportError(
-            'Could not patch plotting API onto intake. ' 'intake could not be imported.'
+            'Could not patch plotting API onto intake. intake could not be imported.'
         )
 
     _patch_plot = lambda self: hvPlot(self)  # noqa: E731

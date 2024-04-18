@@ -23,7 +23,7 @@ def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=Fals
     try:
         import dask.dataframe as dd
     except ImportError:
-        raise ImportError('Could not patch plotting API onto dask. ' 'Dask could not be imported.')
+        raise ImportError('Could not patch plotting API onto dask. Dask could not be imported.')
     _patch_plot = lambda self: hvPlotTabular(self)  # noqa: E731
     _patch_plot.__doc__ = hvPlotTabular.__call__.__doc__
     plot_prop = property(_patch_plot)

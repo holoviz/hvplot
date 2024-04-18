@@ -105,7 +105,7 @@ def scatter_matrix(
         try:
             import datashader  # noqa
         except ImportError:
-            raise ImportError('rasterize and datashade require ' 'datashader to be installed.')
+            raise ImportError('rasterize and datashade require datashader to be installed.')
         from ..util import hv_version
 
         if hv_version <= Version('1.14.6'):
@@ -116,12 +116,10 @@ def scatter_matrix(
             )
 
     if rasterize and datashade:
-        raise ValueError(
-            'Choose to either rasterize or ' 'datashade the scatter matrix, not both.'
-        )
+        raise ValueError('Choose to either rasterize or datashade the scatter matrix, not both.')
 
     if not rasterize and not datashade and (spread or dynspread):
-        raise ValueError('dynspread or spread need rasterize ' 'or datashade to be set to True.')
+        raise ValueError('dynspread or spread need rasterize or datashade to be set to True.')
 
     if rasterize:
         import holoviews.operation.datashader as hd
@@ -197,9 +195,7 @@ def scatter_matrix(
         or (diagonal_kwds and density_kwds)
         or (hist_kwds and density_kwds)
     ):
-        raise TypeError(
-            'Specify at most one of `diagonal_kwds`, `hist_kwds`, or ' '`density_kwds`.'
-        )
+        raise TypeError('Specify at most one of `diagonal_kwds`, `hist_kwds`, or `density_kwds`.')
 
     diagonal_opts = diagonal_kwds or hist_kwds or density_kwds or {}
     # set the histogram colors

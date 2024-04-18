@@ -27,7 +27,7 @@ x_y_mapping = [(kind, el) for kind, el in HoloViewsConverter._kind_mapping.items
 class TestPandasHoloviewsPlotting(TestCase):
     def setUp(self):
         if Version(pd.__version__) < Version('0.25.1'):
-            raise SkipTest('entrypoints for plotting.backends was added ' 'in pandas 0.25.1')
+            raise SkipTest('entrypoints for plotting.backends was added in pandas 0.25.1')
         pd.options.plotting.backend = 'holoviews'
 
     @parameterized.expand(no_args_mapping)
@@ -57,7 +57,7 @@ class TestPandasHoloviewsPlotting(TestCase):
 class TestPandasHvplotPlotting(TestPandasHoloviewsPlotting):
     def setUp(self):
         if Version(pd.__version__) < Version('0.25.1'):
-            raise SkipTest('entrypoints for plotting.backends was added ' 'in pandas 0.25.1')
+            raise SkipTest('entrypoints for plotting.backends was added in pandas 0.25.1')
         pd.options.plotting.backend = 'hvplot'
 
 

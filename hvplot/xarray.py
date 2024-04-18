@@ -45,7 +45,7 @@ def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=Fals
         import xarray as xr
     except ImportError:
         raise ImportError(
-            'Could not patch plotting API onto xarray. ' 'xarray could not be imported.'
+            'Could not patch plotting API onto xarray. xarray could not be imported.'
         )
 
     # Remove the class docstring as it very developer focused
