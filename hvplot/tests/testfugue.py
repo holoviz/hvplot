@@ -10,7 +10,7 @@ hvplot.util._fugue_ipython = True
 try:
     import fugue.api as fa
     import hvplot.fugue  # noqa: F401
-except:
+except ImportError:
     pytest.skip(allow_module_level=True)
 
 

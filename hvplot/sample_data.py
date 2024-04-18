@@ -9,7 +9,7 @@ try:
     import intake_parquet  # noqa
     import intake_xarray  # noqa
     import s3fs  # noqa
-except:
+except ImportError:
     raise ImportError(
         """Loading hvPlot sample data requires:
                 * intake

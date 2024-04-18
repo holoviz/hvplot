@@ -74,11 +74,11 @@ from .utilities import hvplot_extension, output, save, show  # noqa
 from .plotting import (
     hvPlot,
     hvPlotTabular,  # noqa
-    andrews_curves,
-    lag_plot,
-    parallel_coordinates,
-    scatter_matrix,
-    plot,
+    andrews_curves,  # noqa
+    lag_plot,  # noqa
+    parallel_coordinates,  # noqa
+    scatter_matrix,  # noqa
+    plot,  # noqa
 )
 
 # Define '__version__'

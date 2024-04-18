@@ -1,18 +1,15 @@
 import dask
+from importlib.util import find_spec
 from bokeh.io.webdriver import webdriver_control
 
 collect_ignore_glob = []
 
-try:
-    import pygraphviz
-except ModuleNotFoundError:
+if not find_spec('pygraphviz'):
     collect_ignore_glob += [
         'user_guide/NetworkX.ipynb',
     ]
 
-try:
-    import geoviews
-except ModuleNotFoundError:
+if not find_spec('geoviews'):
     collect_ignore_glob += [
         'getting_started/hvplot.ipynb',
         'reference/geopandas/*.ipynb',
@@ -26,9 +23,7 @@ except ModuleNotFoundError:
         'user_guide/Integrations.ipynb',
     ]
 
-try:
-    import ibis
-except ModuleNotFoundError:
+if not find_spec('ibis'):
     collect_ignore_glob += [
         'user_guide/Integrations.ipynb',
     ]

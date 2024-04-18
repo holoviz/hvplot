@@ -24,7 +24,7 @@ class TestXArrayTransforms(ComparisonTestCase):
     def setUp(self):
         try:
             import xarray as xr  # noqa
-        except:
+        except ImportError:
             raise SkipTest('xarray not available')
         import hvplot.xarray  # noqa
 

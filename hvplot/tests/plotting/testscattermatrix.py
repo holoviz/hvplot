@@ -83,7 +83,7 @@ class TestDatashader(TestCase):
     def setUp(self):
         try:
             import datashader  # noqa
-        except:
+        except ImportError:
             raise SkipTest('Datashader not available')
         if sys.maxsize < 2**32:
             raise SkipTest('Datashader does not support 32-bit systems')

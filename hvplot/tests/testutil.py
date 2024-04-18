@@ -23,7 +23,7 @@ class TestProcessXarray(TestCase):
         try:
             import xarray as xr
             import pandas as pd  # noqa
-        except:
+        except ImportError:
             raise SkipTest('xarray or pandas not available')
         self.default_kwargs = {
             'value_label': 'value',
@@ -196,7 +196,7 @@ class TestDynamicArgs(TestCase):
     def setUp(self):
         try:
             import panel as pn  # noqa
-        except:
+        except ImportError:
             raise SkipTest('panel not available')
 
     def test_dynamic_and_static(self):

@@ -20,7 +20,7 @@ try:
     import panel as pn
 
     panel_available = True
-except:
+except ImportError:
     panel_available = False
 
 hv_version = Version(hv.__version__)
@@ -47,7 +47,7 @@ def with_hv_extension(func, extension='bokeh', logo=False):
 def get_ipy():
     try:
         ip = get_ipython()  # noqa
-    except:
+    except NameError:
         ip = None
     return ip
 
@@ -194,7 +194,7 @@ def proj_to_cartopy(proj):
         v = s[1].strip()
         try:
             v = float(v)
-        except:
+        except Exception:
             pass
         if k == 'proj':
             if v == 'longlat':
@@ -358,7 +358,7 @@ def is_series(data):
 def check_library(obj, library):
     if not isinstance(library, list):
         library = [library]
-    return any([obj.__module__.split('.')[0].startswith(l) for l in library])
+    return any([obj.__module__.split('.')[0].startswith(lib) for lib in library])
 
 
 def is_cudf(data):

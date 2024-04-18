@@ -4,7 +4,7 @@ try:
     import numpy as np
     import networkx as nx
     import hvplot.networkx as hvnx
-except:
+except ImportError:
     raise SkipTest('NetworkX not available')
 
 

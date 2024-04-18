@@ -6,15 +6,15 @@ def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=Fals
 
     try:
         import cudf
-    except:
-        raise ImportError('Could not patch plotting API onto cuDF. ' 'cuDF could not be imported.')
-    _patch_plot = lambda self: hvPlotTabular(self)
+    except ImportError:
+        raise ImportError('Could not patch plotting API onto cuDF. cuDF could not be imported.')
+    _patch_plot = lambda self: hvPlotTabular(self)  # noqa: E731
     _patch_plot.__doc__ = hvPlotTabular.__call__.__doc__
     plot_prop = property(_patch_plot)
     setattr(cudf.DataFrame, name, plot_prop)
     setattr(cudf.Series, name, plot_prop)
 
-    _patch_interactive = lambda self: Interactive(self)
+    _patch_interactive = lambda self: Interactive(self)  # noqa: E731
     _patch_interactive.__doc__ = Interactive.__call__.__doc__
     interactive_prop = property(_patch_interactive)
     setattr(cudf.DataFrame, interactive, interactive_prop)

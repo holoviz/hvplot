@@ -780,7 +780,7 @@ class HoloViewsConverter:
                 axis = kwds.pop(axis_name)
                 if not axis:
                     plot_opts[axis_name] = None
-                elif axis != True:
+                elif not axis:
                     plot_opts[axis_name] = axis
                 elif axis_name in plot_opts:
                     plot_opts.pop(axis_name, None)
@@ -1743,7 +1743,7 @@ class HoloViewsConverter:
         style = {}
         if self.datashade:
             operation = datashade
-            if 'cmap' in opts and not 'color_key' in opts:
+            if 'cmap' in opts and 'color_key' not in opts:
                 opts['color_key'] = opts['cmap']
             eltype = 'RGB'
             if 'cnorm' in self._plot_opts:
@@ -2321,7 +2321,7 @@ class HoloViewsConverter:
                 hist_opts['bins'] = bins
 
         if not isinstance(y, (list, tuple)):
-            if not 'bin_range' in self.kwds:
+            if 'bin_range' not in self.kwds:
                 ys = data[y]
                 ymin, ymax = (ys.min(), ys.max())
                 if is_dask(ys):
@@ -2346,7 +2346,7 @@ class HoloViewsConverter:
 
         ranges = []
         for col in y:
-            if not 'bin_range' in self.kwds:
+            if 'bin_range' not in self.kwds:
                 ys = data[col]
                 ymin, ymax = (ys.min(), ys.max())
                 if is_dask(ys):
@@ -2512,9 +2512,9 @@ class HoloViewsConverter:
                 x = self.indexes[0]
         width = self.kwds.get('bar_width', 0.5)
         if y is None:
-            o, h, l, c = [col for col in data.columns if col != x][:4]
+            o, h, l, c = [col for col in data.columns if col != x][:4]  # noqa: E741
         else:
-            o, h, l, c = y
+            o, h, l, c = y  # noqa: E741
         neg, pos = self.kwds.get('neg_color', 'red'), self.kwds.get('pos_color', 'green')
         color_exp = (dim(o) > dim(c)).categorize({True: neg, False: pos})
         ohlc_cols = [o, h, l, c]

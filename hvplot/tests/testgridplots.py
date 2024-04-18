@@ -11,7 +11,7 @@ from holoviews.element.comparison import ComparisonTestCase
 
 try:
     import xarray as xr
-except:
+except ImportError:
     raise SkipTest('XArray not available')
 else:
     import hvplot.xarray  # noqa

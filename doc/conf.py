@@ -3,17 +3,16 @@ import param
 param.parameterized.docstring_signature = False
 param.parameterized.docstring_describe_params = False
 
-from nbsite.shared_conf import *
+import hvplot  # noqa
+from nbsite.shared_conf import *  # noqa
 
 project = 'hvPlot'
 authors = 'HoloViz developers'
-copyright_years['start_year'] = '2016'
-copyright = copyright_fmt.format(**copyright_years)
+copyright_years['start_year'] = '2016'  # noqa
+copyright = copyright_fmt.format(**copyright_years)  # noqa
 description = 'A high-level plotting API for the PyData ecosystem built on HoloViews'
 
-import hvplot
-
-version = release = base_version(hvplot.__version__)
+version = release = base_version(hvplot.__version__)  # noqa
 nbbuild_cell_timeout = 600
 
 # mystnb
@@ -23,15 +22,15 @@ nb_execution_excludepatterns = [
 
 exclude_patterns = ['governance']
 
-html_static_path += ['_static']
+html_static_path += ['_static']  # noqa
 
-html_css_files += ['custom.css']
+html_css_files += ['custom.css']  # noqa
 
 html_js_files = [
     'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js',
 ]
 
-html_theme_options.update(
+html_theme_options.update(  # noqa
     {
         'github_url': 'https://github.com/holoviz/hvplot',
         'icon_links': [
@@ -59,7 +58,7 @@ html_theme = 'pydata_sphinx_theme'
 html_logo = '_static/logo_horizontal.svg'
 html_favicon = '_static/favicon.ico'
 
-extensions += [
+extensions += [  # noqa
     'nbsite.gallery',
     'nbsite.analytics',
     'sphinx_copybutton',
@@ -120,7 +119,7 @@ rediraffe_redirects = {
     'developer_guide/testing': 'developer_guide/index',
 }
 
-html_context.update(
+html_context.update(  # noqa
     {
         'last_release': f'v{release}',
         'github_user': 'holoviz',

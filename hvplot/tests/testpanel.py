@@ -28,7 +28,7 @@ class TestPanelObjects(TestCase):
         try:
             import panel as pn  # noqa
             import hvplot.pandas  # noqa
-        except:
+        except ImportError:
             raise SkipTest('panel not available')
 
         from bokeh.sampledata.iris import flowers

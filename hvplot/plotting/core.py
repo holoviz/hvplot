@@ -7,7 +7,7 @@ try:
     import panel as pn
 
     panel_available = True
-except:
+except ImportError:
     panel_available = False
 
 from ..converter import HoloViewsConverter

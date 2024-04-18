@@ -43,7 +43,7 @@ def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=Fals
 
     try:
         import xarray as xr
-    except:
+    except ImportError:
         raise ImportError(
             'Could not patch plotting API onto xarray. ' 'xarray could not be imported.'
         )

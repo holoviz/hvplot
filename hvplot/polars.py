@@ -7,7 +7,7 @@ from hvplot.plotting.core import hvPlotTabularPolars
 def patch(name='hvplot', extension='bokeh', logo=False):
     try:
         import polars as pl
-    except:
+    except ImportError:
         raise ImportError(
             'Could not patch plotting API onto Polars. Polars could not be imported.'
         )

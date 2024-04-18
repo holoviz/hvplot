@@ -24,7 +24,7 @@ class TestDatashader(ComparisonTestCase):
     def setUp(self):
         try:
             import datashader  # noqa
-        except:
+        except ImportError:
             raise SkipTest('Datashader not available')
         if sys.maxsize < 2**32:
             raise SkipTest('Datashader does not support 32-bit systems')
@@ -328,7 +328,7 @@ class TestChart2D(ComparisonTestCase):
         try:
             import xarray as xr
             import datashader as ds  # noqa
-        except:
+        except ImportError:
             raise SkipTest('xarray or datashader not available')
         if sys.maxsize < 2**32:
             raise SkipTest('Datashader does not support 32-bit systems')

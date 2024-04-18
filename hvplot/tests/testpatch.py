@@ -30,7 +30,7 @@ class TestPatchDask(TestCase):
     def setUp(self):
         try:
             import dask.dataframe as dd  # noqa
-        except:
+        except ImportError:
             raise SkipTest('Dask not available')
         import hvplot.dask  # noqa
 
@@ -55,7 +55,7 @@ class TestPatchXArray(TestCase):
     def setUp(self):
         try:
             import xarray as xr  # noqa
-        except:
+        except ImportError:
             raise SkipTest('XArray not available')
         import hvplot.xarray  # noqa
 
@@ -79,7 +79,7 @@ class TestPatchStreamz(TestCase):
     def setUp(self):
         try:
             import streamz  # noqa
-        except:
+        except ImportError:
             raise SkipTest('streamz not available')
         import hvplot.streamz  # noqa
 
@@ -112,7 +112,7 @@ class TestPatchPolars(TestCase):
     def setUp(self):
         try:
             import polars as pl  # noqa
-        except:
+        except ImportError:
             raise SkipTest('Polars not available')
         import hvplot.polars  # noqa
 

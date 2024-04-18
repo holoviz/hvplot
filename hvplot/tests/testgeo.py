@@ -36,7 +36,7 @@ class TestGeo(TestCase):
             import cartopy.crs as ccrs  # noqa
             import pyproj  # noqa
             import rioxarray as rxr
-        except:
+        except ImportError:
             raise SkipTest(
                 'xarray, rasterio, geoviews, cartopy, pyproj or rioxarray not available'
             )
@@ -153,7 +153,7 @@ class TestProjections(TestGeo):
 
         try:
             from holoviews.operation.datashader import rasterize
-        except:
+        except ImportError:
             raise SkipTest('datashader not available')
 
         ds = xr.tutorial.open_dataset('air_temperature')
@@ -180,7 +180,7 @@ class TestGeoAnnotation(TestCase):
         try:
             import geoviews  # noqa
             import cartopy.crs as ccrs  # noqa
-        except:
+        except ImportError:
             raise SkipTest('geoviews or cartopy not available')
         import hvplot.pandas  # noqa
 
@@ -310,7 +310,7 @@ class TestGeoElements(TestCase):
         try:
             import geoviews  # noqa
             import cartopy.crs as ccrs  # noqa
-        except:
+        except ImportError:
             raise SkipTest('geoviews or cartopy not available')
         import hvplot.pandas  # noqa
 
@@ -353,7 +353,7 @@ class TestGeoPandas(TestCase):
             import geoviews  # noqa
             import cartopy.crs as ccrs  # noqa
             import shapely  # noqa
-        except:
+        except ImportError:
             raise SkipTest('geopandas, geoviews, shapely or cartopy not available')
         import hvplot.pandas  # noqa
 
@@ -445,7 +445,7 @@ class TestGeoUtil(TestCase):
             raise SkipTest('Skip geo tests on windows for now')
         try:
             import cartopy.crs as ccrs
-        except:
+        except ImportError:
             raise SkipTest('cartopy not available')
         self.ccrs = ccrs
 

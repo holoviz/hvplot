@@ -15,7 +15,7 @@ class TestChart2D(ComparisonTestCase):
     def setUp(self):
         try:
             import pandas as pd
-        except:
+        except ImportError:
             raise SkipTest('Pandas not available')
         import hvplot.pandas  # noqa
 
@@ -103,7 +103,7 @@ class TestChart2DDask(TestChart2D):
         super().setUp()
         try:
             import dask.dataframe as dd
-        except:
+        except ImportError:
             raise SkipTest('Dask not available')
         import hvplot.dask  # noqa
 
@@ -119,7 +119,7 @@ class TestChart1D(ComparisonTestCase):
     def setUp(self):
         try:
             import pandas as pd
-        except:
+        except ImportError:
             raise SkipTest('Pandas not available')
         import hvplot.pandas  # noqa
 
@@ -439,7 +439,7 @@ class TestChart1DDask(TestChart1D):
         super().setUp()
         try:
             import dask.dataframe as dd
-        except:
+        except ImportError:
             raise SkipTest('Dask not available')
         import hvplot.dask  # noqa
 

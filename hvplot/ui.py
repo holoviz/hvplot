@@ -164,7 +164,7 @@ class Colormapping(Controls):
 
     def __init__(self, data, **params):
         super().__init__(data, **params)
-        if not 'symmetric' in params:
+        if 'symmetric' not in params:
             self.symmetric = self.explorer._converter._plot_opts.get('symmetric', False)
 
     @property
@@ -922,7 +922,7 @@ class hvGridExplorer(hvPlotExplorer):
     def xlim(self):
         try:
             values = self._data[self._x]
-        except:
+        except Exception:
             return 0, 1
         if values.dtype.kind in 'OSU':
             return None
@@ -1010,7 +1010,7 @@ class hvDataFrameExplorer(hvPlotExplorer):
         else:
             try:
                 values = self._data[self._x]
-            except:
+            except Exception:
                 return 0, 1
         # for dask series; else it cannot get length
         if hasattr(values, 'compute_chunk_sizes'):
