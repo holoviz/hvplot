@@ -185,6 +185,12 @@ line-length = 99
 [tool.ruff.format]
 quote-style = "single"
 
+[tool.nbqa.addopts]
+# E402 Module level import not at top of file
+ruff = [
+    "--extend-ignore=E402"
+]
+
 [tool.pyproject2conda.dependencies]
 geoviews = { skip = true, packages = "geoviews-core >=1.9.0" }
 # It should be ibis-framework[duckdb], but it works anyway.

@@ -4,9 +4,10 @@
 default_stages: [commit]
 repos:
 -   repo: https://github.com/nbQA-dev/nbQA
-    rev: 1.7.1
+    rev: 1.8.5
     hooks:
-    -   id: nbqa-flake8
+    -   id: nbqa-ruff
+        additional_dependencies: [ruff==0.3.7]
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
