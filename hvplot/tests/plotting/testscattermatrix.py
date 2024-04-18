@@ -15,8 +15,8 @@ from holoviews.element import (
 )
 from hvplot import scatter_matrix
 
-class TestScatterMatrix(TestCase):
 
+class TestScatterMatrix(TestCase):
     def setUp(self):
         self.df = pd.DataFrame(np.random.randn(1000, 4), columns=['a', 'b', 'c', 'd'])
 
@@ -80,10 +80,9 @@ class TestScatterMatrix(TestCase):
 
 
 class TestDatashader(TestCase):
-
     def setUp(self):
         try:
-            import datashader # noqa
+            import datashader  # noqa
         except:
             raise SkipTest('Datashader not available')
         if sys.maxsize < 2**32:

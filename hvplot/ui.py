@@ -16,29 +16,36 @@ from .util import is_geodataframe, is_xarray, instantiate_crs_str
 KINDS = {
     # these are for the kind selector
     'dataframe': sorted(
-        set(_hvConverter._kind_mapping) -
-        set(_hvConverter._gridded_types) -
-        set(_hvConverter._geom_types) |
-        set(['points'])
+        set(_hvConverter._kind_mapping)
+        - set(_hvConverter._gridded_types)
+        - set(_hvConverter._geom_types)
+        | set(['points'])
     ),
     'gridded': sorted(set(_hvConverter._gridded_types) - set(['dataset'])),
     'geom': _hvConverter._geom_types,
 }
 
-KINDS['2d'] = ['bivariate', 'heatmap', 'hexbin', 'labels', 'vectorfield', 'points'] + KINDS['gridded'] + KINDS['geom']
+KINDS['2d'] = (
+    ['bivariate', 'heatmap', 'hexbin', 'labels', 'vectorfield', 'points']
+    + KINDS['gridded']
+    + KINDS['geom']
+)
 KINDS['stats'] = ['hist', 'kde', 'boxwhisker', 'violin', 'heatmap', 'bar', 'barh']
 KINDS['all'] = sorted(set(KINDS['dataframe'] + KINDS['gridded'] + KINDS['geom']))
 
 CMAPS = [cm for cm in list_cmaps() if not cm.endswith('_r_r')]
 DEFAULT_CMAPS = _hvConverter._default_cmaps
-GEO_FEATURES = [
-    'borders', 'coastline', 'land', 'lakes', 'ocean', 'rivers',
-    'states', 'grid'
-]
+GEO_FEATURES = ['borders', 'coastline', 'land', 'lakes', 'ocean', 'rivers', 'states', 'grid']
 GEO_TILES = [None] + sorted(tile_sources)
 GEO_KEYS = [
-    'crs', 'crs_kwargs', 'projection', 'projection_kwargs',
-    'global_extent', 'project', 'features', 'feature_scale',
+    'crs',
+    'crs_kwargs',
+    'projection',
+    'projection_kwargs',
+    'global_extent',
+    'project',
+    'features',
+    'feature_scale',
 ]
 AGGREGATORS = [None, 'count', 'min', 'max', 'mean', 'sum', 'any']
 MAX_ROWS = 10000
@@ -104,7 +111,6 @@ def _create_param_pane(inst, widgets_kwargs=None, parameters=None):
 
 
 class Controls(Viewer):
-
     explorer = param.ClassSelector(class_=Viewer, precedence=-1)
 
     _widgets_kwargs = {}
@@ -120,32 +126,39 @@ class Controls(Viewer):
 
     @property
     def kwargs(self):
-        return {k: v for k, v in self.param.values().items()
-                if k not in ('name', 'explorer') and v is not None and v != ''}
+        return {
+            k: v
+            for k, v in self.param.values().items()
+            if k not in ('name', 'explorer') and v is not None and v != ''
+        }
 
 
 class Colormapping(Controls):
-
-    clim = param.Range(label="Colorbar Limits (clim)", doc="""
-        Upper and lower limits of the colorbar.""")
+    clim = param.Range(
+        label='Colorbar Limits (clim)',
+        doc="""
+        Upper and lower limits of the colorbar.""",
+    )
 
     cnorm = param.Selector(
-        label="Colorbar Normalization (cnorm)",
+        label='Colorbar Normalization (cnorm)',
         default='linear',
-        objects=['linear', 'log', 'eq_hist']
+        objects=['linear', 'log', 'eq_hist'],
     )
 
     color = param.String(default=None)
 
     colorbar = param.Boolean(default=None)
 
-    cmap = param.Selector(default=DEFAULT_CMAPS['linear'],
-                          label='Colormap', objects=CMAPS)
+    cmap = param.Selector(default=DEFAULT_CMAPS['linear'], label='Colormap', objects=CMAPS)
 
     rescale_discrete_levels = param.Boolean(default=True)
 
-    symmetric = param.Boolean(default=False, doc="""
-        Whether the data are symmetric around zero.""")
+    symmetric = param.Boolean(
+        default=False,
+        doc="""
+        Whether the data are symmetric around zero.""",
+    )
 
     _widgets_kwargs = {'clim': {'placeholder': '(min, max)'}}
 
@@ -181,12 +194,10 @@ class Colormapping(Controls):
 
 
 class Style(Controls):
-
     alpha = param.Magnitude(default=1)
 
 
 class Axes(Controls):
-
     legend = param.Selector(default='bottom_right', objects=_hvConverter._legend_positions)
 
     logx = param.Boolean(default=False)
@@ -213,7 +224,7 @@ class Axes(Controls):
         super().__init__(data, **params)
         self._update_ranges()
 
-    @param.depends('explorer.xlim', 'explorer.ylim',  watch=True)
+    @param.depends('explorer.xlim', 'explorer.ylim', watch=True)
     def _update_ranges(self):
         xlim = self.explorer.xlim()
         if xlim is not None and is_number(xlim[0]) and is_number(xlim[1]) and xlim[0] != xlim[1]:
@@ -246,81 +257,121 @@ class Axes(Controls):
 
 
 class Labels(Controls):
+    title = param.String(doc='Title for the plot')
 
-    title = param.String(doc="Title for the plot")
+    xlabel = param.String(doc='Axis labels for the x-axis.')
 
-    xlabel = param.String(doc="Axis labels for the x-axis.")
+    ylabel = param.String(doc='Axis labels for the y-axis.')
 
-    ylabel = param.String(doc="Axis labels for the y-axis.")
+    clabel = param.String(
+        label='Colorbar Label (clabel)',
+        doc="""
+        Axis labels for the colorbar.""",
+    )
 
-    clabel = param.String(label="Colorbar Label (clabel)", doc="""
-        Axis labels for the colorbar.""")
-
-    fontscale = param.Number(default=1, doc="""
+    fontscale = param.Number(
+        default=1,
+        doc="""
         Scales the size of all fonts by the same amount, e.g. fontscale=1.5
-        enlarges all fonts (title, xticks, labels etc.) by 50%.""")
+        enlarges all fonts (title, xticks, labels etc.) by 50%.""",
+    )
 
     rot = param.Integer(
-        default=0, bounds=(0, 360), label="X Tick Labels Rotation (rot)", doc="""
+        default=0,
+        bounds=(0, 360),
+        label='X Tick Labels Rotation (rot)',
+        doc="""
         Rotates the axis ticks along the x-axis by the specified
-        number of degrees.""")
+        number of degrees.""",
+    )
 
 
 class Geographic(Controls):
-
-    tiles = param.ObjectSelector(default=None, objects=GEO_TILES, doc="""
+    tiles = param.ObjectSelector(
+        default=None,
+        objects=GEO_TILES,
+        doc="""
         Whether to overlay the plot on a tile source. Tiles sources
         can be selected by name or a tiles object or class can be passed,
-        the default is 'Wikipedia'.""")
+        the default is 'Wikipedia'.""",
+    )
 
-    geo = param.Boolean(default=False, doc="""
+    geo = param.Boolean(
+        default=False,
+        doc="""
         Whether the plot should be treated as geographic (and assume
-        PlateCarree, i.e. lat/lon coordinates). Require GeoViews.""")
+        PlateCarree, i.e. lat/lon coordinates). Require GeoViews.""",
+    )
 
-    crs = param.Selector(default=None, doc="""
+    crs = param.Selector(
+        default=None,
+        doc="""
         Coordinate reference system of the data specified as Cartopy
-        CRS object, proj.4 string or EPSG code.""")
+        CRS object, proj.4 string or EPSG code.""",
+    )
 
-    crs_kwargs = param.Dict(default={}, doc="""
-        Keyword arguments to pass to selected CRS.""")
+    crs_kwargs = param.Dict(
+        default={},
+        doc="""
+        Keyword arguments to pass to selected CRS.""",
+    )
 
-    projection = param.ObjectSelector(default=None, doc="""
-        Projection to use for cartographic plots.""")
+    projection = param.ObjectSelector(
+        default=None,
+        doc="""
+        Projection to use for cartographic plots.""",
+    )
 
-    projection_kwargs = param.Dict(default={}, doc="""
-        Keyword arguments to pass to selected projection.""")
+    projection_kwargs = param.Dict(
+        default={},
+        doc="""
+        Keyword arguments to pass to selected projection.""",
+    )
 
-    global_extent = param.Boolean(default=None, doc="""
-        Whether to expand the plot extent to span the whole globe.""")
+    global_extent = param.Boolean(
+        default=None,
+        doc="""
+        Whether to expand the plot extent to span the whole globe.""",
+    )
 
-    project = param.Boolean(default=False, doc="""
+    project = param.Boolean(
+        default=False,
+        doc="""
         Whether to project the data before plotting (adds initial
         overhead but avoids projecting data when plot is dynamically
-        updated).""")
+        updated).""",
+    )
 
-    features = param.ListSelector(default=None, objects=GEO_FEATURES, doc="""
+    features = param.ListSelector(
+        default=None,
+        objects=GEO_FEATURES,
+        doc="""
         A list of features or a dictionary of features and the scale
         at which to render it. Available features include 'borders',
-        'coastline', 'lakes', 'land', 'ocean', 'rivers' and 'states'.""")
+        'coastline', 'lakes', 'land', 'ocean', 'rivers' and 'states'.""",
+    )
 
-    feature_scale = param.ObjectSelector(default='110m', objects=['110m', '50m', '10m'], doc="""
-        The scale at which to render the features.""")
+    feature_scale = param.ObjectSelector(
+        default='110m',
+        objects=['110m', '50m', '10m'],
+        doc="""
+        The scale at which to render the features.""",
+    )
 
     _widgets_kwargs = {'geo': {'type': pn.widgets.Toggle}}
 
-    def __init__(self, data,  **params):
+    def __init__(self, data, **params):
         gv_available = False
         try:
             import geoviews  # noqa
+
             gv_available = True
         except ImportError:
             pass
 
         geo_params = GEO_KEYS + ['geo']
         if not gv_available and any(p in params for p in geo_params):
-            raise ImportError(
-                'GeoViews must be installed to enable the geographic options.'
-            )
+            raise ImportError('GeoViews must be installed to enable the geographic options.')
         super().__init__(data, **params)
         if not gv_available:
             for p in geo_params:
@@ -340,8 +391,10 @@ class Geographic(Controls):
             return
 
         from cartopy.crs import CRS
+
         crs_list = sorted(
-            k for k in param.concrete_descendents(CRS).keys()
+            k
+            for k in param.concrete_descendents(CRS).keys()
             if not k.startswith('_') and k != 'CRS'
         )
         crs_list.insert(0, 'GOOGLE_MERCATOR')
@@ -364,27 +417,45 @@ class Geographic(Controls):
 
 
 class Operations(Controls):
-
-    datashade = param.Boolean(default=False, doc="""
+    datashade = param.Boolean(
+        default=False,
+        doc="""
         Whether to apply rasterization and shading using datashader
-        library returning an RGB object.""")
+        library returning an RGB object.""",
+    )
 
-    rasterize = param.Boolean(default=False, doc="""
+    rasterize = param.Boolean(
+        default=False,
+        doc="""
         Whether to apply rasterization using the datashader library
-        returning an aggregated Image.""")
+        returning an aggregated Image.""",
+    )
 
-    aggregator = param.Selector(default=None, objects=AGGREGATORS, doc="""
-        Aggregator to use when applying rasterize or datashade operation.""")
+    aggregator = param.Selector(
+        default=None,
+        objects=AGGREGATORS,
+        doc="""
+        Aggregator to use when applying rasterize or datashade operation.""",
+    )
 
-    dynspread = param.Boolean(default=False, doc="""
+    dynspread = param.Boolean(
+        default=False,
+        doc="""
         Allows plots generated with datashade=True or rasterize=True
-        to increase the point size to make sparse regions more visible.""")
+        to increase the point size to make sparse regions more visible.""",
+    )
 
-    x_sampling = param.Number(default=None, doc="""
-        Specifies the smallest allowed sampling interval along the x-axis.""")
+    x_sampling = param.Number(
+        default=None,
+        doc="""
+        Specifies the smallest allowed sampling interval along the x-axis.""",
+    )
 
-    y_sampling = param.Number(default=None, doc="""
-        Specifies the smallest allowed sampling interval along the y-axis.""")
+    y_sampling = param.Number(
+        default=None,
+        doc="""
+        Specifies the smallest allowed sampling interval along the y-axis.""",
+    )
 
     @param.depends('datashade', watch=True)
     def _toggle_rasterize(self):
@@ -406,25 +477,28 @@ class Operations(Controls):
 
 
 class Advanced(Controls):
-
-    opts = param.Dict(label='HoloViews .opts()', doc="""
+    opts = param.Dict(
+        label='HoloViews .opts()',
+        doc="""
         Options applied via HoloViews .opts().
         Examples:
         - image: {"color_levels": 11}
         - line: {"line_dash": "dashed"}
-        - scatter: {'size': 5, 'marker': '^'}""")
+        - scatter: {'size': 5, 'marker': '^'}""",
+    )
 
     _widgets_kwargs = {'opts': {'placeholder': "{'size': 5, 'marker': '^'}"}}
 
 
 class StatusBar(param.Parameterized):
-
-    live_update = param.Boolean(default=True, doc="""
-        Whether to automatically update the plot when a param is changed""")
+    live_update = param.Boolean(
+        default=True,
+        doc="""
+        Whether to automatically update the plot when a param is changed""",
+    )
 
 
 class hvPlotExplorer(Viewer):
-
     kind = param.Selector()
 
     x = param.Selector()
@@ -455,8 +529,11 @@ class hvPlotExplorer(Viewer):
 
     advanced = param.ClassSelector(class_=Advanced)
 
-    code = param.String(precedence=-1, doc="""
-        Code to generate the plot.""")
+    code = param.String(
+        precedence=-1,
+        doc="""
+        Code to generate the plot.""",
+    )
 
     @classmethod
     def from_data(cls, data, **params):
@@ -476,21 +553,12 @@ class hvPlotExplorer(Viewer):
         x, y = params.get('x'), params.get('y')
         if 'y' in params:
             params['y_multi'] = params.pop('y') if isinstance(params['y'], list) else [params['y']]
-        statusbar_params = {
-            k: params.pop(k)
-            for k in params.copy()
-            if k in StatusBar.param
-        }
+        statusbar_params = {k: params.pop(k) for k in params.copy() if k in StatusBar.param}
         converter = _hvConverter(
-            df, x, y,
-            **{k: v for k, v in params.items() if k not in ('x', 'y', 'y_multi')}
+            df, x, y, **{k: v for k, v in params.items() if k not in ('x', 'y', 'y_multi')}
         )
         # Collect kwargs passed to the constructor but meant for the controls
-        extras = {
-            k: params.pop(k)
-            for k in params.copy()
-            if k not in self.param
-        }
+        extras = {k: params.pop(k) for k in params.copy() if k not in self.param}
         super().__init__(**params)
         self._data = df
         self._converter = converter
@@ -508,28 +576,18 @@ class hvPlotExplorer(Viewer):
         self._control_tabs = pn.Tabs(tabs_location='left')
         self.statusbar = StatusBar(**statusbar_params)
         self._statusbar = pn.Param(
-            self.statusbar,
-            show_name=False,
-            default_layout=pn.Row,
-            margin=(5, 56, 0, 56)
+            self.statusbar, show_name=False, default_layout=pn.Row, margin=(5, 56, 0, 56)
         )
         controls = [
             p.class_
             for p in self.param.objects().values()
-            if isinstance(p, param.ClassSelector)
-            and issubclass(p.class_, Controls)
+            if isinstance(p, param.ClassSelector) and issubclass(p.class_, Controls)
         ]
         controller_params = {}
         for cls in controls:
-            controller_params[cls] = {
-                k: extras.pop(k)
-                for k in extras.copy()
-                if k in cls.param
-            }
+            controller_params[cls] = {k: extras.pop(k) for k in extras.copy() if k in cls.param}
         if extras:
-            raise TypeError(
-                f'__init__() got keyword(s) not supported by any control: {extras}'
-            )
+            raise TypeError(f'__init__() got keyword(s) not supported by any control: {extras}')
         self._controllers = {
             cls.name.lower(): cls(df, explorer=self, **cparams)
             for cls, cparams in controller_params.items()
@@ -543,10 +601,15 @@ class hvPlotExplorer(Viewer):
             alert_type='danger', visible=False, sizing_mode='stretch_width'
         )
         self._hv_pane = pn.pane.HoloViews(
-            sizing_mode='stretch_both', min_height=250, margin=(5, 5, 5, 20),
-            widget_location="bottom", widget_layout=pn.Row)
+            sizing_mode='stretch_both',
+            min_height=250,
+            margin=(5, 5, 5, 20),
+            widget_location='bottom',
+            widget_layout=pn.Row,
+        )
         self._code_pane = pn.pane.Markdown(
-            sizing_mode='stretch_both', min_height=250, margin=(5, 5, 0, 20))
+            sizing_mode='stretch_both', min_height=250, margin=(5, 5, 0, 20)
+        )
         self._layout = pn.Column(
             self._alert,
             self._statusbar,
@@ -556,10 +619,10 @@ class hvPlotExplorer(Viewer):
                 # Using .layout on the HoloViews pane to display the widgets
                 # https://github.com/holoviz/panel/issues/5628#issuecomment-1763443895
                 pn.Tabs(('Plot', self._hv_pane.layout), ('Code', self._code_pane)),
-                sizing_mode='stretch_both'
+                sizing_mode='stretch_both',
             ),
             sizing_mode='stretch_width',
-            height=600
+            height=600,
         )
 
         # initialize
@@ -615,7 +678,9 @@ class hvPlotExplorer(Viewer):
 
         kwargs['min_height'] = 400
         df = self._data
-        if len(df) > MAX_ROWS and not (self.kind in KINDS['stats'] or kwargs.get('rasterize') or kwargs.get('datashade')):
+        if len(df) > MAX_ROWS and not (
+            self.kind in KINDS['stats'] or kwargs.get('rasterize') or kwargs.get('datashade')
+        ):
             df = df.sample(n=MAX_ROWS)
         self._layout.loading = True
         try:
@@ -634,8 +699,7 @@ class hvPlotExplorer(Viewer):
             self._alert.visible = False
         except Exception as e:
             self._alert.param.update(
-                object=f'**Rendering failed with following error**: {e}',
-                visible=True
+                object=f'**Rendering failed with following error**: {e}', visible=True
             )
         finally:
             self._layout.loading = False
@@ -696,16 +760,20 @@ class hvPlotExplorer(Viewer):
             self.y = event.old
 
     def _check_by(self, event):
-        if event.new and 'y_multi' in self._controls.parameters and self.y_multi and len(self.y_multi) > 1:
+        if (
+            event.new
+            and 'y_multi' in self._controls.parameters
+            and self.y_multi
+            and len(self.y_multi) > 1
+        ):
             self.by = []
 
-    #----------------------------------------------------------------
+    # ----------------------------------------------------------------
     # Public API
-    #----------------------------------------------------------------
+    # ----------------------------------------------------------------
 
     def hvplot(self):
-        """Return the plot as a HoloViews object.
-        """
+        """Return the plot as a HoloViews object."""
         return self._hvplot.clone()
 
     def plot_code(self, var_name=None):
@@ -722,9 +790,9 @@ class hvPlotExplorer(Viewer):
             Data variable name by which the returned string will start.
         """
         settings = self.settings()
-        if "legend" not in settings:
-            settings["legend"] = "bottom_right"
-        settings["widget_location"] = "bottom"
+        if 'legend' not in settings:
+            settings['legend'] = 'bottom_right'
+        settings['widget_location'] = 'bottom'
         settings_args = ''
         if settings:
             settings_args = self._build_kwargs_string(settings)
@@ -784,7 +852,6 @@ class hvPlotExplorer(Viewer):
 
 
 class hvGeomExplorer(hvPlotExplorer):
-
     kind = param.Selector(default=None, objects=KINDS['all'])
 
     @property
@@ -815,12 +882,13 @@ class hvGeomExplorer(hvPlotExplorer):
     def _groups(self):
         return ['gridded', 'dataframe']
 
-class hvGridExplorer(hvPlotExplorer):
 
+class hvGridExplorer(hvPlotExplorer):
     kind = param.Selector(default='image', objects=KINDS['all'])
 
     def __init__(self, ds, **params):
         import xarray as xr
+
         var_name_suffix = ''
         if isinstance(ds, xr.Dataset):
             data_vars = list(ds.data_vars)
@@ -891,12 +959,15 @@ class hvGridExplorer(hvPlotExplorer):
                     setattr(self, pname, p.objects[0])
                 elif pname == 'y' and getattr(self, pname, None) is None:
                     setattr(self, pname, p.objects[1])
-                elif pname == 'groupby' and len(getattr(self, pname, [])) == 0 and len(p.objects) > 2:
+                elif (
+                    pname == 'groupby'
+                    and len(getattr(self, pname, [])) == 0
+                    and len(p.objects) > 2
+                ):
                     setattr(self, pname, p.objects[2:])
 
 
 class hvDataFrameExplorer(hvPlotExplorer):
-
     z = param.Selector()
 
     kind = param.Selector(default='scatter', objects=KINDS['all'])

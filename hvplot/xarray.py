@@ -6,7 +6,6 @@ from .interactive import Interactive
 
 
 class XArrayInteractive(Interactive):
-
     @classmethod
     def applies(cls, obj):
         return isinstance(obj, (xr.DataArray, xr.Dataset))
@@ -45,11 +44,12 @@ def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=Fals
     try:
         import xarray as xr
     except:
-        raise ImportError('Could not patch plotting API onto xarray. '
-                          'xarray could not be imported.')
+        raise ImportError(
+            'Could not patch plotting API onto xarray. ' 'xarray could not be imported.'
+        )
 
     # Remove the class docstring as it very developer focused
-    XArrayInteractive.__doc__ = ""
+    XArrayInteractive.__doc__ = ''
 
     xr.register_dataset_accessor(name)(hvPlot)
     xr.register_dataarray_accessor(name)(hvPlot)
@@ -57,5 +57,6 @@ def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=Fals
     xr.register_dataarray_accessor(interactive)(XArrayInteractive)
 
     post_patch(extension, logo)
+
 
 patch()

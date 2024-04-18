@@ -1,6 +1,7 @@
 """
 Experimental support for fugue.
 """
+
 from typing import Any, Dict, Tuple
 
 import panel as _pn
@@ -8,7 +9,8 @@ import panel as _pn
 from . import hvPlotTabular, post_patch
 from .util import _fugue_ipython
 
-def patch(name="hvplot", extension="bokeh", logo=False):
+
+def patch(name='hvplot', extension='bokeh', logo=False):
     try:
         from fugue import DataFrames, Outputter
         from fugue.extensions import namespace_candidate, parse_outputter
@@ -38,7 +40,7 @@ def patch(name="hvplot", extension="bokeh", logo=False):
             charts = []
             for df in dfs.values():
                 params = dict(self.params)
-                opts: Dict[str, Any] = params.pop("opts", {})
+                opts: Dict[str, Any] = params.pop('opts', {})
                 chart = getattr(df.as_pandas().hvplot, self._func)(**params).opts(**opts)
                 charts.append(chart)
             col = _pn.Column(*charts)
@@ -49,8 +51,8 @@ def patch(name="hvplot", extension="bokeh", logo=False):
                 col.show()  # in script
             else:
                 from IPython.display import display
-                display(col)  # in notebook
 
+                display(col)  # in notebook
 
     @parse_outputter.candidate(namespace_candidate(name, lambda x: isinstance(x, str)))
     def _parse_hvplot(obj: Tuple[str, str]) -> Outputter:

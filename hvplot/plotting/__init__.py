@@ -1,12 +1,12 @@
 import holoviews as hv
 from ..util import with_hv_extension, is_polars
 
-from .core import hvPlot, hvPlotTabular   # noqa
+from .core import hvPlot, hvPlotTabular  # noqa
 
-from .andrews_curves import andrews_curves   # noqa
-from .parallel_coordinates import parallel_coordinates   # noqa
-from .lag_plot import lag_plot   # noqa
-from .scatter_matrix import scatter_matrix   # noqa
+from .andrews_curves import andrews_curves  # noqa
+from .parallel_coordinates import parallel_coordinates  # noqa
+from .lag_plot import lag_plot  # noqa
+from .scatter_matrix import scatter_matrix  # noqa
 
 
 @with_hv_extension
@@ -32,6 +32,7 @@ def plot(data, kind, **kwargs):
 
     if is_polars(data):
         from .core import hvPlotTabularPolars
+
         return hvPlotTabularPolars(data)(kind=kind, **no_none_kwargs)
     return hvPlotTabular(data)(kind=kind, **no_none_kwargs)
 
@@ -48,8 +49,9 @@ def boxplot_frame_groupby(grouped, **kwargs):
     width = kwargs.pop('width', 300)
     subplots = kwargs.pop('subplots', True)
     layout = hv.Layout if subplots else hv.Overlay
-    plots = [plot(data=data, kind='box', title=name, width=width, **kwargs)
-             for name, data in grouped]
+    plots = [
+        plot(data=data, kind='box', title=name, width=width, **kwargs) for name, data in grouped
+    ]
     return layout(plots)
 
 

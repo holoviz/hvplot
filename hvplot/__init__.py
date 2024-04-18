@@ -57,6 +57,7 @@ In a notebook or ipython environment the usual
 To ask the community go to https://discourse.holoviz.org/.
 To report issues go to https://github.com/holoviz/holoviews.
 """
+
 import inspect
 import os
 import textwrap
@@ -69,23 +70,29 @@ from holoviews import Store, render  # noqa
 from .converter import HoloViewsConverter
 from .interactive import Interactive
 from .ui import explorer  # noqa
-from .utilities import hvplot_extension, output, save, show # noqa
-from .plotting import (hvPlot, hvPlotTabular,  # noqa
-                       andrews_curves, lag_plot,
-                       parallel_coordinates, scatter_matrix, plot)
+from .utilities import hvplot_extension, output, save, show  # noqa
+from .plotting import (
+    hvPlot,
+    hvPlotTabular,  # noqa
+    andrews_curves,
+    lag_plot,
+    parallel_coordinates,
+    scatter_matrix,
+    plot,
+)
 
 # Define '__version__'
 try:
     # For performance reasons on imports, avoid importing setuptools_scm
     # if not in a .git folder
-    if os.path.exists(os.path.join(os.path.dirname(__file__), "..", ".git")):
+    if os.path.exists(os.path.join(os.path.dirname(__file__), '..', '.git')):
         # If setuptools_scm is installed (e.g. in a development environment with
         # an editable install), then use it to determine the version dynamically.
         from setuptools_scm import get_version
 
         # This will fail with LookupError if the package is not installed in
         # editable mode or if Git is not installed.
-        __version__ = get_version(root="..", relative_to=__file__)
+        __version__ = get_version(root='..', relative_to=__file__)
     else:
         raise FileNotFoundError
 except (ImportError, LookupError, FileNotFoundError):
@@ -103,13 +110,14 @@ except (ImportError, LookupError, FileNotFoundError):
         from importlib.metadata import version as mversion, PackageNotFoundError
 
         try:
-            __version__ = mversion("hvplot")
+            __version__ = mversion('hvplot')
         except PackageNotFoundError:
             # The user is probably trying to run this without having installed
             # the package.
-            __version__ = "0.0.0+unknown"
+            __version__ = '0.0.0+unknown'
 
 _METHOD_DOCS = {}
+
 
 def _get_doc_and_signature(
     cls, kind, completions=False, docstring=True, generic=True, style=True, signature=None
@@ -121,15 +129,15 @@ def _get_doc_and_signature(
 
     formatter = ''
     if completions:
-        formatter = "hvplot.{kind}({completions})"
+        formatter = 'hvplot.{kind}({completions})'
     if docstring:
         if formatter:
             formatter += '\n'
-        formatter += "{docstring}"
+        formatter += '{docstring}'
     if generic:
         if formatter:
             formatter += '\n'
-        formatter += "{options}"
+        formatter += '{options}'
 
     # Bokeh is the default backend
     backend = hvplot_extension.compatibility or Store.current_backend
@@ -152,13 +160,19 @@ def _get_doc_and_signature(
         if p.kind == 1:
             parameters.append((name, p.default))
 
-    filtered_signature = [p for p in sig.parameters.values()
-                            if p.kind != inspect.Parameter.VAR_KEYWORD]
-    extra_params = [inspect.Parameter(k, inspect.Parameter.KEYWORD_ONLY)
-                    for k in extra_kwargs
-                    if k not in [p.name for p in filtered_signature]]
-    all_params = (filtered_signature + extra_params
-                    + [inspect.Parameter('kwargs', inspect.Parameter.VAR_KEYWORD)])
+    filtered_signature = [
+        p for p in sig.parameters.values() if p.kind != inspect.Parameter.VAR_KEYWORD
+    ]
+    extra_params = [
+        inspect.Parameter(k, inspect.Parameter.KEYWORD_ONLY)
+        for k in extra_kwargs
+        if k not in [p.name for p in filtered_signature]
+    ]
+    all_params = (
+        filtered_signature
+        + extra_params
+        + [inspect.Parameter('kwargs', inspect.Parameter.VAR_KEYWORD)]
+    )
     signature = inspect.Signature(all_params)
 
     parameters += [(o, None) for o in extra_kwargs]
@@ -167,8 +181,12 @@ def _get_doc_and_signature(
     method_doc = _METHOD_DOCS.get(kind, method.__doc__)
     _METHOD_DOCS[kind] = method_doc
     docstring = formatter.format(
-        kind=kind, completions=completions, docstring=textwrap.dedent(method_doc),
-        options=options, style=style_opts)
+        kind=kind,
+        completions=completions,
+        docstring=textwrap.dedent(method_doc),
+        options=options,
+        style=style_opts,
+    )
     return docstring, signature
 
 
@@ -188,8 +206,9 @@ def help(kind=None, docstring=True, generic=True, style=True):
     style: boolean (default=True)
         Whether to provide list of style options
     """
-    doc, sig = _get_doc_and_signature(cls=hvPlot, kind=kind,
-                                      docstring=docstring, generic=generic, style=style)
+    doc, sig = _get_doc_and_signature(
+        cls=hvPlot, kind=kind, docstring=docstring, generic=generic, style=style
+    )
     print(doc)
 
 
@@ -206,7 +225,6 @@ def _patch_doc(cls, kind, signature=None):
 
 
 class _PatchHvplotDocstrings:
-
     def __init__(self):
         # Store the original signatures because the method signatures
         # are going to be patched every time an extension is changed.
@@ -230,15 +248,19 @@ class _PatchHvplotDocstrings:
 _patch_hvplot_docstrings = _PatchHvplotDocstrings()
 _patch_hvplot_docstrings()
 
+
 def _hook_patch_docstrings(backend):
     # Patch or re-patch the docstrings/signatures to display
     # the right styling options.
     from . import _patch_hvplot_docstrings
+
     _patch_hvplot_docstrings()
+
 
 Store._backend_switch_hooks.append(_hook_patch_docstrings)
 
 extension = hvplot_extension
+
 
 def bind(function, *args, **kwargs):
     """

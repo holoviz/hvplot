@@ -7,7 +7,7 @@ import os
 try:
     from intake import open_catalog
     import intake_parquet  # noqa
-    import intake_xarray   # noqa
+    import intake_xarray  # noqa
     import s3fs  # noqa
 except:
     raise ImportError(

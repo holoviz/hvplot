@@ -1,6 +1,7 @@
 """
 Geo tests **without** importing GeoViews.
 """
+
 import holoviews as hv
 import hvplot.pandas  # noqa
 import numpy as np
@@ -10,13 +11,13 @@ import pytest
 
 bk_renderer = hv.Store.renderers['bokeh']
 
+
 @pytest.fixture
 def simple_df():
     return pd.DataFrame(np.random.rand(10, 2), columns=['x', 'y'])
 
 
 class TestAnnotationNotGeo:
-
     def test_plot_tiles_doesnt_set_geo(self, simple_df):
         plot = simple_df.hvplot.points('x', 'y', tiles=True)
         assert len(plot) == 2
@@ -50,7 +51,7 @@ class TestAnnotationNotGeo:
         assert bk_plot.projection == 'mercator'
 
     def test_plot_with_xyzservices_tileprovider(self, simple_df):
-        xyzservices = pytest.importorskip("xyzservices")
+        xyzservices = pytest.importorskip('xyzservices')
         plot = simple_df.hvplot.points('x', 'y', tiles=xyzservices.providers.Esri.WorldImagery)
         assert len(plot) == 2
         assert isinstance(plot.get(0), hv.Tiles)

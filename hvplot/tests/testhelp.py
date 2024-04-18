@@ -23,7 +23,9 @@ def test_help_style_extension_output(reset_default_backend):
         style=True,
         signature=None,
     )
-    assert docstring == '\nStyle options\n-------------\n\n' + '\n'.join(sorted(Store.registry['bokeh'][Curve].style_opts))
+    assert docstring == '\nStyle options\n-------------\n\n' + '\n'.join(
+        sorted(Store.registry['bokeh'][Curve].style_opts)
+    )
 
     # The current backend becomes matplotlib
     hvplot.extension('matplotlib', 'plotly')
@@ -36,7 +38,9 @@ def test_help_style_extension_output(reset_default_backend):
         style=True,
         signature=None,
     )
-    assert docstring == '\nStyle options\n-------------\n\n' + '\n'.join(sorted(Store.registry['matplotlib'][Curve].style_opts))
+    assert docstring == '\nStyle options\n-------------\n\n' + '\n'.join(
+        sorted(Store.registry['matplotlib'][Curve].style_opts)
+    )
 
     # The current backend becomes plotly
     hvplot.output(backend='plotly')
@@ -49,7 +53,10 @@ def test_help_style_extension_output(reset_default_backend):
         style=True,
         signature=None,
     )
-    assert docstring == '\nStyle options\n-------------\n\n' + '\n'.join(sorted(Store.registry['plotly'][Curve].style_opts))
+    assert docstring == '\nStyle options\n-------------\n\n' + '\n'.join(
+        sorted(Store.registry['plotly'][Curve].style_opts)
+    )
+
 
 def test_help_style_compatibility(reset_default_backend):
     # The current backend is plotly but the style options are those of matplotlib
@@ -63,4 +70,6 @@ def test_help_style_compatibility(reset_default_backend):
         style=True,
         signature=None,
     )
-    assert docstring == '\nStyle options\n-------------\n\n' + '\n'.join(sorted(Store.registry['matplotlib'][Curve].style_opts))
+    assert docstring == '\nStyle options\n-------------\n\n' + '\n'.join(
+        sorted(Store.registry['matplotlib'][Curve].style_opts)
+    )

@@ -7,7 +7,9 @@ renderer = _hv.renderer('bokeh')
 output = _hv.output
 
 
-def save(obj, filename, fmt='auto', backend=None, resources='cdn', toolbar=None, title=None, **kwargs):
+def save(
+    obj, filename, fmt='auto', backend=None, resources='cdn', toolbar=None, title=None, **kwargs
+):
     """
     Saves the supplied object to file.
 
@@ -56,13 +58,19 @@ def save(obj, filename, fmt='auto', backend=None, resources='cdn', toolbar=None,
     """
     if isinstance(obj, _hv.core.Dimensioned):
         _hv.save(
-            obj, filename, fmt=fmt, backend=backend, resources=resources,
-            toolbar=toolbar, title=title, **kwargs
+            obj,
+            filename,
+            fmt=fmt,
+            backend=backend,
+            resources=resources,
+            toolbar=toolbar,
+            title=title,
+            **kwargs,
         )
     elif isinstance(obj, _pn.layout.Panel):
         obj.save(filename, resources=resources, title=title, **kwargs)
     else:
-        raise TypeError(f"Saving not supported for objects of type {type(obj)!r}")
+        raise TypeError(f'Saving not supported for objects of type {type(obj)!r}')
 
 
 def show(obj, title=None, port=0, **kwargs):
@@ -88,15 +96,16 @@ def show(obj, title=None, port=0, **kwargs):
     elif isinstance(obj, _pn.viewable.Viewable):
         return obj.show(title, port, **kwargs)
     else:
-        raise ValueError('%s type object not recognized and cannot be shown.' %
-                         type(obj).__name__)
+        raise ValueError('%s type object not recognized and cannot be shown.' % type(obj).__name__)
 
 
 class hvplot_extension(_hv.extension):
-
     compatibility = param.ObjectSelector(
-        allow_None=True, objects=['bokeh', 'matplotlib', 'plotly'], doc="""
-            Plotting library used to process extra keyword arguments.""")
+        allow_None=True,
+        objects=['bokeh', 'matplotlib', 'plotly'],
+        doc="""
+            Plotting library used to process extra keyword arguments.""",
+    )
 
     logo = param.Boolean(default=False)
 
@@ -116,4 +125,5 @@ class hvplot_extension(_hv.extension):
         # Patch or re-patch the docstrings/signatures to display
         # the right styling options.
         from . import _patch_hvplot_docstrings
+
         _patch_hvplot_docstrings()

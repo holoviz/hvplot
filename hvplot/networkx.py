@@ -13,7 +13,7 @@ from holoviews.plotting.bokeh.styles import markers
 
 from .backend_transforms import _transfer_opts_cur_backend
 from .util import process_crs
-from .utilities import save, show # noqa
+from .utilities import save, show  # noqa
 
 if _hv.extension and not getattr(_hv.extension, '_loaded', False):
     _hv.extension('bokeh', logo=False)
@@ -50,7 +50,7 @@ def _from_networkx(G, positions, nodes=None, cls=Graph, **kwargs):
     for start, end in G.edges():
         for attr, value in sorted(G.adj[start][end].items()):
             if isinstance(value, (list, dict)):
-                continue # Cannot handle list or dict attrs
+                continue  # Cannot handle list or dict attrs
             edges[attr].append(value)
 
         # Handle tuple node indexes (used in 2D grid Graphs)
@@ -60,10 +60,11 @@ def _from_networkx(G, positions, nodes=None, cls=Graph, **kwargs):
             end = str(end)
         edges['start'].append(start)
         edges['end'].append(end)
-    edge_cols = sorted(k for k in edges if k not in ('start', 'end')
-                        and len(edges[k]) == len(edges['start']))
+    edge_cols = sorted(
+        k for k in edges if k not in ('start', 'end') and len(edges[k]) == len(edges['start'])
+    )
     edge_vdims = [str(col) if isinstance(col, int) else col for col in edge_cols]
-    edge_data = tuple(edges[col] for col in ['start', 'end']+edge_cols)
+    edge_data = tuple(edges[col] for col in ['start', 'end'] + edge_cols)
 
     # Unpack user node info
     xdim, ydim, idim = cls.node_type.kdims[:3]
@@ -92,11 +93,14 @@ def _from_networkx(G, positions, nodes=None, cls=Graph, **kwargs):
         for i, col in enumerate(info_cols):
             node_columns[col].append(node_info[idx][i])
         if isinstance(idx, tuple):
-            idx = str(idx) # Tuple node indexes handled as strings
+            idx = str(idx)  # Tuple node indexes handled as strings
         node_columns[idim.name].append(idx)
-    node_cols = sorted(k for k in node_columns if k not in cls.node_type.kdims
-                        and len(node_columns[k]) == len(node_columns[xdim.name]))
-    columns = [xdim.name, ydim.name, idim.name]+node_cols+list(info_cols)
+    node_cols = sorted(
+        k
+        for k in node_columns
+        if k not in cls.node_type.kdims and len(node_columns[k]) == len(node_columns[xdim.name])
+    )
+    columns = [xdim.name, ydim.name, idim.name] + node_cols + list(info_cols)
     node_data = tuple(node_columns[col] for col in columns)
 
     # Construct nodes
@@ -214,9 +218,11 @@ def draw(G, pos=None, **kwargs):
         try:
             import geoviews
         except ImportError:
-            raise ImportError('In order to use geo-related features '
-                              'the geoviews library must be available. '
-                              'It can be installed with pip or conda.')
+            raise ImportError(
+                'In order to use geo-related features '
+                'the geoviews library must be available. '
+                'It can be installed with pip or conda.'
+            )
         crs = process_crs(kwargs.get('crs'))
         label_element = geoviews.Labels
         params['cls'] = geoviews.Graph
@@ -252,7 +258,8 @@ def draw(G, pos=None, **kwargs):
         height=kwargs.pop('height', 400),
         selection_policy=kwargs.pop('selection_policy', 'nodes'),
         inspection_policy=inspection_policy,
-        node_fill_color='red')
+        node_fill_color='red',
+    )
 
     if '_axis_defaults':
         opts.update(xaxis=None, yaxis=None, show_frame=False)
@@ -289,7 +296,12 @@ def draw(G, pos=None, **kwargs):
     node_styles = ('node_fill_color', 'node_size', 'node_alpha', 'node_line_width')
     for node_style in node_styles:
         if isinstance(opts.get(node_style), (np.ndarray, list, range)):
-            g = g.clone((g.data, g.nodes.add_dimension(node_style, len(g.nodes.vdims), opts[node_style], True)))
+            g = g.clone(
+                (
+                    g.data,
+                    g.nodes.add_dimension(node_style, len(g.nodes.vdims), opts[node_style], True),
+                )
+            )
             opts[node_style] = node_style
 
     edge_styles = ('edge_line_color', 'edge_line_alpha', 'edge_alpha', 'edge_line_width')
@@ -311,13 +323,19 @@ def draw(G, pos=None, **kwargs):
             dimension.range = lims
 
     if inspection_policy == 'nodes':
-        tooltip_dims = [(d.label, 'index_hover' if d in g.nodes.kdims else d.name)
-                        for d in g.nodes.kdims[2:] + g.nodes.vdims]
+        tooltip_dims = [
+            (d.label, 'index_hover' if d in g.nodes.kdims else d.name)
+            for d in g.nodes.kdims[2:] + g.nodes.vdims
+        ]
     else:
-        tooltip_dims = [(d.label, d.name+'_values' if d in g.kdims else d.name)
-                        for d in g.kdims + g.vdims]
-    tooltips = [(label, '@{%s}' % dimension_sanitizer(name))
-                for label, name in tooltip_dims if name not in node_styles + edge_styles]
+        tooltip_dims = [
+            (d.label, d.name + '_values' if d in g.kdims else d.name) for d in g.kdims + g.vdims
+        ]
+    tooltips = [
+        (label, '@{%s}' % dimension_sanitizer(name))
+        for label, name in tooltip_dims
+        if name not in node_styles + edge_styles
+    ]
     opts['tools'] = [HoverTool(tooltips=tooltips), 'tap']
 
     g.opts(**opts, backend='bokeh')
@@ -585,6 +603,7 @@ def draw_spring(G, **kwargs):
        Graph element or Graph and Labels
     """
     return draw(G, nx.spring_layout, **kwargs)
+
 
 def draw_planar(G, **kwargs):
     """Draw networkx graph with planar layout.

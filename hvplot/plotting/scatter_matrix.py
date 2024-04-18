@@ -12,12 +12,25 @@ from ..util import with_hv_extension, _convert_col_names_to_str
 
 
 @with_hv_extension
-def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
-                   alpha=0.5, nonselection_alpha=0.1,
-                   tools=None, cmap=None, colormap=None,
-                   diagonal_kwds=None, hist_kwds=None, density_kwds=None,
-                   datashade=False, rasterize=False, dynspread=False, spread=False,
-                   **kwds):
+def scatter_matrix(
+    data,
+    c=None,
+    chart='scatter',
+    diagonal='hist',
+    alpha=0.5,
+    nonselection_alpha=0.1,
+    tools=None,
+    cmap=None,
+    colormap=None,
+    diagonal_kwds=None,
+    hist_kwds=None,
+    density_kwds=None,
+    datashade=False,
+    rasterize=False,
+    dynspread=False,
+    spread=False,
+    **kwds,
+):
     """
     Scatter matrix of numeric columns.
 
@@ -92,33 +105,35 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
         try:
             import datashader  # noqa
         except ImportError:
-            raise ImportError("rasterize and datashade require "
-                              "datashader to be installed.")
+            raise ImportError('rasterize and datashade require ' 'datashader to be installed.')
         from ..util import hv_version
+
         if hv_version <= Version('1.14.6'):
             warnings.warn(
-                "Versions of holoviews before 1.14.7 did not support "
-                "dynamic update of rasterized/datashaded scatter matrix. "
-                "Update holoviews to a newer version."
+                'Versions of holoviews before 1.14.7 did not support '
+                'dynamic update of rasterized/datashaded scatter matrix. '
+                'Update holoviews to a newer version.'
             )
 
     if rasterize and datashade:
-        raise ValueError("Choose to either rasterize or "
-                         "datashade the scatter matrix, not both.")
+        raise ValueError(
+            'Choose to either rasterize or ' 'datashade the scatter matrix, not both.'
+        )
 
     if not rasterize and not datashade and (spread or dynspread):
-        raise ValueError("dynspread or spread need rasterize "
-                         "or datashade to be set to True.")
+        raise ValueError('dynspread or spread need rasterize ' 'or datashade to be set to True.')
 
     if rasterize:
         import holoviews.operation.datashader as hd
+
         if dynspread or spread:
             if hd.ds_version < Version('0.12.0'):
                 raise RuntimeError(
                     'Any version of datashader less than 0.12.0 does '
-                    'not support rasterize with dynspread or spread.')
+                    'not support rasterize with dynspread or spread.'
+                )
 
-    #remove datashade kwds
+    # remove datashade kwds
     if datashade or rasterize:
         import holoviews.operation.datashader as hd
 
@@ -126,7 +141,7 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
         if 'aggregator' in kwds:
             ds_kwds['aggregator'] = kwds.pop('aggregator')
 
-    #remove dynspread kwds
+    # remove dynspread kwds
     sp_kwds = {}
     if dynspread:
         if 'max_px' in kwds:
@@ -150,38 +165,41 @@ def scatter_matrix(data, c=None, chart='scatter', diagonal='hist',
             sp_kwds['mask'] = kwds.pop('mask')
 
     tools = tools or ['box_select', 'lasso_select']
-    chart_opts = dict(alpha=alpha, tools=tools,
-                      nonselection_alpha=nonselection_alpha, **kwds)
+    chart_opts = dict(alpha=alpha, tools=tools, nonselection_alpha=nonselection_alpha, **kwds)
     if c:
         if cmap and colormap:
-            raise TypeError("Only specify `cmap` or `colormap`.")
+            raise TypeError('Only specify `cmap` or `colormap`.')
         ncolors = len(_np.unique(data.dimension_values(c)))
         cmap = cmap or colormap or 'Category10'
         cmap = _hv.plotting.util.process_cmap(cmap, ncolors=ncolors, categorical=True)
         chart_opts['cmap'] = cmap
 
-    #get initial scatter matrix.  No color.
+    # get initial scatter matrix.  No color.
     grid = _hv.operation.gridmatrix(data, diagonal_type=diagonal, chart_type=chart)
 
     if c:
-        #change colors for scatter matrix
+        # change colors for scatter matrix
         chart_opts['color'] = c
         # Add color vdim to each plot.
-        grid = grid.map(lambda x: x.clone(vdims=x.vdims+[c]), 'Scatter')
+        grid = grid.map(lambda x: x.clone(vdims=x.vdims + [c]), 'Scatter')
         # create a new scatter matrix with groups for each catetory, so now the histogram will
         # show separate colors for each group.
-        groups = _hv.operation.gridmatrix(data.groupby(c).overlay(),
-                                          chart_type=chart,
-                                          diagonal_type=diagonal)
+        groups = _hv.operation.gridmatrix(
+            data.groupby(c).overlay(), chart_type=chart, diagonal_type=diagonal
+        )
         # take the correct layer from each Overlay object within the scatter matrix.
-        grid = (grid * groups).map(lambda x: x.get(0) if isinstance(x.get(0), chart) else x.get(1),
-                                   _hv.Overlay)
+        grid = (grid * groups).map(
+            lambda x: x.get(0) if isinstance(x.get(0), chart) else x.get(1), _hv.Overlay
+        )
 
-    if (diagonal_kwds and hist_kwds) or \
-       (diagonal_kwds and density_kwds) or \
-       (hist_kwds and density_kwds):
-        raise TypeError('Specify at most one of `diagonal_kwds`, `hist_kwds`, or '
-                        '`density_kwds`.')
+    if (
+        (diagonal_kwds and hist_kwds)
+        or (diagonal_kwds and density_kwds)
+        or (hist_kwds and density_kwds)
+    ):
+        raise TypeError(
+            'Specify at most one of `diagonal_kwds`, `hist_kwds`, or ' '`density_kwds`.'
+        )
 
     diagonal_opts = diagonal_kwds or hist_kwds or density_kwds or {}
     # set the histogram colors

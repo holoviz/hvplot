@@ -20,6 +20,7 @@ from ..util import is_list_like, process_dynamic_args
 # Orange: #f8b014
 # Red: #f16a6f
 
+
 class hvPlotBase:
     """
     Internal base class.
@@ -41,12 +42,12 @@ class hvPlotBase:
     __all__ = []
 
     def __init__(self, data, custom_plots={}, **metadata):
-        if "query" in metadata:
-            data = data.query(metadata.pop("query"))
-        if "sel" in metadata:
-            data = data.sel(**metadata.pop("sel"))
-        if "isel" in metadata:
-            data = data.isel(**metadata.pop("isel"))
+        if 'query' in metadata:
+            data = data.query(metadata.pop('query'))
+        if 'sel' in metadata:
+            data = data.sel(**metadata.pop('sel'))
+        if 'isel' in metadata:
+            data = data.isel(**metadata.pop('isel'))
         self._data = data
         self._plots = custom_plots
         self._metadata = metadata
@@ -57,15 +58,13 @@ class hvPlotBase:
         y = list(y) if is_list_like(y) else y
 
         if isinstance(kind, str) and kind not in self.__all__:
-            raise NotImplementedError(
-                f"kind='{kind}' for data of type {type(self._data)}"
-            )
+            raise NotImplementedError(f"kind='{kind}' for data of type {type(self._data)}")
 
-        if isinstance(kind, str) and kind == "explorer":
+        if isinstance(kind, str) and kind == 'explorer':
             return self.explorer(x=x, y=y, **kwds)
 
         if panel_available:
-            panel_args = ["widgets", "widget_location", "widget_layout", "widget_type"]
+            panel_args = ['widgets', 'widget_location', 'widget_layout', 'widget_type']
             panel_dict = {}
             for k in panel_args:
                 if k in kwds:
@@ -75,9 +74,9 @@ class hvPlotBase:
 
                 @pn.depends(*arg_deps, **dynamic)
                 def callback(*args, **dyn_kwds):
-                    xd = dyn_kwds.pop("x", x)
-                    yd = dyn_kwds.pop("y", y)
-                    kindd = dyn_kwds.pop("kind", kind)
+                    xd = dyn_kwds.pop('x', x)
+                    yd = dyn_kwds.pop('y', y)
+                    kindd = dyn_kwds.pop('kind', kind)
 
                     combined_kwds = dict(kwds, **dyn_kwds)
                     fn_args = defaultdict(list)
@@ -97,9 +96,9 @@ class hvPlotBase:
 
     def _get_converter(self, x=None, y=None, kind=None, **kwds):
         params = dict(self._metadata, **kwds)
-        x = x or params.pop("x", None)
-        y = y or params.pop("y", None)
-        kind = kind or params.pop("kind", None)
+        x = x or params.pop('x', None)
+        y = y or params.pop('y', None)
+        kind = kind or params.pop('kind', None)
         return HoloViewsConverter(self._data, x, y, kind=kind, **params)
 
     def __dir__(self):
@@ -113,16 +112,16 @@ class hvPlotBase:
         """
         Custom getattribute to expose user defined subplots.
         """
-        plots = object.__getattribute__(self, "_plots")
+        plots = object.__getattribute__(self, '_plots')
         if name in plots:
             plot_opts = plots[name]
-            if "kind" in plot_opts and name in HoloViewsConverter._kind_mapping:
+            if 'kind' in plot_opts and name in HoloViewsConverter._kind_mapping:
                 param.main.param.warning(
-                    "Custom options for existing plot types should not "
+                    'Custom options for existing plot types should not '
                     "declare the 'kind' argument. The .{} plot method "
-                    "was unexpectedly customized with kind={!r}.".format(plot_opts["kind"], name)
+                    'was unexpectedly customized with kind={!r}.'.format(plot_opts['kind'], name)
                 )
-                plot_opts["kind"] = name
+                plot_opts['kind'] = name
             return hvPlotBase(self._data, **dict(self._metadata, **plot_opts))
         return super().__getattribute__(name)
 
@@ -165,6 +164,7 @@ class hvPlotBase:
             df.hvplot.explorer()
         """
         from ..ui import explorer as ui_explorer
+
         return ui_explorer(self._data, x=x, y=y, **kwds)
 
 
@@ -246,30 +246,30 @@ class hvPlotTabular(hvPlotBase):
     """
 
     __all__ = [
-        "line",
-        "step",
-        "scatter",
-        "area",
-        "errorbars",
-        "ohlc",
-        "heatmap",
-        "hexbin",
-        "bivariate",
-        "bar",
-        "barh",
-        "box",
-        "violin",
-        "hist",
-        "kde",
-        "density",
-        "table",
-        "dataset",
-        "points",
-        "vectorfield",
-        "polygons",
-        "paths",
-        "labels",
-        "explorer",
+        'line',
+        'step',
+        'scatter',
+        'area',
+        'errorbars',
+        'ohlc',
+        'heatmap',
+        'hexbin',
+        'bivariate',
+        'bar',
+        'barh',
+        'box',
+        'violin',
+        'hist',
+        'kde',
+        'density',
+        'table',
+        'dataset',
+        'points',
+        'vectorfield',
+        'polygons',
+        'paths',
+        'labels',
+        'explorer',
     ]
 
     def line(self, x=None, y=None, **kwds):
@@ -367,9 +367,9 @@ class hvPlotTabular(hvPlotBase):
         - Seaborn: https://seaborn.pydata.org/generated/seaborn.lineplot.html
         - Wiki: https://en.wikipedia.org/wiki/Line_chart
         """
-        return self(x, y, kind="line", **kwds)
+        return self(x, y, kind='line', **kwds)
 
-    def step(self, x=None, y=None, where="mid", **kwds):
+    def step(self, x=None, y=None, where='mid', **kwds):
         """
         The `step` plot connects the points with piece-wise constant curves.
 
@@ -466,7 +466,7 @@ class hvPlotTabular(hvPlotBase):
         - Plotly: https://plotly.com/python/line-charts/ (See the Interpolation Section)
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.step.html
         """
-        return self(x, y, kind="step", where=where, **kwds)
+        return self(x, y, kind='step', where=where, **kwds)
 
     def scatter(self, x=None, y=None, **kwds):
         """
@@ -573,7 +573,7 @@ class hvPlotTabular(hvPlotBase):
         - Seaborn: https://seaborn.pydata.org/generated/seaborn.scatterplot.html
         - Wiki: https://en.wikipedia.org/wiki/Scatter_plot
         """
-        return self(x, y, kind="scatter", **kwds)
+        return self(x, y, kind='scatter', **kwds)
 
     def area(self, x=None, y=None, y2=None, stacked=True, **kwds):
         """
@@ -651,9 +651,9 @@ class hvPlotTabular(hvPlotBase):
         - Matplotlib:  https://matplotlib.org/stable/gallery/lines_bars_and_markers/fill_between_demo.html
         - Wiki: https://en.wikipedia.org/wiki/Area_chart
         """
-        if "alpha" not in kwds and not stacked:
-            kwds["alpha"] = 0.5
-        return self(x, y, y2=y2, kind="area", stacked=stacked, **kwds)
+        if 'alpha' not in kwds and not stacked:
+            kwds['alpha'] = 0.5
+        return self(x, y, y2=y2, kind='area', stacked=stacked, **kwds)
 
     def errorbars(self, x=None, y=None, yerr1=None, yerr2=None, **kwds):
         """
@@ -740,7 +740,7 @@ class hvPlotTabular(hvPlotBase):
         - Plotly: https://plotly.com/python/error-bars/
         - Wikipedia: https://en.wikipedia.org/wiki/Error_bar
         """
-        return self(x, y, kind="errorbars", yerr1=yerr1, yerr2=yerr2, **kwds)
+        return self(x, y, kind='errorbars', yerr1=yerr1, yerr2=yerr2, **kwds)
 
     def ohlc(self, x=None, y=None, **kwds):
         """
@@ -797,7 +797,7 @@ class hvPlotTabular(hvPlotBase):
         - Plotly: https://plotly.com/python/ohlc-charts/
         - Wikipedia: https://en.wikipedia.org/wiki/Candlestick_chart
         """
-        return self(kind="ohlc", x=x, y=y, **kwds)
+        return self(kind='ohlc', x=x, y=y, **kwds)
 
     def heatmap(self, x=None, y=None, C=None, colorbar=True, **kwds):
         """
@@ -860,7 +860,7 @@ class hvPlotTabular(hvPlotBase):
         - Plotly: https://plotly.com/python/heatmaps/
         - Wiki: https://en.wikipedia.org/wiki/Heat_map
         """
-        return self(x, y, kind="heatmap", C=C, colorbar=colorbar, **kwds)
+        return self(x, y, kind='heatmap', C=C, colorbar=colorbar, **kwds)
 
     def hexbin(self, x=None, y=None, C=None, colorbar=True, **kwds):
         """
@@ -928,7 +928,7 @@ class hvPlotTabular(hvPlotBase):
         - Plotly: https://plotly.com/python/hexbin-mapbox/
         - Wiki: https://think.design/services/data-visualization-data-design/hexbin/
         """
-        return self(x, y, kind="hexbin", C=C, colorbar=colorbar, **kwds)
+        return self(x, y, kind='hexbin', C=C, colorbar=colorbar, **kwds)
 
     def bivariate(self, x=None, y=None, colorbar=True, **kwds):
         """
@@ -1000,7 +1000,7 @@ class hvPlotTabular(hvPlotBase):
         - Seaborn: https://seaborn.pydata.org/generated/seaborn.kdeplot.html
         - Wiki: https://en.wikipedia.org/wiki/Bivariate_analysis
         """
-        return self(x, y, kind="bivariate", colorbar=colorbar, **kwds)
+        return self(x, y, kind='bivariate', colorbar=colorbar, **kwds)
 
     def bar(self, x=None, y=None, **kwds):
         """
@@ -1089,7 +1089,7 @@ class hvPlotTabular(hvPlotBase):
         - Plotly: https://plotly.com/python/bar-charts/
         - Wiki: https://en.wikipedia.org/wiki/Bar_chart
         """
-        return self(x, y, kind="bar", **kwds)
+        return self(x, y, kind='bar', **kwds)
 
     def barh(self, x=None, y=None, **kwds):
         """
@@ -1153,7 +1153,7 @@ class hvPlotTabular(hvPlotBase):
         - Plotly: https://plotly.com/python/horizontal-bar-charts/
         - Wiki: https://en.wikipedia.org/wiki/Bar_chart
         """
-        return self(x, y, kind="barh", **kwds)
+        return self(x, y, kind='barh', **kwds)
 
     def box(self, y=None, by=None, **kwds):
         """
@@ -1219,7 +1219,7 @@ class hvPlotTabular(hvPlotBase):
         - Plotly: https://plotly.com/python/box-plots/
         - Wiki: https://en.wikipedia.org/wiki/Box_plot
         """
-        return self(kind="box", x=None, y=y, by=by, **dict(kwds, hover=False))
+        return self(kind='box', x=None, y=y, by=by, **dict(kwds, hover=False))
 
     def violin(self, y=None, by=None, **kwds):
         """
@@ -1285,7 +1285,7 @@ class hvPlotTabular(hvPlotBase):
         - Plotly: https://plotly.com/python/violin/
         - Wiki: https://en.wikipedia.org/wiki/Violin_plot
         """
-        return self(kind="violin", x=None, y=y, by=by, **dict(kwds, hover=False))
+        return self(kind='violin', x=None, y=y, by=by, **dict(kwds, hover=False))
 
     def hist(self, y=None, by=None, **kwds):
         """
@@ -1366,7 +1366,7 @@ class hvPlotTabular(hvPlotBase):
         - Seaborn: https://seaborn.pydata.org/generated/seaborn.histplot.html
         - Wiki: https://en.wikipedia.org/wiki/Histogram
         """
-        return self(kind="hist", x=None, y=y, by=by, **kwds)
+        return self(kind='hist', x=None, y=y, by=by, **kwds)
 
     def kde(self, y=None, by=None, **kwds):
         """
@@ -1444,7 +1444,7 @@ class hvPlotTabular(hvPlotBase):
         - Seaborn: https://seaborn.pydata.org/generated/seaborn.kdeplot.html
         - Wiki: https://en.wikipedia.org/wiki/Kernel_density_estimation
         """
-        return self(kind="kde", x=None, y=y, by=by, **kwds)
+        return self(kind='kde', x=None, y=y, by=by, **kwds)
 
     def density(self, y=None, by=None, **kwds):
         """
@@ -1522,7 +1522,7 @@ class hvPlotTabular(hvPlotBase):
         - Seaborn: https://seaborn.pydata.org/generated/seaborn.kdeplot.html
         - Wiki: https://en.wikipedia.org/wiki/Kernel_density_estimation
         """
-        return self(kind="kde", x=None, y=y, by=by, **kwds)
+        return self(kind='kde', x=None, y=y, by=by, **kwds)
 
     def table(self, columns=None, **kwds):
         """
@@ -1569,7 +1569,7 @@ class hvPlotTabular(hvPlotBase):
         - Plotly: https://plotly.com/python/table/
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.table.html
         """
-        return self(kind="table", **dict(kwds, columns=columns))
+        return self(kind='table', **dict(kwds, columns=columns))
 
     def dataset(self, columns=None, **kwds):
         """
@@ -1609,7 +1609,7 @@ class hvPlotTabular(hvPlotBase):
         - HoloViews Tabular: https://holoviews.org/getting_started/Tabular_Datasets.html
         - HoloViews Gridded: https://holoviews.org/getting_started/Gridded_Datasets.html
         """
-        return self(kind="dataset", **dict(kwds, columns=columns))
+        return self(kind='dataset', **dict(kwds, columns=columns))
 
     def points(self, x=None, y=None, **kwds):
         """
@@ -1669,7 +1669,7 @@ class hvPlotTabular(hvPlotBase):
 
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Points.html
         """
-        return self(x, y, kind="points", **kwds)
+        return self(x, y, kind='points', **kwds)
 
     def vectorfield(self, x=None, y=None, angle=None, mag=None, **kwds):
         """
@@ -1730,7 +1730,7 @@ class hvPlotTabular(hvPlotBase):
         - Plotly: https://plotly.com/python/quiver-plots/
         - Wiki: https://simple.wikipedia.org/wiki/Vector_field
         """
-        return self(x, y, angle=angle, mag=mag, kind="vectorfield", **kwds)
+        return self(x, y, angle=angle, mag=mag, kind='vectorfield', **kwds)
 
     def polygons(self, x=None, y=None, c=None, **kwds):
         """
@@ -1772,7 +1772,7 @@ class hvPlotTabular(hvPlotBase):
             countries = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
             countries.hvplot.polygons(geo=True, c='pop_est', hover_cols='all')
         """
-        return self(x, y, c=c, kind="polygons", **kwds)
+        return self(x, y, c=c, kind='polygons', **kwds)
 
     def paths(self, x=None, y=None, c=None, **kwds):
         """
@@ -1799,7 +1799,7 @@ class hvPlotTabular(hvPlotBase):
 
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Path.html
         """
-        return self(x, y, c=c, kind="paths", **kwds)
+        return self(x, y, c=c, kind='paths', **kwds)
 
     def labels(self, x=None, y=None, text=None, **kwds):
         """
@@ -1860,7 +1860,7 @@ class hvPlotTabular(hvPlotBase):
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.text.html#matplotlib.pyplot.text
         - Plotly: https://plotly.com/python/text-and-annotations/
         """
-        return self(x, y, text=text, kind="labels", **kwds)
+        return self(x, y, text=text, kind='labels', **kwds)
 
 
 class hvPlotTabularPolars(hvPlotTabular):
@@ -1868,13 +1868,13 @@ class hvPlotTabularPolars(hvPlotTabular):
         import polars as pl
 
         params = dict(self._metadata, **kwds)
-        x = x or params.pop("x", None)
-        y = y or params.pop("y", None)
-        kind = kind or params.pop("kind", None)
+        x = x or params.pop('x', None)
+        y = y or params.pop('y', None)
+        kind = kind or params.pop('kind', None)
 
         # Find columns which should be converted for LazyDataFrame and DataFrame
         if isinstance(self._data, (pl.LazyFrame, pl.DataFrame)):
-            if params.get("hover_cols") == "all":
+            if params.get('hover_cols') == 'all':
                 columns = list(self._data.columns)
             else:
                 possible_columns = [
@@ -1883,9 +1883,9 @@ class hvPlotTabularPolars(hvPlotTabular):
                     if isinstance(v, (str, list))
                 ]
 
-                columns = (
-                    set(self._data.columns) & set(itertools.chain(*possible_columns))
-                ) or {self._data.columns[0]}
+                columns = (set(self._data.columns) & set(itertools.chain(*possible_columns))) or {
+                    self._data.columns[0]
+                }
                 if y is None:
                     # When y is not specified HoloViewsConverter finds all the numeric
                     # columns and use them as y values (see _process_chart_y). We meed
@@ -1905,9 +1905,7 @@ class hvPlotTabularPolars(hvPlotTabular):
         elif isinstance(self._data, pl.LazyFrame):
             data = self._data.select(columns).collect().to_pandas()
         else:
-            raise ValueError(
-                "Only Polars DataFrame, Series, and LazyFrame are supported"
-            )
+            raise ValueError('Only Polars DataFrame, Series, and LazyFrame are supported')
 
         return HoloViewsConverter(data, x, y, kind=kind, **params)
 
@@ -1984,34 +1982,34 @@ class hvPlot(hvPlotTabular):
     """
 
     __all__ = [
-        "line",
-        "step",
-        "scatter",
-        "area",
-        "errorbars",
-        "heatmap",
-        "hexbin",
-        "bivariate",
-        "bar",
-        "barh",
-        "box",
-        "violin",
-        "hist",
-        "kde",
-        "density",
-        "table",
-        "dataset",
-        "points",
-        "vectorfield",
-        "polygons",
-        "paths",
-        "labels",
-        "image",
-        "rgb",
-        "quadmesh",
-        "contour",
-        "contourf",
-        "explorer",
+        'line',
+        'step',
+        'scatter',
+        'area',
+        'errorbars',
+        'heatmap',
+        'hexbin',
+        'bivariate',
+        'bar',
+        'barh',
+        'box',
+        'violin',
+        'hist',
+        'kde',
+        'density',
+        'table',
+        'dataset',
+        'points',
+        'vectorfield',
+        'polygons',
+        'paths',
+        'labels',
+        'image',
+        'rgb',
+        'quadmesh',
+        'contour',
+        'contourf',
+        'explorer',
     ]
 
     def image(self, x=None, y=None, z=None, colorbar=True, **kwds):
@@ -2066,7 +2064,7 @@ class hvPlot(hvPlotTabular):
         - Matplotlib: https://matplotlib.org/stable/tutorials/introductory/images.html
         - Plotly: https://plotly.com/python/imshow/
         """
-        return self(x, y, z=z, kind="image", colorbar=colorbar, **kwds)
+        return self(x, y, z=z, kind='image', colorbar=colorbar, **kwds)
 
     def rgb(self, x=None, y=None, z=None, bands=None, **kwds):
         """
@@ -2110,8 +2108,8 @@ class hvPlot(hvPlotTabular):
         - Plotly: https://plotly.com/python/imshow/
         """
         if bands is not None:
-            kwds["bands"] = bands
-        return self(x, y, z=z, kind="rgb", **kwds)
+            kwds['bands'] = bands
+        return self(x, y, z=z, kind='rgb', **kwds)
 
     def quadmesh(self, x=None, y=None, z=None, colorbar=True, **kwds):
         """
@@ -2162,7 +2160,7 @@ class hvPlot(hvPlotTabular):
 
         - HoloViews: https://holoviews.org/reference/elements/bokeh/QuadMesh.html
         """
-        return self(x, y, z=z, kind="quadmesh", colorbar=colorbar, **kwds)
+        return self(x, y, z=z, kind='quadmesh', colorbar=colorbar, **kwds)
 
     def contour(self, x=None, y=None, z=None, colorbar=True, **kwds):
         """
@@ -2225,7 +2223,7 @@ class hvPlot(hvPlotTabular):
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.contour.html
         - Plotly: https://plotly.com/python/contour-plots/
         """
-        return self(x, y, z=z, kind="contour", colorbar=colorbar, **kwds)
+        return self(x, y, z=z, kind='contour', colorbar=colorbar, **kwds)
 
     def contourf(self, x=None, y=None, z=None, colorbar=True, **kwds):
         """
@@ -2287,4 +2285,4 @@ class hvPlot(hvPlotTabular):
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.contour.html
         - Plotly: https://plotly.com/python/contour-plots/
         """
-        return self(x, y, z=z, kind="contourf", colorbar=colorbar, **kwds)
+        return self(x, y, z=z, kind='contourf', colorbar=colorbar, **kwds)

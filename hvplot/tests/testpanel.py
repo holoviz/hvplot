@@ -1,9 +1,11 @@
 """
 Tests for panel widgets and param objects as arguments
 """
+
 from unittest import TestCase, SkipTest
 
 from hvplot.util import process_xarray  # noqa
+
 
 def look_for_class(panel, classname, items=None):
     """
@@ -22,7 +24,6 @@ def look_for_class(panel, classname, items=None):
 
 
 class TestPanelObjects(TestCase):
-
     def setUp(self):
         try:
             import panel as pn  # noqa
@@ -31,9 +32,9 @@ class TestPanelObjects(TestCase):
             raise SkipTest('panel not available')
 
         from bokeh.sampledata.iris import flowers
+
         self.flowers = flowers
         self.cols = list(self.flowers.columns[:-1])
-
 
     def test_using_explicit_widgets_works(self):
         import panel as pn
@@ -54,8 +55,8 @@ class TestPanelObjects(TestCase):
         import panel as pn
 
         pane = self.flowers.hvplot.scatter(
-            groupby='species', legend='top_right',
-            widgets={'species': pn.widgets.DiscreteSlider})
+            groupby='species', legend='top_right', widgets={'species': pn.widgets.DiscreteSlider}
+        )
 
         assert len(look_for_class(pane, pn.widgets.DiscreteSlider)) == 1
 

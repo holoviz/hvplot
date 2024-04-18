@@ -15,25 +15,25 @@ import glob
 import pytest
 
 # Note: The regex will find urls from code cells in notebooks ending with '\\' because the are really inside \"some_url\"
-URL_REGEX = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))" # pylint: disable=line-too-long
+URL_REGEX = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"  # pylint: disable=line-too-long
 ROOT = pathlib.Path(__file__).parent
 PACKAGE_ROOT = ROOT.parent
 MAX_WORKERS = 10
-POST_FIXES = [".py", ".ipynb", ".md", ".yaml"]
+POST_FIXES = ['.py', '.ipynb', '.md', '.yaml']
 SKIP_URLS = [
-    "https://anaconda.org/anaconda/hvplot",
-    "https://anaconda.org/conda-forge/hvplot",
-    "https://anaconda.org/pyviz/hvplot",
-    "https://creativecommons.org/publicdomain/zero/1.0/",
-    "https://github.com/rasterio/rasterio",
-    "https://www.dask.org",
-    "pyproject.toml/equivalent",
+    'https://anaconda.org/anaconda/hvplot',
+    'https://anaconda.org/conda-forge/hvplot',
+    'https://anaconda.org/pyviz/hvplot',
+    'https://creativecommons.org/publicdomain/zero/1.0/',
+    'https://github.com/rasterio/rasterio',
+    'https://www.dask.org',
+    'pyproject.toml/equivalent',
 ]
 
 
 def _get_files_to_check():
     for post_fix in POST_FIXES:
-        for file in glob.glob("**/*" + post_fix, recursive=True):
+        for file in glob.glob('**/*' + post_fix, recursive=True):
             yield pathlib.Path(file)
 
 
@@ -43,20 +43,22 @@ FIXTURES = [pytest.param(file, id=str(file)) for file in _get_files_to_check()]
 def _skip_url(url: str):
     if url in SKIP_URLS:
         return True
-    if url.startswith("https://github.com/holoviz/hvplot/pull/"):
+    if url.startswith('https://github.com/holoviz/hvplot/pull/'):
         return True
-    if url.startswith("https://img.shields.io"):
+    if url.startswith('https://img.shields.io'):
         return True
-    if url.startswith("assets.holoviews.org/data/"):
+    if url.startswith('assets.holoviews.org/data/'):
         return True
-    if url.startswith("Math.PI"):
+    if url.startswith('Math.PI'):
         return True
     return False
 
+
 def _clean_url(url: str):
-    if url.endswith("\\"):
+    if url.endswith('\\'):
         return url[0:-1]
     return url
+
 
 def _find_urls(text):
     url = re.findall(URL_REGEX, text)
@@ -80,11 +82,9 @@ def _verify_urls(urls):
             try:
                 result = future.result()
             except Exception as ex:
-                raise ValueError(f"The url {url} raised an exception") from ex
+                raise ValueError(f'The url {url} raised an exception') from ex
             if not result.status == 200:
-                raise ValueError(
-                    f"The url {url} responded with status {result.status}, not 200."
-                )
+                raise ValueError(f'The url {url} responded with status {result.status}, not 200.')
 
         return True
 

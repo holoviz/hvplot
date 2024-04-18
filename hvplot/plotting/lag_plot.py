@@ -21,14 +21,13 @@ def lag_plot(data, lag=1, **kwds):
         The HoloViews representation of the plot.
     """
     if lag != int(lag) or int(lag) <= 0:
-        raise ValueError("lag must be a positive integer")
+        raise ValueError('lag must be a positive integer')
     lag = int(lag)
 
     values = data.values
     y1 = 'y(t)'
     y2 = f'y(t + {lag})'
-    lags = pd.DataFrame({y1: values[:-lag].T.ravel(),
-                         y2: values[lag:].T.ravel()})
+    lags = pd.DataFrame({y1: values[:-lag].T.ravel(), y2: values[lag:].T.ravel()})
     if isinstance(data, pd.DataFrame):
         lags['variable'] = np.repeat(data.columns, lags.shape[0] / data.shape[1])
         kwds['c'] = 'variable'

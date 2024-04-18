@@ -1,29 +1,29 @@
 import dask
 
 optional_markers = {
-    "geo": {
-        "help": "Run the tests that require GeoViews",
-        "marker-descr": "Geo test marker",
-        "skip-reason": "Test only runs with the --geo option."
+    'geo': {
+        'help': 'Run the tests that require GeoViews',
+        'marker-descr': 'Geo test marker',
+        'skip-reason': 'Test only runs with the --geo option.',
     },
 }
 
 
 def pytest_addoption(parser):
     for marker, info in optional_markers.items():
-        parser.addoption("--{}".format(marker), action="store_true",
-                         default=False, help=info['help'])
+        parser.addoption(
+            '--{}'.format(marker), action='store_true', default=False, help=info['help']
+        )
 
 
 def pytest_configure(config):
     for marker, info in optional_markers.items():
-        config.addinivalue_line("markers",
-                                "{}: {}".format(marker, info['marker-descr']))
+        config.addinivalue_line('markers', '{}: {}'.format(marker, info['marker-descr']))
 
 
 def pytest_collection_modifyitems(config, items):
     skipped, selected = [], []
-    markers = [m for m in optional_markers if config.getoption(f"--{m}")]
+    markers = [m for m in optional_markers if config.getoption(f'--{m}')]
     empty = not markers
     for item in items:
         if empty and any(m in item.keywords for m in optional_markers):
@@ -41,4 +41,4 @@ def pytest_collection_modifyitems(config, items):
 
 # From Dask 2024.3.0 they now use `dask_expr` by default
 # https://github.com/dask/dask/issues/10995
-dask.config.set({"dataframe.query-planning": False})
+dask.config.set({'dataframe.query-planning': False})
