@@ -1,0 +1,5 @@
+# Run this command to always ignore formatting commits in `git blame`
+# git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# Ignore linting/formatting with ruff initial PR (https://github.com/holoviz/hvplot/pull/1320)
+6c33e47b740e0a5093688a855e99559245c553fd
