@@ -1,6 +1,7 @@
 """
 Tests pandas.options.backend setting
 """
+
 from unittest import TestCase, SkipTest
 
 import holoviews as hv
@@ -17,18 +18,16 @@ from hvplot.tests.util import makeDataFrame
 no_args = ['line', 'area', 'hist', 'box', 'kde', 'density', 'bar', 'barh']
 x_y = ['scatter', 'hexbin']
 
-no_args_mapping = [(kind, el) for kind, el in HoloViewsConverter._kind_mapping.items()
-                   if kind in no_args]
-x_y_mapping = [(kind, el) for kind, el in HoloViewsConverter._kind_mapping.items()
-               if kind in x_y]
+no_args_mapping = [
+    (kind, el) for kind, el in HoloViewsConverter._kind_mapping.items() if kind in no_args
+]
+x_y_mapping = [(kind, el) for kind, el in HoloViewsConverter._kind_mapping.items() if kind in x_y]
 
 
 class TestPandasHoloviewsPlotting(TestCase):
-
     def setUp(self):
         if Version(pd.__version__) < Version('0.25.1'):
-            raise SkipTest('entrypoints for plotting.backends was added '
-                           'in pandas 0.25.1')
+            raise SkipTest('entrypoints for plotting.backends was added in pandas 0.25.1')
         pd.options.plotting.backend = 'holoviews'
 
     @parameterized.expand(no_args_mapping)
@@ -51,21 +50,19 @@ class TestPandasHoloviewsPlotting(TestCase):
 
     def test_pandas_dataframe_plot_does_not_implement_pie(self):
         df = pd.DataFrame({'a': [0, 1, 2], 'b': [5, 7, 2]})
-        with self.assertRaisesRegex(NotImplementedError, "pie"):
+        with self.assertRaisesRegex(NotImplementedError, 'pie'):
             df.plot.pie(y='a')
 
 
 class TestPandasHvplotPlotting(TestPandasHoloviewsPlotting):
-
     def setUp(self):
         if Version(pd.__version__) < Version('0.25.1'):
-            raise SkipTest('entrypoints for plotting.backends was added '
-                           'in pandas 0.25.1')
+            raise SkipTest('entrypoints for plotting.backends was added in pandas 0.25.1')
         pd.options.plotting.backend = 'hvplot'
 
 
 def test_plot_supports_polars():
-    pl = pytest.importorskip("polars")
+    pl = pytest.importorskip('polars')
     dfp = pl.DataFrame(makeDataFrame())
     out = plot(dfp, 'line')
     assert isinstance(out, hv.NdOverlay)

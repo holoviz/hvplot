@@ -10,9 +10,9 @@ from holoviews.element.comparison import ComparisonTestCase
 
 
 class TestOverrides(ComparisonTestCase):
-
     def setUp(self):
         import hvplot.pandas  # noqa
+
         self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
 
     def test_define_default_options(self):
@@ -54,12 +54,11 @@ class TestOverrides(ComparisonTestCase):
 
 
 class TestXArrayOverrides(ComparisonTestCase):
-
     def setUp(self):
         coords = OrderedDict([('time', [0, 1]), ('lat', [0, 1]), ('lon', [0, 1])])
-        self.da_img_by_time = xr.DataArray(np.arange(8).reshape((2, 2, 2)),
-                                           coords, ['time', 'lat', 'lon']).assign_coords(
-                                               lat1=xr.DataArray([2,3], dims=['lat']))
+        self.da_img_by_time = xr.DataArray(
+            np.arange(8).reshape((2, 2, 2)), coords, ['time', 'lat', 'lon']
+        ).assign_coords(lat1=xr.DataArray([2, 3], dims=['lat']))
 
     def test_xarray_isel_scalar_metadata(self):
         hvplot = hvPlot(self.da_img_by_time, isel={'time': 1})

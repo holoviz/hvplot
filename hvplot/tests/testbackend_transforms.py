@@ -18,7 +18,7 @@ from hvplot.backend_transforms import (
         (None, 300, 3, {'aspect': 3, 'fig_size': 100.0}),
         (300, None, None, {'fig_size': 100.0}),
         (None, 300, None, {'fig_size': 100.0}),
-    )
+    ),
 )
 def test_transform_size_to_mpl(width, height, aspect, opts):
     assert _transform_size_to_mpl(width, height, aspect) == opts
@@ -31,7 +31,7 @@ def test_transform_size_to_mpl(width, height, aspect, opts):
         (Curve([]), 'line_alpha', 0.123, 'matplotlib', 'style', None, None),
         (Area([]), 'line_cap', 'square', 'matplotlib', 'style', 'capstyle', 'projecting'),
         (Curve([]), 'line_dash', 'dashed', 'plotly', 'style', 'dash', 'dash'),
-    )
+    ),
 )
 def test_transfer_opts(element, opt, val, backend, opt_kind, transf_opt, transf_val):
     current_backend = Store.current_backend
@@ -50,12 +50,13 @@ def test_transfer_opts(element, opt, val, backend, opt_kind, transf_opt, transf_
     finally:
         Store.set_current_backend(current_backend)
 
+
 @pytest.mark.parametrize(
     ('opt', 'val', 'backend', 'opt_kind', 'transf_opt', 'transf_val'),
     (
         ('line_dash', 'dashed', 'matplotlib', 'style', 'linestyle', 'dashed'),
         ('line_dash', 'dashed', 'plotly', 'style', 'dash', 'dash'),
-    )
+    ),
 )
 def test_transfer_opts_compositeoverlay(opt, val, backend, opt_kind, transf_opt, transf_val):
     current_backend = Store.current_backend
@@ -72,6 +73,7 @@ def test_transfer_opts_compositeoverlay(opt, val, backend, opt_kind, transf_opt,
     finally:
         Store.set_current_backend(current_backend)
 
+
 @pytest.mark.parametrize(
     ('bk_option', 'expected'),
     (
@@ -80,8 +82,8 @@ def test_transfer_opts_compositeoverlay(opt, val, backend, opt_kind, transf_opt,
         ('nonselection_line_alpha', True),
         ('muted_line_alpha', True),
         ('selection_line_alpha', True),
-        ('annular_muted_alpha', True)
-    )
+        ('annular_muted_alpha', True),
+    ),
 )
 def test_is_interactive_opt(bk_option, expected):
     assert _is_interactive_opt(bk_option) == expected

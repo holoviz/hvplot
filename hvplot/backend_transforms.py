@@ -1,6 +1,7 @@
 """
 Set of transforms to go from a Bokeh option to another backend's option.
 """
+
 from holoviews.core.overlay import CompositeOverlay
 from holoviews.core.options import Store
 from holoviews.plotting.util import COLOR_ALIASES
@@ -12,15 +13,15 @@ UNSET = type('UNSET', (), {})
 def _transform_size_to_mpl(width, height, aspect):
     opts = {}
     if width and height:
-        opts = {'aspect': width/height, 'fig_size': (width/300.)*100}
+        opts = {'aspect': width / height, 'fig_size': (width / 300.0) * 100}
     elif aspect and width:
-        opts = {'aspect': aspect, 'fig_size': (width/300.)*100}
+        opts = {'aspect': aspect, 'fig_size': (width / 300.0) * 100}
     elif aspect and height:
-        opts = {'aspect': aspect, 'fig_size': (height/300.)*100}
+        opts = {'aspect': aspect, 'fig_size': (height / 300.0) * 100}
     elif width:
-        opts = {'fig_size': (width/300.)*100}
+        opts = {'fig_size': (width / 300.0) * 100}
     elif height:
-        opts = {'fig_size': (height/300.)*100}
+        opts = {'fig_size': (height / 300.0) * 100}
     return opts
 
 
@@ -33,9 +34,7 @@ def _transfer_opts(element, backend):
     options = Store.options(backend=backend)
     transforms = BACKEND_TRANSFORMS[backend]
     if isinstance(element, CompositeOverlay):
-        element = element.apply(
-            _transfer_opts, backend=backend, per_element=True
-        )
+        element = element.apply(_transfer_opts, backend=backend, per_element=True)
     new_opts = {}
     el_options = element.opts.get(backend='bokeh', defaults=False).kwargs
     for grp, el_opts in options[elname].groups.items():
@@ -57,8 +56,7 @@ def _transfer_opts(element, backend):
             new_opts[opt] = val
     if backend == 'matplotlib':
         size_opts = _transform_size_to_mpl(
-            el_options.get('width'), el_options.get('height'),
-            el_options.get('aspect')
+            el_options.get('width'), el_options.get('height'), el_options.get('aspect')
         )
         new_opts.update(size_opts)
     return element.opts(**new_opts, backend=backend)
@@ -200,7 +198,10 @@ MATPLOTLIB_TRANSFORMS = {
         'outlier_color': UNSET,
         'text_align': lambda k, v: ('horizontalalignment', v),
         'text_alpha': lambda k, v: ('alpha', v),
-        'text_baseline': lambda k, v: ('verticalalignment', _text_baseline_bk_mpl_mapping.get(v, UNSET)),
+        'text_baseline': lambda k, v: (
+            'verticalalignment',
+            _text_baseline_bk_mpl_mapping.get(v, UNSET),
+        ),
         'text_color': lambda k, v: ('color', v),
         'text_font': UNSET,
         'text_font_size': lambda k, v: ('size', v),
@@ -318,7 +319,7 @@ PLOTLY_TRANSFORMS = {
         'line_width': lambda k, v: ('line_width', v),
         'muted_alpha': UNSET,
         'palette': UNSET,
-    }
+    },
 }
 
 

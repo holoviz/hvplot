@@ -112,7 +112,11 @@ from panel.widgets.base import Widget
 
 from .converter import HoloViewsConverter
 from .util import (
-    _flatten, bokeh3, is_tabular, is_xarray, is_xarray_dataarray,
+    _flatten,
+    bokeh3,
+    is_tabular,
+    is_xarray,
+    is_xarray_dataarray,
     _convert_col_names_to_str,
 )
 
@@ -134,20 +138,23 @@ def _find_widgets(op):
         # Find Ipywidgets
         if 'ipywidgets' in sys.modules:
             from ipywidgets import Widget as IPyWidget
+
             if isinstance(op_arg, IPyWidget) and op_arg not in widgets:
                 widgets.append(op_arg)
         # Find widgets introduced as `widget.param.value` in an expression
-        if (isinstance(op_arg, param.Parameter) and
-            isinstance(op_arg.owner, pn.widgets.Widget) and
-            op_arg.owner not in widgets):
+        if (
+            isinstance(op_arg, param.Parameter)
+            and isinstance(op_arg.owner, pn.widgets.Widget)
+            and op_arg.owner not in widgets
+        ):
             widgets.append(op_arg.owner)
         if isinstance(op_arg, slice):
-            if Version(hv.__version__) < Version("1.15.1"):
+            if Version(hv.__version__) < Version('1.15.1'):
                 raise ValueError(
-                    "Using interactive with slices needs to have "
-                    "Holoviews 1.15.1 or greater installed."
+                    'Using interactive with slices needs to have '
+                    'Holoviews 1.15.1 or greater installed.'
                 )
-            nested_op = {"args": [op_arg.start, op_arg.stop, op_arg.step], "kwargs": {}}
+            nested_op = {'args': [op_arg.start, op_arg.stop, op_arg.step], 'kwargs': {}}
             for widget in _find_widgets(nested_op):
                 if widget not in widgets:
                     widgets.append(widget)
@@ -240,10 +247,23 @@ class Interactive:
         """
         return True
 
-    def __init__(self, obj, transform=None, fn=None, plot=False, depth=0,
-                 loc='top_left', center=False, dmap=False, inherit_kwargs={},
-                 max_rows=100, method=None, _shared_obj=None, _current=None, **kwargs):
-
+    def __init__(
+        self,
+        obj,
+        transform=None,
+        fn=None,
+        plot=False,
+        depth=0,
+        loc='top_left',
+        center=False,
+        dmap=False,
+        inherit_kwargs={},
+        max_rows=100,
+        method=None,
+        _shared_obj=None,
+        _current=None,
+        **kwargs,
+    ):
         # _init is used to prevent to __getattribute__ to execute its
         # specialized code.
         self._init = False
@@ -257,8 +277,8 @@ class Interactive:
                     dim = obj.name
                 if dim is None:
                     raise ValueError(
-                        "Cannot use interactive API on DataArray without name."
-                        "Assign a name to the DataArray and try again."
+                        'Cannot use interactive API on DataArray without name.'
+                        'Assign a name to the DataArray and try again.'
                     )
             elif is_tabular(obj):
                 transform = hv.util.transform.df_dim
@@ -362,18 +382,31 @@ class Interactive:
             if isinstance(obj, pd.DataFrame):
                 return pn.pane.DataFrame(obj, max_rows=self._max_rows, **self._kwargs)
             return obj
+
         params = self._params
         if params:
+
             @pn.depends(*params)
             def evaluate(*args, **kwargs):
                 return evaluate_inner()
         else:
+
             def evaluate():
                 return evaluate_inner()
+
         return evaluate
 
-    def _clone(self, transform=None, plot=None, loc=None, center=None,
-               dmap=None, copy=False, max_rows=None, **kwargs):
+    def _clone(
+        self,
+        transform=None,
+        plot=None,
+        loc=None,
+        center=None,
+        dmap=None,
+        copy=False,
+        max_rows=None,
+        **kwargs,
+    ):
         plot = self._plot or plot
         transform = transform or self._transform
         loc = self._loc if loc is None else loc
@@ -382,12 +415,28 @@ class Interactive:
         max_rows = self._max_rows if max_rows is None else max_rows
         depth = self._depth + 1
         if copy:
-            kwargs = dict(self._kwargs, _current=self._current, inherit_kwargs=self._inherit_kwargs, method=self._method, **kwargs)
+            kwargs = dict(
+                self._kwargs,
+                _current=self._current,
+                inherit_kwargs=self._inherit_kwargs,
+                method=self._method,
+                **kwargs,
+            )
         else:
             kwargs = dict(self._inherit_kwargs, **dict(self._kwargs, **kwargs))
-        return type(self)(self._obj, fn=self._fn, transform=transform, plot=plot, depth=depth,
-                         loc=loc, center=center, dmap=dmap, _shared_obj=self._shared_obj,
-                         max_rows=max_rows, **kwargs)
+        return type(self)(
+            self._obj,
+            fn=self._fn,
+            transform=transform,
+            plot=plot,
+            depth=depth,
+            loc=loc,
+            center=center,
+            dmap=dmap,
+            _shared_obj=self._shared_obj,
+            max_rows=max_rows,
+            **kwargs,
+        )
 
     def _repr_mimebundle_(self, include=[], exclude=[]):
         return self.layout()._repr_mimebundle_()
@@ -454,9 +503,11 @@ class Interactive:
         def get_ax():
             from matplotlib.backends.backend_agg import FigureCanvas
             from matplotlib.pyplot import Figure
+
             Interactive._fig = fig = Figure()
             FigureCanvas(fig)
             return fig.subplots()
+
         return get_ax
 
     def __call__(self, *args, **kwargs):
@@ -521,9 +572,9 @@ class Interactive:
             new._method = None
         return clone
 
-    #----------------------------------------------------------------
+    # ----------------------------------------------------------------
     # Interactive pipeline APIs
-    #----------------------------------------------------------------
+    # ----------------------------------------------------------------
 
     def __array_ufunc__(self, *args, **kwargs):
         # TODO: How to trigger this method?
@@ -550,10 +601,13 @@ class Interactive:
     # Unary operators
     def __neg__(self):
         return self._apply_operator(operator.neg)
+
     def __not__(self):
         return self._apply_operator(operator.not_)
+
     def __invert__(self):
         return self._apply_operator(operator.inv)
+
     def __pos__(self):
         return self._apply_operator(operator.pos)
 
@@ -561,51 +615,67 @@ class Interactive:
     def __add__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.add, other)
+
     def __and__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.and_, other)
+
     def __eq__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.eq, other)
+
     def __floordiv__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.floordiv, other)
+
     def __ge__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.ge, other)
+
     def __gt__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.gt, other)
+
     def __le__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.le, other)
+
     def __lt__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.lt, other)
+
     def __lshift__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.lshift, other)
+
     def __mod__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.mod, other)
+
     def __mul__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.mul, other)
+
     def __ne__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.ne, other)
+
     def __or__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.or_, other)
+
     def __rshift__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.rshift, other)
+
     def __pow__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.pow, other)
+
     def __sub__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.sub, other)
+
     def __truediv__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.truediv, other)
@@ -614,36 +684,47 @@ class Interactive:
     def __radd__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.add, other, reverse=True)
+
     def __rand__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.and_, other, reverse=True)
+
     def __rdiv__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.div, other, reverse=True)
+
     def __rfloordiv__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.floordiv, other, reverse=True)
+
     def __rlshift__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.rlshift, other)
+
     def __rmod__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.mod, other, reverse=True)
+
     def __rmul__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.mul, other, reverse=True)
+
     def __ror__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.or_, other, reverse=True)
+
     def __rpow__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.pow, other, reverse=True)
+
     def __rrshift__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.rrshift, other)
+
     def __rsub__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.sub, other, reverse=True)
+
     def __rtruediv__(self, other):
         other = other._transform if isinstance(other, Interactive) else other
         return self._apply_operator(operator.truediv, other, reverse=True)
@@ -658,18 +739,20 @@ class Interactive:
         def get_ax():
             from matplotlib.backends.backend_agg import FigureCanvas
             from matplotlib.pyplot import Figure
+
             Interactive._fig = fig = Figure()
             FigureCanvas(fig)
             return fig.subplots()
+
         kwargs['ax'] = get_ax
         new = self._resolve_accessor()
         transform = new._transform
         transform = type(transform)(transform, 'plot', accessor=True)
         return new._clone(transform(*args, **kwargs), plot=True)
 
-    #----------------------------------------------------------------
+    # ----------------------------------------------------------------
     # Public API
-    #----------------------------------------------------------------
+    # ----------------------------------------------------------------
 
     def dmap(self):
         """
@@ -742,9 +825,17 @@ class Interactive:
             elif loc.startswith('right'):
                 components = [HSpacer(), panel, HSpacer(), widgets]
             elif loc.startswith('top'):
-                components = [HSpacer(), Column(widgets, Row(HSpacer(), panel, HSpacer())), HSpacer()]
+                components = [
+                    HSpacer(),
+                    Column(widgets, Row(HSpacer(), panel, HSpacer())),
+                    HSpacer(),
+                ]
             elif loc.startswith('bottom'):
-                components = [HSpacer(), Column(Row(HSpacer(), panel, HSpacer()), widgets), HSpacer()]
+                components = [
+                    HSpacer(),
+                    Column(Row(HSpacer(), panel, HSpacer()), widgets),
+                    HSpacer(),
+                ]
         else:
             if loc.startswith('left'):
                 components = [widgets, panel]
@@ -773,7 +864,7 @@ class Interactive:
             'left_top': (Row, 'start', True),
             'left_bottom': (Row, ('start', 'end'), True),
             'right_top': (Row, ('end', 'start'), False),
-            'right_bottom': (Row, 'end', False)
+            'right_bottom': (Row, 'end', False),
         }
         layout, align, widget_first = alignments[loc]
         widget_box.align = align
@@ -834,8 +925,7 @@ class Interactive:
         """
         widgets = []
         for p in self._fn_params:
-            if (isinstance(p.owner, pn.widgets.Widget) and
-                p.owner not in widgets):
+            if isinstance(p.owner, pn.widgets.Widget) and p.owner not in widgets:
                 widgets.append(p.owner)
         for op in self._transform.ops:
             for w in _find_widgets(op):
@@ -847,7 +937,7 @@ class Interactive:
 class _hvplot:
     _kinds = tuple(HoloViewsConverter._kind_mapping)
 
-    __slots__ = ["_interactive"]
+    __slots__ = ['_interactive']
 
     def __init__(self, _interactive):
         self._interactive = _interactive
@@ -856,10 +946,10 @@ class _hvplot:
         # The underscore in _kind is to not overwrite it
         # if 'kind' is in kwargs and the function
         # is used with partial.
-        if _kind and "kind" in kwargs:
+        if _kind and 'kind' in kwargs:
             raise TypeError(f"{_kind}() got an unexpected keyword argument 'kind'")
         if _kind:
-            kwargs["kind"] = _kind
+            kwargs['kind'] = _kind
 
         new = self._interactive._resolve_accessor()
         transform = new._transform

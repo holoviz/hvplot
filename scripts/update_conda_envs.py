@@ -1,13 +1,15 @@
 import subprocess
 from pathlib import Path
 
+
 def main():
-    subprocess.run([
-            "pyproject2conda",
-            "project",
-            "--overwrite",
-            "force",
-            "--template-python",
+    subprocess.run(
+        [
+            'pyproject2conda',
+            'project',
+            '--overwrite',
+            'force',
+            '--template-python',
             str(Path('envs', 'py{py_version}-{env}')),
         ],
         check=True,
@@ -21,5 +23,5 @@ def main():
             f.write('    - -e ..\n')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

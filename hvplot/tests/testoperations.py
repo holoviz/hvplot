@@ -21,20 +21,23 @@ from packaging.version import Version
 
 
 class TestDatashader(ComparisonTestCase):
-
     def setUp(self):
         try:
-            import datashader # noqa
-        except:
+            import datashader  # noqa
+        except ImportError:
             raise SkipTest('Datashader not available')
         if sys.maxsize < 2**32:
             raise SkipTest('Datashader does not support 32-bit systems')
-        import hvplot.pandas # noqa
-        self.df = pd.DataFrame([[1, 2, 'A', 0.1], [3, 4, 'B', 0.2], [5, 6, 'C', 0.3]],
-                               columns=['x', 'y', 'category', 'number'])
+        import hvplot.pandas  # noqa
+
+        self.df = pd.DataFrame(
+            [[1, 2, 'A', 0.1], [3, 4, 'B', 0.2], [5, 6, 'C', 0.3]],
+            columns=['x', 'y', 'category', 'number'],
+        )
 
     def test_rasterize_by_cat(self):
         from datashader.reductions import count_cat
+
         dmap = self.df.hvplot.scatter('x', 'y', by='category', rasterize=True)
         agg = dmap.callback.inputs[0].callback.operation.p.aggregator
         self.assertIsInstance(agg, count_cat)
@@ -42,6 +45,7 @@ class TestDatashader(ComparisonTestCase):
 
     def test_rasterize_by_cat_agg(self):
         from datashader.reductions import count_cat
+
         dmap = self.df.hvplot.scatter('x', 'y', aggregator=count_cat('category'), rasterize=True)
         agg = dmap.callback.inputs[0].callback.operation.p.aggregator
         self.assertIsInstance(agg, count_cat)
@@ -50,6 +54,7 @@ class TestDatashader(ComparisonTestCase):
     @parameterized.expand([('rasterize',), ('datashade',)])
     def test_color_dim_with_default_agg(self, operation):
         from datashader.reductions import mean
+
         dmap = self.df.hvplot.scatter('x', 'y', c='number', **{operation: True})
         agg = dmap.callback.inputs[0].callback.operation.p.aggregator
         self.assertIsInstance(agg, mean)
@@ -58,6 +63,7 @@ class TestDatashader(ComparisonTestCase):
     @parameterized.expand([('rasterize',), ('datashade',)])
     def test_color_dim_with_string_agg(self, operation):
         from datashader.reductions import sum
+
         dmap = self.df.hvplot.scatter('x', 'y', c='number', aggregator='sum', **{operation: True})
         agg = dmap.callback.inputs[0].callback.operation.p.aggregator
         self.assertIsInstance(agg, sum)
@@ -66,6 +72,7 @@ class TestDatashader(ComparisonTestCase):
     @parameterized.expand([('rasterize',), ('datashade',)])
     def test_color_dim_also_an_axis(self, operation):
         from datashader.reductions import mean
+
         original_data = self.df.copy(deep=True)
         dmap = self.df.hvplot.scatter('x', 'y', c='y', **{operation: True})
         agg = dmap.callback.inputs[0].callback.operation.p.aggregator
@@ -128,7 +135,9 @@ class TestDatashader(ComparisonTestCase):
 
     @parameterized.expand([('aspect',), ('data_aspect',)])
     def test_aspect_and_frame_height_with_datashade_and_dynamic_is_false(self, opt):
-        plot = self.df.hvplot(x='x', y='y', frame_height=150, datashade=True, dynamic=False, **{opt: 2})
+        plot = self.df.hvplot(
+            x='x', y='y', frame_height=150, datashade=True, dynamic=False, **{opt: 2}
+        )
         opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
         self.assertEqual(opts[opt], 2)
         self.assertEqual(opts.get('frame_height'), 150)
@@ -139,8 +148,9 @@ class TestDatashader(ComparisonTestCase):
         color_key = {'A': '#ff0000', 'B': '#00ff00', 'C': '#0000ff'}
         self.df.hvplot.points(x='x', y='y', by='category', cmap=color_key, datashade=True)
         with self.assertRaises(TypeError):
-            self.df.hvplot.points(x='x', y='y', by='category', datashade=True,
-                                  cmap='kbc_r', color_key=color_key)
+            self.df.hvplot.points(
+                x='x', y='y', by='category', datashade=True, cmap='kbc_r', color_key=color_key
+            )
 
     def test_when_datashade_is_true_set_hover_to_false_by_default(self):
         plot = self.df.hvplot(x='x', y='y', datashade=True)
@@ -163,23 +173,25 @@ class TestDatashader(ComparisonTestCase):
         plot = makeTimeDataFrame().hvplot(y=list(df.columns), datashade=True, kind=kind)
         expected_cmap = HoloViewsConverter._default_cmaps['categorical']
         assert plot.callback.inputs[0].callback.operation.p.cmap == expected_cmap
-        assert  plot.callback.inputs[0].callback.operation.p.aggregator.column == 'Variable'
+        assert plot.callback.inputs[0].callback.operation.p.aggregator.column == 'Variable'
 
     @parameterized.expand([('scatter',), ('line',), ('area',)])
     def test_wide_charts_categorically_shaded_implicit_ys(self, kind):
         plot = makeTimeDataFrame().hvplot(datashade=True, kind=kind)
         expected_cmap = HoloViewsConverter._default_cmaps['categorical']
         assert plot.callback.inputs[0].callback.operation.p.cmap == expected_cmap
-        assert  plot.callback.inputs[0].callback.operation.p.aggregator.column == 'Variable'
+        assert plot.callback.inputs[0].callback.operation.p.aggregator.column == 'Variable'
 
     def test_tidy_charts_categorically_datashade_by(self):
         cat_col = 'category'
         plot = self.df.hvplot.scatter('x', 'y', by=cat_col, datashade=True)
         expected_cmap = HoloViewsConverter._default_cmaps['categorical']
-        assert  plot.callback.inputs[0].callback.operation.p.cmap == expected_cmap
-        assert  plot.callback.inputs[0].callback.operation.p.aggregator.column == cat_col
+        assert plot.callback.inputs[0].callback.operation.p.cmap == expected_cmap
+        assert plot.callback.inputs[0].callback.operation.p.aggregator.column == cat_col
 
-    @pytest.mark.xfail(reason='Assume this is fixed: https://github.com/holoviz/holoviews/issues/6187')
+    @pytest.mark.xfail(
+        reason='Assume this is fixed: https://github.com/holoviz/holoviews/issues/6187'
+    )
     def test_tidy_charts_categorically_rasterized_by(self):
         cat_col = 'category'
         plot = self.df.hvplot.scatter('x', 'y', by=cat_col, rasterize=True)
@@ -188,16 +200,17 @@ class TestDatashader(ComparisonTestCase):
         # Failing line
         assert opts.get('cmap') == expected_cmap
 
-        assert  plot.callback.inputs[0].callback.operation.p.aggregator.column == cat_col
+        assert plot.callback.inputs[0].callback.operation.p.aggregator.column == cat_col
 
     def test_tidy_charts_categorically_rasterized_aggregator_count_cat(self):
         cat_col = 'category'
         from datashader.reductions import count_cat
+
         plot = self.df.hvplot.scatter('x', 'y', aggregator=count_cat(cat_col), rasterize=True)
         expected_cmap = HoloViewsConverter._default_cmaps['categorical']
         opts = Store.lookup_options('bokeh', plot[()], 'style').kwargs
         assert opts.get('cmap') == expected_cmap
-        assert  plot.callback.inputs[0].callback.operation.p.aggregator.column == cat_col
+        assert plot.callback.inputs[0].callback.operation.p.aggregator.column == cat_col
 
     def test_rasterize_cnorm(self):
         expected = 'eq_hist'
@@ -213,13 +226,17 @@ class TestDatashader(ComparisonTestCase):
 
     def test_rasterize_rescale_discrete_levels(self):
         expected = False
-        plot = self.df.hvplot(x='x', y='y', rasterize=True, cnorm='eq_hist', rescale_discrete_levels=expected)
+        plot = self.df.hvplot(
+            x='x', y='y', rasterize=True, cnorm='eq_hist', rescale_discrete_levels=expected
+        )
         opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
         assert opts.get('rescale_discrete_levels') is expected
 
     def test_datashade_rescale_discrete_levels(self):
         expected = False
-        plot = self.df.hvplot(x='x', y='y', datashade=True, cnorm='eq_hist', rescale_discrete_levels=expected)
+        plot = self.df.hvplot(
+            x='x', y='y', datashade=True, cnorm='eq_hist', rescale_discrete_levels=expected
+        )
         actual = plot.callback.inputs[0].callback.operation.p['rescale_discrete_levels']
         assert actual is expected
 
@@ -238,7 +255,7 @@ class TestDatashader(ComparisonTestCase):
         expected = 'category'
         plot = self.df.hvplot(x='x', y='y', by=expected, rasterize=True, dynamic=False)
         assert isinstance(plot, ImageStack)
-        assert plot.opts["cmap"] == HoloViewsConverter._default_cmaps['categorical']
+        assert plot.opts['cmap'] == HoloViewsConverter._default_cmaps['categorical']
 
     def test_rasterize_aggregator_count_cat(self):
         if Version(hv.__version__) < Version('1.18.0a1'):
@@ -249,12 +266,11 @@ class TestDatashader(ComparisonTestCase):
 
         expected = 'category'
         plot = self.df.hvplot(
-            x='x', y='y', aggregator=count_cat(expected), rasterize=True,
-            width=999, dynamic=False
+            x='x', y='y', aggregator=count_cat(expected), rasterize=True, width=999, dynamic=False
         )
         assert isinstance(plot, ImageStack)
-        assert plot.opts["width"] == 999
-        assert plot.opts["cmap"] == HoloViewsConverter._default_cmaps['categorical']
+        assert plot.opts['width'] == 999
+        assert plot.opts['cmap'] == HoloViewsConverter._default_cmaps['categorical']
 
     def test_rasterize_single_y_in_list_linear_cmap(self):
         # Regression, see https://github.com/holoviz/hvplot/issues/1210
@@ -263,18 +279,15 @@ class TestDatashader(ComparisonTestCase):
         assert opts.get('cmap') == 'kbc_r'
 
     def test_resample_when_error_unset_operation(self):
-        with pytest.raises(
-            ValueError,
-            match='At least one resampling operation'
-        ):
+        with pytest.raises(ValueError, match='At least one resampling operation'):
             self.df.hvplot(x='x', y='y', resample_when=10)
 
     @parameterized.expand([('rasterize',), ('datashade',)])
     def test_operation_resample_when(self, operation):
         df = pd.DataFrame(
             np.random.multivariate_normal((0, 0), [[0.1, 0.1], [0.1, 1.0]], (5000,))
-        ).rename({0: "x", 1: "y"}, axis=1)
-        dmap = df.hvplot.scatter("x", "y", resample_when=1000, **{operation: True})
+        ).rename({0: 'x', 1: 'y'}, axis=1)
+        dmap = df.hvplot.scatter('x', 'y', resample_when=1000, **{operation: True})
         assert isinstance(dmap, DynamicMap)
 
         render(dmap)  # trigger dynamicmap
@@ -293,8 +306,8 @@ class TestDatashader(ComparisonTestCase):
     def test_downsample_resample_when(self, kind, eltype):
         df = pd.DataFrame(
             np.random.multivariate_normal((0, 0), [[0.1, 0.1], [0.1, 1.0]], (5000,))
-        ).rename({0: "x", 1: "y"}, axis=1)
-        dmap = df.hvplot(kind=kind, x="x", y="y", resample_when=1000, downsample=True)
+        ).rename({0: 'x', 1: 'y'}, axis=1)
+        dmap = df.hvplot(kind=kind, x='x', y='y', resample_when=1000, downsample=True)
         assert isinstance(dmap, DynamicMap)
 
         render(dmap)  # trigger dynamicmap
@@ -311,22 +324,20 @@ class TestDatashader(ComparisonTestCase):
 
 
 class TestChart2D(ComparisonTestCase):
-
     def setUp(self):
         try:
             import xarray as xr
-            import datashader as ds # noqa
-        except:
+            import datashader as ds  # noqa
+        except ImportError:
             raise SkipTest('xarray or datashader not available')
         if sys.maxsize < 2**32:
             raise SkipTest('Datashader does not support 32-bit systems')
         import hvplot.xarray  # noqa
+
         data = np.arange(0, 60).reshape(6, 10)
         x = np.arange(10)
         y = np.arange(6)
-        self.da = xr.DataArray(data,
-                               coords={'y': y, 'x': x},
-                               dims=('y', 'x'))
+        self.da = xr.DataArray(data, coords={'y': y, 'x': x}, dims=('y', 'x'))
 
     @parameterized.expand([('image', Image), ('quadmesh', QuadMesh)])
     def test_plot_resolution(self, kind, element):
@@ -336,15 +347,15 @@ class TestChart2D(ComparisonTestCase):
 
     @parameterized.expand([('image', Image), ('quadmesh', QuadMesh)])
     def test_plot_resolution_with_rasterize(self, kind, element):
-        plot = self.da.hvplot(kind=kind, dynamic=False, rasterize=True,
-                              x_sampling=5, y_sampling=2)
+        plot = self.da.hvplot(kind=kind, dynamic=False, rasterize=True, x_sampling=5, y_sampling=2)
         assert all(plot.data.x.diff('x').round(0) == 5)
         assert all(plot.data.y.diff('y').round(0) == 2)
 
 
 class TestDownsample(ComparisonTestCase):
     def setUp(self):
-        import hvplot.pandas # noqa
+        import hvplot.pandas  # noqa
+
         self.df = pd.DataFrame(np.random.random(100))
 
     def test_downsample_default(self):
@@ -353,10 +364,12 @@ class TestDownsample(ComparisonTestCase):
         plot = self.df.hvplot.line(downsample=True)
 
         assert isinstance(plot.callback.operation, downsample1d)
-        assert plot.callback.operation.algorithm == "lttb"
+        assert plot.callback.operation.algorithm == 'lttb'
 
     def test_downsample_opts(self):
-        plot = self.df.hvplot.line(downsample=True, width=100, height=50, x_sampling=5, xlim=(0, 5))
+        plot = self.df.hvplot.line(
+            downsample=True, width=100, height=50, x_sampling=5, xlim=(0, 5)
+        )
 
         assert plot.callback.operation.p.width == 100
         assert plot.callback.operation.p.height == 50

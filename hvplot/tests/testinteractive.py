@@ -17,8 +17,8 @@ from hvplot.tests.util import makeDataFrame, makeMixedDataFrame
 from hvplot.xarray import XArrayInteractive
 from hvplot.util import bokeh3, param2
 
-is_bokeh2 = pytest.mark.skipif(bokeh3, reason="requires bokeh 2.x")
-is_bokeh3 = pytest.mark.skipif(not bokeh3, reason="requires bokeh 3.x")
+is_bokeh2 = pytest.mark.skipif(bokeh3, reason='requires bokeh 2.x')
+is_bokeh3 = pytest.mark.skipif(not bokeh3, reason='requires bokeh 3.x')
 
 
 @pytest.fixture(scope='module')
@@ -45,9 +45,7 @@ class CallCtxt:
     def __init__(self, call_args, call_kwargs, **kwargs):
         for k, v in kwargs.items():
             if k in ['args', 'kwargs']:
-                raise ValueError(
-                    "**kwargs passed to CallCtxt can't be named args or kwargs"
-                )
+                raise ValueError("**kwargs passed to CallCtxt can't be named args or kwargs")
             setattr(self, k, v)
         self.args = call_args
         self.kwargs = call_kwargs
@@ -175,7 +173,7 @@ def test_interactive_pandas_function(df):
 
 def test_interactive_xarray_function(dataset):
     ds = dataset.copy()
-    ds['air2'] = ds.air*2
+    ds['air2'] = ds.air * 2
 
     select = pn.widgets.Select(options=list(ds))
 
@@ -196,14 +194,14 @@ def test_interactive_xarray_function(dataset):
 
 def test_interactive_nested_widgets():
     df = makeDataFrame()
-    w = pn.widgets.RadioButtonGroup(value="A", options=list("ABC"))
+    w = pn.widgets.RadioButtonGroup(value='A', options=list('ABC'))
 
     idf = Interactive(df)
-    pipeline = idf.groupby(["D", w]).mean()
+    pipeline = idf.groupby(['D', w]).mean()
     ioutput = pipeline.panel().object().object
     iw = pipeline.widgets()
 
-    output = df.groupby(["D", "A"]).mean()
+    output = df.groupby(['D', 'A']).mean()
 
     pd.testing.assert_frame_equal(ioutput, output)
     assert len(iw) == 1
@@ -211,8 +209,8 @@ def test_interactive_nested_widgets():
 
 
 @pytest.mark.skipif(
-    Version(hv.__version__) < Version("1.15.1"),
-    reason="Needs holoviews 1.15.1",
+    Version(hv.__version__) < Version('1.15.1'),
+    reason='Needs holoviews 1.15.1',
 )
 def test_interactive_slice():
     df = makeDataFrame()
@@ -238,19 +236,19 @@ def test_interactive_slice():
 def test_interactive_pandas_dataframe_hvplot_accessor(df):
     dfi = df.interactive()
 
-    assert dfi.hvplot(kind="scatter")._transform == dfi.hvplot.scatter()._transform
+    assert dfi.hvplot(kind='scatter')._transform == dfi.hvplot.scatter()._transform
 
     with pytest.raises(TypeError):
-        dfi.hvplot.scatter(kind="area")
+        dfi.hvplot.scatter(kind='area')
 
 
 def test_interactive_xarray_dataset_hvplot_accessor(dataarray):
     dai = dataarray.interactive
 
-    assert dai.hvplot(kind="line")._transform == dai.hvplot.line()._transform
+    assert dai.hvplot(kind='line')._transform == dai.hvplot.line()._transform
 
     with pytest.raises(TypeError):
-        dai.hvplot.line(kind="area")
+        dai.hvplot.line(kind='area')
 
 
 def test_interactive_pandas_dataframe_hvplot_accessor_dmap(df):
@@ -270,7 +268,7 @@ def test_interactive_pandas_dataframe_hvplot_accessor_dmap_kind_widget(df):
 
 
 def test_interactive_with_bound_function_calls():
-    df = pd.DataFrame({"species": [1, 1, 1, 2, 2, 2], "sex": 3 * ["MALE", "FEMALE"]})
+    df = pd.DataFrame({'species': [1, 1, 1, 2, 2, 2], 'sex': 3 * ['MALE', 'FEMALE']})
 
     w_species = pn.widgets.Select(name='Species', options=[1, 2])
     w_sex = pn.widgets.MultiSelect(name='Sex', value=['MALE'], options=['MALE', 'FEMALE'])
@@ -291,18 +289,16 @@ def test_interactive_with_bound_function_calls():
     assert isinstance(out, pn.param.ParamFunction)
     assert isinstance(out._pane, pn.pane.DataFrame)
     pd.testing.assert_frame_equal(
-        out._pane.object,
-        load_data(w_species.value, watch=False).loc[df['sex'].isin(w_sex.value)]
+        out._pane.object, load_data(w_species.value, watch=False).loc[df['sex'].isin(w_sex.value)]
     )
 
     (dfi.loc[dfi['sex'].isin(w_sex)])
-    assert load_data.COUNT ==  1
+    assert load_data.COUNT == 1
 
     w_species.value = 2
 
     pd.testing.assert_frame_equal(
-        out._pane.object,
-        load_data(w_species.value, watch=False).loc[df['sex'].isin(w_sex.value)]
+        out._pane.object, load_data(w_species.value, watch=False).loc[df['sex'].isin(w_sex.value)]
     )
 
     assert load_data.COUNT == 2
@@ -315,14 +311,14 @@ def test_interactive_with_bound_function_calls():
 
     pd.testing.assert_frame_equal(
         out._pane.object,
-        load_data(w_species.value, watch=False).loc[df['sex'].isin(w_sex.value)].head(1)
+        load_data(w_species.value, watch=False).loc[df['sex'].isin(w_sex.value)].head(1),
     )
 
     w_species.value = 1
 
     pd.testing.assert_frame_equal(
         out._pane.object,
-        load_data(w_species.value, watch=False).loc[df['sex'].isin(w_sex.value)].head(1)
+        load_data(w_species.value, watch=False).loc[df['sex'].isin(w_sex.value)].head(1),
     )
 
     assert load_data.COUNT == 3
@@ -444,7 +440,6 @@ def test_interactive_pandas_series_method_kwargs(series, clone_spy):
     assert clone_spy.calls[2].kwargs == {'plot': False}
 
 
-
 def test_interactive_pandas_series_method_not_called(series, clone_spy):
     si = Interactive(series)
     si = si.head
@@ -529,7 +524,7 @@ def test_interactive_pandas_series_operator_and_method(series, clone_spy):
 
 
 def test_interactive_pandas_series_operator_widget(series):
-    w = pn.widgets.FloatSlider(value=2., start=1., end=5.)
+    w = pn.widgets.FloatSlider(value=2.0, start=1.0, end=5.0)
 
     si = Interactive(series)
 
@@ -567,7 +562,7 @@ def test_interactive_pandas_series_method_widget(series):
 
 
 def test_interactive_pandas_series_operator_and_method_widget(series):
-    w1 = pn.widgets.FloatSlider(value=2., start=1., end=5.)
+    w1 = pn.widgets.FloatSlider(value=2.0, start=1.0, end=5.0)
     w2 = pn.widgets.IntSlider(value=2, start=1, end=5)
 
     si = Interactive(series)
@@ -578,7 +573,10 @@ def test_interactive_pandas_series_operator_and_method_widget(series):
     assert isinstance(si._current, pd.DataFrame)
     pd.testing.assert_series_equal(si._current.A, (series + w1.value).head(w2.value))
     assert si._obj is series
-    assert repr(si._transform) == "(dim('*').pd+FloatSlider(end=5.0, start=1.0, value=2.0)).head(IntSlider(end=5, start=1, value=2))"
+    assert (
+        repr(si._transform)
+        == "(dim('*').pd+FloatSlider(end=5.0, start=1.0, value=2.0)).head(IntSlider(end=5, start=1, value=2))"
+    )
     assert si._depth == 5
     assert si._method is None
 
@@ -588,9 +586,9 @@ def test_interactive_pandas_series_operator_and_method_widget(series):
 
 
 def test_interactive_pandas_series_operator_ipywidgets(series):
-    ipywidgets = pytest.importorskip("ipywidgets")
+    ipywidgets = pytest.importorskip('ipywidgets')
 
-    w = ipywidgets.FloatSlider(value=2., min=1., max=5.)
+    w = ipywidgets.FloatSlider(value=2.0, min=1.0, max=5.0)
 
     si = Interactive(series)
 
@@ -616,7 +614,7 @@ def test_interactive_pandas_series_operator_ipywidgets(series):
 
 
 def test_interactive_pandas_series_operator_out_widgets(series):
-    w = pn.widgets.FloatSlider(value=2., start=1., end=5.)
+    w = pn.widgets.FloatSlider(value=2.0, start=1.0, end=5.0)
     si = Interactive(series)
     si = si + w
 
@@ -640,7 +638,7 @@ def test_interactive_pandas_series_method_out_widgets(series):
 
 
 def test_interactive_pandas_series_operator_and_method_out_widgets(series):
-    w1 = pn.widgets.FloatSlider(value=2., start=1., end=5.)
+    w1 = pn.widgets.FloatSlider(value=2.0, start=1.0, end=5.0)
     w2 = pn.widgets.IntSlider(value=2, start=1, end=5)
     si = Interactive(series)
 
@@ -677,7 +675,7 @@ def test_interactive_pandas_frame_bind_operator_out_widgets(df):
 
     dfi = Interactive(bind(sel_col, select))
 
-    w = pn.widgets.FloatSlider(value=2., start=1., end=5.)
+    w = pn.widgets.FloatSlider(value=2.0, start=1.0, end=5.0)
     dfi = dfi + w
 
     widgets = dfi.widgets()
@@ -689,28 +687,28 @@ def test_interactive_pandas_frame_bind_operator_out_widgets(df):
 
 
 def test_interactive_reevaluate_uses_cached_value(series):
-    w = pn.widgets.FloatSlider(value=2., start=1., end=5.)
+    w = pn.widgets.FloatSlider(value=2.0, start=1.0, end=5.0)
     si = Interactive(series)
     si = si + w
 
-    w.value = 3.
+    w.value = 3.0
     assert repr(si._transform) == "dim('*').pd+FloatSlider(end=5.0, start=1.0, value=3.0)"
 
     assert si._callback().object is si._callback().object
 
 
 def test_interactive_pandas_series_operator_widget_update(series):
-    w = pn.widgets.FloatSlider(value=2., start=1., end=5.)
+    w = pn.widgets.FloatSlider(value=2.0, start=1.0, end=5.0)
     si = Interactive(series)
     si = si + w
 
-    w.value = 3.
+    w.value = 3.0
     assert repr(si._transform) == "dim('*').pd+FloatSlider(end=5.0, start=1.0, value=3.0)"
 
     out = si._callback()
     assert out.object is si.eval()
     assert isinstance(out, pn.pane.DataFrame)
-    pd.testing.assert_series_equal(out.object.A, series + 3.)
+    pd.testing.assert_series_equal(out.object.A, series + 3.0)
 
 
 def test_interactive_pandas_series_method_widget_update(series):
@@ -719,7 +717,7 @@ def test_interactive_pandas_series_method_widget_update(series):
     si = si.head(w)
 
     w.value = 3
-    assert repr(si._transform) =="dim('*').pd.head(IntSlider(end=5, start=1, value=3))"
+    assert repr(si._transform) == "dim('*').pd.head(IntSlider(end=5, start=1, value=3))"
 
     out = si._callback()
     assert out.object is si.eval()
@@ -728,20 +726,23 @@ def test_interactive_pandas_series_method_widget_update(series):
 
 
 def test_interactive_pandas_series_operator_and_method_widget_update(series):
-    w1 = pn.widgets.FloatSlider(value=2., start=1., end=5.)
+    w1 = pn.widgets.FloatSlider(value=2.0, start=1.0, end=5.0)
     w2 = pn.widgets.IntSlider(value=2, start=1, end=5)
     si = Interactive(series)
     si = (si + w1).head(w2)
 
-    w1.value = 3.
+    w1.value = 3.0
     w2.value = 3
 
-    assert repr(si._transform) == "(dim('*').pd+FloatSlider(end=5.0, start=1.0, value=3.0)).head(IntSlider(end=5, start=1, value=3))"
+    assert (
+        repr(si._transform)
+        == "(dim('*').pd+FloatSlider(end=5.0, start=1.0, value=3.0)).head(IntSlider(end=5, start=1, value=3))"
+    )
 
     out = si._callback()
     assert out.object is si.eval()
     assert isinstance(out, pn.pane.DataFrame)
-    pd.testing.assert_series_equal(out.object.A, (series + 3.).head(3))
+    pd.testing.assert_series_equal(out.object.A, (series + 3.0).head(3))
 
 
 def test_interactive_pandas_frame_loc(df):
@@ -960,15 +961,16 @@ def test_interactive_pandas_out_frame_attrib(df):
     pd.testing.assert_series_equal(df.A, out)
 
 
-@pytest.mark.parametrize('op', [
-    '-',   # __neg__
-
-    # Doesn't any of the supported data implement __not__?
-    # e.g. `not series` raises an error.
-    # 'not', # __not__
-
-    '+',   # _pos__
-])
+@pytest.mark.parametrize(
+    'op',
+    [
+        '-',  # __neg__
+        # Doesn't any of the supported data implement __not__?
+        # e.g. `not series` raises an error.
+        # 'not', # __not__
+        '+',  # _pos__
+    ],
+)
 def test_interactive_pandas_series_operator_unary(series, op):
     if op == '~':
         series = pd.Series([True, False, True], name='A')
@@ -998,33 +1000,36 @@ def test_interactive_pandas_series_operator_unary_invert():  # __invert__
     assert si._method is None
 
 
-@pytest.mark.parametrize('op', [
-    '+',  # __add__
-    '&',  # __and__
-    '/',  # __div__
-    '==', # __eq__
-    '//', # __floordiv__
-    '>=', # __ge__
-    '>',  # __gt__
-    '<=', # __le__
-    '<',  # __lt__
-    '<',  # __lt__
-    # '<<',  # __lshift__
-    '%',  # __mod__
-    '*',  # __mul__
-    '!=',  # __ne__
-    '|',  # __or__
-    # '>>',  # __rshift__
-    '**',  # __pow__
-    '-',  # __sub__
-    '/',  # __truediv__
-])
+@pytest.mark.parametrize(
+    'op',
+    [
+        '+',  # __add__
+        '&',  # __and__
+        '/',  # __div__
+        '==',  # __eq__
+        '//',  # __floordiv__
+        '>=',  # __ge__
+        '>',  # __gt__
+        '<=',  # __le__
+        '<',  # __lt__
+        '<',  # __lt__
+        # '<<',  # __lshift__
+        '%',  # __mod__
+        '*',  # __mul__
+        '!=',  # __ne__
+        '|',  # __or__
+        # '>>',  # __rshift__
+        '**',  # __pow__
+        '-',  # __sub__
+        '/',  # __truediv__
+    ],
+)
 def test_interactive_pandas_series_operator_binary(series, op):
     if op in ['&', '|']:
         series = pd.Series([True, False, True], name='A')
         val = True
     else:
-        val = 2.
+        val = 2.0
     si = Interactive(series)
     si = eval(f'si {op} {val}')
 
@@ -1038,27 +1043,30 @@ def test_interactive_pandas_series_operator_binary(series, op):
     assert si._method is None
 
 
-@pytest.mark.parametrize('op', [
-    '+',  # __radd__
-    '&',  # __rand__
-    '/',  # __rdiv__
-    '//', # __rfloordiv__
-    # '<<',  # __rlshift__
-    '%',  # __rmod__
-    '*',  # __rmul__
-    '|',  # __ror__
-    '**',  # __rpow__
-    # '>>',  # __rshift__
-    '-',  # __rsub__
-    '/',  # __rtruediv__
-])
+@pytest.mark.parametrize(
+    'op',
+    [
+        '+',  # __radd__
+        '&',  # __rand__
+        '/',  # __rdiv__
+        '//',  # __rfloordiv__
+        # '<<',  # __rlshift__
+        '%',  # __rmod__
+        '*',  # __rmul__
+        '|',  # __ror__
+        '**',  # __rpow__
+        # '>>',  # __rshift__
+        '-',  # __rsub__
+        '/',  # __rtruediv__
+    ],
+)
 def test_interactive_pandas_series_operator_reverse_binary(op):
     if op in ['&', '|']:
         series = pd.Series([True, False, True], name='A')
         val = True
     else:
         series = pd.Series([1.0, 2.0, 3.0], name='A')
-        val = 2.
+        val = 2.0
     si = Interactive(series)
     si = eval(f'{val} {op} si')
 
@@ -1106,7 +1114,9 @@ def test_interactive_pandas_series_plot(series, clone_spy):
     assert isinstance(si, Interactive)
     assert isinstance(si._current, matplotlib.axes.Axes)
     assert si._obj is series
-    assert "dim('*').pd.plot(ax=<function Interactive._get_ax_fn.<locals>.get_ax" in repr(si._transform)
+    assert "dim('*').pd.plot(ax=<function Interactive._get_ax_fn.<locals>.get_ax" in repr(
+        si._transform
+    )
     assert si._depth == 3
     assert si._method is None
 
@@ -1127,7 +1137,9 @@ def test_interactive_pandas_series_plot(series, clone_spy):
     assert len(clone_spy.calls[2].args) == 1
     # Not the complete repr as the function doesn't have a nice repr,
     # its repr displays  the memory address.
-    assert "dim('*').pd.plot(ax=<function Interactive._get_ax_fn.<locals>.get_ax" in repr(clone_spy.calls[2].args[0])
+    assert "dim('*').pd.plot(ax=<function Interactive._get_ax_fn.<locals>.get_ax" in repr(
+        clone_spy.calls[2].args[0]
+    )
     assert clone_spy.calls[2].kwargs == {'plot': True}
 
     assert not si._dmap
@@ -1143,7 +1155,6 @@ def test_interactive_pandas_series_plot_kind_attr(series, clone_spy):
     si = Interactive(series)
 
     si = si.plot.line()
-
 
     assert isinstance(si, Interactive)
     assert isinstance(si._current, matplotlib.axes.Axes)
@@ -1186,7 +1197,6 @@ def test_interactive_pandas_series_plot_kind_attr(series, clone_spy):
     si.output()
 
 
-
 def test_interactive_pandas_dir_no_type_change(df):
     dfi = Interactive(df)
     dfi = dfi.head()
@@ -1203,18 +1213,20 @@ def test_interactive_pandas_dir_with_type_change(df):
 
     attrs = dir(dfi)
 
-    assert not any(col in attrs for col in  list(df.columns))
+    assert not any(col in attrs for col in list(df.columns))
     assert 'T' in attrs
 
 
-@pytest.mark.xfail(reason='hvplot.util.check_library expects the obj to have __module__, which is not true for a float')
+@pytest.mark.xfail(
+    reason='hvplot.util.check_library expects the obj to have __module__, which is not true for a float'
+)
 def test_interactive_pandas_dir_with_type_change_to_float(df):
     dfi = Interactive(df)
     dfi = dfi.head().A.max()
 
     attrs = dir(dfi)
 
-    assert not any(col in attrs for col in  list(df.columns))
+    assert not any(col in attrs for col in list(df.columns))
     assert 'describe' not in attrs
     assert 'real' not in attrs
 
@@ -1225,7 +1237,7 @@ def test_interactive_pandas_dir_attrib(df):
 
     attrs = dir(dfi)
 
-    assert not any(col in attrs for col in  list(df.columns))
+    assert not any(col in attrs for col in list(df.columns))
     assert 'T' in attrs
 
 
@@ -1295,6 +1307,7 @@ def test_interactive_pandas_layout_default_with_widgets_bk3(df):
     assert isinstance(layout[0][1], pn.pane.PaneBase)
     assert len(layout[0][0]) == 1
     assert isinstance(layout[0][0][0], pn.widgets.IntSlider)
+
 
 @is_bokeh2
 def test_interactive_pandas_layout_center_with_widgets(df):
@@ -1373,7 +1386,7 @@ def test_interactive_pandas_eval_hvplot(df):
 
 
 def test_interactive_pandas_series_widget_value(series):
-    w = pn.widgets.FloatSlider(value=2., start=1., end=5.)
+    w = pn.widgets.FloatSlider(value=2.0, start=1.0, end=5.0)
 
     si = Interactive(series)
 
@@ -1409,7 +1422,7 @@ def test_clones_dont_reexecute_transforms():
         msgs.append(msg)
         return df
 
-    df.interactive.pipe(piped, msg="1").pipe(piped, msg="2")
+    df.interactive.pipe(piped, msg='1').pipe(piped, msg='2')
 
     assert len(msgs) == 3
 

@@ -9,9 +9,17 @@ from ..util import with_hv_extension
 
 
 @with_hv_extension
-def andrews_curves(data, class_column, samples=200, alpha=0.5,
-                   width=600, height=300, cmap=None, colormap=None,
-                   **kwds):
+def andrews_curves(
+    data,
+    class_column,
+    samples=200,
+    alpha=0.5,
+    width=600,
+    height=300,
+    cmap=None,
+    colormap=None,
+    **kwds,
+):
     """
     Generate a plot of Andrews curves, for visualising clusters of
     multivariate data.
@@ -58,24 +66,34 @@ def andrews_curves(data, class_column, samples=200, alpha=0.5,
         else:
             curves += np.outer(vals[i], np.cos(ft))
 
-    df = pd.DataFrame({'t': np.tile(np.arange(samples), curves.shape[0]),
-                       'sample': np.repeat(np.arange(curves.shape[0]), curves.shape[1]),
-                       'value': curves.ravel(),
-                       class_column: np.repeat(data[class_column], samples)})
+    df = pd.DataFrame(
+        {
+            't': np.tile(np.arange(samples), curves.shape[0]),
+            'sample': np.repeat(np.arange(curves.shape[0]), curves.shape[1]),
+            'value': curves.ravel(),
+            class_column: np.repeat(data[class_column], samples),
+        }
+    )
 
     labelled = ['x']
-    options = {'Overlay': dict(legend_limit=5000),
-               'Curve': dict(kwds, labelled=labelled, alpha=alpha,
-                             width=width, height=height, **kwds)}
+    options = {
+        'Overlay': dict(legend_limit=5000),
+        'Curve': dict(kwds, labelled=labelled, alpha=alpha, width=width, height=height, **kwds),
+    }
     dataset = hv.Dataset(df)
     groups = dataset.to(hv.Curve, 't', 'value').overlay('sample').items()
 
     if cmap and colormap:
-        raise TypeError("Only specify one of `cmap` and `colormap`.")
+        raise TypeError('Only specify one of `cmap` and `colormap`.')
     cmap = cmap or colormap or cc.palette['glasbey_category10']
     colors = hv.plotting.util.process_cmap(cmap, categorical=True, ncolors=len(groups))
 
-    el = hv.Overlay([curve.relabel(k).options('Curve', color=c, backend='bokeh')
-                       for c, (k, v) in zip(colors, groups) for curve in v]).options(options, backend='bokeh')
+    el = hv.Overlay(
+        [
+            curve.relabel(k).options('Curve', color=c, backend='bokeh')
+            for c, (k, v) in zip(colors, groups)
+            for curve in v
+        ]
+    ).options(options, backend='bokeh')
     el = _transfer_opts_cur_backend(el)
     return el

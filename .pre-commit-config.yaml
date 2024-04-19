@@ -4,11 +4,12 @@
 default_stages: [commit]
 repos:
 -   repo: https://github.com/nbQA-dev/nbQA
-    rev: 1.7.1
+    rev: 1.8.5
     hooks:
-    -   id: nbqa-flake8
+    -   id: nbqa-ruff
+        additional_dependencies: [ruff==0.3.7]
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
     -   id: check-builtin-literals
     -   id: check-case-conflict
@@ -19,12 +20,11 @@ repos:
     -   id: end-of-file-fixer
         exclude: (\.min\.js$|\.svg$)
     -   id: trailing-whitespace
--   repo: https://github.com/PyCQA/flake8
-    rev: 7.0.0
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.3.7
     hooks:
-    -   id: flake8  # See 'setup.cfg' for args
-        args: [hvplot]
-        files: hvplot/
+    - id: ruff
+    - id: ruff-format
 -   repo: https://github.com/hoxbro/clean_notebook
     rev: v0.1.14
     hooks:

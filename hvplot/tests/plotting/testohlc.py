@@ -2,13 +2,16 @@ import pandas as pd
 import hvplot.pandas  # noqa
 
 
-df = pd.DataFrame({
+df = pd.DataFrame(
+    {
         'Open': [100.00, 101.25, 102.75],
         'High': [104.10, 105.50, 110.00],
         'Low': [94.00, 97.10, 99.20],
         'Close': [101.15, 99.70, 109.50],
         'Volume': [10012, 5000, 18000],
-    }, index=[pd.Timestamp('2022-08-01'), pd.Timestamp('2022-08-03'), pd.Timestamp('2022-08-04')])
+    },
+    index=[pd.Timestamp('2022-08-01'), pd.Timestamp('2022-08-03'), pd.Timestamp('2022-08-04')],
+)
 
 ohlc_cols = ['Open', 'High', 'Low', 'Close']
 

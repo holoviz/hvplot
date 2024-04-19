@@ -55,7 +55,6 @@ HoloViz = "https://holoviz.org/"
 [project.optional-dependencies]
 tests-core = [
     "dask[dataframe]",
-    "flake8",
     "ipywidgets",
     "matplotlib",
     "parameterized",
@@ -64,6 +63,7 @@ tests-core = [
     "pre-commit",
     "pytest-cov",
     "pytest",
+    "ruff",
     "scipy",
     "xarray",
 ]
@@ -178,6 +178,18 @@ filterwarnings = [
 ignore-words-list = "ser"
 skip = "doc/generate_modules.py"
 write-changes = true
+
+[tool.ruff]
+line-length = 99
+
+[tool.ruff.format]
+quote-style = "single"
+
+[tool.nbqa.addopts]
+# E402 Module level import not at top of file
+ruff = [
+    "--extend-ignore=E402"
+]
 
 [tool.pyproject2conda.dependencies]
 geoviews = { skip = true, packages = "geoviews-core >=1.9.0" }

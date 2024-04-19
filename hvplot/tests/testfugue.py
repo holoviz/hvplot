@@ -10,7 +10,7 @@ hvplot.util._fugue_ipython = True
 try:
     import fugue.api as fa
     import hvplot.fugue  # noqa: F401
-except:
+except ImportError:
     pytest.skip(allow_module_level=True)
 
 
@@ -18,9 +18,9 @@ except:
 def table():
     df = pd.DataFrame(
         {
-            "g": ["a", "b", "a", "b", "a", "b"],
-            "x": [1, 2, 3, 4, 5, 6],
-            "y": [1, 2, 3, 4, 5, 6],
+            'g': ['a', 'b', 'a', 'b', 'a', 'b'],
+            'x': [1, 2, 3, 4, 5, 6],
+            'y': [1, 2, 3, 4, 5, 6],
         }
     )
     return df

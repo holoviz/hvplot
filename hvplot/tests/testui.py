@@ -20,9 +20,9 @@ def test_explorer_basic():
     explorer = hvplot.explorer(df)
 
     assert isinstance(explorer, hvDataFrameExplorer)
-    assert explorer.kind == "scatter"
-    assert explorer.x == "index"
-    assert explorer.y == "species"
+    assert explorer.kind == 'scatter'
+    assert explorer.x == 'index'
+    assert explorer.y == 'species'
 
 
 def test_explorer_settings():
@@ -38,10 +38,10 @@ def test_explorer_settings():
     settings = explorer.settings()
 
     assert settings == dict(
-        by=["species"],
-        kind="scatter",
-        x="bill_length_mm",
-        y=["bill_depth_mm"],
+        by=['species'],
+        kind='scatter',
+        x='bill_length_mm',
+        y=['bill_depth_mm'],
     )
 
 
@@ -57,32 +57,28 @@ def test_explorer_plot_code():
 
     hvplot_code = explorer.plot_code()
 
-    assert (
-        hvplot_code == (
-            "df.hvplot(\n"
-            "    by=['species'],\n"
-            "    kind='scatter',\n"
-            "    x='bill_length_mm',\n"
-            "    y=['bill_depth_mm'],\n"
-            "    legend='bottom_right',\n"
-            "    widget_location='bottom',\n"
-            ")"
-        )
+    assert hvplot_code == (
+        'df.hvplot(\n'
+        "    by=['species'],\n"
+        "    kind='scatter',\n"
+        "    x='bill_length_mm',\n"
+        "    y=['bill_depth_mm'],\n"
+        "    legend='bottom_right',\n"
+        "    widget_location='bottom',\n"
+        ')'
     )
 
-    hvplot_code = explorer.plot_code(var_name="othername")
+    hvplot_code = explorer.plot_code(var_name='othername')
 
-    assert (
-        hvplot_code == (
-            "othername.hvplot(\n"
-            "    by=['species'],\n"
-            "    kind='scatter',\n"
-            "    x='bill_length_mm',\n"
-            "    y=['bill_depth_mm'],\n"
-            "    legend='bottom_right',\n"
-            "    widget_location='bottom',\n"
-            ")"
-        )
+    assert hvplot_code == (
+        'othername.hvplot(\n'
+        "    by=['species'],\n"
+        "    kind='scatter',\n"
+        "    x='bill_length_mm',\n"
+        "    y=['bill_depth_mm'],\n"
+        "    legend='bottom_right',\n"
+        "    widget_location='bottom',\n"
+        ')'
     )
 
 
@@ -98,8 +94,8 @@ def test_explorer_hvplot():
     plot = explorer.hvplot()
 
     assert isinstance(plot, hv.Scatter)
-    assert plot.kdims[0].name == "bill_length_mm"
-    assert plot.vdims[0].name == "bill_depth_mm"
+    assert plot.kdims[0].name == 'bill_length_mm'
+    assert plot.vdims[0].name == 'bill_depth_mm'
 
 
 def test_explorer_save(tmp_path):
@@ -111,7 +107,7 @@ def test_explorer_save(tmp_path):
         y_multi=['bill_depth_mm'],
     )
 
-    outfile = tmp_path / "plot.html"
+    outfile = tmp_path / 'plot.html'
 
     explorer.save(outfile)
 
@@ -119,9 +115,9 @@ def test_explorer_save(tmp_path):
 
 
 def test_explorer_kwargs_controls():
-    explorer = hvplot.explorer(df, title="Dummy title", width=200)
+    explorer = hvplot.explorer(df, title='Dummy title', width=200)
 
-    assert explorer.labels.title == "Dummy title"
+    assert explorer.labels.title == 'Dummy title'
     assert explorer.axes.width == 200
 
 
@@ -248,7 +244,7 @@ def test_explorer_method_grid():
 
 
 def test_explorer_method_kind():
-    explorer = df.hvplot.explorer(kind="scatter")
+    explorer = df.hvplot.explorer(kind='scatter')
 
     assert isinstance(explorer, hvDataFrameExplorer)
     assert explorer.kind == 'scatter'
@@ -257,7 +253,7 @@ def test_explorer_method_kind():
 
 
 def test_explorer_method_as_kind():
-    explorer = df.hvplot(kind="explorer")
+    explorer = df.hvplot(kind='explorer')
 
     assert isinstance(explorer, hvDataFrameExplorer)
     assert explorer.kind == 'scatter'
@@ -266,7 +262,7 @@ def test_explorer_method_as_kind():
 
 
 def test_explorer_method_propagates_kwargs():
-    explorer = df.hvplot.explorer(title="Dummy title", x="bill_length_mm")
+    explorer = df.hvplot.explorer(title='Dummy title', x='bill_length_mm')
 
     assert isinstance(explorer, hvDataFrameExplorer)
     assert explorer.kind == 'scatter'
@@ -284,8 +280,7 @@ def test_explorer_code_dataframe():
             y='species',
             legend='bottom_right',
             widget_location='bottom',
-        )"""
-    )
+        )""")
     assert explorer._code_pane.object == dedent("""\
         ```python
         df.hvplot(
@@ -295,8 +290,7 @@ def test_explorer_code_dataframe():
             legend='bottom_right',
             widget_location='bottom',
         )
-        ```"""
-    )
+        ```""")
 
 
 def test_explorer_code_gridded():
@@ -324,8 +318,7 @@ def test_explorer_code_gridded():
             legend='bottom_right',
             widget_location='bottom',
         )
-        ```"""
-    )
+        ```""")
 
 
 def test_explorer_code_gridded_dataarray():
@@ -354,8 +347,7 @@ def test_explorer_code_gridded_dataarray():
             legend='bottom_right',
             widget_location='bottom',
         )
-        ```"""
-    )
+        ```""")
 
 
 def test_explorer_code_opts():
@@ -388,5 +380,4 @@ def test_explorer_code_opts():
         ).opts(
             color_levels=3,
         )
-        ```"""
-    )
+        ```""")

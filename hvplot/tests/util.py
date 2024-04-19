@@ -11,13 +11,12 @@ import pandas as pd
 _N = 30
 _K = 4
 
+
 def getCols(k):
     return string.ascii_uppercase[:k]
 
 
-def rands_array(
-    nchars, size, dtype="O", replace=True
-):
+def rands_array(nchars, size, dtype='O', replace=True):
     """
     Generate an array of byte strings.
     """
@@ -37,10 +36,10 @@ def makeStringIndex(k=10, name=None):
 
 def makeMixedDataFrame():
     data = {
-        "A": [0.0, 1.0, 2.0, 3.0, 4.0],
-        "B": [0.0, 1.0, 0.0, 1.0, 0.0],
-        "C": ["foo1", "foo2", "foo3", "foo4", "foo5"],
-        "D": pd.bdate_range("1/1/2009", periods=5),
+        'A': [0.0, 1.0, 2.0, 3.0, 4.0],
+        'B': [0.0, 1.0, 0.0, 1.0, 0.0],
+        'C': ['foo1', 'foo2', 'foo3', 'foo4', 'foo5'],
+        'D': pd.bdate_range('1/1/2009', periods=5),
     }
     return pd.DataFrame(data)
 
@@ -58,15 +57,13 @@ def makeDataFrame():
     return pd.DataFrame(data)
 
 
-def makeDateIndex(
-    k=10, freq="B", name=None, **kwargs
-):
+def makeDateIndex(k=10, freq='B', name=None, **kwargs):
     dt = datetime(2000, 1, 1)
     dr = pd.bdate_range(dt, periods=k, freq=freq, name=name)
     return pd.DatetimeIndex(dr, name=name, **kwargs)
 
 
-def makeTimeSeries(nper=None, freq="B", name=None):
+def makeTimeSeries(nper=None, freq='B', name=None):
     if nper is None:
         nper = _N
     return pd.Series(
@@ -76,10 +73,10 @@ def makeTimeSeries(nper=None, freq="B", name=None):
     )
 
 
-def getTimeSeriesData(nper=None, freq="B"):
+def getTimeSeriesData(nper=None, freq='B'):
     return {c: makeTimeSeries(nper, freq) for c in getCols(_K)}
 
 
-def makeTimeDataFrame(nper=None, freq="B"):
+def makeTimeDataFrame(nper=None, freq='B'):
     data = getTimeSeriesData(nper, freq)
     return pd.DataFrame(data)

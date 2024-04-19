@@ -26,37 +26,46 @@ def backend(request):
     if backend not in Store.registry:
         hvplot.extension(backend, compatibility='bokeh')
     Store.set_current_backend(backend)
-    store_copy = OptionTree(sorted(Store.options().items()),
-                                    groups=Options._option_groups)
+    store_copy = OptionTree(sorted(Store.options().items()), groups=Options._option_groups)
     yield backend
     Store.options(val=store_copy)
-    Store._custom_options = {k:{} for k in Store._custom_options.keys()}
+    Store._custom_options = {k: {} for k in Store._custom_options.keys()}
     Store.set_current_backend(backend_copy)
 
 
 @pytest.fixture(scope='module')
 def df():
-    return pd.DataFrame([[1, 2, 'A', 0.1], [3, 4, 'B', 0.2], [5, 6, 'C', 0.3]],
-                            columns=['x', 'y', 'category', 'number'])
+    return pd.DataFrame(
+        [[1, 2, 'A', 0.1], [3, 4, 'B', 0.2], [5, 6, 'C', 0.3]],
+        columns=['x', 'y', 'category', 'number'],
+    )
 
 
 @pytest.fixture(scope='module')
 def symmetric_df():
-    return pd.DataFrame([[1, 2, -1], [3, 4, 0], [5, 6, 1]],
-                                        columns=['x', 'y', 'number'])
+    return pd.DataFrame([[1, 2, -1], [3, 4, 0], [5, 6, 1]], columns=['x', 'y', 'number'])
 
 
 @pytest.mark.usefixtures('load_pandas_accessor')
 class TestOptions:
-
     @pytest.mark.parametrize(
         'backend',
         [
             'bokeh',
-            pytest.param('matplotlib', marks=pytest.mark.xfail(reason='legend_position not supported w/ matplotlib for scatter')),
-            pytest.param('plotly', marks=pytest.mark.xfail(reason='legend_position not supported w/ plotly for scatter')),
+            pytest.param(
+                'matplotlib',
+                marks=pytest.mark.xfail(
+                    reason='legend_position not supported w/ matplotlib for scatter'
+                ),
+            ),
+            pytest.param(
+                'plotly',
+                marks=pytest.mark.xfail(
+                    reason='legend_position not supported w/ plotly for scatter'
+                ),
+            ),
         ],
-        indirect=True
+        indirect=True,
     )
     def test_scatter_legend_position(self, df, backend):
         plot = df.hvplot.scatter('x', 'y', c='category', legend='left')
@@ -68,9 +77,12 @@ class TestOptions:
         [
             'bokeh',
             'matplotlib',
-            pytest.param('plotly', marks=pytest.mark.xfail(reason='legend_position not supported w/ plotly for hist')),
+            pytest.param(
+                'plotly',
+                marks=pytest.mark.xfail(reason='legend_position not supported w/ plotly for hist'),
+            ),
         ],
-        indirect=True
+        indirect=True,
     )
     def test_histogram_by_category_legend_position(self, df, backend):
         plot = df.hvplot.hist('y', by='category', legend='left')
@@ -82,7 +94,6 @@ class TestOptions:
         plot = df.hvplot('x', 'y', c='x', logz=True, kind=kind)
         opts = Store.lookup_options(backend, plot, 'plot')
         assert opts.kwargs['logz'] is True
-
 
     @pytest.mark.parametrize('kind', ['scatter', 'points'])
     def test_color_dim(self, df, kind, backend):
@@ -106,10 +117,15 @@ class TestOptions:
         'backend',
         [
             'bokeh',
-            pytest.param('matplotlib', marks=pytest.mark.xfail(reason='cannot map a dim to alpha w/ matplotlib')),
-            pytest.param('plotly', marks=pytest.mark.xfail(reason='cannot map a dim to alpha w/ plotly')),
+            pytest.param(
+                'matplotlib',
+                marks=pytest.mark.xfail(reason='cannot map a dim to alpha w/ matplotlib'),
+            ),
+            pytest.param(
+                'plotly', marks=pytest.mark.xfail(reason='cannot map a dim to alpha w/ plotly')
+            ),
         ],
-        indirect=True
+        indirect=True,
     )
     @pytest.mark.parametrize('kind', ['scatter', 'points'])
     def test_alpha_dim(self, df, kind, backend):
@@ -152,9 +168,11 @@ class TestOptions:
         [
             'bokeh',
             'matplotlib',
-            pytest.param('plotly', marks=pytest.mark.xfail(reason='cannot map a dim to alpha w/ plotly')),
+            pytest.param(
+                'plotly', marks=pytest.mark.xfail(reason='cannot map a dim to alpha w/ plotly')
+            ),
         ],
-        indirect=True
+        indirect=True,
     )
     @pytest.mark.parametrize('kind', ['scatter', 'points'])
     def test_alpha_dim_overlay(self, df, kind, backend):
@@ -187,10 +205,15 @@ class TestOptions:
         'backend',
         [
             'bokeh',
-            pytest.param('matplotlib', marks=pytest.mark.xfail(reason='default opts not supported w/ matplotlib')),
-            pytest.param('plotly', marks=pytest.mark.xfail(reason='default opts not supported w/ plotly')),
+            pytest.param(
+                'matplotlib',
+                marks=pytest.mark.xfail(reason='default opts not supported w/ matplotlib'),
+            ),
+            pytest.param(
+                'plotly', marks=pytest.mark.xfail(reason='default opts not supported w/ plotly')
+            ),
         ],
-        indirect=True
+        indirect=True,
     )
     def test_holoviews_defined_default_opts(self, df, backend):
         hv.opts.defaults(hv.opts.Scatter(height=400, width=900, show_grid=True))
@@ -207,10 +230,15 @@ class TestOptions:
         'backend',
         [
             'bokeh',
-            pytest.param('matplotlib', marks=pytest.mark.xfail(reason='default opts not supported w/ matplotlib')),
-            pytest.param('plotly', marks=pytest.mark.xfail(reason='default opts not supported w/ plotly')),
+            pytest.param(
+                'matplotlib',
+                marks=pytest.mark.xfail(reason='default opts not supported w/ matplotlib'),
+            ),
+            pytest.param(
+                'plotly', marks=pytest.mark.xfail(reason='default opts not supported w/ plotly')
+            ),
         ],
-        indirect=True
+        indirect=True,
     )
     def test_holoviews_defined_default_opts_overwritten_in_call(self, df, backend):
         hv.opts.defaults(hv.opts.Scatter(height=400, width=900, show_grid=True))
@@ -227,10 +255,20 @@ class TestOptions:
         'backend',
         [
             'bokeh',
-            pytest.param('matplotlib', marks=pytest.mark.xfail(reason='default opts not supported not supported w/ matplotlib')),
-            pytest.param('plotly', marks=pytest.mark.xfail(reason='default opts not supported not supported w/ plotly')),
+            pytest.param(
+                'matplotlib',
+                marks=pytest.mark.xfail(
+                    reason='default opts not supported not supported w/ matplotlib'
+                ),
+            ),
+            pytest.param(
+                'plotly',
+                marks=pytest.mark.xfail(
+                    reason='default opts not supported not supported w/ plotly'
+                ),
+            ),
         ],
-        indirect=True
+        indirect=True,
     )
     def test_holoviews_defined_default_opts_are_not_mutable(self, df, backend):
         hv.opts.defaults(hv.opts.Scatter(tools=['tap']))
@@ -291,10 +329,15 @@ class TestOptions:
         'backend',
         [
             'bokeh',
-            pytest.param('matplotlib', marks=pytest.mark.xfail(reason='default opts not supported w/ matplotlib')),
-            pytest.param('plotly', marks=pytest.mark.xfail(reason='defaykt opts not supported w/ plotly')),
+            pytest.param(
+                'matplotlib',
+                marks=pytest.mark.xfail(reason='default opts not supported w/ matplotlib'),
+            ),
+            pytest.param(
+                'plotly', marks=pytest.mark.xfail(reason='defaykt opts not supported w/ plotly')
+            ),
         ],
-        indirect=True
+        indirect=True,
     )
     def test_holoviews_defined_default_opts_logx(self, df, backend):
         hv.opts.defaults(hv.opts.Scatter(logx=True))
@@ -314,6 +357,7 @@ class TestOptions:
 
     def test_hvplot_default_cat_cmap_opts(self, df, backend):
         import colorcet as cc
+
         plot = df.hvplot.scatter('x', 'y', c='category')
         opts = Store.lookup_options(backend, plot, 'style')
         assert opts.kwargs['cmap'] == cc.palette['glasbey_category10']
@@ -352,11 +396,12 @@ class TestOptions:
             ('data_aspect', 'bokeh'),
             ('data_aspect', 'matplotlib'),
             pytest.param(
-                'data_aspect', 'plotly',
-                marks=pytest.mark.xfail(reason='data_aspect not supported w/ plotly')
+                'data_aspect',
+                'plotly',
+                marks=pytest.mark.xfail(reason='data_aspect not supported w/ plotly'),
             ),
         ],
-        indirect=['backend']
+        indirect=['backend'],
     )
     def test_aspect(self, df, opt, backend):
         plot = df.hvplot(x='x', y='y', **{opt: 2})
@@ -377,11 +422,12 @@ class TestOptions:
             ('data_aspect', 'bokeh'),
             ('data_aspect', 'matplotlib'),
             pytest.param(
-                'data_aspect', 'plotly',
-                marks=pytest.mark.xfail(reason='data_aspect not supported w/ plotly')
+                'data_aspect',
+                'plotly',
+                marks=pytest.mark.xfail(reason='data_aspect not supported w/ plotly'),
             ),
         ],
-        indirect=['backend']
+        indirect=['backend'],
     )
     def test_aspect_and_width(self, df, opt, backend):
         plot = df.hvplot(x='x', y='y', width=150, **{opt: 2})
@@ -395,8 +441,8 @@ class TestOptions:
 
     def test_symmetric_dataframe(self, backend):
         import pandas as pd
-        df = pd.DataFrame([[1, 2, -1], [3, 4, 0], [5, 6, 1]],
-                          columns=['x', 'y', 'number'])
+
+        df = pd.DataFrame([[1, 2, -1], [3, 4, 0], [5, 6, 1]], columns=['x', 'y', 'number'])
         plot = df.hvplot.scatter('x', 'y', c='number')
         plot_opts = Store.lookup_options(backend, plot, 'plot')
         assert plot_opts.kwargs['symmetric'] is True
@@ -425,7 +471,7 @@ class TestOptions:
         assert style_opts.kwargs['cmap'] == 'kbc_r'
 
     def test_if_clim_is_set_symmetric_is_not_deduced(self, symmetric_df, backend):
-        plot = symmetric_df.hvplot.scatter('x', 'y', c='number', clim=(-1,1))
+        plot = symmetric_df.hvplot.scatter('x', 'y', c='number', clim=(-1, 1))
         plot_opts = Store.lookup_options(backend, plot, 'plot')
         assert plot_opts.kwargs.get('symmetric') is None
         style_opts = Store.lookup_options(backend, plot, 'style')
@@ -440,10 +486,10 @@ class TestOptions:
                 'plotly',
                 marks=pytest.mark.xfail(
                     reason='bandwidth, cut, levels not supported w/ plotly for bivariate'
-                )
+                ),
             ),
         ],
-        indirect=True
+        indirect=True,
     )
     def test_bivariate_opts(self, df, backend):
         plot = df.hvplot.bivariate('x', 'y', bandwidth=0.2, cut=1, levels=5, filled=True)
@@ -482,7 +528,7 @@ def da2():
         data=np.arange(27).reshape((3, 3, 3)),
         coords={'y': [0, 1, 2], 'x': [0, 1, 2]},
         dims=['y', 'x', 'other'],
-        name='test2'
+        name='test2',
     )
 
 
@@ -498,7 +544,6 @@ def ds2(da, da2):
 
 @pytest.mark.usefixtures('load_xarray_accessor')
 class TestXarrayTitle:
-
     def test_dataarray_2d_with_title(self, da, backend):
         da_sel = da.sel(time=0, band=0)
         plot = da_sel.hvplot()  # Image plot

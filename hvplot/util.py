@@ -15,33 +15,39 @@ import numpy as np
 import pandas as pd
 import param
 import holoviews as hv
+
 try:
     import panel as pn
+
     panel_available = True
-except:
+except ImportError:
     panel_available = False
 
 hv_version = Version(hv.__version__)
 bokeh_version = Version(bokeh.__version__)
-bokeh3 = bokeh_version >= Version("3.0")
-param2 = Version(param.__version__) >= Version("2.0rc4")
+bokeh3 = bokeh_version >= Version('3.0')
+param2 = Version(param.__version__) >= Version('2.0rc4')
 _fugue_ipython = None  # To be set to True in tests to mock ipython
+
 
 def with_hv_extension(func, extension='bokeh', logo=False):
     """If hv.extension is not loaded, load before calling function"""
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         if extension and not getattr(hv.extension, '_loaded', False):
             from . import hvplot_extension
+
             hvplot_extension(extension, logo=logo)
         return func(*args, **kwargs)
+
     return wrapper
 
 
 def get_ipy():
     try:
-        ip = get_ipython() # noqa
-    except:
+        ip = get_ipython()  # noqa
+    except NameError:
         ip = None
     return ip
 
@@ -70,8 +76,10 @@ def check_crs(crs):
     try:
         crs_type = pyproj.crs.CRS
     except AttributeError:
+
         class Dummy:
             pass
+
         crs_type = Dummy
 
     if isinstance(crs, pyproj.Proj):
@@ -122,8 +130,10 @@ def proj_to_cartopy(proj):
     """
 
     import cartopy.crs as ccrs
+
     try:
         from osgeo import osr
+
         has_gdal = True
     except ImportError:
         has_gdal = False
@@ -131,19 +141,22 @@ def proj_to_cartopy(proj):
     input_proj = proj
     proj = check_crs(input_proj)
     if proj is None:
-        raise ValueError(f"Invalid proj projection {input_proj!r}")
+        raise ValueError(f'Invalid proj projection {input_proj!r}')
 
     srs = proj.srs
     if has_gdal:
         import warnings
+
         with warnings.catch_warnings():
             # Avoiding this warning could be done by setting osr.UseExceptions(),
             # except there might be a risk to break the code of users leveraging
             # GDAL on their side or through other libraries. So we just silence it.
-            warnings.filterwarnings('ignore', category=FutureWarning, message=
-                r'Neither osr\.UseExceptions\(\) nor osr\.DontUseExceptions\(\) has '
+            warnings.filterwarnings(
+                'ignore',
+                category=FutureWarning,
+                message=r'Neither osr\.UseExceptions\(\) nor osr\.DontUseExceptions\(\) has '
                 r'been explicitly called\. In GDAL 4\.0, exceptions will be enabled '
-                'by default'
+                'by default',
             )
             # this is more robust, as srs could be anything (espg, etc.)
             s1 = osr.SpatialReference()
@@ -151,22 +164,25 @@ def proj_to_cartopy(proj):
             if s1.ExportToProj4():
                 srs = s1.ExportToProj4()
 
-    km_proj = {'lon_0': 'central_longitude',
-               'lat_0': 'central_latitude',
-               'x_0': 'false_easting',
-               'y_0': 'false_northing',
-               'lat_ts': 'latitude_true_scale',
-               'o_lon_p': 'central_rotated_longitude',
-               'o_lat_p': 'pole_latitude',
-               'k': 'scale_factor',
-               'zone': 'zone',
-               }
-    km_globe = {'a': 'semimajor_axis',
-                'b': 'semiminor_axis',
-                }
-    km_std = {'lat_1': 'lat_1',
-              'lat_2': 'lat_2',
-              }
+    km_proj = {
+        'lon_0': 'central_longitude',
+        'lat_0': 'central_latitude',
+        'x_0': 'false_easting',
+        'y_0': 'false_northing',
+        'lat_ts': 'latitude_true_scale',
+        'o_lon_p': 'central_rotated_longitude',
+        'o_lat_p': 'pole_latitude',
+        'k': 'scale_factor',
+        'zone': 'zone',
+    }
+    km_globe = {
+        'a': 'semimajor_axis',
+        'b': 'semiminor_axis',
+    }
+    km_std = {
+        'lat_1': 'lat_1',
+        'lat_2': 'lat_2',
+    }
     kw_proj = {}
     kw_globe = {}
     kw_std = {}
@@ -178,10 +194,10 @@ def proj_to_cartopy(proj):
         v = s[1].strip()
         try:
             v = float(v)
-        except:
+        except Exception:
             pass
         if k == 'proj':
-            if v == "longlat":
+            if v == 'longlat':
                 cl = ccrs.PlateCarree
             elif v == 'tmerc':
                 cl = ccrs.TransverseMercator
@@ -217,7 +233,7 @@ def proj_to_cartopy(proj):
     if cl.__name__ == 'Mercator':
         kw_proj.pop('false_easting', None)
         kw_proj.pop('false_northing', None)
-        if "scale_factor" in kw_proj:
+        if 'scale_factor' in kw_proj:
             kw_proj.pop('latitude_true_scale', None)
     elif cl.__name__ == 'Stereographic':
         kw_proj.pop('scale_factor', None)
@@ -256,7 +272,7 @@ def process_crs(crs):
     except ImportError:
         missing.append('cartopy')
     try:
-        import geoviews as gv # noqa
+        import geoviews as gv  # noqa
     except ImportError:
         missing.append('geoviews')
     try:
@@ -286,8 +302,8 @@ def process_crs(crs):
             errors.append(e)
 
     raise ValueError(
-        "Projection must be defined as a EPSG code, proj4 string, "
-        "WKT string, cartopy CRS, pyproj.Proj, or pyproj.CRS."
+        'Projection must be defined as a EPSG code, proj4 string, '
+        'WKT string, cartopy CRS, pyproj.Proj, or pyproj.CRS.'
     ) from Exception(*errors)
 
 
@@ -297,7 +313,8 @@ def is_list_like(obj):
     """
     return (
         # equiv: `isinstance(obj, abc.Iterable)`
-        hasattr(obj, "__iter__") and not isinstance(obj, type)
+        hasattr(obj, '__iter__')
+        and not isinstance(obj, type)
         # we do not count strings/unicode/bytes as list-like
         and not isinstance(obj, (str, bytes))
         # exclude zero-dimensional numpy arrays, effectively scalars
@@ -310,10 +327,12 @@ def is_tabular(data):
         return True
     elif check_library(data, 'intake'):
         from intake.source.base import DataSource
+
         if isinstance(data, DataSource):
             return data.container == 'dataframe'
     else:
         return False
+
 
 def is_series(data):
     if not check_library(data, ['dask', 'streamz', 'pandas', 'cudf']):
@@ -322,74 +341,96 @@ def is_series(data):
         return True
     elif check_library(data, 'streamz'):
         import streamz.dataframe as sdf
+
         return isinstance(data, (sdf.Series, sdf.Seriess))
     elif check_library(data, 'dask'):
         import dask.dataframe as dd
+
         return isinstance(data, dd.Series)
     elif check_library(data, 'cudf'):
         import cudf
+
         return isinstance(data, cudf.Series)
     else:
         return False
 
+
 def check_library(obj, library):
     if not isinstance(library, list):
         library = [library]
-    return any([obj.__module__.split('.')[0].startswith(l) for l in library])
+    return any([obj.__module__.split('.')[0].startswith(lib) for lib in library])
+
 
 def is_cudf(data):
     if 'cudf' in sys.modules:
         from cudf import DataFrame, Series
+
         return isinstance(data, (DataFrame, Series))
+
 
 def is_dask(data):
     if not check_library(data, 'dask'):
         return False
     import dask.dataframe as dd
+
     return isinstance(data, (dd.DataFrame, dd.Series))
+
 
 def is_polars(data):
     if not check_library(data, 'polars'):
         return False
     import polars as pl
+
     return isinstance(data, (pl.DataFrame, pl.Series, pl.LazyFrame))
 
+
 def is_intake(data):
-    if "intake" not in sys.modules:
+    if 'intake' not in sys.modules:
         return False
     from intake.source.base import DataSource
+
     return isinstance(data, DataSource)
+
 
 def is_ibis(data):
     if not check_library(data, 'ibis'):
         return False
     import ibis
+
     return isinstance(data, ibis.Expr)
+
 
 def is_streamz(data):
     if not check_library(data, 'streamz'):
         return False
     import streamz.dataframe as sdf
+
     return sdf and isinstance(data, (sdf.DataFrame, sdf.Series, sdf.DataFrames, sdf.Seriess))
+
 
 def is_xarray(data):
     if not check_library(data, 'xarray'):
         return False
     from xarray import DataArray, Dataset
+
     return isinstance(data, (DataArray, Dataset))
+
 
 def is_xarray_dataarray(data):
     if not check_library(data, 'xarray'):
         return False
     from xarray import DataArray
+
     return isinstance(data, DataArray)
 
 
 def process_intake(data, use_dask):
     if data.container not in ('dataframe', 'xarray'):
-        raise NotImplementedError('Plotting interface currently only '
-                                  'supports DataSource objects declaring '
-                                  'a dataframe or xarray container.')
+        raise NotImplementedError(
+            'Plotting interface currently only '
+            'supports DataSource objects declaring '
+            'a dataframe or xarray container.'
+        )
     if use_dask:
         data = data.to_dask()
     else:
@@ -400,14 +441,19 @@ def process_intake(data, use_dask):
 def is_geodataframe(data):
     if 'spatialpandas' in sys.modules:
         import spatialpandas as spd
+
         if isinstance(data, spd.GeoDataFrame):
             return True
-    return isinstance(data, pd.DataFrame) and hasattr(data, 'geom_type') and hasattr(data, 'geometry')
+    return (
+        isinstance(data, pd.DataFrame) and hasattr(data, 'geom_type') and hasattr(data, 'geometry')
+    )
 
 
-def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded,
-                   label, value_label, other_dims, kind=None):
+def process_xarray(
+    data, x, y, by, groupby, use_dask, persist, gridded, label, value_label, other_dims, kind=None
+):
     import xarray as xr
+
     if isinstance(data, xr.Dataset):
         dataset = data
     else:
@@ -422,7 +468,9 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded,
             all_vars.append(var)
 
     if not gridded:
-        not_found = [var for var in all_vars if var not in list(dataset.data_vars) + list(dataset.coords)]
+        not_found = [
+            var for var in all_vars if var not in list(dataset.data_vars) + list(dataset.coords)
+        ]
         _, extra_vars, extra_coords = process_derived_datetime_xarray(dataset, not_found)
         dataset = dataset.assign_coords(**{var: dataset[var] for var in extra_coords})
         dataset = dataset.assign(**{var: dataset[var] for var in extra_vars})
@@ -449,9 +497,11 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded,
             y = [d for d in dims if d != x][0]
         elif y and not x:
             x = [d for d in dims if d != y][0]
-        if (len(dims) > 2 and kind not in ('table', 'dataset') and not groupby):
+        if len(dims) > 2 and kind not in ('table', 'dataset') and not groupby:
             dims = list(data.coords[x].dims) + list(data.coords[y].dims)
-            groupby = [d for d in index_dims if d not in (x, y) and d not in dims and d not in other_dims]
+            groupby = [
+                d for d in index_dims if d not in (x, y) and d not in dims and d not in other_dims
+            ]
     else:
         if use_dask:
             data = dataset.to_dask_dataframe()
@@ -479,8 +529,7 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded,
         for var in all_vars:
             if var in dataset.coords:
                 covered_dims.extend(dataset[var].dims)
-        leftover_dims = [dim for dim in index_dims
-                         if dim not in covered_dims + all_vars]
+        leftover_dims = [dim for dim in index_dims if dim not in covered_dims + all_vars]
 
         if groupby is None:
             groupby = [c for c in leftover_dims if c not in (by or [])]
@@ -489,6 +538,7 @@ def process_xarray(data, x, y, by, groupby, use_dask, persist, gridded,
 
 def process_derived_datetime_xarray(data, not_found):
     from pandas.api.types import is_datetime64_any_dtype as isdate
+
     extra_vars = []
     extra_coords = []
     for var in not_found:
@@ -505,6 +555,7 @@ def process_derived_datetime_xarray(data, not_found):
 
 def process_derived_datetime_pandas(data, not_found, indexes=None):
     from pandas.api.types import is_datetime64_any_dtype as isdate
+
     indexes = indexes or []
     extra_cols = {}
     for var in not_found:
@@ -554,8 +605,7 @@ def process_dynamic_args(x, y, kind, **kwds):
 
 def filter_opts(eltype, options, backend='bokeh'):
     opts = getattr(hv.Store.options(backend), eltype)
-    allowed = [k for g in opts.groups.values()
-               for k in list(g.allowed_keywords)]
+    allowed = [k for g in opts.groups.values() for k in list(g.allowed_keywords)]
     opts = {k: v for k, v in options.items() if k in allowed}
     return opts
 
@@ -597,9 +647,7 @@ def _convert_col_names_to_str(data):
     if not hasattr(data, 'columns') or not hasattr(data, 'rename'):
         return data
     renamed = {
-        c: str(c)
-        for c in data.columns
-        if not isinstance(c, str) and isinstance(c, Hashable)
+        c: str(c) for c in data.columns if not isinstance(c, str) and isinstance(c, Hashable)
     }
     if renamed:
         data = data.rename(columns=renamed)
@@ -611,6 +659,7 @@ def instantiate_crs_str(crs_str: str, **kwargs):
     Instantiate a cartopy.crs.Projection from a string.
     """
     import cartopy.crs as ccrs
+
     if crs_str.upper() == 'GOOGLE_MERCATOR':
         return ccrs.GOOGLE_MERCATOR
     return getattr(ccrs, crs_str)(**kwargs)
