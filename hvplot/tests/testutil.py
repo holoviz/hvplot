@@ -260,6 +260,9 @@ def test_check_crs():
     'input',
     [
         '+init=epsg:26911',
+        'epsg:6933',
+        6933,
+        'EPSG: 6933',
     ],
 )
 def test_process_crs(input):
