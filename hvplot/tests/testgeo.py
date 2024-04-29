@@ -77,6 +77,10 @@ class TestCRSInference(TestGeo):
     def test_plot_with_geo_as_true_crs_undefined(self):
         plot = self.da.hvplot.image('x', 'y', geo=True)
         self.assertCRS(plot)
+    
+    def test_plot_with_crs_as_class_name(self):
+        plot = self.da.hvplot.image('x', 'y', crs="PlateCarree")
+        self.assertCRS(plot)
 
 
 class TestProjections(TestGeo):
