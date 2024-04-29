@@ -295,10 +295,10 @@ def process_crs(crs):
             and proj[0].isupper()
             or proj == 'GOOGLE_MERCATOR'
         ]
-        if projection in all_crs and projection != 'GOOGLE_MERCATOR':
-            return getattr(ccrs, projection)()
-        elif projection == 'GOOGLE_MERCATOR':
-            return getattr(ccrs, projection)
+        if crs in all_crs and crs != 'GOOGLE_MERCATOR':
+            return getattr(ccrs, crs)()
+        elif crs == 'GOOGLE_MERCATOR':
+            return getattr(ccrs, crs)
     elif isinstance(crs, pyproj.CRS):
         crs = crs.to_wkt()
 
