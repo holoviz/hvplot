@@ -896,6 +896,11 @@ class hvGridExplorer(hvPlotExplorer):
                 ds = ds[data_vars[0]]
                 var_name_suffix = f"['{data_vars[0]}']"
             else:
+                missing_dims = set(ds.dims) - set(ds.coords)
+                if missing_dims:
+                    # fixes https://github.com/holoviz/hvplot/issues/1272
+                    for dim in missing_dims:
+                        ds.coords[dim] = np.arange(len(ds[dim]))
                 ds = ds.to_array('variable').transpose(..., 'variable')
                 var_name_suffix = ".to_array('variable').transpose(..., 'variable')"
         if 'kind' not in params:
