@@ -72,7 +72,7 @@ tests-core = [
 # of those.
 tests = [
     "hvplot[tests-core]",
-    "fugue",
+    "fugue[sql]",
     "ibis-framework[duckdb]",  # ibis-duckdb on conda
     "polars",
 ]
