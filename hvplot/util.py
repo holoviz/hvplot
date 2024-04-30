@@ -316,7 +316,8 @@ def process_crs(crs):
 
     raise ValueError(
         'Projection must be defined as a EPSG code, proj4 string, '
-        'WKT string, cartopy CRS, pyproj.Proj, or pyproj.CRS.'
+        'WKT string, cartopy CRS instance, cartopy CRS class name string, '
+        'pyproj.Proj, or pyproj.CRS.'
     ) from Exception(*errors)
 
 
