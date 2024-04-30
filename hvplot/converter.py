@@ -289,8 +289,8 @@ class HoloViewsConverter:
     crs (default=None):
         Coordinate reference system of the data specified as a string
         or integer EPSG code, a CRS or Proj pyproj object, a Cartopy
-        CRS object, a WKT string, or a proj.4 string. Defaults to
-        PlateCarree.
+        CRS object or class name, a WKT string, or a proj.4 string.
+        Defaults to PlateCarree.
     features (default=None): dict or list
         A list of features or a dictionary of features and the scale
         at which to render it. Available features include 'borders',
@@ -306,8 +306,10 @@ class HoloViewsConverter:
         overhead but avoids projecting data when plot is dynamically
         updated).
     projection (default=None): str or Cartopy CRS
-        Coordinate reference system of the plot specified as Cartopy
-        CRS object or class name.
+        Coordinate reference system of the data specified as a string
+        or integer EPSG code, a CRS or Proj pyproj object, a Cartopy
+        CRS object or class name, a WKT string, or a proj.4 string.
+        Defaults to PlateCarree.
     tiles (default=False):
         Whether to overlay the plot on a tile source:
         - `True`: OpenStreetMap layer
