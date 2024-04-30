@@ -1,3 +1,4 @@
+import os
 import param
 
 param.parameterized.docstring_signature = False
@@ -14,11 +15,6 @@ description = 'A high-level plotting API for the PyData ecosystem built on HoloV
 
 version = release = base_version(hvplot.__version__)  # noqa
 nbbuild_cell_timeout = 600
-
-# mystnb
-nb_execution_excludepatterns = [
-    'user_guide/Streaming.ipynb',
-]
 
 exclude_patterns = ['governance']
 
@@ -93,28 +89,6 @@ nbsite_analytics = {
 }
 
 rediraffe_redirects = {
-    # When the pandas section was renamed tabular:
-    'reference/pandas/andrewscurves': 'reference/tabular/andrewscurves',
-    'reference/pandas/area': 'reference/tabular/area',
-    'reference/pandas/bar': 'reference/tabular/bar',
-    'reference/pandas/barh': 'reference/tabular/barh',
-    'reference/pandas/bivariate': 'reference/tabular/bivariate',
-    'reference/pandas/box': 'reference/tabular/box',
-    'reference/pandas/errorbars': 'reference/tabular/errorbars',
-    'reference/pandas/heatmap': 'reference/tabular/heatmap',
-    'reference/pandas/hexbin': 'reference/tabular/hexbin',
-    'reference/pandas/hist': 'reference/tabular/hist',
-    'reference/pandas/kde': 'reference/tabular/kde',
-    'reference/pandas/labels': 'reference/tabular/labels',
-    'reference/pandas/lagplot': 'reference/tabular/lagplot',
-    'reference/pandas/line': 'reference/tabular/line',
-    'reference/pandas/ohlc': 'reference/tabular/ohlc',
-    'reference/pandas/parallelcoordinates': 'reference/tabular/parallelcoordinates',
-    'reference/pandas/scatter': 'reference/tabular/scatter',
-    'reference/pandas/scattermatrix': 'reference/tabular/scattermatrix',
-    'reference/pandas/step': 'reference/tabular/step',
-    'reference/pandas/table': 'reference/tabular/table',
-    'reference/pandas/violin': 'reference/tabular/violin',
     # Removal of the developer testing page
     'developer_guide/testing': 'developer_guide/index',
 }
@@ -127,3 +101,41 @@ html_context.update(  # noqa
         'default_mode': 'light',
     }
 )
+
+# mystnb
+nb_execution_excludepatterns = [
+    'user_guide/Streaming.ipynb',
+]
+
+if os.getenv('HVPLOT_REFERENCE_GALLERY') not in ('False', 'false', '0'):
+    rediraffe_redirects.update(
+        {
+            # When the pandas section was renamed tabular:
+            'reference/pandas/andrewscurves': 'reference/tabular/andrewscurves',
+            'reference/pandas/area': 'reference/tabular/area',
+            'reference/pandas/bar': 'reference/tabular/bar',
+            'reference/pandas/barh': 'reference/tabular/barh',
+            'reference/pandas/bivariate': 'reference/tabular/bivariate',
+            'reference/pandas/box': 'reference/tabular/box',
+            'reference/pandas/errorbars': 'reference/tabular/errorbars',
+            'reference/pandas/heatmap': 'reference/tabular/heatmap',
+            'reference/pandas/hexbin': 'reference/tabular/hexbin',
+            'reference/pandas/hist': 'reference/tabular/hist',
+            'reference/pandas/kde': 'reference/tabular/kde',
+            'reference/pandas/labels': 'reference/tabular/labels',
+            'reference/pandas/lagplot': 'reference/tabular/lagplot',
+            'reference/pandas/line': 'reference/tabular/line',
+            'reference/pandas/ohlc': 'reference/tabular/ohlc',
+            'reference/pandas/parallelcoordinates': 'reference/tabular/parallelcoordinates',
+            'reference/pandas/scatter': 'reference/tabular/scatter',
+            'reference/pandas/scattermatrix': 'reference/tabular/scattermatrix',
+            'reference/pandas/step': 'reference/tabular/step',
+            'reference/pandas/table': 'reference/tabular/table',
+            'reference/pandas/violin': 'reference/tabular/violin',
+        }
+    )
+else:
+    if 'nbsite.gallery' in extensions:
+        extensions.remove('nbsite.gallery')
+    exclude_patterns.append('doc/reference')
+    nb_execution_excludepatterns.append('doc/reference/**/*.ipynb')
