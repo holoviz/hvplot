@@ -303,14 +303,24 @@ def process_crs(crs):
         crs = crs.to_wkt()
 
     errors = []
-    if isinstance(crs, (str, int)):  # epsg codes
+    if isinstance(crs, (str, int, pyproj.Proj)):
+        wkt = crs
+        if isinstance(crs, (str, int)):  # epsg codes
+            try:
+                wkt = pyproj.CRS.from_epsg(crs).to_wkt()
+            except Exception as e:
+                errors.append(e)
         try:
-            crs = pyproj.CRS.from_epsg(crs).to_wkt()
+            return proj_to_cartopy(wkt)  # should be all proj4 or wkt strings
         except Exception as e:
             errors.append(e)
-    if isinstance(crs, (str, pyproj.Proj)):  # proj4/wkt strings
+
+    if isinstance(crs, (str, int)):
+        if isinstance(crs, str):
+            # pyproj does not expect epsg to be prefixed with `EPSG:`
+            crs = crs.upper().replace('EPSG:', '').strip()
         try:
-            return proj_to_cartopy(crs)
+            return ccrs.epsg(crs)
         except Exception as e:
             errors.append(e)
 
