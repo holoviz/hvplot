@@ -65,7 +65,7 @@ jobs:
                 {
                   "python-version": "3.8",
                   "os": "macos-latest"
-                },
+                }
               ]
           }')
           echo "MATRIX=$MATRIX" >> $GITHUB_ENV
@@ -93,7 +93,7 @@ jobs:
                 {
                   "python-version": "3.8",
                   "os": "macos-latest"
-                },
+                }
               ]
           }')
           echo "MATRIX=$MATRIX" >> $GITHUB_ENV
