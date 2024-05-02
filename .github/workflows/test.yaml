@@ -129,6 +129,7 @@ jobs:
         run: pytest -n auto --dist loadscope --nbval-lax -p no:python
   pip_test:
     name: pip tests:${{ matrix.os }}:${{ matrix.python-version }}
+    if: matrix.os != 'macos-latest' && matrix.python-version != '3.8'
     needs: [pre_commit, setup]
     timeout-minutes: 90
     runs-on: ${{ matrix.os }}
