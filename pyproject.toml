@@ -94,7 +94,7 @@ graphviz = [
 examples = [
     "dask[dataframe] >=2021.3.0",
     "datashader >=0.6.5",
-    "fugue",
+    "fugue[sql]",
     "ibis-framework[duckdb]",  # ibis-duckdb on conda
     "intake-parquet >=0.2.3",
     "intake-xarray >=0.5.0",
@@ -143,6 +143,10 @@ hvdev = [
 ]
 hvdev-geo = [
     "geoviews >=0.0.1a1",
+]
+dev-extras = [
+    # To keep __version__ up-to-date in editable installs
+    "setuptools_scm >= 6"
 ]
 
 [tool.setuptools]
@@ -199,12 +203,12 @@ ibis-framework = { skip = true, packages = "ibis-duckdb" }
 [tool.pyproject2conda.envs."tests"]
 channels = ["nodefaults", "pyviz/label/dev", "conda-forge"]
 python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
-extras = ["tests", "examples-tests", "geo", "graphviz"]
+extras = ["tests", "examples-tests", "geo", "graphviz", "dev-extras"]
 name = "hvplottests"
 # reqs = ["-e .."]  # Doesn't work
 
 [tool.pyproject2conda.envs."docs"]
 channels = ["nodefaults", "pyviz/label/dev", "conda-forge"]
 python = ["3.11"]
-extras = ["doc", "examples", "geo", "graphviz"]
+extras = ["doc", "examples", "geo", "graphviz", "dev-extras"]
 name = "hvplotdocs"

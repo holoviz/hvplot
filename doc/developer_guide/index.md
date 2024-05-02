@@ -79,7 +79,7 @@ source .venv/bin/activate
 Install the test dependencies:
 
 ``` bash
-pip install -e '.[tests, examples-tests, geo, hvdev, hvdev-geo]'
+pip install -e '.[tests, examples-tests, geo, hvdev, hvdev-geo, dev-extras]'
 ```
 
 :::
