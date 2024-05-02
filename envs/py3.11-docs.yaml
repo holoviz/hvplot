@@ -59,4 +59,4 @@ dependencies:
   - xyzservices>=2022.9.0
   - pip
   - pip:
-    - -e ..
+    - -e .. --no-deps
