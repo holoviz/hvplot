@@ -52,6 +52,7 @@ dependencies:
   - scikit-image>=0.17.2
   - scipy>=1.5.3
   - selenium>=3.141.0
+  - setuptools_scm>=6
   - spatialpandas>=0.4.3
   - sphinxext-rediraffe
   - streamz>=0.3.0

@@ -150,10 +150,10 @@ jobs:
       - name: install without geo
         # Because cartopy cannot be installed on Python 3.8 on these platforms
         if: matrix.python-version == '3.8' && contains(fromJSON('["ubuntu-latest", "windows-latest"]'), matrix.os)
-        run: pip install -ve '.[tests, examples-tests, hvdev]'
+        run: pip install -ve '.[tests, examples-tests, hvdev, dev-extras]'
       - name: install with geo
         if: matrix.python-version != '3.8' || !contains(fromJSON('["ubuntu-latest", "windows-latest"]'), matrix.os)
-        run: pip install -ve '.[tests, examples-tests, geo, hvdev, hvdev-geo]'
+        run: pip install -ve '.[tests, examples-tests, geo, hvdev, hvdev-geo, dev-extras]'
       - name: pip list
         run: pip list
       - name: bokeh sampledata
