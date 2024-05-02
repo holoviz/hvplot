@@ -2,7 +2,7 @@
 
 See [the HoloViz blog](https://blog.holoviz.org/#category=hvplot) for a visual summary of the major features added in a selection of releases.
 
-## Version 0.9.3 (2024-04-XX)
+## Version 0.10.0 (2024-05-02)
 
 This patch release brings a number of enhancements and bugfixes.
 
@@ -12,7 +12,7 @@ This patch release brings a number of enhancements and bugfixes.
 - 📈 Enhancing the plotting API: in part to support the [NumFocus SDG](https://opencollective.com/holoviz/projects/holoviz-sdg-2023-round-3) project that aims to modernize the [HoloViz Examples](https://examples.holoviz.org)
 - 🐛 Fixing bugs!
 
-Many thanks to @ahuang11, @droumis, @Hoxbro, and @maximlt for their contributions.
+Many thanks to @ahuang11, @droumis, @Hoxbro @jsignell, and @maximlt for their contributions.
 
 Governance:
 
@@ -25,12 +25,15 @@ Enhancements:
 - Add `tiles_opts` parameter to customize the tiles ([#1299](https://github.com/holoviz/hvplot/pull/1299))
 - Add support to `xyzservices` tiles ([#1307](https://github.com/holoviz/hvplot/pull/1307))
 - Allow to set the `downsample` algorithm as string input ([#1314](https://github.com/holoviz/hvplot/pull/1314))
+- Allow `crs` as Cartopy class name to match `projection` ([#1332](https://github.com/holoviz/hvplot/pull/1332))
 
 Bug Fixes:
 
 - Fix saving Panel objects with `hvplot.save` ([#1297](https://github.com/holoviz/hvplot/pull/1297))
 - Fix setting `group_label` when plotting a histogram ([#1310](https://github.com/holoviz/hvplot/pull/1310))
 - Fix the support of HoloViews ImageStack support and usage of `aggregator` and `by` ([#1316](https://github.com/holoviz/hvplot/pull/1316))
+- Fix handling of EPSG codes ([#1330](https://github.com/holoviz/hvplot/pull/1330))
+- Explorer: fix handling of Xarray objects that have dims without coords ([#1334](https://github.com/holoviz/hvplot/pull/1334))
 
 Compatibility:
 
@@ -50,7 +53,7 @@ Infrastructure / Tests:
 - Fix the test suite after the latest Dask release ([#1298](https://github.com/holoviz/hvplot/pull/1298))
 - Remove the `examples` folder ([#1287](https://github.com/holoviz/hvplot/pull/1287))
 - Install the tests dependencies primarily with pip ([#1276](https://github.com/holoviz/hvplot/pull/1276))
-- Misc ([#1317](https://github.com/holoviz/hvplot/pull/1317), [#1321](https://github.com/holoviz/hvplot/pull/1321), [#1323](https://github.com/holoviz/hvplot/pull/1323))
+- Misc ([#1317](https://github.com/holoviz/hvplot/pull/1317), [#1321](https://github.com/holoviz/hvplot/pull/1321), [#1323](https://github.com/holoviz/hvplot/pull/1323), [#1324](https://github.com/holoviz/hvplot/pull/1324), [#1327](https://github.com/holoviz/hvplot/pull/1327))
 
 [Full Changelog](https://github.com/holoviz/hvplot/compare/v0.9.2...v0.9.3)
 
