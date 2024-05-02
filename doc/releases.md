@@ -4,7 +4,7 @@ See [the HoloViz blog](https://blog.holoviz.org/#category=hvplot) for a visual s
 
 ## Version 0.10.0 (2024-05-02)
 
-This patch release brings a number of enhancements and bugfixes.
+This minor release brings a number of enhancements and bugfixes.
 
 - 🧰 Improving the contributor experience: moving away from `pyctdev` to a more usual and easier approach, and adopt `ruff` as a linter and formatter
 - 📦 Modernizing hvPlot's packaging: migrating to `pyproject.toml`
@@ -12,7 +12,7 @@ This patch release brings a number of enhancements and bugfixes.
 - 📈 Enhancing the plotting API: in part to support the [NumFocus SDG](https://opencollective.com/holoviz/projects/holoviz-sdg-2023-round-3) project that aims to modernize the [HoloViz Examples](https://examples.holoviz.org)
 - 🐛 Fixing bugs!
 
-Many thanks to @ahuang11, @droumis, @Hoxbro @jsignell, and @maximlt for their contributions.
+Many thanks to @ahuang11, @droumis, @Hoxbro, @jsignell, and @maximlt for their contributions.
 
 Governance:
 
