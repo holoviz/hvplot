@@ -287,7 +287,7 @@ class HoloViewsConverter:
         Whether to display a coastline on top of the plot, setting
         coastline='10m'/'50m'/'110m' specifies a specific scale.
     crs (default=None):
-        Coordinate reference system of the data specified as a string
+        Coordinate reference system of the data (input projection) specified as a string
         or integer EPSG code, a CRS or Proj pyproj object, a Cartopy
         CRS object or class name, a WKT string, or a proj.4 string.
         Defaults to PlateCarree.
@@ -306,7 +306,7 @@ class HoloViewsConverter:
         overhead but avoids projecting data when plot is dynamically
         updated).
     projection (default=None): str or Cartopy CRS
-        Coordinate reference system of the data specified as a string
+        Coordinate reference system of the plot (output projection) specified as a string
         or integer EPSG code, a CRS or Proj pyproj object, a Cartopy
         CRS object or class name, a WKT string, or a proj.4 string.
         Defaults to PlateCarree.
