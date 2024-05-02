@@ -61,6 +61,7 @@ dependencies:
   - scipy
   - scipy>=1.5.3
   - selenium>=3.141.0
+  - setuptools_scm>=6
   - spatialpandas>=0.4.3
   - streamz>=0.3.0
   - xarray
@@ -68,4 +69,4 @@ dependencies:
   - xyzservices>=2022.9.0
   - pip
   - pip:
-    - -e ..
+    - -e .. --no-deps

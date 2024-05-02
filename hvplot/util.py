@@ -286,6 +286,19 @@ def process_crs(crs):
         return ccrs.PlateCarree()
     elif isinstance(crs, ccrs.CRS):
         return crs
+    elif isinstance(crs, str):
+        all_crs = [
+            proj
+            for proj in dir(ccrs)
+            if callable(getattr(ccrs, proj))
+            and proj not in ['ABCMeta', 'CRS']
+            and proj[0].isupper()
+            or proj == 'GOOGLE_MERCATOR'
+        ]
+        if crs in all_crs and crs != 'GOOGLE_MERCATOR':
+            return getattr(ccrs, crs)()
+        elif crs == 'GOOGLE_MERCATOR':
+            return getattr(ccrs, crs)
     elif isinstance(crs, pyproj.CRS):
         crs = crs.to_wkt()
 
@@ -313,7 +326,8 @@ def process_crs(crs):
 
     raise ValueError(
         'Projection must be defined as a EPSG code, proj4 string, '
-        'WKT string, cartopy CRS, pyproj.Proj, or pyproj.CRS.'
+        'WKT string, cartopy CRS instance, cartopy CRS class name string, '
+        'pyproj.Proj, or pyproj.CRS.'
     ) from Exception(*errors)
 
 

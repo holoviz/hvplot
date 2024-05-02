@@ -2,7 +2,9 @@ import dask
 from importlib.util import find_spec
 from bokeh.io.webdriver import webdriver_control
 
-collect_ignore_glob = []
+collect_ignore_glob = [
+    'user_guide/Streaming.ipynb',
+]
 
 if not find_spec('pygraphviz'):
     collect_ignore_glob += [

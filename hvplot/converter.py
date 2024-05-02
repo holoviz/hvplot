@@ -287,10 +287,10 @@ class HoloViewsConverter:
         Whether to display a coastline on top of the plot, setting
         coastline='10m'/'50m'/'110m' specifies a specific scale.
     crs (default=None):
-        Coordinate reference system of the data specified as a string
+        Coordinate reference system of the data (input projection) specified as a string
         or integer EPSG code, a CRS or Proj pyproj object, a Cartopy
-        CRS object, a WKT string, or a proj.4 string. Defaults to
-        PlateCarree.
+        CRS object or class name, a WKT string, or a proj.4 string.
+        Defaults to PlateCarree.
     features (default=None): dict or list
         A list of features or a dictionary of features and the scale
         at which to render it. Available features include 'borders',
@@ -306,8 +306,10 @@ class HoloViewsConverter:
         overhead but avoids projecting data when plot is dynamically
         updated).
     projection (default=None): str or Cartopy CRS
-        Coordinate reference system of the plot specified as Cartopy
-        CRS object or class name.
+        Coordinate reference system of the plot (output projection) specified as a string
+        or integer EPSG code, a CRS or Proj pyproj object, a Cartopy
+        CRS object or class name, a WKT string, or a proj.4 string.
+        Defaults to PlateCarree.
     tiles (default=False):
         Whether to overlay the plot on a tile source:
         - `True`: OpenStreetMap layer
@@ -645,24 +647,8 @@ class HoloViewsConverter:
             from cartopy import crs as ccrs
             from geoviews.util import project_extents
 
-            if isinstance(projection, str):
-                all_crs = [
-                    proj
-                    for proj in dir(ccrs)
-                    if callable(getattr(ccrs, proj))
-                    and proj not in ['ABCMeta', 'CRS']
-                    and proj[0].isupper()
-                    or proj == 'GOOGLE_MERCATOR'
-                ]
-                if projection in all_crs and projection != 'GOOGLE_MERCATOR':
-                    projection = getattr(ccrs, projection)()
-                elif projection == 'GOOGLE_MERCATOR':
-                    projection = getattr(ccrs, projection)
-                else:
-                    raise ValueError(
-                        'Projection must be defined as cartopy CRS or '
-                        f'one of the following CRS string:\n {all_crs}'
-                    )
+            if projection is not None:
+                projection = process_crs(projection)
 
             self.output_projection = projection or (ccrs.GOOGLE_MERCATOR if tiles else self.crs)
             if tiles and self.output_projection != ccrs.GOOGLE_MERCATOR:
