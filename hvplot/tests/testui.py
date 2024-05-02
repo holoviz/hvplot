@@ -1,6 +1,7 @@
 import re
 from textwrap import dedent
 
+import numpy as np
 import holoviews as hv
 import pandas as pd
 import hvplot.pandas
@@ -381,3 +382,9 @@ def test_explorer_code_opts():
             color_levels=3,
         )
         ```""")
+
+
+def test_explorer_xarray_multi_var_extra_dims_no_coord():
+    ds = xr.tutorial.open_dataset('air_temperature')
+    ds['lat_bnds'] = (('bnds', 'lat'), np.vstack([ds['lat'], ds['lat']]))
+    assert ds.hvplot.explorer()
