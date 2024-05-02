@@ -260,6 +260,7 @@ def test_check_crs():
     'input',
     [
         '+init=epsg:26911',
+        'PlateCarree',
     ],
 )
 def test_process_crs(input):
