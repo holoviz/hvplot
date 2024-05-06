@@ -73,8 +73,18 @@ tests-core = [
 tests = [
     "hvplot[tests-core]",
     "fugue[sql]",
+    "hvplot[fugue-sql]",
+    # end fugue
     "ibis-framework[duckdb]",  # ibis-duckdb on conda
     "polars",
+]
+# In 0.9 fugue added the sql extra but didn't add a fugue-sql package, removing the sql deps from fugue
+# Adding them manually here
+fugue-sql = [
+    "qpd >=0.4.4",
+    "fugue-sql-antlr >=0.2.0",
+    "sqlglot",
+    "jinja2",
 ]
 geo = [
     "cartopy",
@@ -95,6 +105,7 @@ examples = [
     "dask[dataframe] >=2021.3.0",
     "datashader >=0.6.5",
     "fugue[sql]",
+    "hvplot[fugue-sql]",
     "ibis-framework[duckdb]",  # ibis-duckdb on conda
     "intake-parquet >=0.2.3",
     "intake-xarray >=0.5.0",
