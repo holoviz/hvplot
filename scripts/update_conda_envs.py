@@ -20,7 +20,7 @@ def main():
         with open(file, 'a', encoding='utf-8') as f:
             f.write('  - pip\n')
             f.write('  - pip:\n')
-            f.write('    - -e .. --no-deps\n')
+            f.write('    - -e ..\n')
 
 
 if __name__ == '__main__':
