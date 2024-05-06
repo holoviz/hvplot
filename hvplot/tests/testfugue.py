@@ -9,6 +9,7 @@ hvplot.util._fugue_ipython = True
 
 try:
     import fugue.api as fa
+    import fugue_sql_antlr  # noqa: F401
     import hvplot.fugue  # noqa: F401
 except ImportError:
     pytest.skip(allow_module_level=True)
