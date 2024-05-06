@@ -36,6 +36,7 @@ except RuntimeError:
     # hvplot.save() with bokeh
     collect_ignore_glob += [
         'user_guide/Viewing.ipynb',
+        'user_guide/NetworkX.ipynb',
     ]
 finally:
     webdriver_control.cleanup()

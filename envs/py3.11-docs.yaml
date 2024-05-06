@@ -21,6 +21,7 @@ dependencies:
   - datashader>=0.6.5
   - fiona
   - fugue
+  - fugue-sql-antlr>=0.2.0
   - geodatasets>=2023.12.0
   - geopandas
   - geoviews-core>=1.9.0
@@ -30,6 +31,7 @@ dependencies:
   - intake-xarray>=0.5.0
   - intake<2.0.0,>=0.6.5
   - ipywidgets
+  - jinja2
   - matplotlib
   - nbsite>=0.8.4
   - networkx>=2.6.3
@@ -46,6 +48,7 @@ dependencies:
   - pooch>=1.6.0
   - pygraphviz
   - pyproj
+  - qpd>=0.4.4
   - rasterio
   - rioxarray
   - s3fs>=2022.1.0
@@ -55,6 +58,7 @@ dependencies:
   - setuptools_scm>=6
   - spatialpandas>=0.4.3
   - sphinxext-rediraffe
+  - sqlglot
   - streamz>=0.3.0
   - xarray>=0.18.2
   - xyzservices>=2022.9.0
