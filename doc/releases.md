@@ -2,9 +2,9 @@
 
 See [the HoloViz blog](https://blog.holoviz.org/#category=hvplot) for a visual summary of the major features added in a selection of releases.
 
-## Version 0.10.0 (2024-05-02)
+## Version 0.10.0 (2024-05-06)
 
-This minor release brings a number of enhancements and bugfixes.
+This minor release brings a number of enhancements and bugfixes, checkout the [release blog post](https://blog.holoviz.org/posts/hvplot_release_0.10/) for a visual summary of the most important enhancements.
 
 - 🧰 Improving the contributor experience: moving away from `pyctdev` to a more usual and easier approach, and adopt `ruff` as a linter and formatter
 - 📦 Modernizing hvPlot's packaging: migrating to `pyproject.toml`
