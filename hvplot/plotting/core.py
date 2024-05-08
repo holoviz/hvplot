@@ -1909,6 +1909,19 @@ class hvPlotTabularPolars(hvPlotTabular):
 
         return HoloViewsConverter(data, x, y, kind=kind, **params)
 
+    def explorer(self, x=None, y=None, **kwds):
+        import polars as pl
+        from ..ui import explorer as ui_explorer
+
+        if isinstance(self._data, (pl.DataFrame, pl.Series)):
+            data = self._data.to_pandas()
+        elif isinstance(self._data, pl.LazyFrame):
+            data = self._data.collect().to_pandas()
+        else:
+            raise ValueError('Only Polars DataFrame, Series, and LazyFrame are supported')
+
+        return ui_explorer(data, x=x, y=y, **kwds)
+
 
 class hvPlot(hvPlotTabular):
     """
