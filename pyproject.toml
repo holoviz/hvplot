@@ -161,6 +161,7 @@ dev-extras = [
 ]
 otherdev = [
     "numpy >=2.0.0rc2",
+    "numba >=0.60.0rc1",
 ]
 
 [tool.setuptools]
