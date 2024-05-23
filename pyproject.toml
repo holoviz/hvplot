@@ -159,6 +159,9 @@ dev-extras = [
     # To keep __version__ up-to-date in editable installs
     "setuptools_scm >= 6"
 ]
+otherdev = [
+    "numpy >=2.0.0rc2",
+]
 
 [tool.setuptools]
 include-package-data = true
