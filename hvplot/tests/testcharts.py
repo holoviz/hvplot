@@ -433,6 +433,12 @@ class TestChart1D(ComparisonTestCase):
         ]
         assert list(plot.data['label']) == ['-58.7E -34.58N', '-47.9E -15.78N', '-70.7E -33.45N']
 
+    def test_labels_by(self):
+        plot = self.edge_df.hvplot.labels(
+            'Longitude', 'Latitude', text='{Longitude:.1f}E {Latitude:.2f}N', by='Volume {m3}'
+        )
+        assert isinstance(plot, NdOverlay)
+
 
 class TestChart1DDask(TestChart1D):
     def setUp(self):
