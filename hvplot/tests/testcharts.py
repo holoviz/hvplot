@@ -412,6 +412,7 @@ class TestChart1D(ComparisonTestCase):
         plot = self.df.hvplot('x', 'y', text='({x}, {y})', kind='labels')
         assert list(plot.dimensions()) == [Dimension('x'), Dimension('y'), Dimension('label')]
         assert list(plot.data['label']) == ['(1, 2)', '(3, 4)', '(5, 6)']
+        assert 'label' not in self.df
 
     def test_labels_no_format_edge_case(self):
         plot = self.edge_df.hvplot.labels('Longitude', 'Latitude')

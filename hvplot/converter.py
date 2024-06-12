@@ -2566,6 +2566,7 @@ class HoloViewsConverter:
         self._error_if_unavailable('labels')
         self.use_index = False
         data, x, y = self._process_chart_args(data, x, y, single_y=True)
+        data = data.copy()
 
         text = self.kwds.get('text')
         if not text:
