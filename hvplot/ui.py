@@ -402,7 +402,11 @@ class Geographic(Controls):
             crs_list.insert(0, 'PlateCarree')
             crs_list.remove('PlateCarree')
 
-            self._update_kind()
+            if self.explorer.kind == 'scatter':
+                self.explorer.kind = 'points'
+            elif self.explorer.kind == 'line':
+                self.explorer.kind = 'paths'
+
             self.param.crs.objects = crs_list
             self.param.projection.objects = crs_list
             updates = {}
@@ -416,16 +420,6 @@ class Geographic(Controls):
                 updates['features'] = ['coastline']
 
             self.param.update(**updates)
-
-    @param.depends('explorer.kind', watch=True)
-    def _update_kind(self):
-        if not self.geo:
-            return
-
-        if self.explorer.kind == 'scatter':
-            self.explorer.kind = 'points'
-        elif self.explorer.kind == 'line':
-            self.explorer.kind = 'paths'
 
 
 class Operations(Controls):
