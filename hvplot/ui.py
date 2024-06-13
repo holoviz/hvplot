@@ -424,6 +424,8 @@ class Geographic(Controls):
 
         if self.explorer.kind == 'scatter':
             self.explorer.kind = 'points'
+        elif self.explorer.kind == 'line':
+            self.explorer.kind = 'path'
 
 
 class Operations(Controls):
