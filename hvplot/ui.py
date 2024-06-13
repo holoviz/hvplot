@@ -19,14 +19,14 @@ KINDS = {
         set(_hvConverter._kind_mapping)
         - set(_hvConverter._gridded_types)
         - set(_hvConverter._geom_types)
-        | set(['points'])
+        | set(['points', 'paths'])
     ),
     'gridded': sorted(set(_hvConverter._gridded_types) - set(['dataset'])),
     'geom': _hvConverter._geom_types,
 }
 
 KINDS['2d'] = (
-    ['bivariate', 'heatmap', 'hexbin', 'labels', 'vectorfield', 'points']
+    ['bivariate', 'heatmap', 'hexbin', 'labels', 'vectorfield', 'points', 'paths']
     + KINDS['gridded']
     + KINDS['geom']
 )
@@ -425,7 +425,7 @@ class Geographic(Controls):
         if self.explorer.kind == 'scatter':
             self.explorer.kind = 'points'
         elif self.explorer.kind == 'line':
-            self.explorer.kind = 'path'
+            self.explorer.kind = 'paths'
 
 
 class Operations(Controls):
@@ -714,6 +714,7 @@ class hvPlotExplorer(Viewer):
             self._alert.param.update(
                 object=f'**Rendering failed with following error**: {e}', visible=True
             )
+            raise e
         finally:
             self._layout.loading = False
 
