@@ -675,9 +675,9 @@ class hvPlotExplorer(Viewer):
                 xmax = np.max(np.abs(self.xlim()))
                 self.geographic.crs = 'PlateCarree' if xmax <= 360 else 'GOOGLE_MERCATOR'
                 kwargs['crs'] = self.geographic.crs
-            if 'projection' not in kwargs:
-                kwargs['projection'] = kwargs['crs']
             for key in ['crs', 'projection']:
+                if key not in kwargs:
+                    continue
                 crs_kwargs = kwargs.pop(f'{key}_kwargs', {})
                 kwargs[key] = instantiate_crs_str(kwargs.pop(key), **crs_kwargs)
             feature_scale = kwargs.pop('feature_scale', None)
@@ -708,7 +708,6 @@ class hvPlotExplorer(Viewer):
             self._alert.param.update(
                 object=f'**Rendering failed with following error**: {e}', visible=True
             )
-            raise e
         finally:
             self._layout.loading = False
 
