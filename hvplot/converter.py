@@ -2578,10 +2578,13 @@ class HoloViewsConverter:
         kdims, vdims = self._get_dimensions([x, y], [text])
         cur_opts, compat_opts = self._get_compat_opts('Labels')
         element = self._get_element('labels')
-        return (
-            element(data, kdims, vdims)
-            .redim(**self._redim)
-            .apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
+        if self.by:
+            labels = Dataset(data).to(element, kdims, vdims, self.by)
+            labels = labels.layout() if self.subplots else labels.overlay(sort=False)
+        else:
+            labels = element(data, kdims, vdims)
+        return labels.redim(**self._redim).apply(
+            self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts
         )
 
     ##########################
