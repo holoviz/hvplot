@@ -47,13 +47,11 @@ from holoviews.plotting.util import process_cmap
 from holoviews.operation import histogram, apply_when
 from holoviews.streams import Buffer, Pipe
 from holoviews.util.transform import dim
-from packaging.version import Version
 from pandas import DatetimeIndex, MultiIndex
 
 from .backend_transforms import _transfer_opts_cur_backend
 from .util import (
     filter_opts,
-    hv_version,
     is_tabular,
     is_series,
     is_dask,
@@ -701,12 +699,8 @@ class HoloViewsConverter:
             plot_opts['xlim'] = tuple(xlim)
         if ylim is not None:
             plot_opts['ylim'] = tuple(ylim)
-
         if autorange is not None:
-            if hv_version < Version('1.16.0'):
-                param.main.param.warning('autorange option requires HoloViews >= 1.16')
-            else:
-                plot_opts['autorange'] = autorange
+            plot_opts['autorange'] = autorange
 
         self.invert = invert
         if loglog is not None:
@@ -844,7 +838,7 @@ class HoloViewsConverter:
                 pass
         if cnorm is not None:
             plot_opts['cnorm'] = cnorm
-        if rescale_discrete_levels is not None and hv_version >= Version('1.15.0'):
+        if rescale_discrete_levels is not None:
             plot_opts['rescale_discrete_levels'] = rescale_discrete_levels
 
         self._plot_opts = plot_opts
@@ -1738,10 +1732,7 @@ class HoloViewsConverter:
                 opts['rescale_discrete_levels'] = self._plot_opts['rescale_discrete_levels']
         elif self.rasterize:
             operation = rasterize
-            if Version(hv.__version__) < Version('1.18.0a1'):
-                eltype = 'Image'
-            else:
-                eltype = 'ImageStack' if categorical else 'Image'
+            eltype = 'ImageStack' if categorical else 'Image'
             if 'cmap' in self._style_opts:
                 style['cmap'] = self._style_opts['cmap']
             if self._dim_ranges.get('c', (None, None)) != (None, None):
