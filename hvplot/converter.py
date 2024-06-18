@@ -2571,6 +2571,7 @@ class HoloViewsConverter:
         if not text:
             text = [c for c in data.columns if c not in (x, y)][0]
         elif text not in data.columns:
+            data = data.copy()
             template_str = text  # needed for dask lazy compute
             data['label'] = data.apply(lambda row: template_str.format(**row), axis=1)
             text = 'label'
