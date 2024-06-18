@@ -160,7 +160,7 @@ jobs:
       - name: upgrade pip / setuptools
         run: pip install -U pip setuptools
       - name: install with geo
-        run: pip install -ve '.[tests, examples-tests, geo, hvdev, hvdev-geo, dev-extras]'
+        run: pip install -v --prefer-binary -e '.[tests, examples-tests, geo, hvdev, hvdev-geo, dev-extras]'
       - name: pip list
         run: pip list
       - name: bokeh sampledata
