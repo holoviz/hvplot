@@ -722,7 +722,7 @@ class HoloViewsConverter:
         elif legend not in (True, False, None):
             raise ValueError(
                 'The legend option should be a boolean or '
-                'a valid legend position (i.e. one of %s).' % list(self._legend_positions)
+                f'a valid legend position (i.e. one of {list(self._legend_positions)}).'
             )
         plotwds = [
             'xticks',
@@ -1148,7 +1148,7 @@ class HoloViewsConverter:
 
             self.data = data
         else:
-            raise ValueError('Supplied data type %s not understood' % type(data).__name__)
+            raise ValueError(f'Supplied data type {type(data).__name__} not understood')
 
         if stream is not None:
             if streaming:
@@ -1160,7 +1160,7 @@ class HoloViewsConverter:
             elif isinstance(stream, Buffer):
                 self.stream_type = 'streaming'
             else:
-                raise ValueError('Stream of type %s not recognized.' % type(stream))
+                raise ValueError(f'Stream of type {type(stream)} not recognized.')
             streaming = True
 
         # Validate data and arguments
@@ -1777,8 +1777,8 @@ class HoloViewsConverter:
                 coastline = coastline.opts(scale=self.coastline)
             elif self.coastline is not True:
                 param.main.param.warning(
-                    'coastline scale of %s not recognized, must be one '
-                    "'10m', '50m' or '110m'." % self.coastline
+                    'coastline scale of {self.coastline} not recognized, must be one '
+                    "'10m', '50m' or '110m'."
                 )
             obj = obj * coastline.opts(projection=self.output_projection)
 
@@ -1789,17 +1789,17 @@ class HoloViewsConverter:
                 feature_obj = getattr(gv.feature, feature)
                 if feature_obj is None:
                     raise ValueError(
-                        'Feature %r was not recognized, must be one of '
+                        f'Feature {feature!r} was not recognized, must be one of '
                         "'borders', 'coastline', 'lakes', 'land', 'ocean', "
-                        "'rivers' and 'states'." % feature
+                        "'rivers' and 'states'."
                     )
                 feature_obj = feature_obj.clone()
                 if isinstance(self.features, dict):
                     scale = self.features[feature]
                     if scale not in ['10m', '50m', '110m']:
                         param.main.param.warning(
-                            'Feature scale of %r not recognized, '
-                            "must be one of '10m', '50m' or '110m'." % scale
+                            f'Feature scale of {scale} not recognized, '
+                            "must be one of '10m', '50m' or '110m'."
                         )
                     else:
                         feature_obj = feature_obj.opts(scale=scale)

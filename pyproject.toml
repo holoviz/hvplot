@@ -196,6 +196,11 @@ write-changes = true
 [tool.ruff]
 line-length = 99
 
+[tool.ruff.lint]
+extend-select = [
+    "UP",
+]
+
 [tool.ruff.format]
 quote-style = "single"
 
