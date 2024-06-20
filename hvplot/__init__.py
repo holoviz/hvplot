@@ -118,16 +118,13 @@ except (ImportError, LookupError, FileNotFoundError):
             # the package.
             __version__ = '0.0.0+unknown'
 
-_extensions = (
+_extensions = {
     'hvplot.cudf',
     'hvplot.dask',
     'hvplot.ibis',
     'hvplot.intake',
     'hvplot.fugue',
-    'hvplot.pandas',
-    'hvplot.polars',
-    'hvplot.xarray',
-)
+}
 
 try:
     ip = get_ipython()  # noqa
