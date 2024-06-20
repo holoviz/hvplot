@@ -60,12 +60,14 @@ To report issues go to https://github.com/holoviz/holoviews.
 
 import inspect
 import os
+import sys
 import textwrap
 
 import panel as _pn
 import holoviews as _hv
 
 from holoviews import Store, render  # noqa
+
 
 from .converter import HoloViewsConverter
 from .interactive import Interactive
@@ -115,6 +117,29 @@ except (ImportError, LookupError, FileNotFoundError):
             # The user is probably trying to run this without having installed
             # the package.
             __version__ = '0.0.0+unknown'
+
+_extensions = (
+    'cudf',
+    'dask',
+    'ibis',
+    'intake',
+    'fugue',
+    'pandas',
+    'polars',
+    'xarray',
+)
+
+try:
+    ip = get_ipython()  # noqa
+
+    def pre_run_cell(info):
+        for ext in _extensions:
+            if (mod := f'hvplot.{ext}') in sys.modules:
+                del sys.modules[mod]
+
+    ip.events.register('pre_run_cell', pre_run_cell)
+except Exception:
+    pass
 
 _METHOD_DOCS = {}
 
@@ -213,8 +238,7 @@ def help(kind=None, docstring=True, generic=True, style=True):
 
 
 def post_patch(extension='bokeh', logo=False):
-    if extension and not getattr(_hv.extension, '_loaded', False):
-        hvplot_extension(extension, logo=logo)
+    hvplot_extension(extension, logo=logo)
 
 
 def _patch_doc(cls, kind, signature=None):
