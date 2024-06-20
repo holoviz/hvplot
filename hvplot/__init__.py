@@ -119,14 +119,14 @@ except (ImportError, LookupError, FileNotFoundError):
             __version__ = '0.0.0+unknown'
 
 _extensions = (
-    'cudf',
-    'dask',
-    'ibis',
-    'intake',
-    'fugue',
-    'pandas',
-    'polars',
-    'xarray',
+    'hvplot.cudf',
+    'hvplot.dask',
+    'hvplot.ibis',
+    'hvplot.intake',
+    'hvplot.fugue',
+    'hvplot.pandas',
+    'hvplot.polars',
+    'hvplot.xarray',
 )
 
 try:
@@ -134,8 +134,7 @@ try:
 
     def pre_run_cell(info):
         for ext in _extensions:
-            if (mod := f'hvplot.{ext}') in sys.modules:
-                del sys.modules[mod]
+            sys.modules.pop(ext, None)
 
     ip.events.register('pre_run_cell', pre_run_cell)
 except Exception:
