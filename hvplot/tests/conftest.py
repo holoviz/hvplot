@@ -11,9 +11,7 @@ optional_markers = {
 
 def pytest_addoption(parser):
     for marker, info in optional_markers.items():
-        parser.addoption(
-            '--{}'.format(marker), action='store_true', default=False, help=info['help']
-        )
+        parser.addoption(f'--{marker}', action='store_true', default=False, help=info['help'])
 
 
 def pytest_configure(config):

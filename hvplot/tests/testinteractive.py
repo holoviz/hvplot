@@ -1,5 +1,3 @@
-from packaging.version import Version
-
 import holoviews as hv
 import hvplot.pandas  # noqa
 import hvplot.xarray  # noqa
@@ -15,10 +13,6 @@ from hvplot import bind
 from hvplot.interactive import Interactive
 from hvplot.tests.util import makeDataFrame, makeMixedDataFrame
 from hvplot.xarray import XArrayInteractive
-from hvplot.util import bokeh3, param2
-
-is_bokeh2 = pytest.mark.skipif(bokeh3, reason='requires bokeh 2.x')
-is_bokeh3 = pytest.mark.skipif(not bokeh3, reason='requires bokeh 3.x')
 
 
 @pytest.fixture(scope='module')
@@ -208,10 +202,6 @@ def test_interactive_nested_widgets():
     assert iw[0] == w
 
 
-@pytest.mark.skipif(
-    Version(hv.__version__) < Version('1.15.1'),
-    reason='Needs holoviews 1.15.1',
-)
 def test_interactive_slice():
     df = makeDataFrame()
     w = pn.widgets.IntSlider(start=10, end=40)
@@ -1264,31 +1254,6 @@ def test_interactive_pandas_layout_default_no_widgets_kwargs(df):
     assert layout.width == 200
 
 
-@is_bokeh2
-def test_interactive_pandas_layout_default_with_widgets(df):
-    w = pn.widgets.IntSlider(value=2, start=1, end=5)
-    dfi = Interactive(df)
-    dfi = dfi.head(w)
-
-    assert dfi._center is False
-    assert dfi._loc == 'top_left'
-
-    layout = dfi.layout()
-
-    assert isinstance(layout, pn.Row)
-    assert len(layout) == 1
-    assert isinstance(layout[0], pn.Column)
-    assert len(layout[0]) == 2
-    assert isinstance(layout[0][0], pn.Row)
-    assert isinstance(layout[0][1], pn.pane.PaneBase)
-    assert len(layout[0][0]) == 2
-    assert isinstance(layout[0][0][0], pn.Column)
-    assert len(layout[0][0][0]) == 1
-    assert isinstance(layout[0][0][0][0], pn.widgets.Widget)
-    assert isinstance(layout[0][0][1], pn.layout.HSpacer)
-
-
-@is_bokeh3
 def test_interactive_pandas_layout_default_with_widgets_bk3(df):
     w = pn.widgets.IntSlider(value=2, start=1, end=5)
     dfi = Interactive(df)
@@ -1307,59 +1272,6 @@ def test_interactive_pandas_layout_default_with_widgets_bk3(df):
     assert isinstance(layout[0][1], pn.pane.PaneBase)
     assert len(layout[0][0]) == 1
     assert isinstance(layout[0][0][0], pn.widgets.IntSlider)
-
-
-@is_bokeh2
-def test_interactive_pandas_layout_center_with_widgets(df):
-    w = pn.widgets.IntSlider(value=2, start=1, end=5)
-    dfi = df.interactive(center=True)
-    dfi = dfi.head(w)
-
-    assert dfi._center is True
-    assert dfi._loc == 'top_left'
-
-    layout = dfi.layout()
-
-    assert isinstance(layout, pn.Row)
-    assert len(layout) == 3
-    assert isinstance(layout[0], pn.layout.HSpacer)
-    assert isinstance(layout[1], pn.Column)
-    assert isinstance(layout[2], pn.layout.HSpacer)
-    assert len(layout[1]) == 2
-    assert isinstance(layout[1][0], pn.Row)
-    assert isinstance(layout[1][1], pn.Row)
-    assert len(layout[1][0]) == 2
-    assert len(layout[1][1]) == 3
-    assert isinstance(layout[1][0][0], pn.Column)
-    assert len(layout[1][0][0]) == 1
-    assert isinstance(layout[1][0][0][0], pn.widgets.Widget)
-    assert isinstance(layout[1][1][0], pn.layout.HSpacer)
-    assert isinstance(layout[1][1][1], pn.pane.PaneBase)
-    assert isinstance(layout[1][1][2], pn.layout.HSpacer)
-
-
-@is_bokeh2
-def test_interactive_pandas_layout_loc_with_widgets(df):
-    w = pn.widgets.IntSlider(value=2, start=1, end=5)
-    dfi = df.interactive(loc='top_right')
-    dfi = dfi.head(w)
-
-    assert dfi._center is False
-    assert dfi._loc == 'top_right'
-
-    layout = dfi.layout()
-
-    assert isinstance(layout, pn.Row)
-    assert len(layout) == 1
-    assert isinstance(layout[0], pn.Column)
-    assert len(layout[0]) == 2
-    assert isinstance(layout[0][0], pn.Row)
-    assert isinstance(layout[0][1], pn.pane.PaneBase)
-    assert len(layout[0][0]) == 2
-    assert isinstance(layout[0][0][0], pn.layout.HSpacer)
-    assert isinstance(layout[0][0][1], pn.Column)
-    assert len(layout[0][0][1]) == 1
-    assert isinstance(layout[0][0][1][0], pn.widgets.Widget)
 
 
 def test_interactive_pandas_eval(df):
@@ -1396,10 +1308,7 @@ def test_interactive_pandas_series_widget_value(series):
     assert isinstance(si._current, pd.DataFrame)
     pd.testing.assert_series_equal(si._current.A, series + w.value)
     assert si._obj is series
-    if param2:
-        assert "dim('*').pd+<param.parameters.Number object" in repr(si._transform)
-    else:
-        assert "dim('*').pd+<param.Number object" in repr(si._transform)
+    assert "dim('*').pd+<param.parameters.Number object" in repr(si._transform)
     assert si._depth == 2
     assert si._method is None
 

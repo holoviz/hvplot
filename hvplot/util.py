@@ -25,8 +25,6 @@ except ImportError:
 
 hv_version = Version(hv.__version__)
 bokeh_version = Version(bokeh.__version__)
-bokeh3 = bokeh_version >= Version('3.0')
-param2 = Version(param.__version__) >= Version('2.0rc4')
 _fugue_ipython = None  # To be set to True in tests to mock ipython
 
 
@@ -613,10 +611,7 @@ def process_dynamic_args(x, y, kind, **kwds):
         if isinstance(v, param.Parameter):
             dynamic[k] = v
         elif panel_available and isinstance(v, pn.widgets.Widget):
-            if Version(pn.__version__) < Version('0.6.4'):
-                dynamic[k] = v.param.value
-            else:
-                dynamic[k] = v
+            dynamic[k] = v
 
     for k, v in kwds.items():
         if k not in dynamic and isinstance(v, FunctionType) and hasattr(v, '_dinfo'):
