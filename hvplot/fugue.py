@@ -2,7 +2,7 @@
 Experimental support for fugue.
 """
 
-from typing import Any, Dict, Tuple
+from typing import Any
 
 import panel as _pn
 
@@ -40,7 +40,7 @@ def patch(name='hvplot', extension='bokeh', logo=False):
             charts = []
             for df in dfs.values():
                 params = dict(self.params)
-                opts: Dict[str, Any] = params.pop('opts', {})
+                opts: dict[str, Any] = params.pop('opts', {})
                 chart = getattr(df.as_pandas().hvplot, self._func)(**params).opts(**opts)
                 charts.append(chart)
             col = _pn.Column(*charts)
@@ -55,7 +55,7 @@ def patch(name='hvplot', extension='bokeh', logo=False):
                 display(col)  # in notebook
 
     @parse_outputter.candidate(namespace_candidate(name, lambda x: isinstance(x, str)))
-    def _parse_hvplot(obj: Tuple[str, str]) -> Outputter:
+    def _parse_hvplot(obj: tuple[str, str]) -> Outputter:
         return _Visualize(obj[1])
 
     post_patch(extension, logo)

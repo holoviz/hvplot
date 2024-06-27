@@ -4,7 +4,7 @@ from unittest import SkipTest, expectedFailure
 from parameterized import parameterized
 
 from holoviews.core.dimension import Dimension
-from holoviews import NdOverlay, Store, dim, render
+from holoviews import NdLayout, NdOverlay, Store, dim, render
 from holoviews.element import Curve, Area, Scatter, Points, Path, HeatMap
 from holoviews.element.comparison import ComparisonTestCase
 
@@ -413,6 +413,7 @@ class TestChart1D(ComparisonTestCase):
         plot = self.df.hvplot('x', 'y', text='({x}, {y})', kind='labels')
         assert list(plot.dimensions()) == [Dimension('x'), Dimension('y'), Dimension('label')]
         assert list(plot.data['label']) == ['(1, 2)', '(3, 4)', '(5, 6)']
+        assert 'label' not in self.df
 
     def test_labels_no_format_edge_case(self):
         plot = self.edge_df.hvplot.labels('Longitude', 'Latitude')
@@ -433,6 +434,22 @@ class TestChart1D(ComparisonTestCase):
             Dimension('label'),
         ]
         assert list(plot.data['label']) == ['-58.7E -34.58N', '-47.9E -15.78N', '-70.7E -33.45N']
+
+    def test_labels_by(self):
+        plot = self.edge_df.hvplot.labels(
+            'Longitude', 'Latitude', text='{Longitude:.1f}E {Latitude:.2f}N', by='Volume {m3}'
+        )
+        assert isinstance(plot, NdOverlay)
+
+    def test_labels_by_subplots(self):
+        plot = self.edge_df.hvplot.labels(
+            'Longitude',
+            'Latitude',
+            text='{Longitude:.1f}E {Latitude:.2f}N',
+            by='Volume {m3}',
+            subplots=True,
+        )
+        assert isinstance(plot, NdLayout)
 
 
 class TestChart1DDask(TestChart1D):

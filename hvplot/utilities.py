@@ -96,7 +96,7 @@ def show(obj, title=None, port=0, **kwargs):
     elif isinstance(obj, _pn.viewable.Viewable):
         return obj.show(title, port, **kwargs)
     else:
-        raise ValueError('%s type object not recognized and cannot be shown.' % type(obj).__name__)
+        raise ValueError('{type(obj).__name__} type object not recognized and cannot be shown.')
 
 
 class hvplot_extension(_hv.extension):

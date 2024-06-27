@@ -7,7 +7,6 @@ import holoviews as _hv
 from bokeh.models import HoverTool
 from holoviews import Graph, Labels, dim
 from holoviews.core.options import Store
-from holoviews.core.util import dimension_sanitizer
 from holoviews.plotting.bokeh import GraphPlot, LabelsPlot
 from holoviews.plotting.bokeh.styles import markers
 
@@ -332,7 +331,7 @@ def draw(G, pos=None, **kwargs):
             (d.label, d.name + '_values' if d in g.kdims else d.name) for d in g.kdims + g.vdims
         ]
     tooltips = [
-        (label, '@{%s}' % dimension_sanitizer(name))
+        (label, '@{{dimension_sanitizer(name)}}')
         for label, name in tooltip_dims
         if name not in node_styles + edge_styles
     ]
