@@ -393,6 +393,5 @@ def test_explorer_xarray_multi_var_extra_dims_no_coord():
 @pytest.mark.parametrize('kind_tuple', [('scatter', 'points'), ('line', 'paths')])
 def test_explorer_geo_revise_kind(kind_tuple):
     da = ds_air_temperature['air'].isel(time=0)
-    explorer = hvplot.explorer(da, x='lon', y='lat', kind=kind_tuple[0])
-    explorer.geographic.geo = True
+    explorer = hvplot.explorer(da, x='lon', y='lat', kind=kind_tuple[0], geo=True)
     assert explorer.kind == kind_tuple[1]
