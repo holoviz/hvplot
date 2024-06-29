@@ -89,11 +89,11 @@ align: center
 
 :::{tab-item} GeoPandas
 ```python
-import geopandas as gpd
+import geopandas as gpd, geodatasets
 import hvplot.pandas
 
-gdf = gpd.read_file(gpd.datasets.get_path('naturalearth_cities'))
-gdf.hvplot(global_extent=True, tiles=True)
+chicago = gpd.read_file(geodatasets.get_path("geoda.chicago_commpop"))
+chicago.hvplot.polygons(geo=True, c='POP2010', hover_cols='all')
 ```
 ```{image} ./_static/home/geopandas.gif
 ---
