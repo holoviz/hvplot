@@ -1,7 +1,8 @@
-import numpy as np
-
 from unittest import SkipTest, expectedFailure
 from parameterized import parameterized
+
+import numpy as np
+import pandas as pd
 
 from holoviews.core.dimension import Dimension
 from holoviews import NdLayout, NdOverlay, Store, dim, render
@@ -13,10 +14,6 @@ from ..util import is_dask
 
 class TestChart2D(ComparisonTestCase):
     def setUp(self):
-        try:
-            import pandas as pd
-        except ImportError:
-            raise SkipTest('Pandas not available')
         import hvplot.pandas  # noqa
 
         self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
@@ -117,10 +114,6 @@ class TestChart2DDask(TestChart2D):
 
 class TestChart1D(ComparisonTestCase):
     def setUp(self):
-        try:
-            import pandas as pd
-        except ImportError:
-            raise SkipTest('Pandas not available')
         import hvplot.pandas  # noqa
 
         self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])

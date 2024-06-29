@@ -440,8 +440,6 @@ class TestOptions:
             assert opts.get('fig_size') == pytest.approx(50.0)
 
     def test_symmetric_dataframe(self, backend):
-        import pandas as pd
-
         df = pd.DataFrame([[1, 2, -1], [3, 4, 0], [5, 6, 1]], columns=['x', 'y', 'number'])
         plot = df.hvplot.scatter('x', 'y', c='number')
         plot_opts = Store.lookup_options(backend, plot, 'plot')
