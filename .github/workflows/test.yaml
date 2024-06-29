@@ -157,8 +157,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: upgrade pip / setuptools
-        run: pip install -U pip setuptools
       - name: install with geo
         run: pip install -v --prefer-binary -e '.[tests, examples-tests, geo, hvdev, hvdev-geo, dev-extras]'
       - name: pip list

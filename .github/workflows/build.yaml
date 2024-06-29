@@ -62,9 +62,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: env setup
-        run: |
-          python -m pip install --upgrade pip setuptools
-          python -m pip install build
+        run: python -m pip install build
       - name: pip build
         run: python -m build
       - name: Publish package to PyPI
