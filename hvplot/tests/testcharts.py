@@ -351,8 +351,7 @@ class TestChart1D(ComparisonTestCase):
         df = self.time_df.set_index('time')
         scrambled = df.sample(frac=1)
         plot = scrambled.hvplot()
-        # HoloViews 1.18 uses reset_index and 1.19 does not.
-        time = plot.data.time if 'time' in plot.data.columns else plot.data.index
+        time = plot.data.index
         assert (time == df.index).all()
         assert len(time.unique()) == len(time)
 
@@ -360,8 +359,7 @@ class TestChart1D(ComparisonTestCase):
         df = self.time_df.set_index('time')
         scrambled = df.sample(frac=1)
         plot = scrambled.hvplot(sort_date=False)
-        # HoloViews 1.18 uses reset_index and 1.19 does not.
-        time = plot.data.time if 'time' in plot.data.columns else plot.data.index
+        time = plot.data.index
         assert (time == scrambled.index).all().all()
         assert len(time.unique()) == len(time)
 
