@@ -4,6 +4,7 @@ Tests  utilities to convert data and projections
 
 import numpy as np
 import pandas as pd
+import panel as pn
 import pytest
 
 from unittest import TestCase, SkipTest
@@ -22,9 +23,8 @@ class TestProcessXarray(TestCase):
     def setUp(self):
         try:
             import xarray as xr
-            import pandas as pd  # noqa
         except ImportError:
-            raise SkipTest('xarray or pandas not available')
+            raise SkipTest('xarray not available')
         self.default_kwargs = {
             'value_label': 'value',
             'label': None,
@@ -41,7 +41,6 @@ class TestProcessXarray(TestCase):
 
     def test_process_1d_xarray_dataarray_with_no_coords(self):
         import xarray as xr
-        import pandas as pd
 
         da = xr.DataArray(data=[1, 2, 3])
 
@@ -54,7 +53,6 @@ class TestProcessXarray(TestCase):
 
     def test_process_1d_xarray_dataarray_with_coords(self):
         import xarray as xr
-        import pandas as pd
 
         da = xr.DataArray(data=[1, 2, 3], coords={'day': [5, 6, 7]}, dims=['day'])
 
@@ -67,7 +65,6 @@ class TestProcessXarray(TestCase):
 
     def test_process_1d_xarray_dataarray_with_coords_and_name(self):
         import xarray as xr
-        import pandas as pd
 
         da = xr.DataArray(data=[1, 2, 3], coords={'day': [5, 6, 7]}, dims=['day'], name='temp')
 
@@ -80,7 +77,6 @@ class TestProcessXarray(TestCase):
 
     def test_process_2d_xarray_dataarray_with_no_coords(self):
         import xarray as xr
-        import pandas as pd
 
         da = xr.DataArray(np.random.randn(4, 5))
 
@@ -126,8 +122,6 @@ class TestProcessXarray(TestCase):
         assert not groupby
 
     def test_process_3d_xarray_dataset_with_coords(self):
-        import pandas as pd
-
         data, x, y, by, groupby = process_xarray(data=self.ds, **self.default_kwargs)
         assert isinstance(data, pd.DataFrame)
         assert x == 'time'
@@ -164,8 +158,6 @@ class TestProcessXarray(TestCase):
         assert groupby == ['time']
 
     def test_process_xarray_dataset_with_by_as_derived_datetime(self):
-        import pandas as pd
-
         data = self.ds.mean(dim=['lat', 'lon'])
         kwargs = self.default_kwargs
         kwargs.update(gridded=False, y='air', by=['time.hour'])
@@ -178,8 +170,6 @@ class TestProcessXarray(TestCase):
         assert not groupby
 
     def test_process_xarray_dataset_with_x_as_derived_datetime(self):
-        import pandas as pd
-
         data = self.ds.mean(dim=['lat', 'lon'])
         kwargs = self.default_kwargs
         kwargs.update(gridded=False, y='air', x='time.dayofyear')
@@ -193,14 +183,7 @@ class TestProcessXarray(TestCase):
 
 
 class TestDynamicArgs(TestCase):
-    def setUp(self):
-        try:
-            import panel as pn  # noqa
-        except ImportError:
-            raise SkipTest('panel not available')
-
     def test_dynamic_and_static(self):
-        import panel as pn
         from ..util import process_dynamic_args
 
         x = 'sepal_width'
@@ -215,7 +198,6 @@ class TestDynamicArgs(TestCase):
         assert arg_deps == []
 
     def test_dynamic_kwds(self):
-        import panel as pn
         from ..util import process_dynamic_args
 
         x = 'sepal_length'
@@ -229,7 +211,6 @@ class TestDynamicArgs(TestCase):
         assert arg_deps == []
 
     def test_fn_kwds(self):
-        import panel as pn
         from ..util import process_dynamic_args
 
         x = 'sepal_length'

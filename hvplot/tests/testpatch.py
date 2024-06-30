@@ -5,6 +5,7 @@ Tests patching of supported libraries
 from unittest import TestCase, SkipTest
 
 import numpy as np
+import pandas as pd
 
 from hvplot.plotting import hvPlotTabular, hvPlot
 
@@ -14,14 +15,10 @@ class TestPatchPandas(TestCase):
         import hvplot.pandas  # noqa
 
     def test_pandas_series_patched(self):
-        import pandas as pd
-
         series = pd.Series([0, 1, 2])
         self.assertIsInstance(series.hvplot, hvPlotTabular)
 
     def test_pandas_dataframe_patched(self):
-        import pandas as pd
-
         df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
         self.assertIsInstance(df.hvplot, hvPlotTabular)
 
@@ -35,7 +32,6 @@ class TestPatchDask(TestCase):
         import hvplot.dask  # noqa
 
     def test_dask_series_patched(self):
-        import pandas as pd
         import dask.dataframe as dd
 
         series = pd.Series([0, 1, 2])
@@ -43,7 +39,6 @@ class TestPatchDask(TestCase):
         self.assertIsInstance(dseries.hvplot, hvPlotTabular)
 
     def test_dask_dataframe_patched(self):
-        import pandas as pd
         import dask.dataframe as dd
 
         df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])

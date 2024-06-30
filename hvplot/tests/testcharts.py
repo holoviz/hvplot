@@ -1,7 +1,8 @@
-import numpy as np
-
 from unittest import SkipTest, expectedFailure
 from parameterized import parameterized
+
+import numpy as np
+import pandas as pd
 
 from holoviews.core.dimension import Dimension
 from holoviews import NdLayout, NdOverlay, Store, dim, render
@@ -13,10 +14,6 @@ from ..util import is_dask
 
 class TestChart2D(ComparisonTestCase):
     def setUp(self):
-        try:
-            import pandas as pd
-        except ImportError:
-            raise SkipTest('Pandas not available')
         import hvplot.pandas  # noqa
 
         self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
@@ -117,10 +114,6 @@ class TestChart2DDask(TestChart2D):
 
 class TestChart1D(ComparisonTestCase):
     def setUp(self):
-        try:
-            import pandas as pd
-        except ImportError:
-            raise SkipTest('Pandas not available')
         import hvplot.pandas  # noqa
 
         self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
@@ -358,8 +351,7 @@ class TestChart1D(ComparisonTestCase):
         df = self.time_df.set_index('time')
         scrambled = df.sample(frac=1)
         plot = scrambled.hvplot()
-        # HoloViews 1.18 uses reset_index and 1.19 does not.
-        time = plot.data.time if 'time' in plot.data.columns else plot.data.index
+        time = plot.data.index
         assert (time == df.index).all()
         assert len(time.unique()) == len(time)
 
@@ -367,9 +359,44 @@ class TestChart1D(ComparisonTestCase):
         df = self.time_df.set_index('time')
         scrambled = df.sample(frac=1)
         plot = scrambled.hvplot(sort_date=False)
-        # HoloViews 1.18 uses reset_index and 1.19 does not.
-        time = plot.data.time if 'time' in plot.data.columns else plot.data.index
+        time = plot.data.index
         assert (time == scrambled.index).all().all()
+        assert len(time.unique()) == len(time)
+
+    def test_time_df_sorts_on_plot_multiindex(self):
+        df = self.time_df.set_index(['B', 'time'])
+        scrambled = df.sample(frac=1)
+        plot = scrambled.hvplot(x='time')
+        time = plot.data.index.get_level_values('time')
+        assert plot.kdims == ['time']
+        assert (time == df.index.get_level_values('time')).all()
+        assert len(time.unique()) == len(time)
+
+    def testtime_df_does_not_sort_on_plot_if_sort_date_off_multiindex(self):
+        df = self.time_df.set_index(['B', 'time'])
+        scrambled = df.sample(frac=1)
+        plot = scrambled.hvplot(x='time', sort_date=False)
+        time = plot.data.index.get_level_values('time')
+        assert plot.kdims == ['time']
+        assert (time == scrambled.index.get_level_values('time')).all().all()
+        assert len(time.unique()) == len(time)
+
+    def test_time_df_sorts_on_plot_using_multiindex_level0_as_x(self):
+        df = self.time_df.set_index(['time', 'B'])
+        scrambled = df.sample(frac=1)
+        plot = scrambled.hvplot()
+        time = plot.data.index.get_level_values('time')
+        assert plot.kdims == ['time']
+        assert (time == df.index.get_level_values('time')).all()
+        assert len(time.unique()) == len(time)
+
+    def testtime_df_does_not_sort_on_plot_if_sort_date_off_using_multiindex_level0_as_x(self):
+        df = self.time_df.set_index(['time', 'B'])
+        scrambled = df.sample(frac=1)
+        plot = scrambled.hvplot(sort_date=False)
+        time = plot.data.index.get_level_values('time')
+        assert plot.kdims == ['time']
+        assert (time == scrambled.index.get_level_values('time')).all().all()
         assert len(time.unique()) == len(time)
 
     def test_time_df_with_groupby_as_derived_datetime(self):
