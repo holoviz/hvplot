@@ -363,6 +363,42 @@ class TestChart1D(ComparisonTestCase):
         assert (time == scrambled.index).all().all()
         assert len(time.unique()) == len(time)
 
+    def test_time_df_sorts_on_plot_multiindex(self):
+        df = self.time_df.set_index(['B', 'time'])
+        scrambled = df.sample(frac=1)
+        plot = scrambled.hvplot(x='time')
+        time = plot.data.index.get_level_values('time')
+        assert plot.kdims == ['time']
+        assert (time == df.index.get_level_values('time')).all()
+        assert len(time.unique()) == len(time)
+
+    def testtime_df_does_not_sort_on_plot_if_sort_date_off_multiindex(self):
+        df = self.time_df.set_index(['B', 'time'])
+        scrambled = df.sample(frac=1)
+        plot = scrambled.hvplot(x='time', sort_date=False)
+        time = plot.data.index.get_level_values('time')
+        assert plot.kdims == ['time']
+        assert (time == scrambled.index.get_level_values('time')).all().all()
+        assert len(time.unique()) == len(time)
+
+    def test_time_df_sorts_on_plot_using_multiindex_level0_as_x(self):
+        df = self.time_df.set_index(['time', 'B'])
+        scrambled = df.sample(frac=1)
+        plot = scrambled.hvplot()
+        time = plot.data.index.get_level_values('time')
+        assert plot.kdims == ['time']
+        assert (time == df.index.get_level_values('time')).all()
+        assert len(time.unique()) == len(time)
+
+    def testtime_df_does_not_sort_on_plot_if_sort_date_off_using_multiindex_level0_as_x(self):
+        df = self.time_df.set_index(['time', 'B'])
+        scrambled = df.sample(frac=1)
+        plot = scrambled.hvplot(sort_date=False)
+        time = plot.data.index.get_level_values('time')
+        assert plot.kdims == ['time']
+        assert (time == scrambled.index.get_level_values('time')).all().all()
+        assert len(time.unique()) == len(time)
+
     def test_time_df_with_groupby_as_derived_datetime(self):
         plot = self.time_df.hvplot(groupby='time.dayofweek', dynamic=False)
         assert list(plot.keys()) == [0, 1, 2, 3, 4, 5, 6]
