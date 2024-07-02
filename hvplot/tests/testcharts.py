@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from unittest import SkipTest, expectedFailure
 from parameterized import parameterized
@@ -462,6 +463,19 @@ class TestChart1D(ComparisonTestCase):
         assert list(hmap.keys()) == ['a', 'b']
         assert hmap.last.kdims == ['A']
         assert hmap.last.vdims == ['C']
+
+    @pytest.mark.xfail(reason='See https://github.com/holoviz/hvplot/issues/1364')
+    def test_hierarchical_columns_auto_stack(self):
+        import pandas as pd
+
+        arrays = [
+            ['bar', 'bar', 'baz', 'baz', 'foo', 'foo', 'qux', 'qux'],
+            ['one', 'two', 'one', 'two', 'one', 'two', 'one', 'two'],
+        ]
+        tuples = list(zip(*arrays))
+        index = pd.MultiIndex.from_tuples(tuples)
+        df = pd.DataFrame(np.random.randn(3, 8), index=['A', 'B', 'C'], columns=index)
+        df.hvplot.scatter()
 
 
 class TestChart1DDask(TestChart1D):
