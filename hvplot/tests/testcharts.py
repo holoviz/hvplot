@@ -134,6 +134,10 @@ class TestChart1D(ComparisonTestCase):
         self.cat_only_df = pd.DataFrame(
             [['A', 'a'], ['B', 'b'], ['C', 'c']], columns=['upper', 'lower']
         )
+        multii_df = pd.DataFrame(
+            {'A': [1, 2, 3, 4], 'B': ['a', 'a', 'b', 'b'], 'C': [0, 1, 2, 1.5]}
+        )
+        self.multii_df = multii_df.set_index(['A', 'B'])
         self.time_df = pd.DataFrame(
             {
                 'time': pd.date_range('1/1/2000', periods=10, tz='UTC'),
@@ -451,6 +455,14 @@ class TestChart1D(ComparisonTestCase):
         )
         assert isinstance(plot, NdLayout)
 
+    def test_multi_index_groupby_from_index(self):
+        hmap = self.multii_df.hvplot.scatter(x='A', y='C', groupby='B', dynamic=False)
+        assert hmap.kdims == ['B']
+        assert hmap.vdims == []
+        assert list(hmap.keys()) == ['a', 'b']
+        assert hmap.last.kdims == ['A']
+        assert hmap.last.vdims == ['C']
+
 
 class TestChart1DDask(TestChart1D):
     def setUp(self):
@@ -468,3 +480,6 @@ class TestChart1DDask(TestChart1D):
 
     def test_by_datetime_accessor(self):
         raise SkipTest("Can't expand dt accessor columns when using dask")
+
+    def test_multi_index_groupby_from_index(self):
+        raise SkipTest('Dask does not support MultiIndex Dataframes.')
