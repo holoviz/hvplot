@@ -154,8 +154,8 @@ class TestChart1D(ComparisonTestCase):
         plot = self.df.hvplot(kind=kind)
         obj = NdOverlay(
             {
-                'x': element(self.df, 'index', 'x').redim(x='value'),
-                'y': element(self.df, 'index', 'y').redim(y='value'),
+                'x': element(self.df, 'index', Dimension('x', label='value')),
+                'y': element(self.df, 'index', Dimension('y', label='value')),
             },
             'Variable',
         )
@@ -177,8 +177,8 @@ class TestChart1D(ComparisonTestCase):
         plot = self.df.hvplot(kind=kind, value_label='Test', group_label='Category')
         obj = NdOverlay(
             {
-                'x': element(self.df, 'index', 'x').redim(x='Test'),
-                'y': element(self.df, 'index', 'y').redim(y='Test'),
+                'x': element(self.df, 'index', Dimension('x', label='Test')),
+                'y': element(self.df, 'index', Dimension('y', label='Test')),
             },
             'Category',
         )
@@ -270,8 +270,8 @@ class TestChart1D(ComparisonTestCase):
         plot = self.df.hvplot.area(stacked=True)
         obj = NdOverlay(
             {
-                'x': Area(self.df, 'index', 'x').redim(x='value'),
-                'y': Area(self.df, 'index', 'y').redim(y='value'),
+                'x': Area(self.df, 'index', Dimension('x', label='value')),
+                'y': Area(self.df, 'index', Dimension('y', label='value')),
             },
             'Variable',
         )
@@ -323,8 +323,8 @@ class TestChart1D(ComparisonTestCase):
         plot = self.cat_df.hvplot(kind=kind)
         obj = NdOverlay(
             {
-                'x': element(self.cat_df, 'index', 'x').redim(x='value'),
-                'y': element(self.cat_df, 'index', 'y').redim(y='value'),
+                'x': element(self.cat_df, 'index', Dimension('x', label='value')),
+                'y': element(self.cat_df, 'index', Dimension('y', label='value')),
             },
             'Variable',
         )
@@ -335,10 +335,11 @@ class TestChart1D(ComparisonTestCase):
         plot = self.cat_only_df.hvplot(kind=kind)
         obj = NdOverlay(
             {
-                'upper': element(self.cat_only_df, 'index', 'upper').redim(upper='value'),
-                'lower': element(self.cat_only_df, 'index', 'lower').redim(lower='value'),
+                'upper': element(self.cat_only_df, 'index', Dimension('upper', label='value')),
+                'lower': element(self.cat_only_df, 'index', Dimension('lower', label='value')),
             },
             'Variable',
+            sort=False,
         )
         self.assertEqual(plot, obj)
 
