@@ -1011,7 +1011,7 @@ class HoloViewsConverter:
             self.data = data
             if kind is None:
                 if datatype == 'geopandas':
-                    geom_types = {gt[5:] if 'Multi' in gt else gt for gt in data.geom_type}
+                    geom_types = {gt[5:] if gt and 'Multi' in gt else gt for gt in data.geom_type}
                 else:
                     geom_types = [
                         type(data.geometry.dtype)
