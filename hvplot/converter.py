@@ -47,13 +47,11 @@ from holoviews.plotting.util import process_cmap
 from holoviews.operation import histogram, apply_when
 from holoviews.streams import Buffer, Pipe
 from holoviews.util.transform import dim
-from packaging.version import Version
 from pandas import DatetimeIndex, MultiIndex
 
 from .backend_transforms import _transfer_opts_cur_backend
 from .util import (
     filter_opts,
-    hv_version,
     is_tabular,
     is_series,
     is_dask,
@@ -701,12 +699,8 @@ class HoloViewsConverter:
             plot_opts['xlim'] = tuple(xlim)
         if ylim is not None:
             plot_opts['ylim'] = tuple(ylim)
-
         if autorange is not None:
-            if hv_version < Version('1.16.0'):
-                param.main.param.warning('autorange option requires HoloViews >= 1.16')
-            else:
-                plot_opts['autorange'] = autorange
+            plot_opts['autorange'] = autorange
 
         self.invert = invert
         if loglog is not None:
@@ -728,7 +722,7 @@ class HoloViewsConverter:
         elif legend not in (True, False, None):
             raise ValueError(
                 'The legend option should be a boolean or '
-                'a valid legend position (i.e. one of %s).' % list(self._legend_positions)
+                f'a valid legend position (i.e. one of {list(self._legend_positions)}).'
             )
         plotwds = [
             'xticks',
@@ -844,7 +838,7 @@ class HoloViewsConverter:
                 pass
         if cnorm is not None:
             plot_opts['cnorm'] = cnorm
-        if rescale_discrete_levels is not None and hv_version >= Version('1.15.0'):
+        if rescale_discrete_levels is not None:
             plot_opts['rescale_discrete_levels'] = rescale_discrete_levels
 
         self._plot_opts = plot_opts
@@ -1154,7 +1148,7 @@ class HoloViewsConverter:
 
             self.data = data
         else:
-            raise ValueError('Supplied data type %s not understood' % type(data).__name__)
+            raise ValueError(f'Supplied data type {type(data).__name__} not understood')
 
         if stream is not None:
             if streaming:
@@ -1166,7 +1160,7 @@ class HoloViewsConverter:
             elif isinstance(stream, Buffer):
                 self.stream_type = 'streaming'
             else:
-                raise ValueError('Stream of type %s not recognized.' % type(stream))
+                raise ValueError(f'Stream of type {type(stream)} not recognized.')
             streaming = True
 
         # Validate data and arguments
@@ -1738,10 +1732,7 @@ class HoloViewsConverter:
                 opts['rescale_discrete_levels'] = self._plot_opts['rescale_discrete_levels']
         elif self.rasterize:
             operation = rasterize
-            if Version(hv.__version__) < Version('1.18.0a1'):
-                eltype = 'Image'
-            else:
-                eltype = 'ImageStack' if categorical else 'Image'
+            eltype = 'ImageStack' if categorical else 'Image'
             if 'cmap' in self._style_opts:
                 style['cmap'] = self._style_opts['cmap']
             if self._dim_ranges.get('c', (None, None)) != (None, None):
@@ -1786,8 +1777,8 @@ class HoloViewsConverter:
                 coastline = coastline.opts(scale=self.coastline)
             elif self.coastline is not True:
                 param.main.param.warning(
-                    'coastline scale of %s not recognized, must be one '
-                    "'10m', '50m' or '110m'." % self.coastline
+                    'coastline scale of {self.coastline} not recognized, must be one '
+                    "'10m', '50m' or '110m'."
                 )
             obj = obj * coastline.opts(projection=self.output_projection)
 
@@ -1798,17 +1789,17 @@ class HoloViewsConverter:
                 feature_obj = getattr(gv.feature, feature)
                 if feature_obj is None:
                     raise ValueError(
-                        'Feature %r was not recognized, must be one of '
+                        f'Feature {feature!r} was not recognized, must be one of '
                         "'borders', 'coastline', 'lakes', 'land', 'ocean', "
-                        "'rivers' and 'states'." % feature
+                        "'rivers' and 'states'."
                     )
                 feature_obj = feature_obj.clone()
                 if isinstance(self.features, dict):
                     scale = self.features[feature]
                     if scale not in ['10m', '50m', '110m']:
                         param.main.param.warning(
-                            'Feature scale of %r not recognized, '
-                            "must be one of '10m', '50m' or '110m'." % scale
+                            f'Feature scale of {scale} not recognized, '
+                            "must be one of '10m', '50m' or '110m'."
                         )
                     else:
                         feature_obj = feature_obj.opts(scale=scale)
@@ -2571,6 +2562,7 @@ class HoloViewsConverter:
         if not text:
             text = [c for c in data.columns if c not in (x, y)][0]
         elif text not in data.columns:
+            data = data.copy()
             template_str = text  # needed for dask lazy compute
             data['label'] = data.apply(lambda row: template_str.format(**row), axis=1)
             text = 'label'
@@ -2578,10 +2570,13 @@ class HoloViewsConverter:
         kdims, vdims = self._get_dimensions([x, y], [text])
         cur_opts, compat_opts = self._get_compat_opts('Labels')
         element = self._get_element('labels')
-        return (
-            element(data, kdims, vdims)
-            .redim(**self._redim)
-            .apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
+        if self.by:
+            labels = Dataset(data).to(element, kdims, vdims, self.by)
+            labels = labels.layout() if self.subplots else labels.overlay(sort=False)
+        else:
+            labels = element(data, kdims, vdims)
+        return labels.redim(**self._redim).apply(
+            self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts
         )
 
     ##########################
