@@ -594,3 +594,11 @@ class TestXarrayTitle:
         plot = ds_sel.hvplot.scatter(x='foo', y='bar')  # Image plot
         opts = Store.lookup_options(backend, plot, 'plot')
         assert opts.kwargs['title'] == 'time = 0, y = 0, x = 0, band = 0'
+
+
+@pytest.mark.usefixtures('load_xarray_accessor')
+class TestXarrayCticks:
+    def test_cticks(self, da2):
+        plot = da2.isel(other=0).hvplot(cticks=[5, 10])
+        handles = hv.renderer('bokeh').get_plot(plot).handles
+        assert handles['colorbar'].ticker.ticks == [5, 10]

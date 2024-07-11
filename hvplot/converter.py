@@ -404,7 +404,7 @@ class HoloViewsConverter:
         'colormap',
         'fontsize',
         'c',
-        'cmap',
+        'cticks' 'cmap',
         'color_key',
         'cnorm',
         'rescale_discrete_levels',
@@ -552,6 +552,7 @@ class HoloViewsConverter:
         invert=False,
         stacked=False,
         colorbar=None,
+        cticks=None,
         datashade=False,
         rasterize=False,
         downsample=None,
@@ -790,6 +791,12 @@ class HoloViewsConverter:
             plot_opts['colorbar'] = True
         elif self.rasterize:
             plot_opts['colorbar'] = plot_opts.get('colorbar', True)
+        if plot_opts.get('colorbar') is True and cticks is not None:
+            if self._backend == 'plotly':
+                raise ValueError('cticks option is not supported for plotly backend')
+            key = 'cticks' if self._backend == 'bokeh' else 'cbar_ticks'
+            self._style_opts[key] = cticks
+
         if 'logz' in kwds and 'logz' in self._kind_options.get(self.kind, {}):
             plot_opts['logz'] = kwds.pop('logz')
         if invert:
