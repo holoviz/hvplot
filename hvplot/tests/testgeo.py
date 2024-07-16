@@ -438,6 +438,11 @@ class TestGeoPandas(TestCase):
         opts = hv.Store.lookup_options('bokeh', polygons, 'plot').kwargs
         assert 'hover' not in opts.get('tools')
 
+    def test_geometry_none(self):
+        polygons = self.polygons.copy()
+        polygons.geometry[1] = None
+        assert polygons.hvplot(geo=True)
+
 
 class TestGeoUtil(TestCase):
     def setUp(self):
