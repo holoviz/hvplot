@@ -1246,7 +1246,9 @@ class HoloViewsConverter:
             # Reset groupby dimensions
             groupby_index = [g for g in groupby if g in indexes]
             if groupby_index:
-                self.data = self.data.reset_index(groupby_index)
+                # Dask and Pandas reset_index don't accept the same arguments
+                reset_args = (groupby_index,) if isinstance(self.data, pd.DataFrame) else ()
+                self.data = self.data.reset_index(*reset_args)
 
             if isinstance(by, (np.ndarray, pd.Series)):
                 by_cols = []

@@ -132,6 +132,7 @@ class TestChart1D(ComparisonTestCase):
         self.cat_df = pd.DataFrame(
             [[1, 2, 'A'], [3, 4, 'B'], [5, 6, 'C']], columns=['x', 'y', 'category']
         )
+        self.cat_df_index = self.cat_df.set_index('category')
         self.cat_only_df = pd.DataFrame(
             [['A', 'a'], ['B', 'b'], ['C', 'c']], columns=['upper', 'lower']
         )
@@ -456,6 +457,14 @@ class TestChart1D(ComparisonTestCase):
         )
         assert isinstance(plot, NdLayout)
 
+    def test_groupby_from_index(self):
+        hmap = self.cat_df_index.hvplot.scatter(x='x', y='y', groupby='category', dynamic=False)
+        assert hmap.kdims == ['category']
+        assert hmap.vdims == []
+        assert list(hmap.keys()) == ['A', 'B', 'C']
+        assert hmap.last.kdims == ['x']
+        assert hmap.last.vdims == ['y']
+
     def test_multi_index_groupby_from_index(self):
         hmap = self.multii_df.hvplot.scatter(x='A', y='C', groupby='B', dynamic=False)
         assert hmap.kdims == ['B']
@@ -516,6 +525,7 @@ class TestChart1DDask(TestChart1D):
         self.df = dd.from_pandas(self.df, npartitions=2)
         self.dt_df = dd.from_pandas(self.dt_df, npartitions=3)
         self.cat_df = dd.from_pandas(self.cat_df, npartitions=3)
+        self.cat_df_index = dd.from_pandas(self.cat_df_index, npartitions=3)
         self.cat_only_df = dd.from_pandas(self.cat_only_df, npartitions=1)
 
     def test_by_datetime_accessor(self):
