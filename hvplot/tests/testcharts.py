@@ -477,6 +477,24 @@ class TestChart1D(ComparisonTestCase):
         df = pd.DataFrame(np.random.randn(3, 8), index=['A', 'B', 'C'], columns=index)
         df.hvplot.scatter()
 
+    def test_bar_y_from_index_with_by(self):
+        # Testing a somewhat silly plot but that seemed to be supported
+        # https://github.com/holoviz/hvplot/blob/6c96c7e9abcd44380d2122e3d86827dedab32dea/hvplot/converter.py#L1996-L1999
+        import pandas as pd
+
+        df = pd.DataFrame(
+            {
+                'x': [str(i) for i in range(10)],
+                'y': list(range(10)),
+                'cat': np.random.choice(['aaaa', 'bbbb'], size=10),
+            }
+        )
+        df = df.set_index('y')
+
+        plot = df.hvplot.bar(x='x', y='y', by='cat')
+        assert plot.kdims == ['x', 'cat']
+        assert plot.vdims == ['y']
+
 
 class TestChart1DDask(TestChart1D):
     def setUp(self):
