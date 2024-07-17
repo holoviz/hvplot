@@ -495,6 +495,14 @@ class TestChart1D(ComparisonTestCase):
         assert plot.kdims == ['x', 'cat']
         assert plot.vdims == ['y']
 
+    def test_table_datetime_index_displayed(self):
+        table = self.dt_df.hvplot.table()
+        assert table.kdims[0] == 'index'
+
+    def test_table_multi_index_displayed(self):
+        table = self.multii_df.hvplot.table()
+        assert table.kdims[:2] == self.multii_df.index.names
+
 
 class TestChart1DDask(TestChart1D):
     def setUp(self):
@@ -514,4 +522,10 @@ class TestChart1DDask(TestChart1D):
         raise SkipTest("Can't expand dt accessor columns when using dask")
 
     def test_multi_index_groupby_from_index(self):
+        raise SkipTest('Dask does not support MultiIndex Dataframes.')
+
+    def test_table_datetime_index_displayed(self):
+        raise SkipTest('Only supported for Pandas DatetimeIndex.')
+
+    def test_table_multi_index_displayed(self):
         raise SkipTest('Dask does not support MultiIndex Dataframes.')
