@@ -133,6 +133,7 @@ class TestChart1D(ComparisonTestCase):
             [[1, 2, 'A'], [3, 4, 'B'], [5, 6, 'C']], columns=['x', 'y', 'category']
         )
         self.cat_df_index = self.cat_df.set_index('category')
+        self.cat_df_index_y = self.cat_df.set_index('y')
         self.cat_only_df = pd.DataFrame(
             [['A', 'a'], ['B', 'b'], ['C', 'c']], columns=['upper', 'lower']
         )
@@ -489,19 +490,8 @@ class TestChart1D(ComparisonTestCase):
     def test_bar_y_from_index_with_by(self):
         # Testing a somewhat silly plot but that seemed to be supported
         # https://github.com/holoviz/hvplot/blob/6c96c7e9abcd44380d2122e3d86827dedab32dea/hvplot/converter.py#L1996-L1999
-        import pandas as pd
-
-        df = pd.DataFrame(
-            {
-                'x': [str(i) for i in range(10)],
-                'y': list(range(10)),
-                'cat': np.random.choice(['aaaa', 'bbbb'], size=10),
-            }
-        )
-        df = df.set_index('y')
-
-        plot = df.hvplot.bar(x='x', y='y', by='cat')
-        assert plot.kdims == ['x', 'cat']
+        plot = self.cat_df_index_y.hvplot.bar(x='x', y='y', by='category')
+        assert plot.kdims == ['x', 'category']
         assert plot.vdims == ['y']
 
     def test_table_datetime_index_displayed(self):
@@ -526,6 +516,7 @@ class TestChart1DDask(TestChart1D):
         self.dt_df = dd.from_pandas(self.dt_df, npartitions=3)
         self.cat_df = dd.from_pandas(self.cat_df, npartitions=3)
         self.cat_df_index = dd.from_pandas(self.cat_df_index, npartitions=3)
+        self.cat_df_index_y = dd.from_pandas(self.cat_df_index_y, npartitions=3)
         self.cat_only_df = dd.from_pandas(self.cat_only_df, npartitions=1)
 
     def test_by_datetime_accessor(self):
