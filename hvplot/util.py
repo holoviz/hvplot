@@ -704,3 +704,26 @@ def import_datashader():
             'datashading features. Install it with pip or conda.'
         ) from None
     return datashader
+
+
+def relabel(hv_obj, **kwargs):
+    """Conditionally relabel a HoloViews object"""
+    if kwargs:
+        hv_obj = hv_obj.relabel(**kwargs)
+    return hv_obj
+
+
+def redim_(hv_obj, **kwargs):
+    """Conditionally redim a HoloViews object"""
+    if kwargs:
+        hv_obj = hv_obj.redim(**kwargs)
+    return hv_obj
+
+
+def relabel_redim(hv_obj, relabel_kwargs, redim_kwargs):
+    """Conditionally relabel and/or redim a HoloViews object"""
+    if relabel_kwargs:
+        hv_obj = hv_obj.relabel(**relabel_kwargs)
+    if redim_kwargs:
+        hv_obj = hv_obj.redim(**redim_kwargs)
+    return hv_obj

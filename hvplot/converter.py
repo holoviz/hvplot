@@ -64,6 +64,9 @@ from .util import (
     process_crs,
     process_intake,
     process_xarray,
+    relabel,
+    relabel_redim,
+    redim_,
     support_index,
     check_library,
     is_geodataframe,
@@ -1584,7 +1587,7 @@ class HoloViewsConverter:
                     dataset = Dataset(data, self.indexes, name)
             else:
                 dataset = Dataset(data, self.variables)
-            dataset = dataset.redim(**self._redim)
+            dataset = redim_(dataset, **self._redim)
 
             if groups:
                 datasets = dataset.groupby(groups, dynamic=self.dynamic)
@@ -1675,7 +1678,7 @@ class HoloViewsConverter:
                         dataset = Dataset(data, self.indexes)
                     except Exception:
                         dataset = Dataset(data)
-                    dataset = dataset.redim(**self._redim)
+                    dataset = redim_(dataset, **self._redim)
 
                 obj = method(x, y)
                 obj._dataset = dataset
@@ -2014,22 +2017,21 @@ class HoloViewsConverter:
                 if not support_index(data) and any(y in self.indexes for y in ys):
                     data = data.reset_index()
                 return (
-                    element(data, ([x] if x else []) + self.by, ys)
-                    .relabel(**self._relabel)
-                    .redim(**self._redim)
+                    relabel_redim(
+                        element(data, ([x] if x else []) + self.by, ys), self._relabel, self._redim
+                    )
                     .opts(cur_opts, backend='bokeh')
                     .opts(compat_opts, backend=self._backend_compat)
                 )
-            chart = (
-                Dataset(data, self.by + kdims, vdims)
-                .to(element, kdims, vdims, self.by)
-                .relabel(**self._relabel)
+            chart = relabel(
+                Dataset(data, self.by + kdims, vdims).to(element, kdims, vdims, self.by),
+                **self._relabel,
             )
             chart = chart.layout() if self.subplots else chart.overlay(sort=False)
         else:
-            chart = element(data, kdims, vdims).relabel(**self._relabel)
+            chart = relabel(element(data, kdims, vdims), **self._relabel)
         return (
-            chart.redim(**self._redim)
+            redim_(chart, **self._redim)
             .opts(cur_opts, backend='bokeh')
             .opts(compat_opts, backend=self._backend_compat)
         )
@@ -2149,7 +2151,8 @@ class HoloViewsConverter:
             ydim = hv.Dimension(c, label=self.value_label)
             kdims, vdims = self._get_dimensions([x], [ydim])
             chart = element(data, kdims, vdims)
-            charts.append((c, chart.relabel(**self._relabel).redim(**self._redim)))
+            chart = relabel_redim(chart, self._relabel, self._redim)
+            charts.append((c, chart))
         return (
             self._by_type(charts, self.group_label, sort=False)
             .opts(cur_opts, backend='bokeh')
@@ -2217,10 +2220,8 @@ class HoloViewsConverter:
             obj = Dataset(df, kdims, vdims).to(element, x).layout()
         else:
             obj = element(df, kdims, vdims)
-        return (
-            obj.redim(**self._redim)
-            .relabel(**self._relabel)
-            .apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
+        return relabel_redim(obj, self._relabel, self._redim).apply(
+            self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts
         )
 
     def bar(self, x=None, y=None, data=None):
@@ -2252,12 +2253,10 @@ class HoloViewsConverter:
         ylim = self._plot_opts.get('ylim', (None, None))
         if not isinstance(y, (list, tuple)):
             ranges = {y: ylim}
-            return (
-                element(data, self.by, y)
-                .redim.range(**ranges)
-                .relabel(**self._relabel)
-                .apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
-            )
+            return relabel(
+                element(data, self.by, y).redim.range(**ranges),
+                **self._relabel,
+            ).apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
 
         labelled = ['y' if self.invert else 'x'] if self.group_label != 'Group' else []
         if self.value_label != 'value':
@@ -2280,16 +2279,15 @@ class HoloViewsConverter:
         if list(y) and df[self.value_label].dtype is not data[y[0]].dtype:
             df[self.value_label] = df[self.value_label].astype(data[y[0]].dtype)
         redim = self._merge_redim({self.value_label: ylim})
-        return (
-            element(df, kdims, self.value_label)
-            .redim(**redim)
-            .relabel(**self._relabel)
-            .apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
-        )
+        return relabel_redim(
+            element(df, kdims, self.value_label),
+            self._relabel,
+            redim,
+        ).apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
 
     def box(self, x=None, y=None, data=None):
         self._error_if_unavailable('box')
-        return self._stats_plot(BoxWhisker, y, data).redim(**self._redim)
+        return redim_(self._stats_plot(BoxWhisker, y, data), **self._redim)
 
     def violin(self, x=None, y=None, data=None):
         self._error_if_unavailable('violin')
@@ -2297,7 +2295,7 @@ class HoloViewsConverter:
             from holoviews.element import Violin
         except ImportError:
             raise ImportError('Violin plot requires HoloViews version >=1.10')
-        return self._stats_plot(Violin, y, data).redim(**self._redim)
+        return redim_(self._stats_plot(Violin, y, data), **self._redim)
 
     def hist(self, x=None, y=None, data=None):
         self._error_if_unavailable('hist')
@@ -2351,7 +2349,7 @@ class HoloViewsConverter:
                 hists = histogram(ds, dimension=y, **hist_opts)
 
             return (
-                hists.redim(**self._redim)
+                redim_(hists, **self._redim)
                 .opts(cur_opts, backend='bokeh')
                 .opts(compat_opts, backend=self._backend_compat)
             )
@@ -2373,10 +2371,12 @@ class HoloViewsConverter:
         hists = []
         for col in y:
             hist = histogram(ds, dimension=col, **hist_opts)
-            hists.append((col, hist.relabel(**self._relabel)))
+            hists.append((col, relabel(hist, **self._relabel)))
         return (
-            self._by_type(hists, self.group_label, sort=False)
-            .redim(**self._redim)
+            redim_(
+                self._by_type(hists, self.group_label, sort=False),
+                **self._redim,
+            )
             .opts(cur_opts, backend='bokeh')
             .opts(compat_opts, backend=self._backend_compat)
         )
@@ -2428,8 +2428,7 @@ class HoloViewsConverter:
                 dists = NdOverlay({0: Area([], self.value_label, vdim)}, [self.group_label])
         redim = self._merge_redim(ranges)
         return (
-            dists.redim(**redim)
-            .relabel(**self._relabel)
+            relabel_redim(dists, self._relabel, redim)
             .opts(cur_opts, backend='bokeh')
             .opts(compat_opts, backend=self._backend_compat)
         )
@@ -2445,9 +2444,9 @@ class HoloViewsConverter:
         data = self.data if data is None else data
         if self.gridded:
             kdims = [self.x, self.y] if len(self.indexes) == 2 else None
-            return Dataset(data, kdims=kdims).redim(**self._redim)
+            return redim_(Dataset(data, kdims=kdims), **self._redim)
         else:
-            return Dataset(data, self.kwds.get('columns')).redim(**self._redim)
+            return redim_(Dataset(data, self.kwds.get('columns')), **self._redim)
 
     def heatmap(self, x=None, y=None, data=None):
         self._error_if_unavailable('heatmap')
@@ -2469,7 +2468,7 @@ class HoloViewsConverter:
         hmap = HeatMap(data, [x, y], z, **self._relabel)
         if 'reduce_function' in self.kwds:
             hmap = hmap.aggregate(function=self.kwds['reduce_function'])
-        return hmap.redim(**redim).apply(
+        return redim_(hmap, **redim).apply(
             self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts
         )
 
@@ -2493,10 +2492,8 @@ class HoloViewsConverter:
         params = dict(self._relabel)
         if self.geo:
             params['crs'] = self.crs
-        return (
-            element(data, [x, y], z or [], **params)
-            .redim(**redim)
-            .apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
+        return redim_(element(data, [x, y], z or [], **params), **redim).apply(
+            self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts
         )
 
     def bivariate(self, x=None, y=None, data=None):
@@ -2506,10 +2503,8 @@ class HoloViewsConverter:
 
         cur_opts, compat_opts = self._get_compat_opts('Bivariate', **self.kwds)
         element = self._get_element('bivariate')
-        return (
-            element(data, [x, y])
-            .redim(**self._redim)
-            .apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
+        return redim_(element(data, [x, y]), **self._redim).apply(
+            self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts
         )
 
     def ohlc(self, x=None, y=None, data=None):
@@ -2566,10 +2561,10 @@ class HoloViewsConverter:
             seg_cur_opts['xlabel'] = '' if x == 'index' else x
         if 'ylabel' not in seg_cur_opts:
             seg_cur_opts['ylabel'] = ''
-        segments = segments.redim(**self._redim).apply(
+        segments = redim_(segments, **self._redim).apply(
             self._set_backends_opts, cur_opts=seg_cur_opts, compat_opts=seg_compat_opts
         )
-        rects = rects.redim(**self._redim).apply(
+        rects = redim_(rects, **self._redim).apply(
             self._set_backends_opts, cur_opts=rect_cur_opts, compat_opts=rect_compat_opts
         )
         return segments * rects
@@ -2583,11 +2578,10 @@ class HoloViewsConverter:
 
         cur_opts, compat_opts = self._get_compat_opts('Table')
         element = self._get_element('table')
-        return (
-            element(data, self.kwds.get('columns'), [])
-            .redim(**self._redim)
-            .apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
-        )
+        return redim_(
+            element(data, self.kwds.get('columns'), []),
+            **self._redim,
+        ).apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
 
     def labels(self, x=None, y=None, data=None):
         self._error_if_unavailable('labels')
@@ -2611,7 +2605,7 @@ class HoloViewsConverter:
             labels = labels.layout() if self.subplots else labels.overlay(sort=False)
         else:
             labels = element(data, kdims, vdims)
-        return labels.redim(**self._redim).apply(
+        return redim_(labels, **self._redim).apply(
             self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts
         )
 
@@ -2673,10 +2667,8 @@ class HoloViewsConverter:
         element = self._get_element('image')
         if self.geo:
             params['crs'] = self.crs
-        return (
-            element(data, [x, y], z, **params)
-            .redim(**redim)
-            .apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
+        return redim_(element(data, [x, y], z, **params), **redim).apply(
+            self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts
         )
 
     def rgb(self, x=None, y=None, z=None, data=None):
@@ -2712,7 +2704,7 @@ class HoloViewsConverter:
         if self.geo:
             params['crs'] = self.crs
         rgb = element(eldata, [x, y], element.vdims[:nbands], **params)
-        return rgb.redim(**self._redim).apply(
+        return redim_(rgb, **self._redim).apply(
             self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts
         )
 
@@ -2733,11 +2725,10 @@ class HoloViewsConverter:
         cur_opts, compat_opts = self._get_compat_opts('QuadMesh')
         if self.geo:
             params['crs'] = self.crs
-        return (
-            element(data, [x, y], z, **params)
-            .redim(**redim)
-            .apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
-        )
+        return redim_(
+            element(data, [x, y], z, **params),
+            **redim,
+        ).apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
 
     def contour(self, x=None, y=None, z=None, data=None, filled=False):
         self._error_if_unavailable('contour')
@@ -2786,9 +2777,9 @@ class HoloViewsConverter:
         if self._dim_ranges['c'] != (None, None):
             z_name = contourf.vdims[0].name
             redim = {z_name: self._dim_ranges['c']}
+            return contourf.redim.range(**redim)
         else:
-            redim = {}
-        return contourf.redim.range(**redim)
+            return contourf
 
     def vectorfield(self, x=None, y=None, angle=None, mag=None, data=None):
         self._error_if_unavailable('vectorfield')
@@ -2807,11 +2798,10 @@ class HoloViewsConverter:
         cur_opts, compat_opts = self._get_compat_opts('VectorField')
         if self.geo:
             params['crs'] = self.crs
-        return (
-            element(data, [x, y], z, **params)
-            .redim(**redim)
-            .apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
-        )
+        return redim_(
+            element(data, [x, y], z, **params),
+            **redim,
+        ).apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
 
     ##########################
     #    Geometry plots      #
@@ -2857,7 +2847,7 @@ class HoloViewsConverter:
             obj = element(data, kdims, vdims, **params)
 
         return (
-            obj.redim(**redim)
+            redim_(obj, **redim)
             .opts({element.name: cur_opts}, backend='bokeh')
             .opts({element.name: compat_opts}, backend=self._backend_compat)
         )
