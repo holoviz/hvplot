@@ -207,8 +207,8 @@ class HoloViewsConverter:
         Axis labels for the x-axis, y-axis, and colorbar
     xlim/ylim (default=None): tuple or list
         Plot limits of the x- and y-axis
-    xticks/yticks (default=None): int or list
-        Ticks along x- and y-axis specified as an integer, list of
+    xticks/yticks/cticks (default=None): int or list
+        Ticks along x-axis, y-axis, and colorbar specified as an integer, list of
         ticks positions, or list of tuples of the tick positions and labels
     width (default=700)/height (default=300): int
         The width and height of the plot in pixels
@@ -402,6 +402,7 @@ class HoloViewsConverter:
         'colormap',
         'fontsize',
         'c',
+        'cticks',
         'cmap',
         'color_key',
         'cnorm',
@@ -550,6 +551,7 @@ class HoloViewsConverter:
         invert=False,
         stacked=False,
         colorbar=None,
+        cticks=None,
         datashade=False,
         rasterize=False,
         downsample=None,
@@ -784,6 +786,12 @@ class HoloViewsConverter:
             plot_opts['colorbar'] = True
         elif self.rasterize:
             plot_opts['colorbar'] = plot_opts.get('colorbar', True)
+        if plot_opts.get('colorbar') is True and cticks is not None:
+            if self._backend == 'plotly':
+                raise ValueError('cticks option is not supported for plotly backend')
+            key = 'cticks' if self._backend == 'bokeh' else 'cbar_ticks'
+            self._style_opts[key] = cticks
+
         if 'logz' in kwds and 'logz' in self._kind_options.get(self.kind, {}):
             plot_opts['logz'] = kwds.pop('logz')
         if invert:
