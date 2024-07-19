@@ -209,8 +209,8 @@ class HoloViewsConverter:
         Axis labels for the x-axis, y-axis, and colorbar
     xlim/ylim (default=None): tuple or list
         Plot limits of the x- and y-axis
-    xticks/yticks (default=None): int or list
-        Ticks along x- and y-axis specified as an integer, list of
+    xticks/yticks/cticks (default=None): int or list
+        Ticks along x-axis, y-axis, and colorbar specified as an integer, list of
         ticks positions, or list of tuples of the tick positions and labels
     width (default=700)/height (default=300): int
         The width and height of the plot in pixels
