@@ -929,7 +929,11 @@ class HoloViewsConverter:
                 return False
 
         elif self._color_dim:
-            data = self.data[self._color_dim]
+            data = (
+                self.data[self._color_dim]
+                if self._color_dim in self.data.columns
+                else self.data.index.get_level_values(self._color_dim)
+            )
         else:
             return
 
