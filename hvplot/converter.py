@@ -2058,12 +2058,16 @@ class HoloViewsConverter:
             from pandas.api.types import is_datetime64_any_dtype as is_datetime
 
             if x in self.indexes:
-                index = self.indexes.index(x)
-                if is_datetime(data.axes[index]):
-                    data = data.sort_index(axis=self.indexes.index(x))
-            elif x in data.columns:
-                if is_datetime(data[x]):
-                    data = data.sort_values(x)
+                if isinstance(data.index, MultiIndex):
+                    idx_vals = data.index.get_level_values(x)
+                    sort_kwargs = {'level': x}
+                else:
+                    idx_vals = data.index
+                    sort_kwargs = {}
+                if is_datetime(idx_vals):
+                    data = data.sort_index(**sort_kwargs)
+            elif x in data.columns and is_datetime(data[x]):
+                data = data.sort_values(x)
 
         # set index to column if needed in hover_cols
         if self.use_index and any(
