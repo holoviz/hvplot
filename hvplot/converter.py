@@ -64,6 +64,7 @@ from .util import (
     process_crs,
     process_intake,
     process_xarray,
+    support_index,
     check_library,
     is_geodataframe,
     process_derived_datetime_xarray,
@@ -1219,6 +1220,9 @@ class HoloViewsConverter:
                 and y is None
                 and not by
             ):
+                # Broken, see https://github.com/holoviz/hvplot/issues/1364.
+                # Dask reset_index doesn't accept a level, so this would need to
+                # be adapted for Dask.
                 self.data = data.stack().reset_index(1).rename(columns={'level_1': group_label})
                 by = group_label
                 x = 'index'
@@ -1245,11 +1249,8 @@ class HoloViewsConverter:
             self.variables = indexes + list(self.data.columns)
 
             # Reset groupby dimensions
-            groupby_index = [g for g in groupby if g in indexes]
-            if groupby_index:
-                # Dask and Pandas reset_index don't accept the same arguments
-                reset_args = (groupby_index,) if isinstance(self.data, pd.DataFrame) else ()
-                self.data = self.data.reset_index(*reset_args)
+            if not support_index(self.data) and any(g for g in groupby if g in indexes):
+                self.data = self.data.reset_index()
 
             if isinstance(by, (np.ndarray, pd.Series)):
                 by_cols = []
@@ -1541,7 +1542,11 @@ class HoloViewsConverter:
             if self.streaming:
                 raise NotImplementedError('Streaming and groupby not yet implemented')
             data = self.data
-            if not self.gridded and any(g in self.indexes for g in groups):
+            if (
+                not support_index(data)
+                and not self.gridded
+                and any(g in self.indexes for g in groups)
+            ):
                 data = data.reset_index()
 
             if self.datatype in ('geopandas', 'spatialpandas'):
@@ -1992,7 +1997,7 @@ class HoloViewsConverter:
 
         if self.by:
             if element is Bars and not self.subplots:
-                if any(y in self.indexes for y in ys):
+                if not support_index(data) and any(y in self.indexes for y in ys):
                     data = data.reset_index()
                 return (
                     element(data, ([x] if x else []) + self.by, ys)
@@ -2070,8 +2075,10 @@ class HoloViewsConverter:
                     data = data.sort_values(x)
 
         # set index to column if needed in hover_cols
-        if self.use_index and any(
-            c for c in self.hover_cols if c in self.indexes and c not in data.columns
+        if (
+            not support_index(data)
+            and self.use_index
+            and any(c for c in self.hover_cols if c in self.indexes and c not in data.columns)
         ):
             data = data.reset_index()
 
@@ -2175,6 +2182,8 @@ class HoloViewsConverter:
 
         id_vars = [x]
         if any(v in self.indexes for v in id_vars):
+            # Calling reset_index() is required since id_vars from melt
+            # only accepts column names, not index names.
             data = data.reset_index()
         data = data[y + [x]]
 
@@ -2551,6 +2560,7 @@ class HoloViewsConverter:
         self._error_if_unavailable('table')
         data = self.data if data is None else data
         if isinstance(data.index, (DatetimeIndex, MultiIndex)):
+            # To get the index displayed in the table as Bokeh doesn't show it.
             data = data.reset_index()
 
         cur_opts, compat_opts = self._get_compat_opts('Table')
@@ -2603,8 +2613,10 @@ class HoloViewsConverter:
             if isinstance(data, xr.DataArray):
                 data = data.to_dataset(name=data.name or 'value')
         if is_tabular(data):
-            if self.use_index and any(
-                c for c in self.hover_cols if c in self.indexes and c not in data.columns
+            if (
+                not support_index(data)
+                and self.use_index
+                and any(c for c in self.hover_cols if c in self.indexes and c not in data.columns)
             ):
                 data = data.reset_index()
             # calculate any derived time

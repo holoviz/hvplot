@@ -446,6 +446,16 @@ def is_xarray_dataarray(data):
     return isinstance(data, DataArray)
 
 
+def support_index(data):
+    """
+    HoloViews added in v1.19.0 support for retaining Pandas indexes (no longer
+    calling .reset_index()).
+
+    Update this utility when other data interfaces support that (geopandas, dask, etc.)
+    """
+    return isinstance(data, pd.DataFrame)
+
+
 def process_intake(data, use_dask):
     if data.container not in ('dataframe', 'xarray'):
         raise NotImplementedError(
@@ -530,7 +540,7 @@ def process_xarray(
             data = data.persist() if persist else data
         else:
             data = dataset.to_dataframe()
-            if len(data.index.names) > 1:
+            if not support_index(data) and len(data.index.names) > 1:
                 data = data.reset_index()
         if len(dims) == 0:
             dims = ['index']

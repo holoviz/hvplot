@@ -54,18 +54,12 @@ class TestChart2D(ComparisonTestCase):
     @parameterized.expand([('points', Points), ('paths', Path)])
     def test_2d_set_hover_cols_including_index(self, kind, element):
         plot = self.cat_df.hvplot(x='x', y='y', hover_cols=['index'], kind=kind)
-        data = plot.data[0] if kind == 'paths' else plot.data
-        assert 'index' in data.columns
-        self.assertEqual(plot, element(self.cat_df.reset_index(), ['x', 'y'], ['index']))
+        self.assertEqual(plot, element(self.cat_df, ['x', 'y'], ['index']))
 
     @parameterized.expand([('points', Points), ('paths', Path)])
     def test_2d_set_hover_cols_to_all(self, kind, element):
         plot = self.cat_df.hvplot(x='x', y='y', hover_cols='all', kind=kind)
-        data = plot.data[0] if kind == 'paths' else plot.data
-        assert 'index' in data.columns
-        self.assertEqual(
-            plot, element(self.cat_df.reset_index(), ['x', 'y'], ['index', 'category'])
-        )
+        self.assertEqual(plot, element(self.cat_df, ['x', 'y'], ['index', 'category']))
 
     @parameterized.expand([('points', Points), ('paths', Path)])
     def test_2d_set_hover_cols_to_all_with_use_index_as_false(self, kind, element):
@@ -114,6 +108,22 @@ class TestChart2DDask(TestChart2D):
     @expectedFailure
     def test_heatmap_2d_index_columns(self):
         self.df.hvplot.heatmap()
+
+    @parameterized.expand([('points', Points), ('paths', Path)])
+    def test_2d_set_hover_cols_including_index(self, kind, element):
+        plot = self.cat_df.hvplot(x='x', y='y', hover_cols=['index'], kind=kind)
+        data = plot.data[0] if kind == 'paths' else plot.data
+        assert 'index' in data.columns
+        self.assertEqual(plot, element(self.cat_df.reset_index(), ['x', 'y'], ['index']))
+
+    @parameterized.expand([('points', Points), ('paths', Path)])
+    def test_2d_set_hover_cols_to_all(self, kind, element):
+        plot = self.cat_df.hvplot(x='x', y='y', hover_cols='all', kind=kind)
+        data = plot.data[0] if kind == 'paths' else plot.data
+        assert 'index' in data.columns
+        self.assertEqual(
+            plot, element(self.cat_df.reset_index(), ['x', 'y'], ['index', 'category'])
+        )
 
 
 class TestChart1D(ComparisonTestCase):
