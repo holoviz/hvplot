@@ -1171,7 +1171,7 @@ class HoloViewsConverter:
 
         if gridded_data:
             not_found = [g for g in groupby if g not in data.coords]
-            not_found, _, _ = process_derived_datetime_xarray(data, not_found)
+            post_not_found, _, _ = process_derived_datetime_xarray(data, not_found)
             data_vars = list(data.data_vars) if isinstance(data, xr.Dataset) else [data.name]
             indexes = list(data.coords.indexes)
             # Handle undeclared indexes
@@ -1188,7 +1188,8 @@ class HoloViewsConverter:
                             if coord not in groupby + by:
                                 groupby.append(data_dim)
             self.variables = list(data.coords) + data_vars
-            if groupby and not_found:
+            self.variables.extend([item for item in not_found if item not in post_not_found])
+            if groupby and post_not_found:
                 raise ValueError(
                     f'The supplied groupby dimension(s) {not_found} '
                     'could not be found, expected one or '
@@ -1257,13 +1258,16 @@ class HoloViewsConverter:
             not_found = [
                 g for g in groupby + by_cols if g not in list(self.data.columns) + indexes
             ]
-            not_found, self.data = process_derived_datetime_pandas(self.data, not_found, indexes)
-            if groupby and not_found:
+            post_not_found, self.data = process_derived_datetime_pandas(
+                self.data, not_found, indexes
+            )
+            if groupby and post_not_found:
                 raise ValueError(
                     f'The supplied groupby dimension(s) {not_found} '
                     'could not be found, expected one or '
                     f'more of: {list(self.data.columns)}'
                 )
+            self.variables.extend([item for item in not_found if item not in post_not_found])
 
         if transforms:
             self.data = Dataset(self.data, indexes).transform(**transforms).data
@@ -1560,7 +1564,7 @@ class HoloViewsConverter:
                     name = data.name or self.label or self.value_label
                     dataset = Dataset(data, self.indexes, name)
             else:
-                dataset = Dataset(data)
+                dataset = Dataset(data, self.variables)
             dataset = dataset.redim(**self._redim)
 
             if groups:
@@ -2078,7 +2082,8 @@ class HoloViewsConverter:
                 dimensions.extend(col if isinstance(col, list) else [col])
 
         not_found = [dim for dim in dimensions if dim not in self.variables]
-        _, data = process_derived_datetime_pandas(data, not_found, self.indexes)
+        post_not_found, data = process_derived_datetime_pandas(data, not_found, self.indexes)
+        self.variables.extend(set(post_not_found) - set(not_found))
 
         return data, x, y
 
@@ -2609,7 +2614,8 @@ class HoloViewsConverter:
                     dimensions.extend(dimension if isinstance(dimension, list) else [dimension])
 
             not_found = [dim for dim in dimensions if dim not in self.variables]
-            _, data = process_derived_datetime_pandas(data, not_found, self.indexes)
+            post_not_found, data = process_derived_datetime_pandas(data, not_found, self.indexes)
+            self.variables.extend([item for item in not_found if item not in post_not_found])
 
         return data, x, y, z
 
