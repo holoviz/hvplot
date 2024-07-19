@@ -208,8 +208,8 @@ class HoloViewsConverter:
         Axis labels for the x-axis, y-axis, and colorbar
     xlim/ylim (default=None): tuple or list
         Plot limits of the x- and y-axis
-    xticks/yticks (default=None): int or list
-        Ticks along x- and y-axis specified as an integer, list of
+    xticks/yticks/cticks (default=None): int or list
+        Ticks along x-axis, y-axis, and colorbar specified as an integer, list of
         ticks positions, or list of tuples of the tick positions and labels
     width (default=700)/height (default=300): int
         The width and height of the plot in pixels
@@ -403,6 +403,7 @@ class HoloViewsConverter:
         'colormap',
         'fontsize',
         'c',
+        'cticks',
         'cmap',
         'color_key',
         'cnorm',
@@ -551,6 +552,7 @@ class HoloViewsConverter:
         invert=False,
         stacked=False,
         colorbar=None,
+        cticks=None,
         datashade=False,
         rasterize=False,
         downsample=None,
@@ -785,6 +787,12 @@ class HoloViewsConverter:
             plot_opts['colorbar'] = True
         elif self.rasterize:
             plot_opts['colorbar'] = plot_opts.get('colorbar', True)
+        if plot_opts.get('colorbar') is True and cticks is not None:
+            if self._backend == 'plotly':
+                raise ValueError('cticks option is not supported for plotly backend')
+            key = 'cticks' if self._backend == 'bokeh' else 'cbar_ticks'
+            self._style_opts[key] = cticks
+
         if 'logz' in kwds and 'logz' in self._kind_options.get(self.kind, {}):
             plot_opts['logz'] = kwds.pop('logz')
         if invert:
@@ -1012,7 +1020,9 @@ class HoloViewsConverter:
             self.data = data
             if kind is None:
                 if datatype == 'geopandas':
-                    geom_types = {gt[5:] if 'Multi' in gt else gt for gt in data.geom_type}
+                    geom_types = {gt[5:] if gt and 'Multi' in gt else gt for gt in data.geom_type}
+                    if None in geom_types:
+                        geom_types.remove(None)
                 else:
                     geom_types = [
                         type(data.geometry.dtype)
@@ -2067,12 +2077,16 @@ class HoloViewsConverter:
             from pandas.api.types import is_datetime64_any_dtype as is_datetime
 
             if x in self.indexes:
-                index = self.indexes.index(x)
-                if is_datetime(data.axes[index]):
-                    data = data.sort_index(axis=self.indexes.index(x))
-            elif x in data.columns:
-                if is_datetime(data[x]):
-                    data = data.sort_values(x)
+                if isinstance(data.index, MultiIndex):
+                    idx_vals = data.index.get_level_values(x)
+                    sort_kwargs = {'level': x}
+                else:
+                    idx_vals = data.index
+                    sort_kwargs = {}
+                if is_datetime(idx_vals):
+                    data = data.sort_index(**sort_kwargs)
+            elif x in data.columns and is_datetime(data[x]):
+                data = data.sort_values(x)
 
         # set index to column if needed in hover_cols
         if (
