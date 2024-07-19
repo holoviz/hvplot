@@ -2165,7 +2165,7 @@ class HoloViewsConverter:
     #  Categorical charts    #
     ##########################
 
-    def _category_plot(self, element, x, y, data):
+    def _category_plot(self, element, x: str, y: list[str], data):
         """
         Helper method to generate element from indexed dataframe.
         """
