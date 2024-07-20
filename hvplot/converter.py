@@ -46,7 +46,7 @@ from holoviews.plotting.bokeh import OverlayPlot, colormap_generator
 from holoviews.plotting.util import process_cmap
 from holoviews.operation import histogram, apply_when
 from holoviews.streams import Buffer, Pipe
-from holoviews.util.transform import dim
+from holoviews.util.transform import dim, lon_lat_to_easting_northing
 from pandas import DatetimeIndex, MultiIndex
 
 from .backend_transforms import _transfer_opts_cur_backend
@@ -587,6 +587,21 @@ class HoloViewsConverter:
         autorange=None,
         **kwds,
     ):
+        if geo and tiles and not crs and not projection:
+            # tiles without requiring geoviews/cartopy
+            #  check if between -180 and 360 and lat between -90 and 90
+            min_x = np.min(data[x])
+            max_x = np.max(data[x])
+            min_y = np.min(data[y])
+            max_y = np.max(data[y])
+            if -180 < min_x < 360 and -180 < max_x < 360 and -90 < min_y < 90 and -90 < max_y < 90:
+                data = data.copy()
+                lons, lats = data[x], data[y]
+                easting, northing = lon_lat_to_easting_northing(lons, lats)
+                data[x] = easting
+                data[y] = northing
+            geo = False
+
         # Process data and related options
         self._redim = fields
         self.use_index = use_index
@@ -617,8 +632,6 @@ class HoloViewsConverter:
 
         self.dynamic = dynamic
         self.geo = any([geo, crs, global_extent, projection, project, coastline, features])
-        self.crs = self._process_crs(data, crs) if self.geo else None
-        self.output_projection = self.crs
         self.project = project
         self.coastline = coastline
         self.features = features
@@ -627,6 +640,8 @@ class HoloViewsConverter:
         self.sort_date = sort_date
 
         # Import geoviews if geo-features requested
+        self.crs = self._process_crs(data, crs) if self.geo else None
+        self.output_projection = self.crs
         if self.geo or self.datatype == 'geopandas':
             try:
                 import geoviews  # noqa
@@ -2646,7 +2661,7 @@ class HoloViewsConverter:
         redim = self._merge_redim({z[0]: self._dim_ranges['c']})
 
         element = self._get_element('image')
-        if self.geo:
+        if self.geo and self.crs:
             params['crs'] = self.crs
         return (
             element(data, [x, y], z, **params)
