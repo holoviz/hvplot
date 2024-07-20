@@ -632,6 +632,8 @@ class HoloViewsConverter:
 
         self.dynamic = dynamic
         self.geo = any([geo, crs, global_extent, projection, project, coastline, features])
+        self.crs = self._process_crs(data, crs) if self.geo else None
+        self.output_projection = self.crs
         self.project = project
         self.coastline = coastline
         self.features = features
@@ -640,8 +642,6 @@ class HoloViewsConverter:
         self.sort_date = sort_date
 
         # Import geoviews if geo-features requested
-        self.crs = self._process_crs(data, crs) if self.geo else None
-        self.output_projection = self.crs
         if self.geo or self.datatype == 'geopandas':
             try:
                 import geoviews  # noqa
