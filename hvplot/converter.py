@@ -600,7 +600,7 @@ class HoloViewsConverter:
                 easting, northing = lon_lat_to_easting_northing(lons, lats)
                 data[x] = easting
                 data[y] = northing
-            geo = False
+                geo = False
 
         # Process data and related options
         self._redim = fields
