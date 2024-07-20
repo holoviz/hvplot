@@ -2661,7 +2661,7 @@ class HoloViewsConverter:
         redim = self._merge_redim({z[0]: self._dim_ranges['c']})
 
         element = self._get_element('image')
-        if self.geo and self.crs:
+        if self.geo:
             params['crs'] = self.crs
         return (
             element(data, [x, y], z, **params)
