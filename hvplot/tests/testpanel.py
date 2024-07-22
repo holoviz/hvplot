@@ -2,7 +2,9 @@
 Tests for panel widgets and param objects as arguments
 """
 
-from unittest import TestCase, SkipTest
+from unittest import TestCase
+
+import panel as pn
 
 from hvplot.util import process_xarray  # noqa
 
@@ -11,8 +13,6 @@ def look_for_class(panel, classname, items=None):
     """
     Descend a panel object and find any instances of the given class
     """
-    import panel as pn
-
     if items is None:
         items = []
     if isinstance(panel, pn.layout.ListPanel):
@@ -25,20 +25,13 @@ def look_for_class(panel, classname, items=None):
 
 class TestPanelObjects(TestCase):
     def setUp(self):
-        try:
-            import panel as pn  # noqa
-            import hvplot.pandas  # noqa
-        except ImportError:
-            raise SkipTest('panel not available')
-
+        import hvplot.pandas  # noqa
         from bokeh.sampledata.iris import flowers
 
         self.flowers = flowers
         self.cols = list(self.flowers.columns[:-1])
 
     def test_using_explicit_widgets_works(self):
-        import panel as pn
-
         x = pn.widgets.Select(name='x', value='sepal_length', options=self.cols)
         y = pn.widgets.Select(name='y', value='sepal_width', options=self.cols)
         kind = pn.widgets.Select(name='kind', value='scatter', options=['bivariate', 'scatter'])
@@ -52,8 +45,6 @@ class TestPanelObjects(TestCase):
         self.flowers.hvplot(x, y=y, kind=kind.param.value, c=color)
 
     def test_casting_widgets_to_different_classes(self):
-        import panel as pn
-
         pane = self.flowers.hvplot.scatter(
             groupby='species', legend='top_right', widgets={'species': pn.widgets.DiscreteSlider}
         )
@@ -61,8 +52,6 @@ class TestPanelObjects(TestCase):
         assert len(look_for_class(pane, pn.widgets.DiscreteSlider)) == 1
 
     def test_using_explicit_widgets_with_groupby_does_not_raise_error(self):
-        import panel as pn
-
         x = pn.widgets.Select(name='x', value='sepal_length', options=self.cols)
         y = pn.widgets.Select(name='y', value='sepal_width', options=self.cols)
 
