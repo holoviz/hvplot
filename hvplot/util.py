@@ -453,7 +453,7 @@ def support_index(data):
 
     Update this utility when other data interfaces support that (geopandas, dask, etc.)
     """
-    return isinstance(data, pd.DataFrame)
+    return type(data) is pd.DataFrame
 
 
 def process_intake(data, use_dask):
