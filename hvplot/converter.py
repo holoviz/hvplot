@@ -309,7 +309,8 @@ class HoloViewsConverter:
         CRS object or class name, a WKT string, or a proj.4 string.
         Defaults to PlateCarree.
     tiles (default=False):
-        Whether to overlay the plot on a tile source:
+        Whether to overlay the plot on a tile source. If coordinate values fall within
+        lat/lon bounds, auto-projects to EPSG:3857, unless `projection=False`.
         - `True`: OpenStreetMap layer
         - `xyzservices.TileProvider` instance (requires xyzservices to
            be installed)
@@ -2102,28 +2103,27 @@ class HoloViewsConverter:
         """
         Tiles without requiring geoviews/cartopy.
         """
-        data_is_gdf = is_geodataframe(data)
-        if not self.tiles or self.output_projection is False:
+        if self.geo or not self.tiles or self.output_projection is False:
             return data, x, y
-        elif not data_is_gdf and (x is None or y is None):
+        elif not is_geodataframe(data) and (x is None or y is None):
             return data, x, y
 
-        if data_is_gdf:
-            data = data.to_crs(epsg=3857)
+        if is_geodataframe(data):
+            if data.crs is not None:
+                data = data.to_crs(epsg=3857)
             return data, x, y
         else:
             min_x = np.min(data[x])
             max_x = np.max(data[x])
             min_y = np.min(data[y])
             max_y = np.max(data[y])
-            x_within_bounds = -180 < min_x < 360 and -180 < max_x < 360
-            y_within_bounds = -90 < min_y < 90 and -90 < max_y < 90
+            x_within_bounds = -180 <= min_x <= 360 and -180 <= max_x <= 360
+            y_within_bounds = -90 <= min_y <= 90 and -90 <= max_y <= 90
             if x_within_bounds and y_within_bounds:
                 data = data.copy()
-                lons, lats = data[x], data[y]
-                lons = (lons + 180) % 360 - 180  # ticks are better with -180 to 180
-                easting, northing = lon_lat_to_easting_northing(lons, lats)
-                new_x = 'x' if 'x' not in data else 'x_'
+                lons_180 = (data[x] + 180) % 360 - 180  # ticks are better with -180 to 180
+                easting, northing = lon_lat_to_easting_northing(lons_180, data[y])
+                new_x = 'x' if 'x' not in data else 'x_'  # quick existing var check
                 new_y = 'y' if 'y' not in data else 'y_'
                 data[new_x] = easting
                 data[new_y] = northing
