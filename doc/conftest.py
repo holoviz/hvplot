@@ -63,5 +63,5 @@ else:
         '2024.6.0'
     ):
         collect_ignore_glob += [
-            'user_guide/Gridded_data.ipynb',
+            'user_guide/Gridded_Data.ipynb',
         ]
