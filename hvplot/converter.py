@@ -2127,7 +2127,8 @@ class HoloViewsConverter:
                 new_y = 'y' if 'y' not in data else 'y_'
                 data[new_x] = easting
                 data[new_y] = northing
-                data = data.swap_dims({x: new_x, y: new_y})
+                if is_xarray(data):
+                    data = data.swap_dims({x: new_x, y: new_y})
                 return data, new_x, new_y
         return data, x, y
 
