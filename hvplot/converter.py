@@ -587,21 +587,6 @@ class HoloViewsConverter:
         autorange=None,
         **kwds,
     ):
-        if geo and tiles and not crs and not projection:
-            # tiles without requiring geoviews/cartopy
-            #  check if between -180 and 360 and lat between -90 and 90
-            min_x = np.min(data[x])
-            max_x = np.max(data[x])
-            min_y = np.min(data[y])
-            max_y = np.max(data[y])
-            if -180 < min_x < 360 and -180 < max_x < 360 and -90 < min_y < 90 and -90 < max_y < 90:
-                data = data.copy()
-                lons, lats = data[x], data[y]
-                easting, northing = lon_lat_to_easting_northing(lons, lats)
-                data[x] = easting
-                data[y] = northing
-                geo = False
-
         # Process data and related options
         self._redim = fields
         self.use_index = use_index
@@ -682,6 +667,9 @@ class HoloViewsConverter:
                     xlim = (x0, x1)
                 if ylim:
                     ylim = (y0, y1)
+        elif projection is False:
+            # to disable automatic projection of tiles
+            self.output_projection = projection
 
         # Operations
         if resample_when is not None and not any([rasterize, datashade, downsample]):
@@ -2637,6 +2625,33 @@ class HoloViewsConverter:
             not_found = [dim for dim in dimensions if dim not in self.variables]
             _, data = process_derived_datetime_pandas(data, not_found, self.indexes)
 
+        print(self.tiles, self.output_projection)
+        if self.tiles and self.output_projection is not False:
+            # tiles without requiring geoviews/cartopy
+            # check if between -180 and 360 and lat between -90 and 90
+            _hover_code = """
+                const projections = Bokeh.require("core/util/projections");
+                const {snap_x, snap_y} = special_vars
+                const coords = projections.wgs84_mercator.invert(snap_x, snap_y)
+                return "" + (coords[%d]).toFixed(4)
+            """
+            min_x = np.min(data[self.x])
+            max_x = np.max(data[self.x])
+            min_y = np.min(data[self.y])
+            max_y = np.max(data[self.y])
+            if -180 < min_x < 360 and -180 < max_x < 360 and -90 < min_y < 90 and -90 < max_y < 90:
+                data = data.copy()
+                lons, lats = data[x], data[y]
+                lons = (lons + 180) % 360 - 180  # ticks are better with -180 to 180
+                easting, northing = lon_lat_to_easting_northing(lons, lats)
+                x, y = 'x', 'y'
+                if x in data:
+                    x = x + '_'
+                if y in data:
+                    y = y + '_'
+                data[x] = easting
+                data[y] = northing
+                data = data.swap_dims({self.x: x, self.y: y})
         return data, x, y, z
 
     def _get_element(self, kind):
