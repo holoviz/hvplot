@@ -2095,6 +2095,40 @@ class HoloViewsConverter:
         not_found = [dim for dim in dimensions if dim not in self.variables]
         _, data = process_derived_datetime_pandas(data, not_found, self.indexes)
 
+        data, x, y = self._process_tiles_without_geo(data, x, y)
+        return data, x, y
+
+    def _process_tiles_without_geo(self, data, x, y):
+        """
+        Tiles without requiring geoviews/cartopy.
+        """
+        data_is_gdf = is_geodataframe(data)
+        if not self.tiles or self.output_projection is False:
+            return data, x, y
+        elif not data_is_gdf and (x is None or y is None):
+            return data, x, y
+
+        if data_is_gdf:
+            data = data.to_crs(epsg=3857)
+            return data, x, y
+        else:
+            min_x = np.min(data[x])
+            max_x = np.max(data[x])
+            min_y = np.min(data[y])
+            max_y = np.max(data[y])
+            x_within_bounds = -180 < min_x < 360 and -180 < max_x < 360
+            y_within_bounds = -90 < min_y < 90 and -90 < max_y < 90
+            if x_within_bounds and y_within_bounds:
+                data = data.copy()
+                lons, lats = data[x], data[y]
+                lons = (lons + 180) % 360 - 180  # ticks are better with -180 to 180
+                easting, northing = lon_lat_to_easting_northing(lons, lats)
+                new_x = 'x' if 'x' not in data else 'x_'
+                new_y = 'y' if 'y' not in data else 'y_'
+                data[new_x] = easting
+                data[new_y] = northing
+                data = data.swap_dims({x: new_x, y: new_y})
+                return data, new_x, new_y
         return data, x, y
 
     def chart(self, element, x, y, data=None):
@@ -2625,33 +2659,7 @@ class HoloViewsConverter:
             not_found = [dim for dim in dimensions if dim not in self.variables]
             _, data = process_derived_datetime_pandas(data, not_found, self.indexes)
 
-        print(self.tiles, self.output_projection)
-        if self.tiles and self.output_projection is not False:
-            # tiles without requiring geoviews/cartopy
-            # check if between -180 and 360 and lat between -90 and 90
-            _hover_code = """
-                const projections = Bokeh.require("core/util/projections");
-                const {snap_x, snap_y} = special_vars
-                const coords = projections.wgs84_mercator.invert(snap_x, snap_y)
-                return "" + (coords[%d]).toFixed(4)
-            """
-            min_x = np.min(data[self.x])
-            max_x = np.max(data[self.x])
-            min_y = np.min(data[self.y])
-            max_y = np.max(data[self.y])
-            if -180 < min_x < 360 and -180 < max_x < 360 and -90 < min_y < 90 and -90 < max_y < 90:
-                data = data.copy()
-                lons, lats = data[x], data[y]
-                lons = (lons + 180) % 360 - 180  # ticks are better with -180 to 180
-                easting, northing = lon_lat_to_easting_northing(lons, lats)
-                x, y = 'x', 'y'
-                if x in data:
-                    x = x + '_'
-                if y in data:
-                    y = y + '_'
-                data[x] = easting
-                data[y] = northing
-                data = data.swap_dims({self.x: x, self.y: y})
+        data, x, y = self._process_tiles_without_geo(data, x, y)
         return data, x, y, z
 
     def _get_element(self, kind):
