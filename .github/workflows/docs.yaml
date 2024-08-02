@@ -50,8 +50,6 @@ jobs:
         run: |
           echo "Deploying from ref ${GITHUB_REF#refs/*/}"
           echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
-      - name: bokeh sampledata
-        run: bokeh sampledata
       - name: install dev nbsite
         run: pip install --pre -U nbsite
       - name: conda info
@@ -115,8 +113,6 @@ jobs:
         run: |
           echo "Deploying from ref ${GITHUB_REF#refs/*/}"
           echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
-      - name: bokeh sampledata
-        run: bokeh sampledata
       - name: build docs
         run: sphinx-build -b html doc builtdocs
       - name: report failure
