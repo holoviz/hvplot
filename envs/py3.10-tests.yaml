@@ -15,6 +15,7 @@ channels:
 dependencies:
   - python=3.10
   - bokeh>=3.1
+  - bokeh_sampledata
   - cartopy
   - colorcet>=2
   - dask
