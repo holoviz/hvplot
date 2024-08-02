@@ -65,7 +65,7 @@ tests-core = [
     "ruff",
     "scipy",
     "xarray",
-    "bokeh_sampledata; python_version != '3.9'",
+    "bokeh_sampledata; python_version >= '3.10'",
 ]
 # Optional tests dependencies, i.e. one should be able
 # to run and pass the test suite without installing any
@@ -127,7 +127,7 @@ examples = [
     "xarray >=0.18.2",
     "xyzservices >=2022.9.0",
     "geodatasets >=2023.12.0",
-    "bokeh_sampledata; python_version != '3.9'",
+    "bokeh_sampledata; python_version >= '3.10'",
 ]
 tests-nb = [
     "pytest-xdist",
