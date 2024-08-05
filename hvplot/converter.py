@@ -193,6 +193,10 @@ class HoloViewsConverter:
     rot: number
         Rotates the axis ticks along the x-axis by the specified
         number of degrees.
+    subcoordinate_y: bool or dict
+       Whether to enable sub-coordinate y systems for this plot. Accepts also a
+       dictionary of related options to pass down to HoloViews,
+       e.g. `{'subcoordinate_scale': 2}`.
     shared_axes (default=True): boolean
         Whether to link axes between plots
     transforms (default={}): dict
@@ -398,6 +402,7 @@ class HoloViewsConverter:
         'data_aspect',
         'fontscale',
         'bgcolor',
+        'subcoordinate_y',
     ]
 
     _style_options = [
@@ -589,6 +594,7 @@ class HoloViewsConverter:
         features=None,
         rescale_discrete_levels=None,
         autorange=None,
+        subcoordinate_y=None,
         **kwds,
     ):
         # Process data and related options
@@ -730,6 +736,11 @@ class HoloViewsConverter:
                 'The legend option should be a boolean or '
                 f'a valid legend position (i.e. one of {list(self._legend_positions)}).'
             )
+        if subcoordinate_y:
+            plot_opts['subcoordinate_y'] = True
+            if isinstance(subcoordinate_y, dict):
+                plot_opts.update(subcoordinate_y)
+
         plotwds = [
             'xticks',
             'yticks',
