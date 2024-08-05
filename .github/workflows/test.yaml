@@ -132,6 +132,7 @@ jobs:
       - name: conda list
         run: conda list
       - name: bokeh sampledata
+        if: ${{ matrix.python-version == '3.9'}}
         run: bokeh sampledata
       - name: unit tests
         run: pytest -v hvplot --cov=hvplot --cov-append
@@ -162,6 +163,7 @@ jobs:
       - name: pip list
         run: pip list
       - name: bokeh sampledata
+        if: ${{ matrix.python-version == '3.9'}}
         run: bokeh sampledata
       - name: unit tests
         run: pytest -v hvplot --cov=hvplot --cov-append

@@ -1,6 +1,10 @@
-import dask
 from importlib.util import find_spec
+
+import dask
+
+from packaging.version import Version
 from bokeh.io.webdriver import webdriver_control
+
 
 collect_ignore_glob = [
     'user_guide/Streaming.ipynb',
@@ -45,3 +49,19 @@ finally:
 # From Dask 2024.3.0 they now use `dask_expr` by default
 # https://github.com/dask/dask/issues/10995
 dask.config.set({'dataframe.query-planning': False})
+
+
+# https://github.com/pydata/xarray/pull/9182
+try:
+    import xarray as xr
+except ImportError:
+    pass
+else:
+    import numpy as np
+
+    if Version(np.__version__) >= Version('2.0.0') and Version(xr.__version__) <= Version(
+        '2024.6.0'
+    ):
+        collect_ignore_glob += [
+            'user_guide/Gridded_Data.ipynb',
+        ]
