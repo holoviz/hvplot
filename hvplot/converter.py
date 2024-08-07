@@ -2380,9 +2380,8 @@ class HoloViewsConverter:
                 .opts(compat_opts, backend=self._backend_compat)
             )
 
-        if 'bin_range' not in self.kwds and 'axiswise' not in self._norm_opts:
+        if 'bin_range' not in self.kwds and not self._norm_opts.get('axiswise'):
             ranges = []
-            ymin, ymax = ys.min(), ys.max()
             for col in y:
                 ys = data[col]
                 ymin, ymax = (ys.min(), ys.max())
