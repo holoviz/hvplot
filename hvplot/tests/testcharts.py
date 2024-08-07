@@ -325,7 +325,7 @@ class TestChart1D(ComparisonTestCase):
         plots = self.df.hvplot.hist(subplots=True, shared_axes=False)
         plot_0 = plots.grid_items()[0, 0][1]
         plot_1 = plots.grid_items()[0, 1][1]
-        assert not plot_0.opts['axiswise']
+        assert plot_0.opts['axiswise']
         assert plot_0.range('x') == (1, 5)
         assert plot_1.range('y') == (2, 6)
 
@@ -333,7 +333,7 @@ class TestChart1D(ComparisonTestCase):
         plots = self.df.hvplot.hist(subplots=True, shared_axes=True)
         plot_0 = plots.grid_items()[0, 0][1]
         plot_1 = plots.grid_items()[0, 1][1]
-        assert plot_0.opts['axiswise']
+        assert not plot_0.opts['axiswise']
         assert plot_0.range('x') == (1, 6)
         assert plot_1.range('y') == (1, 6)
 
