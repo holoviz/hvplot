@@ -2401,7 +2401,7 @@ class HoloViewsConverter:
             hists.append((col, relabel(hist, **self._relabel)))
         return (
             redim_(
-                hv.Layout(hists, self.group_label),
+                self._by_type(hists, self.group_label, sort=False),
                 **self._redim,
             )
             .opts(cur_opts, backend='bokeh')
