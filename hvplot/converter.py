@@ -2391,7 +2391,8 @@ class HoloViewsConverter:
                     ymin, ymax = ymin.execute(), ymax.execute()
                 ranges.append((ymin, ymax))
         if ranges:
-            hist_opts['bin_range'] = max_range(ranges)
+            if 'axiswise' not in self._norm_opts:
+                hist_opts['bin_range'] = max_range(ranges)
 
         ds = Dataset(data)
         hists = []
@@ -2400,7 +2401,7 @@ class HoloViewsConverter:
             hists.append((col, relabel(hist, **self._relabel)))
         return (
             redim_(
-                self._by_type(hists, self.group_label, sort=False),
+                hv.Layout(hists, self.group_label),
                 **self._redim,
             )
             .opts(cur_opts, backend='bokeh')
