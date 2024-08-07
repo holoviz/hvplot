@@ -2380,9 +2380,10 @@ class HoloViewsConverter:
                 .opts(compat_opts, backend=self._backend_compat)
             )
 
-        ranges = []
-        for col in y:
-            if 'bin_range' not in self.kwds:
+        if 'bin_range' not in self.kwds and 'axiswise' not in self._norm_opts:
+            ranges = []
+            ymin, ymax = ys.min(), ys.max()
+            for col in y:
                 ys = data[col]
                 ymin, ymax = (ys.min(), ys.max())
                 if is_dask(ys):
@@ -2390,8 +2391,7 @@ class HoloViewsConverter:
                 elif is_ibis(ys):
                     ymin, ymax = ymin.execute(), ymax.execute()
                 ranges.append((ymin, ymax))
-        if ranges:
-            if 'axiswise' not in self._norm_opts:
+            if ranges:
                 hist_opts['bin_range'] = max_range(ranges)
 
         ds = Dataset(data)
