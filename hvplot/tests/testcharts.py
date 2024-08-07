@@ -321,6 +321,22 @@ class TestChart1D(ComparisonTestCase):
         plot = self.df.hvplot.hist(group_label='Test')
         assert plot.kdims[0].name == 'Test'
 
+    def test_histogram_subplots_no_shared_axes(self):
+        plots = self.df.hvplot.hist(subplots=True, shared_axes=False)
+        plot_0 = plots.grid_items()[0, 0][1]
+        plot_1 = plots.grid_items()[0, 1][1]
+        assert plot_0.opts['axiswise']
+        assert plot_0.range('x') == (1, 5)
+        assert plot_1.range('y') == (2, 6)
+
+    def test_histogram_subplots_shared_axes(self):
+        plots = self.df.hvplot.hist(subplots=True, shared_axes=True)
+        plot_0 = plots.grid_items()[0, 0][1]
+        plot_1 = plots.grid_items()[0, 1][1]
+        assert not plot_0.opts['axiswise']
+        assert plot_0.range('x') == (1, 6)
+        assert plot_1.range('y') == (1, 6)
+
     def test_scatter_color_internally_set_to_dim(self):
         altered_df = self.cat_df.copy().rename(columns={'category': 'red'})
         plot = altered_df.hvplot.scatter('x', 'y', c='red')
