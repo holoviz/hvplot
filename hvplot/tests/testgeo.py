@@ -443,6 +443,15 @@ class TestGeoPandas(TestCase):
         polygons.geometry[1] = None
         assert polygons.hvplot(geo=True)
 
+    def test_tiles_without_gv(self):
+        polygons = self.polygons.copy()
+        polygons_plot = polygons.hvplot(tiles=True)
+        polygons_plot.get(1).data.crs is None
+
+        polygons.crs = 'EPSG:4326'
+        polygons_plot = self.polygons.hvplot(tiles=True)
+        polygons_plot.get(1).data.crs == 'EPSG:3857'
+
 
 class TestGeoUtil(TestCase):
     def setUp(self):

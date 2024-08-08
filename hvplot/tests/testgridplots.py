@@ -257,3 +257,10 @@ class TestGridPlots(ComparisonTestCase):
 
         plot = self.da_rgb.sel(band=1).hvplot.image(label='b', value_label='c')
         assert plot.vdims[0].name == 'b'
+
+    def test_tiles_without_gv(self):
+        plot = self.ds.hvplot('lon', 'lat', tiles=True)
+        assert len(plot) == 2
+        assert isinstance(plot.get(1), Image)
+        assert 'x' in plot.get(1).data
+        assert 'y' in plot.get(1).data

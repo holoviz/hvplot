@@ -23,6 +23,8 @@ class TestAnnotationNotGeo:
         assert len(plot) == 2
         assert isinstance(plot.get(0), hv.Tiles)
         assert 'openstreetmap' in plot.get(0).data
+        assert 'x_' in plot.get(1).data
+        assert 'y_' in plot.get(1).data
         bk_plot = bk_renderer.get_plot(plot)
         assert bk_plot.projection == 'mercator'
 
@@ -31,6 +33,8 @@ class TestAnnotationNotGeo:
         assert len(plot) == 2
         assert isinstance(plot.get(0), hv.Tiles)
         assert 'ArcGIS' in plot.get(0).data
+        assert 'x_' in plot.get(1).data
+        assert 'y_' in plot.get(1).data
         bk_plot = bk_renderer.get_plot(plot)
         assert bk_plot.projection == 'mercator'
 
@@ -47,12 +51,16 @@ class TestAnnotationNotGeo:
         assert len(plot) == 2
         assert isinstance(plot.get(0), hv.Tiles)
         assert 'ArcGIS' in plot.get(0).data
+        assert 'x_' in plot.get(1).data
+        assert 'y_' in plot.get(1).data
         bk_plot = bk_renderer.get_plot(plot)
         assert bk_plot.projection == 'mercator'
 
     def test_plot_with_xyzservices_tileprovider(self, simple_df):
         xyzservices = pytest.importorskip('xyzservices')
         plot = simple_df.hvplot.points('x', 'y', tiles=xyzservices.providers.Esri.WorldImagery)
+        assert 'x_' in plot.get(1).data
+        assert 'y_' in plot.get(1).data
         assert len(plot) == 2
         assert isinstance(plot.get(0), hv.Tiles)
         assert isinstance(plot.get(0).data, xyzservices.TileProvider)
