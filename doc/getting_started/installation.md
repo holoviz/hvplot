@@ -13,7 +13,7 @@ or with `pip`:
 
     pip install hvplot
 
-For versions of `jupyterlab>=3.0` the necessary extension is automatically bundled in the `pyviz_comms` package, which must be >=2.0. However note that for version of `jupyterlab<3.0` you must also manually install the JupyterLab extension with:
+Note that `hvplot` needs to run in a Jupyter environment to automatically show output plots. However, if you are using a raw Python or IPython console, it is still possible to [show the plots](https://hvplot.holoviz.org/user_guide/Viewing.html#python-command-prompt-scripts) with `hvplot.show()` or [save the plots](https://hvplot.holoviz.org/user_guide/Viewing.html#saving-plots) even if you cannot view them interactively. For versions of `jupyterlab>=3.0` the necessary extension is automatically bundled in the `pyviz_comms` package, which must be >=2.0. However note that for version of `jupyterlab<3.0` you must also manually install the JupyterLab extension with:
 
     conda install jupyterlab
     jupyter labextension install @pyviz/jupyterlab_pyviz
