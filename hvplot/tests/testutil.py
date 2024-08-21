@@ -6,8 +6,13 @@ import numpy as np
 import pandas as pd
 import panel as pn
 import pytest
-import spatialpandas
-import dask
+
+try:
+    import spatialpandas
+    import dask
+except ImportError:
+    spatialpandas = None
+    dask = None
 
 from unittest import TestCase, SkipTest
 
