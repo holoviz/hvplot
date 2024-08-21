@@ -6,6 +6,8 @@ import numpy as np
 import pandas as pd
 import panel as pn
 import pytest
+import spatialpandas
+import dask
 
 from unittest import TestCase, SkipTest
 
@@ -16,6 +18,7 @@ from hvplot.util import (
     process_xarray,
     _convert_col_names_to_str,
     instantiate_crs_str,
+    is_geodataframe,
 )
 
 
@@ -184,7 +187,7 @@ class TestProcessXarray(TestCase):
 
 class TestDynamicArgs(TestCase):
     def test_dynamic_and_static(self):
-        from ..util import process_dynamic_args
+        from hvplot.util import process_dynamic_args
 
         x = 'sepal_width'
         y = pn.widgets.Select(
@@ -198,7 +201,7 @@ class TestDynamicArgs(TestCase):
         assert arg_deps == []
 
     def test_dynamic_kwds(self):
-        from ..util import process_dynamic_args
+        from hvplot.util import process_dynamic_args
 
         x = 'sepal_length'
         y = 'sepal_width'
@@ -211,7 +214,7 @@ class TestDynamicArgs(TestCase):
         assert arg_deps == []
 
     def test_fn_kwds(self):
-        from ..util import process_dynamic_args
+        from hvplot.util import process_dynamic_args
 
         x = 'sepal_length'
         y = 'sepal_width'
@@ -361,3 +364,22 @@ def test_instantiate_crs_str_kwargs():
     assert isinstance(crs, ccrs.PlateCarree)
     assert isinstance(crs.globe, ccrs.Globe)
     assert crs.globe.datum == 'WGS84'
+
+
+@pytest.mark.skipif(
+    spatialpandas is None or dask is None, reason='spatialpandas or dask is not available'
+)
+def test_is_geodataframe_spatialpandas_dask():
+    import dask.dataframe as dd
+    import spatialpandas as spd
+
+    square = spd.geometry.Polygon([(0.0, 0), (0, 1), (1, 1), (1, 0)])
+    sdf = spd.GeoDataFrame({'geometry': spd.GeoSeries([square, square]), 'name': ['A', 'B']})
+    sddf = dd.from_pandas(sdf, npartitions=2)
+    assert isinstance(sddf, spd.dask.DaskGeoDataFrame)
+    assert is_geodataframe(sddf)
+
+
+def test_is_geodataframe_classic_dataframe():
+    df = pd.DataFrame({'geometry': [None, None], 'name': ['A', 'B']})
+    assert not is_geodataframe(df)
