@@ -69,7 +69,7 @@ def test_plot_supports_duckdb_relation():
     connection = duckdb.connect(':memory:')
     relation = duckdb.from_df(makeDataFrame(), connection=connection)
     out = plot(relation, 'line')
-    assert isinstance(out, hv.Curve)
+    assert isinstance(out, hv.NdOverlay)
 
 
 def test_plot_supports_duckdb_connection():
@@ -78,4 +78,4 @@ def test_plot_supports_duckdb_connection():
     relation = duckdb.from_df(makeDataFrame(), connection=connection)
     relation.to_view('test')
     out = plot(connection.execute('SELECT * FROM test'), 'line')
-    assert isinstance(out, hv.Curve)
+    assert isinstance(out, hv.NdOverlay)
