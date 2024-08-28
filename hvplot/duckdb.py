@@ -16,6 +16,7 @@ def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=Fals
     _patch_duckdb_plot.__doc__ = hvPlotTabular.__call__.__doc__
     plot_prop_duckdb = property(_patch_duckdb_plot)
     setattr(duckdb.DuckDBPyRelation, name, plot_prop_duckdb)
+    setattr(duckdb.DuckDBPyConnection, name, plot_prop_duckdb)
 
     post_patch(extension, logo)
 
