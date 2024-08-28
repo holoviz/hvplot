@@ -11,7 +11,7 @@ def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=Fals
             'Could not patch plotting API onto DuckDB. DuckDB could not be imported.'
         )
 
-    # Patching for DuckDBPyRelation
+    # Patching for DuckDBPyRelation and DuckDBConnection
     _patch_duckdb_plot = lambda self: hvPlotTabular(self.df())  # noqa: E731
     _patch_duckdb_plot.__doc__ = hvPlotTabular.__call__.__doc__
     plot_prop_duckdb = property(_patch_duckdb_plot)
