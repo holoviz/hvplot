@@ -76,7 +76,7 @@ tests = [
     "hvplot[fugue-sql]",
     # end fugue
     "ibis-framework[duckdb]",  # ibis-duckdb on conda
-    "polars",
+    "polars<1.6.0",
 ]
 # In 0.9 fugue added the sql extra but didn't add a fugue-sql package, removing the sql deps from fugue
 # Adding them manually here
