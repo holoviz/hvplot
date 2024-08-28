@@ -1886,50 +1886,63 @@ class hvPlotTabularDuckDB(hvPlotTabular):
         y = y or params.pop('y', None)
         kind = kind or params.pop('kind', None)
 
-        # Handle DuckDB Relation objects
+        # Handle DuckDB Relation and Connection objects
         if isinstance(self._data, (duckdb.DuckDBPyConnection, duckdb.DuckDBPyRelation)):
-            data = self._data
-            if params.get('hover_cols') == 'all':
-                columns = list(data.columns)
+            if isinstance(self._data, duckdb.DuckDBPyConnection):
+                data = self._data.df()
             else:
+                data = self._data
+
+            if params.get('hover_cols') != 'all':
+                data_columns = data.columns
                 possible_columns = [
                     [v] if isinstance(v, str) else v
                     for v in params.values()
                     if isinstance(v, (str, list))
                 ]
 
-                columns = (set(data.columns) & set(itertools.chain(*possible_columns))) or {
-                    data.columns[0]
+                columns = (set(data_columns) & set(itertools.chain(*possible_columns))) or {
+                    data_columns[0]
                 }
                 if y is None:
                     # When y is not specified HoloViewsConverter finds all the numeric
                     # columns and use them as y values (see _process_chart_y). We need
                     # to include these columns too.
-                    numeric_columns = data.select_types(
-                        [
-                            BIGINT,
-                            FLOAT,
-                            DOUBLE,
-                            INTEGER,
-                            SMALLINT,
-                            TINYINT,
-                            UBIGINT,
-                            UINTEGER,
-                            USMALLINT,
-                            UTINYINT,
-                            HUGEINT,
-                        ]
-                    ).columns
+
+                    if isinstance(data, duckdb.DuckDBPyRelation):
+                        numeric_columns = data.select_types(
+                            [
+                                BIGINT,
+                                FLOAT,
+                                DOUBLE,
+                                INTEGER,
+                                SMALLINT,
+                                TINYINT,
+                                UBIGINT,
+                                UINTEGER,
+                                USMALLINT,
+                                UTINYINT,
+                                HUGEINT,
+                            ]
+                        ).columns
+                    else:
+                        numeric_columns = data.select_dtypes(include='number').columns
                     columns |= set(numeric_columns)
                 xs = x if is_list_like(x) else (x,)
                 ys = y if is_list_like(y) else (y,)
                 columns |= {*xs, *ys}
                 columns.discard(None)
-                columns = sorted(columns, key=lambda c: data.columns.index(c))
 
-            data = data.select(*columns).to_df()
+            if isinstance(data, duckdb.DuckDBPyRelation):
+                columns = sorted(columns, key=lambda c: data_columns.index(c))
+                data = data.select(*columns).to_df()
+            else:
+                columns = sorted(columns, key=lambda c: data.columns.get_loc(c))
+                data = data[list(columns)]
         else:
-            raise ValueError('Only DuckDB Relations and pandas DataFrames are supported')
+            raise ValueError(
+                'Only duckdb.DuckDBPyConnection and duckdb.DuckDBPyRelation are supported'
+            )
 
         return HoloViewsConverter(data, x, y, kind=kind, **params)
 
