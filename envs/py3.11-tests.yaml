@@ -48,7 +48,6 @@ dependencies:
   - pillow>=8.2.0
   - plotly
   - polars
-  - polars<1.6.0
   - pooch
   - pooch>=1.6.0
   - pre-commit
