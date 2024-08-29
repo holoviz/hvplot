@@ -50,6 +50,7 @@ dependencies:
   - pooch
   - pooch>=1.6.0
   - pre-commit
+  - psutil
   - pygraphviz
   - pyproj
   - pytest
