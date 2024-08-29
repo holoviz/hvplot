@@ -473,9 +473,8 @@ def process_intake(data, use_dask):
 def is_geodataframe(data):
     if 'spatialpandas' in sys.modules:
         import spatialpandas as spd
-        from spatialpandas.dask import DaskGeoDataFrame
 
-        if isinstance(data, (spd.GeoDataFrame, DaskGeoDataFrame)):
+        if isinstance(data, (spd.GeoDataFrame, spd.dask.DaskGeoDataFrame)):
             return True
     return (
         isinstance(data, pd.DataFrame) and hasattr(data, 'geom_type') and hasattr(data, 'geometry')
