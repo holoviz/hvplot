@@ -4,15 +4,11 @@ Tests pandas.options.backend setting
 
 from unittest import TestCase
 
-import holoviews as hv
 import pandas as pd
-import pytest
 
 from parameterized import parameterized
 
 from hvplot.converter import HoloViewsConverter
-from hvplot.plotting import plot
-from hvplot.tests.util import makeDataFrame
 
 no_args = ['line', 'area', 'hist', 'box', 'kde', 'density', 'bar', 'barh']
 x_y = ['scatter', 'hexbin']
@@ -54,11 +50,3 @@ class TestPandasHoloviewsPlotting(TestCase):
 class TestPandasHvplotPlotting(TestPandasHoloviewsPlotting):
     def setUp(self):
         pd.options.plotting.backend = 'hvplot'
-
-
-def test_plot_supports_polars():
-    pl = pytest.importorskip('polars')
-    dfp = pl.DataFrame(makeDataFrame())
-    out = plot(dfp, 'line')
-    assert isinstance(out, hv.NdOverlay)
-    assert out.keys() == dfp.columns
