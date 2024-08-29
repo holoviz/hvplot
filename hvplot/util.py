@@ -430,6 +430,14 @@ def is_streamz(data):
     return sdf and isinstance(data, (sdf.DataFrame, sdf.Series, sdf.DataFrames, sdf.Seriess))
 
 
+def is_xvec(data):
+    if not hasattr(data, 'xvec'):
+        return False
+    import xvec  # noqa
+
+    return len(data.xvec.geom_coords) > 0
+
+
 def is_xarray(data):
     if not check_library(data, 'xarray'):
         return False
@@ -482,9 +490,23 @@ def is_geodataframe(data):
 
 
 def process_xarray(
-    data, x, y, by, groupby, use_dask, persist, gridded, label, value_label, other_dims, kind=None
+    data,
+    x,
+    y,
+    by,
+    groupby,
+    use_dask,
+    use_xvec,
+    persist,
+    gridded,
+    label,
+    value_label,
+    other_dims,
+    kind=None,
 ):
     import xarray as xr
+
+    print(type(data))
 
     if isinstance(data, xr.Dataset):
         dataset = data
@@ -509,6 +531,9 @@ def process_xarray(
 
     data_vars = list(dataset.data_vars)
     ignore = (by or []) + (groupby or [])
+    if use_xvec:
+        ignore += list(data.xvec.geom_coords)
+
     dims = [c for c in dataset.coords if dataset[c].shape != () and c not in ignore][::-1]
     index_dims = [d for d in dims if d in dataset.indexes]
 
@@ -565,6 +590,7 @@ def process_xarray(
 
         if groupby is None:
             groupby = [c for c in leftover_dims if c not in (by or [])]
+
     return data, x, y, by, groupby
 
 

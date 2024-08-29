@@ -59,6 +59,7 @@ from .util import (
     is_cudf,
     is_streamz,
     is_ibis,
+    is_xvec,
     is_xarray,
     is_xarray_dataarray,
     process_crs,
@@ -1048,6 +1049,7 @@ class HoloViewsConverter:
         if col is not None:
             grid.append(col)
         streaming = False
+        print('HEY')
         if is_geodataframe(data):
             datatype = 'geopandas' if hasattr(data, 'geom_type') else 'spatialpandas'
             self.data = data
@@ -1123,7 +1125,20 @@ class HoloViewsConverter:
             coords = [c for c in data.coords if data[c].shape != () and c not in ignore]
             dims = [c for c in data.dims if data[c].shape != () and c not in ignore]
 
-            if kind is None and (not (x or y) or all(c in data.coords for c in (x, y))):
+            use_xvec = is_xvec(data)
+            if kind is None and use_xvec:
+                first_index_name = list(data.xvec.geom_coords)[0]
+                first_index_values = data[first_index_name][0].item()
+                geom_type = type(first_index_values).__name__.replace('Multi', '')
+                if kind is None:
+                    if geom_type == 'Point':
+                        kind = 'points'
+                    elif geom_type == 'Polygon':
+                        kind = 'polygons'
+                    elif geom_type in ('LineString', 'LineRing', 'Line'):
+                        kind = 'paths'
+
+            elif kind is None and (not (x or y) or all(c in data.coords for c in (x, y))):
                 if list(data.coords) == ['band', 'y', 'x']:
                     kind = 'rgb'
                     gridded = True
@@ -1154,6 +1169,7 @@ class HoloViewsConverter:
                 by,
                 groupby,
                 use_dask,
+                use_xvec,
                 persist,
                 gridded,
                 label,
@@ -1189,6 +1205,8 @@ class HoloViewsConverter:
                     self._title = da._title_for_slice()
                 elif isinstance(da, xr.Dataset):
                     self._title = partial(xr.DataArray._title_for_slice, da)()
+
+            print(x, y, by_new, groupby_new)
 
             self.data = data
         else:
@@ -2870,6 +2888,8 @@ class HoloViewsConverter:
             else:
                 obj = obj.overlay(sort=False)
         else:
+            kdims = ['x', 'y']
+            print(data, kdims, vdims, params)
             obj = element(data, kdims, vdims, **params)
 
         return (
