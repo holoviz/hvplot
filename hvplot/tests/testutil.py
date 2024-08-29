@@ -6,6 +6,8 @@ import numpy as np
 import pandas as pd
 import panel as pn
 import pytest
+import dask.dataframe as dd
+import spatialpandas as spd
 
 try:
     import spatialpandas
@@ -375,9 +377,6 @@ def test_instantiate_crs_str_kwargs():
     spatialpandas is None or dask is None, reason='spatialpandas or dask is not available'
 )
 def test_is_geodataframe_spatialpandas_dask():
-    import dask.dataframe as dd
-    import spatialpandas as spd
-
     square = spd.geometry.Polygon([(0.0, 0), (0, 1), (1, 1), (1, 0)])
     sdf = spd.GeoDataFrame({'geometry': spd.GeoSeries([square, square]), 'name': ['A', 'B']})
     sddf = dd.from_pandas(sdf, npartitions=2)
