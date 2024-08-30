@@ -1049,7 +1049,22 @@ class HoloViewsConverter:
         if col is not None:
             grid.append(col)
         streaming = False
-        print('HEY')
+
+        if is_xvec(data):
+            import xvec  # noqa: F401
+
+            geom_coords = list(data.xvec.geom_coords)
+            if len(geom_coords) > 1:
+                param.main.param.warning(
+                    f'Only the first geometry coord will be rendered: {geom_coords[0]!r}. The '
+                    f"others are 'flattened' in groupby: {geom_coords[1:]}"
+                )
+                data = data.drop_vars(geom_coords[1:])
+            if groupby is None:
+                groupby = [dim for dim in data.dims if dim != geom_coords[0]]
+            data = data.xvec.to_geodataframe()
+            self.source_data = data
+
         if is_geodataframe(data):
             datatype = 'geopandas' if hasattr(data, 'geom_type') else 'spatialpandas'
             self.data = data
@@ -1125,20 +1140,7 @@ class HoloViewsConverter:
             coords = [c for c in data.coords if data[c].shape != () and c not in ignore]
             dims = [c for c in data.dims if data[c].shape != () and c not in ignore]
 
-            use_xvec = is_xvec(data)
-            if kind is None and use_xvec:
-                first_index_name = list(data.xvec.geom_coords)[0]
-                first_index_values = data[first_index_name][0].item()
-                geom_type = type(first_index_values).__name__.replace('Multi', '')
-                if kind is None:
-                    if geom_type == 'Point':
-                        kind = 'points'
-                    elif geom_type == 'Polygon':
-                        kind = 'polygons'
-                    elif geom_type in ('LineString', 'LineRing', 'Line'):
-                        kind = 'paths'
-
-            elif kind is None and (not (x or y) or all(c in data.coords for c in (x, y))):
+            if kind is None and (not (x or y) or all(c in data.coords for c in (x, y))):
                 if list(data.coords) == ['band', 'y', 'x']:
                     kind = 'rgb'
                     gridded = True
@@ -1169,7 +1171,6 @@ class HoloViewsConverter:
                 by,
                 groupby,
                 use_dask,
-                use_xvec,
                 persist,
                 gridded,
                 label,
@@ -1205,8 +1206,6 @@ class HoloViewsConverter:
                     self._title = da._title_for_slice()
                 elif isinstance(da, xr.Dataset):
                     self._title = partial(xr.DataArray._title_for_slice, da)()
-
-            print(x, y, by_new, groupby_new)
 
             self.data = data
         else:
@@ -2888,8 +2887,6 @@ class HoloViewsConverter:
             else:
                 obj = obj.overlay(sort=False)
         else:
-            kdims = ['x', 'y']
-            print(data, kdims, vdims, params)
             obj = element(data, kdims, vdims, **params)
 
         return (
