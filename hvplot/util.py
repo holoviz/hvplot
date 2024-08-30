@@ -496,7 +496,6 @@ def process_xarray(
     by,
     groupby,
     use_dask,
-    use_xvec,
     persist,
     gridded,
     label,
@@ -505,8 +504,6 @@ def process_xarray(
     kind=None,
 ):
     import xarray as xr
-
-    print(type(data))
 
     if isinstance(data, xr.Dataset):
         dataset = data
@@ -531,8 +528,6 @@ def process_xarray(
 
     data_vars = list(dataset.data_vars)
     ignore = (by or []) + (groupby or [])
-    if use_xvec:
-        ignore += list(data.xvec.geom_coords)
 
     dims = [c for c in dataset.coords if dataset[c].shape != () and c not in ignore][::-1]
     index_dims = [d for d in dims if d in dataset.indexes]
