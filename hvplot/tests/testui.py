@@ -11,7 +11,7 @@ import xarray as xr
 import pytest
 
 from bokeh.sampledata import penguins
-from hvplot.ui import hvDataFrameExplorer, hvGridExplorer
+from hvplot.ui import hvDataFrameExplorer, hvGridExplorer, MAX_ROWS
 
 df = penguins.data
 ds_air_temperature = xr.tutorial.open_dataset('air_temperature')
@@ -395,3 +395,22 @@ def test_explorer_geo_revise_kind(kind_tuple):
     da = ds_air_temperature['air'].isel(time=0)
     explorer = hvplot.explorer(da, x='lon', y='lat', kind=kind_tuple[0], geo=True)
     assert explorer.kind == kind_tuple[1]
+
+
+def test_max_rows_curve():
+    N = 10001
+    x = np.linspace(0.0, 6.4, num=N)
+    y = np.sin(x) + 10
+    df = pd.DataFrame({'x': x, 'y': y})
+    ui = hvplot.explorer(df, x='x', y='y', by=['#'], kind='line')
+    assert ui._data.equals(df.head(MAX_ROWS))
+
+
+def test_max_rows_sample():
+    N = 10001
+    x = np.linspace(0.0, 6.4, num=N)
+    y = np.sin(x) + 10
+    df = pd.DataFrame({'x': x, 'y': y})
+    ui = hvplot.explorer(df, x='x', y='y', by=['#'], kind='scatter')
+    assert len(ui._data) == MAX_ROWS
+    assert not ui._data.equals(df.head(MAX_ROWS))

@@ -688,10 +688,22 @@ class hvPlotExplorer(Viewer):
         if len(df) > MAX_ROWS and not (
             self.kind in KINDS['stats'] or kwargs.get('rasterize') or kwargs.get('datashade')
         ):
-            df = df.sample(n=MAX_ROWS)
+            if self.kind == 'line':
+                param.main.param.warning(
+                    f'Plotting the first {MAX_ROWS} rows out of {len(df)} rows '
+                    f'to avoid performance issues; use rasterize=True or datashade=True to visualize more.'
+                )
+                df = df.head(MAX_ROWS)
+            else:
+                param.main.param.warning(
+                    f'Plotting a random sample of {MAX_ROWS} rows out of {len(df)} rows '
+                    f'to avoid performance issues; use rasterize=True or datashade=True to visualize more.'
+                )
+                df = df.sample(n=MAX_ROWS)
+        self._data = df
         self._layout.loading = True
         try:
-            self._hvplot = _hvPlot(df)(
+            self._hvplot = _hvPlot(self._data)(
                 kind=self.kind, x=self.x, y=y, by=self.by, groupby=self.groupby, **kwargs
             )
             if opts_kwargs:
