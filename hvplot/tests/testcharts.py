@@ -3,6 +3,7 @@ from parameterized import parameterized
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from holoviews.core.dimension import Dimension
 from holoviews import NdLayout, NdOverlay, Store, dim, render
@@ -50,18 +51,12 @@ class TestChart2D(ComparisonTestCase):
     @parameterized.expand([('points', Points), ('paths', Path)])
     def test_2d_set_hover_cols_including_index(self, kind, element):
         plot = self.cat_df.hvplot(x='x', y='y', hover_cols=['index'], kind=kind)
-        data = plot.data[0] if kind == 'paths' else plot.data
-        assert 'index' in data.columns
-        self.assertEqual(plot, element(self.cat_df.reset_index(), ['x', 'y'], ['index']))
+        self.assertEqual(plot, element(self.cat_df, ['x', 'y'], ['index']))
 
     @parameterized.expand([('points', Points), ('paths', Path)])
     def test_2d_set_hover_cols_to_all(self, kind, element):
         plot = self.cat_df.hvplot(x='x', y='y', hover_cols='all', kind=kind)
-        data = plot.data[0] if kind == 'paths' else plot.data
-        assert 'index' in data.columns
-        self.assertEqual(
-            plot, element(self.cat_df.reset_index(), ['x', 'y'], ['index', 'category'])
-        )
+        self.assertEqual(plot, element(self.cat_df, ['x', 'y'], ['index', 'category']))
 
     @parameterized.expand([('points', Points), ('paths', Path)])
     def test_2d_set_hover_cols_to_all_with_use_index_as_false(self, kind, element):
@@ -111,6 +106,22 @@ class TestChart2DDask(TestChart2D):
     def test_heatmap_2d_index_columns(self):
         self.df.hvplot.heatmap()
 
+    @parameterized.expand([('points', Points), ('paths', Path)])
+    def test_2d_set_hover_cols_including_index(self, kind, element):
+        plot = self.cat_df.hvplot(x='x', y='y', hover_cols=['index'], kind=kind)
+        data = plot.data[0] if kind == 'paths' else plot.data
+        assert 'index' in data.columns
+        self.assertEqual(plot, element(self.cat_df.reset_index(), ['x', 'y'], ['index']))
+
+    @parameterized.expand([('points', Points), ('paths', Path)])
+    def test_2d_set_hover_cols_to_all(self, kind, element):
+        plot = self.cat_df.hvplot(x='x', y='y', hover_cols='all', kind=kind)
+        data = plot.data[0] if kind == 'paths' else plot.data
+        assert 'index' in data.columns
+        self.assertEqual(
+            plot, element(self.cat_df.reset_index(), ['x', 'y'], ['index', 'category'])
+        )
+
 
 class TestChart1D(ComparisonTestCase):
     def setUp(self):
@@ -124,9 +135,15 @@ class TestChart1D(ComparisonTestCase):
         self.cat_df = pd.DataFrame(
             [[1, 2, 'A'], [3, 4, 'B'], [5, 6, 'C']], columns=['x', 'y', 'category']
         )
+        self.cat_df_index = self.cat_df.set_index('category')
+        self.cat_df_index_y = self.cat_df.set_index('y')
         self.cat_only_df = pd.DataFrame(
             [['A', 'a'], ['B', 'b'], ['C', 'c']], columns=['upper', 'lower']
         )
+        multii_df = pd.DataFrame(
+            {'A': [1, 2, 3, 4], 'B': ['a', 'a', 'b', 'b'], 'C': [0, 1, 2, 1.5]}
+        )
+        self.multii_df = multii_df.set_index(['A', 'B'])
         self.time_df = pd.DataFrame(
             {
                 'time': pd.date_range('1/1/2000', periods=10, tz='UTC'),
@@ -147,8 +164,8 @@ class TestChart1D(ComparisonTestCase):
         plot = self.df.hvplot(kind=kind)
         obj = NdOverlay(
             {
-                'x': element(self.df, 'index', 'x').redim(x='value'),
-                'y': element(self.df, 'index', 'y').redim(y='value'),
+                'x': element(self.df, 'index', Dimension('x', label='value')),
+                'y': element(self.df, 'index', Dimension('y', label='value')),
             },
             'Variable',
         )
@@ -170,8 +187,8 @@ class TestChart1D(ComparisonTestCase):
         plot = self.df.hvplot(kind=kind, value_label='Test', group_label='Category')
         obj = NdOverlay(
             {
-                'x': element(self.df, 'index', 'x').redim(x='Test'),
-                'y': element(self.df, 'index', 'y').redim(y='Test'),
+                'x': element(self.df, 'index', Dimension('x', label='Test')),
+                'y': element(self.df, 'index', Dimension('y', label='Test')),
             },
             'Category',
         )
@@ -263,8 +280,8 @@ class TestChart1D(ComparisonTestCase):
         plot = self.df.hvplot.area(stacked=True)
         obj = NdOverlay(
             {
-                'x': Area(self.df, 'index', 'x').redim(x='value'),
-                'y': Area(self.df, 'index', 'y').redim(y='value'),
+                'x': Area(self.df, 'index', Dimension('x', label='value')),
+                'y': Area(self.df, 'index', Dimension('y', label='value')),
             },
             'Variable',
         )
@@ -304,6 +321,22 @@ class TestChart1D(ComparisonTestCase):
         plot = self.df.hvplot.hist(group_label='Test')
         assert plot.kdims[0].name == 'Test'
 
+    def test_histogram_subplots_no_shared_axes(self):
+        plots = self.df.hvplot.hist(subplots=True, shared_axes=False)
+        plot_0 = plots.grid_items()[0, 0][1]
+        plot_1 = plots.grid_items()[0, 1][1]
+        assert plot_0.opts['axiswise']
+        assert plot_0.range('x') == (1, 5)
+        assert plot_1.range('y') == (2, 6)
+
+    def test_histogram_subplots_shared_axes(self):
+        plots = self.df.hvplot.hist(subplots=True, shared_axes=True)
+        plot_0 = plots.grid_items()[0, 0][1]
+        plot_1 = plots.grid_items()[0, 1][1]
+        assert not plot_0.opts['axiswise']
+        assert plot_0.range('x') == (1, 6)
+        assert plot_1.range('y') == (1, 6)
+
     def test_scatter_color_internally_set_to_dim(self):
         altered_df = self.cat_df.copy().rename(columns={'category': 'red'})
         plot = altered_df.hvplot.scatter('x', 'y', c='red')
@@ -316,8 +349,8 @@ class TestChart1D(ComparisonTestCase):
         plot = self.cat_df.hvplot(kind=kind)
         obj = NdOverlay(
             {
-                'x': element(self.cat_df, 'index', 'x').redim(x='value'),
-                'y': element(self.cat_df, 'index', 'y').redim(y='value'),
+                'x': element(self.cat_df, 'index', Dimension('x', label='value')),
+                'y': element(self.cat_df, 'index', Dimension('y', label='value')),
             },
             'Variable',
         )
@@ -328,10 +361,11 @@ class TestChart1D(ComparisonTestCase):
         plot = self.cat_only_df.hvplot(kind=kind)
         obj = NdOverlay(
             {
-                'upper': element(self.cat_only_df, 'index', 'upper').redim(upper='value'),
-                'lower': element(self.cat_only_df, 'index', 'lower').redim(lower='value'),
+                'upper': element(self.cat_only_df, 'index', Dimension('upper', label='value')),
+                'lower': element(self.cat_only_df, 'index', Dimension('lower', label='value')),
             },
             'Variable',
+            sort=False,
         )
         self.assertEqual(plot, obj)
 
@@ -477,6 +511,48 @@ class TestChart1D(ComparisonTestCase):
         )
         assert isinstance(plot, NdLayout)
 
+    def test_groupby_from_index(self):
+        hmap = self.cat_df_index.hvplot.scatter(x='x', y='y', groupby='category', dynamic=False)
+        assert hmap.kdims == ['category']
+        assert hmap.vdims == []
+        assert list(hmap.keys()) == ['A', 'B', 'C']
+        assert hmap.last.kdims == ['x']
+        assert hmap.last.vdims == ['y']
+
+    def test_multi_index_groupby_from_index(self):
+        hmap = self.multii_df.hvplot.scatter(x='A', y='C', groupby='B', dynamic=False)
+        assert hmap.kdims == ['B']
+        assert hmap.vdims == []
+        assert list(hmap.keys()) == ['a', 'b']
+        assert hmap.last.kdims == ['A']
+        assert hmap.last.vdims == ['C']
+
+    @pytest.mark.xfail(reason='See https://github.com/holoviz/hvplot/issues/1364')
+    def test_hierarchical_columns_auto_stack(self):
+        arrays = [
+            ['bar', 'bar', 'baz', 'baz', 'foo', 'foo', 'qux', 'qux'],
+            ['one', 'two', 'one', 'two', 'one', 'two', 'one', 'two'],
+        ]
+        tuples = list(zip(*arrays))
+        index = pd.MultiIndex.from_tuples(tuples)
+        df = pd.DataFrame(np.random.randn(3, 8), index=['A', 'B', 'C'], columns=index)
+        df.hvplot.scatter()
+
+    def test_bar_y_from_index_with_by(self):
+        # Testing a somewhat silly plot but that seemed to be supported
+        # https://github.com/holoviz/hvplot/blob/6c96c7e9abcd44380d2122e3d86827dedab32dea/hvplot/converter.py#L1996-L1999
+        plot = self.cat_df_index_y.hvplot.bar(x='x', y='y', by='category')
+        assert plot.kdims == ['x', 'category']
+        assert plot.vdims == ['y']
+
+    def test_table_datetime_index_displayed(self):
+        table = self.dt_df.hvplot.table()
+        assert table.kdims[0] == 'index'
+
+    def test_table_multi_index_displayed(self):
+        table = self.multii_df.hvplot.table()
+        assert table.kdims[:2] == self.multii_df.index.names
+
 
 class TestChart1DDask(TestChart1D):
     def setUp(self):
@@ -490,7 +566,18 @@ class TestChart1DDask(TestChart1D):
         self.df = dd.from_pandas(self.df, npartitions=2)
         self.dt_df = dd.from_pandas(self.dt_df, npartitions=3)
         self.cat_df = dd.from_pandas(self.cat_df, npartitions=3)
+        self.cat_df_index = dd.from_pandas(self.cat_df_index, npartitions=3)
+        self.cat_df_index_y = dd.from_pandas(self.cat_df_index_y, npartitions=3)
         self.cat_only_df = dd.from_pandas(self.cat_only_df, npartitions=1)
 
     def test_by_datetime_accessor(self):
         raise SkipTest("Can't expand dt accessor columns when using dask")
+
+    def test_multi_index_groupby_from_index(self):
+        raise SkipTest('Dask does not support MultiIndex Dataframes.')
+
+    def test_table_datetime_index_displayed(self):
+        raise SkipTest('Only supported for Pandas DatetimeIndex.')
+
+    def test_table_multi_index_displayed(self):
+        raise SkipTest('Dask does not support MultiIndex Dataframes.')
