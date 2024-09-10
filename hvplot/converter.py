@@ -435,8 +435,7 @@ class HoloViewsConverter:
     _op_options = [
         'datashade',
         'rasterize',
-        'pixel_ratio'
-        'x_sampling',
+        'pixel_ratio' 'x_sampling',
         'y_sampling',
         'downsample',
         'aggregator',

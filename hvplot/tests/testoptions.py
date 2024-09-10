@@ -606,8 +606,8 @@ class TestXarrayCticks:
 class TestXarrayPixelRatio:
     def test_pixel_ratio(self, da2):
         plot = da2.isel(other=0).hvplot(rasterize=True, pixel_ratio=4.0)
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['pixel_ratio'] = 4.0
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        assert opts.kwargs['pixel_ratio'] == 4.0
 
 
 def test_subcoordinate_y_bool(load_pandas_accessor):
