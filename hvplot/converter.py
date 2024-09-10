@@ -292,6 +292,14 @@ class HoloViewsConverter:
         is above this threshold. The raw plot is displayed otherwise.
     x_sampling/y_sampling (default=None):
         Specifies the smallest allowed sampling interval along the x/y axis.
+    pixel_ratio (default=None):
+       Pixel ratio applied to the height and width. Useful for higher
+       resolution screens where the PlotSize stream reports 'nominal'
+       dimensions in pixels that do not match the physical pixels. For
+       instance, setting pixel_ratio=2 can give better results on Retina
+       displays. Also useful for using lower resolution for speed.
+       If not set explicitly, the zoom level of the browsers will be used,
+       if available.
 
     Geographic options
     ------------------
@@ -427,6 +435,7 @@ class HoloViewsConverter:
     _op_options = [
         'datashade',
         'rasterize',
+        'pixel_ratio'
         'x_sampling',
         'y_sampling',
         'downsample',
@@ -589,6 +598,7 @@ class HoloViewsConverter:
         hover_cols=[],
         x_sampling=None,
         y_sampling=None,
+        pixel_ratio=None,
         project=False,
         tools=[],
         attr_labels=None,
@@ -702,6 +712,7 @@ class HoloViewsConverter:
         self.precompute = precompute
         self.x_sampling = x_sampling
         self.y_sampling = y_sampling
+        self.pixel_ratio = pixel_ratio
 
         # By type
         self.subplots = subplots
@@ -1791,6 +1802,8 @@ class HoloViewsConverter:
                 style['cmap'] = self._style_opts['cmap']
             if self._dim_ranges.get('c', (None, None)) != (None, None):
                 style['clim'] = self._dim_ranges['c']
+            if self.pixel_ratio:
+                opts['pixel_ratio'] = self.pixel_ratio
 
         processed = self._resample_obj(operation, obj, opts)
         if self.dynspread:
