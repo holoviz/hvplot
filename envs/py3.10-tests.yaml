@@ -66,6 +66,7 @@ dependencies:
   - scipy>=1.5.3
   - selenium>=3.141.0
   - setuptools_scm>=6
+  - spatialpandas
   - spatialpandas>=0.4.3
   - sqlglot
   - streamz>=0.3.0
