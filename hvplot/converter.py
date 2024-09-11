@@ -1786,6 +1786,7 @@ class HoloViewsConverter:
             opts['line_width'] = self._style_opts['line_width']
 
         style = {}
+
         if self.datashade:
             operation = datashade
             if 'cmap' in opts and 'color_key' not in opts:
@@ -1795,6 +1796,8 @@ class HoloViewsConverter:
                 opts['cnorm'] = self._plot_opts['cnorm']
             if 'rescale_discrete_levels' in self._plot_opts:
                 opts['rescale_discrete_levels'] = self._plot_opts['rescale_discrete_levels']
+            if self.pixel_ratio:
+                opts['pixel_ratio'] = self.pixel_ratio
         elif self.rasterize:
             operation = rasterize
             eltype = 'ImageStack' if categorical else 'Image'
