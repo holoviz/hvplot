@@ -223,6 +223,18 @@ class TestDatashader(ComparisonTestCase):
         actual = plot.callback.inputs[0].callback.operation.p['cnorm']
         assert actual == expected
 
+    def test_rasterize_pixel_ratio(self):
+        expected = 0.5
+        plot = self.df.hvplot(x='x', y='y', rasterize=True, pixel_ratio=expected)
+        opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
+        assert opts.get('pixel_ratio') == expected
+
+    def test_datashade_pixel_ratio(self):
+        expected = 0.5
+        plot = self.df.hvplot(x='x', y='y', datashade=True, pixel_ratio=expected)
+        actual = plot.callback.inputs[0].callback.operation.p['pixel_ratio']
+        assert actual == expected
+
     def test_rasterize_rescale_discrete_levels(self):
         expected = False
         plot = self.df.hvplot(
