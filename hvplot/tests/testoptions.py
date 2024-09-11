@@ -604,8 +604,13 @@ class TestXarrayCticks:
 
 @pytest.mark.usefixtures('load_xarray_accessor')
 class TestXarrayPixelRatio:
-    def test_pixel_ratio(self, da2):
+    def test_pixel_ratio_rasterize(self, da2):
         plot = da2.isel(other=0).hvplot(rasterize=True, pixel_ratio=4.0)
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        assert opts.kwargs['pixel_ratio'] == 4.0
+
+    def test_pixel_ratio_datashade(self, da2):
+        plot = da2.isel(other=0).hvplot(datashade=True, pixel_ratio=4.0)
         opts = Store.lookup_options('bokeh', plot, 'plot')
         assert opts.kwargs['pixel_ratio'] == 4.0
 
