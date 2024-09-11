@@ -291,9 +291,9 @@ class HoloViewsConverter:
         the number of individual data points present in the current zoom range
         is above this threshold. The raw plot is displayed otherwise.
     x_sampling/y_sampling (default=None):
-        Specifies the smallest allowed sampling interval along the x/y axis.
+        Specifies the smallest allowed sampling interval along the x/y axis. Used when rasterizing or datashading.
     pixel_ratio (default=None):
-       Pixel ratio applied to the height and width. Useful for higher
+       Pixel ratio applied to the height and width. Used when rasterizing or datashading. Useful for higher
        resolution screens where the PlotSize stream reports 'nominal'
        dimensions in pixels that do not match the physical pixels. For
        instance, setting pixel_ratio=2 can give better results on Retina
