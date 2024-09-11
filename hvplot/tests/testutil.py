@@ -6,15 +6,13 @@ import numpy as np
 import pandas as pd
 import panel as pn
 import pytest
-import dask.dataframe as dd
-import spatialpandas as spd
 
 try:
-    import spatialpandas
-    import dask
+    import dask.dataframe as dd
+    import spatialpandas as spd
 except ImportError:
-    spatialpandas = None
-    dask = None
+    spd = None
+    dd = None
 
 from unittest import TestCase, SkipTest
 
@@ -373,9 +371,7 @@ def test_instantiate_crs_str_kwargs():
     assert crs.globe.datum == 'WGS84'
 
 
-@pytest.mark.skipif(
-    spatialpandas is None or dask is None, reason='spatialpandas or dask is not available'
-)
+@pytest.mark.skipif(spd is None or dd is None, reason='spatialpandas or dask is not available')
 def test_is_geodataframe_spatialpandas_dask():
     square = spd.geometry.Polygon([(0.0, 0), (0, 1), (1, 1), (1, 0)])
     sdf = spd.GeoDataFrame({'geometry': spd.GeoSeries([square, square]), 'name': ['A', 'B']})
