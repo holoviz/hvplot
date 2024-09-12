@@ -66,6 +66,7 @@ tests-core = [
     "scipy",
     "xarray",
     "bokeh_sampledata; python_version >= '3.10'",
+    "psutil",
 ]
 # Optional tests dependencies, i.e. one should be able
 # to run and pass the test suite without installing any
