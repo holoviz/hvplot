@@ -685,21 +685,23 @@ class hvPlotExplorer(Viewer):
 
         kwargs['min_height'] = 400
         df = self._data
+        show_alert = False
         if len(df) > MAX_ROWS and not (
             self.kind in KINDS['stats'] or kwargs.get('rasterize') or kwargs.get('datashade')
         ):
+            warn_message = (
+                f'plotted {MAX_ROWS} rows out of {len(df)} rows '
+                f'to avoid performance issues; use rasterize=True or datashade=True to visualize more.'
+            )
             if self.kind == 'line':
-                param.main.param.warning(
-                    f'Plotting the first {MAX_ROWS} rows out of {len(df)} rows '
-                    f'to avoid performance issues; use rasterize=True or datashade=True to visualize more.'
-                )
+                warn_message = f'Selected the first {MAX_ROWS} rows and {warn_message}'
                 df = df.head(MAX_ROWS)
             else:
-                param.main.param.warning(
-                    f'Plotting a random sample of {MAX_ROWS} rows out of {len(df)} rows '
-                    f'to avoid performance issues; use rasterize=True or datashade=True to visualize more.'
-                )
+                warn_message = f'Randomly sampled and {warn_message}'
                 df = df.sample(n=MAX_ROWS)
+            self._alert.param.update(object=warn_message, visible=True)
+            param.main.param.warning(warn_message)
+            show_alert = True
         self._data = df
         self._layout.loading = True
         try:
@@ -715,7 +717,8 @@ class hvPlotExplorer(Viewer):
             if len(self._hv_pane.widget_box) > 1:
                 for w in self._hv_pane.widget_box:
                     w.margin = (20, 5, 5, 5)
-            self._alert.visible = False
+            if not show_alert:
+                self._alert.visible = False
         except Exception as e:
             self._alert.param.update(
                 object=f'**Rendering failed with following error**: {e}', visible=True
