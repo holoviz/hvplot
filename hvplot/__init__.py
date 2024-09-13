@@ -236,8 +236,11 @@ def help(kind=None, docstring=True, generic=True, style=True):
     print(doc)
 
 
-def post_patch(extension='bokeh', logo=False):
-    hvplot_extension(extension, logo=logo)
+def post_patch(extension='bokeh', logo=False, check_loaded=False):
+    if not check_loaded:
+        hvplot_extension(extension, logo=logo)
+    elif not getattr(_hv.extension, '_loaded', False):
+        hvplot_extension(extension, logo=logo)
 
 
 def _patch_doc(cls, kind, signature=None):
