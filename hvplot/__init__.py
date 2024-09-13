@@ -127,7 +127,7 @@ except (ImportError, LookupError, FileNotFoundError):
 # Here we add an IPython hook which simply deletes the modules before every
 # cell execution. This is a big hammer but at least it is restricted to
 # IPython environments.
-_extensions = {}
+_extensions = set()
 
 try:
     ip = get_ipython()  # noqa
