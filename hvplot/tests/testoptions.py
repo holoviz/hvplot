@@ -600,3 +600,18 @@ class TestXarrayCticks:
         plot = da2.isel(other=0).hvplot(cticks=[5, 10])
         handles = hv.renderer('bokeh').get_plot(plot).handles
         assert handles['colorbar'].ticker.ticks == [5, 10]
+
+
+def test_subcoordinate_y_bool(load_pandas_accessor):
+    df = pd.DataFrame(np.random.random((10, 3)), columns=list('ABC'))
+    plot = df.hvplot.line(subcoordinate_y=True)
+    opts = Store.lookup_options('bokeh', plot, 'plot')
+    assert opts.kwargs['subcoordinate_y'] is True
+
+
+def test_subcoordinate_y_dict(load_pandas_accessor):
+    df = pd.DataFrame(np.random.random((10, 3)), columns=list('ABC'))
+    plot = df.hvplot.line(subcoordinate_y={'subcoordinate_scale': 2})
+    opts = Store.lookup_options('bokeh', plot, 'plot')
+    assert opts.kwargs['subcoordinate_y'] is True
+    assert opts.kwargs['subcoordinate_scale'] == 2

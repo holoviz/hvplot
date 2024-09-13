@@ -148,6 +148,12 @@ class HoloViewsConverter:
     hover_cols (default=[]): list or str
         Additional columns to add to the hover tool or 'all' which will
         includes all columns (including indexes if use_index is True).
+    hover_tooltips list[str] or list[tuple]:
+        A list of dimensions to be displayed in the hover tooltip.
+    hover_formatters:
+        A dict of formatting options for the hover tooltip.
+    hover_mode (default='mouse'):
+        The hover mode determines how the hover tool is activated.
     invert (default=False): boolean
         Swaps x- and y-axis
     frame_width/frame_height: int
@@ -193,6 +199,10 @@ class HoloViewsConverter:
     rot: number
         Rotates the axis ticks along the x-axis by the specified
         number of degrees.
+    subcoordinate_y: bool or dict
+       Whether to enable sub-coordinate y systems for this plot. Accepts also a
+       dictionary of related options to pass down to HoloViews,
+       e.g. `{'subcoordinate_scale': 2}`.
     shared_axes (default=True): boolean
         Whether to link axes between plots
     transforms (default={}): dict
@@ -398,6 +408,7 @@ class HoloViewsConverter:
         'data_aspect',
         'fontscale',
         'bgcolor',
+        'subcoordinate_y',
     ]
 
     _style_options = [
@@ -550,6 +561,9 @@ class HoloViewsConverter:
         logy=None,
         loglog=None,
         hover=None,
+        hover_tooltips=None,
+        hover_formatters=None,
+        hover_mode=None,
         subplots=False,
         label=None,
         invert=False,
@@ -589,6 +603,7 @@ class HoloViewsConverter:
         features=None,
         rescale_discrete_levels=None,
         autorange=None,
+        subcoordinate_y=None,
         **kwds,
     ):
         # Process data and related options
@@ -730,6 +745,11 @@ class HoloViewsConverter:
                 'The legend option should be a boolean or '
                 f'a valid legend position (i.e. one of {list(self._legend_positions)}).'
             )
+        if subcoordinate_y:
+            plot_opts['subcoordinate_y'] = True
+            if isinstance(subcoordinate_y, dict):
+                plot_opts.update(subcoordinate_y)
+
         plotwds = [
             'xticks',
             'yticks',
@@ -818,6 +838,12 @@ class HoloViewsConverter:
             else:
                 tools.append('hover')
         plot_opts['tools'] = tools
+        if hover_tooltips:
+            plot_opts['hover_tooltips'] = hover_tooltips
+        if hover_formatters:
+            plot_opts['hover_formatters'] = hover_formatters
+        if hover_mode:
+            plot_opts['hover_mode'] = hover_mode
 
         if self.crs and global_extent:
             plot_opts['global_extent'] = global_extent
@@ -2354,9 +2380,9 @@ class HoloViewsConverter:
                 .opts(compat_opts, backend=self._backend_compat)
             )
 
-        ranges = []
-        for col in y:
-            if 'bin_range' not in self.kwds:
+        if 'bin_range' not in self.kwds and not self._norm_opts.get('axiswise'):
+            ranges = []
+            for col in y:
                 ys = data[col]
                 ymin, ymax = (ys.min(), ys.max())
                 if is_dask(ys):
@@ -2364,8 +2390,8 @@ class HoloViewsConverter:
                 elif is_ibis(ys):
                     ymin, ymax = ymin.execute(), ymax.execute()
                 ranges.append((ymin, ymax))
-        if ranges:
-            hist_opts['bin_range'] = max_range(ranges)
+            if ranges:
+                hist_opts['bin_range'] = max_range(ranges)
 
         ds = Dataset(data)
         hists = []
