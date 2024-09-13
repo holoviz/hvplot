@@ -1,6 +1,6 @@
 from packaging.version import Version
 
-from . import hvPlot, post_patch
+from . import hvPlot, post_patch, _extensions
 
 
 def patch(name='hvplot', extension='bokeh', logo=False):
@@ -11,10 +11,14 @@ def patch(name='hvplot', extension='bokeh', logo=False):
             'Could not patch plotting API onto intake. intake could not be imported.'
         )
 
-    _patch_plot = lambda self: hvPlot(self)  # noqa: E731
-    _patch_plot.__doc__ = hvPlot.__call__.__doc__
-    patch_property = property(_patch_plot)
-    setattr(intake.source.base.DataSource, name, patch_property)
+    if 'hvplot.intake' not in _extensions:
+        _patch_plot = lambda self: hvPlot(self)  # noqa: E731
+        _patch_plot.__doc__ = hvPlot.__call__.__doc__
+        patch_property = property(_patch_plot)
+        setattr(intake.source.base.DataSource, name, patch_property)
+
+        _extensions.add('hvplot.intake')
+
     post_patch(extension, logo)
 
 
