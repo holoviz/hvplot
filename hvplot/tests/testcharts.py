@@ -469,7 +469,7 @@ class TestChart1D(ComparisonTestCase):
         bkplot = Store.renderers['bokeh'].get_plot(plot)
         assert not bkplot.tools
 
-    @pytest.mark.parametrize('hover_mode', ['vline', 'hline'])
+    @parameterized.expand(['vline', 'hline'])
     def test_hover_line(self, hover_mode):
         plot = self.df.hvplot('x', 'y', hover=hover_mode)
         opts = Store.lookup_options('bokeh', plot, 'plot')
