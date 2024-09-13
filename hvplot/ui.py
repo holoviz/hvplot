@@ -19,14 +19,14 @@ KINDS = {
         set(_hvConverter._kind_mapping)
         - set(_hvConverter._gridded_types)
         - set(_hvConverter._geom_types)
-        | set(['points'])
+        | set(['points', 'paths'])
     ),
     'gridded': sorted(set(_hvConverter._gridded_types) - set(['dataset'])),
     'geom': _hvConverter._geom_types,
 }
 
 KINDS['2d'] = (
-    ['bivariate', 'heatmap', 'hexbin', 'labels', 'vectorfield', 'points']
+    ['bivariate', 'heatmap', 'hexbin', 'labels', 'vectorfield', 'points', 'paths']
     + KINDS['gridded']
     + KINDS['geom']
 )
@@ -383,37 +383,43 @@ class Geographic(Controls):
 
     @param.depends('geo', watch=True)
     def _update_crs_projection(self):
-        enabled = bool(self.geo or self.project)
-        for key in GEO_KEYS:
-            self.param[key].constant = not enabled
-        self.geo = enabled
-        if not enabled:
-            return
+        with param.parameterized.batch_call_watchers(self):
+            enabled = bool(self.geo or self.project)
+            for key in GEO_KEYS:
+                self.param[key].constant = not enabled
+            self.geo = enabled
+            if not enabled:
+                return
 
-        from cartopy.crs import CRS
+            from cartopy.crs import CRS
 
-        crs_list = sorted(
-            k
-            for k in param.concrete_descendents(CRS).keys()
-            if not k.startswith('_') and k != 'CRS'
-        )
-        crs_list.insert(0, 'GOOGLE_MERCATOR')
-        crs_list.insert(0, 'PlateCarree')
-        crs_list.remove('PlateCarree')
+            crs_list = sorted(
+                k
+                for k in param.concrete_descendents(CRS).keys()
+                if not k.startswith('_') and k != 'CRS'
+            )
+            crs_list.insert(0, 'GOOGLE_MERCATOR')
+            crs_list.insert(0, 'PlateCarree')
+            crs_list.remove('PlateCarree')
 
-        self.param.crs.objects = crs_list
-        self.param.projection.objects = crs_list
-        updates = {}
-        if self.projection is None:
-            updates['projection'] = crs_list[0]
+            if self.explorer.kind == 'scatter':
+                self.explorer.kind = 'points'
+            elif self.explorer.kind == 'line':
+                self.explorer.kind = 'paths'
 
-        if self.global_extent is None:
-            updates['global_extent'] = True
+            self.param.crs.objects = crs_list
+            self.param.projection.objects = crs_list
+            updates = {}
+            if self.projection is None:
+                updates['projection'] = crs_list[0]
 
-        if self.features is None:
-            updates['features'] = ['coastline']
+            if self.global_extent is None:
+                updates['global_extent'] = True
 
-        self.param.update(**updates)
+            if self.features is None:
+                updates['features'] = ['coastline']
+
+            self.param.update(**updates)
 
 
 class Operations(Controls):
@@ -670,9 +676,10 @@ class hvPlotExplorer(Viewer):
                 self.geographic.crs = 'PlateCarree' if xmax <= 360 else 'GOOGLE_MERCATOR'
                 kwargs['crs'] = self.geographic.crs
             for key in ['crs', 'projection']:
+                if key not in kwargs:
+                    continue
                 crs_kwargs = kwargs.pop(f'{key}_kwargs', {})
                 kwargs[key] = instantiate_crs_str(kwargs.pop(key), **crs_kwargs)
-
             feature_scale = kwargs.pop('feature_scale', None)
             kwargs['features'] = {feature: feature_scale for feature in kwargs.pop('features', [])}
 

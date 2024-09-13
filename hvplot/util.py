@@ -25,8 +25,6 @@ except ImportError:
 
 hv_version = Version(hv.__version__)
 bokeh_version = Version(bokeh.__version__)
-bokeh3 = bokeh_version >= Version('3.0')
-param2 = Version(param.__version__) >= Version('2.0rc4')
 _fugue_ipython = None  # To be set to True in tests to mock ipython
 
 
@@ -448,6 +446,16 @@ def is_xarray_dataarray(data):
     return isinstance(data, DataArray)
 
 
+def support_index(data):
+    """
+    HoloViews added in v1.19.0 support for retaining Pandas indexes (no longer
+    calling .reset_index()).
+
+    Update this utility when other data interfaces support that (geopandas, dask, etc.)
+    """
+    return type(data) is pd.DataFrame
+
+
 def process_intake(data, use_dask):
     if data.container not in ('dataframe', 'xarray'):
         raise NotImplementedError(
@@ -532,7 +540,7 @@ def process_xarray(
             data = data.persist() if persist else data
         else:
             data = dataset.to_dataframe()
-            if len(data.index.names) > 1:
+            if not support_index(data) and len(data.index.names) > 1:
                 data = data.reset_index()
         if len(dims) == 0:
             dims = ['index']
@@ -613,10 +621,7 @@ def process_dynamic_args(x, y, kind, **kwds):
         if isinstance(v, param.Parameter):
             dynamic[k] = v
         elif panel_available and isinstance(v, pn.widgets.Widget):
-            if Version(pn.__version__) < Version('0.6.4'):
-                dynamic[k] = v.param.value
-            else:
-                dynamic[k] = v
+            dynamic[k] = v
 
     for k, v in kwds.items():
         if k not in dynamic and isinstance(v, FunctionType) and hasattr(v, '_dinfo'):
@@ -699,3 +704,26 @@ def import_datashader():
             'datashading features. Install it with pip or conda.'
         ) from None
     return datashader
+
+
+def relabel(hv_obj, **kwargs):
+    """Conditionally relabel a HoloViews object"""
+    if kwargs:
+        hv_obj = hv_obj.relabel(**kwargs)
+    return hv_obj
+
+
+def redim_(hv_obj, **kwargs):
+    """Conditionally redim a HoloViews object"""
+    if kwargs:
+        hv_obj = hv_obj.redim(**kwargs)
+    return hv_obj
+
+
+def relabel_redim(hv_obj, relabel_kwargs, redim_kwargs):
+    """Conditionally relabel and/or redim a HoloViews object"""
+    if relabel_kwargs:
+        hv_obj = hv_obj.relabel(**relabel_kwargs)
+    if redim_kwargs:
+        hv_obj = hv_obj.redim(**redim_kwargs)
+    return hv_obj

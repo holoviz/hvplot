@@ -1767,10 +1767,11 @@ class hvPlotTabular(hvPlotBase):
         .. code-block::
 
             import geopandas as gpd
+            import geodatasets
             import hvplot.pandas
 
-            countries = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
-            countries.hvplot.polygons(geo=True, c='pop_est', hover_cols='all')
+            chicago = gpd.read_file(geodatasets.get_path("geoda.chicago_commpop"))
+            chicago.hvplot.polygons(geo=True, c='POP2010', hover_cols='all')
         """
         return self(x, y, c=c, kind='polygons', **kwds)
 
