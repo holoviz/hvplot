@@ -39,7 +39,7 @@ class XArrayInteractive(Interactive):
 
 
 def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=False):
-    from . import hvPlot, post_patch, _extensions
+    from . import hvPlot, post_patch, _module_extensions
 
     try:
         import xarray as xr
@@ -51,12 +51,12 @@ def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=Fals
     # Remove the class docstring as it very developer focused
     XArrayInteractive.__doc__ = ''
 
-    if 'hvplot.xarray' not in _extensions:
+    if 'hvplot.xarray' not in _module_extensions:
         xr.register_dataset_accessor(name)(hvPlot)
         xr.register_dataarray_accessor(name)(hvPlot)
         xr.register_dataset_accessor(interactive)(XArrayInteractive)
         xr.register_dataarray_accessor(interactive)(XArrayInteractive)
-        _extensions.add('hvplot.xarray')
+        _module_extensions.add('hvplot.xarray')
 
     post_patch(extension, logo)
 
