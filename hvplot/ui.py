@@ -48,7 +48,7 @@ GEO_KEYS = [
     'feature_scale',
 ]
 AGGREGATORS = [None, 'count', 'min', 'max', 'mean', 'sum', 'any']
-MAX_ROWS = 10000
+MAX_ROWS = 100000
 CONTROLS_WIDTH = 200
 
 
