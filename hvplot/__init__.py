@@ -60,12 +60,14 @@ To report issues go to https://github.com/holoviz/holoviews.
 
 import inspect
 import os
+import sys
 import textwrap
 
 import panel as _pn
 import holoviews as _hv
 
 from holoviews import Store, render  # noqa
+
 
 from .converter import HoloViewsConverter
 from .interactive import Interactive
@@ -115,6 +117,28 @@ except (ImportError, LookupError, FileNotFoundError):
             # The user is probably trying to run this without having installed
             # the package.
             __version__ = '0.0.0+unknown'
+
+# The hvplot.<ext> import mechanism is a convenient way to allow users to have
+# to avoid running the holoviews/panel extensions. However since imports are
+# cached only the first import actually embeds the extension JS code, meaning
+# that if you re-run the cell(s) containing import hvplot.pandas (or some other
+# integration) then the JS will no longer be available and on subsequent
+# reloads/re-runs of the notebook plots may not appear.
+# Here we add an IPython hook which simply deletes the modules before every
+# cell execution. This is a big hammer but at least it is restricted to
+# IPython environments.
+_module_extensions = set()
+
+try:
+    ip = get_ipython()  # noqa
+
+    def pre_run_cell(info):
+        for ext in _module_extensions:
+            sys.modules.pop(ext, None)
+
+    ip.events.register('pre_run_cell', pre_run_cell)
+except Exception:
+    pass
 
 _METHOD_DOCS = {}
 
@@ -212,8 +236,10 @@ def help(kind=None, docstring=True, generic=True, style=True):
     print(doc)
 
 
-def post_patch(extension='bokeh', logo=False):
-    if extension and not getattr(_hv.extension, '_loaded', False):
+def post_patch(extension='bokeh', logo=False, check_loaded=False):
+    if not check_loaded:
+        hvplot_extension(extension, logo=logo)
+    elif not getattr(_hv.extension, '_loaded', False):
         hvplot_extension(extension, logo=logo)
 
 
