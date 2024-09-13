@@ -398,7 +398,7 @@ def test_explorer_geo_revise_kind(kind_tuple):
 
 
 def test_max_rows_curve():
-    N = 10001
+    N = 100001
     x = np.linspace(0.0, 6.4, num=N)
     y = np.sin(x) + 10
     df = pd.DataFrame({'x': x, 'y': y})
@@ -407,7 +407,7 @@ def test_max_rows_curve():
 
 
 def test_max_rows_sample():
-    N = 10001
+    N = 100001
     x = np.linspace(0.0, 6.4, num=N)
     y = np.sin(x) + 10
     df = pd.DataFrame({'x': x, 'y': y})
