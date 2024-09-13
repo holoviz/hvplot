@@ -118,13 +118,16 @@ except (ImportError, LookupError, FileNotFoundError):
             # the package.
             __version__ = '0.0.0+unknown'
 
-_extensions = {
-    'hvplot.cudf',
-    'hvplot.dask',
-    'hvplot.ibis',
-    'hvplot.intake',
-    'hvplot.fugue',
-}
+# The hvplot.<ext> import mechanism is a convenient way to allow users to have
+# to avoid running the holoviews/panel extensions. However since imports are
+# cached only the first import actually embeds the extension JS code, meaning
+# that if you re-run the cell(s) containing import hvplot.pandas (or some other
+# integration) then the JS will no longer be available and on subsequent
+# reloads/re-runs of the notebook plots may not appear.
+# Here we add an IPython hook which simply deletes the modules before every
+# cell execution. This is a big hammer but at least it is restricted to
+# IPython environments.
+_extensions = {}
 
 try:
     ip = get_ipython()  # noqa
