@@ -152,8 +152,6 @@ class HoloViewsConverter:
         A list of dimensions to be displayed in the hover tooltip.
     hover_formatters:
         A dict of formatting options for the hover tooltip.
-    hover_mode (default='mouse'):
-        The hover mode determines how the hover tool is activated.
     invert (default=False): boolean
         Swaps x- and y-axis
     frame_width/frame_height: int
@@ -563,7 +561,6 @@ class HoloViewsConverter:
         hover=None,
         hover_tooltips=None,
         hover_formatters=None,
-        hover_mode=None,
         subplots=False,
         label=None,
         invert=False,
@@ -833,17 +830,15 @@ class HoloViewsConverter:
         if hover and not any(
             t for t in tools if isinstance(t, HoverTool) or t in ['hover', 'vline', 'hline']
         ):
-            if hover in ['vline', 'hline']:
-                tools.append(hover)
-            else:
-                tools.append('hover')
+            if hover in {'vline', 'hline'}:
+                plot_opts['hover_mode'] = hover
+            tools.append('hover')
+        if 'hover' in tools:
+            if hover_tooltips:
+                plot_opts['hover_tooltips'] = hover_tooltips
+            if hover_formatters:
+                plot_opts['hover_formatters'] = hover_formatters
         plot_opts['tools'] = tools
-        if hover_tooltips:
-            plot_opts['hover_tooltips'] = hover_tooltips
-        if hover_formatters:
-            plot_opts['hover_formatters'] = hover_formatters
-        if hover_mode:
-            plot_opts['hover_mode'] = hover_mode
 
         if self.crs and global_extent:
             plot_opts['global_extent'] = global_extent
