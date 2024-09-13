@@ -80,6 +80,7 @@ tests = [
     "polars",
     "dask",
     "spatialpandas",
+    "duckdb",
 ]
 # In 0.9 fugue added the sql extra but didn't add a fugue-sql package, removing the sql deps from fugue
 # Adding them manually here
@@ -107,6 +108,7 @@ graphviz = [
 examples = [
     "dask[dataframe] >=2021.3.0",
     "datashader >=0.6.5",
+    "duckdb",
     "fugue[sql]",
     "hvplot[fugue-sql]",
     "ibis-framework[duckdb]",  # ibis-duckdb on conda

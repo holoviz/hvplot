@@ -1864,6 +1864,76 @@ class hvPlotTabular(hvPlotBase):
         return self(x, y, text=text, kind='labels', **kwds)
 
 
+class hvPlotTabularDuckDB(hvPlotTabular):
+    def _get_converter(self, x=None, y=None, kind=None, **kwds):
+        import duckdb
+        from duckdb.typing import (
+            BIGINT,
+            FLOAT,
+            DOUBLE,
+            INTEGER,
+            SMALLINT,
+            TINYINT,
+            UBIGINT,
+            UINTEGER,
+            USMALLINT,
+            UTINYINT,
+            HUGEINT,
+        )
+
+        params = dict(self._metadata, **kwds)
+        x = x or params.pop('x', None)
+        y = y or params.pop('y', None)
+        kind = kind or params.pop('kind', None)
+
+        # Handle DuckDB Relation objects
+        if isinstance(self._data, (duckdb.DuckDBPyConnection, duckdb.DuckDBPyRelation)):
+            data = self._data
+            if params.get('hover_cols') == 'all':
+                columns = list(data.columns)
+            else:
+                possible_columns = [
+                    [v] if isinstance(v, str) else v
+                    for v in params.values()
+                    if isinstance(v, (str, list))
+                ]
+
+                columns = (set(data.columns) & set(itertools.chain(*possible_columns))) or {
+                    data.columns[0]
+                }
+                if y is None:
+                    # When y is not specified HoloViewsConverter finds all the numeric
+                    # columns and use them as y values (see _process_chart_y). We need
+                    # to include these columns too.
+                    numeric_columns = data.select_types(
+                        [
+                            BIGINT,
+                            FLOAT,
+                            DOUBLE,
+                            INTEGER,
+                            SMALLINT,
+                            TINYINT,
+                            UBIGINT,
+                            UINTEGER,
+                            USMALLINT,
+                            UTINYINT,
+                            HUGEINT,
+                        ]
+                    ).columns
+                    columns |= set(numeric_columns)
+                xs = x if is_list_like(x) else (x,)
+                ys = y if is_list_like(y) else (y,)
+                columns |= {*xs, *ys}
+                columns.discard(None)
+                columns = sorted(columns, key=lambda c: data.columns.index(c))
+
+            data = data.select(*columns).to_df()
+        else:
+            raise ValueError('Only DuckDB Relations and pandas DataFrames are supported')
+
+        return HoloViewsConverter(data, x, y, kind=kind, **params)
+
+
 class hvPlotTabularPolars(hvPlotTabular):
     def _get_converter(self, x=None, y=None, kind=None, **kwds):
         import polars as pl

@@ -2,7 +2,8 @@
 
 
 def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=False):
-    from . import hvPlotTabular, post_patch
+    from hvplot.plotting.core import hvPlotTabularDuckDB
+    from . import post_patch
 
     try:
         import duckdb
@@ -12,8 +13,8 @@ def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=Fals
         )
 
     # Patching for DuckDBPyRelation and DuckDBPyConnection
-    _patch_duckdb_plot = lambda self: hvPlotTabular(self.df())  # noqa: E731
-    _patch_duckdb_plot.__doc__ = hvPlotTabular.__call__.__doc__
+    _patch_duckdb_plot = lambda self: hvPlotTabularDuckDB(self)  # noqa: E731
+    _patch_duckdb_plot.__doc__ = hvPlotTabularDuckDB.__call__.__doc__
     plot_prop_duckdb = property(_patch_duckdb_plot)
     setattr(duckdb.DuckDBPyRelation, name, plot_prop_duckdb)
     setattr(duckdb.DuckDBPyConnection, name, plot_prop_duckdb)
