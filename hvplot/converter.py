@@ -148,10 +148,10 @@ class HoloViewsConverter:
     hover_cols (default=[]): list or str
         Additional columns to add to the hover tool or 'all' which will
         includes all columns (including indexes if use_index is True).
-    hover_tooltips list[str] or list[tuple]:
-        A list of dimensions to be displayed in the hover tooltip.
     hover_formatters:
         A dict of formatting options for the hover tooltip.
+    hover_tooltips list[str] or list[tuple]:
+        A list of dimensions to be displayed in the hover tooltip.
     invert (default=False): boolean
         Swaps x- and y-axis
     frame_width/frame_height: int
@@ -559,8 +559,9 @@ class HoloViewsConverter:
         logy=None,
         loglog=None,
         hover=None,
-        hover_tooltips=None,
+        hover_cols=[],
         hover_formatters=None,
+        hover_tooltips=None,
         subplots=False,
         label=None,
         invert=False,
@@ -583,7 +584,6 @@ class HoloViewsConverter:
         flip_xaxis=None,
         flip_yaxis=None,
         dynspread=False,
-        hover_cols=[],
         x_sampling=None,
         y_sampling=None,
         project=False,
