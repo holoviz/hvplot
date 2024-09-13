@@ -46,7 +46,7 @@ from holoviews.plotting.bokeh import OverlayPlot, colormap_generator
 from holoviews.plotting.util import process_cmap
 from holoviews.operation import histogram, apply_when
 from holoviews.streams import Buffer, Pipe
-from holoviews.util.transform import dim
+from holoviews.util.transform import dim, lon_lat_to_easting_northing
 from pandas import DatetimeIndex, MultiIndex
 
 from .backend_transforms import _transfer_opts_cur_backend
@@ -323,7 +323,8 @@ class HoloViewsConverter:
         CRS object or class name, a WKT string, or a proj.4 string.
         Defaults to PlateCarree.
     tiles (default=False):
-        Whether to overlay the plot on a tile source:
+        Whether to overlay the plot on a tile source. If coordinate values fall within
+        lat/lon bounds, auto-projects to EPSG:3857, unless `projection=False`.
         - `True`: OpenStreetMap layer
         - `xyzservices.TileProvider` instance (requires xyzservices to
            be installed)
@@ -686,6 +687,9 @@ class HoloViewsConverter:
                     xlim = (x0, x1)
                 if ylim:
                     ylim = (y0, y1)
+        elif projection is False:
+            # to disable automatic projection of tiles
+            self.output_projection = projection
 
         # Operations
         if resample_when is not None and not any([rasterize, datashade, downsample]):
@@ -2138,6 +2142,40 @@ class HoloViewsConverter:
         post_not_found, data = process_derived_datetime_pandas(data, not_found, self.indexes)
         self.variables.extend(set(post_not_found) - set(not_found))
 
+        data, x, y = self._process_tiles_without_geo(data, x, y)
+        return data, x, y
+
+    def _process_tiles_without_geo(self, data, x, y):
+        """
+        Tiles without requiring geoviews/cartopy.
+        """
+        if self.geo or not self.tiles or self.output_projection is False:
+            return data, x, y
+        elif not is_geodataframe(data) and (x is None or y is None):
+            return data, x, y
+
+        if is_geodataframe(data):
+            if data.crs is not None:
+                data = data.to_crs(epsg=3857)
+            return data, x, y
+        else:
+            min_x = np.min(data[x])
+            max_x = np.max(data[x])
+            min_y = np.min(data[y])
+            max_y = np.max(data[y])
+            x_within_bounds = -180 <= min_x <= 360 and -180 <= max_x <= 360
+            y_within_bounds = -90 <= min_y <= 90 and -90 <= max_y <= 90
+            if x_within_bounds and y_within_bounds:
+                data = data.copy()
+                lons_180 = (data[x] + 180) % 360 - 180  # ticks are better with -180 to 180
+                easting, northing = lon_lat_to_easting_northing(lons_180, data[y])
+                new_x = 'x' if 'x' not in data else 'x_'  # quick existing var check
+                new_y = 'y' if 'y' not in data else 'y_'
+                data[new_x] = easting
+                data[new_y] = northing
+                if is_xarray(data):
+                    data = data.swap_dims({x: new_x, y: new_y})
+                return data, new_x, new_y
         return data, x, y
 
     def chart(self, element, x, y, data=None):
@@ -2667,6 +2705,7 @@ class HoloViewsConverter:
             post_not_found, data = process_derived_datetime_pandas(data, not_found, self.indexes)
             self.variables.extend([item for item in not_found if item not in post_not_found])
 
+        data, x, y = self._process_tiles_without_geo(data, x, y)
         return data, x, y, z
 
     def _get_element(self, kind):
