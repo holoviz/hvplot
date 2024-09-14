@@ -6,7 +6,7 @@ from typing import Any
 
 import panel as _pn
 
-from . import hvPlotTabular, post_patch
+from . import hvPlotTabular, post_patch, _module_extensions
 from .util import _fugue_ipython
 
 
@@ -54,9 +54,13 @@ def patch(name='hvplot', extension='bokeh', logo=False):
 
                 display(col)  # in notebook
 
-    @parse_outputter.candidate(namespace_candidate(name, lambda x: isinstance(x, str)))
-    def _parse_hvplot(obj: tuple[str, str]) -> Outputter:
-        return _Visualize(obj[1])
+    if 'hvplot.fugue' not in _module_extensions:
+
+        @parse_outputter.candidate(namespace_candidate(name, lambda x: isinstance(x, str)))
+        def _parse_hvplot(obj: tuple[str, str]) -> Outputter:
+            return _Visualize(obj[1])
+
+        _module_extensions.add('hvplot.fugue')
 
     post_patch(extension, logo)
 
