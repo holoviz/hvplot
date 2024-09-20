@@ -282,6 +282,13 @@ class HoloViewsConverter:
         For plots generated with datashade=True or rasterize=True,
         automatically increase the point size when the data is sparse
         so that individual points become more visible
+    pixel_ratio (default=None):
+       Pixel ratio applied to the height and width, used when rasterizing or
+       datashading. When not set explicitly, the ratio is automatically
+       obtained from the browser device pixel ratio. Default is 1 when
+       the browser information is not available. Useful when the browser
+       information is not available (pixel_ratio=2 can give better results on
+       Retina displays) or for using lower resolution for speed.
     rasterize (default=False):
         Whether to apply rasterization using the Datashader library,
         returning an aggregated Image (to be colormapped by the
@@ -291,15 +298,8 @@ class HoloViewsConverter:
         the number of individual data points present in the current zoom range
         is above this threshold. The raw plot is displayed otherwise.
     x_sampling/y_sampling (default=None):
-        Specifies the smallest allowed sampling interval along the x/y axis. Used when rasterizing or datashading.
-    pixel_ratio (default=None):
-       Pixel ratio applied to the height and width. Used when rasterizing or datashading. Useful for higher
-       resolution screens where the PlotSize stream reports 'nominal'
-       dimensions in pixels that do not match the physical pixels. For
-       instance, setting pixel_ratio=2 can give better results on Retina
-       displays. Also useful for using lower resolution for speed.
-       If not set explicitly, the zoom level of the browsers will be used,
-       if available.
+        Specifies the smallest allowed sampling interval along the x/y axis.
+        Used when rasterizing or datashading.
 
     Geographic options
     ------------------
