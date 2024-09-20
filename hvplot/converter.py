@@ -148,12 +148,10 @@ class HoloViewsConverter:
     hover_cols (default=[]): list or str
         Additional columns to add to the hover tool or 'all' which will
         includes all columns (including indexes if use_index is True).
-    hover_tooltips list[str] or list[tuple]:
-        A list of dimensions to be displayed in the hover tooltip.
     hover_formatters:
         A dict of formatting options for the hover tooltip.
-    hover_mode (default='mouse'):
-        The hover mode determines how the hover tool is activated.
+    hover_tooltips list[str] or list[tuple]:
+        A list of dimensions to be displayed in the hover tooltip.
     invert (default=False): boolean
         Swaps x- and y-axis
     frame_width/frame_height: int
@@ -562,9 +560,9 @@ class HoloViewsConverter:
         logy=None,
         loglog=None,
         hover=None,
-        hover_tooltips=None,
+        hover_cols=[],
         hover_formatters=None,
-        hover_mode=None,
+        hover_tooltips=None,
         subplots=False,
         label=None,
         invert=False,
@@ -587,7 +585,6 @@ class HoloViewsConverter:
         flip_xaxis=None,
         flip_yaxis=None,
         dynspread=False,
-        hover_cols=[],
         x_sampling=None,
         y_sampling=None,
         project=False,
@@ -837,17 +834,15 @@ class HoloViewsConverter:
         if hover and not any(
             t for t in tools if isinstance(t, HoverTool) or t in ['hover', 'vline', 'hline']
         ):
-            if hover in ['vline', 'hline']:
-                tools.append(hover)
-            else:
-                tools.append('hover')
+            if hover in {'vline', 'hline'}:
+                plot_opts['hover_mode'] = hover
+            tools.append('hover')
+        if 'hover' in tools:
+            if hover_tooltips:
+                plot_opts['hover_tooltips'] = hover_tooltips
+            if hover_formatters:
+                plot_opts['hover_formatters'] = hover_formatters
         plot_opts['tools'] = tools
-        if hover_tooltips:
-            plot_opts['hover_tooltips'] = hover_tooltips
-        if hover_formatters:
-            plot_opts['hover_formatters'] = hover_formatters
-        if hover_mode:
-            plot_opts['hover_mode'] = hover_mode
 
         if self.crs and global_extent:
             plot_opts['global_extent'] = global_extent
