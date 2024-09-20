@@ -280,6 +280,13 @@ class HoloViewsConverter:
         For plots generated with datashade=True or rasterize=True,
         automatically increase the point size when the data is sparse
         so that individual points become more visible
+    pixel_ratio (default=None):
+       Pixel ratio applied to the height and width, used when rasterizing or
+       datashading. When not set explicitly, the ratio is automatically
+       obtained from the browser device pixel ratio. Default is 1 when
+       the browser information is not available. Useful when the browser
+       information is not available (pixel_ratio=2 can give better results on
+       Retina displays) or for using lower resolution for speed.
     rasterize (default=False):
         Whether to apply rasterization using the Datashader library,
         returning an aggregated Image (to be colormapped by the
@@ -290,6 +297,7 @@ class HoloViewsConverter:
         is above this threshold. The raw plot is displayed otherwise.
     x_sampling/y_sampling (default=None):
         Specifies the smallest allowed sampling interval along the x/y axis.
+        Used when rasterizing or datashading.
 
     Geographic options
     ------------------
@@ -426,6 +434,7 @@ class HoloViewsConverter:
     _op_options = [
         'datashade',
         'rasterize',
+        'pixel_ratio',
         'x_sampling',
         'y_sampling',
         'downsample',
@@ -587,6 +596,7 @@ class HoloViewsConverter:
         dynspread=False,
         x_sampling=None,
         y_sampling=None,
+        pixel_ratio=None,
         project=False,
         tools=[],
         attr_labels=None,
@@ -703,6 +713,7 @@ class HoloViewsConverter:
         self.precompute = precompute
         self.x_sampling = x_sampling
         self.y_sampling = y_sampling
+        self.pixel_ratio = pixel_ratio
 
         # By type
         self.subplots = subplots
@@ -1774,6 +1785,7 @@ class HoloViewsConverter:
             opts['line_width'] = self._style_opts['line_width']
 
         style = {}
+
         if self.datashade:
             operation = datashade
             if 'cmap' in opts and 'color_key' not in opts:
@@ -1783,6 +1795,8 @@ class HoloViewsConverter:
                 opts['cnorm'] = self._plot_opts['cnorm']
             if 'rescale_discrete_levels' in self._plot_opts:
                 opts['rescale_discrete_levels'] = self._plot_opts['rescale_discrete_levels']
+            if self.pixel_ratio:
+                opts['pixel_ratio'] = self.pixel_ratio
         elif self.rasterize:
             operation = rasterize
             eltype = 'ImageStack' if categorical else 'Image'
@@ -1790,6 +1804,8 @@ class HoloViewsConverter:
                 style['cmap'] = self._style_opts['cmap']
             if self._dim_ranges.get('c', (None, None)) != (None, None):
                 style['clim'] = self._dim_ranges['c']
+            if self.pixel_ratio:
+                opts['pixel_ratio'] = self.pixel_ratio
 
         processed = self._resample_obj(operation, obj, opts)
         if self.dynspread:
