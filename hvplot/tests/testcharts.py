@@ -469,6 +469,31 @@ class TestChart1D(ComparisonTestCase):
         bkplot = Store.renderers['bokeh'].get_plot(plot)
         assert not bkplot.tools
 
+    @parameterized.expand(['vline', 'hline'])
+    def test_hover_line(self, hover_mode):
+        plot = self.df.hvplot('x', 'y', hover=hover_mode)
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['hover_mode'], hover_mode)
+
+    def test_hover_tooltips(self):
+        plot = self.df.hvplot('x', 'y', hover_tooltips=['x'])
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['hover_tooltips'], ['x'])
+
+    def test_hover_formatter(self):
+        plot = self.df.hvplot('x', 'y', hover_formatters={'x': 'datetime'})
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['hover_formatters'], {'x': 'datetime'})
+
+    def test_hover_disabled(self):
+        plot = self.df.hvplot(
+            'x', 'y', hover_tooltips=['x'], hover_formatters={'x': 'datetime'}, hover=False
+        )
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        self.assertEqual(opts.kwargs['tools'], [])
+        assert 'hover_formatters' not in opts.kwargs
+        assert 'hover_tooltips' not in opts.kwargs
+
     def test_labels_format(self):
         plot = self.df.hvplot('x', 'y', text='({x}, {y})', kind='labels')
         assert list(plot.dimensions()) == [Dimension('x'), Dimension('y'), Dimension('label')]

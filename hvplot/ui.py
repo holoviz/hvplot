@@ -48,7 +48,7 @@ GEO_KEYS = [
     'feature_scale',
 ]
 AGGREGATORS = [None, 'count', 'min', 'max', 'mean', 'sum', 'any']
-MAX_ROWS = 10000
+MAX_ROWS = 100000
 CONTROLS_WIDTH = 200
 
 
@@ -685,13 +685,27 @@ class hvPlotExplorer(Viewer):
 
         kwargs['min_height'] = 400
         df = self._data
+        show_alert = False
         if len(df) > MAX_ROWS and not (
             self.kind in KINDS['stats'] or kwargs.get('rasterize') or kwargs.get('datashade')
         ):
-            df = df.sample(n=MAX_ROWS)
+            warn_message = (
+                f'plotted {MAX_ROWS} rows out of {len(df)} rows '
+                f'to avoid performance issues; use rasterize=True or datashade=True to visualize more.'
+            )
+            if self.kind == 'line':
+                warn_message = f'Selected the first {MAX_ROWS} rows and {warn_message}'
+                df = df.head(MAX_ROWS)
+            else:
+                warn_message = f'Randomly sampled and {warn_message}'
+                df = df.sample(n=MAX_ROWS)
+            self._alert.param.update(object=warn_message, visible=True)
+            param.main.param.warning(warn_message)
+            show_alert = True
+        self._data = df
         self._layout.loading = True
         try:
-            self._hvplot = _hvPlot(df)(
+            self._hvplot = _hvPlot(self._data)(
                 kind=self.kind, x=self.x, y=y, by=self.by, groupby=self.groupby, **kwargs
             )
             if opts_kwargs:
@@ -703,7 +717,8 @@ class hvPlotExplorer(Viewer):
             if len(self._hv_pane.widget_box) > 1:
                 for w in self._hv_pane.widget_box:
                     w.margin = (20, 5, 5, 5)
-            self._alert.visible = False
+            if not show_alert:
+                self._alert.visible = False
         except Exception as e:
             self._alert.param.update(
                 object=f'**Rendering failed with following error**: {e}', visible=True
