@@ -127,7 +127,7 @@ df_duckdb = duckdb.from_df(df)
 table = df_duckdb.groupby(['origin', 'mfr'])['mpg'].mean().sort_values().tail(5)
 table.hvplot.barh('mfr', 'mpg', by='origin', stacked=True)
 ```
-```{image} ./_static/home/dask.gif
+```{image} ./_static/home/pandas.gif
 ---
 alt: Works with DuckDB
 align: center
