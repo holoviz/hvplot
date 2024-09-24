@@ -11,7 +11,6 @@ from .scatter_matrix import scatter_matrix  # noqa
 
 @with_hv_extension
 def plot(data, kind, **kwargs):
-    print(data)
     # drop reuse_plot
     kwargs.pop('reuse_plot', None)
 
