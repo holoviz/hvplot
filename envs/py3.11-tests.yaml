@@ -21,6 +21,7 @@ dependencies:
   - dask
   - dask>=2021.3.0
   - datashader>=0.6.5
+  - duckdb
   - fiona
   - fugue
   - fugue-sql-antlr>=0.2.0

@@ -55,6 +55,7 @@ from .util import (
     is_tabular,
     is_series,
     is_dask,
+    is_duckdb,
     is_intake,
     is_cudf,
     is_streamz,
@@ -1094,6 +1095,9 @@ class HoloViewsConverter:
         elif is_dask(data):
             datatype = 'dask'
             self.data = data.persist() if persist else data
+        elif is_duckdb(data):
+            datatype = 'duckdb'
+            self.data = data
         elif is_cudf(data):
             datatype = 'cudf'
             self.data = data

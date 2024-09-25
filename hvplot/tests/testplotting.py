@@ -4,10 +4,14 @@ Tests pandas.options.backend setting
 
 from unittest import TestCase
 
+import pytest
 import pandas as pd
 
 from parameterized import parameterized
 
+import holoviews as hv
+from hvplot.plotting import plot
+from hvplot.tests.util import makeDataFrame
 from hvplot.converter import HoloViewsConverter
 
 no_args = ['line', 'area', 'hist', 'box', 'kde', 'density', 'bar', 'barh']
@@ -50,3 +54,20 @@ class TestPandasHoloviewsPlotting(TestCase):
 class TestPandasHvplotPlotting(TestPandasHoloviewsPlotting):
     def setUp(self):
         pd.options.plotting.backend = 'hvplot'
+
+
+def test_plot_supports_duckdb_relation():
+    duckdb = pytest.importorskip('duckdb')
+    connection = duckdb.connect(':memory:')
+    relation = duckdb.from_df(makeDataFrame(), connection=connection)
+    out = plot(relation, 'line')
+    assert isinstance(out, hv.NdOverlay)
+
+
+def test_plot_supports_duckdb_connection():
+    duckdb = pytest.importorskip('duckdb')
+    connection = duckdb.connect(':memory:')
+    relation = duckdb.from_df(makeDataFrame(), connection=connection)
+    relation.to_view('test')
+    out = plot(connection.execute('SELECT * FROM test'), 'line')
+    assert isinstance(out, hv.NdOverlay)

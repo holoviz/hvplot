@@ -128,3 +128,30 @@ class TestPatchPolars(TestCase):
 
         pldf = pl.LazyFrame({'x': [1, 3, 5], 'y': [2, 4, 6]})
         self.assertIsInstance(pldf.hvplot, hvPlotTabular)
+
+
+class TestPatchDuckDB(TestCase):
+    def setUp(self):
+        try:
+            import duckdb  # noqa
+        except ImportError:
+            raise SkipTest('DuckDB not available')
+        import hvplot.duckdb  # noqa
+
+    def test_duckdb_relation_patched(self):
+        import duckdb
+
+        df = pd.DataFrame({'x': [1, 2, 3], 'y': [1, 2, 3]})
+        connection = duckdb.connect(':memory:')
+        relation = duckdb.from_df(df, connection=connection)
+        self.assertIsInstance(relation.hvplot, hvPlotTabular)
+
+    def test_duckdb_connection_patched(self):
+        import duckdb
+
+        df = pd.DataFrame({'x': [1, 2, 3], 'y': [1, 2, 3]})
+        connection = duckdb.connect(':memory:')
+        duckdb.from_df(df, connection=connection).to_view('test_connection')
+        self.assertIsInstance(
+            connection.execute('SELECT * FROM test_connection').hvplot, hvPlotTabular
+        )

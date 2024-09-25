@@ -1,5 +1,5 @@
 import holoviews as hv
-from ..util import with_hv_extension, is_polars
+from ..util import with_hv_extension, is_duckdb, is_polars
 
 from .core import hvPlot, hvPlotTabular  # noqa
 
@@ -34,6 +34,11 @@ def plot(data, kind, **kwargs):
         from .core import hvPlotTabularPolars
 
         return hvPlotTabularPolars(data)(kind=kind, **no_none_kwargs)
+
+    elif is_duckdb(data):
+        from .core import hvPlotTabularDuckDB
+
+        return hvPlotTabularDuckDB(data)(kind=kind, **no_none_kwargs)
     return hvPlotTabular(data)(kind=kind, **no_none_kwargs)
 
 

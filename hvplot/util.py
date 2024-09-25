@@ -398,6 +398,14 @@ def is_dask(data):
     return isinstance(data, (dd.DataFrame, dd.Series))
 
 
+def is_duckdb(data):
+    if not check_library(data, 'duckdb'):
+        return False
+    import duckdb
+
+    return isinstance(data, (duckdb.DuckDBPyRelation, duckdb.DuckDBPyConnection))
+
+
 def is_polars(data):
     if not check_library(data, 'polars'):
         return False

@@ -101,6 +101,7 @@ alt: Works with GeoPandas
 align: center
 ---
 :::
+
 :::{tab-item} Polars
 ```python
 import polars
@@ -116,6 +117,24 @@ align: center
 ---
 :::
 
+:::{tab-item} DuckDB
+```python
+import duckdb
+import hvplot.duckdb
+from bokeh.sampledata.autompg import autompg_clean as df
+
+df_duckdb = duckdb.from_df(df)
+table = df_duckdb.groupby(['origin', 'mfr'])['mpg'].mean().sort_values().tail(5)
+table.hvplot.barh('mfr', 'mpg', by='origin', stacked=True)
+```
+```{image} ./_static/home/pandas.gif
+---
+alt: Works with DuckDB
+align: center
+---
+```
+
+:::
 :::{tab-item} Intake
 ```python
 import hvplot.intake
