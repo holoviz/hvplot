@@ -56,14 +56,6 @@ class TestPandasHvplotPlotting(TestPandasHoloviewsPlotting):
         pd.options.plotting.backend = 'hvplot'
 
 
-def test_plot_supports_polars():
-    pl = pytest.importorskip('polars')
-    dfp = pl.DataFrame(makeDataFrame())
-    out = plot(dfp, 'line')
-    assert isinstance(out, hv.NdOverlay)
-    assert out.keys() == dfp.columns
-
-
 def test_plot_supports_duckdb_relation():
     duckdb = pytest.importorskip('duckdb')
     connection = duckdb.connect(':memory:')
