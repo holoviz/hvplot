@@ -1875,8 +1875,13 @@ class hvPlotTabularPolars(hvPlotTabular):
 
         # Find columns which should be converted for LazyDataFrame and DataFrame
         if isinstance(self._data, (pl.LazyFrame, pl.DataFrame)):
+            try:
+                column_names = self._data.collect_schema().names()
+            except Exception:  # Maybe not always supported, has been there since 1.7.1
+                column_names = list(self._data.columns)
+
             if params.get('hover_cols') == 'all':
-                columns = list(self._data.columns)
+                columns = column_names
             else:
                 possible_columns = [
                     [v] if isinstance(v, str) else v
@@ -1884,12 +1889,11 @@ class hvPlotTabularPolars(hvPlotTabular):
                     if isinstance(v, (str, list))
                 ]
 
-                columns = (set(self._data.columns) & set(itertools.chain(*possible_columns))) or {
-                    self._data.columns[0]
-                }
+                columns = set(column_names) & set(itertools.chain(*possible_columns))
+                columns = columns or {column_names[0]}
                 if y is None:
                     # When y is not specified HoloViewsConverter finds all the numeric
-                    # columns and use them as y values (see _process_chart_y). We meed
+                    # columns and use them as y values (see _process_chart_y). We need
                     # to include these columns too.
                     columns |= set(self._data.select(pl.col(pl.NUMERIC_DTYPES)).columns)
                 xs = x if is_list_like(x) else (x,)
@@ -1897,7 +1901,7 @@ class hvPlotTabularPolars(hvPlotTabular):
                 columns |= {*xs, *ys}
                 columns.discard(None)
                 # Reorder the columns as in the data.
-                columns = sorted(columns, key=lambda c: self._data.columns.index(c))
+                columns = sorted(columns, key=lambda c: column_names.index(c))
 
         if isinstance(self._data, pl.DataFrame):
             data = self._data.select(columns).to_pandas()
