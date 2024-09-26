@@ -62,7 +62,13 @@ extensions += [  # noqa
     'sphinxext.rediraffe',
 ]
 
-myst_enable_extensions = ['colon_fence']
+myst_enable_extensions = [
+    # To also use ::: delimiters to denote directives, instead of ```.
+    'colon_fence',
+    # MySt-Parser will attempt to convert any isolated img tags (i.e. not
+    # wrapped in any other HTML) to the internal representation used in sphinx.
+    'html_image',
+]
 
 nbsite_gallery_conf = {
     'github_org': 'holoviz',
