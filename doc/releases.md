@@ -2,6 +2,66 @@
 
 See [the HoloViz blog](https://blog.holoviz.org/#category=hvplot) for a visual summary of the major features added in a selection of releases.
 
+## Version 0.11.0 (2024-09-27)
+
+This minor release brings a number of enhancements and bugfixes, checkout the [release blog post](https://blog.holoviz.org/posts/hvplot_release_0.11/) for a visual summary of the most important changes.
+
+- 🦆 New integration: DuckDB!
+- 🗺️ Automatic latitude/longitude conversion when displaying a tile map
+- 💹 Support for displaying subcoordinate y-axis
+- 🏄 New hover options: `hover_tooltips` and `hover_formatters`
+- 🐼 Optimized Pandas index support
+- 🐛 Fixing "No output in jupyter"
+- ➕ Update of the minimum version of the dependencies
+
+Many thanks to @Azaya89, @liufeimath and @philipc2 for their first contributions, to @iuryt for contributing again, and to the maintainers @ahuang11, @hoxbro, @maximlt and @philippjfr!
+
+Enhancements:
+
+- Add **DuckDB** integration ([#1398](https://github.com/holoviz/hvplot/pull/1398))
+- Add `pixel_ratio` keyword, useful when `datashade/rasterize=True` ([#1411](https://github.com/holoviz/hvplot/pull/1411))
+- Automatically convert lonlat to xy when `tiles=True` ([#1377](https://github.com/holoviz/hvplot/pull/1377))
+- Add `hover_tooltips` and `hover_formatters` keywords, and better document `hover` ([#1385](https://github.com/holoviz/hvplot/pull/1385), [#1415](https://github.com/holoviz/hvplot/pull/1415))
+- Add `subcoordinate_y` keyword ([#1379](https://github.com/holoviz/hvplot/pull/1379))
+- Optimize handling of wide datasets and Pandas indexes ([#1350](https://github.com/holoviz/hvplot/pull/1350))
+- Add `cticks` keyword ([#1368](https://github.com/holoviz/hvplot/pull/1368))
+- Optimize the geographic part of the explorer ([#1353](https://github.com/holoviz/hvplot/pull/1353))
+- Support using `by` with `hvplot.labels()` to color the text ([#1347](https://github.com/holoviz/hvplot/pull/1347))
+
+Bug Fixes:
+
+- Ensure hvplot.<ext> hooks are run on every import ([#1359](https://github.com/holoviz/hvplot/pull/1359))
+- Warn on imposing max rows, fix for curve and increase MAX_ROWS to 100,000 ([#1408](https://github.com/holoviz/hvplot/pull/1408))
+- Do not set `bin_range` if `shared_axes=False` ([#1391](https://github.com/holoviz/hvplot/pull/1391))
+- Fix date sorting of multi index Pandas dataframes ([#1363](https://github.com/holoviz/hvplot/pull/1363))
+- Fix geopandas type check to handle `None` geometry ([#1367](https://github.com/holoviz/hvplot/pull/1367))
+- Do not mutate data when using custom text format ([#1352](https://github.com/holoviz/hvplot/pull/1352))
+
+Compatibility:
+
+- Handle new Polars `PerformanceWarning` ([#1418](https://github.com/holoviz/hvplot/pull/1418))
+- Add `dask-geopandas` check to `is_geodataframe` function ([#1396](https://github.com/holoviz/hvplot/pull/1396))
+- Require HoloViews>=1.19.0, bump other dependencies, and drop Python 3.8 ([#1355](https://github.com/holoviz/hvplot/pull/1355))
+
+Documentation:
+
+- Add interactive downsampling large vector fields ([#1372](https://github.com/holoviz/hvplot/pull/1372))
+- Add customization for the subplots example ([#1371](https://github.com/holoviz/hvplot/pull/1371))
+- Document Jupyter notebook requirements ([#1392](https://github.com/holoviz/hvplot/pull/1392))
+- Replace `geopandas.datasets` by `geodatasets` in the examples ([#1362](https://github.com/holoviz/hvplot/pull/1362))
+- Add `paths` reference notebook ([#1354](https://github.com/holoviz/hvplot/pull/1354), [#1384](https://github.com/holoviz/hvplot/pull/1384))
+- Document the `downsample` and `resample_when` parameters ([#1344](https://github.com/holoviz/hvplot/pull/1344))
+
+Infrastructure / Tests:
+
+- Use `psutil` logical for test examples ([#1404](https://github.com/holoviz/hvplot/pull/1404))
+- Remove `tests` for `polars.plot` ([#1403](https://github.com/holoviz/hvplot/pull/1403))
+- Use `bokeh_sampledata` in CI ([#1387](https://github.com/holoviz/hvplot/pull/1387))
+- Conditionally skip testing the Gridded data user guide ([#1383](https://github.com/holoviz/hvplot/pull/1383))
+
+[Full Changelog](https://github.com/holoviz/hvplot/compare/v0.10.0...v0.11.0)
+
+
 ## Version 0.10.0 (2024-05-06)
 
 This minor release brings a number of enhancements and bugfixes, checkout the [release blog post](https://blog.holoviz.org/posts/hvplot_release_0.10/) for a visual summary of the most important enhancements.
@@ -55,7 +115,7 @@ Infrastructure / Tests:
 - Install the tests dependencies primarily with pip ([#1276](https://github.com/holoviz/hvplot/pull/1276))
 - Misc ([#1317](https://github.com/holoviz/hvplot/pull/1317), [#1321](https://github.com/holoviz/hvplot/pull/1321), [#1323](https://github.com/holoviz/hvplot/pull/1323), [#1324](https://github.com/holoviz/hvplot/pull/1324), [#1327](https://github.com/holoviz/hvplot/pull/1327))
 
-[Full Changelog](https://github.com/holoviz/hvplot/compare/v0.9.2...v0.9.3)
+[Full Changelog](https://github.com/holoviz/hvplot/compare/v0.9.2...v0.10.0)
 
 ## Version 0.9.2 (2024-01-29)
 
