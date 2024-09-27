@@ -230,7 +230,7 @@ name = "hvplottests"
 # reqs = ["-e .."]  # Doesn't work
 
 [tool.pyproject2conda.envs."docs"]
-channels = ["nodefaults", "pyviz/label/dev", "conda-forge"]
+channels = ["nodefaults", "conda-forge"]
 python = ["3.11"]
 extras = ["doc", "examples", "geo", "graphviz", "dev-extras"]
 name = "hvplotdocs"

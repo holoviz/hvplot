@@ -10,7 +10,6 @@
 name: hvplotdocs
 channels:
   - nodefaults
-  - pyviz/label/dev
   - conda-forge
 dependencies:
   - python=3.11
