@@ -45,6 +45,7 @@ Compatibility:
 
 Documentation:
 
+- Fix missing images and image links ([#1422](https://github.com/holoviz/hvplot/pull/1422))
 - Add interactive downsampling large vector fields ([#1372](https://github.com/holoviz/hvplot/pull/1372))
 - Add customization for the subplots example ([#1371](https://github.com/holoviz/hvplot/pull/1371))
 - Document Jupyter notebook requirements ([#1392](https://github.com/holoviz/hvplot/pull/1392))
