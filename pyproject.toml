@@ -221,6 +221,7 @@ ruff = [
 geoviews = { skip = true, packages = "geoviews-core >=1.9.0" }
 # It should be ibis-framework[duckdb], but it works anyway.
 ibis-framework = { skip = true, packages = "ibis-duckdb" }
+nbsite = { skip = true }
 
 [tool.pyproject2conda.envs."tests"]
 channels = ["nodefaults", "pyviz/label/dev", "conda-forge"]
