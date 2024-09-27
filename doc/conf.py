@@ -47,7 +47,7 @@ html_theme_options.update(  # noqa
             },
         ],
         'pygment_dark_style': 'material',
-        'announcement': "hvPlot 0.10 has just been released! Checkout the <a href='https://blog.holoviz.org/posts/hvplot_release_0.10/'>blog post</a> and support hvPlot by giving it a 🌟 on <a href='https://github.com/holoviz/hvplot'>Github</a>.",
+        'announcement': "hvPlot 0.11 has just been released! Checkout the <a href='https://blog.holoviz.org/posts/hvplot_release_0.11/'>blog post</a> and support hvPlot by giving it a 🌟 on <a href='https://github.com/holoviz/hvplot'>Github</a>.",
     }
 )
 
@@ -62,7 +62,13 @@ extensions += [  # noqa
     'sphinxext.rediraffe',
 ]
 
-myst_enable_extensions = ['colon_fence']
+myst_enable_extensions = [
+    # To also use ::: delimiters to denote directives, instead of ```.
+    'colon_fence',
+    # MySt-Parser will attempt to convert any isolated img tags (i.e. not
+    # wrapped in any other HTML) to the internal representation used in sphinx.
+    'html_image',
+]
 
 nbsite_gallery_conf = {
     'github_org': 'holoviz',
