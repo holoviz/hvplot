@@ -1,0 +1,1183 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Pandas API"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "If hvplot and pandas are both installed, then we can use the pandas.options.plotting.backend to control the output of `pd.DataFrame.plot` and `pd.Series.plot`. This notebook is meant to recreate the [pandas visualization docs](https://pandas.pydata.org/pandas-docs/stable/user_guide/visualization.html)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "import pandas as pd\n",
+    "\n",
+    "pd.options.plotting.backend = 'holoviews'"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Basic Plotting: `plot`"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The plot method on Series and DataFrame is just a simple wrapper around `hvplot()`:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "ts = pd.Series(np.random.randn(1000), index=pd.date_range('1/1/2000', periods=1000))\n",
+    "ts = ts.cumsum()\n",
+    "ts.plot()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "If the index consists of dates, they will be sorted (as long as `sort_date=True`) and formatted the x-axis nicely as per above.\n",
+    "\n",
+    "On DataFrame, `plot()` is a convenience to plot all of the columns with labels:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.DataFrame(np.random.randn(1000, 4), index=ts.index, columns=list('ABCD'))\n",
+    "df = df.cumsum()\n",
+    "df.plot()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You can plot one column versus another using the *x* and *y* keywords in `plot()`:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df3 = pd.DataFrame(np.random.randn(1000, 2), columns=['B', 'C']).cumsum()\n",
+    "df3['A'] = pd.Series(list(range(len(df))))\n",
+    "df3.plot(x='A', y='B')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Other Plots\n",
+    "\n",
+    "Plotting methods allow for a handful of plot styles other than the default `line` plot. These methods can be provided as the `kind` keyword argument to `plot()`. These include:\n",
+    "\n",
+    "* `bar` or `barh` for bar plots\n",
+    "* `hist` for histogram\n",
+    "* `box` for boxplot\n",
+    "* `kde` or `density` for density plots\n",
+    "* `area` for area plots\n",
+    "* `scatter` for scatter plots\n",
+    "* `hexbin` for hexagonal bin plots\n",
+    "* ~~`pie` for pie plots~~\n",
+    "\n",
+    "For example, a bar plot can be created the following way:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.iloc[5].plot(kind='bar')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You can also create these other plots using the methods DataFrame.plot.<kind> instead of providing the kind keyword argument. This makes it easier to discover plot methods and the specific arguments they use:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "In addition to these `kind`s, there are the `DataFrame.hist()`, and `DataFrame.boxplot()` methods, which use a separate interface.\n",
+    "\n",
+    "Finally, there are several plotting functions in `hvplot.plotting` that take a `Series` or `DataFrame` as an argument. These include:\n",
+    "\n",
+    "* `Scatter Matrix`\n",
+    "* `Andrews Curves`\n",
+    "* `Parallel Coordinates`\n",
+    "* `Lag Plot`\n",
+    "* ~~`Autocorrelation Plot`~~\n",
+    "* ~~`Bootstrap Plot`~~\n",
+    "* ~~`RadViz`~~\n",
+    "\n",
+    "Plots may also be adorned with errorbars or tables."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Bar plots\n",
+    "\n",
+    "For labeled, non-time series data, you may wish to produce a bar plot:\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import holoviews as hv"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.iloc[5].plot.bar() * hv.HLine(0).opts(color='k')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Calling a DataFrame’s `plot.bar()` method produces a multiple bar plot:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df2 = pd.DataFrame(np.random.rand(10, 4), columns=['a', 'b', 'c', 'd'])\n",
+    "df2.plot.bar()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "To produce a stacked bar plot, pass `stacked=True`:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df2.plot.bar(stacked=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "To get horizontal bar plots, use the `barh` method:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df2.plot.barh(stacked=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Histograms"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Histogram can be drawn by using the `DataFrame.plot.hist()` and `Series.plot.hist()` methods."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df4 = pd.DataFrame({'a': np.random.randn(1000) + 1, 'b': np.random.randn(1000),\n",
+    "                    'c': np.random.randn(1000) - 1}, columns=['a', 'b', 'c'])\n",
+    "\n",
+    "df4.plot.hist(alpha=0.5)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Using the matplotlib backend, histograms can be stacked using `stacked=True`; **stacking is not yet supported in the holoviews backend**. Bin size can be changed by `bins` keyword."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Stacked not supported\n",
+    "df4.plot.hist(stacked=True, bins=20)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You can pass other keywords supported by matplotlib hist. For example, horizontal and cumulative histogram can be drawn by `invert=True` and `cumulative=True`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df4['a'].plot.hist(invert=True, cumulative=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The existing interface `DataFrame.hist` to plot histogram still can be used."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df['A'].diff().hist()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "`DataFrame.hist()` plots the histograms of the columns on multiple subplots:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.diff().hist(color='k', alpha=0.5, bins=50, subplots=True, width=300).cols(2)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The by keyword can be specified to plot grouped histograms:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# by does not support arrays, instead the array should be added as a column\n",
+    "data = pd.Series(np.random.randn(1000))\n",
+    "data = pd.DataFrame({'data': data, 'by_column': np.random.randint(0, 4, 1000)})\n",
+    "data.hist(by='by_column', width=300, subplots=True).cols(2)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Box Plots\n",
+    "\n",
+    "Boxplot can be drawn calling `Series.plot.box()` and `DataFrame.plot.box()`, or `DataFrame.boxplot()` to visualize the distribution of values within each column.\n",
+    "\n",
+    "For instance, here is a boxplot representing five trials of 10 observations of a uniform random variable on [0,1).\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.DataFrame(np.random.rand(10, 5), columns=['A', 'B', 'C', 'D', 'E'])\n",
+    "df.plot.box()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Using the matplotlib backend, boxplot can be colorized by passing `color` keyword. You can pass a `dict` whose keys are `boxes`, `whiskers`, `medians` and `caps`. \n",
+    "\n",
+    "**This behavior is not supported in the holoviews backend.**"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You can pass other keywords supported by holoviews boxplot. For example, horizontal and custom-positioned boxplot can be drawn by `invert=True` and positions keywords."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# positions not supported\n",
+    "df.plot.box(invert=True, positions=[1, 4, 5, 6, 8])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "See the boxplot method and the matplotlib boxplot documentation for more.\n",
+    "\n",
+    "The existing interface `DataFrame.boxplot` to plot boxplot still can be used."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.DataFrame(np.random.rand(10, 5))\n",
+    "df.boxplot()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You can create a stratified boxplot using the `groupby` keyword argument to create groupings. For instance,"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.DataFrame(np.random.rand(10,2), columns=['Col1', 'Col2'])\n",
+    "\n",
+    "df['X'] = pd.Series(['A','A','A','A','A','B','B','B','B','B'])\n",
+    "\n",
+    "df.boxplot(col='X')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You can also pass a subset of columns to plot, as well as group by multiple columns:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.DataFrame(np.random.rand(10,3), columns=['Col1', 'Col2', 'Col3'])\n",
+    "\n",
+    "df['X'] = pd.Series(['A','A','A','A','A','B','B','B','B','B'])\n",
+    "df['Y'] = pd.Series(['A','B','A','B','A','B','A','B','A','B'])\n",
+    "\n",
+    "df.boxplot(y=['Col1','Col2'], col='X', row='Y')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df_box = pd.DataFrame(np.random.randn(50, 2))\n",
+    "df_box['g'] = np.random.choice(['A', 'B'], size=50)\n",
+    "df_box.loc[df_box['g'] == 'B', 1] += 3\n",
+    "df_box.boxplot(row='g')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "For more control over the ordering of the levels, we can perform a groupby on the data before plotting."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df_box.groupby('g').boxplot()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Area Plot\n",
+    "\n",
+    "You can create area plots with `Series.plot.area()` and `DataFrame.plot.area()`. Area plots are *not* stacked by default. To produce stacked area plot, each column must be either all positive or all negative values.\n",
+    "\n",
+    "When input data contains *NaN*, it will be automatically filled by 0. If you want to drop or fill by different values, use `dataframe.dropna()` or `dataframe.fillna()` before calling plot."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.DataFrame(np.random.rand(10, 4), columns=['a', 'b', 'c', 'd'])\n",
+    "df.plot.area(alpha=0.5)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "To produce an stacked plot, pass `stacked=True`. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.plot.area(stacked=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Scatter Plot"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Scatter plot can be drawn by using the `DataFrame.plot.scatter()` method. Scatter plot require that x and y be specified using the `x` and `y` keywords."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.DataFrame(np.random.rand(50, 4), columns=['a', 'b', 'c', 'd'])\n",
+    "df.plot.scatter(x='a', y='b')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "To plot multiple column groups in a single axes, repeat `plot` method and then use the overlay operator (`*`) to combine the plots. It is recommended to specify color and label keywords to distinguish each groups."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot_1 = df.plot.scatter(x='a', y='b', color='DarkBlue', label='Group 1')\n",
+    "plot_2 = df.plot.scatter(x='c', y='d', color='DarkGreen', label='Group 2')\n",
+    "\n",
+    "plot_1 * plot_2"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The keyword `c` may be given as the name of a column to provide colors for each point:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.plot.scatter(x='a', y='b', c='c', s=50)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You can pass other keywords supported by matplotlib `scatter`. The example below shows a bubble chart using a column of the `DataFrame` as the bubble size."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.plot.scatter(x='a', y='b', s=df['c']*500)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The same effect can be accomplished using the `scale` option."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.plot.scatter(x='a', y='b', s='c', scale=25)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Hexagonal Bin Plot\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You can create hexagonal bin plots with `DataFrame.plot.hexbin()`. Hexbin plots can be a useful alternative to scatter plots if your data are too dense to plot each point individually."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.DataFrame(np.random.randn(1000, 2), columns=['a', 'b'])\n",
+    "df['b'] = df['b'] + np.arange(1000)\n",
+    "\n",
+    "df.plot.hexbin(x='a', y='b', gridsize=25, width=500, height=400)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "A useful keyword argument is `gridsize`; it controls the number of hexagons in the x-direction, and defaults to 100. A larger `gridsize` means more, smaller bins.\n",
+    "\n",
+    "By default, a histogram of the counts around each `(x, y)` point is computed. You can specify alternative aggregations by passing values to the `C` and `reduce_C_function` arguments. `C` specifies the value at each `(x, y)` point and `reduce_C_function` is a function of one argument that reduces all the values in a bin to a single number (e.g. `mean`, `max`, `sum`, `std`). In this example the positions are given by columns `a` and `b`, while the value is given by column z. The bins are aggregated with numpy’s `max` function."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.DataFrame(np.random.randn(1000, 2), columns=['a', 'b'])\n",
+    "df['b'] = df['b'] = df['b'] + np.arange(1000)\n",
+    "df['z'] = np.random.uniform(0, 3, 1000)\n",
+    "\n",
+    "df.plot.hexbin(x='a', y='b', C='z', reduce_function=np.max, gridsize=25, width=500, height=400)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Density Plot\n",
+    "\n",
+    "You can create density plots using the `Series.plot.kde()` and `DataFrame.plot.kde()` methods."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "ser = pd.Series(np.random.randn(1000))\n",
+    "\n",
+    "ser.plot.kde()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Pie plot\n",
+    "\n",
+    "**NOT SUPPORTED**\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Plotting Tools\n",
+    "\n",
+    "These functions can be imported from `hvplot.plotting` and take a `Series` or `DataFrame` as an argument.\n",
+    "\n",
+    "### Scatter Matrix Plot\n",
+    "\n",
+    "You can create a scatter plot matrix using the `scatter_matrix` function:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "import numpy as np"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from hvplot import scatter_matrix\n",
+    "\n",
+    "df = pd.DataFrame(np.random.randn(1000, 4), columns=['a', 'b', 'c', 'd'])\n",
+    "\n",
+    "scatter_matrix(df, alpha=0.2, diagonal='kde')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Since scatter matrix plots may generate a large number of points (the one above renders 120,000 points!), you may want to take advantage of the power provided by [Datashader](https://datashader.org/) to rasterize the off-diagonal plots into a fixed-resolution representation:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.DataFrame(np.random.randn(10000, 4), columns=['a', 'b', 'c', 'd'])\n",
+    "\n",
+    "scatter_matrix(df, rasterize=True, dynspread=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Andrews Curves"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Andrews curves allow one to plot multivariate data as a large number of curves that are created using the attributes of samples as coefficients for Fourier series. By coloring these curves differently for each class it is possible to visualize data clustering. Curves belonging to samples of the same class will usually be closer together and form larger structures.\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from bokeh.sampledata import iris\n",
+    "from hvplot import andrews_curves\n",
+    "\n",
+    "data = iris.flowers\n",
+    "\n",
+    "andrews_curves(data, 'species')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Parallel Coordinates"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Parallel coordinates is a plotting technique for plotting multivariate data. It allows one to see clusters in data and to estimate other statistics visually. Using parallel coordinates points are represented as connected line segments. Each vertical line represents one attribute. One set of connected line segments represents one data point. Points that tend to cluster will appear closer together."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from hvplot import parallel_coordinates\n",
+    "\n",
+    "parallel_coordinates(data, 'species')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Lag Plot \n",
+    "\n",
+    "Lag plots are used to check if a data set or time series is random. Random data should not exhibit any structure in the lag plot. Non-random structure implies that the underlying data are not random."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from hvplot import lag_plot\n",
+    "\n",
+    "data = pd.Series(0.1 * np.random.rand(1000) +\n",
+    "                 0.9 * np.sin(np.linspace(-99 * np.pi, 99 * np.pi, num=1000)))\n",
+    "\n",
+    "lag_plot(data, width=400, height=400)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "\n",
+    "### Autocorrelation Plot\n",
+    "\n",
+    "**NOT SUPPORTED**\n",
+    "\n",
+    "### Bootstrap Plot\n",
+    "\n",
+    "**NOT SUPPORTED**\n",
+    "\n",
+    "### RadViz\n",
+    "\n",
+    "**NOT SUPPORTED**\n",
+    "\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Plot Formatting\n",
+    "\n",
+    "### General plot style arguments\n",
+    "\n",
+    "Most plotting methods have a set of keyword arguments that control the layout and formatting of the returned plot:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "ts.plot(c='k', line_dash='dashed', label='Series')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "For each kind of plot (e.g. *line*, *bar*, *scatter*) any additional arguments keywords are passed along to the corresponding holoviews object (`hv.Curve`, `hv.Bar`, `hv.Scatter`). These can be used to control additional styling, beyond what pandas provides.\n",
+    "\n",
+    "### Controlling the Legend\n",
+    "\n",
+    "You may set the `legend` argument to `False` to hide the legend, which is shown by default. You can also control the placement of the legend using the same `legend` argument set to one of: 'top_right', 'top_left', 'bottom_left', 'bottom_right', 'right', 'left', 'top', or 'bottom'."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.DataFrame(np.random.randn(1000, 4), \n",
+    "                  index=ts.index, columns=list('ABCD'))\n",
+    "df = df.cumsum()\n",
+    "\n",
+    "df.plot(legend=False)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.plot(legend='top_left')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Scales\n",
+    "\n",
+    "You may pass `logy` to get a log-scale Y axis, similarly use `logx` to get a log-scale on the X axis or `logz` to get a log-scale on the color axis."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "ts = pd.Series(np.random.randn(1000), \n",
+    "               index=pd.date_range('1/1/2000', periods=1000))\n",
+    "\n",
+    "ts = np.exp(ts.cumsum())\n",
+    "\n",
+    "ts.plot(logy=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.DataFrame(np.random.randn(1000, 2), columns=['a', 'b'])\n",
+    "df['b'] = df['b'] + np.arange(1000)\n",
+    "df.plot.hexbin(x='a', y='b', gridsize=25, width=500, height=400, logz=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Plotting on a Secondary Y-axis\n",
+    "\n",
+    "**NOT SUPPORTED**"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Suppressing tick resolution adjustment\n",
+    "pandas includes automatic tick resolution adjustment for regular frequency time-series data. For limited cases where pandas cannot infer the frequency information (e.g., in an externally created twinx), you can choose to suppress this behavior for alignment purposes.\n",
+    "\n",
+    "Here is the default behavior, notice how the x-axis tick labeling is performed:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.DataFrame(np.random.randn(1000, 4), \n",
+    "                  index=ts.index, columns=list('ABCD'))\n",
+    "df = df.cumsum()\n",
+    "df.A.plot()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Formatters can be set using format strings, by declaring bokeh TickFormatters, or using custom functions. See [HoloViews Tick Docs](https://holoviews.org/user_guide/Customizing_Plots.html#Axis-ticks) for more information."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from bokeh.models.formatters import DatetimeTickFormatter\n",
+    "\n",
+    "formatter = DatetimeTickFormatter(months='%b %Y')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.A.plot(yformatter='$%.2f', xformatter=formatter)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Subplots\n",
+    "\n",
+    "Each `Series` in a `DataFrame` can be plotted on a different axis with the `subplots` keyword:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.DataFrame(np.random.randn(1000, 4), \n",
+    "                  index=ts.index, columns=list('ABCD'))\n",
+    "df = df.cumsum()\n",
+    "df.plot(subplots=True, height=150).cols(1)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Controlling layout and targeting multiple axes\n",
+    "\n",
+    "The layout of subplots can be specified using `.cols(n)`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.plot(subplots=True, shared_axes=False, width=150).cols(3)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Plotting with error bars\n",
+    "\n",
+    "Plotting with error bars is *not* supported in `DataFrame.plot()` and `Series.plot()`. To add errorbars, users should fall back to using hvplot directly."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import hvplot.pandas  # noqa"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df3 = pd.DataFrame({'data1': [3, 2, 4, 3, 2, 4, 3, 2],\n",
+    "                    'data2': [6, 5, 7, 5, 4, 5, 6, 5]})\n",
+    "mean_std = pd.DataFrame({'mean': df3.mean(), 'std': df3.std()})\n",
+    "mean_std"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "(mean_std.plot.bar(y='mean', alpha=0.7) * \\\n",
+    " mean_std.hvplot.errorbars(x='index', y='mean', yerr1='std')\n",
+    ").opts(show_legend=False).redim.range(mean=(0, 6.5))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Plotting tables\n",
+    "\n",
+    "The matplotlib backend includes support for the `table` keyword in `DataFrame.plot()` and `Series.plot()`. This same effect can be accomplished with holoviews by using `hvplot.table` and creating a layout of the resulting plots."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.DataFrame(np.random.rand(5, 3), columns=['a', 'b', 'c'])\n",
+    "\n",
+    "(df.plot(xaxis=False, legend='top_right') + \\\n",
+    " df.T.hvplot.table()).cols(1)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Colormaps\n",
+    "\n",
+    "A potential issue when plotting a large number of columns is that it can be difficult to distinguish some series due to repetition in the default colors. To remedy this, DataFrame plotting supports the use of the `colormap` argument, which accepts either a colormap or a string that is a name of a colormap.\n",
+    "\n",
+    "To use the cubehelix colormap, we can pass `colormap='cubehelix'`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.DataFrame(np.random.randn(1000, 10), index=ts.index)\n",
+    "df = df.cumsum()\n",
+    "df.plot(colormap='cubehelix')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Colormaps can also be used with other plot types, like bar charts:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "dd = pd.DataFrame(np.random.randn(10, 10)).applymap(abs)\n",
+    "dd = dd.cumsum()\n",
+    "dd.plot.bar(colormap='Greens')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Parallel coordinates charts:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from bokeh.sampledata import iris\n",
+    "from hvplot import parallel_coordinates, andrews_curves\n",
+    "\n",
+    "data = iris.flowers\n",
+    "parallel_coordinates(data, 'species', colormap='gist_rainbow')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Andrews curves charts:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "andrews_curves(data, 'species', colormap='winter')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Plotting directly with holoviews\n",
+    "\n",
+    "In some situations it may still be preferable or necessary to prepare plots directly with hvplot or holoviews, for instance when a certain type of plot or customization is not (yet) supported by pandas. `Series` and `DataFrame` objects behave like arrays and can therefore be passed directly to holoviews functions without explicit casts."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import holoviews as hv\n",
+    "\n",
+    "price = pd.Series(np.random.randn(150).cumsum(),\n",
+    "                  index=pd.date_range('2000-1-1', periods=150, freq='B'), name='price')\n",
+    "ma = price.rolling(20).mean()\n",
+    "mstd = price.rolling(20).std()\n",
+    "\n",
+    "price.plot(c='k') * ma.plot(c='b', label='mean') * \\\n",
+    "hv.Area((mstd.index, ma - 2 * mstd, ma + 2 * mstd), \n",
+    "        vdims=['y', 'y2']).opts(color='b', alpha=0.2)"
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python",
+   "pygments_lexer": "ipython3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

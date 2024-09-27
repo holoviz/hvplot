@@ -1,0 +1,194 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "78539fd7-a71f-4027-8b1b-c7fd75526a22",
+   "metadata": {},
+   "source": [
+    "# Scattermatrix"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "c092a604-c386-4dda-bc90-0ff11a8f880f",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "import pandas as pd\n",
+    "from hvplot.plotting import scatter_matrix"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "1793d412-0d1e-4c8e-b470-ca978d5a53e2",
+   "metadata": {},
+   "source": [
+    "`scatter_matrix` shows all the pairwise relationships between the columns of your data. Each non-diagonal entry plots the corresponding columns against another, while the diagonal plot shows the distribution of the data within each individual column.\n",
+    "\n",
+    "This function is closely modelled on [pandas.plotting.scatter_matrix](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.plotting.scatter_matrix.html)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "9d6cb81d-7f65-41de-8386-26479e41ddd4",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.DataFrame(np.random.randn(1000, 4), columns=['A','B','C','D'])\n",
+    "\n",
+    "scatter_matrix(df, alpha=0.2)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "91efa178-7cb4-4dbe-8730-59a2864cdf9a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df_sub = df[['A', 'B']].copy()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "38913fbf-4982-4b82-bf81-01bb33faf8a0",
+   "metadata": {},
+   "source": [
+    "The `chart` parameter allows to change the type of the *off-diagonal* plots."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "a4f72f5f-b9a1-41ce-b00d-59fad1b01b54",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "scatter_matrix(df_sub, chart='bivariate') + scatter_matrix(df_sub, chart='hexbin')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "11943cd6-7d10-4990-9de6-18402c4c42a8",
+   "metadata": {},
+   "source": [
+    "The `diagonal` parameter allows to change the type of the *diagonal* plots."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "d46fd8d8-bf72-45fe-9faf-a85c1239d21e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "scatter_matrix(df_sub, diagonal='kde')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3d13318b-b96c-4e62-b237-5202e5108a44",
+   "metadata": {},
+   "source": [
+    "Setting `tools` to include a selection tool like `box_select` and an inspection tool like `hover` permits further analysis."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "135bdf59-c2c5-4253-b9a0-a786623db591",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "scatter_matrix(df_sub, tools=['box_select', 'hover'])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "d4315596-0a9e-4c00-a0d3-c8f3a01b9518",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df_sub['CAT'] = np.random.choice(['X', 'Y', 'Z'], len(df_sub))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a8b4cef5-25ea-4129-ab0e-7cc6c36d3451",
+   "metadata": {},
+   "source": [
+    "The `c` parameter allows to colorize the data by a given column, here by `'CAT'`. Note also that the `diagonal_kwds` parameter (equivalent to `hist_kwds` in this case or `density_kwds` for *kde* plots) allow to customize the diagonal plots."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "ba178ac7-936e-4585-964b-34a99b711108",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "scatter_matrix(df_sub, c='CAT', diagonal_kwds=dict(alpha=0.3))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "8a97b3bc-0053-41b6-a71a-70ceec9e3341",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.DataFrame(np.random.randn(100_000, 4), columns=['A','B','C','D'])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "eaa67050-09ad-4c79-9b01-03dd96a6bada",
+   "metadata": {},
+   "source": [
+    "Scatter matrix plots may end up with a large number of points having to be rendered which can be challenging for the browser or even just crash it. In that case you should consider setting to `True` the `rasterize` (or `datashade`) parameter that uses [Datashader](https://datashader.org/) to render the off-diagonal plots on the backend and then send more efficient image-based representations to the browser.\n",
+    "\n",
+    "The following scatter matrix plot has 1,200,00 (12x100,000) points that are rendered efficiently by `datashader`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "ed43bbf1-4c62-4a80-b044-970c235727a0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "scatter_matrix(df, rasterize=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c50ec422-baf4-43d4-9f84-a8d74315b7e6",
+   "metadata": {},
+   "source": [
+    "When `rasterize` (or `datashade`) is toggled it's possible to make individual points more visible by setting `dynspread=True` or `spread=True`. Head over to the [Working with large data using datashader](https://holoviews.org/user_guide/Large_Data.html) guide of [HoloViews](https://holoviews.org/index.html) to learn more about these operations and what parameters they accept (which can be passed as `kwds` to `scatter_matrix`)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "e4974565-3c21-462c-b762-c5719d29c221",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "scatter_matrix(df, rasterize=True, dynspread=True)"
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python",
+   "pygments_lexer": "ipython3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

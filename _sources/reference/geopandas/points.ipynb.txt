@@ -1,0 +1,107 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Points"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import hvplot.pandas  # noqa"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Using hvplot with geopandas is as simple as loading a geopandas dataframe and calling `hvplot` on it with `geo=True`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import geopandas as gpd\n",
+    "\n",
+    "\n",
+    "data = {\n",
+    "    'City': ['London', 'Paris', 'Berlin', 'Madrid', 'Rome', 'Vienna', 'Warsaw', 'Amsterdam'],\n",
+    "    'Country': ['United Kingdom', 'France', 'Germany', 'Spain', 'Italy', 'Austria', 'Poland', 'Netherlands'],\n",
+    "    'Latitude': [51.5074, 48.8566, 52.5200, 40.4168, 41.9028, 48.2082, 52.2297, 52.3676],\n",
+    "    'Longitude': [-0.1278, 2.3522, 13.4050, -3.7038, 12.4964, 16.3738, 21.0122, 4.9041]\n",
+    "}\n",
+    "cities = gpd.GeoDataFrame(\n",
+    "    data,\n",
+    "    geometry=gpd.points_from_xy(data['Longitude'], data['Latitude']),\n",
+    "    crs=\"EPSG:4326\",\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cities.hvplot(geo=True, tiles=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You can easily change the tiles, add coastlines, or which fields show up in the hover text:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cities.hvplot(tiles='EsriTerrain', coastline=True, hover_cols='all')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can also alter the projection of the data using cartopy:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import cartopy.crs as ccrs"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cities.hvplot(coastline=True, projection=ccrs.Geostationary(central_longitude=10), global_extent=True)"
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python",
+   "pygments_lexer": "ipython3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

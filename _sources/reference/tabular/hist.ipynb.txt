@@ -1,0 +1,122 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Hist"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import hvplot.pandas  # noqa\n",
+    "\n",
+    "# hvplot.extension(\"matplotlib\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "`hist` is often a good way to start looking at continuous data to get a sense of the distribution. Similar methods include [`kde`](kde.ipynb) (also available as `density`)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from bokeh.sampledata.autompg import autompg_clean\n",
+    "\n",
+    "autompg_clean.sample(n=5)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "autompg_clean.hvplot.hist(\"weight\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "When using `by` the plots are overlaid by default. To create subplots instead, use `subplots=True`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "autompg_clean.hvplot.hist(\"weight\", by=\"origin\", subplots=True, width=250)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You can also plot histograms of *datetime* data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "from bokeh.sampledata.commits import data as commits\n",
+    "\n",
+    "commits = commits.reset_index().sort_values(\"datetime\")\n",
+    "commits.head(3)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "commits.hvplot.hist(\n",
+    "    \"datetime\",\n",
+    "    bin_range=(pd.Timestamp('2012-11-30'), pd.Timestamp('2017-05-01')),\n",
+    "    bins=54,   \n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "If you want to plot the distribution of a categorical column you can calculate the distribution using Pandas' method `value_counts` and plot it using `.hvplot.bar`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "autompg_clean[\"mfr\"].value_counts().hvplot.bar(invert=True, flip_yaxis=True, height=500)"
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python",
+   "pygments_lexer": "ipython3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

@@ -1,0 +1,339 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "c5490881-7be7-4095-8983-0b8d9c1e7e4e",
+   "metadata": {},
+   "source": [
+    "# Exploring"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "cb9dcb54",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import hvplot.pandas  # noqa\n",
+    "import xarray as xr"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "6a6adcf7-2b30-4377-856a-b6aab6c8781d",
+   "metadata": {},
+   "source": [
+    "hvPlot API provides a simple and intuitive way to create plots. However when you are exploring data you don't always know in advance the best way to display it, or even what kind of plot would be best to visualize the data. You will very likely embark in an iterative process that implies choosing a kind of plot, setting various options, running some code, and repeat until you're satisfied with the output and the insights you get. The *Explorer* is a *Graphical User Interface* that allows you to easily generate customized plots, which in practice gives you the possibility to **explore** both your data and hvPlot's extensive API."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "73722900-a368-41b9-bca0-0ea53a0fb7bc",
+   "metadata": {},
+   "source": [
+    ":::{note}\n",
+    "The *Explorer* has been added to hvPlot in version <code>0.8.0</code> and improve over the next versions, in particular version <code>0.9.0</code> added support to Xarray input types. We plan to keep on improving the explorer, making it a powerful exploration app, in the meantime please report any issue or feature request <a href='https://github.com/holoviz/hvplot/'>on GitHub</a>.\n",
+    ":::"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ce9d0665-7bc6-47c2-9993-dc92198b6f26",
+   "metadata": {},
+   "source": [
+    "## Set up"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "2f572b55-5002-4b81-9c92-6a2b56e2cde2",
+   "metadata": {},
+   "source": [
+    "For an explorer to be displayed in a notebook you need to load the hvPlot extension, which happens automatically when you execute an import like `import hvplot.pandas`. You could also just run `hvplot.extension('bokeh')`. If instead of building Bokeh plots you would rather build Matplotlib or Plotly plots, simply execute once `hvplot.extension('matplotlib')` or `hvplot.extension('matplotlib')` before displaying the explorer."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c6c6b74b-01c2-4399-aced-f4e353defaed",
+   "metadata": {},
+   "source": [
+    "## Instantiate"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "fb079fa4-ebe4-48b8-b30c-4d0afe57a2db",
+   "metadata": {},
+   "source": [
+    "An explorer can be instantiated in two different ways:\n",
+    "\n",
+    "- via the top-level `explorer()` function: `from hvplot import explorer; explorer(data)`\n",
+    "- via the `.explorer()` method available on the `.hvplot` namespace: `data.hvplot.explorer()` (added in version 0.9.0)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a3741262-6fc9-432e-af3b-f11a071057e7",
+   "metadata": {},
+   "source": [
+    "The `explorer` callable accept options to pre-customize the plot, for example `data.hvplot.explorer(title='Penguins', width=200)`."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3a6a8f26-a7ed-4c1c-9151-c421854c484c",
+   "metadata": {},
+   "source": [
+    "## Interface"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "dc1a7bc9-12ab-4dee-b9ad-74e3e610e459",
+   "metadata": {},
+   "source": [
+    "The object returned by `explorer()` is a [Panel](https://panel.holoviz.org/) layout that can be displayed in a notebook or served in a web application. This small application includes:\n",
+    "\n",
+    "- right-hand side: a preview of the hvPlot plot and code you are building\n",
+    "- left-hand side: the various options that you can set to customize the plot\n",
+    "- top part: an Alert section that displays error messages\n",
+    "- bottom part: a status bar which includes a *live update* checkbox to disable live updating the preview"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "74c37c79-b797-4d83-847a-4b0f0e5dc3f3",
+   "metadata": {},
+   "source": [
+    "Let's create our first explorer instance."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "c5ff681c-eb18-42d0-99e2-814f074d81f5",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from bokeh.sampledata.penguins import data as df\n",
+    "\n",
+    "df.head(2)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "6d36b75a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "hvexplorer = df.hvplot.explorer()\n",
+    "hvexplorer"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "f2fb3184-862c-4e43-bc5f-cd3bc58d4dc1",
+   "metadata": {},
+   "source": [
+    "Spend some time browsing the options made available to you. Note however that to be fully interactive the explorer needs to be executed with a live Python kernel, updating the options on the website won't update the plot."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "81b0d06d-3348-4310-bc54-cef80c219e5f",
+   "metadata": {},
+   "source": [
+    "Before diving more into the explorer's capabilities, we will update the explorer we just created as the default configuration doesn't lead to a very interesting preview for this dataset. We will do so programmatically for the purpose of building this website but you would usually not have to do that, so just assume you've changed a few options directly in the explorer using your mouse and keyboard."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "c25ee4e1",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "hvexplorer.param.update(x='bill_length_mm', y_multi=['bill_depth_mm'], by=['species'])\n",
+    "hvexplorer.labels.title = 'Penguins Scatter'"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "851f059f-44a4-4387-aab4-943746c5f494",
+   "metadata": {},
+   "source": [
+    "### Record the plot state"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ea42668e-d945-4a91-8e98-fa795cd88539",
+   "metadata": {},
+   "source": [
+    "Quite often you will want to record the state of a plot you have obtained from the explorer. We even encourage the pattern of creating short-lived explorer instances that allow for quickly building the plots you want, record their state and then remove the instances from your notebook, possibly replacing them by simpler `.hvplot()` plot expressions."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "6485252a",
+   "metadata": {},
+   "source": [
+    "You can record the state of an explorer instance in multiple ways:\n",
+    "\n",
+    "- *Code* tab: displays a code snippet you can copy/paste in your notebook and that will generate exactly the same plot as previewed in the explorer\n",
+    "- `code` parameter: holds the code snippet string\n",
+    "- `.plot_code(var_name)` method: similar to the `code` parameter except you can configure the variable name\n",
+    "- `.settings()` method: to obtain a dictionary of your customized settings\n",
+    "- `.save(filename, **kwargs)` method: to save the plot to file\n",
+    "- `.hvplot()` method: to get a handle on the displayed HoloViews plot"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "f0ebfc3f-7fb6-4cb5-9d51-acd71ad474bd",
+   "metadata": {},
+   "source": [
+    "We will explore a few of these approaches. Let's start with printng `code` and validating that is produces a snippet that can be copy/pasted into another cell and executed (using `eval` to simulate that)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "2fb1cf05-4f36-44d0-bebf-c58e6443c4ff",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "print(hvexplorer.code)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "acd860bf-66a9-4363-8108-11f2fbb7066e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "eval(hvexplorer.code)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "906a55c9",
+   "metadata": {},
+   "source": [
+    "The dictionary obtained from calling `.settings()` can be directly passed as kwargs to the `.hvplot()` data accessor to re-create the customized plot using the plotting API."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "9cc7e7db",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "settings = hvexplorer.settings()\n",
+    "settings"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "81f80a7e",
+   "metadata": {},
+   "source": [
+    "Note that for the next line to display a plot `hvplot.pandas` has to be imported, which we did at the beginning of this notebook."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "5c212d28",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.hvplot(**settings)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5f3e6e32-1ff5-4e71-b4fe-5f265fcc7689",
+   "metadata": {},
+   "source": [
+    "## Supported data inputs"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "caa4b9cd-8d9e-46cd-a548-faac2fb088f7",
+   "metadata": {},
+   "source": [
+    "The explorer was added in version `0.8.0` with support for Pandas DataFrames. Support for Xarray objects was added in version `0.9.0`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "f15dde1f",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "ds = xr.tutorial.open_dataset('air_temperature')\n",
+    "\n",
+    "hvplot.explorer(ds, x='lon', y='lat')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "63a216c3-e84b-4100-9d51-50db1031ebc3",
+   "metadata": {},
+   "source": [
+    "## Geographic options"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b1f53ffc-4901-4908-a69b-4ff1e18c87f6",
+   "metadata": {},
+   "source": [
+    "When `geoviews` is installed, it's also possible to geographically reference the data."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "87d4ab4f",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "hvexplorer = hvplot.explorer(ds, x='lon', y='lat', geo=True)\n",
+    "hvexplorer.geographic.param.update(crs='PlateCarree', tiles='CartoDark', global_extent=False)\n",
+    "hvexplorer"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "9702c680-35b5-42f3-8f25-63015af29e9c",
+   "metadata": {},
+   "source": [
+    "## Conclusion"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "145562f8",
+   "metadata": {},
+   "source": [
+    "The *Explorer* makes it very easy to quickly spin up a small application in a notebook with which you can explore your data, generate the visualization that you want, record it in a simple way, and keep going with your analysis!"
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python",
+   "pygments_lexer": "ipython3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

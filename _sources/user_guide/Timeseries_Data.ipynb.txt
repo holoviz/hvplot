@@ -1,0 +1,243 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Timeseries Data"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Almost all the other sections in the user guide mention timeseries. This section demonstrates the special functionality that hvPlot provides specifically for dealing with time. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "import hvplot.pandas  # noqa\n",
+    "from bokeh.sampledata.sea_surface_temperature import sea_surface_temperature as sst\n",
+    "\n",
+    "sst.hvplot()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "By default, the index will be used as the x-axis when plotting tabular data. If the index is composed of datetimes, and they are not in chronological order, hvPlot will try to sort them before plotting (unless you set ``sort_date=False``)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "scrampled = sst.sample(frac=1)\n",
+    "scrampled.hvplot()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Tickers\n",
+    "\n",
+    "The datetime tickers will be set to a default that is meant to fit in the allotted space. If you'd rather use a different format, then you can declare an explicit date ticker according to the rules on [Bokeh DatetimeTickFormatter](https://bokeh.pydata.org/en/latest/docs/reference/models/formatters.html#bokeh.models.formatters.DatetimeTickFormatter)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from bokeh.models.formatters import DatetimeTickFormatter\n",
+    "\n",
+    "formatter = DatetimeTickFormatter(months='%b %Y')\n",
+    "sst.hvplot(xformatter=formatter)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Auto-range\n",
+    "\n",
+    "*(Available with HoloViews >= 1.16)*\n",
+    "\n",
+    "Automatic ranging, aka auto-ranging, on the data in x or y is supported, making it easy to scale the given axes and fit the entire visible curve after a zoom or pan. Try zooming in on the plot and panning around, the y range nicely adapt to fit the curve. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sst.hvplot(autorange=\"y\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Subcoordinate y-axis\n",
+    "\n",
+    "hvPlot enables you to create overlays where each element has its own distinct y-axis subcoordinate system, which is particularly useful to analyse multiple timeseries. To activate this feature that automatically distributes overlay elements along the y-axis, set the `subcoordinate_y` keyword to `True`. `subcoordinate_y` also accepts a dictionary of related options, for example set `subcoordinate_y={'subcoordinate_scale': 2}` to increase the scale of each sub-plot, resulting in each curve's vertical range overlapping 50% with its adjacent elements. Additionally, the y-axis wheel-zoom will apply to each curve's respective sub-coordinate y-axis, rather than the global coordinate frame. More information about this feature can be found in [HoloViews' documentation](https://holoviews.org/user_guide/Customizing_Plots.html#subcoordinate-y-axis)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "For demonstration purposes, we'll temporarily add a new column of 'sensors' that splits up the temperature data into several series."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sensor = np.random.choice(['s1', 's2', 's3', 's4'], size=len(sst))\n",
+    "sst.assign(sensor=sensor).hvplot(by='sensor', subcoordinate_y=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Pandas datetime features\n",
+    "\n",
+    "hvPlot takes advantage of datetime features to make it trivial to produce plots that are aggregated on some feature of the date. For instance in the case of temperature data, it might be interesting to examine the monthly temperature distribution. We can easily do that by setting ``by='index.month'``."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sst.hvplot.violin(by='index.month')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can also use these datetime features as the ``x`` and ``y``. Here we'll look at the mean temperature at each hour of the day for each month in our dataset. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sst.hvplot.heatmap(x='index.hour', y='index.month', C='temperature', cmap='reds')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Combining this with the information from the [section on widgets](Widgets.ipynb), we can even use the datetime features to produce a plot that steps through each month in the data."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sst.hvplot(groupby=['index.year', 'index.month'], widget_type='scrubber', widget_location='bottom')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Xarray datetime features\n",
+    "\n",
+    "The same datetime features can be used with xarray data as well, although for now, the functionality is only supported for non-gridded output. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import xarray as xr\n",
+    "import hvplot.xarray  # noqa\n",
+    "\n",
+    "air_ds = xr.tutorial.open_dataset('air_temperature').load()\n",
+    "air_ds"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Similar to how we did for sea surface temperature above, we can get the distribution of air temperature by month."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "air_ds.hvplot.violin(y='air', by='time.month')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Once we reduce the dimensionality (by taking the mean over 'lat' and 'lon'), we can groupby various datetime features."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "air_ds.mean(dim=['lat', 'lon']).hvplot(by='time.hour', groupby=['time.year', 'time.month'])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Note that xarray supports grouping and aggregation using a similar syntax. To learn more about timeseries in xarray, see the [xarray timeseries docs](https://xarray.pydata.org/en/stable/time-series.html)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Working with Large Timeseries\n",
+    "\n",
+    "Working with large timeseries presents new visualization challenges. Consult our [Large Timeseries User Guide](Large_Timeseries.ipynb) to learn about various approaches."
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python",
+   "pygments_lexer": "ipython3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

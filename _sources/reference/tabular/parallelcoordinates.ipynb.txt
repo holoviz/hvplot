@@ -1,0 +1,76 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "fe36abdf-7ad3-4acf-8143-b8e9eb04c9a9",
+   "metadata": {},
+   "source": [
+    "# Parallelcoordinates"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "98539b4c-af81-4ad7-9fe5-8e1b828ee3d8",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import hvplot.pandas  # noqa"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "0b7674d1-b972-4b43-9e96-18c0d0fcc125",
+   "metadata": {},
+   "source": [
+    "Parallel coordinates are a common way of visualizing and analyzing high-dimensional datasets.\n",
+    "\n",
+    "To show a set of points in an n-dimensional space, a backdrop is drawn consisting of n parallel lines, typically vertical and equally spaced. A point in n-dimensional space is represented as a polyline with vertices on the parallel axes; the position of the vertex on the i-th axis corresponds to the i-th coordinate of the point. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b524875d-aaa6-40da-8b1a-9f42f636da6a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from bokeh.sampledata import iris\n",
+    "\n",
+    "iris = iris.flowers"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "02fa9997-0c52-4ee8-890f-9ce2a6352e3f",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "iris.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "c737ec55-2c45-40dd-92d0-69464607bf7f",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "hvplot.plotting.parallel_coordinates(\n",
+    "    iris,\n",
+    "    class_column='species',\n",
+    "    cols=['sepal_length', 'petal_length', 'petal_width']\n",
+    ")"
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python",
+   "pygments_lexer": "ipython3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

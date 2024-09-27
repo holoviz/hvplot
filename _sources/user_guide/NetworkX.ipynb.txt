@@ -1,0 +1,766 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# NetworkX"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The hvPlot NetworkX plotting API is meant as a drop-in replacement for the ``networkx.draw`` methods. In most cases the existing code will work as is or with minor modifications, returning a HoloViews object rendering an interactive bokeh plot, equivalent to the matplotlib plot the standard API constructs. First let us import the plotting interface and give it the canonical name ``hvnx``:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import hvplot.networkx as hvnx\n",
+    "\n",
+    "import networkx as nx\n",
+    "import holoviews as hv"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "In this user guide we will follow along with many of the examples in the [NetworkX tutorial](https://networkx.github.io/documentation/stable/tutorial.html#drawing-graphs) on drawing graphs.\n",
+    "\n",
+    "The ``hxnx`` namespace provides all the same plotting functions as ``nx``, this means in most cases one can simply be swapped for the other. This also includes most keywords used to customize the plots. The main difference is in the way multiple plots are composited, like all other hvPlot APIs the networkX functions returns HoloViews objects which can be composited using ``+`` and ``*`` operations:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "G = nx.petersen_graph()\n",
+    "\n",
+    "spring = hvnx.draw(G, with_labels=True)\n",
+    "shell = hvnx.draw_shell(G, nlist=[range(5, 10), range(5)], with_labels=True, font_weight='bold')\n",
+    "\n",
+    "spring + shell"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "H = nx.triangular_lattice_graph(1, 20)\n",
+    "hvnx.draw_planar(H, node_color='green', edge_color='brown')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The most common ``layout`` functions have dedicated drawing methods such as the ``draw_shell`` function above, which automatically computes the node positions.\n",
+    "\n",
+    "However layout algorithms are not necessarily deterministic, so if we want to plot and overlay subsets of either the nodes or edges using the ``nodelist`` and ``edgelist`` keywords the node positions should be computed ahead of time and passed in explicitly:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "pos = nx.layout.spring_layout(G)\n",
+    "\n",
+    "hvnx.draw(G, pos, nodelist=[0, 1, 2, 3, 4], node_color='blue') *\\\n",
+    "hvnx.draw_networkx_nodes(G, pos, nodelist=[5, 6, 7, 8, 9], node_color='green')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The `hvnx` namespace also makes `save` and `show` utilities available to save the plot to HTML or PNG files or display it in a separate browser window when working in a standard Python interpreter."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "G = nx.dodecahedral_graph()\n",
+    "\n",
+    "shells = [[2, 3, 4, 5, 6], [8, 1, 0, 19, 18, 17, 16, 15, 14, 7], [9, 10, 11, 12, 13]]\n",
+    "shell = hvnx.draw_shell(G, nlist=shells)\n",
+    "\n",
+    "pos = nx.nx_agraph.graphviz_layout(G)\n",
+    "graphviz = hvnx.draw(G, pos=pos)\n",
+    "\n",
+    "layout = shell + graphviz\n",
+    "\n",
+    "hvnx.save(layout, 'graph_layout.png')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Styling Graphs\n",
+    "\n",
+    "The full set of options which are inherited from networkx's API are listed in the ``hxnx.draw()`` docstring. Using these the more common styling of nodes and edges can easily be altered through the common set of options that are inherited from networkx. In addition common HoloViews options to control the size of the plots, axes and styling are also supported. Finally, some ``layout`` functions also accept special keyword arguments such as the ``nlist`` argument for the shell layout which specifies the shells."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "options = {\n",
+    "    'node_color': 'black',\n",
+    "    'node_size': 100,\n",
+    "    'edge_width': 3,\n",
+    "    'width': 300,\n",
+    "    'height': 300\n",
+    "}\n",
+    "\n",
+    "random = hvnx.draw_random(G, **options)\n",
+    "circular = hvnx.draw_circular(G, **options)\n",
+    "spectral = hvnx.draw_spectral(G, **options)\n",
+    "shell = hvnx.draw_shell(G, nlist=[range(5,10), range(5)], **options)\n",
+    "\n",
+    "(random + circular + spectral + shell).cols(2)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "In addition to being able to set scalar style values hvPlot also supports the HoloViews concept of [style mapping](https://holoviews.org/user_guide/Style_Mapping.html#styling-mapping), which uses so called ``dim`` transforms to map attributes of the graph nodes and edges to vary the visual attributes of the plot. For example we might construct a graph with edge weights and node sizes as attributes. The plotting function will extract these attributes which means they can be used to scale visual properties of the plot such as the ``edge_width``, ``edge_color`` or ``node_size``:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "G = nx.Graph()\n",
+    "\n",
+    "G.add_edge('a', 'b', weight=0.6)\n",
+    "G.add_edge('a', 'c', weight=0.2)\n",
+    "G.add_edge('c', 'd', weight=0.1)\n",
+    "G.add_edge('c', 'e', weight=0.7)\n",
+    "G.add_edge('c', 'f', weight=0.9)\n",
+    "G.add_edge('a', 'd', weight=0.3)\n",
+    "\n",
+    "G.add_node('a', size=20)\n",
+    "G.add_node('b', size=10)\n",
+    "G.add_node('c', size=12)\n",
+    "G.add_node('d', size=5)\n",
+    "G.add_node('e', size=8)\n",
+    "G.add_node('f', size=3)\n",
+    "\n",
+    "pos = nx.spring_layout(G)  # positions for all nodes\n",
+    "\n",
+    "hvnx.draw(G, pos, edge_color='weight', edge_cmap='viridis',\n",
+    "          edge_width=hv.dim('weight')*10, node_size=hv.dim('size')*20)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The full set of options that are supported can be accessed on the ``hvnx.draw`` function (note this does not include some bokeh specific option to control the styling of selection, nonselection and hover nodes and edges which may also be supplied and follow a pattern like ``hover_node_fill_color`` or ``selection_edge_line_alpha``).\n",
+    "\n",
+    "For reference here is the docstring listing the main supported option:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "print(hvnx.draw.__doc__)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The main difference to the networkx.draw API are a few options which are not supported (such as `font_weight` and `arrowsize`) and the renaming of `width` (which controls the edge line width) to ``edge_width`` since `width` and `height` are reserved for defining the screen dimensions of the plot."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Examples\n",
+    "\n",
+    "To demonstrate that the API works almost identically this section reproduces various examples from the NetworkX documentation."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Plot properties\n",
+    "\n",
+    "Compute some network properties for the lollipop graph.\n",
+    "\n",
+    "URL: https://networkx.github.io/documentation/stable/auto_examples/basic/plot_properties.html"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#    Copyright (C) 2004-2018 by\n",
+    "#    Aric Hagberg <hagberg@lanl.gov>\n",
+    "#    Dan Schult <dschult@colgate.edu>\n",
+    "#    Pieter Swart <swart@lanl.gov>\n",
+    "#    All rights reserved.\n",
+    "#    BSD license.\n",
+    "\n",
+    "#    Adapted by Philipp Rudiger <prudiger@anaconda.com>\n",
+    "\n",
+    "G = nx.lollipop_graph(4, 6)\n",
+    "\n",
+    "pathlengths = []\n",
+    "\n",
+    "print(\"source vertex {target:length, }\")\n",
+    "for v in G.nodes():\n",
+    "    spl = dict(nx.single_source_shortest_path_length(G, v))\n",
+    "    print(f'{v} {spl} ')\n",
+    "    for p in spl:\n",
+    "        pathlengths.append(spl[p])\n",
+    "\n",
+    "print('')\n",
+    "print(\"average shortest path length %s\" % (sum(pathlengths) / len(pathlengths)))\n",
+    "\n",
+    "# histogram of path lengths\n",
+    "dist = {}\n",
+    "for p in pathlengths:\n",
+    "    if p in dist:\n",
+    "        dist[p] += 1\n",
+    "    else:\n",
+    "        dist[p] = 1\n",
+    "\n",
+    "print('')\n",
+    "print(\"length #paths\")\n",
+    "verts = dist.keys()\n",
+    "for d in sorted(verts):\n",
+    "    print('%s %d' % (d, dist[d]))\n",
+    "\n",
+    "print(\"radius: %d\" % nx.radius(G))\n",
+    "print(\"diameter: %d\" % nx.diameter(G))\n",
+    "print(\"eccentricity: %s\" % nx.eccentricity(G))\n",
+    "print(\"center: %s\" % nx.center(G))\n",
+    "print(\"periphery: %s\" % nx.periphery(G))\n",
+    "print(\"density: %s\" % nx.density(G))\n",
+    "\n",
+    "hvnx.draw(G, with_labels=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Simple Path\n",
+    "\n",
+    "Draw a graph with hvPlot.\n",
+    "\n",
+    "URL: https://networkx.github.io/documentation/stable/auto_examples/drawing/plot_simple_path.html"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "G = nx.path_graph(8)\n",
+    "hvnx.draw(G)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Node colormap\n",
+    "\n",
+    "Draw a graph with hvPlot, color by degree.\n",
+    "\n",
+    "URL: https://networkx.github.io/documentation/stable/auto_examples/drawing/plot_node_colormap.html"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Author: Aric Hagberg (hagberg@lanl.gov)\n",
+    "# Adapted by Philipp Rudiger <prudiger@anaconda.com>\n",
+    "\n",
+    "G = nx.cycle_graph(24)\n",
+    "pos = nx.spring_layout(G, iterations=200)\n",
+    "\n",
+    "# Preferred API\n",
+    "# hvnx.draw(G, pos, node_color='index', node_size=500, cmap='Blues')\n",
+    "\n",
+    "# Original code\n",
+    "hvnx.draw(G, pos, node_color=range(24), node_size=500, cmap='Blues')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Edge Colormap\n",
+    "\n",
+    "Draw a graph with hvPlot, color edges.\n",
+    "\n",
+    "URL: https://networkx.github.io/documentation/stable/auto_examples/drawing/plot_edge_colormap.html"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Author: Aric Hagberg (hagberg@lanl.gov)\n",
+    "# Adapted by Philipp Rudiger <prudiger@anaconda.com>\n",
+    "\n",
+    "G = nx.star_graph(20)\n",
+    "pos = nx.spring_layout(G)\n",
+    "colors = range(20)\n",
+    "hvnx.draw(G, pos, node_color='#A0CBE2', edge_color=colors,\n",
+    "          edge_width=4, edge_cmap='Blues', with_labels=False)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### House With Colors\n",
+    "\n",
+    "Draw a graph with hvPlot.\n",
+    "\n",
+    "URL: https://networkx.github.io/documentation/stable/auto_examples/drawing/plot_house_with_colors.html"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Author: Aric Hagberg (hagberg@lanl.gov)\n",
+    "# Adapted by Philipp Rudiger <prudiger@anaconda.com>\n",
+    "\n",
+    "G = nx.house_graph()\n",
+    "# explicitly set positions\n",
+    "pos = {0: (0, 0),\n",
+    "       1: (1, 0),\n",
+    "       2: (0, 1),\n",
+    "       3: (1, 1),\n",
+    "       4: (0.5, 2.0)}\n",
+    "\n",
+    "hvnx.draw_networkx_nodes(G, pos, node_size=2000, nodelist=[4], padding=0.2) *\\\n",
+    "hvnx.draw_networkx_nodes(G, pos, node_size=3000, nodelist=[0, 1, 2, 3], node_color='black') *\\\n",
+    "hvnx.draw_networkx_edges(G, pos, alpha=0.5, width=6, xaxis=None, yaxis=None)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Circular Tree\n",
+    "\n",
+    "URL: https://networkx.org/documentation/stable/auto_examples/graphviz_layout/plot_circular_tree.html"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "try:\n",
+    "    import pygraphviz  # noqa\n",
+    "    from networkx.drawing.nx_agraph import graphviz_layout\n",
+    "except ImportError:\n",
+    "    try:\n",
+    "        import pydot  # noqa\n",
+    "        from networkx.drawing.nx_pydot import graphviz_layout\n",
+    "    except ImportError:\n",
+    "        raise ImportError(\"This example needs Graphviz and either \"\n",
+    "                          \"PyGraphviz or pydot\")\n",
+    "\n",
+    "G = nx.balanced_tree(3, 5)\n",
+    "pos = graphviz_layout(G, prog='twopi', args='')\n",
+    "hvnx.draw(G, pos, node_size=20, alpha=0.5, node_color=\"blue\", with_labels=False, width=600, height=600)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Spectral Embedding\n",
+    "\n",
+    "The spectral layout positions the nodes of the graph based on the eigenvectors of the graph Laplacian L=D−A, where A is the adjacency matrix and D is the degree matrix of the graph. By default, the spectral layout will embed the graph in two dimensions (you can embed your graph in other dimensions using the dim argument to either draw_spectral() or spectral_layout()).\n",
+    "\n",
+    "When the edges of the graph represent similarity between the incident nodes, the spectral embedding will place highly similar nodes closer to one another than nodes which are less similar.\n",
+    "\n",
+    "This is particularly striking when you spectrally embed a grid graph. In the full grid graph, the nodes in the center of the graph are pulled apart more than nodes on the periphery. As you remove internal nodes, this effect increases.\n",
+    "\n",
+    "URL: https://networkx.github.io/documentation/stable/auto_examples/drawing/plot_spectral_grid.html"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "options = {\n",
+    "    'node_size': 100,\n",
+    "    'width': 250, 'height': 250\n",
+    "}\n",
+    "\n",
+    "G = nx.grid_2d_graph(6, 6)\n",
+    "spectral1 = hvnx.draw_spectral(G, **options)\n",
+    "\n",
+    "G.remove_edge((2, 2), (2, 3))\n",
+    "spectral2 = hvnx.draw_spectral(G, **options)\n",
+    "\n",
+    "G.remove_edge((3, 2), (3, 3))\n",
+    "spectral3 = hvnx.draw_spectral(G, **options)\n",
+    "\n",
+    "G.remove_edge((2, 2), (3, 2))\n",
+    "spectral4 = hvnx.draw_spectral(G, **options)\n",
+    "\n",
+    "G.remove_edge((2, 3), (3, 3))\n",
+    "spectral5 = hvnx.draw_spectral(G, **options)\n",
+    "\n",
+    "G.remove_edge((1, 2), (1, 3))\n",
+    "spectral6 = hvnx.draw_spectral(G, **options)\n",
+    "\n",
+    "G.remove_edge((4, 2), (4, 3))\n",
+    "spectral7 = hvnx.draw_spectral(G, **options)\n",
+    "\n",
+    "(hv.Empty() + spectral1 + hv.Empty() +\n",
+    " spectral2 + spectral3 + spectral4 +\n",
+    " spectral5 + spectral6 + spectral7).cols(3)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Plot four grids\n",
+    "\n",
+    "Draw a graph with hvPlot.\n",
+    "\n",
+    "URL: https://networkx.github.io/documentation/stable/auto_examples/drawing/plot_four_grids.html"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Author: Aric Hagberg (hagberg@lanl.gov)\n",
+    "# Adapted by Philipp Rudiger <prudiger@anaconda.com>\n",
+    "\n",
+    "#    Copyright (C) 2004-2018\n",
+    "#    Aric Hagberg <hagberg@lanl.gov>\n",
+    "#    Dan Schult <dschult@colgate.edu>\n",
+    "#    Pieter Swart <swart@lanl.gov>\n",
+    "#    All rights reserved.\n",
+    "#    BSD license.\n",
+    "\n",
+    "G = nx.grid_2d_graph(4, 4)  # 4x4 grid\n",
+    "\n",
+    "pos = nx.spring_layout(G, iterations=100)\n",
+    "\n",
+    "g1 = hvnx.draw(G, pos, font_size=8)\n",
+    "\n",
+    "g2 = hvnx.draw(G, pos, node_color='black', node_size=0, with_labels=False)\n",
+    "\n",
+    "g3 = hvnx.draw(G, pos, node_color='green', node_size=250, with_labels=False, edge_width=6)\n",
+    "\n",
+    "H = G.to_directed()\n",
+    "g4 = hvnx.draw(H, pos, node_color='blue', node_size=20, with_labels=False)\n",
+    "\n",
+    "(g1 + g2 + g3 + g4).cols(2)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Ego Graph\n",
+    "\n",
+    "Example using the NetworkX ego_graph() function to return the main egonet of the largest hub in a Barabási-Albert network.\n",
+    "\n",
+    "URL: https://networkx.github.io/documentation/stable/auto_examples/drawing/plot_ego_graph.html"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Author:  Drew Conway (drew.conway@nyu.edu)\n",
+    "# Adapted by Philipp Rudiger <prudiger@anaconda.com>\n",
+    "\n",
+    "from operator import itemgetter\n",
+    "\n",
+    "# Create a BA model graph\n",
+    "n = 1000\n",
+    "m = 2\n",
+    "G = nx.generators.barabasi_albert_graph(n, m)\n",
+    "# find node with largest degree\n",
+    "node_and_degree = G.degree()\n",
+    "(largest_hub, degree) = sorted(node_and_degree, key=itemgetter(1))[-1]\n",
+    "# Create ego graph of main hub\n",
+    "hub_ego = nx.ego_graph(G, largest_hub)\n",
+    "# Draw graph\n",
+    "pos = nx.spring_layout(hub_ego)\n",
+    "g = hvnx.draw(hub_ego, pos, node_color='blue', node_size=50, with_labels=False)\n",
+    "# Draw ego as large and red\n",
+    "gnodes = hvnx.draw_networkx_nodes(hub_ego, pos, nodelist=[largest_hub], node_size=300, node_color='red')\n",
+    "\n",
+    "g * gnodes"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Random Geometric Graph\n",
+    "\n",
+    "URL: https://networkx.github.io/documentation/stable/auto_examples/drawing/plot_random_geometric_graph.html"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "G = nx.random_geometric_graph(200, 0.125)\n",
+    "# position is stored as node attribute data for random_geometric_graph\n",
+    "pos = nx.get_node_attributes(G, 'pos')\n",
+    "\n",
+    "# find node near center (0.5,0.5)\n",
+    "dmin = 1\n",
+    "ncenter = 0\n",
+    "for n in pos:\n",
+    "    x, y = pos[n]\n",
+    "    d = (x - 0.5)**2 + (y - 0.5)**2\n",
+    "    if d < dmin:\n",
+    "        ncenter = n\n",
+    "        dmin = d\n",
+    "\n",
+    "# color by path length from node near center\n",
+    "p = nx.single_source_shortest_path_length(G, ncenter)\n",
+    "\n",
+    "hvnx.draw_networkx_edges(G, pos, nodelist=[ncenter], alpha=0.4, width=600, height=600) *\\\n",
+    "hvnx.draw_networkx_nodes(G, pos, nodelist=list(p.keys()),\n",
+    "                         node_size=80,\n",
+    "                         node_color=list(p.values()),\n",
+    "                         cmap='Reds_r')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Weighted Graph\n",
+    "\n",
+    "An example using Graph as a weighted network.\n",
+    "\n",
+    "URL: https://networkx.github.io/documentation/stable/auto_examples/drawing/plot_weighted_graph.html"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Author: Aric Hagberg (hagberg@lanl.gov)\n",
+    "# Adapted by Philipp Rudiger <prudiger@anaconda.com>\n",
+    "\n",
+    "import networkx as nx\n",
+    "\n",
+    "G = nx.Graph()\n",
+    "\n",
+    "G.add_edge('a', 'b', weight=0.6)\n",
+    "G.add_edge('a', 'c', weight=0.2)\n",
+    "G.add_edge('c', 'd', weight=0.1)\n",
+    "G.add_edge('c', 'e', weight=0.7)\n",
+    "G.add_edge('c', 'f', weight=0.9)\n",
+    "G.add_edge('a', 'd', weight=0.3)\n",
+    "\n",
+    "elarge = [(u, v) for (u, v, attr) in G.edges(data=True) if attr['weight'] > 0.5]\n",
+    "esmall = [(u, v) for (u, v, attr) in G.edges(data=True) if attr['weight'] <= 0.5]\n",
+    "\n",
+    "pos = nx.spring_layout(G)  # positions for all nodes\n",
+    "\n",
+    "# nodes\n",
+    "nodes = hvnx.draw_networkx_nodes(G, pos, node_size=700)\n",
+    "\n",
+    "# edges\n",
+    "edges1 = hvnx.draw_networkx_edges(\n",
+    "    G, pos, edgelist=elarge, edge_width=6)\n",
+    "edges2 = hvnx.draw_networkx_edges(\n",
+    "    G, pos, edgelist=esmall, edge_width=6, alpha=0.5, edge_color='blue', style='dashed')\n",
+    "labels = hvnx.draw_networkx_labels(G, pos, font_size=20, font_family='sans-serif')\n",
+    "\n",
+    "edges1 * edges2 * nodes * labels"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Directed Graph\n",
+    "\n",
+    "Draw a graph with directed edges using a colormap and different node sizes.\n",
+    "\n",
+    "Edges have different colors and alphas (opacity). Drawn using matplotlib.\n",
+    "\n",
+    "URL: https://networkx.github.io/documentation/stable/auto_examples/drawing/plot_directed.html"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Author: Rodrigo Dorantes-Gilardi (rodgdor@gmail.com)\n",
+    "# Adapted by Philipp Rudiger <prudiger@anaconda.com>\n",
+    "\n",
+    "G = nx.generators.directed.random_k_out_graph(10, 3, 0.5)\n",
+    "pos = nx.layout.spring_layout(G)\n",
+    "\n",
+    "node_sizes = [3 + 10 * i for i in range(len(G))]\n",
+    "M = G.number_of_edges()\n",
+    "edge_colors = range(2, M + 2)\n",
+    "edge_alphas = [(5 + i) / (M + 4) for i in range(M)]\n",
+    "\n",
+    "nodes = hvnx.draw_networkx_nodes(G, pos, node_size=node_sizes, node_color='blue')\n",
+    "edges = hvnx.draw_networkx_edges(G, pos, node_size=node_sizes, arrowstyle='->',\n",
+    "                               arrowsize=10, edge_color=edge_colors,\n",
+    "                               edge_cmap='Blues', edge_width=2, colorbar=True)\n",
+    "\n",
+    "nodes * edges"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Giant Component\n",
+    "\n",
+    "This example illustrates the sudden appearance of a giant connected component in a binomial random graph.\n",
+    "\n",
+    "https://networkx.org/documentation/stable/auto_examples/graphviz_layout/plot_giant_component.html"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#    Copyright (C) 2006-2018\n",
+    "#    Aric Hagberg <hagberg@lanl.gov>\n",
+    "#    Dan Schult <dschult@colgate.edu>\n",
+    "#    Pieter Swart <swart@lanl.gov>\n",
+    "#    All rights reserved.\n",
+    "#    BSD license.\n",
+    "\n",
+    "# Adapted by Philipp Rudiger <prudiger@anaconda.com>\n",
+    "\n",
+    "import math\n",
+    "\n",
+    "try:\n",
+    "    import pygraphviz  # noqa\n",
+    "    from networkx.drawing.nx_agraph import graphviz_layout\n",
+    "    layout = graphviz_layout\n",
+    "except ImportError:\n",
+    "    try:\n",
+    "        import pydot  # noqa\n",
+    "        from networkx.drawing.nx_pydot import graphviz_layout\n",
+    "        layout = graphviz_layout\n",
+    "    except ImportError:\n",
+    "        print(\"PyGraphviz and pydot not found;\\n\"\n",
+    "              \"drawing with spring layout;\\n\"\n",
+    "              \"will be slow.\")\n",
+    "        layout = nx.spring_layout\n",
+    "\n",
+    "n = 150  # 150 nodes\n",
+    "# p value at which giant component (of size log(n) nodes) is expected\n",
+    "p_giant = 1.0 / (n - 1)\n",
+    "# p value at which graph is expected to become completely connected\n",
+    "p_conn = math.log(n) / float(n)\n",
+    "\n",
+    "# the following range of p values should be close to the threshold\n",
+    "pvals = [0.003, 0.006, 0.008, 0.015]\n",
+    "\n",
+    "region = 220  # for pylab 2x2 subplot layout\n",
+    "plots = []\n",
+    "for p in pvals:\n",
+    "    G = nx.binomial_graph(n, p)\n",
+    "    pos = layout(G)\n",
+    "    region += 1\n",
+    "    g = hvnx.draw(G, pos, with_labels=False, node_size=15)\n",
+    "    # identify largest connected component\n",
+    "    Gcc = sorted([G.subgraph(c) for c in nx.connected_components(G)], key=len, reverse=True)\n",
+    "    G0 = Gcc[0]\n",
+    "    edges = hvnx.draw_networkx_edges(\n",
+    "        G0, pos, with_labels=False, edge_color='red', edge_width=6.0)\n",
+    "    \n",
+    "    # show other connected components\n",
+    "    other_edges = []\n",
+    "    for Gi in Gcc[1:]:\n",
+    "        if len(Gi) > 1:\n",
+    "            edge = hvnx.draw_networkx_edges(Gi, pos,\n",
+    "                                   with_labels=False,\n",
+    "                                   edge_color='red',\n",
+    "                                   alpha=0.3,\n",
+    "                                   edge_width=5.0\n",
+    "                                  )\n",
+    "            other_edges.append(edge)\n",
+    "    plots.append((g*edges*hv.Overlay(other_edges)).relabel(\"p = %6.3f\" % (p)))\n",
+    "\n",
+    "hv.Layout(plots).cols(2)"
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python",
+   "pygments_lexer": "ipython3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

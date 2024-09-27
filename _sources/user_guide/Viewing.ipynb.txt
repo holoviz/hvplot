@@ -1,0 +1,204 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Viewing"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "hvPlot is written to work well inside a Jupyter notebook, from the interactive Python command prompt, or inside a Python batch script. In this user guide we will discover how to use hvPlot to view plots in each of these cases and how to save the plots to a separate file."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Using hvPlot in different contexts\n",
+    "\n",
+    "### Notebook\n",
+    "\n",
+    "In a Jupyter notebook, hvPlot will return HoloViews objects that display themselves, as long as the plotting library has been loaded. The easiest way of loading the plotting library is to import one of the plotting accessors such as pandas' one with `hvplot.pandas`:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import hvplot.pandas  # noqa"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The above import statement triggers the loading of the default plotting library, i.e. Bokeh.\n",
+    "\n",
+    "Here we will load some of the sample data and then compose the HoloViews objects into a layout:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from hvplot.sample_data import airline_flights, us_crime\n",
+    "\n",
+    "violent_crime = us_crime.hvplot(x='Year', y='Violent Crime rate', width=400)\n",
+    "burglaries    = us_crime.hvplot(x='Year', y='Burglary rate', width=400)\n",
+    "\n",
+    "violent_crime + burglaries"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Using Panel\n",
+    "\n",
+    "To display the object from inside a function it's recommended that you use [Panel](https://panel.holoviz.org). Panel can also be used to create more complicated layouts, to add additional interactivity, and to deploy servers."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import panel as pn\n",
+    "\n",
+    "pane = pn.panel(violent_crime)\n",
+    "pane"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "This ``pane`` can be updated with another HoloViews object replacing the plot:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "pane.object = burglaries"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Or the object can be updated inplace:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "pane.object *= violent_crime "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Python Command Prompt & Scripts\n",
+    "\n",
+    "When working outside the notebook we can instead use the ``hvplot.show`` function, which will open the plot in a new browser window:\n",
+    "\n",
+    "<img src=\"../assets/console.png\" style=\"display: table; margin: 0 auto;\"></img>\n",
+    "\n",
+    "For static plots this will simply save a temporary file and open it, however for dynamic and [datashaded](https://datashader.org) plots it will automatically launch a Bokeh server, enabling all the dynamic features.\n",
+    "\n",
+    "<img src=\"../assets/console_server.gif\" style=\"display: table; margin: 0 auto;\"></img>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Saving plots\n",
+    "\n",
+    "When looking at any Bokeh plot in a web browser, you can use the toolbar's \"Save\" tool to export the plot as a PNG (try it on one of the plots above!).\n",
+    "\n",
+    "hvPlot also provides a convenient ``save`` function to export HoloViews objects to a file. By default it will save the plot as HTML:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot = airline_flights.hvplot.hexbin(x='airtime', y='arrdelay', colorbar=True, width=600, height=500, logz=True)\n",
+    "\n",
+    "hvplot.save(plot, 'test.html')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "By default, the HTML file generated will depend on loading JavaScript code for BokehJS from the online CDN repository, to reduce the file size.  If you need to work in an airgapped or no-network environment, you can declare that `INLINE` resources should be used instead of `CDN`:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from bokeh.resources import INLINE\n",
+    "hvplot.save(plot, 'test.html', resources=INLINE)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Finally, if a 'png' file extension is specified, the exported plot will be rendered as a PNG, which currently requires Selenium and PhantomJS to be installed:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "hvplot.save(plot, 'test.png')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from pathlib import Path\n",
+    "\n",
+    "Path('test.html').unlink(missing_ok=True)\n",
+    "Path('test.png').unlink(missing_ok=True)"
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python",
+   "pygments_lexer": "ipython3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}
