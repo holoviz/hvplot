@@ -10,7 +10,6 @@
 name: hvplotdocs
 channels:
   - nodefaults
-  - pyviz/label/dev
   - conda-forge
 dependencies:
   - python=3.11
@@ -35,7 +34,6 @@ dependencies:
   - ipywidgets
   - jinja2
   - matplotlib
-  - nbsite>=0.8.4
   - networkx>=2.6.3
   - notebook>=5.4
   - numba>=0.51.0
