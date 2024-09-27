@@ -18,7 +18,7 @@
 
 The API is based on the familiar Pandas `.plot` API and the innovative `.interactive` API.
 
-<img src="https://github.com/MarcSkovMadsen/awesome-panel-assets/blob/master/images/hvPlot/hvplot-total-intro.gif?raw=true" style="max-height:600px;border-radius:2%;">
+<img src="https://github.com/MarcSkovMadsen/old-awesome-panel-assets/blob/master/images/hvPlot/hvplot-total-intro.gif?raw=true" style="max-height:600px;border-radius:2%;">
 
 ## hvPlot works with the tools you know and love
 
@@ -28,7 +28,7 @@ hvPlot
 - supports the plotting backends [Bokeh](https://docs.bokeh.org/en/latest/), [Matplotlib](https://matplotlib.org/) and [Plotly](https://plotly.com/python/).
 - exposes the powerful tools from the [HoloViz](https://holoviz.org/) ecosystem in a familiar and convenient API.
 
-[<img src="https://hvplot.holoviz.org/assets/diagram.svg" style="max-height:400px;border-radius:2%;"/>](https://holoviz.org/)
+[<img src="https://hvplot.holoviz.org/_images/diagram.svg" style="max-height:400px;border-radius:2%;"/>](https://holoviz.org/)
 
 hvPlot is **the simplest way to benefit from the [HoloViz](https://holoviz.org/) ecosystem for data exploration**.
 
@@ -87,7 +87,7 @@ Use the `.hvplot` API as you would use the Pandas or Xarray `.plot` API:
 df.hvplot()
 ```
 
-[<img src="https://github.com/MarcSkovMadsen/awesome-panel-assets/blob/master/images/hvPlot/hvplot-intro-plot.gif?raw=true" style="max-height:300px;border-radius:2%;">](https://hvplot.holoviz.org/user_guide/index.html)
+[<img src="https://github.com/MarcSkovMadsen/old-awesome-panel-assets/blob/master/images/hvPlot/hvplot-intro-plot.gif?raw=true" style="max-height:300px;border-radius:2%;">](https://hvplot.holoviz.org/user_guide/index.html)
 
 
 ### Interactive data apps
@@ -101,7 +101,7 @@ pn.extension()
 df.interactive(width=600).head(n=pn.widgets.IntSlider(start=1, end=5, value=3))
 ```
 
-[<img src="https://github.com/MarcSkovMadsen/awesome-panel-assets/blob/master/images/hvPlot/hvplot-intro-interactive.gif?raw=true" style="max-height:300px;border-radius:2%;">](https://hvplot.holoviz.org/user_guide/Interactive.html)
+[<img src="https://github.com/MarcSkovMadsen/old-awesome-panel-assets/blob/master/images/hvPlot/hvplot-intro-interactive.gif?raw=true" style="max-height:300px;border-radius:2%;">](https://hvplot.holoviz.org/user_guide/Interactive.html)
 
 ### How to find documentation from your notebook or editor
 
