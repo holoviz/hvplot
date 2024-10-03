@@ -1836,11 +1836,14 @@ class HoloViewsConverter:
                     f"datashaded points; reverting to 'mouse'."
                 )
 
-            stream = Tap if len(self.data) > 10000 else PointerXY
-            param.main.param.warning(
-                'Hovering over datashaded points is slow for large datasets; '
-                'tap on the plot to see a hover tooltip over desired point.'
-            )
+            stream = PointerXY
+            if len(self.data) > 10000:
+                stream = Tap
+                param.main.param.warning(
+                    'Hovering over datashaded points is slow for large datasets; '
+                    'tap on the plot to see a hover tooltip over desired point.'
+                )
+
             inspector = inspect_points.instance(
                 streams=[stream], transform=self._datashade_hover_transform
             )
@@ -1882,6 +1885,14 @@ class HoloViewsConverter:
 
             if agg_col in cols:
                 cols.remove(agg_col)
+        else:
+            key = 'Count'
+            for i in range(1, 10):
+                if key in df.columns:
+                    key = f'Count_{i}'
+                else:
+                    break
+            agg_value = pd.Series([len(df)], index=[key])
 
         # take the mean of numeric columns
         num_series = df[cols].select_dtypes(include=['number']).mean()
@@ -1894,8 +1905,7 @@ class HoloViewsConverter:
             agg_series_map['object_cols'] = obj_series
 
         # to preserve order of other columns, add this last
-        if agg_col:
-            agg_series_map[agg_col] = agg_value
+        agg_series_map[agg_col] = agg_value
 
         # concat all series into a single dataframe which has one row
         df_hover = pd.concat(agg_series_map.values()).to_frame().transpose()
