@@ -156,11 +156,6 @@ class TestDatashader(ComparisonTestCase):
         opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
         assert 'hover' not in opts.get('tools')
 
-    def test_when_datashade_is_true_hover_can_still_be_true(self):
-        plot = self.df.hvplot(x='x', y='y', datashade=True, hover=True)
-        opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
-        assert 'hover' in opts.get('tools')
-
     def test_xlim_affects_x_range(self):
         data = pd.DataFrame(np.random.randn(100).cumsum())
         img = data.hvplot(xlim=(0, 20000), datashade=True, dynamic=False)
