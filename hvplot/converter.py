@@ -1830,6 +1830,11 @@ class HoloViewsConverter:
 
         # a workaround to show hover info for datashaded points
         if self.hover and self.datashade and self.kind == 'points':
+            if self.hover_mode != 'mouse':
+                param.main.param.warning(
+                    f'Got unsupported hover_mode={self.hover_mode!r} for '
+                    f"datashaded points; reverting to 'mouse'."
+                )
             inspector = inspect_points.instance(
                 streams=[PointerXY], transform=self._datashade_hover_transform
             )

@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from holoviews import Store, render
+from holoviews import Store, render, renderer
 from holoviews.element import Image, QuadMesh, Points
 from holoviews.core.spaces import DynamicMap
 from holoviews.core.overlay import Overlay
@@ -323,6 +323,23 @@ class TestDatashader(ComparisonTestCase):
         element = overlay.get(1)
         assert isinstance(element, eltype)
         assert len(element) == 0
+
+    @parameterized.expand([(None,), (True,), ('vline',), ('hline',)])
+    def test_include_inspect_point_hover(self, hover):
+        df = pd.DataFrame(
+            np.random.multivariate_normal((0, 0), [[0.1, 0.1], [0.1, 1.0]], (5000,))
+        ).rename({0: 'x', 1: 'y'}, axis=1)
+
+        p = df.hvplot.points(datashade=True, hover=hover)
+        assert renderer('bokeh').get_plot(p).name.startswith('Overlay')
+
+    def test_include_inspect_point_no_hover(self):
+        df = pd.DataFrame(
+            np.random.multivariate_normal((0, 0), [[0.1, 0.1], [0.1, 1.0]], (5000,))
+        ).rename({0: 'x', 1: 'y'}, axis=1)
+
+        p = df.hvplot.points(datashade=True, hover=False)
+        assert renderer('bokeh').get_plot(p).name.startswith('RGB')
 
 
 class TestChart2D(ComparisonTestCase):
