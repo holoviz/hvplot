@@ -45,7 +45,7 @@ from holoviews.element import (
 from holoviews.plotting.bokeh import OverlayPlot, colormap_generator
 from holoviews.plotting.util import process_cmap
 from holoviews.operation import histogram, apply_when
-from holoviews.streams import Buffer, Pipe, PointerXY
+from holoviews.streams import Buffer, Pipe, Tap, PointerXY
 from holoviews.util.transform import dim, lon_lat_to_easting_northing
 from pandas import DatetimeIndex, MultiIndex
 
@@ -1835,8 +1835,14 @@ class HoloViewsConverter:
                     f'Got unsupported hover_mode={self.hover_mode!r} for '
                     f"datashaded points; reverting to 'mouse'."
                 )
+
+            stream = Tap if len(self.data) > 10000 else PointerXY
+            param.main.param.warning(
+                'Hovering over datashaded points is slow for large datasets; '
+                'tap on the plot to see a hover tooltip over desired point.'
+            )
             inspector = inspect_points.instance(
-                streams=[PointerXY], transform=self._datashade_hover_transform
+                streams=[stream], transform=self._datashade_hover_transform
             )
             processed *= inspector(processed).opts(
                 size=10,
