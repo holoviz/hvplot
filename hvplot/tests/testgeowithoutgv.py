@@ -76,9 +76,9 @@ class TestAnnotationNotGeo:
     @pytest.mark.skipif(dd is None, reason='dask not installed')
     def test_plot_with_dask(self, simple_df):
         ddf = dd.from_pandas(simple_df, npartitions=2)
-        plot = ddf.hvplot.points('x', 'y')
-        assert 'x_' in plot.get(1).data
-        assert 'y_' in plot.get(1).data
+        plot = ddf.hvplot.points('x', 'y', tiles=True)
+        assert 'x_' not in plot.get(1).data
+        assert 'y_' not in plot.get(1).data
         assert len(plot) == 2
         assert isinstance(plot.get(0), hv.Tiles)
         bk_plot = bk_renderer.get_plot(plot)

@@ -2173,16 +2173,13 @@ class HoloViewsConverter:
             if data.crs is not None:
                 data = data.to_crs(epsg=3857)
             return data, x, y
-        else:
+        elif not (is_dask(data) or is_ibis(data)):
+            # no dask/ibis as to prevent eager evaluation
+            # https://github.com/holoviz/hvplot/pull/1432/files#r1789862990
             min_x = np.min(data[x])
             max_x = np.max(data[x])
             min_y = np.min(data[y])
             max_y = np.max(data[y])
-
-            if hasattr(min_x, 'compute'):
-                min_x, max_x = min_x.compute(), max_x.compute()
-            if hasattr(min_y, 'compute'):
-                min_y, max_y = min_y.compute(), max_y.compute()
 
             x_within_bounds = -180 <= min_x <= 360 and -180 <= max_x <= 360
             y_within_bounds = -90 <= min_y <= 90 and -90 <= max_y <= 90
