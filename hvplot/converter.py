@@ -60,6 +60,7 @@ from .util import (
     is_cudf,
     is_streamz,
     is_ibis,
+    is_xvec,
     is_xarray,
     is_xarray_dataarray,
     process_crs,
@@ -1059,6 +1060,22 @@ class HoloViewsConverter:
         if col is not None:
             grid.append(col)
         streaming = False
+
+        if is_xvec(data):
+            import xvec  # noqa: F401
+
+            geom_coords = list(data.xvec.geom_coords)
+            if len(geom_coords) > 1:
+                param.main.param.warning(
+                    f'Only the first geometry coord will be rendered: {geom_coords[0]!r}. The '
+                    f"others are 'flattened' in groupby: {geom_coords[1:]}"
+                )
+                data = data.drop_vars(geom_coords[1:])
+            if groupby is None:
+                groupby = [dim for dim in data.dims if dim != geom_coords[0]]
+            data = data.xvec.to_geodataframe()
+            self.source_data = data
+
         if is_geodataframe(data):
             datatype = 'geopandas' if hasattr(data, 'geom_type') else 'spatialpandas'
             self.data = data
