@@ -18,7 +18,7 @@
 
 The API is based on the familiar Pandas `.plot` API and the innovative `.interactive` API.
 
-<img src="https://github.com/MarcSkovMadsen/old-awesome-panel-assets/blob/master/images/hvPlot/hvplot-total-intro.gif?raw=true" style="max-height:600px;border-radius:2%;">
+<img src="https://assets.holoviz.org/hvplot/hvplot-total-intro.gif" style="max-height:600px;border-radius:2%;">
 
 ## hvPlot works with the tools you know and love
 
@@ -36,7 +36,7 @@ hvPlot is **the simplest way to benefit from the [HoloViz](https://holoviz.org/)
 
 Check out [this blog post](https://towardsdatascience.com/the-easiest-way-to-create-an-interactive-dashboard-in-python-77440f2511d1) to see how easy it is to create an interactive dashboard with hvPlot and Panel.
 
-<a href="https://towardsdatascience.com/the-easiest-way-to-create-an-interactive-dashboard-in-python-77440f2511d1"><img src="https://miro.medium.com/max/700/1*bZjPtucT8O1esjQaGQenHw.gif" style="max-height:600px;border-radius:2%;"></a>
+<a href="https://towardsdatascience.com/the-easiest-way-to-create-an-interactive-dashboard-in-python-77440f2511d1"><img src="https://assets.holoviz.org/hvplot/interactive_dashboard.gif" style="max-height:600px;border-radius:2%;"></a>
 
 ## Mini getting-started
 
@@ -54,12 +54,6 @@ or with ``pip``:
 
 ```bash
 pip install hvplot
-```
-
-Please note that for versions of `jupyterlab<3.0`, you must install the JupyterLab extension manually with:
-
-```bash
-jupyter labextension install @pyviz/jupyterlab_pyviz
 ```
 
 ### Plotting data
@@ -87,7 +81,7 @@ Use the `.hvplot` API as you would use the Pandas or Xarray `.plot` API:
 df.hvplot()
 ```
 
-[<img src="https://github.com/MarcSkovMadsen/old-awesome-panel-assets/blob/master/images/hvPlot/hvplot-intro-plot.gif?raw=true" style="max-height:300px;border-radius:2%;">](https://hvplot.holoviz.org/user_guide/index.html)
+[<img src="https://assets.holoviz.org/hvplot/hvplot-intro-plot.gif" style="max-height:300px;border-radius:2%;">](https://hvplot.holoviz.org/user_guide/index.html)
 
 
 ### Interactive data apps
@@ -101,7 +95,7 @@ pn.extension()
 df.interactive(width=600).head(n=pn.widgets.IntSlider(start=1, end=5, value=3))
 ```
 
-[<img src="https://github.com/MarcSkovMadsen/old-awesome-panel-assets/blob/master/images/hvPlot/hvplot-intro-interactive.gif?raw=true" style="max-height:300px;border-radius:2%;">](https://hvplot.holoviz.org/user_guide/Interactive.html)
+[<img src="https://assets.holoviz.org/hvplot/hvplot-intro-interactive.gif" style="max-height:300px;border-radius:2%;">](https://hvplot.holoviz.org/user_guide/Interactive.html)
 
 ### How to find documentation from your notebook or editor
 
