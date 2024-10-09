@@ -446,6 +446,16 @@ def is_xarray(data):
     return isinstance(data, (DataArray, Dataset))
 
 
+def is_lazy_data(data):
+    if is_dask(data) or is_ibis(data):
+        return True
+    elif is_polars(data):
+        import polars as pl
+
+        return isinstance(data, pl.LazyFrame)
+    return False
+
+
 def is_xarray_dataarray(data):
     if not check_library(data, 'xarray'):
         return False

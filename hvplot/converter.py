@@ -60,6 +60,7 @@ from .util import (
     is_cudf,
     is_streamz,
     is_ibis,
+    is_lazy_data,
     is_xarray,
     is_xarray_dataarray,
     process_crs,
@@ -2173,7 +2174,7 @@ class HoloViewsConverter:
             if data.crs is not None:
                 data = data.to_crs(epsg=3857)
             return data, x, y
-        elif not (is_dask(data) or is_ibis(data)):
+        elif not is_lazy_data(data):
             # no dask/ibis as to prevent eager evaluation
             # https://github.com/holoviz/hvplot/pull/1432/files#r1789862990
             min_x = np.min(data[x])
