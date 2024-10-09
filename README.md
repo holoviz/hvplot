@@ -56,12 +56,6 @@ or with ``pip``:
 pip install hvplot
 ```
 
-Please note that for versions of `jupyterlab<3.0`, you must install the JupyterLab extension manually with:
-
-```bash
-jupyter labextension install @pyviz/jupyterlab_pyviz
-```
-
 ### Plotting data
 
 Work with your data source:
