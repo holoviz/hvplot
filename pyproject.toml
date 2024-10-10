@@ -231,7 +231,14 @@ name = "hvplottests"
 # reqs = ["-e .."]  # Doesn't work
 
 [tool.pyproject2conda.envs."docs"]
-channels = ["nodefaults", "conda-forge"]
+channels = [
+    "nodefaults",
+    # To get dev HoloViews, not always needed.
+    "pyviz/label/dev",
+    # To get dev nbsite, not always needed.
+    "pyviz/label/tooling_dev",
+    "conda-forge"
+]
 python = ["3.11"]
 extras = ["doc", "examples", "geo", "graphviz", "dev-extras"]
 name = "hvplotdocs"
