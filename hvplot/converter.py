@@ -60,6 +60,7 @@ from .util import (
     is_cudf,
     is_streamz,
     is_ibis,
+    is_lazy_data,
     is_xarray,
     is_xarray_dataarray,
     process_crs,
@@ -2173,11 +2174,13 @@ class HoloViewsConverter:
             if data.crs is not None:
                 data = data.to_crs(epsg=3857)
             return data, x, y
-        else:
+        elif not is_lazy_data(data):
+            # To prevent eager evaluation: https://github.com/holoviz/hvplot/pull/1432
             min_x = np.min(data[x])
             max_x = np.max(data[x])
             min_y = np.min(data[y])
             max_y = np.max(data[y])
+
             x_within_bounds = -180 <= min_x <= 360 and -180 <= max_x <= 360
             y_within_bounds = -90 <= min_y <= 90 and -90 <= max_y <= 90
             if x_within_bounds and y_within_bounds:

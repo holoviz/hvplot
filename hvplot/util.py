@@ -446,6 +446,21 @@ def is_xarray(data):
     return isinstance(data, (DataArray, Dataset))
 
 
+def is_lazy_data(data):
+    """Check if data is lazy
+
+    This checks if the datatype is Dask, Ibis, or Polars' LazyFrame.
+    It is useful to avoid eager evaluation of the data.
+    """
+    if is_dask(data) or is_ibis(data):
+        return True
+    elif is_polars(data):
+        import polars as pl
+
+        return isinstance(data, pl.LazyFrame)
+    return False
+
+
 def is_xarray_dataarray(data):
     if not check_library(data, 'xarray'):
         return False
