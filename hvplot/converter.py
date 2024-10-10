@@ -2175,8 +2175,7 @@ class HoloViewsConverter:
                 data = data.to_crs(epsg=3857)
             return data, x, y
         elif not is_lazy_data(data):
-            # no dask/ibis as to prevent eager evaluation
-            # https://github.com/holoviz/hvplot/pull/1432/files#r1789862990
+            # To prevent eager evaluation: https://github.com/holoviz/hvplot/pull/1432
             min_x = np.min(data[x])
             max_x = np.max(data[x])
             min_y = np.min(data[y])

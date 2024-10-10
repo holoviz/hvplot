@@ -447,6 +447,11 @@ def is_xarray(data):
 
 
 def is_lazy_data(data):
+    """Check if data is lazy
+
+    This checks if the datatype is Dask, Ibis, or Polars' LazyFrame.
+    It is useful to avoid eager evaluation of the data.
+    """
     if is_dask(data) or is_ibis(data):
         return True
     elif is_polars(data):
