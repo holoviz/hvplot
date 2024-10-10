@@ -105,8 +105,6 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: install
         run: pip install -v --prefer-binary -e ."[doc, examples, geo]"
-      - name: install dev nbsite
-        run: pip install --pre -U nbsite
       - name: pip list
         run: pip list
       - name: Set and echo git ref
