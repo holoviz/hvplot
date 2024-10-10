@@ -50,8 +50,9 @@ jobs:
         run: |
           echo "Deploying from ref ${GITHUB_REF#refs/*/}"
           echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
-      - name: install dev nbsite
-        run: pip install --pre -U nbsite
+      - name: install dev
+        # To make sure the latest is installed.
+        run: pip install -e . --no-deps
       - name: conda info
         run: conda info
       - name: conda list
