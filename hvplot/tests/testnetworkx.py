@@ -24,3 +24,10 @@ class TestOptions(TestCase):
     def test_nodes_are_not_sorted(self):
         plot = hvnx.draw(self.g)
         assert all(self.nodes == plot.nodes.dimension_values(2))
+
+    def test_default_hover_tooltip(self):
+        from bokeh.models import HoverTool
+
+        plot = hvnx.draw(self.g)
+        hover = next(t for t in plot.opts['tools'] if isinstance(t, HoverTool))
+        assert [('index', '@{index_hover}')] == hover.tooltips
