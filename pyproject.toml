@@ -146,7 +146,7 @@ examples-tests = [
 # Additional packages required to build the docs
 doc = [
     "hvplot[examples]",
-    "nbsite >=0.8.4",
+    "nbsite >=0.8.6",
     "sphinxext-rediraffe",
 ]
 # Trick to let pip know we want to install dev dependencies

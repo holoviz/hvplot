@@ -58,6 +58,7 @@ html_favicon = '_static/favicon.ico'
 extensions += [  # noqa
     'nbsite.gallery',
     'nbsite.analytics',
+    'nbsite.nb_interactivity_warning',
     'sphinx_copybutton',
     'sphinxext.rediraffe',
 ]
@@ -114,7 +115,7 @@ nb_execution_excludepatterns = [
     'user_guide/Streaming.ipynb',
 ]
 # cell execution timeout in seconds (-1 to ignore, 30 by default)
-nb_execution_timeout = 120
+nb_execution_timeout = 240
 
 if os.getenv('HVPLOT_REFERENCE_GALLERY') not in ('False', 'false', '0'):
     rediraffe_redirects.update(
