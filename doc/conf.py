@@ -58,6 +58,7 @@ html_favicon = '_static/favicon.ico'
 extensions += [  # noqa
     'nbsite.gallery',
     'nbsite.analytics',
+    'nbsite.nb_interactivity_warning',
     'sphinx_copybutton',
     'sphinxext.rediraffe',
 ]
