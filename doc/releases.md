@@ -2,6 +2,29 @@
 
 See [the HoloViz blog](https://blog.holoviz.org/#category=hvplot) for a visual summary of the major features added in a selection of releases.
 
+## Version 0.11.1 (2024-10-16)
+
+The 0.11.1 release is a patch release that brings a few bugfixes and documentation improvements. In particular it fixes a regression introduced in version 0.11.0 leading to an error when a plot is created from a Dask object with `tiles=True`. Many thanks to @Palmr (first contribution!), @ahuang11, @Hoxbro, @maximlt, and @philippjfr for their contributions!
+
+Bug Fixes:
+
+- Fix regression when `tiles=True` with Dask ([#1432](https://github.com/holoviz/hvplot/pull/1432))
+- Fix hover tooltips for NetworkX plots ([#1439](https://github.com/holoviz/hvplot/pull/1439))
+
+Documentation:
+
+- Add `nb_interactivity_warning` extension ([#1444](https://github.com/holoviz/hvplot/pull/1444))
+- Document Ruff's `allowed-unused-imports` ([#1436](https://github.com/holoviz/hvplot/pull/1436))
+- Update image links in README ([#1433](https://github.com/holoviz/hvplot/pull/1433))
+- Minor fixes ([#1434](https://github.com/holoviz/hvplot/pull/1434))
+
+Tests:
+
+- Mark `test_explorer_geo_revise_kind` with geo marker ([#1426](https://github.com/holoviz/hvplot/pull/1426))
+
+[Full Changelog](https://github.com/holoviz/hvplot/compare/v0.11.0...v0.11.1)
+
+
 ## Version 0.11.0 (2024-09-27)
 
 This minor release brings a number of enhancements and bugfixes, checkout the [release blog post](https://blog.holoviz.org/posts/hvplot_release_0.11/) for a visual summary of the most important changes.
