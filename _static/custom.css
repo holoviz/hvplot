@@ -1,0 +1,22 @@
+:root[data-theme="light"] {
+    --pst-color-primary: rgb(56,123,178);
+    --pst-color-link: rgb(56,123,178);
+    --pst-color-link-hover: rgb(254,203,56);
+}
+
+.sphx-glr-thumbcontainer {
+    height: 210px;
+}
+
+.nav-link {
+    white-space: nowrap;
+}
+
+.showcase-table {
+    border-spacing: 15px
+}
+
+.showcase-table td {
+    border: 0px;
+    vertical-align: top;
+}
