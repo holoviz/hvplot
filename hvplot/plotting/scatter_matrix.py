@@ -113,10 +113,11 @@ def scatter_matrix(
         raise ValueError('dynspread or spread need rasterize or datashade to be set to True.')
 
     if rasterize:
+        import datashader as ds
         import holoviews.operation.datashader as hd
 
         if dynspread or spread:
-            if hd.ds_version < Version('0.12.0'):
+            if Version(ds.__version__) < Version('0.12.0'):
                 raise RuntimeError(
                     'Any version of datashader less than 0.12.0 does '
                     'not support rasterize with dynspread or spread.'
