@@ -370,7 +370,7 @@ class Geographic(Controls):
             pass
 
         geo_params = GEO_KEYS + ['geo']
-        if not gv_available and any(p in params and params[p] for p in geo_params):
+        if not gv_available and any(params.get(p) for p in geo_params):
             raise ImportError('GeoViews must be installed to enable the geographic options.')
         super().__init__(data, **params)
         if not gv_available:
