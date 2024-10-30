@@ -2,6 +2,7 @@
 Tests  utilities to convert data and projections
 """
 
+from unittest.mock import patch
 import numpy as np
 import pandas as pd
 import panel as pn
@@ -18,6 +19,7 @@ from unittest import TestCase, SkipTest
 
 from hvplot.util import (
     check_crs,
+    geoviews_is_available,
     is_list_like,
     process_crs,
     process_xarray,
@@ -383,3 +385,22 @@ def test_is_geodataframe_spatialpandas_dask():
 def test_is_geodataframe_classic_dataframe():
     df = pd.DataFrame({'geometry': [None, None], 'name': ['A', 'B']})
     assert not is_geodataframe(df)
+
+
+@pytest.mark.geo
+def test_geoviews_is_available():
+    assert geoviews_is_available(raise_error=True)
+
+
+def test_geoviews_is_available_no_raise():
+    with patch('hvplot.util.geoviews_is_available', side_effect=ImportError):
+        result = geoviews_is_available(raise_error=False)
+        assert result is False
+
+
+def test_geoviews_is_available_with_raise():
+    with patch('hvplot.util.geoviews_is_available', side_effect=ImportError):
+        with pytest.raises(
+            ImportError, match='GeoViews must be installed to enable the geographic options.'
+        ):
+            geoviews_is_available(raise_error=True)

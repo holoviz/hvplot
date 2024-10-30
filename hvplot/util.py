@@ -750,3 +750,21 @@ def relabel_redim(hv_obj, relabel_kwargs, redim_kwargs):
     if redim_kwargs:
         hv_obj = hv_obj.redim(**redim_kwargs)
     return hv_obj
+
+
+def geoviews_is_available(raise_error: bool = False):
+    """
+    Check if GeoViews is available and raise an ImportError if not.
+    """
+    try:
+        import geoviews  # noqa
+
+        gv_available = True
+    except ImportError:
+        gv_available = False
+
+    if not raise_error:
+        return gv_available
+
+    if not gv_available and raise_error:
+        raise ImportError('GeoViews must be installed to enable the geographic options.')

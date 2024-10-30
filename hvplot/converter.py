@@ -76,6 +76,7 @@ from .util import (
     process_derived_datetime_pandas,
     _convert_col_names_to_str,
     import_datashader,
+    geoviews_is_available,
 )
 from .utilities import hvplot_extension
 
@@ -646,6 +647,10 @@ class HoloViewsConverter:
 
         self.dynamic = dynamic
         self.geo = any([geo, crs, global_extent, projection, project, coastline, features])
+        # Try importing geoviews if geo-features requested
+        if self.geo or self.datatype == 'geopandas':
+            geoviews_is_available(raise_error=True)
+
         self.crs = self._process_crs(data, crs) if self.geo else None
         self.output_projection = self.crs
         self.project = project
@@ -655,17 +660,6 @@ class HoloViewsConverter:
         self.tiles_opts = tiles_opts or {}
         self.sort_date = sort_date
 
-        # Import geoviews if geo-features requested
-        if self.geo or self.datatype == 'geopandas':
-            try:
-                import geoviews  # noqa
-            except ImportError:
-                raise ImportError(
-                    'In order to use geo-related features '
-                    'the geoviews library must be available. '
-                    'It can be installed with:\n  conda '
-                    'install geoviews'
-                )
         if self.geo:
             if self.kind not in self._geo_types:
                 param.main.param.warning(

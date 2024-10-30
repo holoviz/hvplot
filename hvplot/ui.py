@@ -10,7 +10,7 @@ from panel.viewable import Viewer
 
 from .converter import HoloViewsConverter as _hvConverter
 from .plotting import hvPlot as _hvPlot
-from .util import is_geodataframe, is_xarray, instantiate_crs_str
+from .util import is_geodataframe, is_xarray, instantiate_crs_str, geoviews_is_available
 
 # Defaults
 KINDS = {
@@ -361,17 +361,9 @@ class Geographic(Controls):
     _widgets_kwargs = {'geo': {'type': pn.widgets.Toggle}}
 
     def __init__(self, data, **params):
-        gv_available = False
-        try:
-            import geoviews  # noqa
-
-            gv_available = True
-        except ImportError:
-            pass
-
         geo_params = GEO_KEYS + ['geo']
-        if not gv_available and any(params.get(p) for p in geo_params):
-            raise ImportError('GeoViews must be installed to enable the geographic options.')
+        gv_available = geoviews_is_available(raise_error=any(params.get(p) for p in geo_params))
+
         super().__init__(data, **params)
         if not gv_available:
             for p in geo_params:
