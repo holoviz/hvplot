@@ -393,13 +393,13 @@ def test_geoviews_is_available():
 
 
 def test_geoviews_is_available_no_raise():
-    with patch('hvplot.util.geoviews_is_available', side_effect=ImportError):
+    with patch('hvplot.util.find_spec', return_value=None):
         result = geoviews_is_available(raise_error=False)
         assert result is False
 
 
 def test_geoviews_is_available_with_raise():
-    with patch('hvplot.util.geoviews_is_available', side_effect=ImportError):
+    with patch('hvplot.util.find_spec', return_value=None):
         with pytest.raises(
             ImportError, match='GeoViews must be installed to enable the geographic options.'
         ):

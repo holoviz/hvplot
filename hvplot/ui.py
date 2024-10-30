@@ -665,8 +665,8 @@ class hvPlotExplorer(Viewer):
         if kwargs.get('geo'):
             if 'crs' not in kwargs:
                 xmax = np.max(np.abs(self.xlim()))
-                self.geographic.crs = 'PlateCarree' if xmax <= 360 else 'GOOGLE_MERCATOR'
-                kwargs['crs'] = self.geographic.crs
+                # self.geographic.crs = 'PlateCarree' if xmax <= 360 else 'GOOGLE_MERCATOR'
+                kwargs['crs'] = 'PlateCarree' if xmax <= 360 else 'GOOGLE_MERCATOR'
             for key in ['crs', 'projection']:
                 if key not in kwargs:
                     continue

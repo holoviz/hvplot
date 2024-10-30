@@ -2,6 +2,7 @@
 Provides utilities to convert data and projections
 """
 
+from importlib.util import find_spec
 import sys
 
 from collections.abc import Hashable
@@ -756,15 +757,8 @@ def geoviews_is_available(raise_error: bool = False):
     """
     Check if GeoViews is available and raise an ImportError if not.
     """
-    try:
-        import geoviews  # noqa
-
-        gv_available = True
-    except ImportError:
-        gv_available = False
-
-    if not raise_error:
-        return gv_available
+    gv_available = find_spec('geoviews') is not None
 
     if not gv_available and raise_error:
         raise ImportError('GeoViews must be installed to enable the geographic options.')
+    return gv_available
