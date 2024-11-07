@@ -1,48 +1,41 @@
-# This is the configuration for pre-commit, a local framework for managing pre-commit hooks
-#   Check out the docs at: https://pre-commit.com/
-
-default_stages: [commit]
+default_stages: [pre-commit]
 repos:
--   repo: https://github.com/nbQA-dev/nbQA
-    rev: 1.8.5
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
     hooks:
-    -   id: nbqa-ruff
-        additional_dependencies: [ruff==0.3.7]
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
-    hooks:
-    -   id: check-builtin-literals
-    -   id: check-case-conflict
-    -   id: check-docstring-first
-    -   id: check-executables-have-shebangs
-    -   id: check-toml
-    -   id: detect-private-key
-    -   id: end-of-file-fixer
+      - id: check-builtin-literals
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-executables-have-shebangs
+      - id: check-toml
+      - id: detect-private-key
+      - id: end-of-file-fixer
         exclude: (\.min\.js$|\.svg$)
-    -   id: trailing-whitespace
--   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.3.7
+      - id: trailing-whitespace
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.7.2
     hooks:
-    - id: ruff
-    - id: ruff-format
--   repo: https://github.com/hoxbro/clean_notebook
-    rev: v0.1.14
+      - id: ruff
+      - id: ruff-format
+        exclude: \.ipynb$
+  - repo: https://github.com/hoxbro/clean_notebook
+    rev: v0.1.15
     hooks:
-    - id: clean-notebook
-      args: [-i, tags]
--   repo: https://github.com/codespell-project/codespell
-    rev: v2.2.6
+      - id: clean-notebook
+        args: [-i, tags]
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.3.0
     hooks:
-    - id: codespell
-      exclude: (\.min\.js$|\.svg$|\.html$)
-      additional_dependencies:
-      - tomli
--   repo: local
+      - id: codespell
+        exclude: (\.min\.js$|\.svg$|\.html$)
+        additional_dependencies:
+          - tomli
+  - repo: local
     hooks:
-    - id: update_conda_envs
-      name: Update conda envs
-      entry: python scripts/update_conda_envs.py
-      language: python
-      additional_dependencies: [pyproject2conda]
-      files: '(pyproject.toml|update_conda_envs)'
-      pass_filenames: false
+      - id: update_conda_envs
+        name: Update conda envs
+        entry: python scripts/update_conda_envs.py
+        language: python
+        additional_dependencies: [pyproject2conda]
+        files: "(pyproject.toml|update_conda_envs)"
+        pass_filenames: false
