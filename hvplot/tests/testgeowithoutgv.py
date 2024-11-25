@@ -93,13 +93,10 @@ class TestAnnotationNotGeo:
         sdf = spd.GeoDataFrame({'geometry': spd.GeoSeries([square, square]), 'name': ['A', 'B']})
         plot = sdf.hvplot.polygons(tiles=True)
 
-        if hasattr(sdf, 'crs'):
-            del sdf.crs
-
         assert len(plot) == 2
         assert is_geodataframe(sdf)
-        assert not hasattr(plot, 'crs')
+        assert not hasattr(sdf, 'crs')
         assert isinstance(plot.get(0), hv.Tiles)
         assert isinstance(plot.get(1), hv.Polygons)
         bk_plot = bk_renderer.get_plot(plot)
-        assert bk_plot.projection == 'mercator'
+        assert bk_plot.projection == 'mercator'  # projection enabled due to `tiles=True`
