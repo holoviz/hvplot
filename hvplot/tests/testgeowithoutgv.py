@@ -7,6 +7,9 @@ import hvplot.pandas  # noqa
 import numpy as np
 import pandas as pd
 import pytest
+import spatialpandas as spd
+
+from hvplot.util import is_geodataframe
 
 try:
     import dask.dataframe as dd
@@ -81,5 +84,22 @@ class TestAnnotationNotGeo:
         assert 'y_' not in plot.get(1).data
         assert len(plot) == 2
         assert isinstance(plot.get(0), hv.Tiles)
+        bk_plot = bk_renderer.get_plot(plot)
+        assert bk_plot.projection == 'mercator'
+
+    @pytest.mark.skipif(spd is None, reason='spatialpandas not installed')
+    def test_plot_without_crs(self):
+        square = spd.geometry.Polygon([(0.0, 0), (0, 1), (1, 1), (1, 0)])
+        sdf = spd.GeoDataFrame({'geometry': spd.GeoSeries([square, square]), 'name': ['A', 'B']})
+        plot = sdf.hvplot.polygons(tiles=True)
+
+        if hasattr(sdf, 'crs'):
+            del sdf.crs
+
+        assert len(plot) == 2
+        assert is_geodataframe(sdf)
+        assert not hasattr(plot, 'crs')
+        assert isinstance(plot.get(0), hv.Tiles)
+        assert isinstance(plot.get(1), hv.Polygons)
         bk_plot = bk_renderer.get_plot(plot)
         assert bk_plot.projection == 'mercator'
