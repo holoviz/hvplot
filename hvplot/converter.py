@@ -2171,7 +2171,7 @@ class HoloViewsConverter:
             return data, x, y
 
         if is_geodataframe(data):
-            if hasattr(data, 'crs') and data.crs is not None:
+            if getattr(data, 'crs', None) is not None:
                 data = data.to_crs(epsg=3857)
             return data, x, y
         elif not is_lazy_data(data):
