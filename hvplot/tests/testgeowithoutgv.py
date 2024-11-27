@@ -7,7 +7,6 @@ import hvplot.pandas  # noqa
 import numpy as np
 import pandas as pd
 import pytest
-import spatialpandas as spd
 
 from hvplot.util import is_geodataframe
 
@@ -16,6 +15,11 @@ try:
     import hvplot.dask  # noqa
 except ImportError:
     dd = None
+
+try:
+    import spatialpandas as spd
+except ModuleNotFoundError:
+    spd = None
 
 
 bk_renderer = hv.Store.renderers['bokeh']
