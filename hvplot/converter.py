@@ -2170,12 +2170,13 @@ class HoloViewsConverter:
         elif not is_geodataframe(data) and (x is None or y is None):
             return data, x, y
 
-        if is_geodataframe(data):
+        if is_lazy_data(data):
+            # To prevent eager evaluation: https://github.com/holoviz/hvplot/pull/1432
+            pass
+        elif is_geodataframe(data):
             if getattr(data, 'crs', None) is not None:
                 data = data.to_crs(epsg=3857)
-            return data, x, y
-        elif not is_lazy_data(data):
-            # To prevent eager evaluation: https://github.com/holoviz/hvplot/pull/1432
+        else:
             min_x = np.min(data[x])
             max_x = np.max(data[x])
             min_y = np.min(data[y])
@@ -2193,7 +2194,8 @@ class HoloViewsConverter:
                 data[new_y] = northing
                 if is_xarray(data):
                     data = data.swap_dims({x: new_x, y: new_y})
-                return data, new_x, new_y
+                x = new_x
+                y = new_y
         return data, x, y
 
     def chart(self, element, x, y, data=None):
