@@ -1485,7 +1485,7 @@ class HoloViewsConverter:
         if 'color' in style_opts:
             color = style_opts['color']
         elif not isinstance(cmap, dict):
-            if cmap and any(c in cmap for c in categories):
+            if isinstance(cmap, str) and any(c in cmap for c in categories):
                 color = process_cmap(cmap or self._default_cmaps['categorical'], categorical=True)
             else:
                 color = cmap
