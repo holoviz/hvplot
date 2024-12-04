@@ -2,6 +2,7 @@
 Provides utilities to convert data and projections
 """
 
+from importlib.util import find_spec
 import sys
 
 from collections.abc import Hashable
@@ -750,3 +751,14 @@ def relabel_redim(hv_obj, relabel_kwargs, redim_kwargs):
     if redim_kwargs:
         hv_obj = hv_obj.redim(**redim_kwargs)
     return hv_obj
+
+
+def geoviews_is_available(raise_error: bool = False):
+    """
+    Check if GeoViews is available and raise an ImportError if not.
+    """
+    gv_available = find_spec('geoviews') is not None
+
+    if not gv_available and raise_error:
+        raise ImportError('GeoViews must be installed to enable the geographic options.')
+    return gv_available
