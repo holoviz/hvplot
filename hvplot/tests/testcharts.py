@@ -606,3 +606,14 @@ class TestChart1DDask(TestChart1D):
 
     def test_table_multi_index_displayed(self):
         raise SkipTest('Dask does not support MultiIndex Dataframes.')
+
+
+def test_cmap_LinearSegmentedColormap():
+    # test for https://github.com/holoviz/hvplot/pull/1461
+    xr = pytest.importorskip('xarray')
+    mpl = pytest.importorskip('matplotlib')
+    import hvplot.xarray  # noqa
+
+    data = np.arange(25).reshape(5, 5)
+    xr_da = xr.DataArray(data)
+    xr_da.hvplot.image(cmap=mpl.colormaps['viridis'])
