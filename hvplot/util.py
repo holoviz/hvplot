@@ -750,3 +750,12 @@ def relabel_redim(hv_obj, relabel_kwargs, redim_kwargs):
     if redim_kwargs:
         hv_obj = hv_obj.redim(**redim_kwargs)
     return hv_obj
+
+
+def is_mpl_cmap(obj):
+    """Check if the object is a Matplotlib LinearSegmentedColormap."""
+    if 'matplotlib' not in sys.modules:
+        return False
+    from matplotlib.colors import LinearSegmentedColormap
+
+    return isinstance(obj, LinearSegmentedColormap)
