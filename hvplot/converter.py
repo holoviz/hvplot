@@ -76,7 +76,7 @@ from .util import (
     process_derived_datetime_pandas,
     _convert_col_names_to_str,
     import_datashader,
-    _mpl_cmap,
+    is_mpl_cmap,
 )
 from .utilities import hvplot_extension
 
@@ -1486,8 +1486,12 @@ class HoloViewsConverter:
         if 'color' in style_opts:
             color = style_opts['color']
         elif not isinstance(cmap, dict):
-            if (isinstance(cmap, str) or _mpl_cmap(cmap)) and any(
-                c in getattr(cmap, 'name', cmap) for c in categorical_cmaps
+            # Checks if any of the categorical cmaps matches cmap;
+            # uses any() instead of `cmap in categorical_cmaps` to handle reversed colormaps (suffixed with `_r`).
+            # If cmap is LinearSegmentedColormap, get the name attr, else return the str typed cmap.
+            if (isinstance(cmap, str) or is_mpl_cmap(cmap)) and any(
+                categorical_cmap in getattr(cmap, 'name', cmap)
+                for categorical_cmap in categorical_cmaps
             ):
                 color = process_cmap(cmap or self._default_cmaps['categorical'], categorical=True)
             else:
