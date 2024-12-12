@@ -420,5 +420,5 @@ def test_max_rows_sample():
 
 def test_explorer_geo_no_import_error_when_false():
     da = ds_air_temperature['air'].isel(time=0)
-    with patch('hvplot.util.geoviews_is_available', return_value=False):
+    with patch('hvplot.util.import_geoviews', return_value=None):
         assert hvplot.explorer(da, x='lon', y='lat', geo=False)

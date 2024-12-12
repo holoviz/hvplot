@@ -10,7 +10,7 @@ from panel.viewable import Viewer
 
 from .converter import HoloViewsConverter as _hvConverter
 from .plotting import hvPlot as _hvPlot
-from .util import is_geodataframe, is_xarray, instantiate_crs_str, geoviews_is_available
+from .util import is_geodataframe, is_xarray, instantiate_crs_str, import_geoviews
 
 # Defaults
 KINDS = {
@@ -362,8 +362,9 @@ class Geographic(Controls):
 
     def __init__(self, data, **params):
         geo_params = GEO_KEYS + ['geo']
-        gv_available = geoviews_is_available(raise_error=any(params.get(p) for p in geo_params))
-
+        gv_available = None
+        if any(params.get(p) for p in geo_params):
+            gv_available = import_geoviews()
         super().__init__(data, **params)
         if not gv_available:
             for p in geo_params:

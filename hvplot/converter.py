@@ -76,7 +76,7 @@ from .util import (
     process_derived_datetime_pandas,
     _convert_col_names_to_str,
     import_datashader,
-    geoviews_is_available,
+    import_geoviews,
 )
 from .utilities import hvplot_extension
 
@@ -649,7 +649,7 @@ class HoloViewsConverter:
         self.geo = any([geo, crs, global_extent, projection, project, coastline, features])
         # Try importing geoviews if geo-features requested
         if self.geo or self.datatype == 'geopandas':
-            geoviews_is_available(raise_error=True)
+            import_geoviews()
 
         self.crs = self._process_crs(data, crs) if self.geo else None
         self.output_projection = self.crs
