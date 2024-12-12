@@ -77,6 +77,7 @@ from .util import (
     _convert_col_names_to_str,
     import_datashader,
     import_geoviews,
+    is_mpl_cmap,
 )
 from .utilities import hvplot_extension
 
@@ -1414,7 +1415,7 @@ class HoloViewsConverter:
             valid_opts = []
 
         cmap_opts = ('cmap', 'colormap', 'color_key')
-        categories = [
+        categorical_cmaps = [
             'accent',
             'category',
             'dark',
@@ -1479,7 +1480,13 @@ class HoloViewsConverter:
         if 'color' in style_opts:
             color = style_opts['color']
         elif not isinstance(cmap, dict):
-            if cmap and any(c in cmap for c in categories):
+            # Checks if any of the categorical cmaps matches cmap;
+            # uses any() instead of `cmap in categorical_cmaps` to handle reversed colormaps (suffixed with `_r`).
+            # If cmap is LinearSegmentedColormap, get the name attr, else return the str typed cmap.
+            if (isinstance(cmap, str) or is_mpl_cmap(cmap)) and any(
+                categorical_cmap in getattr(cmap, 'name', cmap)
+                for categorical_cmap in categorical_cmaps
+            ):
                 color = process_cmap(cmap or self._default_cmaps['categorical'], categorical=True)
             else:
                 color = cmap
@@ -2164,12 +2171,13 @@ class HoloViewsConverter:
         elif not is_geodataframe(data) and (x is None or y is None):
             return data, x, y
 
-        if is_geodataframe(data):
-            if data.crs is not None:
-                data = data.to_crs(epsg=3857)
-            return data, x, y
-        elif not is_lazy_data(data):
+        if is_lazy_data(data):
             # To prevent eager evaluation: https://github.com/holoviz/hvplot/pull/1432
+            pass
+        elif is_geodataframe(data):
+            if getattr(data, 'crs', None) is not None:
+                data = data.to_crs(epsg=3857)
+        else:
             min_x = np.min(data[x])
             max_x = np.max(data[x])
             min_y = np.min(data[y])
@@ -2187,7 +2195,8 @@ class HoloViewsConverter:
                 data[new_y] = northing
                 if is_xarray(data):
                     data = data.swap_dims({x: new_x, y: new_y})
-                return data, new_x, new_y
+                x = new_x
+                y = new_y
         return data, x, y
 
     def chart(self, element, x, y, data=None):

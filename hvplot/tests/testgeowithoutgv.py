@@ -8,11 +8,18 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from hvplot.util import is_geodataframe
+
 try:
     import dask.dataframe as dd
     import hvplot.dask  # noqa
 except ImportError:
     dd = None
+
+try:
+    import spatialpandas as spd
+except ModuleNotFoundError:
+    spd = None
 
 
 bk_renderer = hv.Store.renderers['bokeh']
@@ -83,3 +90,17 @@ class TestAnnotationNotGeo:
         assert isinstance(plot.get(0), hv.Tiles)
         bk_plot = bk_renderer.get_plot(plot)
         assert bk_plot.projection == 'mercator'
+
+    @pytest.mark.skipif(spd is None, reason='spatialpandas not installed')
+    def test_plot_without_crs(self):
+        square = spd.geometry.Polygon([(0.0, 0), (0, 1), (1, 1), (1, 0)])
+        sdf = spd.GeoDataFrame({'geometry': spd.GeoSeries([square, square]), 'name': ['A', 'B']})
+        plot = sdf.hvplot.polygons(tiles=True)
+
+        assert len(plot) == 2
+        assert is_geodataframe(sdf)
+        assert not hasattr(sdf, 'crs')
+        assert isinstance(plot.get(0), hv.Tiles)
+        assert isinstance(plot.get(1), hv.Polygons)
+        bk_plot = bk_renderer.get_plot(plot)
+        assert bk_plot.projection == 'mercator'  # projection enabled due to `tiles=True`
