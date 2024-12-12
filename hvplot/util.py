@@ -4,6 +4,7 @@ Provides utilities to convert data and projections
 
 import sys
 import types
+import typing
 
 from collections.abc import Hashable
 
@@ -730,7 +731,7 @@ def import_datashader():
     return datashader
 
 
-def import_geoviews() -> types.ModuleType | None:
+def import_geoviews() -> typing.Union[types.ModuleType, None]:
     geoviews = None
     try:
         import geoviews
