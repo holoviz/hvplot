@@ -1,5 +1,6 @@
 import re
 from textwrap import dedent
+from unittest.mock import patch
 
 import numpy as np
 import holoviews as hv
@@ -415,3 +416,9 @@ def test_max_rows_sample():
     ui = hvplot.explorer(df, x='x', y='y', by=['#'], kind='scatter')
     assert len(ui._data) == MAX_ROWS
     assert not ui._data.equals(df.head(MAX_ROWS))
+
+
+def test_explorer_geo_no_import_error_when_false():
+    da = ds_air_temperature['air'].isel(time=0)
+    with patch('hvplot.util.import_geoviews', return_value=None):
+        assert hvplot.explorer(da, x='lon', y='lat', geo=False)

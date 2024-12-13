@@ -729,6 +729,18 @@ def import_datashader():
     return datashader
 
 
+def import_geoviews():
+    geoviews = None
+    try:
+        import geoviews
+    except ModuleNotFoundError:
+        raise ModuleNotFoundError(
+            'The `geoviews` package must be installed in order to use '
+            'geographic features. Install it with pip or conda.'
+        ) from None
+    return geoviews
+
+
 def relabel(hv_obj, **kwargs):
     """Conditionally relabel a HoloViews object"""
     if kwargs:

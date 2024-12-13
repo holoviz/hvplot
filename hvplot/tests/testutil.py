@@ -18,6 +18,7 @@ from unittest import TestCase, SkipTest
 
 from hvplot.util import (
     check_crs,
+    import_geoviews,
     is_list_like,
     process_crs,
     process_xarray,
@@ -383,3 +384,8 @@ def test_is_geodataframe_spatialpandas_dask():
 def test_is_geodataframe_classic_dataframe():
     df = pd.DataFrame({'geometry': [None, None], 'name': ['A', 'B']})
     assert not is_geodataframe(df)
+
+
+@pytest.mark.geo
+def test_geoviews_is_available():
+    assert import_geoviews()
