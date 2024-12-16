@@ -2,6 +2,23 @@
 
 See [the HoloViz blog](https://blog.holoviz.org/#category=hvplot) for a visual summary of the major features added in a selection of releases.
 
+## Version 0.11.2 (2024-12-16)
+
+The 0.11.2 release is a patch release that brings a few important bugfixes. Many thanks to @tomchor (first contribution!), @ahuang11, @Azaya89, @Hoxbro, and @maximlt for their contributions!
+
+Bug Fixes:
+
+- Stop using HoloViews private API to get datashader's version in `scatter_matrix` ([#1446](https://github.com/holoviz/hvplot/pull/1446))
+- Fix geoviews availability logic in the Explorer ([#1451](https://github.com/holoviz/hvplot/pull/1451))
+- Do not attempt to auto-project a spatialpandas geodataframe ([#1459](https://github.com/holoviz/hvplot/pull/1459))
+- Check cmap type before comparing to categories ([#1462](https://github.com/holoviz/hvplot/pull/1462))
+
+Documentation:
+
+- Fix typo in the Explorer docs ([#1455](https://github.com/holoviz/hvplot/pull/1455))
+
+[Full Changelog](https://github.com/holoviz/hvplot/compare/v0.11.1...v0.11.2)
+
 ## Version 0.11.1 (2024-10-16)
 
 The 0.11.1 release is a patch release that brings a few bugfixes and documentation improvements. In particular it fixes a regression introduced in version 0.11.0 leading to an error when a plot is created from a Dask object with `tiles=True`. Many thanks to @Palmr (first contribution!), @ahuang11, @Hoxbro, @maximlt, and @philippjfr for their contributions!
