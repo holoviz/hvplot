@@ -47,7 +47,7 @@ html_theme_options.update(  # noqa
             },
         ],
         'pygment_dark_style': 'material',
-        'announcement': "hvPlot 0.11 has just been released! Checkout the <a href='https://blog.holoviz.org/posts/hvplot_release_0.11/'>blog post</a> and support hvPlot by giving it a 🌟 on <a href='https://github.com/holoviz/hvplot'>Github</a>.",
+        # 'announcement': "hvPlot 0.11 has just been released! Checkout the <a href='https://blog.holoviz.org/posts/hvplot_release_0.11/'>blog post</a> and support hvPlot by giving it a 🌟 on <a href='https://github.com/holoviz/hvplot'>Github</a>.",
     }
 )
 
