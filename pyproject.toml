@@ -113,7 +113,7 @@ examples = [
     "hvplot[fugue-sql]",
     "ibis-framework[duckdb]",  # ibis-duckdb on conda
     "intake-parquet >=0.2.3",
-    "intake-xarray >=0.5.0",
+    "intake-xarray >=0.5.0,<2",
     "intake >=0.6.5,<2.0.0",
     "ipywidgets",
     "networkx >=2.6.3",
