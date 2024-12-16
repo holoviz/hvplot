@@ -1,0 +1,489 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "artificial-english",
+   "metadata": {},
+   "source": [
+    "# Large Timeseries Data\n",
+    "\n",
+    "Effectively representing temporal dynamics in large datasets requires selecting appropriate visualization techniques that ensure responsiveness while providing both a macroscopic view of overall trends and a microscopic view of fine details. This guide will explore various methods, such as **WebGL Rendering**, **LTTB Downsampling**, **Datashader Rasterizing**, and **Minimap Contextualizing**, each suited for different aspects of large timeseries data visualization. We predominantly demonstrate the use of hvPlot syntax, leveraging HoloViews for more complex requirements. Although hvPlot supports multiple backends, including Matplotlib and Plotly, our focus will be on Bokeh due to its advanced capabilities in handling large timeseries data.\n",
+    "\n",
+    "\n",
+    "## Getting the data \n",
+    "\n",
+    "Here we have a DataFrame with 1.2 million rows containing standardized data from 5 different sensors."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "arabic-container",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "\n",
+    "df = pd.read_parquet(\"https://datasets.holoviz.org/sensor/v1/data.parq\")\n",
+    "df.sample(5)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "banned-richards",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df0 = df[df.sensor=='0']"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "fourth-sentence",
+   "metadata": {},
+   "source": [
+    "Let's go ahead and plot this data using various approaches.\n",
+    "\n",
+    "## WebGL Rendering\n",
+    "\n",
+    "[WebGL](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API) is a JavaScript API that allows rendering content in the browser using hardware acceleration from a Graphics Processing Unit (GPU). WebGL is standardized and available in all modern browsers.\n",
+    "\n",
+    "### Canvas Rendering - Prior Default\n",
+    "\n",
+    "Rendering Bokeh plots in hvPlot or HoloViews has evolved significantly. Prior to 2023, Bokeh's custom HTML **Canvas** rendering was the default. This approach works well for datasets up to a few tens of thousands of points but struggles above 100K points, particularly in terms of zooming and panning speed. These days, if you want to utilize Bokeh's Canvas rendering, use `import holoviews as hv; hv.renderer(\"bokeh\").webgl = False` prior to creating your hvPlot or HoloViews object.\n",
+    "\n",
+    "### WebGL Rendering - Current Default\n",
+    "\n",
+    "Around mid-2023, the adoption of improved **WebGL** as the default for hvPlot and HoloViews allowed for smoother interactions with larger datasets by utilizing GPU-acceleration. It's important to note that WebGL performance can vary based on your machine's specifications. For example, some Apple Mac models may not exhibit a marked improvement in WebGL performance over Canvas due to GPU hardware configuration."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "constitutional-metabolism",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import holoviews as hv\n",
+    "import hvplot.pandas  # noqa\n",
+    "\n",
+    "# Set notebook hvPlot/HoloViews default options\n",
+    "hv.opts.defaults(hv.opts.Curve(responsive=True))\n",
+    "\n",
+    "df0.hvplot(x=\"time\", y=\"value\", autorange='y', title=\"WebGL\", min_height=300)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "428042ef",
+   "metadata": {},
+   "source": [
+    "<div class=\"alert alert-info\">\n",
+    "\n",
+    "<b>Note:</b> `autorange='y'` is demonstrated here for automatic y-axis scaling, a feature from HoloViews 1.17 and hvPlot 0.9.0. You can omit that option if you prefer to set the y scaling manually using the zoom tool.\n",
+    "\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "directed-proof",
+   "metadata": {},
+   "source": [
+    "Alone, both Canvas and WebGL rendering have a common limitation: they transfer the entire dataset from the server to the browser. This can be a significant bottleneck, especially for remote server setups or datasets larger than a million points. To address this, we'll explore other techniques like LTTB Downsampling, which focus on delivering only the necessary data for the current view. These methods offer more scalable solutions for interacting with large timeseries data, as we'll see in the following sections.\n",
+    "\n",
+    "## LTTB Downsampling\n",
+    "\n",
+    "### The Challenge with Simple Downsampling\n",
+    "\n",
+    "A straightforward approach to handling large datasets might involve plotting every _n_th datapoint using a method like `df.sample`:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "conservative-maldives",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df0.hvplot(x=\"time\", y=\"value\", color= '#003366', label = \"All the data\") *\\\n",
+    "df0.sample(500).hvplot(x=\"time\", y=\"value\", alpha=0.8, color='#FF6600', min_height=300,\n",
+    "                       label=\"Decimation\", title=\"Decimation: Don't do this!\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c38a3dea",
+   "metadata": {},
+   "source": [
+    "However, this method, known as decimation or arbitrarily strided sampling, can lead to [aliasing](https://en.wikipedia.org/wiki/Downsampling_(signal_processing)), where the resulting plot misrepresents the actual data by missing crucial peaks, troughs, or slopes. For instance, significant variations visible in the WebGL plot of the previous section might be entirely absent in a decimated plot, making this approach generally inadvisable for accurate data representation.\n",
+    "\n",
+    "### The LTTB Solution\n",
+    "\n",
+    "To address this, a more sophisticated method like the [Largest Triangle Three Buckets (LTTB)](https://skemman.is/handle/1946/15343) algorithm can be employed. LTTB allows data points not contributing significantly to the visible shape to be dropped, reducing the amount of data to send to the browser but preserving the appearance (and particularly the envelope, i.e. highest and lowest values in a region).\n",
+    "\n",
+    "In hvPlot, adding `downsample=True` will enable the LTTB algorithm, which will automatically choose an appropriate number of samples for the current plot:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "47e52cc0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df0.hvplot(x=\"time\", y=\"value\", color='#003366', label = \"All the data\") *\\\n",
+    "df0.hvplot(x=\"time\", y=\"value\", color='#00B3B3', label=\"LTTB\", title=\"LTTB\",\n",
+    "           min_height=300, alpha=.8, downsample=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a25195ea",
+   "metadata": {},
+   "source": [
+    "The LTTB plot will closely resemble the WebGL plot in appearance, but in general, it is rendered much more quickly (especially for local browsing of remote computation).\n",
+    "\n",
+    "<div class=\"alert alert-info\">\n",
+    "\n",
+    "<b>Note:</b> As LTTB dynamically depends on Python and therefore won't update as you zoom in on our website. If you are locally running this notebook with a live Python process, the plot will automatically update with additional detail as you zoom in.\n",
+    "\n",
+    "</div>\n",
+    "\n",
+    "\n",
+    "With LTTB, it is now practical to include all of the different sensors in a single plot without slowdown: "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "208fada7",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.hvplot(x=\"time\", y=\"value\", downsample=True, by='sensor', min_height=300, title=\"LTTB By Sensor\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e06b1e4d",
+   "metadata": {},
+   "source": [
+    "This makes LTTB an ideal default method for exploring timeseries datasets, particularly when the dataset size is unknown or too large for standard WebGL rendering."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "660510d6",
+   "metadata": {},
+   "source": [
+    "### Enhanced Downsampling Options\n",
+    "\n",
+    "\n",
+    "Starting in HoloViews version 1.19.0, integration with the [tsdownsample](https://github.com/predict-idlab/tsdownsample) library introduces enhanced downsampling functionality with the following methods, which will be accepted as inputs to `downsample` in hvPlot:\n",
+    "\n",
+    "- **lttb**: Implements the Largest Triangle Three Buckets ([LTTB](https://github.com/predict-idlab/tsdownsample?tab=readme-ov-file#:~:text=performs%20the-,Largest%20Triangle%20Three%20Buckets,-algorithm)) algorithm, optimizing the selection of points to retain the visual shape of the data.\n",
+    "- **minmax**: For each segment of the data, this method retains the minimum and maximum values, ensuring that peaks and troughs are preserved.\n",
+    "- **minmax-lttb**: A hybrid approach that combines the minmax strategy with LTTB.\n",
+    "- **m4**: A [multi-step process](https://www.vldb.org/pvldb/vol7/p797-jugel.pdf) that leverages the min, max, first, and last values for each time segment."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "conscious-collector",
+   "metadata": {},
+   "source": [
+    "\n",
+    "\n",
+    "## Datashader Rasterizing"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "39ff4ae1",
+   "metadata": {
+    "tags": [
+     "hide-cell"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "# Cell hidden on the website (hide-cell in tags)\n",
+    "from holoviews.operation.resample import ResampleOperation2D\n",
+    "ResampleOperation2D.width=1200\n",
+    "ResampleOperation2D.height=500"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "28acbb0b-21b7-401e-af1e-29dee1f41287",
+   "metadata": {},
+   "source": [
+    "### Principles of Datashader\n",
+    "\n",
+    "While WebGL and LTTB both send individual data points to the web browser, [Datashader](https://datashader.org) rasterizing offers a fundamentally different approach to visualizing large datasets. Datashader operates by generating a fixed-size 2D binned array tailored to your screen's resolution during each zoom or pan event. In this array, each bin aggregates data points from its corresponding location, effectively creating a 2D histogram. So, instead of transmitting the entire dataset, only this optimized array is sent to the web browser, thereby displaying all relevant data at the current zoom level and facilitating the visualization of the largest datasets.\n",
+    "\n",
+    "❗ A couple important details: ❗\n",
+    "1. As with LTTB downsampling, Datashader rasterization dynamically depends on Python and, therefore, won't update as you zoom in on our website. If you are locally running this notebook with a live Python process, the plot will automatically update with additional detail as you zoom in.\n",
+    "2. Setting `line_width` to be greater than `0` activates [anti-aliasing](https://en.wikipedia.org/wiki/Anti-aliasing), smoothing the visual representation of lines that might otherwise look too pixelated.\n",
+    "\n",
+    "### Single Line Example\n",
+    "Activating Datashader rasterization for a single large timeseries curve in hvPlot is as simple as setting `rasterize=True`!"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "8bbad008-adb6-4e00-ac4e-828445c3dd57",
+   "metadata": {},
+   "source": [
+    "<div class=\"alert alert-info\">\n",
+    "\n",
+    "<b>Note:</b> When plotting a single curve, the default behavior is to flatten the count in each pixel to better match the appearance of plotting a line without Datashader rasterization (see the [relevant PR](https://github.com/holoviz/holoviews/pull/6030) for details). If you want to restore these pixel count aggregations, just import Datashader (`import datashader as ds`) and activate 'self-intersection' in a count aggregator to hvPlot (`aggregator=ds.count(self_intersect=True)`).\n",
+    "\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "a623a983-5a91-40e1-ab98-0967d1f0afef",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df0.hvplot(x=\"time\", y=\"value\", rasterize=True, cnorm='eq_hist', padding=(0, 0.1),\n",
+    "           min_height=300, autorange='y', title=\"Datashader Rasterize\", colorbar=False, line_width=2)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5a98e727",
+   "metadata": {},
+   "source": [
+    "### Rasterize Conditionally\n",
+    "\n",
+    "Alternatively, it's possible to activate `rasterize` *conditionally* with `resample_when`.\n",
+    "\n",
+    "When the number of individual data points present in the current zoom range is below the provided threshold, the raw plot is displayed; otherwise the `rasterize`, `datashade`, or `downsample` operation is applied."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "12910d8e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df0.hvplot(x=\"time\", y=\"value\", rasterize=True, resample_when=1000, cnorm='eq_hist', padding=(0, 0.1),\n",
+    "           min_height=300, autorange='y', title=\"Datashader Rasterize\", colorbar=False, line_width=2)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "naughty-adventure",
+   "metadata": {},
+   "source": [
+    "### Multiple Categories Example\n",
+    "\n",
+    "For data with a line for each of several \"categories\" (sensors, in this case), Datashader can assign a different color to each of the sensor categories. The resulting image then blends these colors where data overlaps, providing visual cues for areas with high category intersection. This is particularly useful for datasets with multiple data series:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "expired-gallery",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.hvplot(x=\"time\", y=\"value\", rasterize=True, hover=True, padding=(0, 0.1), min_height=300,\n",
+    "          by='sensor', title=\"Datashader Rasterize Categories\", line_width=2, colorbar=False, cmap='glasbey')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5fae9346-45e2-48bb-84a3-3ba95329345d",
+   "metadata": {},
+   "source": [
+    "When you're zoomed out, Datashader's effectiveness is apparent. The image it creates reveals the overall data distribution and patterns, with color and intensity showing areas of higher data concentration - where lines cross through the same pixel. Datashader rendering can therefore provide a good overview of the full shape of a long timeseries, helping you understand how the signal varies even when the variations involved are smaller than the pixels on the screen."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "177ef209-13c8-43e4-848d-0ee40ed1b89f",
+   "metadata": {},
+   "source": [
+    "### Multiple Lines Per Category Example\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "467fa694-23ba-437e-8b8f-d7485bcbb514",
+   "metadata": {},
+   "source": [
+    "Plotting hundreds or thousands of overlapping timeseries snippets relative to a set of events is important in domains like finance, sensor monitoring, and neuroscience. In neuroscience, for example, this approach is used to reveal distinct patterns across action potential waveforms from different neurons. Let's load a dataset of neural waveforms:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "6c4d782b-5417-48ec-a773-817714929d91",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "waves = pd.read_parquet(\"https://datasets.holoviz.org/waveform/v1/waveforms.parq\")\n",
+    "print(len(waves))\n",
+    "waves.head(2)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "463ae980-bd8e-4439-8fde-3804d66191ed",
+   "metadata": {},
+   "source": [
+    "This dataset contains numerous neural waveform snippets. To grasp its structure, we examine the length of each waveform and count of waveforms per neuron:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "5cabd9ea-1c75-4976-9c31-c4b745c54c00",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "first_waveform = waves[(waves['Neuron'] == waves['Neuron'].unique()[0]) & (waves['Waveform'] == 0)]\n",
+    "print(f'Number of samples per waveform: {len(first_waveform)}')\n",
+    "waves.groupby('Neuron')['Waveform'].nunique().reset_index().rename(columns={'Waveform': '# Waveforms'})"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e51c2274-f963-4fa6-8b4c-fb56ba4d445a",
+   "metadata": {},
+   "source": [
+    "With a substantial number of waveforms and multiple categories (neurons), the density of data can make it difficult to accurately visualize patterns in the data. We can utilize hvPlot and Datashader, but there is currently one caveat: each waveform must be distinctly separated in the dataframe with a row containing `NaN` to effectively separate one waveform from another and still color by neuron with Datashader. This ensures each waveform is treated as an individual entity, avoiding misleading connections between the end of one waveform and the start of the next. Below, we can see one of these `NaN` rows at the end of the first waveform."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "77cf41a3-8206-4033-b555-3e47a86c1f38",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "first_waveform.tail(3)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "dcc55202-ee53-42e5-8beb-c68d1031095b",
+   "metadata": {},
+   "source": [
+    "<div class=\"alert alert-info\">\n",
+    "\n",
+    "<b>Note:</b> [Work is planned](https://github.com/holoviz/holoviews/issues/5976) to avoid having to prepare your dataset with `NaN`-separators. Stay tuned!\n",
+    "\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "8be05959-aae1-4325-842a-71b7ee8b2e61",
+   "metadata": {},
+   "source": [
+    "With the `NaN`-separators already in place, all we need to do is specify that hvPlot should color by neuron and apply datashader rasterization:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "28cadcc8-9f09-4a1c-ae35-06ffa9e02bfa",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "waves.hvplot.line('Time', 'Amplitude', by='Neuron', hover=True, datashade=True,\n",
+    "                  xlabel='Time (ms)', ylabel='Amplitude (µV)', min_height=300,\n",
+    "                  title=\"Datashade Multiple Lines Per Category\", line_width=1)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b4fe1f6f",
+   "metadata": {},
+   "source": [
+    "Datashader's approach, while comprehensive for large timeseries data, focuses on the entire dataset's view at a specific resolution. To explore data across different timescales, particularly when dealing with years of data but focusing on shorter intervals like a day or an hour, the next \"minimap\" approach offers an effective solution."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "82346bfc",
+   "metadata": {},
+   "source": [
+    "## Minimap Contextualizing\n",
+    "\n",
+    "\n",
+    "### Minimap Overview\n",
+    "Minimap introduces a way to visualize and navigate through extensive time ranges in your dataset. It allows you to maintain awareness of the larger context while focusing on a specific, smaller time range. This technique is particularly useful when dealing with timeseries data that span long durations but require detailed study of shorter intervals.\n",
+    "\n",
+    "### Implementing Minimap\n",
+    "To create a minimap, we use the HoloViews `RangeToolLink`, which links a main plot to a smaller overview plot. The smaller minimap plot provides a fixed, broad view of the data, and the main plot can be used for detailed examination. Note, we also make use of **Datashader rasterization** on the minimap and **LTTB downsampling** on the main plot to limit the data sent to the browser."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "smoking-findings",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from holoviews.plotting.links import RangeToolLink\n",
+    "\n",
+    "plot = df0.hvplot(x=\"time\", y=\"value\", rasterize=True, color='darkblue', line_width=2,\n",
+    "                  min_height=300, colorbar=False, ylim=(-9, 3), # optional: set initial y-range\n",
+    "                  xlim=(pd.Timestamp(\"2023-03-10\"), pd.Timestamp(\"2023-04-10\")), # optional: set initial x-range\n",
+    "                  ).opts(\n",
+    "    backend_opts={\n",
+    "        \"x_range.bounds\": (df0.time.min(), df0.time.max()), # optional: limit max viewable x-extent to data\n",
+    "        \"y_range.bounds\": (df0.value.min()-1, df0.value.max()+1), # optional: limit max viewable y-extent to data\n",
+    "    }\n",
+    ")\n",
+    "\n",
+    "minimap = df0.hvplot(x=\"time\", y=\"value\", height=150, padding=(0, 0.1), rasterize=True,\n",
+    "                     color='darkblue', colorbar=False, line_width=2).opts(toolbar='disable')\n",
+    "\n",
+    "link = RangeToolLink(minimap, plot, axes=[\"x\", \"y\"])\n",
+    "\n",
+    "(plot + minimap).opts(shared_axes=False).cols(1)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "lesser-magazine",
+   "metadata": {},
+   "source": [
+    "In this setup, you can interact with the minimap by dragging the grey selection box. The main plot above will update to reflect the selected range, allowing you to explore extensive datasets while focusing on specific segments.\n",
+    "\n",
+    "Here, we also demonstrate the use of `backend_opts` to configure properties of the Bokeh plotting library that are not yet exposed as HoloViews/hvPlot options. By setting hard outer limits on the plot's panning/zooming, we ensure that the view remains within the data's range, enhancing the user experience."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "fd0ffe6b",
+   "metadata": {},
+   "source": [
+    "## Future Improvements\n",
+    "As we look to the future, our roadmap includes several exciting enhancements. A significant focus is to enrich Datashader inspections by incorporating rich hover tooltips for Datashader images. This addition will greatly enhance the data exploration experience, allowing users to access detailed information more intuitively.\n",
+    "\n",
+    "Additionally, we are working towards a more streamlined process for plotting multiple overlapping lines. Our goal is to evolve the current approach, eliminating the need for inserting `NaN` rows as separators in the data structure. This improvement will simplify data preparation, making the visualization of complex timeseries more accessible and user-friendly."
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python",
+   "pygments_lexer": "ipython3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

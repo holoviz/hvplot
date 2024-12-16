@@ -1,0 +1,81 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Scatter"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import hvplot.pandas  # noqa"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "`scatter` plots are a good first way to plot data with non continuous axes."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from bokeh.sampledata.iris import flowers as df\n",
+    "\n",
+    "df.sample(n=5)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.hvplot.scatter(x='sepal_length', y='sepal_width', by='species', \n",
+    "                  legend='top', height=400, width=400)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "As for most other types of hvPlot plots, you can add fields to the hover display using the `hover_cols` argument. It can also take \"all\" as input to show all fields. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.hvplot.scatter(x='sepal_length', y='sepal_width', s='petal_length', scale=5, by='species', \n",
+    "                  legend='top', height=400, width=600,\n",
+    "                  hover_cols=[\"species\", \"sepal_length\", \"sepal_width\", \"petal_width\"])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You can add the 's' parameter in scatter to specify the marker plot size and add the 'scale' parameter to specify what the scaling factor should be."
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python",
+   "pygments_lexer": "ipython3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}
