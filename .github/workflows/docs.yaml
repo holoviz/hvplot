@@ -20,45 +20,37 @@ on:
   schedule:
     - cron: '0 15 * * SUN'
 
+defaults:
+  run:
+    shell: bash -e {0}
+
 env:
   PYTHON_VERSION: "3.11"
 
 jobs:
-  conda_build_docs:
-    name: Documentation:conda
+  pixi_lock:
+    name: Pixi lock
+    runs-on: ubuntu-latest
+    steps:
+      - uses: holoviz-dev/holoviz_tasks/pixi_lock@v0
+
+  docs_build:
+    name: Build Documentation
     runs-on: 'ubuntu-latest'
     timeout-minutes: 120
-    defaults:
-      run:
-        shell: bash -l {0}
     env:
-      DESC: "Documentation build"
-      MPLBACKEND: "Agg"
-      MOZ_HEADLESS: 1
       DISPLAY: ":99.0"
     steps:
-      - uses: actions/checkout@v4
+      - uses: holoviz-dev/holoviz_tasks/pixi_install@v0
         with:
-          fetch-depth: 0
-      - uses: conda-incubator/setup-miniconda@v3
-        with:
-          auto-update-conda: true
-          environment-file: envs/py${{ env.PYTHON_VERSION }}-docs.yaml
-          activate-environment: hvplotdocs
+          environments: docs
+      - name: Build documentation
+        run: pixi run -e docs docs-build
       - name: Set and echo git ref
         id: vars
         run: |
           echo "Deploying from ref ${GITHUB_REF#refs/*/}"
           echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
-      - name: install dev
-        # To make sure the latest is installed.
-        run: pip install -e . --no-deps
-      - name: conda info
-        run: conda info
-      - name: conda list
-        run: conda list
-      - name: build docs
-        run: sphinx-build -b html doc builtdocs
       - name: report failure
         if: failure()
         run: cat /tmp/sphinx-*.log | tail -n 100
@@ -84,13 +76,11 @@ jobs:
           cname: hvplot.holoviz.org
           force_orphan: true
           exclude_assets: '.doctrees'
+
   pip_build_docs:
-    name: Documentation:pip
+    name: Build Documentation (pip)
     runs-on: 'ubuntu-latest'
     timeout-minutes: 120
-    defaults:
-      run:
-        shell: bash -l {0}
     env:
       DESC: "Documentation build"
       MPLBACKEND: "Agg"

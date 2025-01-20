@@ -1,4 +1,4 @@
-{% set pyproject = load_file_data('../pyproject.toml', from_recipe_dir=True) %}
+{% set pyproject = load_file_data('../../../pyproject.toml', from_recipe_dir=True) %}
 {% set buildsystem = pyproject['build-system'] %}
 {% set project = pyproject['project'] %}
 
@@ -10,7 +10,7 @@ package:
   version: {{ version }}
 
 source:
-  path: ..
+  url: ../../../dist/{{ name }}-{{ version }}.tar.gz
 
 build:
   noarch: python
