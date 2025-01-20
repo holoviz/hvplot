@@ -210,28 +210,3 @@ extend-select = [
 
 [tool.ruff.format]
 quote-style = "single"
-
-[tool.pyproject2conda.dependencies]
-geoviews = { skip = true, packages = "geoviews-core >=1.9.0" }
-# It should be ibis-framework[duckdb], but it works anyway.
-ibis-framework = { skip = true, packages = "ibis-duckdb" }
-
-[tool.pyproject2conda.envs."tests"]
-channels = ["nodefaults", "pyviz/label/dev", "conda-forge"]
-python = ["3.9", "3.10", "3.11", "3.12"]
-extras = ["tests", "examples-tests", "geo", "graphviz", "dev-extras"]
-name = "hvplottests"
-# reqs = ["-e .."]  # Doesn't work
-
-[tool.pyproject2conda.envs."docs"]
-channels = [
-    "nodefaults",
-    # To get dev HoloViews, not always needed.
-    "pyviz/label/dev",
-    # To get dev nbsite, not always needed.
-    "pyviz/label/tooling_dev",
-    "conda-forge"
-]
-python = ["3.11"]
-extras = ["doc", "examples", "geo", "graphviz", "dev-extras"]
-name = "hvplotdocs"
