@@ -98,7 +98,9 @@ nbsite_analytics = {
 
 rediraffe_redirects = {
     # Removal of the developer testing page
-    'developer_guide/testing': 'developer_guide/index',
+    'developer_guide/testing': 'developer_guide',
+    # Removal of the developer_guide folder
+    'developer_guide/index': 'developer_guide',
 }
 
 html_context.update(  # noqa

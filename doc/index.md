@@ -425,7 +425,7 @@ Getting Started <getting_started/index>
 User Guide <user_guide/index>
 Reference Gallery <reference/index>
 Topics <topics>
-Developer Guide <developer_guide/index>
+Developer Guide <developer_guide>
 Releases <releases>
 Roadmap <roadmap>
 About <about>
