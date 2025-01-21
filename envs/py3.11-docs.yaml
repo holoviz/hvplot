@@ -19,7 +19,7 @@ dependencies:
   - bokeh_sampledata
   - cartopy
   - colorcet>=2
-  - dask>=2021.3.0
+  - dask<2025.1.0,>=2021.3.0
   - datashader>=0.6.5
   - duckdb
   - fiona

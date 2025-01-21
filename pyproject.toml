@@ -53,7 +53,7 @@ HoloViz = "https://holoviz.org/"
 
 [project.optional-dependencies]
 tests-core = [
-    "dask[dataframe]",
+    "dask[dataframe] <2025.1.0",
     "ipywidgets",
     "matplotlib",
     "parameterized",
@@ -106,7 +106,7 @@ graphviz = [
 ]
 # Dependencies required to run the notebooks
 examples = [
-    "dask[dataframe] >=2021.3.0",
+    "dask[dataframe] >=2021.3.0,<2025.1.0",
     "datashader >=0.6.5",
     "duckdb",
     "fugue[sql]",
