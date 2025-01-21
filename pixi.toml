@@ -18,7 +18,7 @@ default = [
 ]
 
 [environments.test-39]
-features = ["py39", "required", ]
+features = ["py39", "required", "test-core", "test", "example", "geo", "graphviz", "test-example"]
 no-default-feature = true
 
 [environments.test-310]
@@ -162,6 +162,7 @@ scipy = "*"
 xarray = "*"
 # bokeh_sampledata = "*" (only available starting from Python 3.10)
 psutil = "*"
+cftime = "*"
 
 [feature.test-example.dependencies]
 # Dependencies required to run the examples notebooks.
@@ -203,10 +204,12 @@ spatialpandas = ">=0.4.3"
 pygraphviz = "*"
 
 [feature.test.tasks]
-test-unit = 'pytest -v hvplot'
 test-unit-geo = 'pytest -v hvplot --geo'
 test-unit-cov = 'pytest -v hvplot --cov=hvplot --cov-append'
 test-unit-geo-cov = 'pytest -v hvplot --geo --cov=hvplot --cov-append'
+
+[feature.test-core.tasks]
+test-unit = 'pytest -v hvplot'
 
 [feature.test-example.tasks]
 test-example = 'pytest -n logical --dist loadscope --nbval-lax -p no:python'

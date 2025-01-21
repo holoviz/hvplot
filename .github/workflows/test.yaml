@@ -181,8 +181,8 @@ jobs:
         run: |
           python --version --version
           python -m pip list
-      - name: bokeh sampledata
-        run: bokeh sampledata
+      - name: download datasets
+        run: python scripts/download_data.py
       - name: unit tests
         run: pytest -v hvplot --cov=hvplot --cov-append
       - name: unit tests geo
