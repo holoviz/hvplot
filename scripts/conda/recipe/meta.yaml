@@ -33,8 +33,10 @@ test:
   requires:
     - pip
     {% for dep in project['optional-dependencies']['tests-core'] %}
-    {% if dep == 'dask[dataframe]' %}
-    - dask
+    {% if 'dask[dataframe]' in dep %}
+    - {{ dep | replace("[dataframe]", "") }}
+    {% elif 'bokeh_sampledata' in dep %}
+    - {{ dep | replace("; python_version >= '3.10'", "") }}
     {% else %}
     - {{ dep }}
     {% endif %}
