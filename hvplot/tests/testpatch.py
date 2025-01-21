@@ -8,7 +8,6 @@ from unittest import TestCase, SkipTest
 
 import numpy as np
 import pandas as pd
-import pytest
 
 from hvplot.plotting import hvPlotTabular, hvPlot
 
@@ -108,6 +107,8 @@ class TestPatchStreamz(TestCase):
 
 class TestPatchPolars(TestCase):
     def setUp(self):
+        if sys.platform == 'win32' and sys.version_info[:2] == (3, 9):
+            raise SkipTest('stack overflow error')
         try:
             import polars as pl  # noqa
         except ImportError:
@@ -120,10 +121,6 @@ class TestPatchPolars(TestCase):
         pseries = pl.Series([0, 1, 2])
         self.assertIsInstance(pseries.hvplot, hvPlotTabular)
 
-    @pytest.mark.skipif(
-        sys.platform == 'win32' and sys.version[:2] == (3, 9),
-        reason='stack overflow error on the CI',
-    )
     def test_polars_dataframe_patched(self):
         import polars as pl
 
