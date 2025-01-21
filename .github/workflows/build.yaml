@@ -43,10 +43,12 @@ jobs:
           echo "CONDA_FILE=$(ls dist/*.tar.bz2)" >> $GITHUB_ENV
       - name: conda dev upload
         if: contains(env.TAG, 'a') || contains(env.TAG, 'b') || contains(env.TAG, 'rc')
-        run: pixi run -e build publish-conda --token ${{ secrets.CONDA_UPLOAD_TOKEN }} upload --user pyviz --label=dev $CONDA_FILE
+        # run: pixi run -e build publish-conda --token ${{ secrets.CONDA_UPLOAD_TOKEN }} upload --user pyviz --label=dev $CONDA_FILE
+        run: echo "dev"
       - name: conda main upload
         if: (!(contains(env.TAG, 'a') || contains(env.TAG, 'b') || contains(env.TAG, 'rc')))
-        run: pixi run -e build publish-conda --token ${{ secrets.CONDA_UPLOAD_TOKEN }} upload --user pyviz --label=dev --label=main $CONDA_FILE
+        # run: pixi run -e build publish-conda --token ${{ secrets.CONDA_UPLOAD_TOKEN }} upload --user pyviz --label=dev --label=main $CONDA_FILE
+        run: echo "prod"
 
   pip_build:
     name: Build PyPI
@@ -64,4 +66,5 @@ jobs:
         run: pixi run -e build build-pip
       - name: Publish to PyPI
         if: github.event_name == 'push'
-        uses: pypa/gh-action-pypi-publish@release/v1
+        # uses: pypa/gh-action-pypi-publish@release/v1
+        run: echo "publish"
