@@ -120,8 +120,10 @@ class TestPatchPolars(TestCase):
         pseries = pl.Series([0, 1, 2])
         self.assertIsInstance(pseries.hvplot, hvPlotTabular)
 
-    # stack overflow error on the CI
-    @pytest.mark.skipif(sys.platform == 'win32' and sys.version[:2] == (3, 9))
+    @pytest.mark.skipif(
+        sys.platform == 'win32' and sys.version[:2] == (3, 9),
+        reason='stack overflow error on the CI',
+    )
     def test_polars_dataframe_patched(self):
         import polars as pl
 
