@@ -46,9 +46,10 @@ finally:
     webdriver_control.cleanup()
 
 
-# From Dask 2024.3.0 they now use `dask_expr` by default
-# https://github.com/dask/dask/issues/10995
-dask.config.set({'dataframe.query-planning': False})
+if Version(dask.__version__).release < (2025, 1, 0):
+    # From Dask 2024.3.0 they now use `dask_expr` by default
+    # https://github.com/dask/dask/issues/10995
+    dask.config.set({'dataframe.query-planning': False})
 
 
 # https://github.com/pydata/xarray/pull/9182
