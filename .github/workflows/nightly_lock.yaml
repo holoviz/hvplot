@@ -5,7 +5,7 @@ on:
     - cron: "0 0 * * *"
 
 env:
-  PACKAGE: "holoviews"
+  PACKAGE: "hvplot"
 
 jobs:
   pixi_lock:
