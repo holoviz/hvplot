@@ -1,3 +1,5 @@
+import sys
+
 from importlib.util import find_spec
 
 import dask
@@ -10,7 +12,11 @@ collect_ignore_glob = [
     'user_guide/Streaming.ipynb',
 ]
 
-if not find_spec('pygraphviz'):
+# On MacOs, Python 3.12, got the following error running this:
+# `pos = layout(G)`
+# => OSError: Format: "dot" not recognized. No formats found.
+# Fixed locally by running `dot -c`
+if not find_spec('pygraphviz') or (sys.platform == 'darwin' and sys.version_info[:2] == (3, 12)):
     collect_ignore_glob += [
         'user_guide/NetworkX.ipynb',
     ]

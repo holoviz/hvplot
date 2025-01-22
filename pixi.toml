@@ -1,0 +1,260 @@
+[project]
+name = "hvplot"
+channels = ["pyviz/label/dev",  "conda-forge"]
+platforms = ["linux-64", "osx-arm64", "osx-64", "win-64"]
+
+[environments]
+default = [
+    "py312",
+    "required",
+    "test-core",
+    "test",
+    "example",
+    "geo",
+    "graphviz",
+    "test-example",
+    "lint",
+    "dev",
+]
+
+[environments.test-39]
+features = ["py39", "required", "test-core", "test", "example", "geo", "graphviz", "test-example"]
+no-default-feature = true
+
+[environments.test-310]
+features = ["py310", "required", "test-core", "test", "example", "geo", "graphviz", "test-example"]
+no-default-feature = true
+
+[environments.test-311]
+features = ["py311", "required", "test-core", "test", "example", "geo", "graphviz", "test-example"]
+no-default-feature = true
+
+[environments.test-312]
+features = ["py312", "required", "test-core", "test", "example", "geo", "graphviz", "test-example"]
+no-default-feature = true
+
+[environments.test-core]
+features = ["py313", "required", "test-core"]
+no-default-feature = true
+
+[environments.docs]
+features = ["py311", "required", "doc", "example", "geo", "graphviz"]
+no-default-feature = true
+
+[environments.build]
+features = ["py311", "required", "build"]
+no-default-feature = true
+
+[environments.lint]
+features = ["lint"]
+no-default-feature = true
+
+[feature.required.dependencies]
+nomkl = "*"
+pip = "*"
+# Required
+bokeh = ">=3.1"
+colorcet = ">=2"
+holoviews = ">=1.19.0"
+numpy = ">=1.21"
+packaging = "*"
+pandas = ">=1.3"
+panel = ">=1.0"
+param = ">=1.12.0,<3.0"
+
+[feature.required.tasks]
+download-data = 'python scripts/download_data.py'
+install = 'python -m pip install --no-deps --disable-pip-version-check -e .'
+install-dev = { cmd = "pre-commit install", depends-on = ["install", "download-data"] }
+sync-git-tags = 'python scripts/sync_git_tags.py hvplot'
+
+[feature.required.activation.env]
+PYTHONIOENCODING = "utf-8"
+
+[feature.py39.dependencies]
+python = "3.9.*"
+
+[feature.py310.dependencies]
+python = "3.10.*"
+bokeh_sampledata = "*"
+
+[feature.py311.dependencies]
+python = "3.11.*"
+bokeh_sampledata = "*"
+
+[feature.py312.dependencies]
+python = "3.12.*"
+bokeh_sampledata = "*"
+
+[feature.py312.activation.env]
+COVERAGE_CORE = "sysmon"
+
+[feature.py313.dependencies]
+python = "3.13.*"
+bokeh_sampledata = "*"
+
+[feature.py313.activation.env]
+COVERAGE_CORE = "sysmon"
+
+# =================== DEV ===================
+
+[feature.dev.dependencies]
+jupyterlab = "*"
+jupyterlab-myst = "*"
+setuptools_scm = ">=6"
+
+[feature.dev.tasks]
+lab = 'jupyter lab'
+
+# =================== SHARED DEPS ===================
+
+# Dependencies required to run the notebooks
+[feature.example.dependencies]
+dask = "<2025.1.0"  # dask[dataframe]
+datashader = ">=0.6.5"
+duckdb = "*"
+# In 0.9 fugue added the sql extra but didn't add a fugue-sql conda package,
+# removing the sql deps from core fugue. Adding them manually here.
+qpd = ">=0.4.4"
+fugue-sql-antlr = ">=0.2.0"
+sqlglot = "*"
+jinja2 = "*"
+# fugue[sql] = "*"
+fugue = "*"
+# end fugue
+"ibis-duckdb" = "*"  # ibis-framework[duckdb]
+intake-parquet = ">=0.2.3"
+intake-xarray = ">=0.5.0,<2"
+intake  = ">=0.6.5,<2.0.0"
+ipywidgets = "*"
+networkx = ">=2.6.3"
+matplotlib = "*"
+notebook = ">=5.4"
+numba = ">=0.51.0"
+pillow = ">=8.2.0"
+plotly = "*"
+polars = "*"
+pooch = ">=1.6.0"
+s3fs = ">=2022.1.0"
+scikit-image = ">=0.17.2"
+scipy = ">=1.5.3"
+selenium  = ">=3.141.0"
+streamz = ">=0.3.0"
+xarray = ">=0.18.2"
+xyzservices = ">=2022.9.0"
+geodatasets = ">=2023.12.0"
+
+# =================== TESTS ===================
+
+[feature.test-core.dependencies]
+# Minimum dependencies required to run the test suite.
+dask = "<2025.1.0"  # dask[dataframe]
+ipywidgets = "*"
+matplotlib = "*"
+parameterized = "*"
+plotly = "*"
+pooch = "*"
+pre-commit = "*"
+pytest-cov = "*"
+pytest = "*"
+ruff = "*"
+scipy = "*"
+xarray = "*"
+# bokeh_sampledata = "*" (only available starting from Python 3.10)
+psutil = "*"
+cftime = "*"
+
+[feature.test-example.dependencies]
+# Dependencies required to run the examples notebooks.
+pytest-xdist = "*"
+nbval = "*"
+
+[feature.test.dependencies]
+# Optional tests dependencies, i.e. one should be able to run and pass
+# the test suite without installing any of those.
+
+# In 0.9 fugue added the sql extra but didn't add a fugue-sql conda package,
+# removing the sql deps from core fugue. Adding them manually here.
+qpd = ">=0.4.4"
+fugue-sql-antlr = ">=0.2.0"
+sqlglot = "*"
+jinja2 = "*"
+# fugue[sql] = "*"
+fugue = "*"
+# end fugue
+"ibis-duckdb" = "*"  # ibis-framework[duckdb]
+polars = "*"
+dask = "<2025.1.0"
+spatialpandas = "*"
+duckdb = "*"
+
+[feature.geo.dependencies]
+# Geo dependencies are always a little special.
+cartopy = "*"
+fiona = "*"
+geopandas = "*"
+geoviews-core = ">=1.9.0"  # geoviews
+pyproj = "*"
+rasterio = "*"
+rioxarray = "*"
+spatialpandas = ">=0.4.3"
+
+[feature.graphviz.dependencies]
+# graphviz is difficult to install with pip, ok with conda.
+pygraphviz = "*"
+
+[feature.test.tasks]
+test-unit-geo = 'pytest -v hvplot --geo'
+test-unit-cov = 'pytest -v hvplot --cov=hvplot --cov-append'
+test-unit-geo-cov = 'pytest -v hvplot --geo --cov=hvplot --cov-append'
+
+[feature.test-core.tasks]
+test-unit = 'pytest -v hvplot'
+
+[feature.test-example.tasks]
+test-example = 'pytest -n logical --dist loadscope --nbval-lax -p no:python'
+
+# =================== DOCS ====================
+
+[feature.doc]
+channels = [
+    # To get dev HoloViews, not always needed.
+    "pyviz/label/dev",
+    # To get dev nbsite, not always needed.
+    "pyviz/label/tooling_dev",
+    "conda-forge"
+]
+dependencies = {nbsite = ">=0.8.6", sphinxext-rediraffe = "*"}
+
+[feature.doc.activation.env]
+MOZ_HEADLESS = "1"
+MPLBACKEND = "Agg"
+DISPLAY = ":99.0"
+
+[feature.doc.tasks]
+docs-build = 'sphinx-build -b html doc builtdocs'
+# docs-build-dev = { cmd = "pre-commit install", depends-on = ["install", "docs-build"] }
+_docs-install = 'python -m pip install --no-deps --disable-pip-version-check -e .'
+docs-build-dev = { depends-on = ["_docs-install", "docs-build"] }
+
+
+# ================== BUILD ====================
+
+[feature.build.dependencies]
+python-build = "*"
+conda-build = "*"
+anaconda-client = "*"
+
+[feature.build.tasks]
+build-conda = 'bash scripts/conda/build.sh'
+publish-conda = 'anaconda'
+build-pip = 'python -m build .'
+
+# =================== LINT ====================
+
+[feature.lint.dependencies]
+pre-commit = "*"
+
+[feature.lint.tasks]
+lint = 'pre-commit run --all-files'
+lint-install = 'pre-commit install'

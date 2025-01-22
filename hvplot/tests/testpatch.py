@@ -2,6 +2,8 @@
 Tests patching of supported libraries
 """
 
+import sys
+
 from unittest import TestCase, SkipTest
 
 import numpy as np
@@ -105,6 +107,8 @@ class TestPatchStreamz(TestCase):
 
 class TestPatchPolars(TestCase):
     def setUp(self):
+        if sys.platform == 'win32' and sys.version_info[:2] == (3, 9):
+            raise SkipTest('stack overflow error')
         try:
             import polars as pl  # noqa
         except ImportError:
