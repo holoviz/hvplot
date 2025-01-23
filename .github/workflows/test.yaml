@@ -30,12 +30,17 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+defaults:
+  run:
+    shell: bash -e {0}
+
 jobs:
   pre_commit:
     name: Run pre-commit
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: holoviz-dev/holoviz_tasks/pre-commit@v0.1a19
+      - uses: holoviz-dev/holoviz_tasks/pre-commit@v0
+
   setup:
     name: Setup workflow
     runs-on: ubuntu-latest
@@ -60,10 +65,10 @@ jobs:
         run: |
           MATRIX=$(jq -nsc '{
               "os": ["ubuntu-latest", "macos-latest", "windows-latest"],
-              "python-version": ["3.9", "3.12"],
+              "environment": ["test-39", "test-312"],
               "exclude": [
                 {
-                  "python-version": "3.9",
+                  "environment": "test-39",
                   "os": "macos-latest"
                 }
               ]
@@ -74,24 +79,24 @@ jobs:
         run: |
           MATRIX=$(jq -nsc '{
               "os": ["ubuntu-latest", "macos-latest", "windows-latest"],
-              "python-version": ["3.9", "3.12"],
+              "environment": ["test-39", "test-312"],
               "include": [
                 {
-                  "python-version": "3.9",
+                  "environment": "test-39",
                   "os": "ubuntu-latest"
                 },
                 {
-                  "python-version": "3.10",
+                  "environment": "test-310",
                   "os": "ubuntu-latest"
                 },
                 {
-                  "python-version": "3.11",
+                  "environment": "test-311",
                   "os": "ubuntu-latest"
                 }
               ],
               "exclude": [
                 {
-                  "python-version": "3.9",
+                  "environment": "test-39",
                   "os": "macos-latest"
                 }
               ]
@@ -102,71 +107,82 @@ jobs:
         run: |
           MATRIX=$(jq -nsc '{
               "os": ["ubuntu-latest"],
-              "python-version": ["3.12"]
+              "environment": ["test-312"]
           }')
           echo "MATRIX=$MATRIX" >> $GITHUB_ENV
 
-  conda_suite:
-    name: conda tests:${{ matrix.os }}:${{ matrix.python-version }}
+  pixi_lock:
+    name: Pixi lock
+    runs-on: ubuntu-latest
+    steps:
+      - uses: holoviz-dev/holoviz_tasks/pixi_lock@v0
+        with:
+          cache: ${{ github.event.inputs.cache == 'true' || github.event.inputs.cache == '' }}
+
+  unit_test_suite:
+    name: unit:${{ matrix.environment }}:${{ matrix.os }}
+    needs: [pre_commit, setup, pixi_lock]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
+    timeout-minutes: 90
+
+    steps:
+      - uses: holoviz-dev/holoviz_tasks/pixi_install@v0
+        with:
+          environments: ${{ matrix.environment }}
+      - name: Test Unit
+        run: pixi run -e ${{ matrix.environment }} test-unit-cov
+      - name: Test Geo
+        run: pixi run -e ${{ matrix.environment }} test-unit-geo-cov
+      - name: Test Examples
+        run: pixi run -e ${{ matrix.environment }} test-example
+      - uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  core_test_suite:
+    name: core:${{ matrix.environment }}:${{ matrix.os }}
+    needs: [pre_commit, setup, pixi_lock]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-latest"]
+        environment: ["test-core"]
+    timeout-minutes: 120
+    steps:
+      - uses: holoviz-dev/holoviz_tasks/pixi_install@v0
+        with:
+          environments: ${{ matrix.environment }}
+      - name: Test Unit
+        run: pixi run -e ${{ matrix.environment }} test-unit
+
+  pip_test:
+    name: pip tests:${{ matrix.os }}:${{ matrix.environment }}
     needs: [pre_commit, setup]
     if: needs.setup.outputs.matrix_option != 'default'
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
-    timeout-minutes: 90
-    defaults:
-      run:
-        shell: bash -el {0}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: conda-incubator/setup-miniconda@v3
-        with:
-          auto-update-conda: true
-          environment-file: envs/py${{ matrix.python-version }}-tests.yaml
-          activate-environment: hvplottests
-      - name: conda info
-        run: conda info
-      - name: conda list
-        run: conda list
-      - name: bokeh sampledata
-        if: ${{ matrix.python-version == '3.9'}}
-        run: bokeh sampledata
-      - name: unit tests
-        run: pytest -v hvplot --cov=hvplot --cov-append
-      - name: unit tests geo
-        run: pytest -v hvplot --geo --cov=hvplot --cov-append
-      - name: examples tests
-        run: pytest -n logical --dist loadscope --nbval-lax -p no:python
-  pip_test:
-    name: pip tests:${{ matrix.os }}:${{ matrix.python-version }}
-    needs: [pre_commit, setup]
     timeout-minutes: 90
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
-    defaults:
-      run:
-        shell: bash -e {0}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.12'
       - name: install with geo
         run: python -m pip install -v --prefer-binary -e '.[tests, examples-tests, geo, hvdev, hvdev-geo, dev-extras]'
       - name: python version and pip list
         run: |
           python --version --version
           python -m pip list
-      - name: bokeh sampledata
-        if: ${{ matrix.python-version == '3.9'}}
-        run: bokeh sampledata
+      - name: download datasets
+        run: python scripts/download_data.py
       - name: unit tests
         run: pytest -v hvplot --cov=hvplot --cov-append
       - name: unit tests geo
@@ -181,3 +197,13 @@ jobs:
           verbose: false
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  result_test_suite:
+    name: result:test
+    needs: [unit_test_suite, core_test_suite, pip_test]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: check for failures
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: echo job failed && exit 1

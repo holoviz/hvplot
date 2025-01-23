@@ -1,3 +1,5 @@
+import sys
+
 from importlib.util import find_spec
 
 import dask
@@ -10,7 +12,11 @@ collect_ignore_glob = [
     'user_guide/Streaming.ipynb',
 ]
 
-if not find_spec('pygraphviz'):
+# On MacOs, Python 3.12, got the following error running this:
+# `pos = layout(G)`
+# => OSError: Format: "dot" not recognized. No formats found.
+# Fixed locally by running `dot -c`
+if not find_spec('pygraphviz') or (sys.platform == 'darwin' and sys.version_info[:2] == (3, 12)):
     collect_ignore_glob += [
         'user_guide/NetworkX.ipynb',
     ]
@@ -46,9 +52,10 @@ finally:
     webdriver_control.cleanup()
 
 
-# From Dask 2024.3.0 they now use `dask_expr` by default
-# https://github.com/dask/dask/issues/10995
-dask.config.set({'dataframe.query-planning': False})
+if Version(dask.__version__).release < (2025, 1, 0):
+    # From Dask 2024.3.0 they now use `dask_expr` by default
+    # https://github.com/dask/dask/issues/10995
+    dask.config.set({'dataframe.query-planning': False})
 
 
 # https://github.com/pydata/xarray/pull/9182

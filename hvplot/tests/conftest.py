@@ -1,3 +1,4 @@
+from packaging.version import Version
 import dask
 
 optional_markers = {
@@ -37,6 +38,7 @@ def pytest_collection_modifyitems(config, items):
     items[:] = selected
 
 
-# From Dask 2024.3.0 they now use `dask_expr` by default
-# https://github.com/dask/dask/issues/10995
-dask.config.set({'dataframe.query-planning': False})
+if Version(dask.__version__).release < (2025, 1, 0):
+    # From Dask 2024.3.0 they now use `dask_expr` by default
+    # https://github.com/dask/dask/issues/10995
+    dask.config.set({'dataframe.query-planning': False})

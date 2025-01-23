@@ -1,4 +1,4 @@
-{% set pyproject = load_file_data('../pyproject.toml', from_recipe_dir=True) %}
+{% set pyproject = load_file_data('../../../pyproject.toml', from_recipe_dir=True) %}
 {% set buildsystem = pyproject['build-system'] %}
 {% set project = pyproject['project'] %}
 
@@ -10,7 +10,7 @@ package:
   version: {{ version }}
 
 source:
-  path: ..
+  url: ../../../dist/{{ name }}-{{ version }}.tar.gz
 
 build:
   noarch: python
@@ -33,8 +33,10 @@ test:
   requires:
     - pip
     {% for dep in project['optional-dependencies']['tests-core'] %}
-    {% if dep == 'dask[dataframe]' %}
-    - dask
+    {% if 'dask[dataframe]' in dep %}
+    - {{ dep | replace("[dataframe]", "") }}
+    {% elif 'bokeh_sampledata' in dep %}
+    - {{ dep | replace("; python_version >= '3.10'", "") }}
     {% else %}
     - {{ dep }}
     {% endif %}

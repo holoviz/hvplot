@@ -127,3 +127,7 @@ doc/user_guide/plot.html
 
 # setuptools_scm
 hvplot/_version.py
+
+# pixi
+.pixi
+pixi.lock

@@ -14,61 +14,54 @@ on:
 env:
   PYTHON_VERSION: "3.11"
 
+defaults:
+  run:
+    shell: bash -e {0}
+
 jobs:
+  pixi_lock:
+    name: Pixi lock
+    runs-on: ubuntu-latest
+    steps:
+      - uses: holoviz-dev/holoviz_tasks/pixi_lock@v0
+
   conda_build:
-    name: Build Conda Packages
-    runs-on: 'ubuntu-latest'
-    defaults:
-      run:
-        shell: bash -l {0}
-    env:
-      MPLBACKEND: "Agg"
+    name: Build Conda
+    needs: [pixi_lock]
+    runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v4
-      - name: Fetch unshallow
-        run: git fetch --prune --tags --unshallow -f
-      - uses: conda-incubator/setup-miniconda@v3
+      - uses: holoviz-dev/holoviz_tasks/pixi_install@v0
         with:
-          miniconda-version: "latest"
-          python-version: ${{ env.PYTHON_VERSION }}
-          auto-update-conda: true
-      - name: Set output
-        id: vars
-        run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
-      - name: conda setup
-        run: conda install anaconda-client conda-build setuptools_scm
+          environments: "build"
+          download-data: false
+          install: false
       - name: conda build
-        # TODO: remove --no-test when Dask 2024.4.2 is released on defaults
-        run: VERSION=`python -m setuptools_scm` conda build conda.recipe/ --no-test
+        run: pixi run -e build build-conda
+      - name: Set environment variables
+        run: |
+          echo "TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+          echo "CONDA_FILE=$(ls dist/*.tar.bz2)" >> $GITHUB_ENV
       - name: conda dev upload
-        if: (github.event_name == 'push' && (contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc')))
-        run: anaconda --token ${{ secrets.CONDA_UPLOAD_TOKEN }} upload --user pyviz --label=dev $(VERSION=`python -m setuptools_scm` conda build --output conda.recipe)
+        if: contains(env.TAG, 'a') || contains(env.TAG, 'b') || contains(env.TAG, 'rc')
+        run: pixi run -e build publish-conda --token ${{ secrets.CONDA_UPLOAD_TOKEN }} upload --user pyviz --label=dev $CONDA_FILE
       - name: conda main upload
-        if: (github.event_name == 'push' && !(contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc')))
-        run: anaconda --token ${{ secrets.CONDA_UPLOAD_TOKEN }} upload --user pyviz --label=dev --label=main $(VERSION=`python -m setuptools_scm` conda build --output conda.recipe)
+        if: (!(contains(env.TAG, 'a') || contains(env.TAG, 'b') || contains(env.TAG, 'rc')))
+        run: pixi run -e build publish-conda --token ${{ secrets.CONDA_UPLOAD_TOKEN }} upload --user pyviz --label=dev --label=main $CONDA_FILE
+
   pip_build:
-    name: Build PyPI Packages
-    runs-on: 'ubuntu-latest'
-    defaults:
-      run:
-        shell: bash -l {0}
-    env:
-      MPLBACKEND: "Agg"
+    name: Build PyPI
+    needs: [pixi_lock]
+    runs-on: "ubuntu-latest"
+    permissions:
+      id-token: write
     steps:
-      - uses: actions/checkout@v4
-      - name: Fetch unshallow
-        run: git fetch --prune --tags --unshallow -f
-      - uses: actions/setup-python@v5
+      - uses: holoviz-dev/holoviz_tasks/pixi_install@v0
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
-      - name: env setup
-        run: python -m pip install build
-      - name: pip build
-        run: python -m build
-      - name: Publish package to PyPI
+          environments: "build"
+          download-data: false
+          install: false
+      - name: Build package
+        run: pixi run -e build build-pip
+      - name: Publish to PyPI
         if: github.event_name == 'push'
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: ${{ secrets.PPU }}
-          password: ${{ secrets.PPP }}
-          packages-dir: dist/
