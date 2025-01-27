@@ -420,7 +420,6 @@ align: center
 :hidden:
 :maxdepth: 2
 
-Home <self>
 Getting Started <getting_started/index>
 User Guide <user_guide/index>
 Reference Gallery <reference/index>
