@@ -2,30 +2,21 @@
 Tests pandas.options.backend setting
 """
 
-from unittest import TestCase
-
 import pytest
 import pandas as pd
-
-from parameterized import parameterized
-
 import holoviews as hv
+from hvplot.converter import HoloViewsConverter
 from hvplot.plotting import plot
 from hvplot.tests.util import makeDataFrame
-from hvplot.converter import HoloViewsConverter
+
 
 no_args = ['line', 'area', 'hist', 'box', 'kde', 'density', 'bar', 'barh']
 x_y = ['scatter', 'hexbin']
 frame_specials = [
-    # delegates to boxplot_frame
     ('boxplot', hv.BoxWhisker),
-    # delegates to hist_frame
     ('hist', hv.Histogram),
 ]
-series_specials = [
-    # delegates to hist_series
-    ('hist', hv.Histogram)
-]
+series_specials = [('hist', hv.Histogram)]
 
 no_args_mapping = [
     (kind, el) for kind, el in HoloViewsConverter._kind_mapping.items() if kind in no_args
@@ -33,49 +24,53 @@ no_args_mapping = [
 x_y_mapping = [(kind, el) for kind, el in HoloViewsConverter._kind_mapping.items() if kind in x_y]
 
 
-class TestPandasHoloviewsPlotting(TestCase):
-    def setUp(self):
-        pd.options.plotting.backend = 'holoviews'
-
-    @parameterized.expand(no_args_mapping)
-    def test_pandas_series_plot_returns_holoviews_object(self, kind, el):
-        series = pd.Series([0, 1, 2])
-        plot = getattr(series.plot, kind)()
-        self.assertIsInstance(plot, el)
-
-    @parameterized.expand(no_args_mapping)
-    def test_pandas_dataframe_plot_returns_holoviews_object(self, kind, el):
-        df = pd.DataFrame([0, 1, 2])
-        plot = getattr(df.plot, kind)()
-        self.assertIsInstance(plot, el)
-
-    @parameterized.expand(x_y_mapping)
-    def test_pandas_dataframe_plot_returns_holoviews_object_when_x_and_y_set(self, kind, el):
-        df = pd.DataFrame({'a': [0, 1, 2], 'b': [5, 7, 2]})
-        plot = getattr(df.plot, kind)(x='a', y='b')
-        self.assertIsInstance(plot, el)
-
-    def test_pandas_dataframe_plot_does_not_implement_pie(self):
-        df = pd.DataFrame({'a': [0, 1, 2], 'b': [5, 7, 2]})
-        with self.assertRaisesRegex(NotImplementedError, 'pie'):
-            df.plot.pie(y='a')
-
-    @parameterized.expand(series_specials)
-    def test_pandas_series_specials_plot_return_holoviews_object(self, kind, el):
-        series = pd.Series([0, 1, 2])
-        plot = getattr(series, kind)()
-        self.assertIsInstance(plot, el)
-
-    @parameterized.expand(frame_specials)
-    def test_pandas_frame_specials_plot_return_holoviews_object(self, kind, el):
-        df = pd.DataFrame([0, 1, 2])
-        plot = getattr(df, kind)()
-        self.assertIsInstance(plot, el)
+@pytest.fixture(params=['holoviews', 'hvplot'])
+def plotting_backend(request):
+    pd.options.plotting.backend = request.param
+    return request.param
 
 
-class TestPandasHvplotPlotting(TestPandasHoloviewsPlotting):
-    def setUp(self):
-        pd.options.plotting.backend = 'hvplot'
+@pytest.mark.parametrize('kind,el', no_args_mapping)
+def test_pandas_series_plot_returns_holoviews_object(plotting_backend, kind, el):
+    series = pd.Series([0, 1, 2])
+    plot = getattr(series.plot, kind)()
+    assert isinstance(plot, el)
+
+
+@pytest.mark.parametrize('kind,el', no_args_mapping)
+def test_pandas_dataframe_plot_returns_holoviews_object(plotting_backend, kind, el):
+    df = pd.DataFrame([0, 1, 2])
+    plot = getattr(df.plot, kind)()
+    assert isinstance(plot, el)
+
+
+@pytest.mark.parametrize('kind,el', x_y_mapping)
+def test_pandas_dataframe_plot_returns_holoviews_object_when_x_and_y_set(
+    plotting_backend, kind, el
+):
+    df = pd.DataFrame({'a': [0, 1, 2], 'b': [5, 7, 2]})
+    plot = getattr(df.plot, kind)(x='a', y='b')
+    assert isinstance(plot, el)
+
+
+def test_pandas_dataframe_plot_does_not_implement_pie(plotting_backend):
+    df = pd.DataFrame({'a': [0, 1, 2], 'b': [5, 7, 2]})
+    with pytest.raises(NotImplementedError, match='pie'):
+        df.plot.pie(y='a')
+
+
+@pytest.mark.parametrize('kind,el', series_specials)
+def test_pandas_series_specials_plot_return_holoviews_object(plotting_backend, kind, el):
+    series = pd.Series([0, 1, 2])
+    plot = getattr(series, kind)()
+    assert isinstance(plot, el)
+
+
+@pytest.mark.parametrize('kind,el', frame_specials)
+def test_pandas_frame_specials_plot_return_holoviews_object(plotting_backend, kind, el):
+    df = pd.DataFrame([0, 1, 2])
+    plot = getattr(df, kind)()
+    assert isinstance(plot, el)
 
 
 def test_plot_supports_duckdb_relation():
