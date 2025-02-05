@@ -2,6 +2,8 @@
 Tests pandas.options.backend setting
 """
 
+from unittest.mock import patch
+
 import pytest
 import pandas as pd
 import holoviews as hv
@@ -128,6 +130,41 @@ def test_pandas_frame_specials_plot_explicit_return_holoviews_object(backend, ki
     df = pd.DataFrame([0, 1, 2])
     plot = getattr(df, kind)(backend=backend)
     assert isinstance(plot, el)
+
+
+def test_pandas_plot_reuse_plot_dropped(plotting_backend):
+    df = pd.DataFrame([0, 1, 2])
+    with patch('hvplot.plotting.hvPlotTabular.__call__') as hvcall:
+        df.plot.line(reuse_plot=True)
+    hvcall.assert_called_with(kind='line')
+
+
+def test_pandas_plot_sharexy_handled(plotting_backend):
+    df = pd.DataFrame([0, 1, 2])
+    with patch('hvplot.plotting.hvPlotTabular.__call__') as hvcall:
+        df.plot.line(sharex=True, sharey=True)
+        hvcall.assert_called_with(kind='line', shared_axes=True)
+        df.plot.line(sharex=False, sharey=True)
+        hvcall.assert_called_with(kind='line', shared_axes=True)
+        df.plot.line(sharex=True, sharey=False)
+        hvcall.assert_called_with(kind='line', shared_axes=True)
+        df.plot.line(sharex=False, sharey=False)
+        hvcall.assert_called_with(kind='line', shared_axes=False)
+        df.plot.line(sharex=True)
+        hvcall.assert_called_with(kind='line', shared_axes=True)
+        df.plot.line(sharex=False)
+        hvcall.assert_called_with(kind='line', shared_axes=False)
+        df.plot.line(sharey=True)
+        hvcall.assert_called_with(kind='line', shared_axes=True)
+        df.plot.line(sharey=False)
+        hvcall.assert_called_with(kind='line', shared_axes=False)
+
+
+def test_pandas_plot_extension_loaded(plotting_backend):
+    df = pd.DataFrame([0, 1, 2])
+    with patch('hvplot.hvplot_extension') as mock_hvplot_ext:
+        df.plot.line()
+        mock_hvplot_ext.assert_called_once_with('bokeh', logo=False)
 
 
 def test_plot_supports_duckdb_relation():
