@@ -16,6 +16,16 @@ from hvplot.converter import HoloViewsConverter
 
 no_args = ['line', 'area', 'hist', 'box', 'kde', 'density', 'bar', 'barh']
 x_y = ['scatter', 'hexbin']
+frame_specials = [
+    # delegates to boxplot_frame
+    ('boxplot', hv.BoxWhisker),
+    # delegates to hist_frame
+    ('hist', hv.Histogram),
+]
+series_specials = [
+    # delegates to hist_series
+    ('hist', hv.Histogram)
+]
 
 no_args_mapping = [
     (kind, el) for kind, el in HoloViewsConverter._kind_mapping.items() if kind in no_args
@@ -49,6 +59,18 @@ class TestPandasHoloviewsPlotting(TestCase):
         df = pd.DataFrame({'a': [0, 1, 2], 'b': [5, 7, 2]})
         with self.assertRaisesRegex(NotImplementedError, 'pie'):
             df.plot.pie(y='a')
+
+    @parameterized.expand(series_specials)
+    def test_pandas_series_specials_plot_return_holoviews_object(self, kind, el):
+        series = pd.Series([0, 1, 2])
+        plot = getattr(series, kind)()
+        self.assertIsInstance(plot, el)
+
+    @parameterized.expand(frame_specials)
+    def test_pandas_frame_specials_plot_return_holoviews_object(self, kind, el):
+        df = pd.DataFrame([0, 1, 2])
+        plot = getattr(df, kind)()
+        self.assertIsInstance(plot, el)
 
 
 class TestPandasHvplotPlotting(TestPandasHoloviewsPlotting):
