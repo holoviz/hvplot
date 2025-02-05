@@ -13,10 +13,15 @@ from hvplot.tests.util import makeDataFrame
 no_args = ['line', 'area', 'hist', 'box', 'kde', 'density', 'bar', 'barh']
 x_y = ['scatter', 'hexbin']
 frame_specials = [
+    # delegates to boxplot_frame
     ('boxplot', hv.BoxWhisker),
+    # delegates to hist_frame
     ('hist', hv.Histogram),
 ]
-series_specials = [('hist', hv.Histogram)]
+series_specials = [
+    # delegates to hist_series
+    ('hist', hv.Histogram),
+]
 no_args_mapping = [
     (kind, el) for kind, el in HoloViewsConverter._kind_mapping.items() if kind in no_args
 ]
