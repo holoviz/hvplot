@@ -17,7 +17,6 @@ frame_specials = [
     ('hist', hv.Histogram),
 ]
 series_specials = [('hist', hv.Histogram)]
-
 no_args_mapping = [
     (kind, el) for kind, el in HoloViewsConverter._kind_mapping.items() if kind in no_args
 ]
@@ -26,8 +25,12 @@ x_y_mapping = [(kind, el) for kind, el in HoloViewsConverter._kind_mapping.items
 
 @pytest.fixture(params=['holoviews', 'hvplot'])
 def plotting_backend(request):
+    initial_backend = pd.options.plotting.backend
     pd.options.plotting.backend = request.param
-    return request.param
+    try:
+        yield request.param
+    finally:
+        pd.options.plotting.backend = initial_backend
 
 
 @pytest.mark.parametrize('kind,el', no_args_mapping)
