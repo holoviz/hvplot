@@ -76,6 +76,55 @@ def test_pandas_frame_specials_plot_return_holoviews_object(plotting_backend, ki
     assert isinstance(plot, el)
 
 
+@pytest.mark.parametrize('backend', ['holoviews', 'hvplot'])
+@pytest.mark.parametrize('kind,el', no_args_mapping)
+def test_pandas_series_plot_explicit_returns_holoviews_object(backend, kind, el):
+    series = pd.Series([0, 1, 2])
+    plot = getattr(series.plot, kind)(backend=backend)
+    assert isinstance(plot, el)
+
+
+@pytest.mark.parametrize('backend', ['holoviews', 'hvplot'])
+@pytest.mark.parametrize('kind,el', no_args_mapping)
+def test_pandas_dataframe_plot_explicit_returns_holoviews_object(backend, kind, el):
+    df = pd.DataFrame([0, 1, 2])
+    plot = getattr(df.plot, kind)(backend=backend)
+    assert isinstance(plot, el)
+
+
+@pytest.mark.parametrize('backend', ['holoviews', 'hvplot'])
+@pytest.mark.parametrize('kind,el', x_y_mapping)
+def test_pandas_dataframe_plot_explicit_returns_holoviews_object_when_x_and_y_set(
+    backend, kind, el
+):
+    df = pd.DataFrame({'a': [0, 1, 2], 'b': [5, 7, 2]})
+    plot = getattr(df.plot, kind)(x='a', y='b', backend=backend)
+    assert isinstance(plot, el)
+
+
+@pytest.mark.parametrize('backend', ['holoviews', 'hvplot'])
+def test_pandas_dataframe_plot_explicit_does_not_implement_pie(backend):
+    df = pd.DataFrame({'a': [0, 1, 2], 'b': [5, 7, 2]})
+    with pytest.raises(NotImplementedError, match='pie'):
+        df.plot.pie(y='a', backend=backend)
+
+
+@pytest.mark.parametrize('backend', ['holoviews', 'hvplot'])
+@pytest.mark.parametrize('kind,el', series_specials)
+def test_pandas_series_specials_plot_explicit_return_holoviews_object(backend, kind, el):
+    series = pd.Series([0, 1, 2])
+    plot = getattr(series, kind)(backend=backend)
+    assert isinstance(plot, el)
+
+
+@pytest.mark.parametrize('backend', ['holoviews', 'hvplot'])
+@pytest.mark.parametrize('kind,el', frame_specials)
+def test_pandas_frame_specials_plot_explicit_return_holoviews_object(backend, kind, el):
+    df = pd.DataFrame([0, 1, 2])
+    plot = getattr(df, kind)(backend=backend)
+    assert isinstance(plot, el)
+
+
 def test_plot_supports_duckdb_relation():
     duckdb = pytest.importorskip('duckdb')
     connection = duckdb.connect(':memory:')
