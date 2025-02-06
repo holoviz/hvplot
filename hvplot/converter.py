@@ -2631,14 +2631,15 @@ class HoloViewsConverter:
         tools = seg_cur_opts.pop('tools', [])
         if 'hover' in tools:
             tools[tools.index('hover')] = HoverTool(
+                formatters={f'@{x}': 'datetime'},
                 tooltips=[
-                    (x, f'@{x}'),
+                    (x, f'@{x}{{%F}}'),
                     ('Open', f'@{o}'),
                     ('High', f'@{h}'),
                     ('Low', f'@{l}'),
                     ('Close', f'@{c}'),
                 ]
-                + [(hc, f'@{hc}') for hc in vdims[4:]]
+                + [(hc, f'@{hc}') for hc in vdims[4:]],
             )
         seg_cur_opts['tools'] = tools
         seg_cur_opts['color'] = self.kwds.get('line_color', 'black')
