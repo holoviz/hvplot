@@ -32,3 +32,15 @@ def test_ohlc_hover_cols_all():
     tooltips = segments.opts.get('plot').kwargs['tools'][0].tooltips
     assert len(tooltips) == len(df.columns) + 1
     assert tooltips[-1] == ('Volume', '@Volume')
+
+
+def test_ohlc_date_tooltip_format():
+    plot = df.hvplot.ohlc(y=ohlc_cols)
+    segments = plot.Segments.I
+    hover_tool = segments.opts.get('plot').kwargs['tools'][0]
+    tooltips = hover_tool.tooltips
+    x_label, x_tooltip = tooltips[0]
+    assert '{%F}' in x_tooltip
+    formatter_key = '@' + x_label
+    formatter = hover_tool.formatters
+    assert formatter.get(formatter_key) == 'datetime'
