@@ -2631,7 +2631,7 @@ class HoloViewsConverter:
         tools = seg_cur_opts.pop('tools', [])
         if 'hover' in tools:
             x_data = data[x] if x in data.columns else data.index
-            if np.issubdtype(x_data.dtype, np.datetime64):
+            if pd.api.types.is_datetime64_any_dtype(x_data):
                 x_tooltip = f'@{x}{{%F}}'
                 formatter = {f'@{x}': 'datetime'}
             else:
