@@ -2630,10 +2630,17 @@ class HoloViewsConverter:
         seg_cur_opts, seg_compat_opts = self._get_compat_opts('Segments')
         tools = seg_cur_opts.pop('tools', [])
         if 'hover' in tools:
+            x_data = data[x] if x in data.columns else data.index
+            if np.issubdtype(x_data.dtype, np.datetime64):
+                x_tooltip = f'@{x}{{%F}}'
+                formatter = {f'@{x}': 'datetime'}
+            else:
+                x_tooltip = f'@{x}'
+                formatter = {}
             tools[tools.index('hover')] = HoverTool(
-                formatters={f'@{x}': 'datetime'},
+                formatters=formatter,
                 tooltips=[
-                    (x, f'@{x}{{%F}}'),
+                    (x, x_tooltip),
                     ('Open', f'@{o}'),
                     ('High', f'@{h}'),
                     ('Low', f'@{l}'),
