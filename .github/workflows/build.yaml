@@ -42,10 +42,10 @@ jobs:
           echo "TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
           echo "CONDA_FILE=$(ls dist/*.tar.bz2)" >> $GITHUB_ENV
       - name: conda dev upload
-        if: contains(env.TAG, 'a') || contains(env.TAG, 'b') || contains(env.TAG, 'rc')
+        if: github.event_name == 'push' && (contains(env.TAG, 'a') || contains(env.TAG, 'b') || contains(env.TAG, 'rc'))
         run: pixi run -e build publish-conda --token ${{ secrets.CONDA_UPLOAD_TOKEN }} upload --user pyviz --label=dev $CONDA_FILE
       - name: conda main upload
-        if: (!(contains(env.TAG, 'a') || contains(env.TAG, 'b') || contains(env.TAG, 'rc')))
+        if: github.event_name == 'push' && (!(contains(env.TAG, 'a') || contains(env.TAG, 'b') || contains(env.TAG, 'rc')))
         run: pixi run -e build publish-conda --token ${{ secrets.CONDA_UPLOAD_TOKEN }} upload --user pyviz --label=dev --label=main $CONDA_FILE
 
   pip_build:
