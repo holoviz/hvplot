@@ -2630,15 +2630,25 @@ class HoloViewsConverter:
         seg_cur_opts, seg_compat_opts = self._get_compat_opts('Segments')
         tools = seg_cur_opts.pop('tools', [])
         if 'hover' in tools:
+            x_data = data[x] if x in data.columns else data.index
+            if pd.api.types.is_datetime64_any_dtype(x_data):
+                # %F %T: strftime code for %Y-%m-%d %H:%M:%S.
+                # See https://man7.org/linux/man-pages/man3/strftime.3.html
+                x_tooltip = f'@{x}{{%F %T}}'
+                formatter = {f'@{x}': 'datetime'}
+            else:
+                x_tooltip = f'@{x}'
+                formatter = {}
             tools[tools.index('hover')] = HoverTool(
+                formatters=formatter,
                 tooltips=[
-                    (x, f'@{x}'),
+                    (x, x_tooltip),
                     ('Open', f'@{o}'),
                     ('High', f'@{h}'),
                     ('Low', f'@{l}'),
                     ('Close', f'@{c}'),
                 ]
-                + [(hc, f'@{hc}') for hc in vdims[4:]]
+                + [(hc, f'@{hc}') for hc in vdims[4:]],
             )
         seg_cur_opts['tools'] = tools
         seg_cur_opts['color'] = self.kwds.get('line_color', 'black')
