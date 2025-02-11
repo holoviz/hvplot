@@ -45,6 +45,7 @@ dependencies = [
 
 [project.entry-points."pandas_plotting_backends"]
 holoviews = "hvplot:plotting"
+hvplot = "hvplot:plotting"
 
 [project.urls]
 Homepage = "https://hvplot.holoviz.org"
