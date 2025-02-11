@@ -2632,7 +2632,9 @@ class HoloViewsConverter:
         if 'hover' in tools:
             x_data = data[x] if x in data.columns else data.index
             if pd.api.types.is_datetime64_any_dtype(x_data):
-                x_tooltip = f'@{x}{{%F}}'
+                # %F %T: strftime code for %Y-%m-%d %H:%M:%S.
+                # See https://man7.org/linux/man-pages/man3/strftime.3.html
+                x_tooltip = f'@{x}{{%F %T}}'
                 formatter = {f'@{x}': 'datetime'}
             else:
                 x_tooltip = f'@{x}'
