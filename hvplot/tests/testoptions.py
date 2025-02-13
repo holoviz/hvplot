@@ -296,6 +296,12 @@ class TestOptions:
         assert opts.kwargs['xaxis'] is None
         assert opts.kwargs['yaxis'] is None
 
+    def test_axis_set_to_some_value(self, df, backend):
+        plot = df.hvplot.scatter('x', 'y', c='category', xaxis='top', yaxis='right')
+        opts = Store.lookup_options(backend, plot, 'plot')
+        assert opts.kwargs['xaxis'] == 'top'
+        assert opts.kwargs['yaxis'] == 'right'
+
     def test_axis_set_to_none_in_holoviews_opts_default(self, df, backend):
         hv.opts.defaults(hv.opts.Scatter(xaxis=None, yaxis=None))
         plot = df.hvplot.scatter('x', 'y', c='category')
@@ -303,13 +309,26 @@ class TestOptions:
         assert opts.kwargs['xaxis'] is None
         assert opts.kwargs['yaxis'] is None
 
-    @pytest.mark.xfail
+    def test_axis_set_to_some_value_in_holoviews_opts_default(self, df, backend):
+        hv.opts.defaults(hv.opts.Scatter(xaxis='top', yaxis='right'))
+        plot = df.hvplot.scatter('x', 'y', c='category')
+        opts = Store.lookup_options(backend, plot, 'plot')
+        assert opts.kwargs['xaxis'] == 'top'
+        assert opts.kwargs['yaxis'] == 'right'
+
     def test_axis_set_to_none_in_holoviews_opts_default_overwrite_in_call(self, df, backend):
         hv.opts.defaults(hv.opts.Scatter(xaxis=None, yaxis=None))
         plot = df.hvplot.scatter('x', 'y', c='category', xaxis=True, yaxis=True)
         opts = Store.lookup_options(backend, plot, 'plot')
-        assert 'xaxis' not in opts.kwargs
-        assert 'yaxis' not in opts.kwargs
+        assert opts.kwargs['xaxis'] is True
+        assert opts.kwargs['yaxis'] is True
+
+    def test_axis_set_to_some_value_in_holoviews_opts_default_overwrite_in_call(self, df, backend):
+        hv.opts.defaults(hv.opts.Scatter(xaxis='top', yaxis='right'))
+        plot = df.hvplot.scatter('x', 'y', c='category', xaxis='top-bare', yaxis='right-bare')
+        opts = Store.lookup_options(backend, plot, 'plot')
+        assert opts.kwargs['xaxis'] == 'top-bare'
+        assert opts.kwargs['yaxis'] == 'right-bare'
 
     def test_loglog_opts(self, df, backend):
         plot = df.hvplot.scatter('x', 'y', c='category', loglog=True)
