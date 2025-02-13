@@ -793,12 +793,7 @@ class HoloViewsConverter:
         for axis_name in ['xaxis', 'yaxis']:
             if axis_name in kwds:
                 axis = kwds.pop(axis_name)
-                if not axis:
-                    plot_opts[axis_name] = None
-                elif not axis:
-                    plot_opts[axis_name] = axis
-                elif axis_name in plot_opts:
-                    plot_opts.pop(axis_name, None)
+                plot_opts[axis_name] = axis or None
 
         if flip_xaxis:
             plot_opts['invert_xaxis'] = True
