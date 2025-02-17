@@ -110,7 +110,7 @@ lab = 'jupyter lab'
 
 # Dependencies required to run the notebooks
 [feature.example.dependencies]
-dask = "<2025.1.0"  # dask[dataframe]
+dask = "*"  # dask[dataframe]
 datashader = ">=0.6.5"
 duckdb = "*"
 # In 0.9 fugue added the sql extra but didn't add a fugue-sql conda package,
@@ -148,7 +148,7 @@ geodatasets = ">=2023.12.0"
 
 [feature.test-core.dependencies]
 # Minimum dependencies required to run the test suite.
-dask = "<2025.1.0"  # dask[dataframe]
+dask = "*"  # dask[dataframe]
 ipywidgets = "*"
 matplotlib = "*"
 parameterized = "*"
@@ -184,7 +184,7 @@ fugue = "*"
 # end fugue
 "ibis-duckdb" = "*"  # ibis-framework[duckdb]
 polars = "*"
-dask = "<2025.1.0"
+dask = "*"
 spatialpandas = "*"
 duckdb = "*"
 
