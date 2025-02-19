@@ -65,7 +65,7 @@ param = ">=1.12.0,<3.0"
 [feature.required.tasks]
 download-data = 'python scripts/download_data.py'
 install = 'python -m pip install --no-deps --disable-pip-version-check -e .'
-install-dev = { cmd = "pre-commit install", depends-on = ["install", "download-data"] }
+setup-dev = { depends-on = ["install", "download-data", "lint-install"] }
 sync-git-tags = 'python scripts/sync_git_tags.py hvplot'
 
 [feature.required.activation.env]
@@ -232,10 +232,11 @@ MPLBACKEND = "Agg"
 DISPLAY = ":99.0"
 
 [feature.doc.tasks]
-docs-build = 'sphinx-build -b html doc builtdocs'
-# docs-build-dev = { cmd = "pre-commit install", depends-on = ["install", "docs-build"] }
+docs-build-sphinx = 'sphinx-build -b html doc builtdocs'
 _docs-install = 'python -m pip install --no-deps --disable-pip-version-check -e .'
-docs-build-dev = { depends-on = ["_docs-install", "docs-build"] }
+# Depends on _docs-install instead of install as install
+# in the default environment
+docs-build = { depends-on = ["_docs-install", "docs-build-sphinx"] }
 
 
 # ================== BUILD ====================
