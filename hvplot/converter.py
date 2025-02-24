@@ -132,8 +132,9 @@ class HoloViewsConverter:
         Maximum number of rows to keep in the stream buffer when using a streaming data source.
     bgcolor (default=None): str
         Background color of the data area of the plot
-    by (default=None): str or list
-        Column(s) by which to color the data categories.
+    by (default=None): str or list of str
+        Dimension(s) by which to group the data categories.
+        An NdOverlay is returned by default unless `subplots=True`, then an NdLayout is returned.
     clim: tuple
         Lower and upper bound of the color scale
     cnorm (default='linear'): str
@@ -142,11 +143,6 @@ class HoloViewsConverter:
         Column name to use for splitting the plot into separate subplots by columns.
     colorbar (default=False): boolean
         Enables a colorbar
-    data:
-        Input data for generating the plot.
-        The data source can be a pandas DataFrame, an xarray Dataset, or other data structures supported by hvPlot.
-    debug (default=False): boolean
-        If True, outputs debugging information during plot creation.
     fields (default={}): dict
         A dictionary of fields for renaming or transforming data dimensions.
     flip_xaxis/flip_yaxis: boolean
@@ -163,13 +159,12 @@ class HoloViewsConverter:
         Whether to show a grid
     group_label (default=None): str
         Label for grouped data, typically used in legends or as axis labels.
-    groupby (default=None): str or list
-        Column(s) by which to group data, enabling widgets.
+    groupby (default=None): str or list of str
+        Dimension(s) by which to group data, enabling widgets.
+        Returns a DynamicMap if `dynamic=True`, else returns a HoloMap.
     kind (default='line'): str
         The type of plot to generate.
-    kwds (default={}): dict
-        Additional keyword arguments to pass to the plotting function.
-    hover : boolean
+    hover: boolean
         Whether to show hover tooltips, default is True unless datashade is
         True in which case hover is False by default
     hover_cols (default=[]): list or str
@@ -206,8 +201,6 @@ class HoloViewsConverter:
         upper and lower bounds.
     persist (default=False): boolean
         Whether to persist the data in memory when using dask.
-    precompute (default=False): boolean
-        Whether to precompute aggregations when using `rasterize` or `datashade`.
     rescale_discrete_levels (default=True): boolean
         If `cnorm='eq_hist'` and there are only a few discrete values,
         then `rescale_discrete_levels=True` (the default) decreases
@@ -233,11 +226,11 @@ class HoloViewsConverter:
     row (default=None): str
         Column name to use for splitting the plot into separate subplots by rows.
     stacked (default=False): boolean
-        Whether to stack data in plots like `bar` or `area`.
+        Whether to stack data in plots like `bar`, `barh` and `area`.
     stream (default=None): holoviews.streams.Stream or None
         A stream object for dynamic plotting, allowing data updates without re-rendering the entire plot.
     subplots (default=False): boolean
-        Whether to display data in separate subplots when using the `by` or `groupby` parameters.
+        Whether to display data in separate subplots when using the `by` parameter.
     subcoordinate_y: bool or dict
        Whether to enable sub-coordinate y systems for this plot. Accepts also a
        dictionary of related options to pass down to HoloViews,
@@ -254,10 +247,9 @@ class HoloViewsConverter:
         Whether to use dask for processing the data, helpful for large datasets that do not fit into memory.
     use_index (default=True): boolean
         Whether to use the data's index for the x-axis by default.
+        if `hover_cols == 'all', adds the index to the hover tools.
     value_label (default='value'): str
         Label for the data values, typically used for the y-axis or in legends.
-    x/y: str
-        Column name to use for the x/y-axis.
     xaxis/yaxis: str or None
         Whether to show the x/y-axis and whether to place it at the
         'top'/'bottom' and 'left'/'right' respectively.
@@ -336,6 +328,8 @@ class HoloViewsConverter:
        the browser information is not available. Useful when the browser
        information is not available (pixel_ratio=2 can give better results on
        Retina displays) or for using lower resolution for speed.
+    precompute (default=False): boolean
+        Whether to precompute aggregations when using `rasterize` or `datashade`.
     rasterize (default=False):
         Whether to apply rasterization using the Datashader library,
         returning an aggregated Image (to be colormapped by the
