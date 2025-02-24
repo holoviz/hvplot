@@ -431,6 +431,20 @@ class HoloViewsConverter:
         'backlog',
         'persist',
         'sort_date',
+        'attr_labels',
+        'fields',
+        'groupby',
+        'label',
+        'robust',
+        'row',
+        'col',
+        'stacked',
+        'subplots',
+        'symmetric',
+        'check_symmetric_max',
+        'transforms',
+        'framewise',
+        'stream',
     ]
 
     _geo_options = [
@@ -440,8 +454,9 @@ class HoloViewsConverter:
         'project',
         'coastline',
         'tiles',
+        'tiles_opts',
         'projection',
-        'global_extents',
+        'global_extent',
     ]
 
     _axis_options = [
@@ -460,6 +475,7 @@ class HoloViewsConverter:
         'title',
         'logx',
         'logy',
+        'logz',
         'loglog',
         'xaxis',
         'yaxis',
@@ -476,11 +492,17 @@ class HoloViewsConverter:
         'min_width',
         'frame_height',
         'frame_width',
-        'aspect',
-        'data_aspect',
         'fontscale',
         'bgcolor',
         'subcoordinate_y',
+        'clim',
+        'flip_xaxis',
+        'flip_yaxis',
+        'tools',
+        'hover',
+        'hover_cols',
+        'hover_formatters',
+        'hover_tooltips',
     ]
 
     _style_options = [
@@ -494,6 +516,8 @@ class HoloViewsConverter:
         'color_key',
         'cnorm',
         'rescale_discrete_levels',
+        'aspect',
+        'data_aspect',
     ]
 
     _op_options = [
@@ -505,6 +529,11 @@ class HoloViewsConverter:
         'downsample',
         'aggregator',
         'resample_when',
+        'autorange',
+        'dynspread',
+        'max_px',
+        'precompute',
+        'threshold',
     ]
 
     # Options specific to a particular plot type
