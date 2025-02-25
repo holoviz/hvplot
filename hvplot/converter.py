@@ -139,9 +139,14 @@ class HoloViewsConverter:
         A list of dimensions to be displayed in the hover tooltip.
     invert (default=False): boolean
         Swaps x- and y-axis
+    tools (default=[]): list
+        List of tool instances or strings (e.g. ['tap', 'box_select'])
 
     Axis options
     ------------
+    autorange (default=None): Literal['x', 'y'] | None
+        Whether to enable auto-ranging along the x- or y-axis when
+        zooming. Requires HoloViews >= 1.16.
     logx/logy (default=False): boolean
         Enables logarithmic x- and y-axis respectively
     logz (default=False): boolean
@@ -177,9 +182,6 @@ class HoloViewsConverter:
         Aggregator to use when applying rasterize or datashade operation
         (valid options include 'mean', 'count', 'min', 'max' and more, and
         datashader reduction objects)
-    autorange (default=None): Literal['x', 'y'] | None
-        Whether to enable auto-ranging along the x- or y-axis when
-        zooming. Requires HoloViews >= 1.16.
     dynamic (default=True):
         Whether to return a dynamic plot which sends updates on widget and
         zoom/pan events or whether all the data should be embedded
@@ -388,8 +390,6 @@ class HoloViewsConverter:
         to a fixed size, ignoring any responsive option.
     title (default=''): str
         Title for the plot
-    tools (default=[]): list
-        List of tool instances or strings (e.g. ['tap', 'box_select'])
     width (default=700)/height (default=300): int
         The width and height of the plot in pixels
 
@@ -459,53 +459,66 @@ class HoloViewsConverter:
         'global_extent',
     ]
 
-    _axis_options = [
-        'width',
+    _size_layout_options = [
+        'clim',
+        'fontscale',
+        'frame_height',
+        'frame_width',
         'height',
-        'shared_axes',
-        'grid',
-        'legend',
-        'rot',
-        'xlim',
-        'ylim',
-        'xticks',
-        'yticks',
-        'colorbar',
+        'max_height',
+        'max_width',
+        'min_height',
+        'min_width',
+        'padding',
+        'responsive',
+        'width',
+    ]
+
+    _axis_config_options = [
+        'clabel',
+        'flip_xaxis',
+        'flip_yaxis',
         'invert',
-        'title',
+        'loglog',
         'logx',
         'logy',
         'logz',
-        'loglog',
+        'rot',
+        'shared_axes',
+        'subcoordinate_y',
+        'title',
         'xaxis',
         'yaxis',
         'xformatter',
         'yformatter',
         'xlabel',
         'ylabel',
-        'clabel',
-        'padding',
-        'responsive',
-        'max_height',
-        'max_width',
-        'min_height',
-        'min_width',
-        'frame_height',
-        'frame_width',
-        'fontscale',
-        'bgcolor',
-        'subcoordinate_y',
-        'clim',
-        'flip_xaxis',
-        'flip_yaxis',
-        'tools',
+        'xlim',
+        'ylim',
+        'xticks',
+        'yticks',
+    ]
+
+    _grid_legend_options = [
+        'colorbar',
+        'grid',
+        'legend',
+    ]
+
+    _interactivity_options = [
         'hover',
         'hover_cols',
         'hover_formatters',
         'hover_tooltips',
+        'tools',
     ]
 
+    _axis_options = (
+        _size_layout_options + _axis_config_options + _grid_legend_options + _interactivity_options
+    )
+
     _style_options = [
+        'bgcolor',
         'color',
         'alpha',
         'colormap',
