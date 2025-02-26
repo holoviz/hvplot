@@ -176,7 +176,7 @@ def _get_doc_and_signature(
 
     parameters = []
     extra_kwargs = _hv.core.util.unique_iterator(
-        valid_opts + kind_opts + converter._axis_options + converter._op_options
+        valid_opts + kind_opts + converter._axis_config_options + converter._resample_options
     )
 
     sig = signature or inspect.signature(method)
