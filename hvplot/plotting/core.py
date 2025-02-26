@@ -592,7 +592,7 @@ class hvPlotTabular(hvPlotBase):
         y2 : string, optional
             Field name to draw the second y-position from
         stacked : boolean, optional
-            Whether to stack multiple areas. Default is False.
+            Whether to stack multiple areas. Default is True.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('area')`.
 
@@ -1106,8 +1106,10 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
+        stacked : bool, optional
+            If True, creates a stacked horizontal bar plot. Default is False.
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('image')`.
+            Additional keywords arguments are documented in `hvplot.help('barh')`.
 
         Returns
         -------
