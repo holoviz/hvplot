@@ -274,6 +274,8 @@ class HoloViewsConverter:
         zooming. Requires HoloViews >= 1.16.
     flip_xaxis/flip_yaxis: boolean
         Whether to flip the axis left to right or up and down respectively
+    framewise (default=True): boolean
+        Whether to compute the axis ranges frame-by-frame when using dynamic plots.
     invert (default=False): boolean
         Swaps x- and y-axis
     logx/logy (default=False): boolean
@@ -420,8 +422,6 @@ class HoloViewsConverter:
     -----------------
     backlog (default=1000): int
         Maximum number of rows to keep in the stream buffer when using a streaming data source.
-    framewise (default=True): boolean
-        Whether to compute the axis ranges frame-by-frame when using dynamic plots.
     stream (default=None): holoviews.streams.Stream or None
         A stream object for streaming plots, allowing data updates without re-rendering the entire plot.
     """
@@ -495,6 +495,7 @@ class HoloViewsConverter:
         'clabel',
         'flip_xaxis',
         'flip_yaxis',
+        'framewise',
         'invert',
         'loglog',
         'logx',
@@ -561,7 +562,6 @@ class HoloViewsConverter:
 
     _stream_options = [
         'backlog',
-        'framewise',
         'stream',
     ]
 
@@ -1694,8 +1694,8 @@ class HoloViewsConverter:
             + kind_opts
             + valid_opts
         )
-        # Only add the global styling options in the suggestions for bokeh
-        # since they may not be supported by all the backends.
+        # Add the global styling options and interactivity options in the suggestions
+        # for only bokeh since they may not be supported by all the backends.
         # See e.g. alpha for Area plots with plotly:
         # https://github.com/holoviz/holoviews/issues/5226
         if self._backend_compat == 'bokeh':
