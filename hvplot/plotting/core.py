@@ -1002,7 +1002,7 @@ class hvPlotTabular(hvPlotBase):
         """
         return self(x, y, kind='bivariate', colorbar=colorbar, **kwds)
 
-    def bar(self, x=None, y=None, **kwds):
+    def bar(self, x=None, y=None, stacked=False, **kwds):
         """
         A vertical bar plot
 
@@ -1089,9 +1089,9 @@ class hvPlotTabular(hvPlotBase):
         - Plotly: https://plotly.com/python/bar-charts/
         - Wiki: https://en.wikipedia.org/wiki/Bar_chart
         """
-        return self(x, y, kind='bar', **kwds)
+        return self(x, y, kind='bar', stacked=stacked, **kwds)
 
-    def barh(self, x=None, y=None, **kwds):
+    def barh(self, x=None, y=None, stacked=False, **kwds):
         """
         A horizontal bar plot
 
@@ -1155,7 +1155,7 @@ class hvPlotTabular(hvPlotBase):
         - Plotly: https://plotly.com/python/horizontal-bar-charts/
         - Wiki: https://en.wikipedia.org/wiki/Bar_chart
         """
-        return self(x, y, kind='barh', **kwds)
+        return self(x, y, kind='barh', stacked=stacked, **kwds)
 
     def box(self, y=None, by=None, **kwds):
         """
