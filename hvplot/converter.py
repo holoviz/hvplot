@@ -562,7 +562,9 @@ class HoloViewsConverter:
 
     # Options specific to a particular plot type
     _kind_options = {
-        'area': ['y2'],
+        'area': ['y2', 'stacked'],
+        'bar': ['stacked'],
+        'barh': ['stacked'],
         'errorbars': ['yerr1', 'yerr2'],
         'bivariate': ['bandwidth', 'cut', 'filled', 'levels'],
         'contour': ['z', 'levels', 'logz'],
