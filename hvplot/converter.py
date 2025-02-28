@@ -164,8 +164,6 @@ class HoloViewsConverter:
         Column name to use for splitting the plot into separate subplots by columns.
     sort_date (default=True): bool
         Whether to sort the x-axis by date before plotting
-    stacked (default=False): boolean
-        Whether to stack data in plots like `bar`, `barh` and `area`.
     subplots (default=False): boolean
         Whether to display data in separate subplots when using the `by` parameter.
     symmetric (default=None): bool
@@ -174,8 +172,6 @@ class HoloViewsConverter:
         ``check_symmetric_max``.
     check_symmetric_max (default=1000000):
         Size above which to stop checking for symmetry by default on the data.
-    stacked (default=False): boolean
-        Whether to stack data in plots like `bar`, `barh` and `area`. # move to specific methods
     transforms (default={}): dict
         A dictionary of HoloViews dim transforms to apply before plotting
     use_dask (default=False): boolean
@@ -452,7 +448,6 @@ class HoloViewsConverter:
         'row',
         'col',
         'sort_date',
-        'stacked',
         'subplots',
         'symmetric',
         'check_symmetric_max',
@@ -567,7 +562,9 @@ class HoloViewsConverter:
 
     # Options specific to a particular plot type
     _kind_options = {
-        'area': ['y2'],
+        'area': ['y2', 'stacked'],
+        'bar': ['stacked'],
+        'barh': ['stacked'],
         'errorbars': ['yerr1', 'yerr2'],
         'bivariate': ['bandwidth', 'cut', 'filled', 'levels'],
         'contour': ['z', 'levels', 'logz'],
