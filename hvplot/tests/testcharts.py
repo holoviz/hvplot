@@ -9,6 +9,7 @@ from holoviews.core.dimension import Dimension
 from holoviews import NdLayout, NdOverlay, Store, dim, render
 from holoviews.element import Curve, Area, Scatter, Points, Path, HeatMap
 from holoviews.element.comparison import ComparisonTestCase
+from packaging.version import Version
 
 from ..util import is_dask
 
@@ -217,14 +218,20 @@ class TestChart1D(ComparisonTestCase):
 
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
     def test_tidy_chart_index_by(self, kind, element):
+        import dask
+
         plot = self.df.hvplot(x='index', y='y', by='x', kind=kind)
+        # The new dask dataframe implementation that replace the old one
+        # in 2025.1.0 doesn't guarantee the data order on `.unique()` calls
+        # made internally by HoloViews when running a groupby operation.
+        if Version(dask.__version__).release >= (2025, 1, 0):
+            keys = list(plot.keys())
+        else:
+            keys = [1, 3, 5]
         obj = NdOverlay(
-            {
-                1: element(self.df[self.df.x == 1], 'index', 'y'),
-                3: element(self.df[self.df.x == 3], 'index', 'y'),
-                5: element(self.df[self.df.x == 5], 'index', 'y'),
-            },
+            {k: element(self.df[self.df.x == k], 'index', 'y') for k in keys},
             'x',
+            sort=False,
         )
         self.assertEqual(plot, obj)
 
