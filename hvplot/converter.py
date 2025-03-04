@@ -334,6 +334,38 @@ class HoloViewsConverter:
     -------------
     bgcolor (default=None): str
         Background color of the data area of the plot
+    color: str, list or column name, optional
+        Defines the color(s) to use for the plot. Accepts:
+        - a single color name (e.g., 'red', 'blue')
+        - a HEX color code (e.g., '#ff5733')
+        - a list of colors for multiple elements
+        - a column name from the dataset to map colors based on values.
+    c: str or list or column name, optional
+        Alias for `color`. If both `color` and `c` are provided,
+        the `color` keyword takes precedence.
+    cmap: str, list, dict, or colormap object, optional
+        The colormap to use for continuous or categorical color mapping.
+        Accepts:
+        - a predefined colormap name from Bokeh, Matplotlib, or Colorcet (e.g., 'viridis', 'plasma')
+        - a list of named colors or HEX color codes.
+        - a dictionary mapping categories to colors for discrete colormaps.
+        - A colormap object from HoloViews or Matplotlib.
+        If not specified, a default colormap is automatically chosen based on the data type:
+        - Linear data: Uses the `kbc_r` colormap.
+        - Categorical data: Uses `glasbey_category10` colormap from Colorcet.
+        - Cyclic data: Uses `colorwheel` colormap.
+        - Diverging data: Uses `coolwarm` colormap.
+        You can override these defaults by explicitly setting `cmap=<colormap_name>`.
+        Only one of `cmap`, `colormap`, or `color_key` can be specified at a time.
+    colormap: str, list, or colormap object, optional
+        Alias for `cmap`. The colormap to apply when applying color mapping.
+        Accepts the same values as `cmap`. See `cmap` for more details.
+        Only one of `cmap`, `colormap`, or `color_key` can be specified at a time.
+    color_key: str, list, or dict, optional
+        Defines a categorical colormap for datashaded plots where distinct
+        colors must be assigned to different categories. The number of colors
+        must match or exceed the number of unique categories in the dataset.
+        Only one of `cmap`, `colormap`, or `color_key` can be specified at a time.
     clim: tuple
         Lower and upper bound of the color scale
     cnorm (default='linear'): str
