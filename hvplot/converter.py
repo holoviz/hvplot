@@ -334,6 +334,24 @@ class HoloViewsConverter:
     -------------
     bgcolor (default=None): str
         Background color of the data area of the plot
+    color: str or list, optional
+        Color(s) to use for the plot. Accepts a single color, a list of colors, or
+        a column name from the data to map colors based on values.
+    c: str or list, optional
+        Alias for `color`. Used for specifying colors in scatter plots and other
+        elements that support color mapping.
+    cmap: str or list, optional
+        The colormap to use for continuous or categorical color mapping.
+        Accepts colormap names, dictionaries for discrete mapping,
+        colormap objects, or custom lists.
+    colormap: str or list, optional
+        Alias for `cmap`. The colormap to apply when using color mapping.
+        Can be a predefined colormap name (e.g., 'viridis', 'plasma') or a custom list of colors.
+    color_key: str or list, optional
+        Colormapping for use in categorical datashaded plots
+        where distinct colors need to be assigned to categories.
+        The length of the color key used must be at least the same
+        as the length of the categories in the data.
     clim: tuple
         Lower and upper bound of the color scale
     cnorm (default='linear'): str
