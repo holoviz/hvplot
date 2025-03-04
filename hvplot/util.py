@@ -50,6 +50,14 @@ def get_ipy():
     return ip
 
 
+def _in_ipython():
+    try:
+        get_ipython  # noqa
+        return True
+    except NameError:
+        return False
+
+
 def check_crs(crs):
     """
     Checks if the crs represents a valid grid, projection or ESPG string.

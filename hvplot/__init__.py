@@ -72,6 +72,7 @@ from holoviews import Store, render  # noqa
 from .converter import HoloViewsConverter
 from .interactive import Interactive
 from .ui import explorer  # noqa
+from .util import _in_ipython
 from .utilities import hvplot_extension, output, save, show  # noqa
 from .plotting import (
     hvPlot,
@@ -118,6 +119,10 @@ except (ImportError, LookupError, FileNotFoundError):
             # the package.
             __version__ = '0.0.0+unknown'
 
+_PATCH_PLOT_SIGNATURES = _in_ipython() or (
+    os.getenv('HVPLOT_PATCH_PLOT_DOCSTRING_SIGNATURE', 'false').lower() in ('1', 'true')
+)
+
 # The hvplot.<ext> import mechanism is a convenient way to allow users to have
 # to avoid running the holoviews/panel extensions. However since imports are
 # cached only the first import actually embeds the extension JS code, meaning
@@ -163,8 +168,11 @@ def _get_doc_and_signature(
             formatter += '\n'
         formatter += '{options}'
 
-    # Bokeh is the default backend
-    backend = hvplot_extension.compatibility or Store.current_backend
+    if isinstance(style, str):
+        backend = style
+    else:
+        # Bokeh is the default backend
+        backend = hvplot_extension.compatibility or Store.current_backend
     if eltype in Store.registry[backend]:
         valid_opts = Store.registry[backend][eltype].style_opts
         if style:
@@ -226,14 +234,15 @@ def help(kind=None, docstring=True, generic=True, style=True):
 
     Parameters
     ----------
-    kind: str
-        The kind of plot to provide help for
-    docstring: boolean (default=True)
-        Whether to display the docstring
-    generic: boolean (default=True)
-        Whether to provide list of generic options
-    style: boolean (default=True)
-        Whether to provide list of style options
+    kind: str, optional
+        The kind of plot to provide help for.
+    docstring: boolean, default=True
+        Whether to display the docstring.
+    generic: boolean, default=True
+        Whether to provide list of generic options.
+    style: str or boolean, default=True
+        Plotting backend used to get the styling options. True by default
+        to automatically infer it based on the loaded extension.
     """
     doc, sig = _get_doc_and_signature(
         cls=hvPlot, kind=kind, docstring=docstring, generic=generic, style=style
@@ -276,8 +285,9 @@ class _PatchHvplotDocstrings:
                     _patch_doc(cls, _kind, signature=signature)
 
 
-_patch_hvplot_docstrings = _PatchHvplotDocstrings()
-_patch_hvplot_docstrings()
+if _PATCH_PLOT_SIGNATURES:
+    _patch_hvplot_docstrings = _PatchHvplotDocstrings()
+    _patch_hvplot_docstrings()
 
 
 def _hook_patch_docstrings(backend):
@@ -288,7 +298,8 @@ def _hook_patch_docstrings(backend):
     _patch_hvplot_docstrings()
 
 
-Store._backend_switch_hooks.append(_hook_patch_docstrings)
+if _PATCH_PLOT_SIGNATURES:
+    Store._backend_switch_hooks.append(_hook_patch_docstrings)
 
 extension = hvplot_extension
 

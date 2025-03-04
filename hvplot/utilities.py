@@ -110,6 +110,8 @@ class hvplot_extension(_hv.extension):
     logo = param.Boolean(default=False)
 
     def __call__(self, *args, **params):
+        from . import _PATCH_PLOT_SIGNATURES
+
         # importing e.g. hvplot.pandas always loads the bokeh extension.
         # so hvplot.extension('matplotlib', compatibility='bokeh') doesn't
         # require the user or the code to explicitly load bokeh.
@@ -122,8 +124,9 @@ class hvplot_extension(_hv.extension):
                 'not yet implemented. Defaults to bokeh.'
             )
         hvplot_extension.compatibility = compatibility
-        # Patch or re-patch the docstrings/signatures to display
-        # the right styling options.
-        from . import _patch_hvplot_docstrings
+        if _PATCH_PLOT_SIGNATURES:
+            # Patch or re-patch the docstrings/signatures to display
+            # the right styling options.
+            from . import _patch_hvplot_docstrings
 
-        _patch_hvplot_docstrings()
+            _patch_hvplot_docstrings()
