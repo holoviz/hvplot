@@ -341,8 +341,7 @@ class HoloViewsConverter:
         - a list of colors for multiple elements
         - a column name from the dataset to map colors based on values.
     c: str or list or column name, optional
-        Alias for `color`. Used for specifying colors in scatter plots and other
-        elements that support color mapping. If both `color` and `c` are provided,
+        Alias for `color`. If both `color` and `c` are provided,
         the `color` keyword takes precedence.
     cmap: str, list, dict, or colormap object, optional
         The colormap to use for continuous or categorical color mapping.
@@ -351,9 +350,17 @@ class HoloViewsConverter:
         - a list of named colors or HEX color codes.
         - a dictionary mapping categories to colors for discrete colormaps.
         - A colormap object from HoloViews or Matplotlib.
+        If not specified, a default colormap is automatically chosen based on the data type:
+        - Linear data: Uses the `kbc_r` colormap.
+        - Categorical data: Uses `glasbey_category10` colormap from Colorcet.
+        - Cyclic data: Uses `colorwheel` colormap.
+        - Diverging data: Uses `coolwarm` colormap.
+        You can override these defaults by explicitly setting `cmap=<colormap_name>`.
+        Only one of `cmap`, `colormap`, or `color_key` can be specified at a time.
     colormap: str, list, or colormap object, optional
         Alias for `cmap`. The colormap to apply when applying color mapping.
         Accepts the same values as `cmap`. See `cmap` for more details.
+        Only one of `cmap`, `colormap`, or `color_key` can be specified at a time.
     color_key: str, list, or dict, optional
         Defines a categorical colormap for datashaded plots where distinct
         colors must be assigned to different categories. The number of colors
