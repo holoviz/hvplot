@@ -1,7 +1,8 @@
 import subprocess
 import sys
 
-from hvplot.util import _in_ipython
+from hvplot.converter import HoloViewsConverter
+from hvplot.util import _PatchHvplotDocstrings, _in_ipython, _parse_docstring_sections
 
 
 def run_script(script, env_vars=None):
@@ -51,3 +52,31 @@ print(inspect.signature(hvPlot.line))
     out = run_script(script, {'HVPLOT_PATCH_PLOT_DOCSTRING_SIGNATURE': 'true'})
     assert out != '(self, x=None, y=None, **kwds)'
     assert 'xlim' in out
+
+
+def test_patch_hvplot_docstrings():
+    patchd = _PatchHvplotDocstrings()
+    assert patchd.orig
+    try:
+        patchd()
+        for (cls, _kind), (osig, odoc) in patchd.orig.items():
+            obj = getattr(cls, _kind)
+            assert obj.__signature__ != osig
+            assert obj.__doc__ != odoc
+    finally:
+        patchd.reset()
+    for (cls, _kind), (osig, odoc) in patchd.orig.items():
+        obj = getattr(cls, _kind)
+        assert obj.__signature__ == osig
+        assert obj.__doc__ == odoc
+
+
+def test_converter_docstrings_sections():
+    sections = _parse_docstring_sections(HoloViewsConverter.__doc__)
+    assert set(sections) == set(HoloViewsConverter._docstring_sections.values())
+
+
+def test_converter_options_docstrings():
+    assert (
+        HoloViewsConverter._docstring_sections.keys() == HoloViewsConverter._options_groups.keys()
+    )

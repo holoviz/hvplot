@@ -25,7 +25,7 @@ def test_help_style_extension_output(reset_default_backend):
         style=True,
         signature=None,
     )
-    assert docstring == '\nStyle options\n-------------\n\n' + '\n'.join(
+    assert docstring == '\nStyle options\n-------------\n' + '\n'.join(
         sorted(Store.registry['bokeh'][Curve].style_opts)
     )
 
@@ -40,7 +40,7 @@ def test_help_style_extension_output(reset_default_backend):
         style=True,
         signature=None,
     )
-    assert docstring == '\nStyle options\n-------------\n\n' + '\n'.join(
+    assert docstring == '\nStyle options\n-------------\n' + '\n'.join(
         sorted(Store.registry['matplotlib'][Curve].style_opts)
     )
 
@@ -55,7 +55,7 @@ def test_help_style_extension_output(reset_default_backend):
         style=True,
         signature=None,
     )
-    assert docstring == '\nStyle options\n-------------\n\n' + '\n'.join(
+    assert docstring == '\nStyle options\n-------------\n' + '\n'.join(
         sorted(Store.registry['plotly'][Curve].style_opts)
     )
 
@@ -72,6 +72,6 @@ def test_help_style_compatibility(reset_default_backend):
         style=True,
         signature=None,
     )
-    assert docstring == '\nStyle options\n-------------\n\n' + '\n'.join(
+    assert docstring == '\nStyle options\n-------------\n' + '\n'.join(
         sorted(Store.registry['matplotlib'][Curve].style_opts)
     )

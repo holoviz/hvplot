@@ -182,7 +182,7 @@ class HoloViewsConverter:
     value_label (default='value'): str
         Label for the data values, typically used for the y-axis or in legends.
 
-    Geographic options
+    Geographic Options
     ------------------
     coastline (default=False):
         Whether to display a coastline on top of the plot, setting
@@ -224,7 +224,7 @@ class HoloViewsConverter:
         Options to customize the tiles layer created when `tiles` is set,
         e.g. `dict(alpha=0.5)`.
 
-    Size and Layout options
+    Size and Layout Options
     -----------------------
     fontscale: number
         Scales the size of all fonts by the same amount, e.g. fontscale=1.5
@@ -250,7 +250,7 @@ class HoloViewsConverter:
         width and height or width and aspect are set the plot is set
         to a fixed size, ignoring any responsive option.
 
-    Axis options
+    Axis Options
     ------------
     aspect (default=None): str or float
         The aspect ratio mode of the plot. By default, a plot may
@@ -305,7 +305,7 @@ class HoloViewsConverter:
         Ticks along x-axis, y-axis, and colorbar specified as an integer, list of
         ticks positions, or list of tuples of the tick positions and labels
 
-    Grid and Legend options
+    Grid and Legend Options
     -----------------------
     colorbar (default=False): boolean
         Enables a colorbar
@@ -315,7 +315,7 @@ class HoloViewsConverter:
         Whether to show a legend, or a legend position
         ('top', 'bottom', 'left', 'right')
 
-    Interactivity options
+    Interactivity Options
     ---------------------
     hover : boolean
         Whether to show hover tooltips, default is True unless datashade is
@@ -330,7 +330,7 @@ class HoloViewsConverter:
     tools (default=[]): list
         List of tool instances or strings (e.g. ['tap', 'box_select'])
 
-    Style options
+    Style Options
     -------------
     bgcolor (default=None): str
         Background color of the data area of the plot
@@ -349,7 +349,7 @@ class HoloViewsConverter:
         thus avoiding washout of the lower values.  Has no effect if
         `cnorm!=`eq_hist`.
 
-    Resampling options
+    Resampling Options
     ------------------
     aggregator (default=None):
         Aggregator to use when applying rasterize or datashade operation
@@ -414,7 +414,7 @@ class HoloViewsConverter:
         Specifies the smallest allowed sampling interval along the x/y axis.
         Used when rasterizing or datashading.
 
-    Streaming options
+    Streaming Options
     -----------------
     backlog (default=1000): int
         Maximum number of rows to keep in the stream buffer when using a streaming data source.
@@ -559,6 +559,30 @@ class HoloViewsConverter:
         'backlog',
         'stream',
     ]
+
+    _docstring_sections = {
+        'data': 'Data Options',
+        'geographic': 'Geographic Options',
+        'size_layout': 'Size and Layout Options',
+        'axis': 'Axis Options',
+        'grid_legend': 'Grid and Legend Options',
+        'interactivity': 'Interactivity Options',
+        'style': 'Style Options',
+        'resampling': 'Resampling Options',
+        'streaming': 'Streaming Options',
+    }
+
+    _options_groups = {
+        'data': _data_options,
+        'geographic': _geo_options,
+        'size_layout': _size_layout_options,
+        'axis': _axis_config_options,
+        'grid_legend': _grid_legend_options,
+        'interactivity': _interactivity_options,
+        'style': _style_options,
+        'resampling': _resample_options,
+        'streaming': _stream_options,
+    }
 
     # Options specific to a particular plot type
     _kind_options = {
