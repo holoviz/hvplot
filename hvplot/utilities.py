@@ -2,9 +2,36 @@ import panel as _pn
 import param
 import holoviews as _hv
 
+from .util import _get_doc_and_signature
+
 renderer = _hv.renderer('bokeh')
 
 output = _hv.output
+
+
+def help(kind=None, docstring=True, generic=True, style=True):
+    """
+    Provide a docstring with all valid options which apply to the plot
+    type.
+
+    Parameters
+    ----------
+    kind: str, optional
+        The kind of plot to provide help for.
+    docstring: boolean, default=True
+        Whether to display the docstring.
+    generic: boolean, default=True
+        Whether to provide list of generic options.
+    style: str or boolean, default=True
+        Plotting backend used to get the styling options. True by default
+        to automatically infer it based on the loaded extension.
+    """
+    from .plotting.core import hvPlot
+
+    doc, sig = _get_doc_and_signature(
+        cls=hvPlot, kind=kind, docstring=docstring, generic=generic, style=style
+    )
+    print(doc)
 
 
 def save(

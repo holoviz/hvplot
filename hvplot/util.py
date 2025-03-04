@@ -2,6 +2,8 @@
 Provides utilities to convert data and projections
 """
 
+import inspect
+import textwrap
 import sys
 
 from collections.abc import Hashable
@@ -779,3 +781,122 @@ def is_mpl_cmap(obj):
     from matplotlib.colors import LinearSegmentedColormap
 
     return isinstance(obj, LinearSegmentedColormap)
+
+
+_METHOD_DOCS = {}
+
+
+def _get_doc_and_signature(
+    cls, kind, completions=False, docstring=True, generic=True, style=True, signature=None
+):
+    from .converter import HoloViewsConverter
+    from .utilities import hvplot_extension
+
+    converter = HoloViewsConverter
+    method = getattr(cls, kind)
+    kind_opts = converter._kind_options.get(kind, [])
+    eltype = converter._kind_mapping[kind]
+
+    formatter = ''
+    if completions:
+        formatter = 'hvplot.{kind}({completions})'
+    if docstring:
+        if formatter:
+            formatter += '\n'
+        formatter += '{docstring}'
+    if generic:
+        if formatter:
+            formatter += '\n'
+        formatter += '{options}'
+
+    if isinstance(style, str):
+        backend = style
+    else:
+        # Bokeh is the default backend
+        backend = hvplot_extension.compatibility or hv.Store.current_backend
+    if eltype in hv.Store.registry[backend]:
+        valid_opts = hv.Store.registry[backend][eltype].style_opts
+        if style:
+            formatter += '\n{style}'
+    else:
+        valid_opts = []
+
+    style_opts = 'Style options\n-------------\n\n' + '\n'.join(sorted(valid_opts))
+
+    parameters = []
+    extra_kwargs = hv.core.util.unique_iterator(
+        valid_opts
+        + kind_opts
+        + converter._axis_config_options
+        + converter._size_layout_options
+        + converter._grid_legend_options
+        + converter._resample_options
+    )
+
+    sig = signature or inspect.signature(method)
+    for name, p in list(sig.parameters.items())[1:]:
+        if p.kind == 1:
+            parameters.append((name, p.default))
+
+    filtered_signature = [
+        p for p in sig.parameters.values() if p.kind != inspect.Parameter.VAR_KEYWORD
+    ]
+    extra_params = [
+        inspect.Parameter(k, inspect.Parameter.KEYWORD_ONLY)
+        for k in extra_kwargs
+        if k not in [p.name for p in filtered_signature]
+    ]
+    all_params = (
+        filtered_signature
+        + extra_params
+        + [inspect.Parameter('kwargs', inspect.Parameter.VAR_KEYWORD)]
+    )
+    signature = inspect.Signature(all_params)
+
+    parameters += [(o, None) for o in extra_kwargs]
+    completions = ', '.join([f'{n}={v}' for n, v in parameters])
+    options = textwrap.dedent(converter.__doc__)
+    method_doc = _METHOD_DOCS.get(kind, method.__doc__)
+    _METHOD_DOCS[kind] = method_doc
+    docstring = formatter.format(
+        kind=kind,
+        completions=completions,
+        docstring=textwrap.dedent(method_doc),
+        options=options,
+        style=style_opts,
+    )
+    return docstring, signature
+
+
+class _PatchHvplotDocstrings:
+    def __init__(self):
+        from .plotting.core import hvPlot, hvPlotTabular
+        from .converter import HoloViewsConverter
+
+        # Store the original signatures because the method signatures
+        # are going to be patched every time an extension is changed.
+        signatures = {}
+        for cls in [hvPlot, hvPlotTabular]:
+            for _kind in HoloViewsConverter._kind_mapping:
+                if hasattr(cls, _kind):
+                    method = getattr(cls, _kind)
+                    sig = inspect.signature(method)
+                    signatures[(cls, _kind)] = sig
+        self.orig_signatures = signatures
+
+    def __call__(self):
+        from .plotting.core import hvPlot, hvPlotTabular
+        from .converter import HoloViewsConverter
+
+        for cls in [hvPlot, hvPlotTabular]:
+            for _kind in HoloViewsConverter._kind_mapping:
+                if hasattr(cls, _kind):
+                    signature = self.orig_signatures[(cls, _kind)]
+                    _patch_doc(cls, _kind, signature=signature)
+
+
+def _patch_doc(cls, kind, signature=None):
+    method = getattr(cls, kind)
+    docstring, signature = _get_doc_and_signature(cls, kind, False, signature=signature)
+    method.__doc__ = docstring
+    method.__signature__ = signature
