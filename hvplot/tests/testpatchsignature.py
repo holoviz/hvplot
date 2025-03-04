@@ -1,3 +1,4 @@
+import os
 import subprocess
 import sys
 
@@ -6,11 +7,12 @@ from hvplot.util import _PatchHvplotDocstrings, _in_ipython, _parse_docstring_se
 
 
 def run_script(script, env_vars=None):
+    env_vars = env_vars or {}
     process = subprocess.run(
         [sys.executable, '-c', script],
         text=True,
         capture_output=True,
-        env=env_vars or {},
+        env=os.environ | env_vars,
     )
     if process.returncode != 0:
         raise RuntimeError(f'Subprocess failed: {process.stderr}')
