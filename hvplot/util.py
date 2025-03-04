@@ -815,17 +815,17 @@ def _get_doc_and_signature(
         # Bokeh is the default backend
         backend = hvplot_extension.compatibility or hv.Store.current_backend
     if eltype in hv.Store.registry[backend]:
-        valid_opts = hv.Store.registry[backend][eltype].style_opts
+        backend_style_opts = hv.Store.registry[backend][eltype].style_opts
         if style:
             formatter += '\n{style}'
     else:
-        valid_opts = []
+        backend_style_opts = []
 
-    style_opts = 'Style options\n-------------\n\n' + '\n'.join(sorted(valid_opts))
+    style_opts = 'Style options\n-------------\n\n' + '\n'.join(sorted(backend_style_opts))
 
     parameters = []
     extra_kwargs = hv.core.util.unique_iterator(
-        valid_opts
+        backend_style_opts
         + kind_opts
         + converter._axis_config_options
         + converter._size_layout_options
