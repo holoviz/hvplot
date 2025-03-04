@@ -334,24 +334,31 @@ class HoloViewsConverter:
     -------------
     bgcolor (default=None): str
         Background color of the data area of the plot
-    color: str or list, optional
-        Color(s) to use for the plot. Accepts a single color, a list of colors, or
-        a column name from the data to map colors based on values.
-    c: str or list, optional
+    color: str, list or column name, optional
+        Defines the color(s) to use for the plot. Accepts:
+        - a single color name (e.g., 'red', 'blue')
+        - a HEX color code (e.g., '#ff5733')
+        - a list of colors for multiple elements
+        - a column name from the dataset to map colors based on values.
+    c: str or list or column name, optional
         Alias for `color`. Used for specifying colors in scatter plots and other
-        elements that support color mapping.
-    cmap: str or list, optional
+        elements that support color mapping. If both `color` and `c` are provided,
+        the `color` keyword takes precedence.
+    cmap: str, list, dict, or colormap object, optional
         The colormap to use for continuous or categorical color mapping.
-        Accepts colormap names, dictionaries for discrete mapping,
-        colormap objects, or custom lists.
-    colormap: str or list, optional
-        Alias for `cmap`. The colormap to apply when using color mapping.
-        Can be a predefined colormap name (e.g., 'viridis', 'plasma') or a custom list of colors.
-    color_key: str or list, optional
-        Colormapping for use in categorical datashaded plots
-        where distinct colors need to be assigned to categories.
-        The length of the color key used must be at least the same
-        as the length of the categories in the data.
+        Accepts:
+        - a predefined colormap name from Bokeh, Matplotlib, or Colorcet (e.g., 'viridis', 'plasma')
+        - a list of named colors or HEX color codes.
+        - a dictionary mapping categories to colors for discrete colormaps.
+        - A colormap object from HoloViews or Matplotlib.
+    colormap: str, list, or colormap object, optional
+        Alias for `cmap`. The colormap to apply when applying color mapping.
+        Accepts the same values as `cmap`. See `cmap` for more details.
+    color_key: str, list, or dict, optional
+        Defines a categorical colormap for datashaded plots where distinct
+        colors must be assigned to different categories. The number of colors
+        must match or exceed the number of unique categories in the dataset.
+        Only one of `cmap`, `colormap`, or `color_key` can be specified at a time.
     clim: tuple
         Lower and upper bound of the color scale
     cnorm (default='linear'): str
