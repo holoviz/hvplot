@@ -2264,7 +2264,7 @@ class hvPlot(hvPlotTabular):
         """
         return self(x, y, z=z, kind='quadmesh', colorbar=colorbar, **kwds)
 
-    def contour(self, x=None, y=None, z=None, colorbar=True, **kwds):
+    def contour(self, x=None, y=None, z=None, colorbar=True, levels=5, logz=False, **kwds):
         """
         Line contour plot
 
@@ -2278,10 +2278,12 @@ class hvPlot(hvPlotTabular):
             The coordinate variable along the y-axis
         z : string, optional
             The data variable to plot
-        levels: int, optional
-            The number of contour levels
         colorbar: boolean
             Whether to display a colorbar
+        levels: int, optional
+            The number of contour levels. Default is 5
+        logz: bool, optional
+            Whether to apply log scaling to the z-axis. Default is False
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('contour')`.
 
@@ -2325,9 +2327,9 @@ class hvPlot(hvPlotTabular):
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.contour.html
         - Plotly: https://plotly.com/python/contour-plots/
         """
-        return self(x, y, z=z, kind='contour', colorbar=colorbar, **kwds)
+        return self(x, y, z=z, kind='contour', colorbar=colorbar, levels=levels, logz=logz, **kwds)
 
-    def contourf(self, x=None, y=None, z=None, colorbar=True, **kwds):
+    def contourf(self, x=None, y=None, z=None, colorbar=True, levels=5, logz=False, **kwds):
         """
         Filled contour plot
 
@@ -2341,10 +2343,12 @@ class hvPlot(hvPlotTabular):
             The coordinate variable along the y-axis
         z : string, optional
             The data variable to plot
-        levels: int, optional
-            The number of contour levels
         colorbar: boolean
             Whether to display a colorbar
+        levels: int, optional
+            The number of contour levels. default is 5
+        logz: bool, optional
+            Whether to apply log scaling to the z-axis. Default is False
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('contourf')`.
 
@@ -2387,4 +2391,6 @@ class hvPlot(hvPlotTabular):
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.contour.html
         - Plotly: https://plotly.com/python/contour-plots/
         """
-        return self(x, y, z=z, kind='contourf', colorbar=colorbar, **kwds)
+        return self(
+            x, y, z=z, kind='contourf', colorbar=colorbar, levels=levels, logz=logz, **kwds
+        )
