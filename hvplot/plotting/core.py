@@ -799,7 +799,7 @@ class hvPlotTabular(hvPlotBase):
         """
         return self(kind='ohlc', x=x, y=y, **kwds)
 
-    def heatmap(self, x=None, y=None, C=None, colorbar=True, **kwds):
+    def heatmap(self, x=None, y=None, C=None, colorbar=True, logz=False, **kwds):
         """
         `heatmap` visualises tabular data indexed by two key dimensions as a grid of colored values.
         This allows spotting correlations in multivariate data and provides a high-level overview
@@ -822,6 +822,8 @@ class hvPlotTabular(hvPlotBase):
             Whether to apply log scaling to the z-axis. Default is False.
         reduce_function : function, optional
             Function to compute statistics for heatmap, for example `np.mean`.
+            If omitted, no aggregation is applied and duplicate values are dropped.
+            Note: Explicitly setting this parameter to `None` is not allowed and will raise an error.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('heatmap')`.
 
@@ -860,7 +862,7 @@ class hvPlotTabular(hvPlotBase):
         - Plotly: https://plotly.com/python/heatmaps/
         - Wiki: https://en.wikipedia.org/wiki/Heat_map
         """
-        return self(x, y, kind='heatmap', C=C, colorbar=colorbar, **kwds)
+        return self(x, y, kind='heatmap', C=C, colorbar=colorbar, logz=logz, **kwds)
 
     def hexbin(self, x=None, y=None, C=None, colorbar=True, **kwds):
         """
