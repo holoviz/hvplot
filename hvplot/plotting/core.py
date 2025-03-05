@@ -799,7 +799,7 @@ class hvPlotTabular(hvPlotBase):
         """
         return self(kind='ohlc', x=x, y=y, **kwds)
 
-    def heatmap(self, x=None, y=None, C=None, colorbar=True, **kwds):
+    def heatmap(self, x=None, y=None, C=None, colorbar=True, logz=False, **kwds):
         """
         `heatmap` visualises tabular data indexed by two key dimensions as a grid of colored values.
         This allows spotting correlations in multivariate data and provides a high-level overview
@@ -822,6 +822,8 @@ class hvPlotTabular(hvPlotBase):
             Whether to apply log scaling to the z-axis. Default is False.
         reduce_function : function, optional
             Function to compute statistics for heatmap, for example `np.mean`.
+            If omitted, no aggregation is applied and duplicate values are dropped.
+            Note: Explicitly setting this parameter to `None` is not allowed and will raise an error.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('heatmap')`.
 
@@ -860,7 +862,7 @@ class hvPlotTabular(hvPlotBase):
         - Plotly: https://plotly.com/python/heatmaps/
         - Wiki: https://en.wikipedia.org/wiki/Heat_map
         """
-        return self(x, y, kind='heatmap', C=C, colorbar=colorbar, **kwds)
+        return self(x, y, kind='heatmap', C=C, colorbar=colorbar, logz=logz, **kwds)
 
     def hexbin(self, x=None, y=None, C=None, colorbar=True, **kwds):
         """
@@ -930,7 +932,9 @@ class hvPlotTabular(hvPlotBase):
         """
         return self(x, y, kind='hexbin', C=C, colorbar=colorbar, **kwds)
 
-    def bivariate(self, x=None, y=None, colorbar=True, **kwds):
+    def bivariate(
+        self, x=None, y=None, colorbar=True, bandwidth=None, cut=3, filled=False, levels=10, **kwds
+    ):
         """
         A bivariate, density plot uses nested contours (or contours plus colors) to indicate
         regions of higher local density.
@@ -951,9 +955,9 @@ class hvPlotTabular(hvPlotBase):
         bandwidth: int, optional
             The bandwidth of the kernel for the density estimate. Default is None.
         cut: Integer, Optional
-            Draw the estimate to cut * bw from the extreme data points. Default is None.
+            Draw the estimate to cut * bw from the extreme data points. Default is 3.
         filled : bool, optional
-            If True the the contours will be filled. Default is False.
+            If True the contours will be filled. Default is False.
         levels: int, optional
             The number of contour lines to draw. Default is 10.
 
@@ -1000,7 +1004,17 @@ class hvPlotTabular(hvPlotBase):
         - Seaborn: https://seaborn.pydata.org/generated/seaborn.kdeplot.html
         - Wiki: https://en.wikipedia.org/wiki/Bivariate_analysis
         """
-        return self(x, y, kind='bivariate', colorbar=colorbar, **kwds)
+        return self(
+            x,
+            y,
+            kind='bivariate',
+            colorbar=colorbar,
+            bandwidth=bandwidth,
+            cut=cut,
+            filled=filled,
+            levels=levels,
+            **kwds,
+        )
 
     def bar(self, x=None, y=None, stacked=False, **kwds):
         """
@@ -2252,7 +2266,7 @@ class hvPlot(hvPlotTabular):
         """
         return self(x, y, z=z, kind='quadmesh', colorbar=colorbar, **kwds)
 
-    def contour(self, x=None, y=None, z=None, colorbar=True, **kwds):
+    def contour(self, x=None, y=None, z=None, colorbar=True, levels=5, logz=False, **kwds):
         """
         Line contour plot
 
@@ -2266,10 +2280,12 @@ class hvPlot(hvPlotTabular):
             The coordinate variable along the y-axis
         z : string, optional
             The data variable to plot
-        levels: int, optional
-            The number of contour levels
         colorbar: boolean
             Whether to display a colorbar
+        levels: int, optional
+            The number of contour levels. Default is 5
+        logz: bool, optional
+            Whether to apply log scaling to the z-axis. Default is False
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('contour')`.
 
@@ -2313,9 +2329,9 @@ class hvPlot(hvPlotTabular):
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.contour.html
         - Plotly: https://plotly.com/python/contour-plots/
         """
-        return self(x, y, z=z, kind='contour', colorbar=colorbar, **kwds)
+        return self(x, y, z=z, kind='contour', colorbar=colorbar, levels=levels, logz=logz, **kwds)
 
-    def contourf(self, x=None, y=None, z=None, colorbar=True, **kwds):
+    def contourf(self, x=None, y=None, z=None, colorbar=True, levels=5, logz=False, **kwds):
         """
         Filled contour plot
 
@@ -2329,10 +2345,12 @@ class hvPlot(hvPlotTabular):
             The coordinate variable along the y-axis
         z : string, optional
             The data variable to plot
-        levels: int, optional
-            The number of contour levels
         colorbar: boolean
             Whether to display a colorbar
+        levels: int, optional
+            The number of contour levels. default is 5
+        logz: bool, optional
+            Whether to apply log scaling to the z-axis. Default is False
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('contourf')`.
 
@@ -2375,4 +2393,6 @@ class hvPlot(hvPlotTabular):
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.contour.html
         - Plotly: https://plotly.com/python/contour-plots/
         """
-        return self(x, y, z=z, kind='contourf', colorbar=colorbar, **kwds)
+        return self(
+            x, y, z=z, kind='contourf', colorbar=colorbar, levels=levels, logz=logz, **kwds
+        )
