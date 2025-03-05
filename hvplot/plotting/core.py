@@ -930,7 +930,9 @@ class hvPlotTabular(hvPlotBase):
         """
         return self(x, y, kind='hexbin', C=C, colorbar=colorbar, **kwds)
 
-    def bivariate(self, x=None, y=None, colorbar=True, **kwds):
+    def bivariate(
+        self, x=None, y=None, colorbar=True, bandwidth=None, cut=3, filled=False, levels=10, **kwds
+    ):
         """
         A bivariate, density plot uses nested contours (or contours plus colors) to indicate
         regions of higher local density.
@@ -951,9 +953,9 @@ class hvPlotTabular(hvPlotBase):
         bandwidth: int, optional
             The bandwidth of the kernel for the density estimate. Default is None.
         cut: Integer, Optional
-            Draw the estimate to cut * bw from the extreme data points. Default is None.
+            Draw the estimate to cut * bw from the extreme data points. Default is 3.
         filled : bool, optional
-            If True the the contours will be filled. Default is False.
+            If True the contours will be filled. Default is False.
         levels: int, optional
             The number of contour lines to draw. Default is 10.
 
@@ -1000,7 +1002,17 @@ class hvPlotTabular(hvPlotBase):
         - Seaborn: https://seaborn.pydata.org/generated/seaborn.kdeplot.html
         - Wiki: https://en.wikipedia.org/wiki/Bivariate_analysis
         """
-        return self(x, y, kind='bivariate', colorbar=colorbar, **kwds)
+        return self(
+            x,
+            y,
+            kind='bivariate',
+            colorbar=colorbar,
+            bandwidth=bandwidth,
+            cut=cut,
+            filled=filled,
+            levels=levels,
+            **kwds,
+        )
 
     def bar(self, x=None, y=None, stacked=False, **kwds):
         """
