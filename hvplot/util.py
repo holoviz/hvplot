@@ -753,10 +753,6 @@ def import_geoviews():
     return geoviews
 
 
-def _is_installed(package: str) -> bool:
-    return find_spec(package) is not None
-
-
 def relabel(hv_obj, **kwargs):
     """Conditionally relabel a HoloViews object"""
     if kwargs:
@@ -880,11 +876,11 @@ def _get_doc_and_signature(
         extra_kwargs.extend(converter._options_groups['interactivity'])
         out_doc_sections.append(doc_sections[converter._docstring_sections['interactivity']])
 
-    if kind not in converter._stats_types and _is_installed('datashader'):
+    if kind not in converter._stats_types and find_spec('datashader'):
         extra_kwargs.extend(converter._options_groups['resampling'])
         out_doc_sections.append(doc_sections[converter._docstring_sections['resampling']])
 
-    if kind in converter._geo_types and _is_installed('geoviews'):
+    if kind in converter._geo_types and find_spec('geoviews'):
         extra_kwargs.extend(converter._options_groups['geographic'])
         out_doc_sections.append(doc_sections[converter._docstring_sections['geographic']])
 
