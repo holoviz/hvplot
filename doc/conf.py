@@ -102,10 +102,10 @@ rediraffe_redirects = {
     # Removal of the developer_guide folder
     'developer_guide/index': 'developer_guide',
     # Redirecting removed "getting started" pages to the new index
-    'getting_started/explorer': 'getting_started/index',
-    'getting_started/hvplot': 'getting_started/index',
-    'getting_started/installation': 'getting_started/index',
-    'getting_started/interactive': 'getting_started/index',
+    'getting_started/explorer': 'tutorials/getting_started/index',
+    'getting_started/hvplot': 'tutorials/getting_started/index',
+    'getting_started/installation': 'tutorials/getting_started/index',
+    'getting_started/interactive': 'tutorials/getting_started/index',
 }
 
 html_context.update(  # noqa
