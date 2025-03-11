@@ -592,7 +592,7 @@ class hvPlotTabular(hvPlotBase):
         y2 : string, optional
             Field name to draw the second y-position from
         stacked : boolean, optional
-            Whether to stack multiple areas. Default is False.
+            Whether to stack multiple areas. Default is True.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('area')`.
 
@@ -1002,7 +1002,7 @@ class hvPlotTabular(hvPlotBase):
         """
         return self(x, y, kind='bivariate', colorbar=colorbar, **kwds)
 
-    def bar(self, x=None, y=None, **kwds):
+    def bar(self, x=None, y=None, stacked=False, **kwds):
         """
         A vertical bar plot
 
@@ -1089,9 +1089,9 @@ class hvPlotTabular(hvPlotBase):
         - Plotly: https://plotly.com/python/bar-charts/
         - Wiki: https://en.wikipedia.org/wiki/Bar_chart
         """
-        return self(x, y, kind='bar', **kwds)
+        return self(x, y, kind='bar', stacked=stacked, **kwds)
 
-    def barh(self, x=None, y=None, **kwds):
+    def barh(self, x=None, y=None, stacked=False, **kwds):
         """
         A horizontal bar plot
 
@@ -1106,8 +1106,10 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
+        stacked : bool, optional
+            If True, creates a stacked horizontal bar plot. Default is False.
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('image')`.
+            Additional keywords arguments are documented in `hvplot.help('barh')`.
 
         Returns
         -------
@@ -1153,7 +1155,7 @@ class hvPlotTabular(hvPlotBase):
         - Plotly: https://plotly.com/python/horizontal-bar-charts/
         - Wiki: https://en.wikipedia.org/wiki/Bar_chart
         """
-        return self(x, y, kind='barh', **kwds)
+        return self(x, y, kind='barh', stacked=stacked, **kwds)
 
     def box(self, y=None, by=None, **kwds):
         """
