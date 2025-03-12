@@ -2,9 +2,36 @@ import panel as _pn
 import param
 import holoviews as _hv
 
+from .util import _get_doc_and_signature
+
 renderer = _hv.renderer('bokeh')
 
 output = _hv.output
+
+
+def help(kind=None, docstring=True, generic=True, style=True):
+    """
+    Provide a docstring with all valid options which apply to the plot
+    type.
+
+    Parameters
+    ----------
+    kind: str, optional
+        The kind of plot to provide help for.
+    docstring: boolean, default=True
+        Whether to display the docstring.
+    generic: boolean, default=True
+        Whether to provide list of generic options.
+    style: str or boolean, default=True
+        Plotting backend used to get the styling options. True by default
+        to automatically infer it based on the loaded extension.
+    """
+    from .plotting.core import hvPlot
+
+    doc, sig = _get_doc_and_signature(
+        cls=hvPlot, kind=kind, docstring=docstring, generic=generic, style=style
+    )
+    print(doc)
 
 
 def save(
@@ -110,6 +137,8 @@ class hvplot_extension(_hv.extension):
     logo = param.Boolean(default=False)
 
     def __call__(self, *args, **params):
+        from . import _PATCH_PLOT_SIGNATURES
+
         # importing e.g. hvplot.pandas always loads the bokeh extension.
         # so hvplot.extension('matplotlib', compatibility='bokeh') doesn't
         # require the user or the code to explicitly load bokeh.
@@ -122,8 +151,9 @@ class hvplot_extension(_hv.extension):
                 'not yet implemented. Defaults to bokeh.'
             )
         hvplot_extension.compatibility = compatibility
-        # Patch or re-patch the docstrings/signatures to display
-        # the right styling options.
-        from . import _patch_hvplot_docstrings
+        if _PATCH_PLOT_SIGNATURES:
+            # Patch or re-patch the docstrings/signatures to display
+            # the right styling options.
+            from . import _patch_hvplot_docstrings
 
-        _patch_hvplot_docstrings()
+            _patch_hvplot_docstrings()
