@@ -823,7 +823,7 @@ class hvPlotTabular(hvPlotBase):
         reduce_function : function, optional
             Function to compute statistics for heatmap, for example `np.mean`.
             If omitted, no aggregation is applied and duplicate values are dropped.
-            Note: Explicitly setting this parameter to `None` is not allowed and will raise an error.
+            Note: Explicitly setting this parameter to `None` is not allowed and will raise a TypeError.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('heatmap')`.
 
@@ -864,7 +864,9 @@ class hvPlotTabular(hvPlotBase):
         """
         return self(x, y, kind='heatmap', C=C, colorbar=colorbar, logz=logz, **kwds)
 
-    def hexbin(self, x=None, y=None, C=None, colorbar=True, **kwds):
+    def hexbin(
+        self, x=None, y=None, C=None, colorbar=True, gridsize=50, logz=False, min_count=1, **kwds
+    ):
         """
         The `hexbin` plot uses hexagons to split the area into several parts and attribute a color
         to it.
@@ -885,8 +887,10 @@ class hvPlotTabular(hvPlotBase):
             Whether to display a colorbar. Default is True.
         reduce_function : function, optional
             Function to compute statistics for hexbins, for example `np.mean`.
+            Default aggregation is a count of the values in the area.
+            Note: Explicitly setting this parameter to `None` is not allowed and will raise a TypeError.
         gridsize: int, optional
-            The number of hexagons in the x-direction
+            The number of hexagons in the x-direction. Default is 50.
         logz : bool
             Whether to apply log scaling to the z-axis. Default is False.
         min_count : number, optional
@@ -930,7 +934,17 @@ class hvPlotTabular(hvPlotBase):
         - Plotly: https://plotly.com/python/hexbin-mapbox/
         - Wiki: https://think.design/services/data-visualization-data-design/hexbin/
         """
-        return self(x, y, kind='hexbin', C=C, colorbar=colorbar, **kwds)
+        return self(
+            x,
+            y,
+            kind='hexbin',
+            C=C,
+            colorbar=colorbar,
+            gridsize=gridsize,
+            logz=logz,
+            min_count=min_count,
+            **kwds,
+        )
 
     def bivariate(
         self, x=None, y=None, colorbar=True, bandwidth=None, cut=3, filled=False, levels=10, **kwds
