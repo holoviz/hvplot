@@ -143,7 +143,7 @@ class HoloViewsConverter:
     groupby : str or list or None, default=None
         Dimension(s) by which to group data, enabling widgets.
         Returns a DynamicMap if ``dynamic=True``, else returns a HoloMap.
-        See :paramref:`dynamic` for more information.
+        See ``dynamic`` for more information.
     group_label : str or None, default=None
         Label for grouped data, typically in legends or axis labels.
     kind : str, default='line'
