@@ -273,7 +273,7 @@ class HoloViewsConverter:
         zooming. Requires HoloViews >= 1.16.
     flip_xaxis/flip_yaxis : bool or None, default=None
         Whether to flip the axis left to right or up and down respectively
-    framewise  : bool, default=True
+    framewise : bool, default=True
         Whether to compute the axis ranges frame-by-frame when using dynamic plots.
     invert : bool, default=False
         Swaps x- and y-axis
