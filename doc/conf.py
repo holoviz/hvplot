@@ -1,4 +1,10 @@
 import os
+import sys
+
+# To include the local extension.
+sys.path.insert(0, os.path.abspath('_ext'))
+
+import os
 import param
 
 param.parameterized.docstring_signature = False
@@ -61,6 +67,9 @@ extensions += [  # noqa
     'nbsite.nb_interactivity_warning',
     'sphinx_copybutton',
     'sphinxext.rediraffe',
+    'numpydoc',
+    # Custom extensions
+    'plotting_options_table',
 ]
 
 myst_enable_extensions = [
