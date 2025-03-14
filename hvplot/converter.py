@@ -132,7 +132,7 @@ class HoloViewsConverter:
         the behavior.
     by : str or list of str or None, default=None
         Dimension(s) by which to group the data categories.
-        An NdOverlay is returned by default unless `subplots=True`, then an NdLayout is returned.
+        An NdOverlay is returned by default unless ``subplots=True``, then an NdLayout is returned.
     dynamic : bool, default=True
         Whether to return a dynamic plot which sends updates on widget and
         zoom/pan events or whether all the data should be embedded
@@ -142,7 +142,7 @@ class HoloViewsConverter:
         A dictionary of fields for renaming or transforming data dimensions.
     groupby : str or list or None, default=None
         Dimension(s) by which to group data, enabling widgets.
-        Returns a DynamicMap if `dynamic=True`, else returns a HoloMap.
+        Returns a DynamicMap if ``dynamic=True``, else returns a HoloMap.
         See :paramref:`dynamic` for more information.
     group_label : str or None, default=None
         Label for grouped data, typically in legends or axis labels.
@@ -165,7 +165,7 @@ class HoloViewsConverter:
     sort_date : bool, default=True
         Whether to sort the x-axis by date before plotting
     subplots : bool, default=False
-        Whether to display data in separate subplots when using the `by` parameter.
+        Whether to display data in separate subplots when using the ``by`` parameter.
     symmetric : bool or None, default=None
         Whether the data are symmetric around zero. If left unset, the data
         will be checked for symmetry as long as the size is less than
@@ -178,7 +178,7 @@ class HoloViewsConverter:
         Whether to use dask for processing the data, helpful for large datasets that do not fit into memory.
     use_index : bool, default=True
         Whether to use the data's index for the x-axis by default.
-        if `hover_cols == 'all', adds the index to the hover tools.
+        if ``hover_cols == 'all'``, adds the index to the hover tools.
     value_label : str, default='value'
         Label for the data values, typically used for the y-axis or in legends.
 
@@ -213,16 +213,16 @@ class HoloViewsConverter:
         Defaults to PlateCarree.
     tiles : bool or str or xyzservices.TileProvider or holoviews.Tiles or geoviews.WMTS or None, default=False
         Whether to overlay the plot on a tile source. If coordinate values fall within
-        lat/lon bounds, auto-projects to EPSG:3857, unless `projection=False`.
-        - `True`: OpenStreetMap layer
-        - `xyzservices.TileProvider` instance (requires xyzservices to
+        lat/lon bounds, auto-projects to EPSG:3857, unless ``projection=False``.
+        - ``True``: OpenStreetMap layer
+        - ``xyzservices.TileProvider`` instance (requires xyzservices to
            be installed)
         - a map string name based on one of the default layers made
           available by HoloViews or GeoViews.
-        - a `holoviews.Tiles` or `geoviews.WMTS` instance or class
+        - a ``holoviews.Tiles`` or ``geoviews.WMTS`` instance or class
     tiles_opts : dict or None, default=None
-        Options to customize the tiles layer created when `tiles` is set,
-        e.g. `dict(alpha=0.5)`.
+        Options to customize the tiles layer created when ``tiles`` is set,
+        e.g. ``dict(alpha=0.5)``.
 
     Size And Layout Options
     -----------------------
@@ -262,7 +262,7 @@ class HoloViewsConverter:
         'equal' correspond to the axis modes of the same name in
         matplotlib, a numeric value specifying the ratio between plot
         width and height may also be passed. To control the aspect
-        ratio between the axis scales use the `data_aspect` option
+        ratio between the axis scales use the ``data_aspect`` option
         instead.
     data_aspect : float or None, default=None
         Defines the aspect of the axis scaling, i.e. the ratio of
@@ -288,7 +288,7 @@ class HoloViewsConverter:
     subcoordinate_y : bool or dict or None, default=None
        Whether to enable sub-coordinate y systems for this plot. Accepts also a
        dictionary of related options to pass down to HoloViews,
-       e.g. `{'subcoordinate_scale': 2}`.
+       e.g. ``{'subcoordinate_scale': 2}``.
     title : str or None, default=None
         Title for the plot
     xaxis/yaxis : str or None
@@ -343,8 +343,8 @@ class HoloViewsConverter:
         - a list of colors for multiple elements
         - a column name from the dataset to map colors based on values.
     c : str or list or column name or None, default=None
-        Alias for `color`. If both `color` and `c` are provided,
-        the `color` keyword takes precedence.
+        Alias for ``color``. If both ``color`` and ``c`` are provided,
+        the ``color`` keyword takes precedence.
     cmap : str or list or dict or colormap object or None, default=None
         The colormap to use for continuous or categorical color mapping.
         Accepts:
@@ -353,21 +353,21 @@ class HoloViewsConverter:
         - a dictionary mapping categories to colors for discrete colormaps.
         - A colormap object from HoloViews or Matplotlib.
         If not specified, a default colormap is automatically chosen based on the data type:
-        - Linear data: Uses the `kbc_r` colormap.
-        - Categorical data: Uses `glasbey_category10` colormap from Colorcet.
-        - Cyclic data: Uses `colorwheel` colormap.
-        - Diverging data: Uses `coolwarm` colormap.
-        You can override these defaults by explicitly setting `cmap=<colormap_name>`.
-        Only one of `cmap`, `colormap`, or `color_key` can be specified at a time.
+        - Linear data: Uses the ``kbc_r`` colormap.
+        - Categorical data: Uses ``glasbey_category10`` colormap from Colorcet.
+        - Cyclic data: Uses ``colorwheel`` colormap.
+        - Diverging data: Uses ``coolwarm`` colormap.
+        You can override these defaults by explicitly setting ``cmap=<colormap_name>``.
+        Only one of ``cmap``, ``colormap``, or ``color_key`` can be specified at a time.
     colormap : str or list  or colormap object or None, default=None
-        Alias for `cmap`. The colormap to apply when applying color mapping.
+        Alias for ``cmap``. The colormap to apply when applying color mapping.
         Accepts the same values as `cmap`. See `cmap` for more details.
-        Only one of `cmap`, `colormap`, or `color_key` can be specified at a time.
+        Only one of ``cmap``, ``colormap``, or ``color_key`` can be specified at a time.
     color_key : str or list or dict or None, default=None
         Defines a categorical colormap for datashaded plots where distinct
         colors must be assigned to different categories. The number of colors
         must match or exceed the number of unique categories in the dataset.
-        Only one of `cmap`, `colormap`, or `color_key` can be specified at a time.
+        Only one of ``cmap``, ``colormap``, or ``color_key`` can be specified at a time.
     clim : tuple or None, default=None
         Lower and upper bound of the color scale
     cnorm : str, default='linear'
@@ -376,12 +376,12 @@ class HoloViewsConverter:
         Set title, label and legend text to the same fontsize. Finer control
         by using a dict: {'title': '15pt', 'ylabel': '5px', 'ticks': 20}
     rescale_discrete_levels : bool or None, default=None
-        If `cnorm='eq_hist'` and there are only a few discrete values,
-        then `rescale_discrete_levels=True` (the default) decreases
+        If ``cnorm='eq_hist'`` and there are only a few discrete values,
+        then ``rescale_discrete_levels=True`` (the default) decreases
         the lower limit of the autoranged span so that the values are
-        rendering towards the (more visible) top of the `cmap` range,
+        rendering towards the (more visible) top of the ``cmap`` range,
         thus avoiding washout of the lower values.  Has no effect if
-        `cnorm!=`eq_hist`.
+        ``cnorm!=`eq_hist``.
 
     Resampling Options
     ------------------
@@ -398,7 +398,7 @@ class HoloViewsConverter:
         which is particularly useful for large timeseries datasets to
         reduce the amount of data sent to browser and improve
         visualization performance. Requires HoloViews >= 1.16. Additional
-        dependencies: Installing the `tsdownsample` library is required
+        dependencies: Installing the ``tsdownsample`` library is required
         for using any downsampling methods other than the default 'lttb'.
         Acceptable values:
         - False: No downsampling is applied.
@@ -407,13 +407,13 @@ class HoloViewsConverter:
         - 'lttb': Explicitly applies the Largest Triangle Three Buckets
           algorithm.
         - 'minmax': Applies the MinMax algorithm, selecting the minimum
-          and maximum values in each bin. Requires `tsdownsample`.
+          and maximum values in each bin. Requires ``tsdownsample``.
         - 'm4': Applies the M4 algorithm, selecting the minimum, maximum,
-          first, and last values in each bin. Requires `tsdownsample`.
+          first, and last values in each bin. Requires ``tsdownsample``.
         - 'minmax-lttb': Combines MinMax and LTTB algorithms for
           downsampling, first applying MinMax to reduce to a preliminary
           set of points, then LTTB for further reduction. Requires
-          `tsdownsample`.
+          ``tsdownsample``.
         Other string values corresponding to supported algorithms in
         HoloViews may also be used.
     dynspread : bool, default=False
@@ -421,7 +421,7 @@ class HoloViewsConverter:
         automatically increase the point size when the data is sparse
         so that individual points become more visible
     max_px : int, default=3
-        The maximum size in pixels for dynamically spreading elements in sparse data using `dynspread`.
+        The maximum size in pixels for dynamically spreading elements in sparse data using ``dynspread``.
         This helps to increase the visibility of sparse data points.
     pixel_ratio : number or None, default=None
        Pixel ratio applied to the height and width, used when rasterizing or
@@ -431,7 +431,7 @@ class HoloViewsConverter:
        information is not available (pixel_ratio=2 can give better results on
        Retina displays) or for using lower resolution for speed.
     precompute : bool, default=False
-        Whether to precompute aggregations when using `rasterize` or `datashade`.
+        Whether to precompute aggregations when using ``rasterize`` or ``datashade``.
     rasterize : bool, default=False
         Whether to apply rasterization using the Datashader library,
         returning an aggregated Image (to be colormapped by the
@@ -441,7 +441,7 @@ class HoloViewsConverter:
         the number of individual data points present in the current zoom range
         is above this threshold. The raw plot is displayed otherwise.
     threshold : float, default=0.5
-        When using `dynspread`, this value defines the minimum density of overlapping points
+        When using ``dynspread``, this value defines the minimum density of overlapping points
         required before the spreading operation is applied.
         Values between 0 and 1, where 1 means always spread and 0 means never spread.
     x_sampling/y_sampling : number or None, default=None:
