@@ -224,7 +224,7 @@ class HoloViewsConverter:
         Options to customize the tiles layer created when `tiles` is set,
         e.g. `dict(alpha=0.5)`.
 
-    Size and Layout Options
+    Size And Layout Options
     -----------------------
     fontscale: number
         Scales the size of all fonts by the same amount, e.g. fontscale=1.5
@@ -305,7 +305,7 @@ class HoloViewsConverter:
         Ticks along x-axis, y-axis, and colorbar specified as an integer, list of
         ticks positions, or list of tuples of the tick positions and labels
 
-    Grid and Legend Options
+    Grid And Legend Options
     -----------------------
     colorbar (default=False): boolean
         Enables a colorbar
@@ -595,9 +595,9 @@ class HoloViewsConverter:
     _docstring_sections = {
         'data': 'Data Options',
         'geographic': 'Geographic Options',
-        'size_layout': 'Size and Layout Options',
+        'size_layout': 'Size And Layout Options',
         'axis': 'Axis Options',
-        'grid_legend': 'Grid and Legend Options',
+        'grid_legend': 'Grid And Legend Options',
         'interactivity': 'Interactivity Options',
         'style': 'Style Options',
         'resampling': 'Resampling Options',
