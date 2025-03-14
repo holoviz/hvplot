@@ -217,7 +217,7 @@ class HoloViewsConverter:
 
         - ``True``: OpenStreetMap layer
         - ``xyzservices.TileProvider`` instance (requires xyzservices to
-           be installed)
+          be installed)
         - a map string name based on one of the default layers made
           available by HoloViews or GeoViews.
         - a ``holoviews.Tiles`` or ``geoviews.WMTS`` instance or class
