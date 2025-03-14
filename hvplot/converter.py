@@ -213,7 +213,8 @@ class HoloViewsConverter:
         Defaults to PlateCarree.
     tiles : bool or str or xyzservices.TileProvider or holoviews.Tiles or geoviews.WMTS or None, default=False
         Whether to overlay the plot on a tile source. If coordinate values fall within
-        lat/lon bounds, auto-projects to EPSG:3857, unless ``projection=False``.
+        lat/lon bounds, auto-projects to EPSG:3857, unless ``projection=False``:
+
         - ``True``: OpenStreetMap layer
         - ``xyzservices.TileProvider`` instance (requires xyzservices to
            be installed)
@@ -347,16 +348,21 @@ class HoloViewsConverter:
         the ``color`` keyword takes precedence.
     cmap : str or list or dict or colormap object or None, default=None
         The colormap to use for continuous or categorical color mapping.
+
         Accepts:
+
         - a predefined colormap name from Bokeh, Matplotlib, or Colorcet (e.g., 'viridis', 'plasma')
         - a list of named colors or HEX color codes.
         - a dictionary mapping categories to colors for discrete colormaps.
         - A colormap object from HoloViews or Matplotlib.
+
         If not specified, a default colormap is automatically chosen based on the data type:
+
         - Linear data: Uses the ``kbc_r`` colormap.
         - Categorical data: Uses ``glasbey_category10`` colormap from Colorcet.
         - Cyclic data: Uses ``colorwheel`` colormap.
         - Diverging data: Uses ``coolwarm`` colormap.
+
         You can override these defaults by explicitly setting ``cmap=<colormap_name>``.
         Only one of ``cmap``, ``colormap``, or ``color_key`` can be specified at a time.
     colormap : str or list  or colormap object or None, default=None
@@ -400,10 +406,12 @@ class HoloViewsConverter:
         visualization performance. Requires HoloViews >= 1.16. Additional
         dependencies: Installing the ``tsdownsample`` library is required
         for using any downsampling methods other than the default 'lttb'.
+
         Acceptable values:
+
         - False: No downsampling is applied.
         - True: Applies downsampling using HoloViews' default algorithm
-            (LTTB - Largest Triangle Three Buckets).
+          (LTTB - Largest Triangle Three Buckets).
         - 'lttb': Explicitly applies the Largest Triangle Three Buckets
           algorithm.
         - 'minmax': Applies the MinMax algorithm, selecting the minimum
@@ -414,6 +422,7 @@ class HoloViewsConverter:
           downsampling, first applying MinMax to reduce to a preliminary
           set of points, then LTTB for further reduction. Requires
           ``tsdownsample``.
+
         Other string values corresponding to supported algorithms in
         HoloViews may also be used.
     dynspread : bool, default=False
