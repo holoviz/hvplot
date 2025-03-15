@@ -123,5 +123,4 @@ def setup(app):
 if __name__ == '__main__':
     group = ' '.join(sys.argv[1:])
     opts = get_group_parameters(group)
-    breakpoint()
     print(opts)
