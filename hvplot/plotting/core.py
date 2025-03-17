@@ -823,7 +823,6 @@ class hvPlotTabular(hvPlotBase):
         reduce_function : function, optional
             Function to compute statistics for heatmap, for example `np.mean`.
             If omitted, no aggregation is applied and duplicate values are dropped.
-            Note: Explicitly setting this parameter to `None` is not allowed and will raise a TypeError.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('heatmap')`.
 
@@ -865,7 +864,15 @@ class hvPlotTabular(hvPlotBase):
         return self(x, y, kind='heatmap', C=C, colorbar=colorbar, logz=logz, **kwds)
 
     def hexbin(
-        self, x=None, y=None, C=None, colorbar=True, gridsize=50, logz=False, min_count=1, **kwds
+        self,
+        x=None,
+        y=None,
+        C=None,
+        colorbar=True,
+        gridsize=50,
+        logz=False,
+        min_count=None,
+        **kwds,
     ):
         """
         The `hexbin` plot uses hexagons to split the area into several parts and attribute a color
@@ -888,9 +895,11 @@ class hvPlotTabular(hvPlotBase):
         reduce_function : function, optional
             Function to compute statistics for hexbins, for example `np.mean`.
             Default aggregation is a count of the values in the area.
-            Note: Explicitly setting this parameter to `None` is not allowed and will raise a TypeError.
-        gridsize: int, optional
-            The number of hexagons in the x-direction. Default is 50.
+        gridsize: int or tuple, optional
+            Number of hexagonal bins along x- and y-axes. Defaults to uniform
+            sampling along both axes when setting and integer but independent
+            bin sampling can be specified a tuple of integers corresponding to
+            the number of bins along each axis. Default is 50.
         logz : bool
             Whether to apply log scaling to the z-axis. Default is False.
         min_count : number, optional
@@ -968,12 +977,13 @@ class hvPlotTabular(hvPlotBase):
             Whether to display a colorbar
         bandwidth: int, optional
             The bandwidth of the kernel for the density estimate. Default is None.
-        cut: Integer, Optional
+        cut: int, optional
             Draw the estimate to cut * bw from the extreme data points. Default is 3.
         filled : bool, optional
             If True the contours will be filled. Default is False.
-        levels: int, optional
-            The number of contour lines to draw. Default is 10.
+        levels: int or list, optional
+            The number of contour lines to draw or a list of scalar values used
+            to specify the contour levels. Default is 10.
 
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('bivariate')`.
@@ -1317,7 +1327,9 @@ class hvPlotTabular(hvPlotBase):
         """
         return self(kind='violin', x=None, y=y, by=by, **dict(kwds, hover=False))
 
-    def hist(self, y=None, by=None, bins=20, normed=False, cumulative=False, **kwds):
+    def hist(
+        self, y=None, by=None, bins=20, bin_range=None, normed=False, cumulative=False, **kwds
+    ):
         """
         A `histogram` displays an approximate representation of the distribution of continuous data.
 
@@ -1330,25 +1342,25 @@ class hvPlotTabular(hvPlotBase):
             Please note the fields should contain continuous data. Not categorical.
         by : string or sequence
             Field(s) in the *long* data to group by.
-        bins : int, optional
-            An explicit set of bin edges or a method to find the optimal
-            set of bin edges, e.g. 'auto', 'fd', 'scott' etc. For more
-            documentation on these approaches see the np.histogram_bin_edges
-            documentation. Default is 20
+        bins : int or string or np.ndarray or list or tuple, optional
+            The number of bins in the histogram, or an explicit set of bin edges
+            or a method to find the optimal set of bin edges, e.g. 'auto', 'fd',
+            'scott' etc. For more documentation on these approaches see the
+            :class:`numpy:numpy.histogram_bin_edges` documentation. Default is 20.
         bin_range: tuple, optional
             The lower and upper range of the bins.
             Default is the minimum and maximum values of the continuous data.
-        normed : bool, optional
-            Controls normalization behavior.  If `True` or `'integral'`, then
-            `density=True` is passed to np.histogram, and the distribution
-            is normalized such that the integral is unity.  If `False`,
-            then the frequencies will be raw counts. If `'height'`, then the
+        normed : str or bool, optional
+            Controls normalization behavior.  If ``True`` or ``'integral'``, then
+            ``density=True`` is passed to np.histogram, and the distribution
+            is normalized such that the integral is unity.  If ``False``,
+            then the frequencies will be raw counts. If ``'height'``, then the
             frequencies are normalized such that the max bin height is unity.
             Default is False.
         cumulative: bool, optional
-            If True, then a histogram is computed where each bin gives the counts in that bin plus
-            all bins for smaller values. The last bin gives the total number of datapoints.
-            Default is False.
+            If True, then a histogram is computed where each bin gives the counts
+            in that bin plus all bins for smaller values. The last bin gives the
+            total number of data points. Default is False.
         kwds : optional
             Additional keywords arguments are documented in `hvplot.help('hist')`.
 
@@ -2312,8 +2324,9 @@ class hvPlot(hvPlotTabular):
             The data variable to plot
         colorbar: boolean
             Whether to display a colorbar
-        levels: int, optional
-            The number of contour levels. Default is 5
+        levels: int or list, optional
+            The number of contour lines to draw or a list of scalar values used
+            to specify the contour levels. Default is 5
         logz: bool, optional
             Whether to apply log scaling to the z-axis. Default is False
         **kwds : optional
@@ -2378,7 +2391,8 @@ class hvPlot(hvPlotTabular):
         colorbar: boolean
             Whether to display a colorbar
         levels: int, optional
-            The number of contour levels. default is 5
+            The number of contour lines to draw or a list of scalar values used
+            to specify the contour levels. Default is 5
         logz: bool, optional
             Whether to apply log scaling to the z-axis. Default is False
         **kwds : optional
