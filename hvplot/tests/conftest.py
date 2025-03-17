@@ -1,5 +1,6 @@
-from packaging.version import Version
 import dask
+
+from packaging.version import Version
 
 optional_markers = {
     'geo': {
