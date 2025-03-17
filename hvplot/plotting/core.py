@@ -1317,7 +1317,7 @@ class hvPlotTabular(hvPlotBase):
         """
         return self(kind='violin', x=None, y=y, by=by, **dict(kwds, hover=False))
 
-    def hist(self, y=None, by=None, **kwds):
+    def hist(self, y=None, by=None, bins=20, normed=False, cumulative=False, **kwds):
         """
         A `histogram` displays an approximate representation of the distribution of continuous data.
 
@@ -1331,17 +1331,24 @@ class hvPlotTabular(hvPlotBase):
         by : string or sequence
             Field(s) in the *long* data to group by.
         bins : int, optional
-            The number of bins
+            An explicit set of bin edges or a method to find the optimal
+            set of bin edges, e.g. 'auto', 'fd', 'scott' etc. For more
+            documentation on these approaches see the np.histogram_bin_edges
+            documentation. Default is 20
         bin_range: tuple, optional
-            The lower and upper range of the bins. Default is None.
+            The lower and upper range of the bins.
+            Default is the minimum and maximum values of the continuous data.
         normed : bool, optional
-            If True the distribution will sum to 1. Default is False.
+            Controls normalization behavior.  If `True` or `'integral'`, then
+            `density=True` is passed to np.histogram, and the distribution
+            is normalized such that the integral is unity.  If `False`,
+            then the frequencies will be raw counts. If `'height'`, then the
+            frequencies are normalized such that the max bin height is unity.
+            Default is False.
         cumulative: bool, optional
             If True, then a histogram is computed where each bin gives the counts in that bin plus
             all bins for smaller values. The last bin gives the total number of datapoints.
             Default is False.
-        alpha : float, optional
-            An alpha value between 0.0 and 1.0 to better visualize multiple fields. Default is 1.0.
         kwds : optional
             Additional keywords arguments are documented in `hvplot.help('hist')`.
 
@@ -1396,7 +1403,16 @@ class hvPlotTabular(hvPlotBase):
         - Seaborn: https://seaborn.pydata.org/generated/seaborn.histplot.html
         - Wiki: https://en.wikipedia.org/wiki/Histogram
         """
-        return self(kind='hist', x=None, y=y, by=by, **kwds)
+        return self(
+            kind='hist',
+            x=None,
+            y=y,
+            by=by,
+            bins=bins,
+            normed=normed,
+            cumulative=cumulative,
+            **kwds,
+        )
 
     def kde(self, y=None, by=None, **kwds):
         """
