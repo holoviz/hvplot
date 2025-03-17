@@ -123,6 +123,7 @@ def test_explorer_kwargs_controls():
     assert explorer.axes.width == 200
 
 
+@pytest.mark.usefixtures('disable_param_warnings_as_exceptions')
 def test_explorer_kwargs_controls_error_not_supported():
     with pytest.raises(
         TypeError,
@@ -391,6 +392,7 @@ def test_explorer_xarray_multi_var_extra_dims_no_coord():
     assert ds.hvplot.explorer()
 
 
+@pytest.mark.usefixtures('disable_param_warnings_as_exceptions')
 @pytest.mark.parametrize('kind_tuple', [('scatter', 'points'), ('line', 'paths')])
 @pytest.mark.geo
 def test_explorer_geo_revise_kind(kind_tuple):
@@ -399,6 +401,7 @@ def test_explorer_geo_revise_kind(kind_tuple):
     assert explorer.kind == kind_tuple[1]
 
 
+@pytest.mark.usefixtures('disable_param_warnings_as_exceptions')
 def test_max_rows_curve():
     N = 100001
     x = np.linspace(0.0, 6.4, num=N)
@@ -408,6 +411,7 @@ def test_max_rows_curve():
     assert ui._data.equals(df.head(MAX_ROWS))
 
 
+@pytest.mark.usefixtures('disable_param_warnings_as_exceptions')
 def test_max_rows_sample():
     N = 100001
     x = np.linspace(0.0, 6.4, num=N)

@@ -60,6 +60,7 @@ def test_help_style_extension_output(reset_default_backend):
     )
 
 
+@pytest.mark.usefixtures('disable_param_warnings_as_exceptions')
 def test_help_style_compatibility(reset_default_backend):
     # The current backend is plotly but the style options are those of matplotlib
     hvplot.extension('plotly', 'matplotlib', compatibility='matplotlib')
