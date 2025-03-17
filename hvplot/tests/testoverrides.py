@@ -2,6 +2,7 @@ from collections import OrderedDict
 
 import numpy as np
 import pandas as pd
+import pytest
 import xarray as xr
 
 from hvplot.plotting import hvPlot, hvPlotTabular
@@ -44,6 +45,7 @@ class TestOverrides(ComparisonTestCase):
         self.assertNotEqual(opts.options.get('width'), 42)
         self.assertNotEqual(opts.options.get('height'), 42)
 
+    @pytest.mark.usefixtures('disable_param_warnings_as_exceptions')
     def test_attempt_to_override_kind_on_method(self):
         hvplot = hvPlotTabular(self.df, {'scatter': {'kind': 'line'}})
         self.assertIsInstance(hvplot.scatter(y='y'), Scatter)
