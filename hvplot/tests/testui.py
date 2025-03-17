@@ -392,6 +392,7 @@ def test_explorer_xarray_multi_var_extra_dims_no_coord():
     assert ds.hvplot.explorer()
 
 
+@pytest.mark.usefixtures('disable_param_warnings_as_exceptions')
 @pytest.mark.parametrize('kind_tuple', [('scatter', 'points'), ('line', 'paths')])
 @pytest.mark.geo
 def test_explorer_geo_revise_kind(kind_tuple):
