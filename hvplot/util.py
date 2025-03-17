@@ -8,7 +8,8 @@ import textwrap
 import sys
 
 from collections.abc import Hashable
-from functools import wraps
+from contextlib import contextmanager
+from functools import lru_cache, wraps
 from importlib.util import find_spec
 from types import FunctionType
 
@@ -963,3 +964,78 @@ def _patch_doc(cls, kind, signature=None):
     docstring, signature = _get_doc_and_signature(cls, kind, False, signature=signature)
     method.__doc__ = docstring
     method.__signature__ = signature
+
+
+@lru_cache
+def _numpydoc_extra_sections():
+    from .converter import HoloViewsConverter
+
+    return list(HoloViewsConverter._docstring_sections.values())
+
+
+def _parse_numpydoc_patch(self):
+    self._doc.reset()
+    self._parse_summary()
+
+    sections = list(self._read_sections())
+    section_names = {section for section, content in sections}
+
+    has_returns = 'Returns' in section_names
+    has_yields = 'Yields' in section_names
+    # We could do more tests, but we are not. Arbitrarily.
+    if has_returns and has_yields:
+        msg = 'Docstring contains both a Returns and Yields section.'
+        raise ValueError(msg)
+    if not has_yields and 'Receives' in section_names:
+        msg = 'Docstring contains a Receives section but not Yields.'
+        raise ValueError(msg)
+
+    for section, content in sections:
+        if not section.startswith('..'):
+            section = (s.capitalize() for s in section.split(' '))
+            section = ' '.join(section)
+            if self.get(section):
+                self._error_location(
+                    'The section %s appears twice in  %s'  # noqa
+                    % (section, '\n'.join(self._doc._str))  # noqa
+                )
+
+        # Patch is here, extending the sections with these other options
+        if section in ('Parameters', 'Other Parameters', 'Attributes', 'Methods') + tuple(
+            _numpydoc_extra_sections()
+        ):
+            self[section] = self._parse_param_list(content)
+        elif section in ('Returns', 'Yields', 'Raises', 'Warns', 'Receives'):
+            self[section] = self._parse_param_list(content, single_element_is_type=True)
+        elif section.startswith('.. index::'):
+            self['index'] = self._parse_index(section, content)
+        elif section == 'See Also':
+            self['See Also'] = self._parse_see_also(content)
+        else:
+            self[section] = content
+
+
+@contextmanager
+def _patch_numpy_docstring():
+    from numpydoc.docscrape import NumpyDocString
+
+    old_parse = NumpyDocString._parse
+    old_sections = NumpyDocString.sections
+    NumpyDocString._parse = _parse_numpydoc_patch
+    # Extend
+    for option_group in _numpydoc_extra_sections():
+        NumpyDocString.sections[option_group] = []
+    try:
+        yield
+    finally:
+        NumpyDocString._parse = old_parse
+        NumpyDocString.sections = old_sections
+
+
+def _get_docstring_group_parameters(option_group: str) -> list:
+    from numpydoc.docscrape import NumpyDocString
+    from .converter import HoloViewsConverter
+
+    with _patch_numpy_docstring():
+        cdoc = NumpyDocString(HoloViewsConverter.__doc__)
+        return cdoc[option_group]

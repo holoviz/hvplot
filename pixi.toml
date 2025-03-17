@@ -163,6 +163,7 @@ xarray = "*"
 # bokeh_sampledata = "*" (only available starting from Python 3.10)
 psutil = "*"
 cftime = "*"
+numpydoc = "*"
 
 [feature.test-example.dependencies]
 # Dependencies required to run the examples notebooks.

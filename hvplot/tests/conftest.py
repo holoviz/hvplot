@@ -1,5 +1,12 @@
-from packaging.version import Version
 import dask
+import param
+import pytest
+
+from packaging.version import Version
+
+param.parameterized.warnings_as_exceptions = True
+
+from packaging.version import Version
 
 optional_markers = {
     'geo': {
@@ -42,3 +49,13 @@ if Version(dask.__version__).release < (2025, 1, 0):
     # From Dask 2024.3.0 they now use `dask_expr` by default
     # https://github.com/dask/dask/issues/10995
     dask.config.set({'dataframe.query-planning': False})
+
+
+@pytest.fixture
+def disable_param_warnings_as_exceptions():
+    original = param.parameterized.warnings_as_exceptions
+    param.parameterized.warnings_as_exceptions = False
+    try:
+        yield
+    finally:
+        param.parameterized.warnings_as_exceptions = original
