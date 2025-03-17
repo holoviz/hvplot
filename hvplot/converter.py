@@ -125,134 +125,137 @@ class HoloViewsConverter:
     """
     Data Options
     ------------
-    attr_labels (default=None): bool
+    attr_labels : bool or None, default=None
         Whether to use an xarray object's attributes as labels, defaults to
         None to allow best effort without throwing a warning. Set to True
         to see warning if the attrs can't be found, set to False to disable
         the behavior.
-    by (default=None): str or list of str
+    by : str or list of str or None, default=None
         Dimension(s) by which to group the data categories.
-        An NdOverlay is returned by default unless `subplots=True`, then an NdLayout is returned.
-    dynamic (default=True):
+        An NdOverlay is returned by default unless ``subplots=True``, then an NdLayout is returned.
+    dynamic : bool, default=True
         Whether to return a dynamic plot which sends updates on widget and
         zoom/pan events or whether all the data should be embedded
         (warning: for large groupby operations embedded data can become
         very large if dynamic=False)
-    fields (default={}): dict
+    fields : dict, default={}
         A dictionary of fields for renaming or transforming data dimensions.
-    groupby (default=None): str or list
+    groupby : str or list or None, default=None
         Dimension(s) by which to group data, enabling widgets.
-        Returns a DynamicMap if `dynamic=True`, else returns a HoloMap.
-        See :paramref:`dynamic` for more information.
-    group_label (default=None): str
+        Returns a DynamicMap if ``dynamic=True``, else returns a HoloMap.
+        See ``dynamic`` for more information.
+    group_label : str or None, default=None
         Label for grouped data, typically in legends or axis labels.
-    kind (default='line'): str
+    kind : str, default='line'
         The type of plot to generate.
-    label (default=None): str
+    label : str or None, default=None
         Label for the data, typically used in the plot title or legends.
-    persist (default=False): boolean
+    persist : bool, default=False
         Whether to persist the data in memory when using dask.
-    robust: bool
+    robust : bool or None, default=None
         If True and clim are absent, the colormap range is computed
         with 2nd and 98th percentiles instead of the extreme values
         for image elements. For RGB elements, clips the "RGB", or
         raw reflectance values between 2nd and 98th percentiles.
         Follows the same logic as xarray's robust option.
-    row (default=None): str
+    row : str or None, default=None
         Column name to use for splitting the plot into separate subplots by rows.
-    col (default=None): str
+    col : str or None, default=None
         Column name to use for splitting the plot into separate subplots by columns.
-    sort_date (default=True): bool
+    sort_date : bool, default=True
         Whether to sort the x-axis by date before plotting
-    subplots (default=False): boolean
-        Whether to display data in separate subplots when using the `by` parameter.
-    symmetric (default=None): bool
+    subplots : bool, default=False
+        Whether to display data in separate subplots when using the ``by`` parameter.
+    symmetric : bool or None, default=None
         Whether the data are symmetric around zero. If left unset, the data
         will be checked for symmetry as long as the size is less than
         ``check_symmetric_max``.
-    check_symmetric_max (default=1000000):
+    check_symmetric_max : int, default=1000000
         Size above which to stop checking for symmetry by default on the data.
-    transforms (default={}): dict
+    transforms : dict, default={}
         A dictionary of HoloViews dim transforms to apply before plotting
-    use_dask (default=False): boolean
+    use_dask : bool, default=False
         Whether to use dask for processing the data, helpful for large datasets that do not fit into memory.
-    use_index (default=True): boolean
+    use_index : bool, default=True
         Whether to use the data's index for the x-axis by default.
-        if `hover_cols == 'all', adds the index to the hover tools.
-    value_label (default='value'): str
+        if ``hover_cols == 'all'``, adds the index to the hover tools.
+    value_label : str, default='value'
         Label for the data values, typically used for the y-axis or in legends.
 
-    Geographic options
+    Geographic Options
     ------------------
-    coastline (default=False):
+    coastline : bool, default=False
         Whether to display a coastline on top of the plot, setting
         coastline='10m'/'50m'/'110m' specifies a specific scale.
-    crs (default=None):
+    crs : str or int or pyproj.CRS or pyproj.Proj or cartopy.CRS or None
         Coordinate reference system of the data (input projection) specified as a string
         or integer EPSG code, a CRS or Proj pyproj object, a Cartopy
         CRS object or class name, a WKT string, or a proj.4 string.
         Defaults to PlateCarree.
-    features (default=None): dict or list
+    features : dict or list or None, default=None
         A list of features or a dictionary of features and the scale
         at which to render it. Available features include 'borders',
         'coastline', 'lakes', 'land', 'ocean', 'rivers' and 'states'.
         Available scales include '10m'/'50m'/'110m'.
-    geo (default=False):
+    geo : bool, default=False
         Whether the plot should be treated as geographic (and assume
         PlateCarree, i.e. lat/lon coordinates).
-    global_extent (default=False):
+    global_extent : bool, default=False
         Whether to expand the plot extent to span the whole globe.
-    project (default=False):
+    project : bool, default=False
         Whether to project the data before plotting (adds initial
         overhead but avoids projecting data when plot is dynamically
         updated).
-    projection (default=None): str or Cartopy CRS
+    projection : str or int or pyproj.CRS or pyproj.Proj or cartopy.CRS or bool or None
         Coordinate reference system of the plot (output projection) specified as a string
         or integer EPSG code, a CRS or Proj pyproj object, a Cartopy
         CRS object or class name, a WKT string, or a proj.4 string.
         Defaults to PlateCarree.
-    tiles (default=False):
+    tiles : bool or str or xyzservices.TileProvider or holoviews.Tiles or geoviews.WMTS or None, default=False
         Whether to overlay the plot on a tile source. If coordinate values fall within
-        lat/lon bounds, auto-projects to EPSG:3857, unless `projection=False`.
-        - `True`: OpenStreetMap layer
-        - `xyzservices.TileProvider` instance (requires xyzservices to
-           be installed)
+        lat/lon bounds, auto-projects to EPSG:3857, unless ``projection=False``:
+
+        - ``True``: OpenStreetMap layer
+        - ``xyzservices.TileProvider`` instance (requires xyzservices to
+          be installed)
         - a map string name based on one of the default layers made
           available by HoloViews or GeoViews.
-        - a `holoviews.Tiles` or `geoviews.WMTS` instance or class
-    tiles_opts (default=None): dict
-        Options to customize the tiles layer created when `tiles` is set,
-        e.g. `dict(alpha=0.5)`.
+        - a ``holoviews.Tiles`` or ``geoviews.WMTS`` instance or class
+    tiles_opts : dict or None, default=None
+        Options to customize the tiles layer created when ``tiles`` is set,
+        e.g. ``dict(alpha=0.5)``.
 
-    Size and Layout options
+    Size And Layout Options
     -----------------------
-    fontscale: number
+    fontscale : number
         Scales the size of all fonts by the same amount, e.g. fontscale=1.5
         enlarges all fonts (title, xticks, labels etc.) by 50%
-    frame_width/frame_height: int
+    frame_width/frame_height : int
         The width and height of the data area of the plot
-    max_width/max_height: int
+    max_width/max_height : int
         The maximum width and height of the plot for responsive modes
-    min_width/min_height: int
+    min_width/min_height : int
         The minimum width and height of the plot for responsive modes
-    width (default=700)/height (default=300): int
-        The width and height of the plot in pixels
-    padding: number or tuple
+    height : int, default=300
+        The height of the plot in pixels
+    width : int, default=700
+        The width of the plot in pixels
+    padding : number or tuple
         Fraction by which to increase auto-ranged extents to make
         datapoints more visible around borders. Supports tuples to
         specify different amount of padding for x- and y-axis and
         tuples of tuples to specify different amounts of padding for
         upper and lower bounds.
-    responsive: boolean
+    responsive : bool, default=False
         Whether the plot should responsively resize depending on the
         size of the browser. Responsive mode will only work if at
         least one dimension of the plot is left undefined, e.g. when
         width and height or width and aspect are set the plot is set
         to a fixed size, ignoring any responsive option.
 
-    Axis options
+    Axis Options
     ------------
-    aspect (default=None): str or float
+    aspect : str or float or None, default=None
         The aspect ratio mode of the plot. By default, a plot may
         select its own appropriate aspect ratio but sometimes it may
         be necessary to force a square aspect ratio (e.g. to display
@@ -260,197 +263,205 @@ class HoloViewsConverter:
         'equal' correspond to the axis modes of the same name in
         matplotlib, a numeric value specifying the ratio between plot
         width and height may also be passed. To control the aspect
-        ratio between the axis scales use the `data_aspect` option
+        ratio between the axis scales use the ``data_aspect`` option
         instead.
-    data_aspect (default=None): float
+    data_aspect : float or None, default=None
         Defines the aspect of the axis scaling, i.e. the ratio of
         y-unit to x-unit.
-    autorange (default=None): Literal['x', 'y'] | None
+    autorange : Literal['x', 'y'] or None, default=None
         Whether to enable auto-ranging along the x- or y-axis when
         zooming. Requires HoloViews >= 1.16.
-    flip_xaxis/flip_yaxis: boolean
+    flip_xaxis/flip_yaxis : bool or None, default=None
         Whether to flip the axis left to right or up and down respectively
-    framewise (default=True): boolean
+    framewise : bool, default=True
         Whether to compute the axis ranges frame-by-frame when using dynamic plots.
-    invert (default=False): boolean
+    invert : bool, default=False
         Swaps x- and y-axis
-    logx/logy (default=False): boolean
+    logx/logy : bool, default=False
         Enables logarithmic x- and y-axis respectively
-    logz (default=False): boolean
-        Enables logarithmic colormapping
-    loglog (default=False): boolean
+    loglog : bool or None, default=None
         Enables logarithmic x- and y-axis
-    rot: number
+    rot : number or None, default=None
         Rotates the axis ticks along the x-axis by the specified
         number of degrees.
-    shared_axes (default=True): boolean
+    shared_axes : bool, default=True
         Whether to link axes between plots
-    subcoordinate_y: bool or dict
+    subcoordinate_y : bool or dict or None, default=None
        Whether to enable sub-coordinate y systems for this plot. Accepts also a
        dictionary of related options to pass down to HoloViews,
-       e.g. `{'subcoordinate_scale': 2}`.
-    title (default=''): str
+       e.g. ``{'subcoordinate_scale': 2}``.
+    title : str or None, default=None
         Title for the plot
-    xaxis/yaxis: str or None
+    xaxis/yaxis : str or None
         Whether to show the x/y-axis and whether to place it at the
         'top'/'bottom' and 'left'/'right' respectively.
-    xformatter/yformatter (default=None): str or TickFormatter
+    xformatter/yformatter : str or bokeh.TickFormatter or None, default=None
         Formatter for the x-axis and y-axis (accepts printf formatter,
         e.g. '%.3f', and bokeh TickFormatter)
-    xlabel/ylabel/clabel (default=None): str
+    xlabel/ylabel/clabel : str or None, default=None
         Axis labels for the x-axis, y-axis, and colorbar
-    xlim/ylim (default=None): tuple or list
+    xlim/ylim : tuple or list or None, default=None
         Plot limits of the x- and y-axis
-    xticks/yticks/cticks (default=None): int or list
+    xticks/yticks/cticks : int or list or None, default=None
         Ticks along x-axis, y-axis, and colorbar specified as an integer, list of
         ticks positions, or list of tuples of the tick positions and labels
 
-    Grid and Legend options
+    Grid And Legend Options
     -----------------------
-    colorbar (default=False): boolean
-        Enables a colorbar
-    grid (default=False): boolean
+    colorbar : bool or None, default=None
+        Enables a colorbar. Enabled by default for these plots: bivariate,
+        contour, contourf, heatmap, image, hexbin, quadmesh, polygons. Enabled
+        by default for rasterized plots.
+    grid : bool or None, default=None
         Whether to show a grid
-    legend (default=True): boolean or str
+    legend : bool or str or None, default=None
         Whether to show a legend, or a legend position
         ('top', 'bottom', 'left', 'right')
 
-    Interactivity options
+    Interactivity Options
     ---------------------
-    hover : boolean
+    hover : bool or None, default=None
         Whether to show hover tooltips, default is True unless datashade is
         True in which case hover is False by default
-    hover_cols (default=[]): list or str
+    hover_cols : list or str, default=[]
         Additional columns to add to the hover tool or 'all' which will
         includes all columns (including indexes if use_index is True).
-    hover_formatters:
+    hover_formatters : dict or None, default=None
         A dict of formatting options for the hover tooltip.
-    hover_tooltips: list[str] or list[tuple]
+    hover_tooltips : list[str] or list[tuple] or None, default=None
         A list of dimensions to be displayed in the hover tooltip.
-    tools (default=[]): list
+    tools : list, default=[]
         List of tool instances or strings (e.g. ['tap', 'box_select'])
 
-    Style options
+    Style Options
     -------------
-    bgcolor (default=None): str
+    bgcolor : str or None, default=None
         Background color of the data area of the plot
-    color: str, list or column name, optional
+    color : str or list or column name or None, default=None
         Defines the color(s) to use for the plot. Accepts:
         - a single color name (e.g., 'red', 'blue')
         - a HEX color code (e.g., '#ff5733')
         - a list of colors for multiple elements
         - a column name from the dataset to map colors based on values.
-    c: str or list or column name, optional
-        Alias for `color`. If both `color` and `c` are provided,
-        the `color` keyword takes precedence.
-    cmap: str, list, dict, or colormap object, optional
+    c : str or list or column name or None, default=None
+        Alias for ``color``. If both ``color`` and ``c`` are provided,
+        the ``color`` keyword takes precedence.
+    cmap : str or list or dict or colormap object or None, default=None
         The colormap to use for continuous or categorical color mapping.
+
         Accepts:
+
         - a predefined colormap name from Bokeh, Matplotlib, or Colorcet (e.g., 'viridis', 'plasma')
         - a list of named colors or HEX color codes.
         - a dictionary mapping categories to colors for discrete colormaps.
         - A colormap object from HoloViews or Matplotlib.
+
         If not specified, a default colormap is automatically chosen based on the data type:
-        - Linear data: Uses the `kbc_r` colormap.
-        - Categorical data: Uses `glasbey_category10` colormap from Colorcet.
-        - Cyclic data: Uses `colorwheel` colormap.
-        - Diverging data: Uses `coolwarm` colormap.
-        You can override these defaults by explicitly setting `cmap=<colormap_name>`.
-        Only one of `cmap`, `colormap`, or `color_key` can be specified at a time.
-    colormap: str, list, or colormap object, optional
-        Alias for `cmap`. The colormap to apply when applying color mapping.
+
+        - Linear data: Uses the ``kbc_r`` colormap.
+        - Categorical data: Uses ``glasbey_category10`` colormap from Colorcet.
+        - Cyclic data: Uses ``colorwheel`` colormap.
+        - Diverging data: Uses ``coolwarm`` colormap.
+
+        You can override these defaults by explicitly setting ``cmap=<colormap_name>``.
+        Only one of ``cmap``, ``colormap``, or ``color_key`` can be specified at a time.
+    colormap : str or list  or colormap object or None, default=None
+        Alias for ``cmap``. The colormap to apply when applying color mapping.
         Accepts the same values as `cmap`. See `cmap` for more details.
-        Only one of `cmap`, `colormap`, or `color_key` can be specified at a time.
-    color_key: str, list, or dict, optional
+        Only one of ``cmap``, ``colormap``, or ``color_key`` can be specified at a time.
+    color_key : str or list or dict or None, default=None
         Defines a categorical colormap for datashaded plots where distinct
         colors must be assigned to different categories. The number of colors
         must match or exceed the number of unique categories in the dataset.
-        Only one of `cmap`, `colormap`, or `color_key` can be specified at a time.
-    clim: tuple
+        Only one of ``cmap``, ``colormap``, or ``color_key`` can be specified at a time.
+    clim : tuple or None, default=None
         Lower and upper bound of the color scale
-    cnorm (default='linear'): str
+    cnorm : str, default='linear'
         Color scaling which must be one of 'linear', 'log' or 'eq_hist'
-    fontsize: number or dict
+    fontsize : number or dict or None, default=None
         Set title, label and legend text to the same fontsize. Finer control
         by using a dict: {'title': '15pt', 'ylabel': '5px', 'ticks': 20}
-    rescale_discrete_levels (default=True): boolean
-        If `cnorm='eq_hist'` and there are only a few discrete values,
-        then `rescale_discrete_levels=True` (the default) decreases
+    rescale_discrete_levels : bool or None, default=None
+        If ``cnorm='eq_hist'`` and there are only a few discrete values,
+        then ``rescale_discrete_levels=True`` (the default) decreases
         the lower limit of the autoranged span so that the values are
-        rendering towards the (more visible) top of the `cmap` range,
+        rendering towards the (more visible) top of the ``cmap`` range,
         thus avoiding washout of the lower values.  Has no effect if
-        `cnorm!=`eq_hist`.
+        ``cnorm!=`eq_hist``.
 
-    Resampling options
+    Resampling Options
     ------------------
-    aggregator (default=None):
+    aggregator : str datashader.Reduction or None, default=None
         Aggregator to use when applying rasterize or datashade operation
         (valid options include 'mean', 'count', 'min', 'max' and more, and
         datashader reduction objects)
-    datashade (default=False):
+    datashade : bool, default=False
         Whether to apply rasterization and shading (colormapping) using
         the Datashader library, returning an RGB object instead of
         individual points
-    downsample (default=False):
+    downsample : bool or str or None, default=None
         Controls the application of downsampling to the plotted data,
         which is particularly useful for large timeseries datasets to
         reduce the amount of data sent to browser and improve
         visualization performance. Requires HoloViews >= 1.16. Additional
-        dependencies: Installing the `tsdownsample` library is required
+        dependencies: Installing the ``tsdownsample`` library is required
         for using any downsampling methods other than the default 'lttb'.
+
         Acceptable values:
+
         - False: No downsampling is applied.
         - True: Applies downsampling using HoloViews' default algorithm
-            (LTTB - Largest Triangle Three Buckets).
+          (LTTB - Largest Triangle Three Buckets).
         - 'lttb': Explicitly applies the Largest Triangle Three Buckets
           algorithm.
         - 'minmax': Applies the MinMax algorithm, selecting the minimum
-          and maximum values in each bin. Requires `tsdownsample`.
+          and maximum values in each bin. Requires ``tsdownsample``.
         - 'm4': Applies the M4 algorithm, selecting the minimum, maximum,
-          first, and last values in each bin. Requires `tsdownsample`.
+          first, and last values in each bin. Requires ``tsdownsample``.
         - 'minmax-lttb': Combines MinMax and LTTB algorithms for
           downsampling, first applying MinMax to reduce to a preliminary
           set of points, then LTTB for further reduction. Requires
-          `tsdownsample`.
+          ``tsdownsample``.
+
         Other string values corresponding to supported algorithms in
         HoloViews may also be used.
-    dynspread (default=False):
+    dynspread : bool, default=False
         For plots generated with datashade=True or rasterize=True,
         automatically increase the point size when the data is sparse
         so that individual points become more visible
-    max_px (default=3): int
-        The maximum size in pixels for dynamically spreading elements in sparse data using `dynspread`.
+    max_px : int, default=3
+        The maximum size in pixels for dynamically spreading elements in sparse data using ``dynspread``.
         This helps to increase the visibility of sparse data points.
-    pixel_ratio (default=None):
+    pixel_ratio : number or None, default=None
        Pixel ratio applied to the height and width, used when rasterizing or
        datashading. When not set explicitly, the ratio is automatically
        obtained from the browser device pixel ratio. Default is 1 when
        the browser information is not available. Useful when the browser
        information is not available (pixel_ratio=2 can give better results on
        Retina displays) or for using lower resolution for speed.
-    precompute (default=False): boolean
-        Whether to precompute aggregations when using `rasterize` or `datashade`.
-    rasterize (default=False):
+    precompute : bool, default=False
+        Whether to precompute aggregations when using ``rasterize`` or ``datashade``.
+    rasterize : bool, default=False
         Whether to apply rasterization using the Datashader library,
         returning an aggregated Image (to be colormapped by the
         plotting backend) instead of individual points
-    resample_when (default=None):
+    resample_when : int, default=None
         Applies a resampling operation (datashade, rasterize or downsample) if
         the number of individual data points present in the current zoom range
         is above this threshold. The raw plot is displayed otherwise.
-    threshold (default=0.5): float
-        When using `dynspread`, this value defines the minimum density of overlapping points
+    threshold : float, default=0.5
+        When using ``dynspread``, this value defines the minimum density of overlapping points
         required before the spreading operation is applied.
         Values between 0 and 1, where 1 means always spread and 0 means never spread.
-    x_sampling/y_sampling (default=None):
+    x_sampling/y_sampling : number or None, default=None:
         Specifies the smallest allowed sampling interval along the x/y axis.
         Used when rasterizing or datashading.
 
-    Streaming options
+    Streaming Options
     -----------------
-    backlog (default=1000): int
+    backlog : int, default=1000
         Maximum number of rows to keep in the stream buffer when using a streaming data source.
-    stream (default=None): holoviews.streams.Stream or None
+    stream : holoviews.streams.Stream or None, default=None
         A stream object for streaming plots, allowing data updates without re-rendering the entire plot.
     """
 
@@ -591,6 +602,30 @@ class HoloViewsConverter:
         'backlog',
         'stream',
     ]
+
+    _docstring_sections = {
+        'data': 'Data Options',
+        'geographic': 'Geographic Options',
+        'size_layout': 'Size And Layout Options',
+        'axis': 'Axis Options',
+        'grid_legend': 'Grid And Legend Options',
+        'interactivity': 'Interactivity Options',
+        'style': 'Style Options',
+        'resampling': 'Resampling Options',
+        'streaming': 'Streaming Options',
+    }
+
+    _options_groups = {
+        'data': _data_options,
+        'geographic': _geo_options,
+        'size_layout': _size_layout_options,
+        'axis': _axis_config_options,
+        'grid_legend': _grid_legend_options,
+        'interactivity': _interactivity_options,
+        'style': _style_options,
+        'resampling': _resample_options,
+        'streaming': _stream_options,
+    }
 
     # Options specific to a particular plot type
     _kind_options = {
@@ -941,12 +976,7 @@ class HoloViewsConverter:
         for axis_name in ['xaxis', 'yaxis']:
             if axis_name in kwds:
                 axis = kwds.pop(axis_name)
-                if not axis:
-                    plot_opts[axis_name] = None
-                elif not axis:
-                    plot_opts[axis_name] = axis
-                elif axis_name in plot_opts:
-                    plot_opts.pop(axis_name, None)
+                plot_opts[axis_name] = axis or None
 
         if flip_xaxis:
             plot_opts['invert_xaxis'] = True

@@ -212,9 +212,32 @@ The documentation can be built with the command:
 pixi run docs-build
 ```
 
-As hvPlot uses notebooks for much of the documentation, this takes a little while. You can disable building the gallery by setting the environment variable `HVPLOT_REFERENCE_GALLERY` to `false`.
+As hvPlot uses notebooks for much of the documentation, this takes a little while. You can disable:
+
+- Executing all the notebooks by setting the environment variable `HVPLOT_EXECUTE_NBS` to `false`
+- Building the gallery with `HVPLOT_REFERENCE_GALLERY="false"`
+- Running the user guide notebooks with `HVPLOT_EXECUTE_NBS_USER_GUIDE="false"`
+- Running the getting started notebooks with `HVPLOT_EXECUTE_NBS_GETTING_STARTED="false"`
 
 A development version of hvPlot can be found [here](https://holoviz-dev.github.io/hvplot/). You can ask a maintainer if they want to make a dev release for your PR, but there is no guarantee they will say yes.
+
+### Link to hvPlot objects
+
+```md
+{meth}`hvplot.hvPlot.scatter`
+{meth}`<obj>.scatter() <hvplot.hvPlot.scatter>`
+```
+
+### Intersphinx
+
+The Sphinx Intersphinx extension allows linking to references in other projects that use this extension. For example:
+
+1. Run this command to find all the references of the HoloViews site `python -m sphinx.ext.intersphinx https://holoviews.org/objects.inv`
+2. Extend `intersphinx_mapping` in `conf.py`
+3. Link to the `Scatter` element with:
+```md
+:class:`holoviews:holoviews.element.Scatter`
+```
 
 ## Build
 
