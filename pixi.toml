@@ -224,7 +224,10 @@ channels = [
     "pyviz/label/tooling_dev",
     "conda-forge"
 ]
-dependencies = {nbsite = ">=0.8.6", sphinxext-rediraffe = "*"}
+[feature.doc.dependencies]
+nbsite = ">=0.8.6"
+sphinxext-rediraffe = "*"
+numpydoc = "*"
 
 [feature.doc.activation.env]
 MOZ_HEADLESS = "1"
