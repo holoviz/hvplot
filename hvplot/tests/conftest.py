@@ -1,5 +1,9 @@
-from packaging.version import Version
 import dask
+import param
+
+from packaging.version import Version
+
+param.parameterized.warnings_as_exceptions = True
 
 optional_markers = {
     'geo': {
