@@ -6,8 +6,6 @@ from packaging.version import Version
 
 param.parameterized.warnings_as_exceptions = True
 
-from packaging.version import Version
-
 optional_markers = {
     'geo': {
         'help': 'Run the tests that require GeoViews',
