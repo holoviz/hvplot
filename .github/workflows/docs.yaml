@@ -79,7 +79,7 @@ jobs:
 
   pip_build_docs:
     name: Build Documentation (pip)
-    runs-on: 'macos-latest'
+    runs-on: 'ubuntu-latest'
     timeout-minutes: 120
     env:
       DESC: "Documentation build"
