@@ -30,14 +30,15 @@ def parallel_coordinates(
 
     Parameters
     ----------
-    frame: DataFrame
-    class_column: str
+    frame : DataFrame
+        The DataFrame to be plotted.
+    class_column : str
         Column name containing class names
-    cols: list, optional
+    cols : list, optional
         A list of column names to use
-    alpha: float, optional
+    alpha : float, optional
         The transparency of the lines
-    cmap/colormap: str or colormap object
+    cmap/colormap : str or colormap object
         Colormap to use for groups
 
     Returns

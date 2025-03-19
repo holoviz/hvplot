@@ -62,6 +62,7 @@ html_logo = '_static/logo_horizontal.svg'
 html_favicon = '_static/favicon.ico'
 
 extensions += [  # noqa
+    'sphinx.ext.autosummary',
     'nbsite.gallery',
     'nbsite.analytics',
     'nbsite.nb_interactivity_warning',
@@ -69,6 +70,7 @@ extensions += [  # noqa
     'sphinxext.rediraffe',
     'numpydoc',
     # Custom extensions
+    'backend_styling_options',
     'plotting_options_table',
 ]
 
@@ -169,3 +171,18 @@ if os.getenv('HVPLOT_EXECUTE_NBS_GETTING_STARTED') in ('False', 'false', '0'):
 
 if os.getenv('HVPLOT_EXECUTE_NBS') in ('False', 'false', '0'):
     nb_execution_mode = 'off'
+
+# We replace the automatically generated stub files by notebooks
+# that include the API ref and some examples.
+autosummary_generate = False
+autosummary_generate_overwrite = False
+
+intersphinx_mapping = {
+    'holoviews': ('https://holoviews.org/', None),
+    'pandas': (
+        'https://pandas.pydata.org/pandas-docs/stable/',
+        'https://pandas.pydata.org/pandas-docs/stable/objects.inv',
+    ),
+}
+# See https://docs.readthedocs.com/platform/stable/guides/intersphinx.html
+intersphinx_disabled_reftypes = ['*']
