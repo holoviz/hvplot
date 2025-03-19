@@ -236,7 +236,7 @@ MPLBACKEND = "Agg"
 DISPLAY = ":99.0"
 
 [feature.doc.tasks]
-docs-build-sphinx = 'sphinx-build -b html doc builtdocs'
+docs-build-sphinx = 'sphinx-build -j auto -b html doc builtdocs'
 _docs-install = 'python -m pip install --no-deps --disable-pip-version-check -e .'
 # Depends on _docs-install instead of install as install
 # in the default environment
