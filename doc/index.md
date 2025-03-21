@@ -420,7 +420,7 @@ align: center
 :hidden:
 :maxdepth: 2
 
-Getting Started <getting_started/index>
+Tutorials <tutorials/index>
 User Guide <user_guide/index>
 Reference Gallery <reference/index>
 Topics <topics>
