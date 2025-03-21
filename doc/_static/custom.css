@@ -20,3 +20,31 @@
     border: 0px;
     vertical-align: top;
 }
+
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+.card {
+    flex: 1 1 calc(25% - 1rem);
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: scale(1.02);
+}
+
+.card a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    height: 100%;
+}
