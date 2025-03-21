@@ -2,32 +2,32 @@
 
 Welcome to the Tutorials section. Here, you will find clear, step-by-step guides to help you master hvPlot and explore the full holoviz ecosystem. Whether you’re just starting out, coming from pandas or xarray, or looking to sharpen your skills, these tutorials offer practical examples and hands-on learning to explore and transform your data into compelling visualizations.
 
-<div class="card-container">
-  <div class="card">
-    <a href="getting_started.html">
-      <h4>Getting Started</h4>
-      <p>Learn how to get started with hvPlot using this quick tutorial.</p>
-    </a>
-  </div>
-  <div class="card">
-    <a href="#">
-      <h4>Coming From Pandas?</h4>
-      <p>Learn how hvPlot mirrors the pandas API.</p>
-    </a>
-  </div>
-  <div class="card">
-    <a href="#">
-      <h4>hvPlot for Xarray users</h4>
-      <p>Learn how to use hvPlot to explore your Xarray data.</p>
-    </a>
-  </div>
-  <div class="card">
-    <a href="https://holoviz.org/tutorial/index.html">
-      <h4>Holoviz Tutorial</h4>
-      <p>Explore all the holoviz tools in this comprehensive tutorial.</p>
-    </a>
-  </div>
-</div>
+::::{grid} 1 2 2 3
+:gutter: 1 1 1 2
+
+:::{grid-item-card} {octicon}`book;2.5em;sd-mr-1 sd-animate-grow50` Getting Started
+:link: getting_started
+:link-type: doc
+
+Learn how to get started with hvPlot using this quick tutorial.
+:::
+
+:::{grid-item-card} {octicon}`repo-template;2.5em;sd-mr-1 sd-animate-grow50` Coming From Pandas?
+
+Learn how hvPlot mirrors the pandas API.
+:::
+
+:::{grid-item-card} {octicon}`repo-template;2.5em;sd-mr-1 sd-animate-grow50` hvPlot for Xarray Users
+
+Learn how to use hvPlot to explore your Xarray data.
+:::
+
+:::{grid-item-card} {octicon}`link;2.5em;sd-mr-1 sd-animate-grow50` Holoviz Tutorial
+:link: https://holoviz.org/tutorial/index.html
+
+Explore all the holoviz tools in this comprehensive tutorial.
+:::
+::::
 
 ```{toctree}
 :titlesonly:
