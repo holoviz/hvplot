@@ -2,13 +2,18 @@
 Provides utilities to convert data and projections
 """
 
+import inspect
+import itertools
+import textwrap
 import sys
 
 from collections.abc import Hashable
-
-from functools import wraps
-from packaging.version import Version
+from contextlib import contextmanager
+from functools import lru_cache, wraps
+from importlib.util import find_spec
 from types import FunctionType
+
+from packaging.version import Version
 
 import bokeh
 import numpy as np
@@ -48,6 +53,14 @@ def get_ipy():
     except NameError:
         ip = None
     return ip
+
+
+def _in_ipython():
+    try:
+        get_ipython  # noqa
+        return True
+    except NameError:
+        return False
 
 
 def check_crs(crs):
@@ -771,3 +784,258 @@ def is_mpl_cmap(obj):
     from matplotlib.colors import LinearSegmentedColormap
 
     return isinstance(obj, LinearSegmentedColormap)
+
+
+def _parse_docstring_sections(docstring: str) -> dict[str, str]:
+    """Used to parse the docstring that contains all the plot options."""
+    docstring = docstring.strip()
+    if docstring.startswith('"""') and docstring.endswith('"""'):
+        docstring = docstring[3:-3].strip()
+
+    lines = docstring.splitlines()
+    section_headers = []
+
+    for i, line in enumerate(lines):
+        if (
+            i < len(lines) - 1
+            and set(lines[i + 1].strip()) == {'-'}
+            and len(lines[i + 1].strip()) >= 3
+        ):
+            section_headers.append((i, line.strip()))
+
+    sections = {}
+    for i, section_header in enumerate(section_headers):
+        start_line = section_headers[i][0]
+        if i == len(section_headers) - 1:
+            section_text = '\n'.join(lines[start_line:])
+        else:
+            end_line = section_headers[i + 1][0]
+            section_text = '\n'.join(lines[start_line:end_line])
+        sections[section_header[1]] = section_text.strip()
+    return sections
+
+
+_METHOD_DOCS = {}
+
+
+def _get_doc_and_signature(
+    cls, kind, completions=False, docstring=True, generic=True, style=True, signature=None
+):
+    from .converter import HoloViewsConverter
+    from .utilities import hvplot_extension
+
+    converter = HoloViewsConverter
+    method = getattr(cls, kind)
+    kind_opts = converter._kind_options.get(kind, [])
+    eltype = converter._kind_mapping[kind]
+
+    formatter = ''
+    if completions:
+        formatter = 'hvplot.{kind}({completions})'
+    if docstring:
+        if formatter:
+            formatter += '\n'
+        formatter += '{docstring}'
+    if generic:
+        if formatter:
+            formatter += '\n'
+        formatter += '{options}'
+
+    if isinstance(style, str):
+        backend = style
+    else:
+        # Bokeh is the default backend
+        backend = hvplot_extension.compatibility or hv.Store.current_backend
+    if eltype in hv.Store.registry[backend]:
+        backend_style_opts = hv.Store.registry[backend][eltype].style_opts
+        if style:
+            formatter += '\n{style}'
+    else:
+        backend_style_opts = []
+
+    style_opts = 'Style options\n-------------\n' + '\n'.join(sorted(backend_style_opts))
+
+    parameters = []
+    # The options are built in this order in the signature and the docstring.
+    groups = [
+        'data',
+        'style',
+        'axis',
+        'size_layout',
+        'grid_legend',
+        'streaming',
+    ]
+    extra_kwargs = kind_opts + list(
+        itertools.chain.from_iterable([converter._options_groups[group] for group in groups])
+    )
+
+    doc_options = textwrap.dedent(converter.__doc__)
+    doc_sections = _parse_docstring_sections(doc_options)
+    out_doc_sections = [doc_sections[converter._docstring_sections[g]] for g in groups]
+
+    if backend == 'bokeh':
+        extra_kwargs.extend(converter._options_groups['interactivity'])
+        out_doc_sections.append(doc_sections[converter._docstring_sections['interactivity']])
+
+    if kind not in converter._stats_types and find_spec('datashader'):
+        extra_kwargs.extend(converter._options_groups['resampling'])
+        out_doc_sections.append(doc_sections[converter._docstring_sections['resampling']])
+
+    if kind in converter._geo_types and find_spec('geoviews'):
+        extra_kwargs.extend(converter._options_groups['geographic'])
+        out_doc_sections.append(doc_sections[converter._docstring_sections['geographic']])
+
+    extra_kwargs.extend(backend_style_opts)
+
+    extra_kwargs = list(dict.fromkeys(extra_kwargs))
+    out_doc_options = '\n\n'.join(out_doc_sections) + '\n'
+
+    sig = signature or inspect.signature(method)
+    for name, p in list(sig.parameters.items())[1:]:
+        if p.kind == 1:
+            parameters.append((name, p.default))
+
+    filtered_signature = [
+        p for p in sig.parameters.values() if p.kind != inspect.Parameter.VAR_KEYWORD
+    ]
+    extra_params = [
+        inspect.Parameter(k, inspect.Parameter.KEYWORD_ONLY)
+        for k in extra_kwargs
+        if k not in [p.name for p in filtered_signature]
+    ]
+    all_params = (
+        filtered_signature
+        + extra_params
+        + [inspect.Parameter('kwargs', inspect.Parameter.VAR_KEYWORD)]
+    )
+    signature = inspect.Signature(all_params)
+
+    parameters += [(o, None) for o in extra_kwargs]
+    completions = ', '.join([f'{n}={v}' for n, v in parameters])
+
+    method_doc = _METHOD_DOCS.get(kind, method.__doc__)
+    _METHOD_DOCS[kind] = method_doc
+    docstring = formatter.format(
+        kind=kind,
+        completions=completions,
+        docstring=textwrap.dedent(method_doc),
+        options=out_doc_options,
+        style=style_opts,
+    )
+    return docstring, signature
+
+
+class _PatchHvplotDocstrings:
+    def __init__(self):
+        from .plotting.core import hvPlot, hvPlotTabular
+        from .converter import HoloViewsConverter
+
+        # Store the original signatures because the method signatures
+        # are going to be patched every time an extension is changed.
+        orig = {}
+        for cls in [hvPlot, hvPlotTabular]:
+            for _kind in HoloViewsConverter._kind_mapping:
+                if hasattr(cls, _kind):
+                    method = getattr(cls, _kind)
+                    sig = inspect.signature(method)
+                    orig[(cls, _kind)] = (sig, method.__doc__)
+        self.orig = orig
+
+    def __call__(self):
+        from .plotting.core import hvPlot, hvPlotTabular
+        from .converter import HoloViewsConverter
+
+        for cls in [hvPlot, hvPlotTabular]:
+            for _kind in HoloViewsConverter._kind_mapping:
+                if hasattr(cls, _kind):
+                    signature = self.orig[(cls, _kind)][0]
+                    _patch_doc(cls, _kind, signature=signature)
+
+    def reset(self):
+        """Used for testing purposes mostly."""
+        for (cls, _kind), (osig, odoc) in self.orig.items():
+            obj = getattr(cls, _kind)
+            obj.__signature__ = osig
+            obj.__doc__ = odoc
+
+
+def _patch_doc(cls, kind, signature=None):
+    method = getattr(cls, kind)
+    docstring, signature = _get_doc_and_signature(cls, kind, False, signature=signature)
+    method.__doc__ = docstring
+    method.__signature__ = signature
+
+
+@lru_cache
+def _numpydoc_extra_sections():
+    from .converter import HoloViewsConverter
+
+    return list(HoloViewsConverter._docstring_sections.values())
+
+
+def _parse_numpydoc_patch(self):
+    self._doc.reset()
+    self._parse_summary()
+
+    sections = list(self._read_sections())
+    section_names = {section for section, content in sections}
+
+    has_returns = 'Returns' in section_names
+    has_yields = 'Yields' in section_names
+    # We could do more tests, but we are not. Arbitrarily.
+    if has_returns and has_yields:
+        msg = 'Docstring contains both a Returns and Yields section.'
+        raise ValueError(msg)
+    if not has_yields and 'Receives' in section_names:
+        msg = 'Docstring contains a Receives section but not Yields.'
+        raise ValueError(msg)
+
+    for section, content in sections:
+        if not section.startswith('..'):
+            section = (s.capitalize() for s in section.split(' '))
+            section = ' '.join(section)
+            if self.get(section):
+                self._error_location(
+                    'The section %s appears twice in  %s'  # noqa
+                    % (section, '\n'.join(self._doc._str))  # noqa
+                )
+
+        # Patch is here, extending the sections with these other options
+        if section in ('Parameters', 'Other Parameters', 'Attributes', 'Methods') + tuple(
+            _numpydoc_extra_sections()
+        ):
+            self[section] = self._parse_param_list(content)
+        elif section in ('Returns', 'Yields', 'Raises', 'Warns', 'Receives'):
+            self[section] = self._parse_param_list(content, single_element_is_type=True)
+        elif section.startswith('.. index::'):
+            self['index'] = self._parse_index(section, content)
+        elif section == 'See Also':
+            self['See Also'] = self._parse_see_also(content)
+        else:
+            self[section] = content
+
+
+@contextmanager
+def _patch_numpy_docstring():
+    from numpydoc.docscrape import NumpyDocString
+
+    old_parse = NumpyDocString._parse
+    old_sections = NumpyDocString.sections
+    NumpyDocString._parse = _parse_numpydoc_patch
+    # Extend
+    for option_group in _numpydoc_extra_sections():
+        NumpyDocString.sections[option_group] = []
+    try:
+        yield
+    finally:
+        NumpyDocString._parse = old_parse
+        NumpyDocString.sections = old_sections
+
+
+def _get_docstring_group_parameters(option_group: str) -> list:
+    from numpydoc.docscrape import NumpyDocString
+    from .converter import HoloViewsConverter
+
+    with _patch_numpy_docstring():
+        cdoc = NumpyDocString(HoloViewsConverter.__doc__)
+        return cdoc[option_group]

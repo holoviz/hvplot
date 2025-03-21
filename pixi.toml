@@ -164,6 +164,7 @@ xarray = "*"
 # bokeh_sampledata = "*" (only available starting from Python 3.10)
 psutil = "*"
 cftime = "*"
+numpydoc = "*"
 
 [feature.test-example.dependencies]
 # Dependencies required to run the examples notebooks.
@@ -225,7 +226,10 @@ channels = [
     "pyviz/label/tooling_dev",
     "conda-forge"
 ]
-dependencies = {nbsite = ">=0.8.6", sphinxext-rediraffe = "*"}
+[feature.doc.dependencies]
+nbsite = ">=0.8.6"
+sphinxext-rediraffe = "*"
+numpydoc = "*"
 
 [feature.doc.activation.env]
 MOZ_HEADLESS = "1"
@@ -233,7 +237,7 @@ MPLBACKEND = "Agg"
 DISPLAY = ":99.0"
 
 [feature.doc.tasks]
-docs-build-sphinx = 'sphinx-build -b html doc builtdocs'
+docs-build-sphinx = 'sphinx-build -j auto -b html doc builtdocs'
 _docs-install = 'python -m pip install --no-deps --disable-pip-version-check -e .'
 # Depends on _docs-install instead of install as install
 # in the default environment

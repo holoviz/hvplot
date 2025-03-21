@@ -1,4 +1,10 @@
 import os
+import sys
+
+# To include the local extension.
+sys.path.insert(0, os.path.abspath('_ext'))
+
+import os
 import param
 
 param.parameterized.docstring_signature = False
@@ -61,6 +67,9 @@ extensions += [  # noqa
     'nbsite.nb_interactivity_warning',
     'sphinx_copybutton',
     'sphinxext.rediraffe',
+    'numpydoc',
+    # Custom extensions
+    'plotting_options_table',
 ]
 
 myst_enable_extensions = [
@@ -154,5 +163,14 @@ if os.getenv('HVPLOT_REFERENCE_GALLERY') not in ('False', 'false', '0'):
 else:
     if 'nbsite.gallery' in extensions:
         extensions.remove('nbsite.gallery')
-    exclude_patterns.append('doc/reference')
-    nb_execution_excludepatterns.append('doc/reference/**/*.ipynb')
+    exclude_patterns.append('reference')
+    nb_execution_excludepatterns.append('reference/**/*.ipynb')
+
+if os.getenv('HVPLOT_EXECUTE_NBS_USER_GUIDE') in ('False', 'false', '0'):
+    nb_execution_excludepatterns.append('user_guide/**/*.ipynb')
+
+if os.getenv('HVPLOT_EXECUTE_NBS_GETTING_STARTED') in ('False', 'false', '0'):
+    nb_execution_excludepatterns.append('getting_started/**/*.ipynb')
+
+if os.getenv('HVPLOT_EXECUTE_NBS') in ('False', 'false', '0'):
+    nb_execution_mode = 'off'
