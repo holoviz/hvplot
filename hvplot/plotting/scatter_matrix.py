@@ -39,50 +39,51 @@ def scatter_matrix(
 
     This function is closely modelled on :func:`pandas.plotting.scatter_matrix`.
 
-    Parameters:
-    -----------
-    data: DataFrame
+    Parameters
+    ----------
+    data : DataFrame
         The data to plot. Every column is compared to every other column.
-    c: str, optional
+    c : str, optional
         Column to color by
-    chart: str, optional
+    chart : str, optional
         Chart type for the off-diagonal plots (one of 'scatter', 'bivariate', 'hexbin')
-    diagonal: str, optional
+    diagonal : str, optional
         Chart type for the diagonal plots (one of 'hist', 'kde')
-    alpha: float, optional
+    alpha : float, optional
         Transparency level for the off-diagonal plots
-    nonselection_alpha: float, optional
+    nonselection_alpha : float, optional
         Transparency level for nonselected object in the off-diagonal plots
-    tools: list of str, optional
+    tools : list of str, optional
         Interaction tools to include
         Defaults are 'box_select' and 'lasso_select'
-    cmap/colormap: str or colormap object, optional
+    cmap/colormap : str or colormap object, optional
         Colormap to use when ``c`` is set.
         Default is `Category10 <https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md#category10>`.
-    diagonal_kwds/hist_kwds/density_kwds: dict, optional
+    diagonal_kwds/hist_kwds/density_kwds : dict, optional
         Keyword options for the diagonal plots
-    datashade (default=False):
+    datashade : bool, default=False
         Whether to apply rasterization and shading (colormapping) using
         the Datashader library, returning an RGB object instead of
         individual points
-    rasterize (default=False):
+    rasterize : bool, default=False
         Whether to apply rasterization using the Datashader library,
         returning an aggregated Image (to be colormapped by the
         plotting backend) instead of individual points
-    dynspread (default=False):
+    dynspread : bool, default=False
         For plots generated with datashade=True or rasterize=True,
         automatically increase the point size when the data is sparse
         so that individual points become more visible.
         kwds supported include ``max_px``, ``threshold``,  ``shape``, ``how`` and ``mask``.
-    spread (default=False):
+    spread : bool, default=False
         Make plots generated with datashade=True or rasterize=True
         increase the point size to make points more visible, by
         applying a fixed spreading of a certain number of cells/pixels. kwds
         supported include: ``px``, ``shape``, ``how`` and ``mask``.
-    kwds: Keyword options for the off-diagonal plots and datashader's spreading , optional
+    **kwds : optional
+        Keyword options for the off-diagonal plots and datashader's spreading , optional
 
-    Returns:
-    --------
+    Returns
+    -------
     obj : HoloViews object
         The HoloViews representation of the plot.
 

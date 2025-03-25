@@ -818,6 +818,17 @@ def _parse_docstring_sections(docstring: str) -> dict[str, str]:
 _METHOD_DOCS = {}
 
 
+def _get_backend_style_options(kind: str, backend: str):
+    from .converter import HoloViewsConverter
+
+    eltype = HoloViewsConverter._kind_mapping[kind]
+    if eltype in hv.Store.registry[backend]:
+        backend_style_opts = hv.Store.registry[backend][eltype].style_opts
+    else:
+        backend_style_opts = []
+    return backend_style_opts
+
+
 def _get_doc_and_signature(
     cls, kind, completions=False, docstring=True, generic=True, style=True, signature=None
 ):
@@ -827,7 +838,6 @@ def _get_doc_and_signature(
     converter = HoloViewsConverter
     method = getattr(cls, kind)
     kind_opts = converter._kind_options.get(kind, [])
-    eltype = converter._kind_mapping[kind]
 
     formatter = ''
     if completions:
@@ -846,13 +856,9 @@ def _get_doc_and_signature(
     else:
         # Bokeh is the default backend
         backend = hvplot_extension.compatibility or hv.Store.current_backend
-    if eltype in hv.Store.registry[backend]:
-        backend_style_opts = hv.Store.registry[backend][eltype].style_opts
-        if style:
-            formatter += '\n{style}'
-    else:
-        backend_style_opts = []
-
+    backend_style_opts = _get_backend_style_options(kind, backend=backend)
+    if style:
+        formatter += '\n{style}'
     style_opts = 'Style options\n-------------\n' + '\n'.join(sorted(backend_style_opts))
 
     parameters = []

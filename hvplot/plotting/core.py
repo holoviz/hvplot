@@ -303,17 +303,19 @@ class hvPlotTabular(hvPlotBase):
             plotted, then only the first color from the color list will be used.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('line')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.Curve` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
         Examples
         --------
@@ -400,22 +402,24 @@ class hvPlotTabular(hvPlotBase):
             '#a98d19.
 
             A sequence of color strings referred to by name, RGB or RGBA code, which will be used
-            for each series recursively. For instance ['green','yellow'] each field’s line will be
+            for each series recursively. For instance ['green','yellow'] each field's line will be
             filled in green or yellow, alternatively. If there is only a single series to be
             plotted, then only the first color from the color list will be used.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('step')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.Curve` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
         Examples
         --------
@@ -462,7 +466,7 @@ class hvPlotTabular(hvPlotBase):
 
         - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/step.html
         - HoloViews: https://holoviews.org/gallery/demos/bokeh/step_chart.html
-        - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.line.html (use `draw_style='step')
+        - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.line.html (use `draw_style='step'`)
         - Plotly: https://plotly.com/python/line-charts/ (See the Interpolation Section)
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.step.html
         """
@@ -513,20 +517,22 @@ class hvPlotTabular(hvPlotBase):
             plotted, then only the first color from the color list will be used.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('scatter')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.Scatter` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
-        Example
-        -------
+        Examples
+        --------
 
         .. code-block::
 
@@ -595,20 +601,22 @@ class hvPlotTabular(hvPlotBase):
             Whether to stack multiple areas. Default is True.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('area')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.Area` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
-        Example
-        -------
+        Examples
+        --------
 
         .. code-block::
 
@@ -676,20 +684,22 @@ class hvPlotTabular(hvPlotBase):
             Field name to draw positive errors from
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('errorbars')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.ErrorBars` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
-        Example
-        -------
+        Examples
+        --------
 
         .. code-block::
 
@@ -763,20 +773,22 @@ class hvPlotTabular(hvPlotBase):
             The color indicating a negative change. Default is red.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('ohlc')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.Rectangles` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
-        Example
-        -------
+        Examples
+        --------
 
         .. code-block::
 
@@ -825,20 +837,22 @@ class hvPlotTabular(hvPlotBase):
             If omitted, no aggregation is applied and duplicate values are dropped.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('heatmap')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.HeatMap` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
-        Example
-        -------
+        Examples
+        --------
 
         .. code-block::
 
@@ -907,20 +921,22 @@ class hvPlotTabular(hvPlotBase):
             a count of less than 1 are hidden
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('hexbin')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.HexTiles` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
-        Example
-        -------
+        Examples
+        --------
 
         .. code-block::
 
@@ -987,17 +1003,19 @@ class hvPlotTabular(hvPlotBase):
 
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('bivariate')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.Bivariate` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
         Examples
         --------
@@ -1073,20 +1091,22 @@ class hvPlotTabular(hvPlotBase):
             for each series recursively. For instance ['red', 'green','blue'].
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('bar')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.Bars` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
-        Example
-        -------
+        Examples
+        --------
 
         .. code-block::
 
@@ -1148,17 +1168,19 @@ class hvPlotTabular(hvPlotBase):
             If True, creates a stacked horizontal bar plot. Default is False.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('barh')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.Bars` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
         Examples
         --------
@@ -1213,20 +1235,22 @@ class hvPlotTabular(hvPlotBase):
             Field in the *long* data to group by.
         kwds : optional
             Additional keywords arguments are documented in `hvplot.help('box')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.BoxWhisker` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
-        Example
-        -------
+        Examples
+        --------
 
         Here is an example using *wide* data.
 
@@ -1279,17 +1303,19 @@ class hvPlotTabular(hvPlotBase):
             Field in the *long* data to group by.
         kwds : optional
             Additional keywords arguments are documented in `hvplot.help('violin')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.Violin` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
         Examples
         --------
@@ -1363,17 +1389,19 @@ class hvPlotTabular(hvPlotBase):
             total number of data points. Default is False.
         kwds : optional
             Additional keywords arguments are documented in `hvplot.help('hist')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.Histogram` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
         Examples
         --------
@@ -1451,17 +1479,19 @@ class hvPlotTabular(hvPlotBase):
             Whether the bivariate contours should be filled. Default is True.
         kwds : optional
             Additional keywords arguments are documented in `hvplot.help('kde')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.Distribution` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
         Examples
         --------
@@ -1504,83 +1534,7 @@ class hvPlotTabular(hvPlotBase):
         """
         return self(kind='kde', x=None, y=y, by=by, **kwds)
 
-    def density(self, y=None, by=None, **kwds):
-        """
-        The Kernel density estimate (`density`) plot shows the distribution and spread of the data.
-
-        The `kde` and `density` plots are the same.
-
-        Reference: https://hvplot.holoviz.org/reference/tabular/kde.html
-
-        Parameters
-        ----------
-        y : string or sequence
-            Field(s) in the data to compute distribution from. If not specified all numerical fields
-            are used.
-        by : string or sequence
-            Field(s) in the data to group by.
-        bandwidth : float, optional
-            The bandwidth of the kernel for the density estimate. Default is None.
-        cut :
-            Draw the estimate to cut * bw from the extreme data points.
-        n_samples : int, optional
-            Number of samples to compute the KDE over. Default is 100.
-        filled :
-            Whether the bivariate contours should be filled. Default is True.
-        kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('density')`.
-
-        Returns
-        -------
-        A Holoviews object. You can `print` the object to study its composition and run
-
-        .. code-block::
-
-            import holoviews as hv
-            hv.help(the_holoviews_object)
-
-        to learn more about its parameters and options.
-
-        Examples
-        --------
-
-        Lets display a 'density' plot from *wide* data
-
-        .. code-block::
-
-            import hvplot.pandas
-            import numpy as np
-            import pandas as pd
-
-            df = pd.DataFrame({
-                'x': [1, 2, 2.5, 3, 3.5, 4, 5],
-                'y': [4, 4, 4.5, 5, 5.5, 6, 6],
-            })
-            df.hvplot.density(color=["orange", "green"])
-
-        Lets display a 'density' plot from *long* data using the 'by' attribute
-
-        .. code-block::
-
-            import hvplot.pandas # noqa
-            import pandas as pd
-            import numpy as np
-            df = pd.DataFrame({
-                'category': list('xxxxxxxyyyyyyy'),
-                'value': [1, 2, 2.5, 3, 3.5, 4, 5, 4, 4, 4.5, 5, 5.5, 6, 6],
-            })
-            df.hvplot.density(by='category', filled=False)
-
-        References
-        ----------
-
-        - HoloViews: https://holoviews.org/reference/elements/bokeh/Distribution.html
-        - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.kde.html
-        - Plotly: https://plotly.com/python/distplot/
-        - Seaborn: https://seaborn.pydata.org/generated/seaborn.kdeplot.html
-        - Wiki: https://en.wikipedia.org/wiki/Kernel_density_estimation
-        """
-        return self(kind='kde', x=None, y=y, by=by, **kwds)
+    density = kde
 
     def table(self, columns=None, **kwds):
         """
@@ -1598,20 +1552,22 @@ class hvPlotTabular(hvPlotBase):
             If True the cells are selectable. Default is False. # Todo: Describe how to use this
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('table')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.Table` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
-        Example
-        -------
+        Examples
+        --------
 
         .. code-block::
 
@@ -1638,20 +1594,22 @@ class hvPlotTabular(hvPlotBase):
         ----------
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('dataset')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.Dataset` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
-        Example
-        -------
+        Examples
+        --------
 
         .. code-block::
 
@@ -1698,17 +1656,19 @@ class hvPlotTabular(hvPlotBase):
             Whether to apply log scaling to the z-axis. Default is False.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('points')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.Points` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
         Examples
         --------
@@ -1731,8 +1691,9 @@ class hvPlotTabular(hvPlotBase):
 
     def vectorfield(self, x=None, y=None, angle=None, mag=None, **kwds):
         """
-        `vectorfield visualizes vectors given by the (`x , `y`) starting point, a magnitude (`mag`)
-        and an `angle` . A `vectorfield` plot is also known as a `quiver` plot.
+        vectorfield visualizes vectors given by the (`x `, `y`) starting point,
+        a magnitude (`mag`) and an `angle`. A `vectorfield` plot is also known
+        as a `quiver` plot.
 
         Reference: https://hvplot.holoviz.org/reference/xarray/vectorfield.html
 
@@ -1748,20 +1709,22 @@ class hvPlotTabular(hvPlotBase):
             Angle in radians.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('vectorfield')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.Points` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
-        Example
-        -------
+        Examples
+        --------
 
         .. code-block::
 
@@ -1807,17 +1770,19 @@ class hvPlotTabular(hvPlotBase):
             PlateCarree, i.e. lat/lon coordinates).
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('polygons')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.Polygons` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
         Examples
         --------
@@ -1841,17 +1806,19 @@ class hvPlotTabular(hvPlotBase):
         ----------
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('paths')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.Path` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
         References
         ----------
@@ -1881,17 +1848,19 @@ class hvPlotTabular(hvPlotBase):
             automatically format the text, e.g. "{col1}, {col2}".
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('labels')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.Labels` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
         Examples
         --------
@@ -2179,20 +2148,22 @@ class hvPlot(hvPlotTabular):
             Whether to display a colorbar
         kwds : optional
             To see all the keyword arguments available, run `hvplot.help('image')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.Image` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
-        Example
-        -------
+        Examples
+        --------
 
         .. code-block::
 
@@ -2233,17 +2204,19 @@ class hvPlot(hvPlotTabular):
             The data variable to plot
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('rgb')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.RGB` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
         References
         ----------
@@ -2278,17 +2251,19 @@ class hvPlot(hvPlotTabular):
             Whether to display a colorbar
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('quadmesh')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.QuadMesh` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
         Examples
         --------
@@ -2331,17 +2306,19 @@ class hvPlot(hvPlotTabular):
             Whether to apply log scaling to the z-axis. Default is False
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('contour')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.Contours` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
         Examples
         --------
@@ -2397,19 +2374,22 @@ class hvPlot(hvPlotTabular):
             Whether to apply log scaling to the z-axis. Default is False
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('contourf')`.
+            See :ref:`plot-options` for more information.
 
         Returns
         -------
-        A Holoviews object. You can `print` the object to study its composition and run
+        :class:`holoviews:holoviews.element.Contours` / Panel object
+            You can `print` the object to study its composition and run:
 
-        .. code-block::
+            .. code-block::
 
-            import holoviews as hv
-            hv.help(the_holoviews_object)
+                import holoviews as hv
+                hv.help(the_holoviews_object)
 
-        to learn more about its parameters and options.
+            to learn more about its parameters and options.
 
         Examples
+        --------
 
         .. code-block::
 
