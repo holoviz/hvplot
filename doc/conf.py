@@ -170,8 +170,8 @@ else:
 if os.getenv('HVPLOT_EXECUTE_NBS_USER_GUIDE') in ('False', 'false', '0'):
     nb_execution_excludepatterns.append('user_guide/**/*.ipynb')
 
-if os.getenv('HVPLOT_EXECUTE_NBS_GETTING_STARTED') in ('False', 'false', '0'):
-    nb_execution_excludepatterns.append('getting_started/**/*.ipynb')
+if os.getenv('HVPLOT_EXECUTE_NBS_TUTORIALS') in ('False', 'false', '0'):
+    nb_execution_excludepatterns.append('tutorials/**/*.ipynb')
 
 if os.getenv('HVPLOT_EXECUTE_NBS') in ('False', 'false', '0'):
     nb_execution_mode = 'off'

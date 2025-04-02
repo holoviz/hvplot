@@ -23,7 +23,7 @@ if not find_spec('pygraphviz') or (sys.platform == 'darwin' and sys.version_info
 
 if not find_spec('geoviews'):
     collect_ignore_glob += [
-        'getting_started/hvplot.ipynb',
+        'tutorials/getting_started.ipynb',
         'reference/geopandas/*.ipynb',
         'reference/xarray/contour.ipynb',
         'reference/xarray/contourf.ipynb',
