@@ -1534,7 +1534,11 @@ class hvPlotTabular(hvPlotBase):
         """
         return self(kind='kde', x=None, y=y, by=by, **kwds)
 
-    density = kde
+    def density(self, y=None, by=None, **kwds):
+        """
+        Alias of :meth:`hvplot.hvPlot.kde`.
+        """
+        return self(kind='kde', x=None, y=y, by=by, **kwds)
 
     def table(self, columns=None, **kwds):
         """
