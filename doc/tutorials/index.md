@@ -1,6 +1,8 @@
 # Tutorials
 
-Welcome to the Tutorials section. Here, you will find clear, step-by-step guides to help you master hvPlot and explore the full holoviz ecosystem. Whether you’re just starting out, coming from pandas or xarray, or looking to sharpen your skills, these tutorials offer practical examples and hands-on learning to explore and transform your data into compelling visualizations.
+Welcome to the Tutorials section. Here, you will find clear, step-by-step guides to help you master hvPlot and explore the full [HoloViz](https://holoviz.org/) ecosystem. Whether you’re just starting out, coming from Pandas or Xarray, or looking to sharpen your skills, these tutorials offer practical examples and hands-on learning to explore and transform your data into compelling visualizations.
+
+## Internal tutorials
 
 ::::{grid} 1 2 2 3
 :gutter: 1 1 1 2
@@ -21,12 +23,19 @@ Learn how hvPlot mirrors the pandas API.
 
 Learn how to use hvPlot to explore your Xarray data.
 :::
+::::
+
+## External tutorials
+
+::::{grid} 1 2 2 3
+:gutter: 1 1 1 2
 
 :::{grid-item-card} {octicon}`link;2.5em;sd-mr-1 sd-animate-grow50` Holoviz Tutorial
 :link: https://holoviz.org/tutorial/index.html
 
-Explore all the holoviz tools in this comprehensive tutorial.
+Explore all the HoloViz tools in this comprehensive tutorial.
 :::
+
 ::::
 
 ```{toctree}
@@ -34,5 +43,6 @@ Explore all the holoviz tools in this comprehensive tutorial.
 :hidden:
 :maxdepth: 2
 
-Getting started with hvPlot <getting_started>
+Getting Started <getting_started>
+HoloViz Tutorial <https://holoviz.org/tutorial/index.html>
 ```
