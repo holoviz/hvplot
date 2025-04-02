@@ -33,23 +33,13 @@ hvPlot(df).scatter()
 hvPlot(df)(kind='scatter')
 ```
 
-
 This page documents all the plotting methods of the `hvPlot` class, which as described above are also available via the `hvplot` namespace.
 
 ```{eval-rst}
 .. currentmodule:: hvplot
 ```
 
-### `hvPlotBase`
-
-```{eval-rst}
-.. autosummary::
-   :toctree: api/
-
-   hvPlot.explorer
-```
-
-### `hvPlotTabular`
+### `hvPlot`
 
 ```{eval-rst}
 .. autosummary::
@@ -60,12 +50,16 @@ This page documents all the plotting methods of the `hvPlot` class, which as des
    hvPlot.barh
    hvPlot.box
    hvPlot.bivariate
+   hvPlot.contour
+   hvPlot.contourf
    hvPlot.dataset
    hvPlot.density
    hvPlot.errorbars
+   hvPlot.explorer
    hvPlot.heatmap
    hvPlot.hexbin
    hvPlot.hist
+   hvPlot.image
    hvPlot.kde
    hvPlot.labels
    hvPlot.line
@@ -73,6 +67,8 @@ This page documents all the plotting methods of the `hvPlot` class, which as des
    hvPlot.paths
    hvPlot.points
    hvPlot.polygons
+   hvPlot.quadmesh
+   hvPlot.rgb
    hvPlot.scatter
    hvPlot.step
    hvPlot.table
@@ -80,19 +76,6 @@ This page documents all the plotting methods of the `hvPlot` class, which as des
    hvPlot.violin
 ```
 
-
-### `hvPlot`
-
-```{eval-rst}
-.. autosummary::
-   :toctree: api/
-
-   hvPlot.contour
-   hvPlot.contourf
-   hvPlot.image
-   hvPlot.rgb
-   hvPlot.quadmesh
-```
 
 ## `plotting` module
 
