@@ -33,6 +33,10 @@ no-default-feature = true
 features = ["py312", "required", "test-core", "test", "example", "geo", "graphviz", "test-example"]
 no-default-feature = true
 
+[environments.test-313]
+features = ["py313", "required", "test-core", "test", "example", "geo", "graphviz", "test-example"]
+no-default-feature = true
+
 [environments.test-core]
 features = ["py313", "required", "test-core"]
 no-default-feature = true
@@ -143,6 +147,7 @@ streamz = ">=0.3.0"
 xarray = ">=0.18.2"
 xyzservices = ">=2022.9.0"
 geodatasets = ">=2023.12.0"
+hvsampledata = "*"
 
 # =================== TESTS ===================
 

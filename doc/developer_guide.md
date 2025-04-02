@@ -217,7 +217,7 @@ As hvPlot uses notebooks for much of the documentation, this takes a little whil
 - Executing all the notebooks by setting the environment variable `HVPLOT_EXECUTE_NBS` to `false`
 - Building the gallery with `HVPLOT_REFERENCE_GALLERY="false"`
 - Running the user guide notebooks with `HVPLOT_EXECUTE_NBS_USER_GUIDE="false"`
-- Running the getting started notebooks with `HVPLOT_EXECUTE_NBS_GETTING_STARTED="false"`
+- Running the getting started notebooks with `HVPLOT_EXECUTE_NBS_TUTORIALS="false"`
 
 A development version of hvPlot can be found [here](https://holoviz-dev.github.io/hvplot/). You can ask a maintainer if they want to make a dev release for your PR, but there is no guarantee they will say yes.
 
