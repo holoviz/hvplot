@@ -12,11 +12,13 @@ collect_ignore_glob = [
     'user_guide/Streaming.ipynb',
 ]
 
-# On MacOs, Python 3.12, got the following error running this:
+# On MacOs, Python 3.12 and 3.13, got the following error running this:
 # `pos = layout(G)`
 # => OSError: Format: "dot" not recognized. No formats found.
 # Fixed locally by running `dot -c`
-if not find_spec('pygraphviz') or (sys.platform == 'darwin' and sys.version_info[:2] == (3, 12)):
+if not find_spec('pygraphviz') or (
+    sys.platform == 'darwin' and sys.version_info[:2] in [(3, 12), (3, 13)]
+):
     collect_ignore_glob += [
         'user_guide/NetworkX.ipynb',
     ]
