@@ -111,6 +111,7 @@ rediraffe_redirects = {
     # Removal of the developer_guide folder
     'developer_guide/index': 'developer_guide',
     # Redirecting removed "getting started" pages to the new location
+    'getting_started/index': 'tutorials/index',
     'getting_started/explorer': 'tutorials/getting_started',
     'getting_started/hvplot': 'tutorials/getting_started',
     'getting_started/installation': 'tutorials/getting_started',
