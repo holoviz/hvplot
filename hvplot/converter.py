@@ -145,7 +145,13 @@ class HoloViewsConverter:
         Returns a DynamicMap if ``dynamic=True``, else returns a HoloMap.
         See ``dynamic`` for more information.
     group_label : str or None, default=None
-        Label for grouped data, typically in legends or axis labels.
+        A custom label for the grouping dimension used in overlay plots.
+        When multiple series are plotted, hvPlot creates an overlay (NdOverlay)
+        with a key dimension that labels each series. By default, this label is set
+        to 'Variable'. Setting `group_label` overrides this default, allowing you to
+        provide a more descriptive name for the grouping dimension.
+        Note that `group_label` only affects the overlay’s key dimension when multiple
+        groups (or series) are present.
     kind : str, default='line'
         The type of plot to generate.
     label : str or None, default=None
@@ -1563,7 +1569,7 @@ class HoloViewsConverter:
             except Exception as e:
                 if attr_labels is True:
                     param.main.param.warning(
-                        'Unable to auto label using xarray attrs ' f'because {e}'
+                        f'Unable to auto label using xarray attrs because {e}'
                     )
 
     def _process_plot(self):
@@ -2108,8 +2114,8 @@ class HoloViewsConverter:
                 f'{tile_source} tiles not recognized. tiles must be either True, a '
                 'xyzservices.TileProvider instance, a HoloViews'
                 + (' or Geoviews' if lib == 'geoviews' else '')
-                + " basemap string "
-                f"(one of {', '.join(sorted(sources))}), a HoloViews Tiles instance"
+                + ' basemap string '
+                f'(one of {", ".join(sorted(sources))}), a HoloViews Tiles instance'
                 + (', a Geoviews WMTS instance' if lib == 'geoviews' else '')
                 + '.'
             )
