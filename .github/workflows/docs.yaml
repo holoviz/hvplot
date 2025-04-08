@@ -41,12 +41,14 @@ jobs:
     env:
       DISPLAY: ":99.0"
     steps:
-      # - uses: holoviz-dev/holoviz_tasks/pixi_install@v0
-      #   with:
-      #     environments: docs
+      - uses: holoviz-dev/holoviz_tasks/pixi_install@v0
+        with:
+          environments: docs
       - name: Build documentation
-        # run: pixi run -e docs docs-build
-        run: mkdir -p builtdocs/test
+        run: pixi run -e docs docs-build
+      - name: report failure
+        if: failure()
+        run: cat /tmp/sphinx-*.log | tail -n 100
       - uses: holoviz-dev/holoviz_tasks/docs-publish@docs_publish
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -54,33 +56,7 @@ jobs:
         with:
           url: s3://hvplot.holoviz.org
           cloudfront_id: E13QSRL36ILGWH
-          # tag: ${{ steps.vars.output.tag }}
-      # - name: report failure
-      #   if: failure()
-      #   run: cat /tmp/sphinx-*.log | tail -n 100
-      # - name: Deploy dev
-      #   uses: peaceiris/actions-gh-pages@v4
-      #   if: |
-      #     (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'dev') ||
-      #     (github.event_name == 'push' && (contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc')))
-      #   with:
-      #     personal_token: ${{ secrets.ACCESS_TOKEN }}
-      #     external_repository: holoviz-dev/hvplot
-      #     publish_dir: ./builtdocs
-      #     force_orphan: true
-      #     exclude_assets: '.doctrees'
-      # - name: Deploy main
-      #   if: |
-      #     (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'main') ||
-      #     (github.event_name == 'push' && !(contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc')))
-      #   uses: peaceiris/actions-gh-pages@v4
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     publish_dir: ./builtdocs
-      #     cname: hvplot.holoviz.org
-      #     force_orphan: true
-      #     exclude_assets: '.doctrees'
-  #
+
   # pip_build_docs:
   #   name: Build Documentation (pip)
   #   runs-on: 'ubuntu-latest'
