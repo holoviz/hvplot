@@ -54,8 +54,7 @@ jobs:
           echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
       - uses: holoviz-dev/holoviz_tasks/docs-publish@docs_publish
         with:
-          path: builtdocs/
-          # target: ${{ github.event.inputs.target }}
+          url: s3://hvplot.holoviz.org
           # tag: ${{ steps.vars.output.tag }}
       # - name: report failure
       #   if: failure()
