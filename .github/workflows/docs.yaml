@@ -53,6 +53,9 @@ jobs:
           echo "Deploying from ref ${GITHUB_REF#refs/*/}"
           echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
       - uses: holoviz-dev/holoviz_tasks/docs-publish@docs_publish
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         with:
           url: s3://hvplot.holoviz.org
           # tag: ${{ steps.vars.output.tag }}
