@@ -41,69 +41,75 @@ jobs:
     env:
       DISPLAY: ":99.0"
     steps:
-      - uses: holoviz-dev/holoviz_tasks/pixi_install@v0
-        with:
-          environments: docs
+      # - uses: holoviz-dev/holoviz_tasks/pixi_install@v0
+      #   with:
+      #     environments: docs
       - name: Build documentation
-        run: pixi run -e docs docs-build
+        # run: pixi run -e docs docs-build
+        run: mkdir -p builtdocs/test
       - name: Set and echo git ref
         id: vars
         run: |
           echo "Deploying from ref ${GITHUB_REF#refs/*/}"
           echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
-      - name: report failure
-        if: failure()
-        run: cat /tmp/sphinx-*.log | tail -n 100
-      - name: Deploy dev
-        uses: peaceiris/actions-gh-pages@v4
-        if: |
-          (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'dev') ||
-          (github.event_name == 'push' && (contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc')))
+      - uses: holoviz-dev/holoviz_tasks/docs-publish@docs_publish
         with:
-          personal_token: ${{ secrets.ACCESS_TOKEN }}
-          external_repository: holoviz-dev/hvplot
-          publish_dir: ./builtdocs
-          force_orphan: true
-          exclude_assets: '.doctrees'
-      - name: Deploy main
-        if: |
-          (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'main') ||
-          (github.event_name == 'push' && !(contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc')))
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./builtdocs
-          cname: hvplot.holoviz.org
-          force_orphan: true
-          exclude_assets: '.doctrees'
-
-  pip_build_docs:
-    name: Build Documentation (pip)
-    runs-on: 'ubuntu-latest'
-    timeout-minutes: 120
-    env:
-      DESC: "Documentation build"
-      MPLBACKEND: "Agg"
-      MOZ_HEADLESS: 1
-      DISPLAY: ":99.0"
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-      - name: install
-        run: pip install -v --prefer-binary -e ."[doc, examples, geo]"
-      - name: pip list
-        run: pip list
-      - name: Set and echo git ref
-        id: vars
-        run: |
-          echo "Deploying from ref ${GITHUB_REF#refs/*/}"
-          echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
-      - name: build docs
-        run: sphinx-build -b html doc builtdocs
-      - name: report failure
-        if: failure()
-        run: cat /tmp/sphinx-*.log | tail -n 100
+          path: builtdocs/
+          # target: ${{ github.event.inputs.target }}
+          # tag: ${{ steps.vars.output.tag }}
+      # - name: report failure
+      #   if: failure()
+      #   run: cat /tmp/sphinx-*.log | tail -n 100
+      # - name: Deploy dev
+      #   uses: peaceiris/actions-gh-pages@v4
+      #   if: |
+      #     (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'dev') ||
+      #     (github.event_name == 'push' && (contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc')))
+      #   with:
+      #     personal_token: ${{ secrets.ACCESS_TOKEN }}
+      #     external_repository: holoviz-dev/hvplot
+      #     publish_dir: ./builtdocs
+      #     force_orphan: true
+      #     exclude_assets: '.doctrees'
+      # - name: Deploy main
+      #   if: |
+      #     (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'main') ||
+      #     (github.event_name == 'push' && !(contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc')))
+      #   uses: peaceiris/actions-gh-pages@v4
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     publish_dir: ./builtdocs
+      #     cname: hvplot.holoviz.org
+      #     force_orphan: true
+      #     exclude_assets: '.doctrees'
+  #
+  # pip_build_docs:
+  #   name: Build Documentation (pip)
+  #   runs-on: 'ubuntu-latest'
+  #   timeout-minutes: 120
+  #   env:
+  #     DESC: "Documentation build"
+  #     MPLBACKEND: "Agg"
+  #     MOZ_HEADLESS: 1
+  #     DISPLAY: ":99.0"
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
+  #     - uses: actions/setup-python@v5
+  #       with:
+  #         python-version: ${{ env.PYTHON_VERSION }}
+  #     - name: install
+  #       run: pip install -v --prefer-binary -e ."[doc, examples, geo]"
+  #     - name: pip list
+  #       run: pip list
+  #     - name: Set and echo git ref
+  #       id: vars
+  #       run: |
+  #         echo "Deploying from ref ${GITHUB_REF#refs/*/}"
+  #         echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+  #     - name: build docs
+  #       run: sphinx-build -b html doc builtdocs
+  #     - name: report failure
+  #       if: failure()
+  #       run: cat /tmp/sphinx-*.log | tail -n 100
