@@ -17,6 +17,9 @@ on:
         - dryrun
         required: true
         default: dryrun
+    version:
+      description: 'Version tag (required if target is main)'
+      required: false
   schedule:
     - cron: '0 15 * * SUN'
 
@@ -43,14 +46,18 @@ jobs:
     env:
       DISPLAY: ":99.0"
     steps:
+      - name: Validate version
+        if: ${{ inputs.target == 'main' }}
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [[ -z "$VERSION" || ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ 'version' is required and must match format vX.X.X (e.g. v0.11.1) when target is 'main'"
+            exit 1
+          fi
       - uses: holoviz-dev/holoviz_tasks/pixi_install@v0
         with:
           environments: docs
-      - name: Set version
-        run: |
-          version=$(pixi run -e docs python -c "from $PACKAGE._version import __version__ as v; print(v)")
-          echo "version=$version"
-          echo "version=$version" >> $GITHUB_ENV
       - name: Build documentation
         run: pixi run -e docs docs-build
       - name: report failure
@@ -63,7 +70,7 @@ jobs:
         with:
           url: s3://hvplot.holoviz.org
           cloudfront_id: E13QSRL36ILGWH
-          version: ${{ env.version }}
+          version: ${{ inputs.version }}
 
   # pip_build_docs:
   #   name: Build Documentation (pip)
