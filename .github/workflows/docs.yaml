@@ -26,6 +26,7 @@ defaults:
 
 env:
   PYTHON_VERSION: "3.11"
+  PACKAGE: "hvplot"
 
 jobs:
   pixi_lock:
@@ -45,6 +46,11 @@ jobs:
       - uses: holoviz-dev/holoviz_tasks/pixi_install@v0
         with:
           environments: docs
+      - name: Set version
+        run: |
+          version=$(pixi run -e docs python -c "from $PACKAGE._version import __version__ as v; print(v)")
+          echo "version=$version"
+          echo "version=$version" >> $GITHUB_ENV
       - name: Build documentation
         run: pixi run -e docs docs-build
       - name: report failure
@@ -57,6 +63,7 @@ jobs:
         with:
           url: s3://hvplot.holoviz.org
           cloudfront_id: E13QSRL36ILGWH
+          version: ${{ env.version }}
 
   # pip_build_docs:
   #   name: Build Documentation (pip)
