@@ -56,7 +56,7 @@ html_theme_options.update(  # noqa
                 'icon': 'fa-brands fa-discord',
             },
         ],
-        'pygment_dark_style': 'material',
+        'pygments_dark_style': 'material',
         # 'announcement': "hvPlot 0.11 has just been released! Checkout the <a href='https://blog.holoviz.org/posts/hvplot_release_0.11/'>blog post</a> and support hvPlot by giving it a 🌟 on <a href='https://github.com/holoviz/hvplot'>Github</a>.",
         'switcher': {
             # 'json_url': 'http://127.0.0.1:5500/_static/switcher.json',
