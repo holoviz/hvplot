@@ -65,6 +65,7 @@ html_theme_options.update(  # noqa
             'json_url': 'https://hvplot-test.holoviz.org/switcher.json',
             'version_match': switcher_version,
         },
+        'show_version_warning_banner': True,
     }
 )
 
