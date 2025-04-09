@@ -36,6 +36,7 @@ jobs:
 
   docs_build:
     name: Build Documentation
+    needs: [pixi_lock]
     runs-on: 'macos-latest'
     timeout-minutes: 120
     env:
