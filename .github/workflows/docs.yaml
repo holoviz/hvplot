@@ -18,7 +18,7 @@ on:
         required: true
         default: dryrun
       version:
-        description: 'Version tag (required if target is main)'
+        description: 'Version tag vX.X.X (required if target is main)'
         required: false
   schedule:
     - cron: '0 15 * * SUN'
