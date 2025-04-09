@@ -45,15 +45,14 @@ jobs:
     timeout-minutes: 120
     env:
       DISPLAY: ":99.0"
+      VERSION: ${{ inputs.version }}
     steps:
       - name: Validate version
         if: ${{ inputs.target == 'main' }}
-        env:
-          VERSION: ${{ inputs.version }}
         run: |
           if [[ -z "$VERSION" || "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "❌ 'version' is required and must match format vX.X.X (e.g. v0.11.1) when target is 'main'"
-          # exit 1  # TODO: Uncomment before merge
+            # exit 1  # TODO: Uncomment before merge
           fi
       - uses: holoviz-dev/holoviz_tasks/pixi_install@v0
         with:

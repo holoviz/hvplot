@@ -31,9 +31,9 @@ html_css_files += ['custom.css']  # noqa
 html_js_files = [
     'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js',
 ]
-
-switcher_version = (
-    'dev' if any(pr in hvplot.__version__ for pr in ('a', 'b', 'rc', 'dev')) else version
+switcher_version = os.getenv(
+    'VERSION',
+    'dev' if any(pr in hvplot.__version__ for pr in ('a', 'b', 'rc', 'dev')) else version,
 )
 html_theme_options.update(  # noqa
     {

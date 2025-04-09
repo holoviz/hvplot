@@ -1,12 +1,12 @@
 [
   {
     "version": "dev",
-    "url": "https://hvplot.holoviz.org/en/docs/dev/"
+    "url": "https://hvplot-test.holoviz.org/en/docs/dev/"
   },
   {
     "name": "0.11.3 (latest)",
     "version": "0.11.3",
-    "url": "https://hvplot.holoviz.org/en/docs/latest/",
+    "url": "https://hvplot-test.holoviz.org/en/docs/latest/",
     "preferred": true
   }
 ]
