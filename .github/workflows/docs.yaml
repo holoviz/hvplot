@@ -29,7 +29,6 @@ defaults:
 
 env:
   PYTHON_VERSION: "3.11"
-  PACKAGE: "hvplot"
 
 jobs:
   pixi_lock:
