@@ -8,9 +8,5 @@
     "version": "0.11.3",
     "url": "https://hvplot.holoviz.org/en/docs/latest/",
     "preferred": true
-  },
-  {
-    "version": "0.10.0",
-    "url": "https://hvplot.holoviz.org/en/docs/v0.10.0/"
   }
 ]

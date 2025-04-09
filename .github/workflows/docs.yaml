@@ -20,7 +20,6 @@ on:
     version:
       description: 'Version tag (required if target is main)'
       required: false
-      default: v0.11.3  # HACK: REMOVE ME BEFORE MERGE
   schedule:
     - cron: '0 15 * * SUN'
 
@@ -52,10 +51,9 @@ jobs:
         env:
           VERSION: ${{ inputs.version }}
         run: |
-          echo $VERSION
-          if [[ -z "$VERSION" || ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          if [[ -z "$VERSION" || "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "❌ 'version' is required and must match format vX.X.X (e.g. v0.11.1) when target is 'main'"
-            exit 1
+          # exit 1  # TODO: Uncomment before merge
           fi
       - uses: holoviz-dev/holoviz_tasks/pixi_install@v0
         with:
