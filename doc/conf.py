@@ -32,6 +32,7 @@ html_js_files = [
     'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js',
 ]
 
+switcher_version = 'dev' if any(pr in hvplot.__version__ for pr in ('a', 'b', 'rc')) else version
 html_theme_options.update(  # noqa
     {
         'navbar_start': ['navbar-logo', 'version-switcher'],
@@ -59,7 +60,7 @@ html_theme_options.update(  # noqa
             # 'json_url': 'http://127.0.0.1:5500/_static/switcher.json',
             # 'json_url': 'https://s3.us-east-1.amazonaws.com/hvplot.holoviz.org/en/docs/latest/_static/switcher.json',
             'json_url': 'https://hvplot-test.holoviz.org/en/docs/latest/_static/switcher.json',
-            'version_match': 'dev' if any(pr in version for pr in ('a', 'b', 'rc')) else version,
+            'version_match': switcher_version,
         },
     }
 )
@@ -131,7 +132,6 @@ html_context.update(  # noqa
         'github_user': 'holoviz',
         'github_repo': 'hvplot',
         'default_mode': 'light',
-        'SITEMAP_BASE_URL': 'https://hvplot-test.holoviz.org/en/docs/',  # Trailing slash is needed
     }
 )
 
