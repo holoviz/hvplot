@@ -60,8 +60,6 @@ html_theme_options.update(  # noqa
         'pygments_dark_style': 'material',
         # 'announcement': "hvPlot 0.11 has just been released! Checkout the <a href='https://blog.holoviz.org/posts/hvplot_release_0.11/'>blog post</a> and support hvPlot by giving it a 🌟 on <a href='https://github.com/holoviz/hvplot'>Github</a>.",
         'switcher': {
-            # 'json_url': 'http://127.0.0.1:5500/_static/switcher.json',
-            # 'json_url': 'https://s3.us-east-1.amazonaws.com/hvplot.holoviz.org/en/docs/latest/_static/switcher.json',
             'json_url': 'https://hvplot-test.holoviz.org/switcher.json',
             'version_match': switcher_version,
         },
