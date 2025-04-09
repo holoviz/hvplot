@@ -62,7 +62,7 @@ html_theme_options.update(  # noqa
         'switcher': {
             # 'json_url': 'http://127.0.0.1:5500/_static/switcher.json',
             # 'json_url': 'https://s3.us-east-1.amazonaws.com/hvplot.holoviz.org/en/docs/latest/_static/switcher.json',
-            'json_url': 'https://hvplot-test.holoviz.org/en/docs/latest/_static/switcher.json',
+            'json_url': 'https://hvplot-test.holoviz.org/switcher.json',
             'version_match': switcher_version,
         },
     }
