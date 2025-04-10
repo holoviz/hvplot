@@ -31,9 +31,14 @@ html_css_files += ['custom.css']  # noqa
 html_js_files = [
     'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js',
 ]
-
+switcher_version = (
+    os.getenv('VERSION') or 'dev'
+    if any(pr in hvplot.__version__ for pr in ('a', 'b', 'rc', 'dev'))
+    else version
+)
 html_theme_options.update(  # noqa
     {
+        'navbar_start': ['navbar-logo', 'version-switcher'],
         'github_url': 'https://github.com/holoviz/hvplot',
         'icon_links': [
             {
@@ -52,8 +57,13 @@ html_theme_options.update(  # noqa
                 'icon': 'fa-brands fa-discord',
             },
         ],
-        'pygment_dark_style': 'material',
+        'pygments_dark_style': 'material',
         # 'announcement': "hvPlot 0.11 has just been released! Checkout the <a href='https://blog.holoviz.org/posts/hvplot_release_0.11/'>blog post</a> and support hvPlot by giving it a 🌟 on <a href='https://github.com/holoviz/hvplot'>Github</a>.",
+        'switcher': {
+            'json_url': 'https://hvplot-test.holoviz.org/switcher.json',
+            'version_match': switcher_version,
+        },
+        'show_version_warning_banner': True,
     }
 )
 
@@ -122,7 +132,7 @@ html_context.update(  # noqa
     {
         'last_release': f'v{release}',
         'github_user': 'holoviz',
-        'github_repo': 'panel',
+        'github_repo': 'hvplot',
         'default_mode': 'light',
     }
 )
