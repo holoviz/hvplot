@@ -62,12 +62,11 @@ jobs:
         if: failure()
         run: cat /tmp/sphinx-*.log | tail -n 100
       - uses: holoviz-dev/holoviz_tasks/docs-publish@docs_publish
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         with:
-          url: s3://hvplot.holoviz.org
-          cloudfront_id: E13QSRL36ILGWH
+          s3-url: s3://hvplot.holoviz.org
+          s3-cloudfront-id: E13QSRL36ILGWH
+          s3-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          s3-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           version: ${{ inputs.version }}
 
   pip_build_docs:
