@@ -184,7 +184,6 @@ class HoloViewsConverter:
         Whether to use dask for processing the data, helpful for large datasets that do not fit into memory.
     use_index : bool, default=True
         Whether to use the data's index for the x-axis by default.
-        if ``hover_cols == 'all'``, adds the index to the hover tools.
     value_label : str, default='value'
         Label for the data values, typically used for the y-axis or in legends.
 
