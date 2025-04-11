@@ -491,7 +491,6 @@ class HoloViewsConverter:
         'kind',
         'label',
         'persist',
-        'robust',
         'row',
         'col',
         'sort_date',
@@ -584,6 +583,7 @@ class HoloViewsConverter:
         'color_key',
         'cnorm',
         'rescale_discrete_levels',
+        'robust',
     ]
 
     _resample_options = [
