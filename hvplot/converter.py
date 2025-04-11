@@ -158,12 +158,6 @@ class HoloViewsConverter:
         Label for the data, typically used in the plot title or legends.
     persist : bool, default=False
         Whether to persist the data in memory when using dask.
-    robust : bool or None, default=None
-        If True and clim are absent, the colormap range is computed
-        with 2nd and 98th percentiles instead of the extreme values
-        for image elements. For RGB elements, clips the "RGB", or
-        raw reflectance values between 2nd and 98th percentiles.
-        Follows the same logic as xarray's robust option.
     row : str or None, default=None
         Column name to use for splitting the plot into separate subplots by rows.
     col : str or None, default=None
@@ -393,6 +387,13 @@ class HoloViewsConverter:
         rendering towards the (more visible) top of the ``cmap`` range,
         thus avoiding washout of the lower values.  Has no effect if
         ``cnorm!=`eq_hist``.
+    robust : bool or None, default=None
+        If True and clim are absent, the colormap range is computed
+        with 2nd and 98th percentiles instead of the extreme values
+        for image elements. For RGB elements, clips the "RGB", or
+        raw reflectance values between 2nd and 98th percentiles.
+        Follows the same logic as xarray's robust option.
+
 
     Resampling Options
     ------------------
