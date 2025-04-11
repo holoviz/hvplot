@@ -166,7 +166,7 @@ jobs:
   pip_test:
     name: pip tests:${{ matrix.os }}:${{ matrix.environment }}
     needs: [pre_commit, setup]
-    if: needs.setup.outputs.matrix_option != 'default'
+    if: needs.setup.outputs.matrix_option == 'full'
     timeout-minutes: 90
     runs-on: ${{ matrix.os }}
     strategy:
