@@ -126,7 +126,7 @@ jinja2 = "*"
 # fugue[sql] = "*"
 fugue = "*"
 # end fugue
-"ibis-duckdb" = "*"  # ibis-framework[duckdb]
+ibis-duckdb = ">=9.0.0"  # ibis-framework[duckdb]
 intake-parquet = ">=0.2.3"
 intake-xarray = ">=0.5.0,<2"
 intake  = ">=0.6.5,<2.0.0"
@@ -188,7 +188,7 @@ jinja2 = "*"
 # fugue[sql] = "*"
 fugue = "*"
 # end fugue
-"ibis-duckdb" = "*"  # ibis-framework[duckdb]
+ibis-duckdb = ">=9.0.0"  # ibis-framework[duckdb]
 polars = "*"
 dask = "*"
 spatialpandas = "*"
