@@ -145,19 +145,19 @@ class HoloViewsConverter:
         Returns a DynamicMap if ``dynamic=True``, else returns a HoloMap.
         See ``dynamic`` for more information.
     group_label : str or None, default=None
-        Label for grouped data, typically in legends or axis labels.
+        A custom label for the grouping dimension used in overlay plots.
+        When multiple series are plotted, hvPlot creates an overlay (NdOverlay)
+        with a key dimension that labels each series. By default, this label is set
+        to 'Variable'. Setting `group_label` overrides this default, allowing you to
+        provide a more descriptive name for the grouping dimension.
+        Note that `group_label` only affects the overlay’s key dimension when multiple
+        groups (or series) are present.
     kind : str, default='line'
         The type of plot to generate.
     label : str or None, default=None
         Label for the data, typically used in the plot title or legends.
     persist : bool, default=False
         Whether to persist the data in memory when using dask.
-    robust : bool or None, default=None
-        If True and clim are absent, the colormap range is computed
-        with 2nd and 98th percentiles instead of the extreme values
-        for image elements. For RGB elements, clips the "RGB", or
-        raw reflectance values between 2nd and 98th percentiles.
-        Follows the same logic as xarray's robust option.
     row : str or None, default=None
         Column name to use for splitting the plot into separate subplots by rows.
     col : str or None, default=None
@@ -178,7 +178,6 @@ class HoloViewsConverter:
         Whether to use dask for processing the data, helpful for large datasets that do not fit into memory.
     use_index : bool, default=True
         Whether to use the data's index for the x-axis by default.
-        if ``hover_cols == 'all'``, adds the index to the hover tools.
     value_label : str, default='value'
         Label for the data values, typically used for the y-axis or in legends.
 
@@ -388,6 +387,13 @@ class HoloViewsConverter:
         rendering towards the (more visible) top of the ``cmap`` range,
         thus avoiding washout of the lower values.  Has no effect if
         ``cnorm!=`eq_hist``.
+    robust : bool or None, default=None
+        If True and clim are absent, the colormap range is computed
+        with 2nd and 98th percentiles instead of the extreme values
+        for image elements. For RGB elements, clips the "RGB", or
+        raw reflectance values between 2nd and 98th percentiles.
+        Follows the same logic as xarray's robust option.
+
 
     Resampling Options
     ------------------
@@ -485,7 +491,6 @@ class HoloViewsConverter:
         'kind',
         'label',
         'persist',
-        'robust',
         'row',
         'col',
         'sort_date',
@@ -578,6 +583,7 @@ class HoloViewsConverter:
         'color_key',
         'cnorm',
         'rescale_discrete_levels',
+        'robust',
     ]
 
     _resample_options = [
@@ -1563,7 +1569,7 @@ class HoloViewsConverter:
             except Exception as e:
                 if attr_labels is True:
                     param.main.param.warning(
-                        'Unable to auto label using xarray attrs ' f'because {e}'
+                        f'Unable to auto label using xarray attrs because {e}'
                     )
 
     def _process_plot(self):
@@ -2108,8 +2114,8 @@ class HoloViewsConverter:
                 f'{tile_source} tiles not recognized. tiles must be either True, a '
                 'xyzservices.TileProvider instance, a HoloViews'
                 + (' or Geoviews' if lib == 'geoviews' else '')
-                + " basemap string "
-                f"(one of {', '.join(sorted(sources))}), a HoloViews Tiles instance"
+                + ' basemap string '
+                f'(one of {", ".join(sorted(sources))}), a HoloViews Tiles instance'
                 + (', a Geoviews WMTS instance' if lib == 'geoviews' else '')
                 + '.'
             )
