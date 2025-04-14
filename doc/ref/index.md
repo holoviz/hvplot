@@ -4,8 +4,12 @@ The reference section includes the API reference and pages that provide detailed
 
 ```{toctree}
 :titlesonly:
+:includehidden:
 :maxdepth: 2
 
-Plotting API <plot_api/index>
-Plot Options <plot_options/index>
+Installation <installation>
+Supported data libraries <data_libraries>
+Supported plotting extensions <plotting_extensions>
+Plotting options <plot_options/index>
+API <api/index>
 ```

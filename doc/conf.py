@@ -52,7 +52,7 @@ html_theme_options.update(  # noqa
                 'icon': 'fa-brands fa-discord',
             },
         ],
-        'pygment_dark_style': 'material',
+        'pygments_dark_style': 'material',
         # 'announcement': "hvPlot 0.11 has just been released! Checkout the <a href='https://blog.holoviz.org/posts/hvplot_release_0.11/'>blog post</a> and support hvPlot by giving it a 🌟 on <a href='https://github.com/holoviz/hvplot'>Github</a>.",
     }
 )
@@ -112,6 +112,8 @@ rediraffe_redirects = {
     'developer_guide/testing': 'developer_guide',
     # Removal of the developer_guide folder
     'developer_guide/index': 'developer_guide',
+    # Integrations user guide moved to the reference
+    'user_guide/integrations': 'ref/data_libraries',
 }
 
 html_context.update(  # noqa
@@ -174,8 +176,8 @@ if os.getenv('HVPLOT_EXECUTE_NBS') in ('False', 'false', '0'):
 
 # We replace the automatically generated stub files by notebooks
 # that include the API ref and some examples.
-autosummary_generate = False
-autosummary_generate_overwrite = False
+autosummary_generate = True
+# autosummary_generate_overwrite = False
 
 intersphinx_mapping = {
     'holoviews': ('https://holoviews.org/', None),
@@ -183,6 +185,15 @@ intersphinx_mapping = {
         'https://pandas.pydata.org/pandas-docs/stable/',
         'https://pandas.pydata.org/pandas-docs/stable/objects.inv',
     ),
+    'panel': ('https://panel.holoviz.org/', None),
 }
 # See https://docs.readthedocs.com/platform/stable/guides/intersphinx.html
 intersphinx_disabled_reftypes = ['*']
+
+# To avoid this warning
+# hvplot/ui.py:docstring of hvplot.ui.hvPlotExplorer:43: WARNING: autosummary: stub file not found 'hvplot.ui.hvPlotExplorer.hvplot'. Check your autosummary_generate setting.
+# See https://stackoverflow.com/a/73294408
+numpydoc_class_members_toctree = False
+
+numpydoc_show_inherited_class_members = False
+numpydoc_class_members_toctree = False

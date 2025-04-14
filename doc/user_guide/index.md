@@ -36,8 +36,6 @@ rather than Matplotlib.
 
 - [Introduction](Introduction)
   Introduction to hvPlot and how to start using it.
-- [Integrations](Integrations)
-  How hvPlot integrates with the Python ecosystem.
 - [Plotting with Bokeh](Plotting)
   Overview of plotting your data with hvPlot and Bokeh.
 - [Plotting with Matplotlib](Plotting_with_Matplotlib)
@@ -81,7 +79,6 @@ rather than Matplotlib.
 :titlesonly: true
 
 Introduction <Introduction>
-Integrations <Integrations>
 Plotting with Bokeh <Plotting>
 Plotting with Matplotlib <Plotting_with_Matplotlib>
 Plotting with Plotly <Plotting_with_Plotly>
