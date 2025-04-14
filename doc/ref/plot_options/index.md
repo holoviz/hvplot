@@ -16,6 +16,8 @@ See [this page](./data) for more information on these options.
 .. plotting-options-table:: Size And Layout Options
 ```
 
+See [this page](./size) for more information on these options.
+
 ## Axis Options
 
 ```{eval-rst}
@@ -59,4 +61,5 @@ See [this page](./data) for more information on these options.
 
 All Options <self>
 Data Options <data>
+Size and Layout Options <size>
 ```
