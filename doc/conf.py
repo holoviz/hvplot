@@ -90,7 +90,7 @@ nbsite_gallery_conf = {
         'reference': {
             'title': 'Reference Gallery',
             'intro': (
-                'Find the list of supported libraries on the `Integrations <../user_guide/Integrations.html>`_ page.'
+                'Find the list of supported libraries on `this page <../ref/data_libraries.html>`_.'
             ),
             'sections': [
                 'tabular',
