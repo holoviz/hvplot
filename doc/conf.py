@@ -150,6 +150,9 @@ html_context.update(  # noqa
     }
 )
 
+# linkcheck
+linkcheck_ignore = [r'https://github.com/holoviz/hvplot/pull/\d+']
+
 # mystnb
 nb_execution_excludepatterns = [
     'user_guide/Streaming.ipynb',
