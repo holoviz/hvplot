@@ -136,6 +136,8 @@ rediraffe_redirects = {
     'user_guide/pandas_api': 'ref/api_compatibility/pandas/pandas_api',
 }
 
+html_extra_path = ['topics.html']
+
 html_context.update(  # noqa
     {
         'last_release': f'v{release}',
