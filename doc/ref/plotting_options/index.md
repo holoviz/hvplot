@@ -1,6 +1,6 @@
 (plot-options)=
 
-# Plot Options
+# Plotting Options
 
 ## Data Options
 

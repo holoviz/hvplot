@@ -10,6 +10,6 @@ The reference section includes the API reference and pages that provide detailed
 Installation <installation>
 Supported data libraries <data_libraries>
 Supported plotting extensions <plotting_extensions>
-Plotting options <plot_options/index>
+Plotting options <plotting_options/index>
 API <api/index>
 ```
