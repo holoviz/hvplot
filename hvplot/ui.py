@@ -58,7 +58,7 @@ def explorer(data, **kwargs):
     This function returns an interactive Panel component that enable you to quickly change the
     settings of your plot via widgets.
 
-    Reference: https://hvplot.holoviz.org/getting_started/explorer.html
+    Reference: https://hvplot.holoviz.org/user_guide/explorer.html
 
     Parameters
     ----------

@@ -33,6 +33,10 @@ no-default-feature = true
 features = ["py312", "required", "test-core", "test", "example", "geo", "graphviz", "test-example"]
 no-default-feature = true
 
+[environments.test-313]
+features = ["py313", "required", "test-core", "test", "example", "geo", "graphviz", "test-example"]
+no-default-feature = true
+
 [environments.test-core]
 features = ["py313", "required", "test-core"]
 no-default-feature = true
@@ -122,7 +126,7 @@ jinja2 = "*"
 # fugue[sql] = "*"
 fugue = "*"
 # end fugue
-"ibis-duckdb" = "*"  # ibis-framework[duckdb]
+ibis-duckdb = ">=9.0.0"  # ibis-framework[duckdb]
 intake-parquet = ">=0.2.3"
 intake-xarray = ">=0.5.0,<2"
 intake  = ">=0.6.5,<2.0.0"
@@ -143,6 +147,7 @@ streamz = ">=0.3.0"
 xarray = ">=0.18.2"
 xyzservices = ">=2022.9.0"
 geodatasets = ">=2023.12.0"
+hvsampledata = "*"
 
 # =================== TESTS ===================
 
@@ -183,7 +188,7 @@ jinja2 = "*"
 # fugue[sql] = "*"
 fugue = "*"
 # end fugue
-"ibis-duckdb" = "*"  # ibis-framework[duckdb]
+ibis-duckdb = ">=9.0.0"  # ibis-framework[duckdb]
 polars = "*"
 dask = "*"
 spatialpandas = "*"

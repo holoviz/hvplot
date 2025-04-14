@@ -112,6 +112,12 @@ rediraffe_redirects = {
     'developer_guide/testing': 'developer_guide',
     # Removal of the developer_guide folder
     'developer_guide/index': 'developer_guide',
+    # Redirecting removed "getting started" pages to the new location
+    'getting_started/index': 'tutorials/index',
+    'getting_started/explorer': 'tutorials/getting_started',
+    'getting_started/hvplot': 'tutorials/getting_started',
+    'getting_started/installation': 'tutorials/getting_started',
+    'getting_started/interactive': 'tutorials/getting_started',
     # Integrations user guide moved to the reference
     'user_guide/integrations': 'ref/data_libraries',
 }
@@ -168,8 +174,8 @@ else:
 if os.getenv('HVPLOT_EXECUTE_NBS_USER_GUIDE') in ('False', 'false', '0'):
     nb_execution_excludepatterns.append('user_guide/**/*.ipynb')
 
-if os.getenv('HVPLOT_EXECUTE_NBS_GETTING_STARTED') in ('False', 'false', '0'):
-    nb_execution_excludepatterns.append('getting_started/**/*.ipynb')
+if os.getenv('HVPLOT_EXECUTE_NBS_TUTORIALS') in ('False', 'false', '0'):
+    nb_execution_excludepatterns.append('tutorials/**/*.ipynb')
 
 if os.getenv('HVPLOT_EXECUTE_NBS') in ('False', 'false', '0'):
     nb_execution_mode = 'off'
