@@ -333,8 +333,8 @@ class HoloViewsConverter:
     tools : list, default=[]
         List of tool instances or strings (e.g. ['tap', 'box_select'])
 
-    Style Options
-    -------------
+    Styling Options
+    ---------------
     bgcolor : str or None, default=None
         Background color of the data area of the plot
     color : str or list or column name or None, default=None
@@ -607,7 +607,7 @@ class HoloViewsConverter:
         'axis': 'Axis Options',
         'grid_legend': 'Grid And Legend Options',
         'interactivity': 'Interactivity Options',
-        'style': 'Style Options',
+        'style': 'Styling Options',
         'resampling': 'Resampling Options',
         'streaming': 'Streaming Options',
     }

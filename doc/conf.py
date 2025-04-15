@@ -120,6 +120,8 @@ rediraffe_redirects = {
     'getting_started/interactive': 'tutorials/getting_started',
     # Integrations user guide moved to the reference
     'user_guide/integrations': 'ref/data_libraries',
+    # Customizations user guide moved to the reference
+    'user_guide/Customization': 'ref/plotting_options/index',
 }
 
 html_context.update(  # noqa

@@ -859,7 +859,7 @@ def _get_doc_and_signature(
     backend_style_opts = _get_backend_style_options(kind, backend=backend)
     if style:
         formatter += '\n{style}'
-    style_opts = 'Style options\n-------------\n' + '\n'.join(sorted(backend_style_opts))
+    style_opts = 'Styling options\n---------------\n' + '\n'.join(sorted(backend_style_opts))
 
     parameters = []
     # The options are built in this order in the signature and the docstring.
