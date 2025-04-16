@@ -58,7 +58,7 @@ def explorer(data, **kwargs):
     This function returns an interactive Panel component that enable you to quickly change the
     settings of your plot via widgets.
 
-    Reference: https://hvplot.holoviz.org/getting_started/explorer.html
+    Reference: https://hvplot.holoviz.org/user_guide/explorer.html
 
     Parameters
     ----------
@@ -553,9 +553,11 @@ class hvPlotExplorer(Viewer):
         if 'y' in params:
             params['y_multi'] = params.pop('y') if isinstance(params['y'], list) else [params['y']]
         statusbar_params = {k: params.pop(k) for k in params.copy() if k in StatusBar.param}
+        opts_kwargs = params.pop('opts', {})
         converter = _hvConverter(
             df, x, y, **{k: v for k, v in params.items() if k not in ('x', 'y', 'y_multi')}
         )
+        params['opts'] = opts_kwargs
         # Collect kwargs passed to the constructor but meant for the controls
         extras = {k: params.pop(k) for k in params.copy() if k not in self.param}
         super().__init__(**params)

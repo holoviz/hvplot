@@ -329,7 +329,7 @@ align: center
 
 **`.interactive()` to turn data pipelines into widget-based interactive applications**
 
-By starting a data pipeline with [`.interactive()`](./getting_started/interactive) you can then inject widgets into an extract and transform data pipeline. The pipeline output dynamically updates with widget changes, making data exploration in Jupyter notebooks in particular a lot more efficient.
+By starting a data pipeline with [`.interactive()`](./user_guide/Interactive) you can then inject widgets into an extract and transform data pipeline. The pipeline output dynamically updates with widget changes, making data exploration in Jupyter notebooks in particular a lot more efficient.
 
 ::::{tab-set}
 
@@ -420,10 +420,11 @@ align: center
 :hidden:
 :maxdepth: 2
 
-Getting Started <getting_started/index>
+Tutorials <tutorials/index>
 User Guide <user_guide/index>
 Reference Gallery <reference/index>
 Topics <topics>
+Reference <ref/index>
 Developer Guide <developer_guide>
 Releases <releases>
 Roadmap <roadmap>

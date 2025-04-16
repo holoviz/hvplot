@@ -13,11 +13,11 @@ If you have any problems with the steps here, please reach out in the `dev` chan
 0. Open an [issue on Github](https://github.com/holoviz/hvplot/issues) if needed
 1. Fork and clone [hvPlot's Github repository](https://github.com/holoviz/hvplot)
 2. Install [`pixi`](https://pixi.sh)
-3. Run `pixi run install-dev` to create your development environment
+3. Run `pixi run setup-dev` to create your development environment
 4. Make some changes and run:
   - `pixi run test-unit` if you updated the source code to run the unit tests
   - `pixi run test-example` if you updated the notebooks to run them
-  - `pixi run docs-build-dev` if you need to build the website locally
+  - `pixi run docs-build` if you need to build the website locally
 5. Open a Pull Request
 
 ## Preliminaries
@@ -80,7 +80,7 @@ This `hvplot` directory is the _source checkout_ for the remainder of this docum
 To start developing, run the following command, this will create an environment called `default` (in `.pixi/envs`), install hvPlot in [editable mode](https://pip.pypa.io/en/stable/topics/local-project-installs/#editable-installs), download test datasets, and install `pre-commit`:
 
 ```bash
-pixi run install-dev
+pixi run setup-dev
 ```
 
 :::{admonition} Note
@@ -106,7 +106,7 @@ pixi run sync-git-tags
 
 The `default` environment is meant to provide all the tools needed to develop hvPlot.
 
-This environment is created by running `pixi run install-dev`. Run `pixi shell` to activate it; this is equivalent to `source venv/bin/activate` in a Python virtual environment or `conda activate` in a conda environment.
+This environment is created by running `pixi run setup-dev`. Run `pixi shell` to activate it; this is equivalent to `source venv/bin/activate` in a Python virtual environment or `conda activate` in a conda environment.
 
 If you need to run a command directly instead of via `pixi`, activate the environment and run the command (e.g. `pixi shell` and `pytest hvplot/tests/<somefile.py>`).
 
@@ -137,7 +137,7 @@ You can launch Jupyter lab with the `default` environment with `pixi run lab`. T
 
 ## Linting
 
-hvPlot uses [`pre-commit`](https://pre-commit.com/) to lint and format the source code. `pre-commit` is installed automatically when running `pixi run install-dev`; it can also be installed with `pixi run lint-install`.
+hvPlot uses [`pre-commit`](https://pre-commit.com/) to lint and format the source code. `pre-commit` is installed automatically when running `pixi run setup-dev`; it can also be installed with `pixi run lint-install`.
 `pre-commit` runs all the linters when a commit is made locally. Linting can be forced to run for all the files with:
 
 ```bash
@@ -209,12 +209,35 @@ pixi run test-example
 The documentation can be built with the command:
 
 ```bash
-pixi run docs-build-dev
+pixi run docs-build
 ```
 
-As hvPlot uses notebooks for much of the documentation, this takes a little while. You can disable building the gallery by setting the environment variable `HVPLOT_REFERENCE_GALLERY` to `false`.
+As hvPlot uses notebooks for much of the documentation, this takes a little while. You can disable:
+
+- Executing all the notebooks by setting the environment variable `HVPLOT_EXECUTE_NBS` to `false`
+- Building the gallery with `HVPLOT_REFERENCE_GALLERY="false"`
+- Running the user guide notebooks with `HVPLOT_EXECUTE_NBS_USER_GUIDE="false"`
+- Running the getting started notebooks with `HVPLOT_EXECUTE_NBS_TUTORIALS="false"`
 
 A development version of hvPlot can be found [here](https://holoviz-dev.github.io/hvplot/). You can ask a maintainer if they want to make a dev release for your PR, but there is no guarantee they will say yes.
+
+### Link to hvPlot objects
+
+```md
+{meth}`hvplot.hvPlot.scatter`
+{meth}`<obj>.scatter() <hvplot.hvPlot.scatter>`
+```
+
+### Intersphinx
+
+The Sphinx Intersphinx extension allows linking to references in other projects that use this extension. For example:
+
+1. Run this command to find all the references of the HoloViews site `python -m sphinx.ext.intersphinx https://holoviews.org/objects.inv`
+2. Extend `intersphinx_mapping` in `conf.py`
+3. Link to the `Scatter` element with:
+```md
+:class:`holoviews:holoviews.element.Scatter`
+```
 
 ## Build
 
