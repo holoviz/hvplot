@@ -496,25 +496,10 @@ class hvPlotTabular(hvPlotBase):
             A color or a Field name to draw the color of the marker from
         s : int, optional, also available as 'size'
             The size of the marker
-        by : string, optional
-            A single field or list of fields to group by. All the subgroups are visualized.
-        groupby: string, list, optional
-            A single field or list of fields to group and filter by. Adds one or more widgets to
-            select the subgroup(s) to visualize.
         scale: number, optional
             Scaling factor to apply to point scaling.
         logz : bool
             Whether to apply log scaling to the z-axis. Default is False.
-        color : str or array-like, optional.
-            The color for each of the series. Possible values are:
-
-            A single color string referred to by name, RGB or RGBA code, for instance 'red' or
-            '#a98d19.
-
-            A sequence of color strings referred to by name, RGB or RGBA code, which will be used
-            for each series recursively. For instance ['green','yellow'] each field’s line will be
-            filled in green or yellow, alternatively. If there is only a single series to be
-            plotted, then only the first color from the color list will be used.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('scatter')`.
             See :ref:`plot-options` for more information.
