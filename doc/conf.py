@@ -122,6 +122,8 @@ rediraffe_redirects = {
     'user_guide/integrations': 'ref/data_libraries',
     # Customizations user guide moved to the reference
     'user_guide/Customization': 'ref/plotting_options/index',
+    # Pandas API viz user guide moved to the reference
+    'user_guide/pandas_api': 'ref/api_compatibility/pandas/pandas_api',
 }
 
 html_context.update(  # noqa

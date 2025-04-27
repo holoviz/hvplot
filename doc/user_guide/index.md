@@ -26,10 +26,7 @@ analysis pipelines using APIs you are already familiar with.
 
 Lastly the [statistical plots](Statistical_Plots.ipynb) section will
 take you through a number of specialized plot types modelled on the
-pandas.plotting module and the [pandas API](Pandas_API.ipynb) section mimics
-the [pandas visualization docs](https://pandas.pydata.org/pandas-docs/stable/user_guide/visualization.ipynb)
-but using pandas.options.plotting.backend to do the plotting in HoloViews
-rather than Matplotlib.
+pandas.plotting module.
 
 **Overview**:
 
@@ -67,8 +64,6 @@ rather than Matplotlib.
   Using hvPlot when working with large timeseries data.
 - [Statistical Plots](Statistical_Plots)
   A number of statistical plot types modeled on the pandas.plotting module.
-- [Pandas API](Pandas_API)
-  How to use pandas.plot directly by switching out the plotting backend.
 
 ```{toctree}
 :hidden: true
@@ -92,5 +87,4 @@ Geographic Data <Geographic_Data>
 Timeseries Data <Timeseries_Data>
 Large Timeseries <Large_Timeseries>
 Statistical Plots <Statistical_Plots>
-Pandas API <Pandas_API>
 ```
