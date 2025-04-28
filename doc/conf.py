@@ -69,6 +69,7 @@ extensions += [  # noqa
     'sphinx_copybutton',
     'sphinxext.rediraffe',
     'numpydoc',
+    'sphinxcontrib.mermaid',
     # Custom extensions
     'backend_styling_options',
     'plotting_options_table',
