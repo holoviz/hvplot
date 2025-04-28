@@ -9,14 +9,21 @@ from .core import hvPlotTabular
 def lag_plot(data, lag=1, **kwds):
     """Lag plot for time series.
 
-    Parameters:
-    -----------
-    data: Time series
-    lag: lag of the scatter plot, default 1
-    kwds: hvplot.scatter options, optional
+    A lag plot is a scatter plot of a time series against a lag of itself. It helps
+    in visualizing the temporal dependence between observations by plotting the values
+    at time `t` on the x-axis and the values at time `t + lag` on the y-axis.
 
-    Returns:
-    --------
+    Parameters
+    ----------
+    data : Series
+        The time series to visualize.
+    lag : int, default 1
+        Lag length of the scatter plot.
+    **kwds : optional
+        hvplot.scatter options
+
+    Returns
+    -------
     obj : HoloViews object
         The HoloViews representation of the plot.
     """
