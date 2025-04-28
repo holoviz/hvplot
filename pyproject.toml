@@ -137,6 +137,7 @@ examples = [
     "xyzservices >=2022.9.0",
     "geodatasets >=2023.12.0",
     "bokeh_sampledata; python_version >= '3.10'",
+    "hvsampledata >=0.1.1",
 ]
 tests-nb = [
     "pytest-xdist",
