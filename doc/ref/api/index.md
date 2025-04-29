@@ -121,7 +121,7 @@ hvPlot's structure is based on Pandas' plotting API and as such provides special
 :maxdepth: 2
 :titlesonly: true
 
-hvplot.hvPlot.hvplot_area <hvplot_api/hvplot.hvPlot.area>
+hvplot.hvPlot.area <hvplot_api/hvplot.hvPlot.area>
 hvplot.hvPlot.bar <hvplot_api/hvplot.hvPlot.bar>
 hvplot.hvPlot.barh <hvplot_api/hvplot.hvPlot.barh>
 hvplot.hvPlot.box <hvplot_api/hvplot.hvPlot.box>
@@ -131,7 +131,6 @@ hvplot.hvPlot.contourf <hvplot_api/hvplot.hvPlot.contourf>
 hvplot.hvPlot.dataset <hvplot_api/hvplot.hvPlot.dataset>
 hvplot.hvPlot.density <hvplot_api/hvplot.hvPlot.density>
 hvplot.hvPlot.errorbars <hvplot_api/hvplot.hvPlot.errorbars>
-hvplot.hvPlot.explorer <hvplot_api/hvplot.hvPlot.explorer>
 hvplot.hvPlot.heatmap <hvplot_api/hvplot.hvPlot.heatmap>
 hvplot.hvPlot.hexbin <hvplot_api/hvplot.hvPlot.hexbin>
 hvplot.hvPlot.hist <hvplot_api/hvplot.hvPlot.hist>
