@@ -234,11 +234,13 @@ channels = [
 nbsite = ">=0.8.6"
 sphinxext-rediraffe = "*"
 numpydoc = "*"
+sphinxcontrib-mermaid = "*"
 
 [feature.doc.activation.env]
 MOZ_HEADLESS = "1"
 MPLBACKEND = "Agg"
 DISPLAY = ":99.0"
+HVPLOT_PATCH_PLOT_DOCSTRING_SIGNATURE = "false"
 
 [feature.doc.tasks]
 docs-build-sphinx = 'sphinx-build -j auto -b html doc builtdocs'
@@ -246,7 +248,6 @@ _docs-install = 'python -m pip install --no-deps --disable-pip-version-check -e 
 # Depends on _docs-install instead of install as install
 # in the default environment
 docs-build = { depends-on = ["_docs-install", "docs-build-sphinx"] }
-
 
 # ================== BUILD ====================
 
