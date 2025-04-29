@@ -69,7 +69,7 @@ The `.pixi` directory can be large, so it is advised not to put the source direc
 The source code for the hvPlot project is hosted on [GitHub](https://github.com/holoviz/hvplot). The first thing you need to do is clone the repository.
 
 1. Go to [github.com/holoviz/hvplot](https://github.com/holoviz/hvplot)
-2. [Fork the repository](https://docs.github.com/en/get-started/quickstart/contributing-to-projects#forking-a-repository)
+2. [Fork the repository](https://docs.github.com/en/get-started/quickstart/contributing-to-projects)
 3. Run in your terminal: `git clone https://github.com/<Your Username Here>/hvplot`
 
 The instructions for cloning above created a `hvplot` directory at your file system location.

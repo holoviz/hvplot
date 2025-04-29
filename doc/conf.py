@@ -6,6 +6,7 @@ sys.path.insert(0, os.path.abspath('_ext'))
 
 import os
 import param
+import pydata_sphinx_theme
 
 param.parameterized.docstring_signature = False
 param.parameterized.docstring_describe_params = False
@@ -26,6 +27,10 @@ exclude_patterns = ['governance']
 
 html_static_path += ['_static']  # noqa
 
+if pydata_sphinx_theme.__version__ == '0.16.1':
+    # See https://github.com/pydata/pydata-sphinx-theme/issues/2088
+    templates_path.append('_static/patch_templates')  # noqa
+
 html_css_files += ['custom.css']  # noqa
 
 html_js_files = [
@@ -34,6 +39,7 @@ html_js_files = [
 
 html_theme_options.update(  # noqa
     {
+        'use_edit_page_button': True,
         'github_url': 'https://github.com/holoviz/hvplot',
         'icon_links': [
             {
@@ -56,6 +62,9 @@ html_theme_options.update(  # noqa
         # 'announcement': "hvPlot 0.11 has just been released! Checkout the <a href='https://blog.holoviz.org/posts/hvplot_release_0.11/'>blog post</a> and support hvPlot by giving it a 🌟 on <a href='https://github.com/holoviz/hvplot'>Github</a>.",
     }
 )
+
+# Without this .txt is appended to the files
+html_sourcelink_suffix = ''
 
 html_theme = 'pydata_sphinx_theme'
 html_logo = '_static/logo_horizontal.svg'
@@ -127,14 +136,22 @@ rediraffe_redirects = {
     'user_guide/pandas_api': 'ref/api_compatibility/pandas/pandas_api',
 }
 
+html_extra_path = ['topics.html']
+
 html_context.update(  # noqa
     {
         'last_release': f'v{release}',
-        'github_user': 'holoviz',
-        'github_repo': 'panel',
         'default_mode': 'light',
+        # Useful for the edit button
+        'github_user': 'holoviz',
+        'github_repo': 'hvplot',
+        'github_version': 'main',
+        'doc_path': 'doc',
     }
 )
+
+# linkcheck
+linkcheck_ignore = [r'https://github.com/holoviz/hvplot/pull/\d+']
 
 # mystnb
 nb_execution_excludepatterns = [

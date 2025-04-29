@@ -7,6 +7,7 @@ jupytext:
 kernelspec:
   display_name: Python 3
   name: python3
+  language: python
 ---
 
 # hvPlot
@@ -22,6 +23,17 @@ width: 70%
 ```
 
 **`.hvplot()` is a powerful and interactive Pandas-like `.plot()` API**
+
+---
+
+```{button-ref} tutorials/getting_started
+:ref-type: doc
+:align: center
+:color: primary
+:class: getting-started-button
+
+Get Started
+```
 
 ---
 
@@ -423,7 +435,6 @@ align: center
 Tutorials <tutorials/index>
 User Guide <user_guide/index>
 Reference Gallery <reference/index>
-Topics <topics>
 Reference <ref/index>
 Developer Guide <developer_guide>
 Releases <releases>
