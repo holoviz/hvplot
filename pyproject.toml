@@ -154,6 +154,7 @@ doc = [
     "nbsite >=0.8.6",
     "sphinxext-rediraffe",
     "numpydoc",
+    "sphinxcontrib-mermaid",
 ]
 # Trick to let pip know we want to install dev dependencies
 hvdev = [

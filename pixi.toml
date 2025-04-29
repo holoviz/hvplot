@@ -234,6 +234,7 @@ channels = [
 nbsite = ">=0.8.6"
 sphinxext-rediraffe = "*"
 numpydoc = "*"
+sphinxcontrib-mermaid = "*"
 
 [feature.doc.activation.env]
 MOZ_HEADLESS = "1"
