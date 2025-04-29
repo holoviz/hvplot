@@ -145,13 +145,13 @@ class HoloViewsConverter:
         Returns a DynamicMap if ``dynamic=True``, else returns a HoloMap.
         See ``dynamic`` for more information.
     group_label : str or None, default=None
-        A custom label for the grouping dimension used in overlay plots.
-        When multiple series are plotted, hvPlot creates an overlay (NdOverlay)
-        with a key dimension that labels each series. By default, this label is set
-        to 'Variable'. Setting `group_label` overrides this default, allowing you to
-        provide a more descriptive name for the grouping dimension.
-        Note that `group_label` only affects the overlay’s key dimension when multiple
-        groups (or series) are present.
+        Sets a custom label for the dimension created when plotting multiple columns.
+        When multiple columns are plotted (e.g., multiple y values), hvPlot automatically reshapes the data from wide to long format.
+        It creates a new grouping dimension that holds the original column names.
+        By default, this grouping dimension is labeled 'Variable'.
+        Setting ``group_label`` overrides this default label.
+
+        Note: ``group_label`` only applies when plotting multiple columns and does not control grouping with ``by``.
     kind : str, default='line'
         The type of plot to generate.
     label : str or None, default=None
@@ -166,20 +166,17 @@ class HoloViewsConverter:
         Whether to sort the x-axis by date before plotting
     subplots : bool, default=False
         Whether to display data in separate subplots when using the ``by`` parameter.
-    symmetric : bool or None, default=None
-        Whether the data are symmetric around zero. If left unset, the data
-        will be checked for symmetry as long as the size is less than
-        ``check_symmetric_max``.
-    check_symmetric_max : int, default=1000000
-        Size above which to stop checking for symmetry by default on the data.
     transforms : dict, default={}
         A dictionary of HoloViews dim transforms to apply before plotting
     use_dask : bool, default=False
-        Whether to use dask for processing the data, helpful for large datasets that do not fit into memory.
+        Enables support for Dask-backed xarray datasets, allowing out-of-core computation
+        and parallel processing. Only applicable when the input data is an xarray object.
+        Has no effect on Pandas or other non-xarray data structures.
     use_index : bool, default=True
         Whether to use the data's index for the x-axis by default.
     value_label : str, default='value'
-        Label for the data values, typically used for the y-axis or in legends.
+        Sets a custom label for the values when the data is reshaped from wide to long format (e.g., when plotting multiple columns).
+        This label is typically used for the y-axis, colorbar, or in hover tooltips.
 
     Geographic Options
     ------------------
@@ -393,6 +390,12 @@ class HoloViewsConverter:
         for image elements. For RGB elements, clips the "RGB", or
         raw reflectance values between 2nd and 98th percentiles.
         Follows the same logic as xarray's robust option.
+    symmetric : bool or None, default=None
+        Whether the data are symmetric around zero. If left unset, the data
+        will be checked for symmetry as long as the size is less than
+        ``check_symmetric_max``.
+    check_symmetric_max : int, default=1000000
+        Size above which to stop checking for symmetry by default on the data.
 
 
     Resampling Options
@@ -495,8 +498,6 @@ class HoloViewsConverter:
         'col',
         'sort_date',
         'subplots',
-        'symmetric',
-        'check_symmetric_max',
         'transforms',
         'use_dask',
         'use_index',
@@ -584,6 +585,8 @@ class HoloViewsConverter:
         'cnorm',
         'rescale_discrete_levels',
         'robust',
+        'symmetric',
+        'check_symmetric_max',
     ]
 
     _resample_options = [
