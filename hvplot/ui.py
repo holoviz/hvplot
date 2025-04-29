@@ -58,31 +58,36 @@ def explorer(data, **kwargs):
     This function returns an interactive Panel component that enable you to quickly change the
     settings of your plot via widgets.
 
-    Reference: https://hvplot.holoviz.org/user_guide/explorer.html
+    Reference: https://hvplot.holoviz.org/user_guide/Explorer.html
 
     Parameters
     ----------
     data : pandas.DataFrame | xarray.DataArray | xarray.Dataset
         Data structure to explore.
-    kwargs : optional
+    **kwargs : optional
         Arguments that `data.hvplot()` would also accept like `kind='bar'`.
 
     Returns
     -------
-    hvplotExporer
-        Panel component to explore the data and design your plot.
+    hvplotExplorer
+        Panel component to explore the data and design your plot. See
+        :class:`hvplot.ui.hvplotExplorer` for details.
 
-    Example
-    -------
+    Examples
+    --------
 
-    >>> import hvplot.pandas
-    >>> import pandas as pd
-    >>> df = pd.DataFrame({"x": [1, 2, 3], "y": [1, 4, 9]})
-    >>> hvplot.explorer(df)
+    .. code-block::
+
+       import hvplot.pandas
+       import pandas as pd
+       df = pd.DataFrame({"x": [1, 2, 3], "y": [1, 4, 9]})
+       hvplot.explorer(df)
 
     You can also specify initial values
 
-    >>> hvplot.explorer(df, kind='bar', x='x')
+    .. code-block::
+
+       hvplot.explorer(df, kind='bar', x='x')
     """
     return hvPlotExplorer.from_data(data, **kwargs)
 
@@ -528,11 +533,7 @@ class hvPlotExplorer(Viewer):
 
     advanced = param.ClassSelector(class_=Advanced)
 
-    code = param.String(
-        precedence=-1,
-        doc="""
-        Code to generate the plot.""",
-    )
+    code = param.String(precedence=-1, doc='Code to generate the plot.')
 
     @classmethod
     def from_data(cls, data, **params):
@@ -798,13 +799,20 @@ class hvPlotExplorer(Viewer):
         in a notebook cell to create a plot from a call to the `.hvplot`
         accessor, and that includes all the customized settings of the explorer.
 
-        >>> hvexplorer.plot_code(var_name='data')
-        "data.hvplot(x='time', y='value')"
+        .. code-block::
+
+           >>> hvexplorer.plot_code(var_name='data')
+           "data.hvplot(x='time', y='value')"
 
         Parameters
         ----------
         var_name: string
             Data variable name by which the returned string will start.
+
+        Returns
+        -------
+        str
+            Code snippet
         """
         settings = self.settings()
         if 'legend' not in settings:
@@ -847,8 +855,15 @@ class hvPlotExplorer(Viewer):
         This dictionary can be reused as an unpacked input to the explorer or
         a call to the `.hvplot` accessor.
 
-        >>> hvplot.explorer(df, **settings)
-        >>> df.hvplot(**settings)
+        .. code-block::
+
+           hvplot.explorer(df, **settings)
+           df.hvplot(**settings)
+
+        Returns
+        -------
+        dict
+            Customized settings.
         """
         settings = {}
         for controller in self._controllers.values():

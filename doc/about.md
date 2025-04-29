@@ -1,6 +1,6 @@
 # About
 
-hvPlot is completely open source, available under a BSD license freely for both commercial and non-commercial use. hvPlot was originally developed with the support of [Anaconda Inc.](https://anaconda.com), and is now maintained by Anaconda developers and community contributors.
+hvPlot is completely open source, available under a BSD license freely for both commercial and non-commercial use. hvPlot was originally developed with the support of [Anaconda Inc.](https://www.anaconda.com), and is now maintained by Anaconda developers and community contributors.
 
 hvPlot is part of the [HoloViz](https://holoviz.org) family of tools. The [holoviz.org](https://holoviz.org) website shows how to use hvPlot together with other libraries to solve complex problems, with detailed tutorials and examples. You can see a variety of projects using hvPlot at [examples.holoviz.org](https://examples.holoviz.org), and you can compare hvPlot to other available tools at [pyviz.org](https://pyviz.org).
 

@@ -137,6 +137,7 @@ examples = [
     "xyzservices >=2022.9.0",
     "geodatasets >=2023.12.0",
     "bokeh_sampledata; python_version >= '3.10'",
+    "hvsampledata >=0.1.1",
 ]
 tests-nb = [
     "pytest-xdist",
@@ -150,9 +151,10 @@ examples-tests = [
 # Additional packages required to build the docs
 doc = [
     "hvplot[examples]",
-    "nbsite >=0.8.6",
+    "nbsite >=0.9.0a2",
     "sphinxext-rediraffe",
     "numpydoc",
+    "sphinxcontrib-mermaid",
 ]
 # Trick to let pip know we want to install dev dependencies
 hvdev = [
