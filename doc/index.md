@@ -26,6 +26,17 @@ width: 70%
 
 ---
 
+```{button-ref} tutorials/getting_started
+:ref-type: doc
+:align: center
+:color: primary
+:class: getting-started-button
+
+Get Started
+```
+
+---
+
 By replacing `.plot()` with `.hvplot()` you get an interactive figure. Try it out below!
 
 ```{code-cell} ipython3

@@ -20,3 +20,9 @@
     border: 0px;
     vertical-align: top;
 }
+
+.getting-started-button {
+    border-radius: 6px !important;
+    padding: 0.7em 3em !important;
+    font-size: 1.2em;
+}
