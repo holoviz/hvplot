@@ -2,6 +2,50 @@
 
 See [the HoloViz blog](https://blog.holoviz.org/#category=hvplot) for a visual summary of the major features added in a selection of releases.
 
+## Version 0.11.3 (2025-04-30)
+
+The 0.11.3 release is a patch release that brings a few bugfixes, migrates the developer tooling to [pixi](https://pixi.sh), and most importantly kicks off a large project - partially [funded by NumFocus](https://opencollective.com/holoviz/projects/holoviz-2024-sdg-r3) - aiming to improve the documentation by adopting the [Diátaxis](https://diataxis.fr/) framework. This release brings a new *Reference* section including a complete API reference, a new *Tutorials* section with a refactored version of the Getting Started and a new tutorial for users coming from Pandas. Many thanks to @Azaya89, @hoxbro, and @maximlt for their contributions!
+
+Bug Fixes:
+
+- Refactor and improve patching of the plotting methods docstring and signature ([#1520](https://github.com/holoviz/hvplot/pull/1520))
+- Fix setting `xaxis`/`yaxis` as string ([#1497](https://github.com/holoviz/hvplot/pull/1497))
+- Fix OHLC x-axis tooltip to handle datetime format ([#1493](https://github.com/holoviz/hvplot/pull/1493))
+- Fix calling special Pandas plotting methods with Pandas backend set to `'hvplot'` ([#1491](https://github.com/holoviz/hvplot/pull/1491))
+
+Documentation:
+
+- Various improvements before the release ([#1553](https://github.com/holoviz/hvplot/pull/1553))
+- Add Getting started with Pandas tutorial ([#1535](https://github.com/holoviz/hvplot/pull/1535))
+- Extend the Pandas API compatibility reference ([#1482](https://github.com/holoviz/hvplot/pull/1482))
+- Extend the reference with the plotting API and more ([#1530](https://github.com/holoviz/hvplot/pull/1530))
+- Add `hvsampledata` to the docs dependencies ([#1543](https://github.com/holoviz/hvplot/pull/1543))
+- Refactor the Getting Started tutorial to one page ([#1476](https://github.com/holoviz/hvplot/pull/1476))
+- Complete the signature of plot methods with all their kind options ([#1523](https://github.com/holoviz/hvplot/pull/1523))
+- Automatically document the generic plot options ([#1526](https://github.com/holoviz/hvplot/pull/1526))
+- Document extra keywords caught internally ([#1519](https://github.com/holoviz/hvplot/pull/1519))
+- Document the `stacked` docstring directly in the relevant methods ([#1517](https://github.com/holoviz/hvplot/pull/1517))
+- Re-categorize HoloViewsConverter docstring and add missing keywords in the correct special lists ([#1514](https://github.com/holoviz/hvplot/pull/1514))
+- Document keywords not in the HoloViewsConverter docstring ([#1511](https://github.com/holoviz/hvplot/pull/1511))
+- Removed 'Home' from website index and replace hide-cell with remove-cell ([#1477](https://github.com/holoviz/hvplot/pull/1477))
+
+Compatibility:
+
+- No longer use some deprecated Param API ([#1537](https://github.com/holoviz/hvplot/pull/1537))
+- Declare Python 3.13 support ([#1532](https://github.com/holoviz/hvplot/pull/1532))
+
+Infrastructure / Tests:
+
+- Add lower pin to ibis-duckdb ([#1542](https://github.com/holoviz/hvplot/pull/1542))
+- Parallelize the docs build and run on macOS ([#1531](https://github.com/holoviz/hvplot/pull/1531))
+- Run unit tests with param warnings as exceptions by default ([#1528](https://github.com/holoviz/hvplot/pull/1528))
+- Add tests to help ensure the generic options are documented ([#1527](https://github.com/holoviz/hvplot/pull/1527))
+- Align `pixi` developer commands with HoloViews ([#1502](https://github.com/holoviz/hvplot/pull/1502))
+- Only publish the conda package on a push event ([#1495](https://github.com/holoviz/hvplot/pull/1495))
+- Migrate to `pixi` ([#1470](https://github.com/holoviz/hvplot/pull/1470), [#1474](https://github.com/holoviz/hvplot/pull/1474), [#1494](https://github.com/holoviz/hvplot/pull/1494))
+
+[Full Changelog](https://github.com/holoviz/hvplot/compare/v0.11.2...v0.11.3)
+
 ## Version 0.11.2 (2024-12-16)
 
 The 0.11.2 release is a patch release that brings a few important bugfixes. Many thanks to @tomchor (first contribution!), @ahuang11, @Azaya89, @Hoxbro, and @maximlt for their contributions!
