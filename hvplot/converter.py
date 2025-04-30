@@ -227,9 +227,6 @@ class HoloViewsConverter:
 
     Size And Layout Options
     -----------------------
-    fontscale : number
-        Scales the size of all fonts by the same amount, e.g. fontscale=1.5
-        enlarges all fonts (title, xticks, labels etc.) by 50%
     frame_width/frame_height : int
         The width and height of the data area of the plot
     max_width/max_height : int
@@ -378,6 +375,9 @@ class HoloViewsConverter:
         Lower and upper bound of the color scale
     cnorm : str, default='linear'
         Color scaling which must be one of 'linear', 'log' or 'eq_hist'
+    fontscale : number
+        Scales the size of all fonts by the same amount, e.g. fontscale=1.5
+        enlarges all fonts (title, xticks, labels etc.) by 50%
     fontsize : number or dict or None, default=None
         Set title, label and legend text to the same fontsize. Finer control
         by using a dict: {'title': '15pt', 'ylabel': '5px', 'ticks': 20}
@@ -511,7 +511,6 @@ class HoloViewsConverter:
     ]
 
     _size_layout_options = [
-        'fontscale',
         'frame_height',
         'frame_width',
         'height',
@@ -572,6 +571,7 @@ class HoloViewsConverter:
         'clim',
         'color',
         'colormap',
+        'fontscale',
         'fontsize',
         'c',
         'cmap',
