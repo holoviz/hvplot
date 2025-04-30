@@ -133,7 +133,7 @@ rediraffe_redirects = {
     # Customizations user guide moved to the reference
     'user_guide/Customization': 'ref/plotting_options/index',
     # Pandas API viz user guide moved to the reference
-    'user_guide/pandas_api': 'ref/api_compatibility/pandas/pandas_api',
+    'user_guide/pandas_api': 'ref/api_compatibility/pandas/Pandas_API',
 }
 
 html_extra_path = ['topics.html']
