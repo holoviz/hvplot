@@ -1,0 +1,1021 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>hvPlot.scatter &#8212; hvPlot 0.11.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/nbsite.css?v=d9d93254" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/notebook.css?v=19946987" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/gallery.css?v=0a3248cd" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alert.css?v=c26666be" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/dataframe.css?v=a0f274c1" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/scroller.css?v=2dcde208" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/hv-sidebar-dropdown.css?v=3e2b0152" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=bab6b1ab" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=2088e4e3"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>
+    window.goatcounter = {
+        path: function(p) { return location.host + p }
+    }
+</script>
+    <script async="async" data-goatcounter="https://holoviz.goatcounter.com/count" src="../../../_static/js/goatcounter.js?v=f53f84b8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'ref/api/manual/hvplot.hvPlot.scatter';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="icon" href="../../../_static/favicon.ico"/>
+    <link rel="author" title="About these documents" href="../../../about.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="hvPlot.step" href="hvplot.hvPlot.step.html" />
+    <link rel="prev" title="hvPlot.rgb" href="hvplot.hvPlot.rgb.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.11.3" />
+    <meta name="docbuild:last-update" content="2025-04-30"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../_static/logo_horizontal.svg" class="logo__image only-light" alt="hvPlot 0.11.3 documentation - Home"/>
+    <img src="../../../_static/logo_horizontal.svg" class="logo__image only-dark pst-js-only" alt="hvPlot 0.11.3 documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/index.html">
+    Reference Gallery
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../index.html">
+    Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../developer_guide.html">
+    Developer Guide
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../releases.html">
+    Releases
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../roadmap.html">
+    Roadmap
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../about.html">
+    About
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/holoviz/hvplot" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://twitter.com/HoloViews" title="Twitter" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-twitter-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Twitter</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discourse.holoviz.org/c/hvplot" title="Discourse" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discourse fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Discourse</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discord.gg/AXRHnJU6sP" title="Discord" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discord fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Discord</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../user_guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/index.html">
+    Reference Gallery
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../index.html">
+    Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../developer_guide.html">
+    Developer Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../releases.html">
+    Releases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../roadmap.html">
+    Roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../about.html">
+    About
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/holoviz/hvplot" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://twitter.com/HoloViews" title="Twitter" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-twitter-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Twitter</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discourse.holoviz.org/c/hvplot" title="Discourse" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discourse fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Discourse</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discord.gg/AXRHnJU6sP" title="Discord" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discord fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Discord</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><!-- Adapted from sidebar-nav-bs.html (1.15.2) with the following changes
+
+  - Commented out the tag that adds the "Section Navigation" title
+  - Call generate_toctree_html with startdepth=0
+
+Please update this file when required when bumping the max pin of pydata-sphinx-theme.
+-->
+
+
+<nav class="bd-docs-nav bd-links"
+      aria-label="Section Navigation">
+  <!-- <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p> -->
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../tutorials/index.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/getting_started_pandas.html">Using hvPlot as a Pandas user</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://holoviz.org/tutorial/index.html">HoloViz Tutorial</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../user_guide/index.html">User Guide</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/Introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/Plotting.html">Plotting with Bokeh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/Plotting_with_Matplotlib.html">Plotting with Matplotlib</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/Plotting_with_Plotly.html">Plotting with Plotly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/Interactive.html">Interactive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/Widgets.html">Widgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/Plotting_Extensions.html">Plotting Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/Explorer.html">Exploring data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/Viewing.html">Viewing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/Subplots.html">Subplots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/Streaming.html">Streaming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/Gridded_Data.html">Gridded Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/NetworkX.html">Network Graphs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/Geographic_Data.html">Geographic Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/Timeseries_Data.html">Timeseries Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/Large_Timeseries.html">Large Timeseries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/Statistical_Plots.html">Statistical Plots</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../reference/index.html">Reference Gallery</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../reference/tabular/index.html">Tabular</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/tabular/andrewscurves.html">Andrewscurves</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/tabular/area.html">Area</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/tabular/bar.html">Bar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/tabular/barh.html">Barh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/tabular/bivariate.html">Bivariate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/tabular/box.html">Box</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/tabular/errorbars.html">Errorbars</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/tabular/heatmap.html">Heatmap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/tabular/hexbin.html">Hexbin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/tabular/hist.html">Hist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/tabular/kde.html">Kde</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/tabular/labels.html">Labels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/tabular/lagplot.html">Lagplot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/tabular/line.html">Line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/tabular/ohlc.html">Ohlc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/tabular/parallelcoordinates.html">Parallelcoordinates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/tabular/paths.html">Paths</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/tabular/scatter.html">Scatter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/tabular/scattermatrix.html">Scattermatrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/tabular/step.html">Step</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/tabular/table.html">Table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/tabular/violin.html">Violin</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../reference/geopandas/index.html">Geopandas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/geopandas/points.html">Points</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/geopandas/polygons.html">Polygons</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../reference/xarray/index.html">Xarray</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/xarray/bar.html">Bar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/xarray/contour.html">Contour</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/xarray/contourf.html">Contourf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/xarray/hist.html">Hist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/xarray/image.html">Image</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/xarray/kde.html">Kde</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/xarray/line.html">Line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/xarray/quadmesh.html">Quadmesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/xarray/rgb.html">Rgb</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/xarray/vectorfield.html">Vectorfield</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../reference/xarray/violin.html">Violin</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../index.html">Reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../data_libraries.html">Supported data libraries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../plotting_extensions.html">Supported plotting extensions</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../plotting_options/index.html">Plotting options</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../plotting_options/index.html">All Options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plotting_options/data.html">Data Options</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../index.html">API</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.help.html">hvplot.help</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.hvplot_extension.html">hvplot.hvplot_extension</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.extension.html">hvplot.extension</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.output.html">hvplot.output</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.render.html">hvplot.render</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.save.html">hvplot.save</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.show.html">hvplot.show</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.area.html">hvplot.hvPlot.area</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.bar.html">hvplot.hvPlot.bar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.barh.html">hvplot.hvPlot.barh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.box.html">hvplot.hvPlot.box</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.bivariate.html">hvplot.hvPlot.bivariate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.contour.html">hvplot.hvPlot.contour</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.contourf.html">hvplot.hvPlot.contourf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.dataset.html">hvplot.hvPlot.dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.density.html">hvplot.hvPlot.density</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.errorbars.html">hvplot.hvPlot.errorbars</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.heatmap.html">hvplot.hvPlot.heatmap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.hexbin.html">hvplot.hvPlot.hexbin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.hist.html">hvplot.hvPlot.hist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.image.html">hvplot.hvPlot.image</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.kde.html">hvplot.hvPlot.kde</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.labels.html">hvplot.hvPlot.labels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.line.html">hvplot.hvPlot.line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.ohlc.html">hvplot.hvPlot.ohlc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.paths.html">hvplot.hvPlot.paths</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.points.html">hvplot.hvPlot.points</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.polygons.html">hvplot.hvPlot.polygons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.quadmesh.html">hvplot.hvPlot.quadmesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.rgb.html">hvplot.hvPlot.rgb</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">hvplot.hvPlot.scatter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.step.html">hvplot.hvPlot.step</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.table.html">hvplot.hvPlot.table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.vectorfield.html">hvplot.hvPlot.vectorfield</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.hvPlot.violin.html">hvplot.hvPlot.violin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.plotting.andrews_curves.html">hvplot.plotting.andrews_curves</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.plotting.lag_plot.html">hvplot.plotting.lag_plot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.plotting.parallel_coordinates.html">hvplot.plotting.parallel_coordinates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hvplot.plotting.scatter_matrix.html">hvplot.plotting.scatter_matrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.networkx.draw.html">hvplot.networkx.draw</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.networkx.draw_networkx.html">hvplot.networkx.draw_networkx</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.networkx.draw_networkx_nodes.html">hvplot.networkx.draw_networkx_nodes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.networkx.draw_networkx_edges.html">hvplot.networkx.draw_networkx_edges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.networkx.draw_networkx_labels.html">hvplot.networkx.draw_networkx_labels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.networkx.draw_circular.html">hvplot.networkx.draw_circular</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.networkx.draw_kamada_kawai.html">hvplot.networkx.draw_kamada_kawai</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.networkx.draw_random.html">hvplot.networkx.draw_random</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.networkx.draw_planar.html">hvplot.networkx.draw_planar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.networkx.draw_shell.html">hvplot.networkx.draw_shell</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.networkx.draw_spectral.html">hvplot.networkx.draw_spectral</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.networkx.draw_spring.html">hvplot.networkx.draw_spring</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.hvPlot.explorer.html">hvplot.hvPlot.explorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.ui.explorer.html">hvplot.ui.explorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.ui.hvPlotExplorer.html">hvplot.ui.hvPlotExplorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.ui.hvPlotExplorer.hvplot.html">hvplot.ui.hvPlotExplorer.hvplot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.ui.hvPlotExplorer.plot_code.html">hvplot.ui.hvPlotExplorer.plot_code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.ui.hvPlotExplorer.save.html">hvplot.ui.hvPlotExplorer.save</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.ui.hvPlotExplorer.servable.html">hvplot.ui.hvPlotExplorer.servable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.ui.hvPlotExplorer.settings.html">hvplot.ui.hvPlotExplorer.settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generated/hvplot.ui.hvPlotExplorer.show.html">hvplot.ui.hvPlotExplorer.show</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../api_compatibility/index.html">API compatibility</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api_compatibility/pandas/index.html">Pandas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api_compatibility/pandas/Pandas_API.html">Comparison with Pandas API</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer_guide.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../roadmap.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../about.html">About</a></li>
+</ul>
+</div>
+</nav></div>
+        <div class="sidebar-primary-item">
+<div class="hv-sb-dd">
+  <div class="btn-group">
+    
+    <a href="https://holoviz.org" class="btn hv-sb-dd-value" target="_blank">HoloViz.org<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a>
+    
+    <button type="button" class="btn dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="visually-hidden"></span>
+    </button>
+    <ul class="dropdown-menu">
+      
+      
+        <li><a class="dropdown-item" href="https://param.holoviz.org" target="_blank" title="Assembling objects from many different libraries into a layout or app, whether in a Jupyter notebook or in a standalone servable dashboard">Panel<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+      
+      
+        <li><a class="dropdown-item" href="https://holoviews.org" target="_blank" title="Declarative objects for instantly visualizable data, building Bokeh plots from convenient high-level specifications">HoloViews<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://geoviews.org" target="_blank" title="Visualizable geographic data that that can be mixed and matched with HoloViews objects">GeoViews<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://datashader.org" target="_blank" title="Rasterizing huge datasets quickly as fixed-size images">Datashader<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://param.holoviz.org" target="_blank" title="Make your Python code clearer and more reliable by declaring Parameters">Param<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://lumen.holoviz.org" target="_blank" title="Framework for visual analytics that allows users to build data-driven dashboards from a simple YAML specification">Lumen<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://colorcet.holoviz.org" target="_blank" title="A wide range of perceptually uniform continuous colormaps and perceptually based categorical color sets for use with the other libraries">Colorcet<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+      <li><hr class="dropdown-divider"></li>
+      
+      
+      <li><a class="dropdown-item" href="https://examples.holoviz.org" target="_blank" title=" Visualization-focused examples using HoloViz for specific topics ">Examples Gallery<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+      <li><a class="dropdown-item" href="https://blog.holoviz.org" target="_blank" title="HoloViz blog">Blog<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+    </ul>
+  </div>
+</div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Reference</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">API</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">hvPlot.scatter</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="hvplot-scatter">
+<h1>hvPlot.scatter<a class="headerlink" href="#hvplot-scatter" title="Link to this heading">#</a></h1>
+<dl class="py method">
+<dt class="sig sig-object py" id="hvplot.hvPlot.scatter">
+<span class="sig-prename descclassname"><span class="pre">hvPlot.</span></span><span class="sig-name descname"><span class="pre">scatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/holoviz/hvplot/blob/v0.11.3/hvplot/plotting/core.py#L475-L582"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hvplot.hvPlot.scatter" title="Link to this definition">#</a></dt>
+<dd><p>The <cite>scatter</cite> plot visualizes your points as markers in 2D space. You can visualize
+one more dimension by using colors.</p>
+<p>The <cite>scatter</cite> plot is a good first way to plot data with non continuous axes.</p>
+<p>Reference: <a class="reference external" href="https://hvplot.holoviz.org/reference/tabular/scatter.html">https://hvplot.holoviz.org/reference/tabular/scatter.html</a></p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>x</strong><span class="classifier">string, optional</span></dt><dd><p>Field name(s) to draw x-positions from. If not specified, the index is
+used. Can refer to continuous and categorical data.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">string or list, optional</span></dt><dd><p>Field name(s) to draw y-positions from. If not specified, all numerical
+fields are used.</p>
+</dd>
+<dt><strong>marker</strong><span class="classifier">string, optional</span></dt><dd><p>The marker shape specified above can be any supported by matplotlib, e.g. s, d, o etc.
+See <a class="reference external" href="https://matplotlib.org/stable/api/markers_api.html">https://matplotlib.org/stable/api/markers_api.html</a>.</p>
+</dd>
+<dt><strong>c</strong><span class="classifier">string, optional</span></dt><dd><p>A color or a Field name to draw the color of the marker from</p>
+</dd>
+<dt><strong>s</strong><span class="classifier">int, optional, also available as ‘size’</span></dt><dd><p>The size of the marker</p>
+</dd>
+<dt><strong>by</strong><span class="classifier">string, optional</span></dt><dd><p>A single field or list of fields to group by. All the subgroups are visualized.</p>
+</dd>
+<dt><strong>groupby: string, list, optional</strong></dt><dd><p>A single field or list of fields to group and filter by. Adds one or more widgets to
+select the subgroup(s) to visualize.</p>
+</dd>
+<dt><strong>scale: number, optional</strong></dt><dd><p>Scaling factor to apply to point scaling.</p>
+</dd>
+<dt><strong>logz</strong><span class="classifier">bool</span></dt><dd><p>Whether to apply log scaling to the z-axis. Default is False.</p>
+</dd>
+<dt><strong>color</strong><span class="classifier">str or array-like, optional.</span></dt><dd><p>The color for each of the series. Possible values are:</p>
+<p>A single color string referred to by name, RGB or RGBA code, for instance ‘red’ or
+‘#a98d19.</p>
+<p>A sequence of color strings referred to by name, RGB or RGBA code, which will be used
+for each series recursively. For instance [‘green’,’yellow’] each field’s line will be
+filled in green or yellow, alternatively. If there is only a single series to be
+plotted, then only the first color from the color list will be used.</p>
+</dd>
+<dt><strong>**kwds</strong><span class="classifier">optional</span></dt><dd><p>Additional keywords arguments are documented in <cite>hvplot.help(‘scatter’)</cite>.
+See <a class="reference internal" href="../../plotting_options/index.html#plot-options"><span class="std std-ref">Plotting Options</span></a> for more information.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><a class="reference external" href="https://holoviews.org/reference_manual/holoviews.element.html#holoviews.element.Scatter" title="(in HoloViews v1.20.2)"><code class="docutils literal notranslate"><span class="pre">holoviews.element.Scatter</span></code></a> / Panel object</dt><dd><p>You can <cite>print</cite> the object to study its composition and run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">holoviews</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">hv</span>
+<span class="n">hv</span><span class="o">.</span><span class="n">help</span><span class="p">(</span><span class="n">the_holoviews_object</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>to learn more about its parameters and options.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p>Bokeh: <a class="reference external" href="https://docs.bokeh.org/en/latest/docs/user_guide/plotting.html#scatter-markers">https://docs.bokeh.org/en/latest/docs/user_guide/plotting.html#scatter-markers</a></p></li>
+<li><p>HoloViews: <a class="reference external" href="https://holoviews.org/reference/elements/matplotlib/Scatter.html">https://holoviews.org/reference/elements/matplotlib/Scatter.html</a></p></li>
+<li><p>Pandas: <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.scatter.html">https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.scatter.html</a></p></li>
+<li><p>Plotly: <a class="reference external" href="https://plotly.com/python/line-and-scatter/">https://plotly.com/python/line-and-scatter/</a></p></li>
+<li><p>Matplotlib:  <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html">https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html</a></p></li>
+<li><p>Seaborn: <a class="reference external" href="https://seaborn.pydata.org/generated/seaborn.scatterplot.html">https://seaborn.pydata.org/generated/seaborn.scatterplot.html</a></p></li>
+<li><p>Wiki: <a class="reference external" href="https://en.wikipedia.org/wiki/Scatter_plot">https://en.wikipedia.org/wiki/Scatter_plot</a></p></li>
+</ul>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.pandas</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;actual&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">125</span><span class="p">,</span> <span class="mi">140</span><span class="p">,</span> <span class="mi">145</span><span class="p">,</span> <span class="mi">135</span><span class="p">,</span> <span class="mi">123</span><span class="p">],</span>
+        <span class="s2">&quot;forecast&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">90</span><span class="p">,</span> <span class="mi">160</span><span class="p">,</span> <span class="mi">125</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">141</span><span class="p">,</span> <span class="mi">141</span><span class="p">,</span> <span class="mi">120</span><span class="p">],</span>
+        <span class="s2">&quot;numerical&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.9</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">,</span> <span class="mf">3.8</span><span class="p">,</span> <span class="mf">4.3</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">],</span>
+        <span class="s2">&quot;date&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s2">&quot;2022-01-03&quot;</span><span class="p">,</span> <span class="s2">&quot;2022-01-09&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;string&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Mon&quot;</span><span class="p">,</span> <span class="s2">&quot;Tue&quot;</span><span class="p">,</span> <span class="s2">&quot;Wed&quot;</span><span class="p">,</span> <span class="s2">&quot;Thu&quot;</span><span class="p">,</span> <span class="s2">&quot;Fri&quot;</span><span class="p">,</span> <span class="s2">&quot;Sat&quot;</span><span class="p">,</span> <span class="s2">&quot;Sun&quot;</span><span class="p">],</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+<span class="n">scatter</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="s2">&quot;numerical&quot;</span><span class="p">,</span>
+    <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;actual&quot;</span><span class="p">,</span> <span class="s2">&quot;forecast&quot;</span><span class="p">],</span>
+    <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;value&quot;</span><span class="p">,</span>
+    <span class="n">legend</span><span class="o">=</span><span class="s2">&quot;bottom&quot;</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;#f16a6f&quot;</span><span class="p">,</span> <span class="s2">&quot;#1e85f7&quot;</span><span class="p">],</span>
+    <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">scatter</span>
+</pre></div>
+</div>
+<p>You can overlay the <cite>scatter</cite> markers on for example a <cite>line</cite> plot</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">line</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="s2">&quot;numerical&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;actual&quot;</span><span class="p">,</span> <span class="s2">&quot;forecast&quot;</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;#f16a6f&quot;</span><span class="p">,</span> <span class="s2">&quot;#1e85f7&quot;</span><span class="p">],</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">5</span>
+<span class="p">)</span>
+<span class="n">scatter</span> <span class="o">*</span> <span class="n">line</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<section id="backend-specific-styling-options">
+<h2>Backend-specific styling options<a class="headerlink" href="#backend-specific-styling-options" title="Link to this heading">#</a></h2>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-0">
+Bokeh</label><div class="sd-tab-content docutils">
+<p>alpha, angle, cmap, color, fill_alpha, fill_color, hit_dilation, hover_alpha, hover_color, hover_fill_alpha, hover_fill_color, hover_line_alpha, hover_line_cap, hover_line_color, hover_line_dash, hover_line_dash_offset, hover_line_join, hover_line_width, line_alpha, line_cap, line_color, line_dash, line_dash_offset, line_join, line_width, marker, muted, muted_alpha, muted_color, muted_fill_alpha, muted_fill_color, muted_line_alpha, muted_line_cap, muted_line_color, muted_line_dash, muted_line_dash_offset, muted_line_join, muted_line_width, nonselection_alpha, nonselection_color, nonselection_fill_alpha, nonselection_fill_color, nonselection_line_alpha, nonselection_line_cap, nonselection_line_color, nonselection_line_dash, nonselection_line_dash_offset, nonselection_line_join, nonselection_line_width, palette, selection_alpha, selection_color, selection_fill_alpha, selection_fill_color, selection_line_alpha, selection_line_cap, selection_line_color, selection_line_dash, selection_line_dash_offset, selection_line_join, selection_line_width, size, visible</p>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-1">
+Matplotlib</label><div class="sd-tab-content docutils">
+<p>alpha, c, cmap, color, ec, ecolor, edgecolor, edgecolors, facecolors, linewidth, lw, marker, norm, s, visible, vmax, vmin</p>
+</div>
+</div>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
+<p>TBD</p>
+</section>
+</section>
+
+<div id="scroller-right">
+    This web page was generated from a Jupyter notebook and not all
+    interactivity will work on this website.
+</div>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="hvplot.hvPlot.rgb.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">hvPlot.rgb</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="hvplot.hvPlot.step.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">hvPlot.step</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hvplot.hvPlot.scatter"><code class="docutils literal notranslate"><span class="pre">hvPlot.scatter()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backend-specific-styling-options">Backend-specific styling options</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/holoviz/hvplot/edit/main/doc/ref/api/manual/hvplot.hvPlot.scatter.ipynb">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+
+  <div class="tocsection sourcelink">
+    <a href="../../../_sources/ref/api/manual/hvplot.hvPlot.scatter.ipynb">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item"><p class="nbsite-copyright-last-updated">
+    <span class="copyright">
+            &copy; Copyright 2016-2025 Holoviz contributors.
+    </span>
+    <span class="last-updated">Last updated on 2025-04-30.</span><br>
+</p></div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

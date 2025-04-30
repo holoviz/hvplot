@@ -1,0 +1,1697 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Kde &#8212; hvPlot 0.11.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsite.css?v=d9d93254" />
+    <link rel="stylesheet" type="text/css" href="../../_static/notebook.css?v=19946987" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css?v=0a3248cd" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alert.css?v=c26666be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/dataframe.css?v=a0f274c1" />
+    <link rel="stylesheet" type="text/css" href="../../_static/scroller.css?v=2dcde208" />
+    <link rel="stylesheet" type="text/css" href="../../_static/hv-sidebar-dropdown.css?v=3e2b0152" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=bab6b1ab" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=2088e4e3"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>
+    window.goatcounter = {
+        path: function(p) { return location.host + p }
+    }
+</script>
+    <script async="async" data-goatcounter="https://holoviz.goatcounter.com/count" src="../../_static/js/goatcounter.js?v=f53f84b8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'reference/tabular/kde';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="icon" href="../../_static/favicon.ico"/>
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Labels" href="labels.html" />
+    <link rel="prev" title="Hist" href="hist.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.11.3" />
+    <meta name="docbuild:last-update" content="2025-04-30"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../_static/logo_horizontal.svg" class="logo__image only-light" alt="hvPlot 0.11.3 documentation - Home"/>
+    <img src="../../_static/logo_horizontal.svg" class="logo__image only-dark pst-js-only" alt="hvPlot 0.11.3 documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Reference Gallery
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../ref/index.html">
+    Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide.html">
+    Developer Guide
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../releases.html">
+    Releases
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../roadmap.html">
+    Roadmap
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../about.html">
+    About
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/holoviz/hvplot" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://twitter.com/HoloViews" title="Twitter" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-twitter-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Twitter</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discourse.holoviz.org/c/hvplot" title="Discourse" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discourse fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Discourse</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discord.gg/AXRHnJU6sP" title="Discord" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discord fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Discord</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Reference Gallery
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../ref/index.html">
+    Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide.html">
+    Developer Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../releases.html">
+    Releases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../roadmap.html">
+    Roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../about.html">
+    About
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/holoviz/hvplot" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://twitter.com/HoloViews" title="Twitter" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-twitter-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Twitter</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discourse.holoviz.org/c/hvplot" title="Discourse" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discourse fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Discourse</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discord.gg/AXRHnJU6sP" title="Discord" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discord fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Discord</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><!-- Adapted from sidebar-nav-bs.html (1.15.2) with the following changes
+
+  - Commented out the tag that adds the "Section Navigation" title
+  - Call generate_toctree_html with startdepth=0
+
+Please update this file when required when bumping the max pin of pydata-sphinx-theme.
+-->
+
+
+<nav class="bd-docs-nav bd-links"
+      aria-label="Section Navigation">
+  <!-- <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p> -->
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/getting_started_pandas.html">Using hvPlot as a Pandas user</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://holoviz.org/tutorial/index.html">HoloViz Tutorial</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../user_guide/index.html">User Guide</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Plotting.html">Plotting with Bokeh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Plotting_with_Matplotlib.html">Plotting with Matplotlib</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Plotting_with_Plotly.html">Plotting with Plotly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Interactive.html">Interactive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Widgets.html">Widgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Plotting_Extensions.html">Plotting Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Explorer.html">Exploring data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Viewing.html">Viewing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Subplots.html">Subplots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Streaming.html">Streaming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Gridded_Data.html">Gridded Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/NetworkX.html">Network Graphs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Geographic_Data.html">Geographic Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Timeseries_Data.html">Timeseries Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Large_Timeseries.html">Large Timeseries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Statistical_Plots.html">Statistical Plots</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../index.html">Reference Gallery</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="index.html">Tabular</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="andrewscurves.html">Andrewscurves</a></li>
+<li class="toctree-l3"><a class="reference internal" href="area.html">Area</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bar.html">Bar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="barh.html">Barh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bivariate.html">Bivariate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="box.html">Box</a></li>
+<li class="toctree-l3"><a class="reference internal" href="errorbars.html">Errorbars</a></li>
+<li class="toctree-l3"><a class="reference internal" href="heatmap.html">Heatmap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hexbin.html">Hexbin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hist.html">Hist</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Kde</a></li>
+<li class="toctree-l3"><a class="reference internal" href="labels.html">Labels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lagplot.html">Lagplot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="line.html">Line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ohlc.html">Ohlc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parallelcoordinates.html">Parallelcoordinates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="paths.html">Paths</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scatter.html">Scatter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scattermatrix.html">Scattermatrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="step.html">Step</a></li>
+<li class="toctree-l3"><a class="reference internal" href="table.html">Table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="violin.html">Violin</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../geopandas/index.html">Geopandas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../geopandas/points.html">Points</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../geopandas/polygons.html">Polygons</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../xarray/index.html">Xarray</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../xarray/bar.html">Bar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../xarray/contour.html">Contour</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../xarray/contourf.html">Contourf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../xarray/hist.html">Hist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../xarray/image.html">Image</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../xarray/kde.html">Kde</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../xarray/line.html">Line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../xarray/quadmesh.html">Quadmesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../xarray/rgb.html">Rgb</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../xarray/vectorfield.html">Vectorfield</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../xarray/violin.html">Violin</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../ref/index.html">Reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../ref/installation.html">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ref/data_libraries.html">Supported data libraries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ref/plotting_extensions.html">Supported plotting extensions</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../ref/plotting_options/index.html">Plotting options</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/plotting_options/index.html">All Options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/plotting_options/data.html">Data Options</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../ref/api/index.html">API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.help.html">hvplot.help</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.hvplot_extension.html">hvplot.hvplot_extension</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.extension.html">hvplot.extension</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.output.html">hvplot.output</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.render.html">hvplot.render</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.save.html">hvplot.save</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.show.html">hvplot.show</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.area.html">hvplot.hvPlot.area</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.bar.html">hvplot.hvPlot.bar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.barh.html">hvplot.hvPlot.barh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.box.html">hvplot.hvPlot.box</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.bivariate.html">hvplot.hvPlot.bivariate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.contour.html">hvplot.hvPlot.contour</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.contourf.html">hvplot.hvPlot.contourf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.dataset.html">hvplot.hvPlot.dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.density.html">hvplot.hvPlot.density</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.errorbars.html">hvplot.hvPlot.errorbars</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.heatmap.html">hvplot.hvPlot.heatmap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.hexbin.html">hvplot.hvPlot.hexbin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.hist.html">hvplot.hvPlot.hist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.image.html">hvplot.hvPlot.image</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.kde.html">hvplot.hvPlot.kde</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.labels.html">hvplot.hvPlot.labels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.line.html">hvplot.hvPlot.line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.ohlc.html">hvplot.hvPlot.ohlc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.paths.html">hvplot.hvPlot.paths</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.points.html">hvplot.hvPlot.points</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.polygons.html">hvplot.hvPlot.polygons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.quadmesh.html">hvplot.hvPlot.quadmesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.rgb.html">hvplot.hvPlot.rgb</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.scatter.html">hvplot.hvPlot.scatter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.step.html">hvplot.hvPlot.step</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.table.html">hvplot.hvPlot.table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.vectorfield.html">hvplot.hvPlot.vectorfield</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.violin.html">hvplot.hvPlot.violin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.plotting.andrews_curves.html">hvplot.plotting.andrews_curves</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.plotting.lag_plot.html">hvplot.plotting.lag_plot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.plotting.parallel_coordinates.html">hvplot.plotting.parallel_coordinates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.plotting.scatter_matrix.html">hvplot.plotting.scatter_matrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.networkx.draw.html">hvplot.networkx.draw</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.networkx.draw_networkx.html">hvplot.networkx.draw_networkx</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.networkx.draw_networkx_nodes.html">hvplot.networkx.draw_networkx_nodes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.networkx.draw_networkx_edges.html">hvplot.networkx.draw_networkx_edges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.networkx.draw_networkx_labels.html">hvplot.networkx.draw_networkx_labels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.networkx.draw_circular.html">hvplot.networkx.draw_circular</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.networkx.draw_kamada_kawai.html">hvplot.networkx.draw_kamada_kawai</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.networkx.draw_random.html">hvplot.networkx.draw_random</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.networkx.draw_planar.html">hvplot.networkx.draw_planar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.networkx.draw_shell.html">hvplot.networkx.draw_shell</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.networkx.draw_spectral.html">hvplot.networkx.draw_spectral</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.networkx.draw_spring.html">hvplot.networkx.draw_spring</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.hvPlot.explorer.html">hvplot.hvPlot.explorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.ui.explorer.html">hvplot.ui.explorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.ui.hvPlotExplorer.html">hvplot.ui.hvPlotExplorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.ui.hvPlotExplorer.hvplot.html">hvplot.ui.hvPlotExplorer.hvplot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.ui.hvPlotExplorer.plot_code.html">hvplot.ui.hvPlotExplorer.plot_code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.ui.hvPlotExplorer.save.html">hvplot.ui.hvPlotExplorer.save</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.ui.hvPlotExplorer.servable.html">hvplot.ui.hvPlotExplorer.servable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.ui.hvPlotExplorer.settings.html">hvplot.ui.hvPlotExplorer.settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.ui.hvPlotExplorer.show.html">hvplot.ui.hvPlotExplorer.show</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../ref/api_compatibility/index.html">API compatibility</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../ref/api_compatibility/pandas/index.html">Pandas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../ref/api_compatibility/pandas/Pandas_API.html">Comparison with Pandas API</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../roadmap.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about.html">About</a></li>
+</ul>
+</div>
+</nav></div>
+        <div class="sidebar-primary-item">
+<div class="hv-sb-dd">
+  <div class="btn-group">
+    
+    <a href="https://holoviz.org" class="btn hv-sb-dd-value" target="_blank">HoloViz.org<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a>
+    
+    <button type="button" class="btn dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="visually-hidden"></span>
+    </button>
+    <ul class="dropdown-menu">
+      
+      
+        <li><a class="dropdown-item" href="https://param.holoviz.org" target="_blank" title="Assembling objects from many different libraries into a layout or app, whether in a Jupyter notebook or in a standalone servable dashboard">Panel<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+      
+      
+        <li><a class="dropdown-item" href="https://holoviews.org" target="_blank" title="Declarative objects for instantly visualizable data, building Bokeh plots from convenient high-level specifications">HoloViews<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://geoviews.org" target="_blank" title="Visualizable geographic data that that can be mixed and matched with HoloViews objects">GeoViews<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://datashader.org" target="_blank" title="Rasterizing huge datasets quickly as fixed-size images">Datashader<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://param.holoviz.org" target="_blank" title="Make your Python code clearer and more reliable by declaring Parameters">Param<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://lumen.holoviz.org" target="_blank" title="Framework for visual analytics that allows users to build data-driven dashboards from a simple YAML specification">Lumen<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://colorcet.holoviz.org" target="_blank" title="A wide range of perceptually uniform continuous colormaps and perceptually based categorical color sets for use with the other libraries">Colorcet<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+      <li><hr class="dropdown-divider"></li>
+      
+      
+      <li><a class="dropdown-item" href="https://examples.holoviz.org" target="_blank" title=" Visualization-focused examples using HoloViz for specific topics ">Examples Gallery<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+      <li><a class="dropdown-item" href="https://blog.holoviz.org" target="_blank" title="HoloViz blog">Blog<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+    </ul>
+  </div>
+</div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Reference Gallery</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Tabular</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Kde</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="kde">
+<h1>Kde<a class="headerlink" href="#kde" title="Link to this heading">#</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.pandas</span>  <span class="c1"># noqa</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><script type="esms-options">{"shimMode": true}</script><style>*[data-root-id],
+*[data-root-id] > * {
+  box-sizing: border-box;
+  font-family: var(--jp-ui-font-family);
+  font-size: var(--jp-ui-font-size1);
+  color: var(--vscode-editor-foreground, var(--jp-ui-font-color1));
+}
+
+/* Override VSCode background color */
+.cell-output-ipywidget-background:has(
+    > .cell-output-ipywidget-background > .lm-Widget > *[data-root-id]
+  ),
+.cell-output-ipywidget-background:has(> .lm-Widget > *[data-root-id]) {
+  background-color: transparent !important;
+}
+</style></div><script type="application/javascript">(function(root) {
+  function now() {
+    return new Date();
+  }
+
+  const force = true;
+  const py_version = '3.7.2'.replace('rc', '-rc.').replace('.dev', '-dev.');
+  const reloading = false;
+  const Bokeh = root.Bokeh;
+
+  // Set a timeout for this load but only if we are not already initializing
+  if (typeof (root._bokeh_timeout) === "undefined" || (force || !root._bokeh_is_initializing)) {
+    root._bokeh_timeout = Date.now() + 5000;
+    root._bokeh_failed_load = false;
+  }
+
+  function run_callbacks() {
+    try {
+      root._bokeh_onload_callbacks.forEach(function(callback) {
+        if (callback != null)
+          callback();
+      });
+    } finally {
+      delete root._bokeh_onload_callbacks;
+    }
+    console.debug("Bokeh: all callbacks have finished");
+  }
+
+  function load_libs(css_urls, js_urls, js_modules, js_exports, callback) {
+    if (css_urls == null) css_urls = [];
+    if (js_urls == null) js_urls = [];
+    if (js_modules == null) js_modules = [];
+    if (js_exports == null) js_exports = {};
+
+    root._bokeh_onload_callbacks.push(callback);
+
+    if (root._bokeh_is_loading > 0) {
+      // Don't load bokeh if it is still initializing
+      console.debug("Bokeh: BokehJS is being loaded, scheduling callback at", now());
+      return null;
+    } else if (js_urls.length === 0 && js_modules.length === 0 && Object.keys(js_exports).length === 0) {
+      // There is nothing to load
+      run_callbacks();
+      return null;
+    }
+
+    function on_load() {
+      root._bokeh_is_loading--;
+      if (root._bokeh_is_loading === 0) {
+        console.debug("Bokeh: all BokehJS libraries/stylesheets loaded");
+        run_callbacks()
+      }
+    }
+    window._bokeh_on_load = on_load
+
+    function on_error(e) {
+      const src_el = e.srcElement
+      console.error("failed to load " + (src_el.href || src_el.src));
+    }
+
+    const skip = [];
+    if (window.requirejs) {
+      window.requirejs.config({'packages': {}, 'paths': {}, 'shim': {}});
+      root._bokeh_is_loading = css_urls.length + 0;
+    } else {
+      root._bokeh_is_loading = css_urls.length + js_urls.length + js_modules.length + Object.keys(js_exports).length;
+    }
+
+    const existing_stylesheets = []
+    const links = document.getElementsByTagName('link')
+    for (let i = 0; i < links.length; i++) {
+      const link = links[i]
+      if (link.href != null) {
+        existing_stylesheets.push(link.href)
+      }
+    }
+    for (let i = 0; i < css_urls.length; i++) {
+      const url = css_urls[i];
+      const escaped = encodeURI(url)
+      if (existing_stylesheets.indexOf(escaped) !== -1) {
+        on_load()
+        continue;
+      }
+      const element = document.createElement("link");
+      element.onload = on_load;
+      element.onerror = on_error;
+      element.rel = "stylesheet";
+      element.type = "text/css";
+      element.href = url;
+      console.debug("Bokeh: injecting link tag for BokehJS stylesheet: ", url);
+      document.body.appendChild(element);
+    }    var existing_scripts = []
+    const scripts = document.getElementsByTagName('script')
+    for (let i = 0; i < scripts.length; i++) {
+      var script = scripts[i]
+      if (script.src != null) {
+        existing_scripts.push(script.src)
+      }
+    }
+    for (let i = 0; i < js_urls.length; i++) {
+      const url = js_urls[i];
+      const escaped = encodeURI(url)
+      if (skip.indexOf(escaped) !== -1 || existing_scripts.indexOf(escaped) !== -1) {
+        if (!window.requirejs) {
+          on_load();
+        }
+        continue;
+      }
+      const element = document.createElement('script');
+      element.onload = on_load;
+      element.onerror = on_error;
+      element.async = false;
+      element.src = url;
+      console.debug("Bokeh: injecting script tag for BokehJS library: ", url);
+      document.head.appendChild(element);
+    }
+    for (let i = 0; i < js_modules.length; i++) {
+      const url = js_modules[i];
+      const escaped = encodeURI(url)
+      if (skip.indexOf(escaped) !== -1 || existing_scripts.indexOf(escaped) !== -1) {
+        if (!window.requirejs) {
+          on_load();
+        }
+        continue;
+      }
+      var element = document.createElement('script');
+      element.onload = on_load;
+      element.onerror = on_error;
+      element.async = false;
+      element.src = url;
+      element.type = "module";
+      console.debug("Bokeh: injecting script tag for BokehJS library: ", url);
+      document.head.appendChild(element);
+    }
+    for (const name in js_exports) {
+      const url = js_exports[name];
+      const escaped = encodeURI(url)
+      if (skip.indexOf(escaped) >= 0 || root[name] != null) {
+        if (!window.requirejs) {
+          on_load();
+        }
+        continue;
+      }
+      var element = document.createElement('script');
+      element.onerror = on_error;
+      element.async = false;
+      element.type = "module";
+      console.debug("Bokeh: injecting script tag for BokehJS library: ", url);
+      element.textContent = `
+      import ${name} from "${url}"
+      window.${name} = ${name}
+      window._bokeh_on_load()
+      `
+      document.head.appendChild(element);
+    }
+    if (!js_urls.length && !js_modules.length) {
+      on_load()
+    }
+  };
+
+  function inject_raw_css(css) {
+    const element = document.createElement("style");
+    element.appendChild(document.createTextNode(css));
+    document.body.appendChild(element);
+  }
+
+  const js_urls = ["https://cdn.holoviz.org/panel/1.6.3/dist/bundled/reactiveesm/es-module-shims@^1.10.0/dist/es-module-shims.min.js", "https://cdn.bokeh.org/bokeh/release/bokeh-3.7.2.min.js", "https://cdn.bokeh.org/bokeh/release/bokeh-gl-3.7.2.min.js", "https://cdn.bokeh.org/bokeh/release/bokeh-widgets-3.7.2.min.js", "https://cdn.bokeh.org/bokeh/release/bokeh-tables-3.7.2.min.js", "https://cdn.holoviz.org/panel/1.6.3/dist/panel.min.js"];
+  const js_modules = [];
+  const js_exports = {};
+  const css_urls = [];
+  const inline_js = [    function(Bokeh) {
+      Bokeh.set_log_level("info");
+    },
+function(Bokeh) {} // ensure no trailing comma for IE
+  ];
+
+  function run_inline_js() {
+    if ((root.Bokeh !== undefined) || (force === true)) {
+      for (let i = 0; i < inline_js.length; i++) {
+        try {
+          inline_js[i].call(root, root.Bokeh);
+        } catch(e) {
+          if (!reloading) {
+            throw e;
+          }
+        }
+      }
+      // Cache old bokeh versions
+      if (Bokeh != undefined && !reloading) {
+        var NewBokeh = root.Bokeh;
+        if (Bokeh.versions === undefined) {
+          Bokeh.versions = new Map();
+        }
+        if (NewBokeh.version !== Bokeh.version) {
+          Bokeh.versions.set(NewBokeh.version, NewBokeh)
+        }
+        root.Bokeh = Bokeh;
+      }
+    } else if (Date.now() < root._bokeh_timeout) {
+      setTimeout(run_inline_js, 100);
+    } else if (!root._bokeh_failed_load) {
+      console.log("Bokeh: BokehJS failed to load within specified timeout.");
+      root._bokeh_failed_load = true;
+    }
+    root._bokeh_is_initializing = false
+  }
+
+  function load_or_wait() {
+    // Implement a backoff loop that tries to ensure we do not load multiple
+    // versions of Bokeh and its dependencies at the same time.
+    // In recent versions we use the root._bokeh_is_initializing flag
+    // to determine whether there is an ongoing attempt to initialize
+    // bokeh, however for backward compatibility we also try to ensure
+    // that we do not start loading a newer (Panel>=1.0 and Bokeh>3) version
+    // before older versions are fully initialized.
+    if (root._bokeh_is_initializing && Date.now() > root._bokeh_timeout) {
+      // If the timeout and bokeh was not successfully loaded we reset
+      // everything and try loading again
+      root._bokeh_timeout = Date.now() + 5000;
+      root._bokeh_is_initializing = false;
+      root._bokeh_onload_callbacks = undefined;
+      root._bokeh_is_loading = 0
+      console.log("Bokeh: BokehJS was loaded multiple times but one version failed to initialize.");
+      load_or_wait();
+    } else if (root._bokeh_is_initializing || (typeof root._bokeh_is_initializing === "undefined" && root._bokeh_onload_callbacks !== undefined)) {
+      setTimeout(load_or_wait, 100);
+    } else {
+      root._bokeh_is_initializing = true
+      root._bokeh_onload_callbacks = []
+      const bokeh_loaded = root.Bokeh != null && (root.Bokeh.version === py_version || (root.Bokeh.versions !== undefined && root.Bokeh.versions.has(py_version)));
+      if (!reloading && !bokeh_loaded) {
+        if (root.Bokeh) {
+          root.Bokeh = undefined;
+        }
+        console.debug("Bokeh: BokehJS not loaded, scheduling load and callback at", now());
+      }
+      load_libs(css_urls, js_urls, js_modules, js_exports, function() {
+        console.debug("Bokeh: BokehJS plotting callback run at", now());
+        run_inline_js();
+      });
+    }
+  }
+  // Give older versions of the autoload script a head-start to ensure
+  // they initialize before we start loading newer version.
+  setTimeout(load_or_wait, 100)
+}(window));</script><script type="application/javascript">
+if ((window.PyViz === undefined) || (window.PyViz instanceof HTMLElement)) {
+  window.PyViz = {comms: {}, comm_status:{}, kernels:{}, receivers: {}, plot_index: []}
+}
+
+
+    function JupyterCommManager() {
+    }
+
+    JupyterCommManager.prototype.register_target = function(plot_id, comm_id, msg_handler) {
+      if (window.comm_manager || ((window.Jupyter !== undefined) && (Jupyter.notebook.kernel != null))) {
+        var comm_manager = window.comm_manager || Jupyter.notebook.kernel.comm_manager;
+        comm_manager.register_target(comm_id, function(comm) {
+          comm.on_msg(msg_handler);
+        });
+      } else if ((plot_id in window.PyViz.kernels) && (window.PyViz.kernels[plot_id])) {
+        window.PyViz.kernels[plot_id].registerCommTarget(comm_id, function(comm) {
+          comm.onMsg = msg_handler;
+        });
+      } else if (typeof google != 'undefined' && google.colab.kernel != null) {
+        google.colab.kernel.comms.registerTarget(comm_id, (comm) => {
+          var messages = comm.messages[Symbol.asyncIterator]();
+          function processIteratorResult(result) {
+            var message = result.value;
+            console.log(message)
+            var content = {data: message.data, comm_id};
+            var buffers = []
+            for (var buffer of message.buffers || []) {
+              buffers.push(new DataView(buffer))
+            }
+            var metadata = message.metadata || {};
+            var msg = {content, buffers, metadata}
+            msg_handler(msg);
+            return messages.next().then(processIteratorResult);
+          }
+          return messages.next().then(processIteratorResult);
+        })
+      }
+    }
+
+    JupyterCommManager.prototype.get_client_comm = function(plot_id, comm_id, msg_handler) {
+      if (comm_id in window.PyViz.comms) {
+        return window.PyViz.comms[comm_id];
+      } else if (window.comm_manager || ((window.Jupyter !== undefined) && (Jupyter.notebook.kernel != null))) {
+        var comm_manager = window.comm_manager || Jupyter.notebook.kernel.comm_manager;
+        var comm = comm_manager.new_comm(comm_id, {}, {}, {}, comm_id);
+        if (msg_handler) {
+          comm.on_msg(msg_handler);
+        }
+      } else if ((plot_id in window.PyViz.kernels) && (window.PyViz.kernels[plot_id])) {
+        var comm = window.PyViz.kernels[plot_id].connectToComm(comm_id);
+        comm.open();
+        if (msg_handler) {
+          comm.onMsg = msg_handler;
+        }
+      } else if (typeof google != 'undefined' && google.colab.kernel != null) {
+        var comm_promise = google.colab.kernel.comms.open(comm_id)
+        comm_promise.then((comm) => {
+          window.PyViz.comms[comm_id] = comm;
+          if (msg_handler) {
+            var messages = comm.messages[Symbol.asyncIterator]();
+            function processIteratorResult(result) {
+              var message = result.value;
+              var content = {data: message.data};
+              var metadata = message.metadata || {comm_id};
+              var msg = {content, metadata}
+              msg_handler(msg);
+              return messages.next().then(processIteratorResult);
+            }
+            return messages.next().then(processIteratorResult);
+          }
+        }) 
+        var sendClosure = (data, metadata, buffers, disposeOnDone) => {
+          return comm_promise.then((comm) => {
+            comm.send(data, metadata, buffers, disposeOnDone);
+          });
+        };
+        var comm = {
+          send: sendClosure
+        };
+      }
+      window.PyViz.comms[comm_id] = comm;
+      return comm;
+    }
+    window.PyViz.comm_manager = new JupyterCommManager();
+    
+
+
+var JS_MIME_TYPE = 'application/javascript';
+var HTML_MIME_TYPE = 'text/html';
+var EXEC_MIME_TYPE = 'application/vnd.holoviews_exec.v0+json';
+var CLASS_NAME = 'output';
+
+/**
+ * Render data to the DOM node
+ */
+function render(props, node) {
+  var div = document.createElement("div");
+  var script = document.createElement("script");
+  node.appendChild(div);
+  node.appendChild(script);
+}
+
+/**
+ * Handle when a new output is added
+ */
+function handle_add_output(event, handle) {
+  var output_area = handle.output_area;
+  var output = handle.output;
+  if ((output.data == undefined) || (!output.data.hasOwnProperty(EXEC_MIME_TYPE))) {
+    return
+  }
+  var id = output.metadata[EXEC_MIME_TYPE]["id"];
+  var toinsert = output_area.element.find("." + CLASS_NAME.split(' ')[0]);
+  if (id !== undefined) {
+    var nchildren = toinsert.length;
+    var html_node = toinsert[nchildren-1].children[0];
+    html_node.innerHTML = output.data[HTML_MIME_TYPE];
+    var scripts = [];
+    var nodelist = html_node.querySelectorAll("script");
+    for (var i in nodelist) {
+      if (nodelist.hasOwnProperty(i)) {
+        scripts.push(nodelist[i])
+      }
+    }
+
+    scripts.forEach( function (oldScript) {
+      var newScript = document.createElement("script");
+      var attrs = [];
+      var nodemap = oldScript.attributes;
+      for (var j in nodemap) {
+        if (nodemap.hasOwnProperty(j)) {
+          attrs.push(nodemap[j])
+        }
+      }
+      attrs.forEach(function(attr) { newScript.setAttribute(attr.name, attr.value) });
+      newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+      oldScript.parentNode.replaceChild(newScript, oldScript);
+    });
+    if (JS_MIME_TYPE in output.data) {
+      toinsert[nchildren-1].children[1].textContent = output.data[JS_MIME_TYPE];
+    }
+    output_area._hv_plot_id = id;
+    if ((window.Bokeh !== undefined) && (id in Bokeh.index)) {
+      window.PyViz.plot_index[id] = Bokeh.index[id];
+    } else {
+      window.PyViz.plot_index[id] = null;
+    }
+  } else if (output.metadata[EXEC_MIME_TYPE]["server_id"] !== undefined) {
+    var bk_div = document.createElement("div");
+    bk_div.innerHTML = output.data[HTML_MIME_TYPE];
+    var script_attrs = bk_div.children[0].attributes;
+    for (var i = 0; i < script_attrs.length; i++) {
+      toinsert[toinsert.length - 1].childNodes[1].setAttribute(script_attrs[i].name, script_attrs[i].value);
+    }
+    // store reference to server id on output_area
+    output_area._bokeh_server_id = output.metadata[EXEC_MIME_TYPE]["server_id"];
+  }
+}
+
+/**
+ * Handle when an output is cleared or removed
+ */
+function handle_clear_output(event, handle) {
+  var id = handle.cell.output_area._hv_plot_id;
+  var server_id = handle.cell.output_area._bokeh_server_id;
+  if (((id === undefined) || !(id in PyViz.plot_index)) && (server_id !== undefined)) { return; }
+  var comm = window.PyViz.comm_manager.get_client_comm("hv-extension-comm", "hv-extension-comm", function () {});
+  if (server_id !== null) {
+    comm.send({event_type: 'server_delete', 'id': server_id});
+    return;
+  } else if (comm !== null) {
+    comm.send({event_type: 'delete', 'id': id});
+  }
+  delete PyViz.plot_index[id];
+  if ((window.Bokeh !== undefined) & (id in window.Bokeh.index)) {
+    var doc = window.Bokeh.index[id].model.document
+    doc.clear();
+    const i = window.Bokeh.documents.indexOf(doc);
+    if (i > -1) {
+      window.Bokeh.documents.splice(i, 1);
+    }
+  }
+}
+
+/**
+ * Handle kernel restart event
+ */
+function handle_kernel_cleanup(event, handle) {
+  delete PyViz.comms["hv-extension-comm"];
+  window.PyViz.plot_index = {}
+}
+
+/**
+ * Handle update_display_data messages
+ */
+function handle_update_output(event, handle) {
+  handle_clear_output(event, {cell: {output_area: handle.output_area}})
+  handle_add_output(event, handle)
+}
+
+function register_renderer(events, OutputArea) {
+  function append_mime(data, metadata, element) {
+    // create a DOM node to render to
+    var toinsert = this.create_output_subarea(
+    metadata,
+    CLASS_NAME,
+    EXEC_MIME_TYPE
+    );
+    this.keyboard_manager.register_events(toinsert);
+    // Render to node
+    var props = {data: data, metadata: metadata[EXEC_MIME_TYPE]};
+    render(props, toinsert[0]);
+    element.append(toinsert);
+    return toinsert
+  }
+
+  events.on('output_added.OutputArea', handle_add_output);
+  events.on('output_updated.OutputArea', handle_update_output);
+  events.on('clear_output.CodeCell', handle_clear_output);
+  events.on('delete.Cell', handle_clear_output);
+  events.on('kernel_ready.Kernel', handle_kernel_cleanup);
+
+  OutputArea.prototype.register_mime_type(EXEC_MIME_TYPE, append_mime, {
+    safe: true,
+    index: 0
+  });
+}
+
+if (window.Jupyter !== undefined) {
+  try {
+    var events = require('base/js/events');
+    var OutputArea = require('notebook/js/outputarea').OutputArea;
+    if (OutputArea.prototype.mime_types().indexOf(EXEC_MIME_TYPE) == -1) {
+      register_renderer(events, OutputArea);
+    }
+  } catch(err) {
+  }
+}
+</script><div class="output text_html"><div id='bb86f057-a53a-4513-bf10-e168ad4b79d7'>
+  <div id="da8fc4ef-52b0-4368-8713-9376ccc614d3" data-root-id="bb86f057-a53a-4513-bf10-e168ad4b79d7" style="display: contents;"></div>
+</div>
+<script type="application/javascript">(function(root) {
+  var docs_json = {"bf7f37a6-2fe2-4283-b1f4-14c41a8952e1":{"version":"3.7.2","title":"Bokeh Application","roots":[{"type":"object","name":"panel.models.browser.BrowserInfo","id":"bb86f057-a53a-4513-bf10-e168ad4b79d7"},{"type":"object","name":"panel.models.comm_manager.CommManager","id":"45ecf4ef-8b51-4c9d-bac8-e62673cab1fb","attributes":{"plot_id":"bb86f057-a53a-4513-bf10-e168ad4b79d7","comm_id":"720e8011cb38468d8aadccf3b25d18ed","client_comm_id":"492468acc837445b8d6274ce547882bc"}}],"defs":[{"type":"model","name":"ReactiveHTML1"},{"type":"model","name":"FlexBox1","properties":[{"name":"align_content","kind":"Any","default":"flex-start"},{"name":"align_items","kind":"Any","default":"flex-start"},{"name":"flex_direction","kind":"Any","default":"row"},{"name":"flex_wrap","kind":"Any","default":"wrap"},{"name":"gap","kind":"Any","default":""},{"name":"justify_content","kind":"Any","default":"flex-start"}]},{"type":"model","name":"FloatPanel1","properties":[{"name":"config","kind":"Any","default":{"type":"map"}},{"name":"contained","kind":"Any","default":true},{"name":"position","kind":"Any","default":"right-top"},{"name":"offsetx","kind":"Any","default":null},{"name":"offsety","kind":"Any","default":null},{"name":"theme","kind":"Any","default":"primary"},{"name":"status","kind":"Any","default":"normalized"}]},{"type":"model","name":"GridStack1","properties":[{"name":"ncols","kind":"Any","default":null},{"name":"nrows","kind":"Any","default":null},{"name":"allow_resize","kind":"Any","default":true},{"name":"allow_drag","kind":"Any","default":true},{"name":"state","kind":"Any","default":[]}]},{"type":"model","name":"drag1","properties":[{"name":"slider_width","kind":"Any","default":5},{"name":"slider_color","kind":"Any","default":"black"},{"name":"value","kind":"Any","default":50}]},{"type":"model","name":"click1","properties":[{"name":"terminal_output","kind":"Any","default":""},{"name":"debug_name","kind":"Any","default":""},{"name":"clears","kind":"Any","default":0}]},{"type":"model","name":"FastWrapper1","properties":[{"name":"object","kind":"Any","default":null},{"name":"style","kind":"Any","default":null}]},{"type":"model","name":"NotificationArea1","properties":[{"name":"js_events","kind":"Any","default":{"type":"map"}},{"name":"max_notifications","kind":"Any","default":5},{"name":"notifications","kind":"Any","default":[]},{"name":"position","kind":"Any","default":"bottom-right"},{"name":"_clear","kind":"Any","default":0},{"name":"types","kind":"Any","default":[{"type":"map","entries":[["type","warning"],["background","#ffc107"],["icon",{"type":"map","entries":[["className","fas fa-exclamation-triangle"],["tagName","i"],["color","white"]]}]]},{"type":"map","entries":[["type","info"],["background","#007bff"],["icon",{"type":"map","entries":[["className","fas fa-info-circle"],["tagName","i"],["color","white"]]}]]}]}]},{"type":"model","name":"Notification","properties":[{"name":"background","kind":"Any","default":null},{"name":"duration","kind":"Any","default":3000},{"name":"icon","kind":"Any","default":null},{"name":"message","kind":"Any","default":""},{"name":"notification_type","kind":"Any","default":null},{"name":"_rendered","kind":"Any","default":false},{"name":"_destroyed","kind":"Any","default":false}]},{"type":"model","name":"TemplateActions1","properties":[{"name":"open_modal","kind":"Any","default":0},{"name":"close_modal","kind":"Any","default":0}]},{"type":"model","name":"BootstrapTemplateActions1","properties":[{"name":"open_modal","kind":"Any","default":0},{"name":"close_modal","kind":"Any","default":0}]},{"type":"model","name":"TemplateEditor1","properties":[{"name":"layout","kind":"Any","default":[]}]},{"type":"model","name":"MaterialTemplateActions1","properties":[{"name":"open_modal","kind":"Any","default":0},{"name":"close_modal","kind":"Any","default":0}]},{"type":"model","name":"ReactiveESM1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"JSComponent1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"ReactComponent1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"AnyWidgetComponent1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"request_value1","properties":[{"name":"fill","kind":"Any","default":"none"},{"name":"_synced","kind":"Any","default":null},{"name":"_request_sync","kind":"Any","default":0}]}]}};
+  var render_items = [{"docid":"bf7f37a6-2fe2-4283-b1f4-14c41a8952e1","roots":{"bb86f057-a53a-4513-bf10-e168ad4b79d7":"da8fc4ef-52b0-4368-8713-9376ccc614d3"},"root_ids":["bb86f057-a53a-4513-bf10-e168ad4b79d7"]}];
+  var docs = Object.values(docs_json)
+  if (!docs) {
+    return
+  }
+  const py_version = docs[0].version.replace('rc', '-rc.').replace('.dev', '-dev.')
+  async function embed_document(root) {
+    var Bokeh = get_bokeh(root)
+    await Bokeh.embed.embed_items_notebook(docs_json, render_items);
+    for (const render_item of render_items) {
+      for (const root_id of render_item.root_ids) {
+	const id_el = document.getElementById(root_id)
+	if (id_el.children.length && id_el.children[0].hasAttribute('data-root-id')) {
+	  const root_el = id_el.children[0]
+	  root_el.id = root_el.id + '-rendered'
+	  for (const child of root_el.children) {
+            // Ensure JupyterLab does not capture keyboard shortcuts
+            // see: https://jupyterlab.readthedocs.io/en/4.1.x/extension/notebook.html#keyboard-interaction-model
+	    child.setAttribute('data-lm-suppress-shortcuts', 'true')
+	  }
+	}
+      }
+    }
+  }
+  function get_bokeh(root) {
+    if (root.Bokeh === undefined) {
+      return null
+    } else if (root.Bokeh.version !== py_version) {
+      if (root.Bokeh.versions === undefined || !root.Bokeh.versions.has(py_version)) {
+	return null
+      }
+      return root.Bokeh.versions.get(py_version);
+    } else if (root.Bokeh.version === py_version) {
+      return root.Bokeh
+    }
+    return null
+  }
+  function is_loaded(root) {
+    var Bokeh = get_bokeh(root)
+    return (Bokeh != null && Bokeh.Panel !== undefined)
+  }
+  if (is_loaded(root)) {
+    embed_document(root);
+  } else {
+    var attempts = 0;
+    var timer = setInterval(function(root) {
+      if (is_loaded(root)) {
+        clearInterval(timer);
+        embed_document(root);
+      } else if (document.readyState == "complete") {
+        attempts++;
+        if (attempts > 200) {
+          clearInterval(timer);
+	  var Bokeh = get_bokeh(root)
+	  if (Bokeh == null || Bokeh.Panel == null) {
+            console.warn("Panel: ERROR: Unable to run Panel code because Bokeh or Panel library is missing");
+	  } else {
+	    console.warn("Panel: WARNING: Attempting to render but not all required libraries could be resolved.")
+	    embed_document(root)
+	  }
+        }
+      }
+    }, 25, root)
+  }
+})(window);</script></div></div>
+</div>
+<p>Kernel density estimate (<code class="docutils literal notranslate"><span class="pre">kde</span></code>) provides a mechanism for showing the distribution and spread of the data. In <code class="docutils literal notranslate"><span class="pre">hvplot</span></code> the method is exposed both as <code class="docutils literal notranslate"><span class="pre">kde</span></code> and <code class="docutils literal notranslate"><span class="pre">density</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">bokeh.sampledata</span><span class="w"> </span><span class="kn">import</span> <span class="n">sea_surface_temperature</span> <span class="k">as</span> <span class="n">sst</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">sst</span><span class="o">.</span><span class="n">sea_surface_temperature</span>
+<span class="n">df</span><span class="o">.</span><span class="n">tail</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>temperature</th>
+    </tr>
+    <tr>
+      <th>time</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2017-03-21 22:00:00+00:00</th>
+      <td>4.000</td>
+    </tr>
+    <tr>
+      <th>2017-03-21 22:30:00+00:00</th>
+      <td>3.975</td>
+    </tr>
+    <tr>
+      <th>2017-03-21 23:00:00+00:00</th>
+      <td>4.017</td>
+    </tr>
+    <tr>
+      <th>2017-03-21 23:30:00+00:00</th>
+      <td>4.121</td>
+    </tr>
+    <tr>
+      <th>2017-03-22 00:00:00+00:00</th>
+      <td>4.316</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">kde</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div id='ff0dc38a-e3b5-43f7-94b7-cbe3aac747a3'>
+  <div id="ceeb218f-57b1-474c-ba67-66ab31e8de82" data-root-id="ff0dc38a-e3b5-43f7-94b7-cbe3aac747a3" style="display: contents;"></div>
+</div>
+<script type="application/javascript">(function(root) {
+  var docs_json = {"f84ea95a-8df6-480f-b904-a830853381a1":{"version":"3.7.2","title":"Bokeh Application","roots":[{"type":"object","name":"Row","id":"ff0dc38a-e3b5-43f7-94b7-cbe3aac747a3","attributes":{"name":"Row00285","tags":["embedded"],"stylesheets":["\n:host(.pn-loading):before, .pn-loading:before {\n  background-color: #c3c3c3;\n  mask-size: auto calc(min(50%, 400px));\n  -webkit-mask-size: auto calc(min(50%, 400px));\n}",{"type":"object","name":"ImportedStyleSheet","id":"c512590c-d077-4276-a8cb-e7c55b704eeb","attributes":{"url":"https://cdn.holoviz.org/panel/1.6.3/dist/css/loading.css"}},{"type":"object","name":"ImportedStyleSheet","id":"c975a6d4-d592-4d15-9da3-ea9ebacbaade","attributes":{"url":"https://cdn.holoviz.org/panel/1.6.3/dist/css/listpanel.css"}},{"type":"object","name":"ImportedStyleSheet","id":"ae78c6c4-df0d-4897-b675-3d0309bfd936","attributes":{"url":"https://cdn.holoviz.org/panel/1.6.3/dist/bundled/theme/default.css"}},{"type":"object","name":"ImportedStyleSheet","id":"f1e01794-3d03-4c36-8a76-84ad3a27beca","attributes":{"url":"https://cdn.holoviz.org/panel/1.6.3/dist/bundled/theme/native.css"}}],"min_width":700,"margin":0,"sizing_mode":"stretch_width","align":"start","children":[{"type":"object","name":"Spacer","id":"843e3ece-6869-427c-810e-42db954135fd","attributes":{"name":"HSpacer00289","stylesheets":["\n:host(.pn-loading):before, .pn-loading:before {\n  background-color: #c3c3c3;\n  mask-size: auto calc(min(50%, 400px));\n  -webkit-mask-size: auto calc(min(50%, 400px));\n}",{"id":"c512590c-d077-4276-a8cb-e7c55b704eeb"},{"id":"ae78c6c4-df0d-4897-b675-3d0309bfd936"},{"id":"f1e01794-3d03-4c36-8a76-84ad3a27beca"}],"margin":0,"sizing_mode":"stretch_width","align":"start"}},{"type":"object","name":"Figure","id":"e0914323-823a-45bb-81f4-d444be2af652","attributes":{"width":700,"height":300,"margin":[5,10],"sizing_mode":"fixed","align":"start","x_range":{"type":"object","name":"Range1d","id":"615c0fc1-2865-453e-bc2b-5fd6ff4a9d60","attributes":{"name":"temperature","tags":[[["temperature",null]],[]],"start":1.377966701609044,"end":24.384033298390953,"reset_start":1.377966701609044,"reset_end":24.384033298390953}},"y_range":{"type":"object","name":"Range1d","id":"c660b57a-1e23-4777-b3ca-bd03f46da028","attributes":{"name":"temperature_density","tags":[[["Density",null]],{"type":"map","entries":[["invert_yaxis",false],["autorange",false]]}],"end":0.14434900082494131,"reset_start":0.0,"reset_end":0.14434900082494131}},"x_scale":{"type":"object","name":"LinearScale","id":"fa48b9ab-62f0-4a89-9143-e1e370e3bed7"},"y_scale":{"type":"object","name":"LinearScale","id":"db9cb608-ff95-46bb-9c78-aa6369ad3bd2"},"title":{"type":"object","name":"Title","id":"9ea2be91-4b69-4079-aa24-6e08fb2e6f84","attributes":{"text_color":"black","text_font_size":"12pt"}},"renderers":[{"type":"object","name":"GlyphRenderer","id":"a0101ad4-4eaa-4069-bcd4-d2de1099f53f","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"b66d7828-f779-46ca-b7de-e8fc6d360d1c","attributes":{"selected":{"type":"object","name":"Selection","id":"930b3359-36c9-4f34-9fa7-687e6f5d245a","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"bbb014a0-c77c-4be6-a796-bb64aaa679eb"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"ccc0fb62-1391-4cc2-aec2-0247e0a2c2bb","attributes":{"filter":{"type":"object","name":"AllIndices","id":"1ba52970-f72c-46dd-8947-4513d8737520"}}},"glyph":{"type":"object","name":"Patch","id":"854fb502-a07b-44fe-9276-7a665e850364","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#30a2da","fill_alpha":0.5,"hatch_color":"#30a2da"}},"selection_glyph":{"type":"object","name":"Patch","id":"b9e96b3c-00c8-4ee8-a8fa-aaa5095cb775","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#30a2da","fill_alpha":0.5,"hatch_color":"#30a2da"}},"nonselection_glyph":{"type":"object","name":"Patch","id":"f24fbf6c-bf03-4429-900f-2fbf1aeb2c1e","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":1,"fill_color":"#30a2da","fill_alpha":0.5,"hatch_color":"#30a2da","hatch_alpha":0.1}},"muted_glyph":{"type":"object","name":"Patch","id":"e23644f6-9664-47f5-81fd-7ab7b0f01af9","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.2,"fill_color":"#30a2da","fill_alpha":0.2,"hatch_color":"#30a2da","hatch_alpha":0.2}}}}],"toolbar":{"type":"object","name":"Toolbar","id":"1c8a023c-efaf-4e64-81fe-f23dc7b073ed","attributes":{"tools":[{"type":"object","name":"WheelZoomTool","id":"45b26414-1907-420b-bdd2-10ac8a4e1152","attributes":{"tags":["hv_created"],"renderers":"auto","zoom_together":"none"}},{"type":"object","name":"HoverTool","id":"862a8cd4-7d92-4030-ba07-d2480fecf1e4","attributes":{"tags":["hv_created"],"renderers":[{"id":"a0101ad4-4eaa-4069-bcd4-d2de1099f53f"}],"tooltips":[["temperature","@{temperature}"],["Density","@{temperature_density}"]]}},{"type":"object","name":"SaveTool","id":"cc1b173d-c550-4f2a-a568-9975734dae7d"},{"type":"object","name":"PanTool","id":"8cc111b3-de33-4def-9692-c740ff4363f1"},{"type":"object","name":"BoxZoomTool","id":"274d3378-1d60-4b60-8e73-037f079fecdd","attributes":{"dimensions":"both","overlay":{"type":"object","name":"BoxAnnotation","id":"0d5ed017-d866-42a4-85c2-88be1ec13a36","attributes":{"syncable":false,"line_color":"black","line_alpha":1.0,"line_width":2,"line_dash":[4,4],"fill_color":"lightgrey","fill_alpha":0.5,"level":"overlay","visible":false,"left":{"type":"number","value":"nan"},"right":{"type":"number","value":"nan"},"top":{"type":"number","value":"nan"},"bottom":{"type":"number","value":"nan"},"left_units":"canvas","right_units":"canvas","top_units":"canvas","bottom_units":"canvas","handles":{"type":"object","name":"BoxInteractionHandles","id":"97fe1ce9-07d4-4e00-9f8f-b443db0ffc4a","attributes":{"all":{"type":"object","name":"AreaVisuals","id":"df17210b-3502-4e6f-a34b-e6dd6ea26671","attributes":{"fill_color":"white","hover_fill_color":"lightgray"}}}}}}}},{"type":"object","name":"ResetTool","id":"5e031e62-e65a-4f1d-bbbd-121a9b4c9b1f"}],"active_drag":{"id":"8cc111b3-de33-4def-9692-c740ff4363f1"},"active_scroll":{"id":"45b26414-1907-420b-bdd2-10ac8a4e1152"}}},"left":[{"type":"object","name":"LinearAxis","id":"e1d66a05-fde7-4f6b-98f1-6a7198d842f7","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"74b96664-c717-42be-8e20-366f1c71019a","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"5a127244-6a4d-45ce-8306-22502e2cfcef"},"axis_label":"Density","major_label_policy":{"type":"object","name":"AllLabels","id":"993d70d3-84fe-422d-912f-d141575f591a"}}}],"below":[{"type":"object","name":"LinearAxis","id":"ec4e72ac-3095-49a2-bd20-094a1f78a882","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"d650f891-ed94-426c-937f-23d259e2a82d","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"2296019c-e751-4202-bb8a-ff66104ecb13"},"axis_label":"temperature","major_label_policy":{"type":"object","name":"AllLabels","id":"51b9ba48-10e0-4a52-a78d-ac7a4b246586"}}}],"center":[{"type":"object","name":"Grid","id":"e12264b9-756f-4f9b-9d8d-bb05f31a6236","attributes":{"axis":{"id":"ec4e72ac-3095-49a2-bd20-094a1f78a882"},"grid_line_color":null}},{"type":"object","name":"Grid","id":"b76504c5-2590-499f-b56b-96c3570a501f","attributes":{"dimension":1,"axis":{"id":"e1d66a05-fde7-4f6b-98f1-6a7198d842f7"},"grid_line_color":null}}],"min_border_top":10,"min_border_bottom":10,"min_border_left":10,"min_border_right":10,"output_backend":"webgl"}},{"type":"object","name":"Spacer","id":"441a0dc6-0cc8-43b6-beb6-fc6d8fc3bead","attributes":{"name":"HSpacer00290","stylesheets":["\n:host(.pn-loading):before, .pn-loading:before {\n  background-color: #c3c3c3;\n  mask-size: auto calc(min(50%, 400px));\n  -webkit-mask-size: auto calc(min(50%, 400px));\n}",{"id":"c512590c-d077-4276-a8cb-e7c55b704eeb"},{"id":"ae78c6c4-df0d-4897-b675-3d0309bfd936"},{"id":"f1e01794-3d03-4c36-8a76-84ad3a27beca"}],"margin":0,"sizing_mode":"stretch_width","align":"start"}}]}}],"defs":[{"type":"model","name":"ReactiveHTML1"},{"type":"model","name":"FlexBox1","properties":[{"name":"align_content","kind":"Any","default":"flex-start"},{"name":"align_items","kind":"Any","default":"flex-start"},{"name":"flex_direction","kind":"Any","default":"row"},{"name":"flex_wrap","kind":"Any","default":"wrap"},{"name":"gap","kind":"Any","default":""},{"name":"justify_content","kind":"Any","default":"flex-start"}]},{"type":"model","name":"FloatPanel1","properties":[{"name":"config","kind":"Any","default":{"type":"map"}},{"name":"contained","kind":"Any","default":true},{"name":"position","kind":"Any","default":"right-top"},{"name":"offsetx","kind":"Any","default":null},{"name":"offsety","kind":"Any","default":null},{"name":"theme","kind":"Any","default":"primary"},{"name":"status","kind":"Any","default":"normalized"}]},{"type":"model","name":"GridStack1","properties":[{"name":"ncols","kind":"Any","default":null},{"name":"nrows","kind":"Any","default":null},{"name":"allow_resize","kind":"Any","default":true},{"name":"allow_drag","kind":"Any","default":true},{"name":"state","kind":"Any","default":[]}]},{"type":"model","name":"drag1","properties":[{"name":"slider_width","kind":"Any","default":5},{"name":"slider_color","kind":"Any","default":"black"},{"name":"value","kind":"Any","default":50}]},{"type":"model","name":"click1","properties":[{"name":"terminal_output","kind":"Any","default":""},{"name":"debug_name","kind":"Any","default":""},{"name":"clears","kind":"Any","default":0}]},{"type":"model","name":"FastWrapper1","properties":[{"name":"object","kind":"Any","default":null},{"name":"style","kind":"Any","default":null}]},{"type":"model","name":"NotificationArea1","properties":[{"name":"js_events","kind":"Any","default":{"type":"map"}},{"name":"max_notifications","kind":"Any","default":5},{"name":"notifications","kind":"Any","default":[]},{"name":"position","kind":"Any","default":"bottom-right"},{"name":"_clear","kind":"Any","default":0},{"name":"types","kind":"Any","default":[{"type":"map","entries":[["type","warning"],["background","#ffc107"],["icon",{"type":"map","entries":[["className","fas fa-exclamation-triangle"],["tagName","i"],["color","white"]]}]]},{"type":"map","entries":[["type","info"],["background","#007bff"],["icon",{"type":"map","entries":[["className","fas fa-info-circle"],["tagName","i"],["color","white"]]}]]}]}]},{"type":"model","name":"Notification","properties":[{"name":"background","kind":"Any","default":null},{"name":"duration","kind":"Any","default":3000},{"name":"icon","kind":"Any","default":null},{"name":"message","kind":"Any","default":""},{"name":"notification_type","kind":"Any","default":null},{"name":"_rendered","kind":"Any","default":false},{"name":"_destroyed","kind":"Any","default":false}]},{"type":"model","name":"TemplateActions1","properties":[{"name":"open_modal","kind":"Any","default":0},{"name":"close_modal","kind":"Any","default":0}]},{"type":"model","name":"BootstrapTemplateActions1","properties":[{"name":"open_modal","kind":"Any","default":0},{"name":"close_modal","kind":"Any","default":0}]},{"type":"model","name":"TemplateEditor1","properties":[{"name":"layout","kind":"Any","default":[]}]},{"type":"model","name":"MaterialTemplateActions1","properties":[{"name":"open_modal","kind":"Any","default":0},{"name":"close_modal","kind":"Any","default":0}]},{"type":"model","name":"ReactiveESM1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"JSComponent1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"ReactComponent1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"AnyWidgetComponent1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"request_value1","properties":[{"name":"fill","kind":"Any","default":"none"},{"name":"_synced","kind":"Any","default":null},{"name":"_request_sync","kind":"Any","default":0}]}]}};
+  var render_items = [{"docid":"f84ea95a-8df6-480f-b904-a830853381a1","roots":{"ff0dc38a-e3b5-43f7-94b7-cbe3aac747a3":"ceeb218f-57b1-474c-ba67-66ab31e8de82"},"root_ids":["ff0dc38a-e3b5-43f7-94b7-cbe3aac747a3"]}];
+  var docs = Object.values(docs_json)
+  if (!docs) {
+    return
+  }
+  const py_version = docs[0].version.replace('rc', '-rc.').replace('.dev', '-dev.')
+  async function embed_document(root) {
+    var Bokeh = get_bokeh(root)
+    await Bokeh.embed.embed_items_notebook(docs_json, render_items);
+    for (const render_item of render_items) {
+      for (const root_id of render_item.root_ids) {
+	const id_el = document.getElementById(root_id)
+	if (id_el.children.length && id_el.children[0].hasAttribute('data-root-id')) {
+	  const root_el = id_el.children[0]
+	  root_el.id = root_el.id + '-rendered'
+	  for (const child of root_el.children) {
+            // Ensure JupyterLab does not capture keyboard shortcuts
+            // see: https://jupyterlab.readthedocs.io/en/4.1.x/extension/notebook.html#keyboard-interaction-model
+	    child.setAttribute('data-lm-suppress-shortcuts', 'true')
+	  }
+	}
+      }
+    }
+  }
+  function get_bokeh(root) {
+    if (root.Bokeh === undefined) {
+      return null
+    } else if (root.Bokeh.version !== py_version) {
+      if (root.Bokeh.versions === undefined || !root.Bokeh.versions.has(py_version)) {
+	return null
+      }
+      return root.Bokeh.versions.get(py_version);
+    } else if (root.Bokeh.version === py_version) {
+      return root.Bokeh
+    }
+    return null
+  }
+  function is_loaded(root) {
+    var Bokeh = get_bokeh(root)
+    return (Bokeh != null && Bokeh.Panel !== undefined)
+  }
+  if (is_loaded(root)) {
+    embed_document(root);
+  } else {
+    var attempts = 0;
+    var timer = setInterval(function(root) {
+      if (is_loaded(root)) {
+        clearInterval(timer);
+        embed_document(root);
+      } else if (document.readyState == "complete") {
+        attempts++;
+        if (attempts > 200) {
+          clearInterval(timer);
+	  var Bokeh = get_bokeh(root)
+	  if (Bokeh == null || Bokeh.Panel == null) {
+            console.warn("Panel: ERROR: Unable to run Panel code because Bokeh or Panel library is missing");
+	  } else {
+	    console.warn("Panel: WARNING: Attempting to render but not all required libraries could be resolved.")
+	    embed_document(root)
+	  }
+        }
+      }
+    }, 25, root)
+  }
+})(window);</script></div></div>
+</div>
+<p>There are many options exposed and explorable using tab completion. In this case we’ll create a colormap that spans the rainbow and divide the temperature by month.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">colorcet</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cc</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">categorical_cmap</span> <span class="o">=</span> <span class="p">[</span><span class="n">cc</span><span class="o">.</span><span class="n">rainbow</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">12</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">kde</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;time.month&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">categorical_cmap</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div id='f0f6cc41-1afd-4ac7-aa36-cdf4e13c88ad'>
+  <div id="f095823d-e543-43c4-a88e-4b2e658ceb89" data-root-id="f0f6cc41-1afd-4ac7-aa36-cdf4e13c88ad" style="display: contents;"></div>
+</div>
+<script type="application/javascript">(function(root) {
+  var docs_json = {"c183b07c-7a52-46f8-ad3b-213236ea6a40":{"version":"3.7.2","title":"Bokeh Application","roots":[{"type":"object","name":"Row","id":"f0f6cc41-1afd-4ac7-aa36-cdf4e13c88ad","attributes":{"name":"Row00523","tags":["embedded"],"stylesheets":["\n:host(.pn-loading):before, .pn-loading:before {\n  background-color: #c3c3c3;\n  mask-size: auto calc(min(50%, 400px));\n  -webkit-mask-size: auto calc(min(50%, 400px));\n}",{"type":"object","name":"ImportedStyleSheet","id":"0a147fed-34e7-4a4a-8408-6f8cc010434a","attributes":{"url":"https://cdn.holoviz.org/panel/1.6.3/dist/css/loading.css"}},{"type":"object","name":"ImportedStyleSheet","id":"e81ba173-f5ad-4910-bf1d-b89546fb8f87","attributes":{"url":"https://cdn.holoviz.org/panel/1.6.3/dist/css/listpanel.css"}},{"type":"object","name":"ImportedStyleSheet","id":"442234bc-c668-434d-b565-dd089549569d","attributes":{"url":"https://cdn.holoviz.org/panel/1.6.3/dist/bundled/theme/default.css"}},{"type":"object","name":"ImportedStyleSheet","id":"40d14ae8-2f2d-4b4a-ae89-9d2c0548138c","attributes":{"url":"https://cdn.holoviz.org/panel/1.6.3/dist/bundled/theme/native.css"}}],"min_width":700,"margin":0,"sizing_mode":"stretch_width","align":"start","children":[{"type":"object","name":"Spacer","id":"c625967f-e784-475a-bd63-0b73349d4641","attributes":{"name":"HSpacer00527","stylesheets":["\n:host(.pn-loading):before, .pn-loading:before {\n  background-color: #c3c3c3;\n  mask-size: auto calc(min(50%, 400px));\n  -webkit-mask-size: auto calc(min(50%, 400px));\n}",{"id":"0a147fed-34e7-4a4a-8408-6f8cc010434a"},{"id":"442234bc-c668-434d-b565-dd089549569d"},{"id":"40d14ae8-2f2d-4b4a-ae89-9d2c0548138c"}],"margin":0,"sizing_mode":"stretch_width","align":"start"}},{"type":"object","name":"Figure","id":"d6fa7e31-e866-4c3a-b153-41455deff8f9","attributes":{"width":700,"height":400,"margin":[5,10],"sizing_mode":"fixed","align":"start","x_range":{"type":"object","name":"Range1d","id":"66c86904-05de-4487-a35d-fb4ba75c5f71","attributes":{"name":"temperature","tags":[[["temperature",null]],[]],"start":3.317143212590234,"end":23.528029198555693,"reset_start":3.317143212590234,"reset_end":23.528029198555693}},"y_range":{"type":"object","name":"Range1d","id":"19285149-8037-43b1-b29e-dc049d6fc1a6","attributes":{"name":"temperature_density","tags":[[["Density",null]],{"type":"map","entries":[["invert_yaxis",false],["autorange",false]]}],"end":1.3321982450681402,"reset_start":0.0,"reset_end":1.3321982450681402}},"x_scale":{"type":"object","name":"LinearScale","id":"b69c3156-7409-499b-b955-a783b5bf9fe4"},"y_scale":{"type":"object","name":"LinearScale","id":"c1b7daf0-d491-4a55-9165-5d491c86af7e"},"title":{"type":"object","name":"Title","id":"13423b25-4cb3-4498-b28b-b8c90ec4666c","attributes":{"text_color":"black","text_font_size":"12pt"}},"renderers":[{"type":"object","name":"GlyphRenderer","id":"58c7a5b5-6323-4799-874b-1dbacf7c455e","attributes":{"name":"2","data_source":{"type":"object","name":"ColumnDataSource","id":"9d1f88a5-19eb-4feb-b721-a0e91f6f1727","attributes":{"selected":{"type":"object","name":"Selection","id":"11351ccb-3626-41da-b76b-9f0f25144491","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"58e9c44a-e9ba-458d-8ad3-55e441a0be98"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"96437e3a-50ac-4972-b171-37a54a4b4c23","attributes":{"filter":{"type":"object","name":"AllIndices","id":"82191929-28e1-4a73-a55a-c804c6b131f6"}}},"glyph":{"type":"object","name":"Patch","id":"c3a179ee-dc35-4e74-b982-be3491fe58da","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#30a2da","fill_alpha":0.5,"hatch_color":"#30a2da"}},"selection_glyph":{"type":"object","name":"Patch","id":"1992e0ad-24a4-4b6b-aeb4-d4dad3b7c5f3","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#30a2da","fill_alpha":0.5,"hatch_color":"#30a2da"}},"nonselection_glyph":{"type":"object","name":"Patch","id":"a686d5e2-16d2-4564-9f01-afb721fe6edb","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":1,"fill_color":"#30a2da","fill_alpha":0.5,"hatch_color":"#30a2da","hatch_alpha":0.1}},"muted_glyph":{"type":"object","name":"Patch","id":"dfbaab99-bbc6-468f-aefd-ce84c8e6c4e1","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.2,"fill_color":"#30a2da","fill_alpha":0.2,"hatch_color":"#30a2da","hatch_alpha":0.2}}}},{"type":"object","name":"GlyphRenderer","id":"f82f288e-b575-4ffc-a254-d5425a39c33b","attributes":{"name":"3","data_source":{"type":"object","name":"ColumnDataSource","id":"5bc566b5-891b-4f14-a21a-0ee89921ef22","attributes":{"selected":{"type":"object","name":"Selection","id":"a9be17fc-d4d6-4648-b81c-2ec61714a002","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"8f40d8f9-de39-4ab2-990c-d24943fecd6a"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"f8f2aeb0-2d5e-4e97-91b8-e63b9c66f1f8","attributes":{"filter":{"type":"object","name":"AllIndices","id":"beba3c98-3ec8-49a8-bd08-80a763c2b2be"}}},"glyph":{"type":"object","name":"Patch","id":"735c82ed-d8bf-4af2-80e2-8b62ace61ff0","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#fc4f30","fill_alpha":0.5,"hatch_color":"#fc4f30"}},"selection_glyph":{"type":"object","name":"Patch","id":"a8092fab-172b-46d8-ad02-5d40bba2d2fb","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#fc4f30","fill_alpha":0.5,"hatch_color":"#fc4f30"}},"nonselection_glyph":{"type":"object","name":"Patch","id":"ec5b4a0d-5f8d-492a-a699-8a61acf67c7d","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":1,"fill_color":"#fc4f30","fill_alpha":0.5,"hatch_color":"#fc4f30","hatch_alpha":0.1}},"muted_glyph":{"type":"object","name":"Patch","id":"6a8f4335-1eb8-43a4-a387-deb930c1e58a","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.2,"fill_color":"#fc4f30","fill_alpha":0.2,"hatch_color":"#fc4f30","hatch_alpha":0.2}}}},{"type":"object","name":"GlyphRenderer","id":"350f96c0-5b12-4235-9735-f39d34293aff","attributes":{"name":"4","data_source":{"type":"object","name":"ColumnDataSource","id":"3c1a56e2-46a4-4a3c-b536-9492053bfb47","attributes":{"selected":{"type":"object","name":"Selection","id":"380581d7-5616-432b-bfaa-4e654f134374","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"15fcad11-9c31-4de4-aebb-e88913413298"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"ac9b83c2-b485-4308-ba5e-32d7d4c8d274","attributes":{"filter":{"type":"object","name":"AllIndices","id":"3f2aa893-ee6f-43eb-9cc7-0428f5d7abf5"}}},"glyph":{"type":"object","name":"Patch","id":"9aa70013-8017-45cf-b878-27901f1072a0","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#e5ae38","fill_alpha":0.5,"hatch_color":"#e5ae38"}},"selection_glyph":{"type":"object","name":"Patch","id":"b965e4ac-c895-4f8b-9855-47bbcb941634","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#e5ae38","fill_alpha":0.5,"hatch_color":"#e5ae38"}},"nonselection_glyph":{"type":"object","name":"Patch","id":"bed31483-dc91-485b-973a-d35b26a53d89","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":1,"fill_color":"#e5ae38","fill_alpha":0.5,"hatch_color":"#e5ae38","hatch_alpha":0.1}},"muted_glyph":{"type":"object","name":"Patch","id":"1e65f309-be32-4ebf-9431-33e934539b01","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.2,"fill_color":"#e5ae38","fill_alpha":0.2,"hatch_color":"#e5ae38","hatch_alpha":0.2}}}},{"type":"object","name":"GlyphRenderer","id":"c1c1f94d-80d4-4ac9-ae55-407b3c61f60b","attributes":{"name":"5","data_source":{"type":"object","name":"ColumnDataSource","id":"a6f182a4-6272-4711-afd2-445751cb2daa","attributes":{"selected":{"type":"object","name":"Selection","id":"46f66564-d83f-45c4-b4ab-9f0ea1b59bfc","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"de1e3ca4-8ae9-4b4b-91ce-4240c80a1e4f"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"d69e805a-fffb-4551-82b4-67193b4a1b2a","attributes":{"filter":{"type":"object","name":"AllIndices","id":"f6ac8b65-4752-4a1a-b368-e628b04dbcaa"}}},"glyph":{"type":"object","name":"Patch","id":"9dcf0e9e-1324-4ca7-9f6e-85f2ed18170b","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#6d904f","fill_alpha":0.5,"hatch_color":"#6d904f"}},"selection_glyph":{"type":"object","name":"Patch","id":"0b89f7ad-f961-436d-bda6-ca4d350a245e","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#6d904f","fill_alpha":0.5,"hatch_color":"#6d904f"}},"nonselection_glyph":{"type":"object","name":"Patch","id":"5d5b8f21-855d-4fea-a443-a27943586540","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":1,"fill_color":"#6d904f","fill_alpha":0.5,"hatch_color":"#6d904f","hatch_alpha":0.1}},"muted_glyph":{"type":"object","name":"Patch","id":"d0a855ba-bbb5-4eb5-9bd8-551b013c9ce8","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.2,"fill_color":"#6d904f","fill_alpha":0.2,"hatch_color":"#6d904f","hatch_alpha":0.2}}}},{"type":"object","name":"GlyphRenderer","id":"b71afc0d-a5d7-4e1b-b1c6-b622c489b590","attributes":{"name":"6","data_source":{"type":"object","name":"ColumnDataSource","id":"6e1e48c6-c1a0-4ff9-9b28-57e201536a37","attributes":{"selected":{"type":"object","name":"Selection","id":"321daa88-9718-455d-b035-3029d0d14ceb","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"220141cf-3689-4cee-aedc-fcf959298e09"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"9be561d6-8b63-4905-8387-c6025006e8ff","attributes":{"filter":{"type":"object","name":"AllIndices","id":"3967bcc1-e08b-41b1-b0ac-57c1bcbc32be"}}},"glyph":{"type":"object","name":"Patch","id":"a8e02624-e2a1-498b-975d-7bb81874efae","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#8b8b8b","fill_alpha":0.5,"hatch_color":"#8b8b8b"}},"selection_glyph":{"type":"object","name":"Patch","id":"6d9fa8f8-68c2-416b-9814-102c24f545af","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#8b8b8b","fill_alpha":0.5,"hatch_color":"#8b8b8b"}},"nonselection_glyph":{"type":"object","name":"Patch","id":"94ac4035-f369-4d44-9826-79b7a13c18b9","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":1,"fill_color":"#8b8b8b","fill_alpha":0.5,"hatch_color":"#8b8b8b","hatch_alpha":0.1}},"muted_glyph":{"type":"object","name":"Patch","id":"bba6748a-3865-48c5-bee8-a6d4bef790da","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.2,"fill_color":"#8b8b8b","fill_alpha":0.2,"hatch_color":"#8b8b8b","hatch_alpha":0.2}}}},{"type":"object","name":"GlyphRenderer","id":"db5198f8-9c92-455d-88cf-435bb441aed7","attributes":{"name":"7","data_source":{"type":"object","name":"ColumnDataSource","id":"2a2ac075-a085-4811-8fac-5eb44fd5837c","attributes":{"selected":{"type":"object","name":"Selection","id":"fd7705e3-80f4-4b9e-bd1e-34a6890142d3","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"8a51d320-7c82-40fd-9a59-35a243be1b77"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACdPS8gRMoEP47W1xF49xc/EivAW9bkKT94A1hS8T06PzDg4VtS+Ug/mWVCrPRZVj/l/pd4eNliP6x/LaE4CW4/jW/EcCuwdj8WGs1L31KAP728uTv4gYY/KQvSXxL1jT99i2HaRmiTP4had3LbsJg/uoRAvqoTnz949/xmDHGjP/1awFHzNag/13qpOtfwrT9ajJPAVE2yP9gLVhrLALY/9iet/aDjuT/fh+wl9bW9P8yEkWl1mcA/jssIwvsPwj/zPcHUry3DP3W/xNmA8sM/dwkavPZuxD/lSOL8Hb/EPx7Cl7kRAsU//u3uO/ZQxT+ivICOerjFP3No2Ib0NsY/xvmVUES/xj91T575xT7HPwmIioSjo8c/gOOE9Erhxz/3qSUKRPLHP+mbRk0o2Mc/S0bnhiGbxz8RmpYQvknHP0rTTZeh+MY/m6hfbJjAxj/ivipWsbnGPxTA8khq88Y/Z6xuvQ5sxz8EP6yX/ArIP6Sp/ViFocg/+5fjhx70yD/Wxw2/KsrIP6R8SBta/8c/c6abVTCQxj8/nn52pJzEP1/cSmWbX8I//Ga7/XYewD/2rdWW5S28P95SJ0lg47g/jTvbI4x6tj/m9oxbtuO0P9Z+ZfJF9LM/QaeLZq16sz9B+U1BIU2zP5PeCDnwT7M/JMgvkXF0sz+gdsJO1bOzP3jvuWNECbQ/ZCT4AnNttD9M+bGxTtS0P3EinRGrLLU/UHsc6r9htT/oObVBU161PwVoXAsBEbU/gVLlQFRwtD+3h01bBX2zP5oHHYtJQbI/hb4NfobNsD8iSIlEJmiuP43N1x79C6s/FdB1Udyjpz9nKqLqZ0mkPyZaDm2VFKE/7bmuUPY3nD+tAe94mOWWP/Y+XtN3S5I/BsjRTwXjjD+sWV52T5yGP4Y+RkyolYE/TUNML5srez+GXU6Khsl0P7EmaEK/Um8/W4wWsXETZz9XwLAFn39gP1g7bFEKvFY/2plm0AMBTj8LrXsUlt1CPwttwfczgzY/fu32HJtoKT+fSasmew0bP/xC5PKJHQs/IMCF7D6L+T7bxg8nQ5bmPg=="},"shape":[200],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"74a0ab4d-0f69-4179-96a2-064fffc9ea28","attributes":{"filter":{"type":"object","name":"AllIndices","id":"ee99b850-3d88-4f4c-a354-ed5426fba0b6"}}},"glyph":{"type":"object","name":"Patch","id":"60d50843-bdb1-44d1-bc40-914e357ca5bd","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#17becf","fill_alpha":0.5,"hatch_color":"#17becf"}},"selection_glyph":{"type":"object","name":"Patch","id":"17c855e5-b61d-4751-be93-2719ffc621f9","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#17becf","fill_alpha":0.5,"hatch_color":"#17becf"}},"nonselection_glyph":{"type":"object","name":"Patch","id":"6d406b8f-6ec6-4dde-8ed5-0dff474c2c41","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":1,"fill_color":"#17becf","fill_alpha":0.5,"hatch_color":"#17becf","hatch_alpha":0.1}},"muted_glyph":{"type":"object","name":"Patch","id":"b0949729-7396-4eb4-a5b8-cd3dc77d1ec0","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.2,"fill_color":"#17becf","fill_alpha":0.2,"hatch_color":"#17becf","hatch_alpha":0.2}}}},{"type":"object","name":"GlyphRenderer","id":"c155241d-e731-4c30-ba86-4dcc5c2793fb","attributes":{"name":"8","data_source":{"type":"object","name":"ColumnDataSource","id":"13c7c95a-13b0-408e-8e8d-8d68a95551e1","attributes":{"selected":{"type":"object","name":"Selection","id":"f23393d3-f3b9-4320-9c2a-b956d2f2e6a8","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"0ed11637-31c0-451b-af6e-27479494003c"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADZ2f/OLhHqPmGgIHWp9v4+CYexJ+3pED9c47p++gQhPzqyy1Rpmy8/tdIsv50mOz8iNKzx66VFP7XZvyq+F1A/T6pNKZNwVj8DaCJea5NdPxslKVaKm2I/5hwwb/ugZj+vMUIM2PpqP8G57gC4BHA/UINN4TdAcz+k0Y37lcJ3P/PgosF1an4/Y5ot1cY2hD8rzzlpSqSLPzXbhzJfIpM/QzyNkyNhmj9ANg3iQOShPw32jXk+vqc/zuq6snXQrj8nsmwyKJuzP13ZaOEHh7g/g+ku7AQtvj/H4BDyIzXCPzrhReLndMU/lt5Qq8WWyD/vHpMTXVnLP519Klnekc0/Nmz62K8+zz/zR0SvVETQP3fjdKiF2NA/6DWbb5x60T9jvZlCSTvSPwALu9+/GNM/4RjffMkC1D9f5ow57+PUP7cWzJSBqtU/IqxwwZJN1j9RyYDY/MzWP/j0xRQ8Ltc/+8HGjth41z/UHco1JLTXPzXWvQgs5tc/4eoxBXIS2D/ecOgydDfYPxAeH6rnS9g/NXT/pjE+2D8JYshPOfjXP6ErlyP+Ztc/u1iyL2qC1j+cGFpQJVHVP+yv8b+F5tM/3fLh9VNc0j+YTRyfMczQP09HyWJal84/VxFGPsnWyz+CHlNCt27JP2NO8MzpbMc/iO07VkjRxT8cCsceuIrEP4+aVHqeeMM/31w4z9Bywj/kzGfEn1XBP44/Sf3YDMA/8ajWH84xvT+Q1Nz+cxi6Px9+pkaiBbc/ipLpDgYwtD+4VFS9Nr2xP6KzrVOjdq8/V0P2DGZIrD/fabJgRM6pPwIbh6dt6Kc/aJ/j1MeJpj/TYYMmJ72lP1Cn5B0rnaU/EhFgsR9Cpj/cE6yNjKynPzI+qxTws6k/dprIY/n/qz8E5cS2YBCuP5PjrRtbVK8/p9UtZuhNrz/2ATDJPbetP1GfUf9EnKo/1QB8Ss1bpj+s/LaUPY2hP2ag7uG7qJk/IDWaKM9qkT+AivjKEumFP+rcXdr8fnk/ry1kNchnaz94rTaJHC5bP0OzHg+O2Ug/nPM2o5ztND8JiWhR4TkgPw=="},"shape":[200],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"c6e40516-ef6c-4bb9-8b80-9cdf0bccf7be","attributes":{"filter":{"type":"object","name":"AllIndices","id":"b8c0b2e9-0c9f-4b85-a98a-abab58c4cd9b"}}},"glyph":{"type":"object","name":"Patch","id":"8f9ba2f5-ea97-4abf-94e7-7e85e83677f0","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#9467bd","fill_alpha":0.5,"hatch_color":"#9467bd"}},"selection_glyph":{"type":"object","name":"Patch","id":"665e83ef-7b81-4ab0-8ad9-122276deb3d0","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#9467bd","fill_alpha":0.5,"hatch_color":"#9467bd"}},"nonselection_glyph":{"type":"object","name":"Patch","id":"cb8353de-3d07-4810-995c-971a0d7076f7","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":1,"fill_color":"#9467bd","fill_alpha":0.5,"hatch_color":"#9467bd","hatch_alpha":0.1}},"muted_glyph":{"type":"object","name":"Patch","id":"3eea8bb7-5d41-4f78-ab68-2429855b8518","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.2,"fill_color":"#9467bd","fill_alpha":0.2,"hatch_color":"#9467bd","hatch_alpha":0.2}}}},{"type":"object","name":"GlyphRenderer","id":"ee4c17be-01fc-4aa6-ad10-bc3772f18f99","attributes":{"name":"9","data_source":{"type":"object","name":"ColumnDataSource","id":"987ee41c-d0fd-4474-9038-f304d0746b69","attributes":{"selected":{"type":"object","name":"Selection","id":"8d37d51a-6ac3-49f3-8eaf-b5ce92c501e6","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"0beaeac0-c808-411c-8023-55c937d2c6ac"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"384016b3-091d-4480-b08b-2ce77da24e45","attributes":{"filter":{"type":"object","name":"AllIndices","id":"4a5fd4e7-8f56-4793-ba2a-0e35b5d0fbce"}}},"glyph":{"type":"object","name":"Patch","id":"23282006-5000-47e8-b6fc-3456e505a10d","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#d62728","fill_alpha":0.5,"hatch_color":"#d62728"}},"selection_glyph":{"type":"object","name":"Patch","id":"cf71464d-21fb-416b-b197-644b16def6e6","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#d62728","fill_alpha":0.5,"hatch_color":"#d62728"}},"nonselection_glyph":{"type":"object","name":"Patch","id":"17628cf5-d9e7-4417-ba46-b891cf7970f1","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":1,"fill_color":"#d62728","fill_alpha":0.5,"hatch_color":"#d62728","hatch_alpha":0.1}},"muted_glyph":{"type":"object","name":"Patch","id":"af9e0abd-e79e-43c4-9871-3820a49d18aa","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.2,"fill_color":"#d62728","fill_alpha":0.2,"hatch_color":"#d62728","hatch_alpha":0.2}}}},{"type":"object","name":"GlyphRenderer","id":"a2115a5a-af76-4912-8f3d-2d7562594984","attributes":{"name":"10","data_source":{"type":"object","name":"ColumnDataSource","id":"3a3cb4c4-c804-4111-a2a2-4e5329b3f18b","attributes":{"selected":{"type":"object","name":"Selection","id":"3a7369f2-80fa-44ce-9e81-01b64dfec2a5","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"8abb4572-e4ab-4524-8207-c4a1cb8836b9"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"f83866ec-c6a5-4b08-bba8-9fc9294f586a","attributes":{"filter":{"type":"object","name":"AllIndices","id":"f5d19825-237a-48e1-821e-984aa2c18ec0"}}},"glyph":{"type":"object","name":"Patch","id":"e8b754ce-51cd-4ccc-ba28-7e9ae2df6cfb","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#1f77b4","fill_alpha":0.5,"hatch_color":"#1f77b4"}},"selection_glyph":{"type":"object","name":"Patch","id":"983fc9b2-b4c0-45c7-a699-26cf10102519","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#1f77b4","fill_alpha":0.5,"hatch_color":"#1f77b4"}},"nonselection_glyph":{"type":"object","name":"Patch","id":"568932a9-7da2-4aa6-bc6c-dabc74290705","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":1,"fill_color":"#1f77b4","fill_alpha":0.5,"hatch_color":"#1f77b4","hatch_alpha":0.1}},"muted_glyph":{"type":"object","name":"Patch","id":"5fe94776-0018-417d-abf8-fd4a73623b7e","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.2,"fill_color":"#1f77b4","fill_alpha":0.2,"hatch_color":"#1f77b4","hatch_alpha":0.2}}}},{"type":"object","name":"GlyphRenderer","id":"bcc5a8ae-0213-4d8b-aef1-be87afcc44e3","attributes":{"name":"11","data_source":{"type":"object","name":"ColumnDataSource","id":"2cdd8763-74b7-4004-aff2-0584727414a1","attributes":{"selected":{"type":"object","name":"Selection","id":"c1769ffc-33a2-4da0-bfe2-3dac34e25a07","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"4acc2c25-c261-4527-a5f6-badf523f93d1"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"7iOxndo4JEC2ZXJTK0QkQH+nMwl8TyRAR+n0vsxaJEAPK7Z0HWYkQNhsdypucSRAoK444L58JEBo8PmVD4gkQDAyu0tgkyRA+XN8AbGeJEDBtT23AaokQIn3/mxStSRAUjnAIqPAJEAae4HY88skQOK8Qo5E1yRAq/4DRJXiJEBzQMX55e0kQDuChq82+SRAA8RHZYcEJUDMBQkb2A8lQJRHytAoGyVAXImLhnkmJUAly0w8yjElQO0MDvIaPSVAtU7Pp2tIJUB+kJBdvFMlQEbSURMNXyVADhQTyV1qJUDWVdR+rnUlQJ+XlTT/gCVAZ9lW6k+MJUAvGxigoJclQPhc2VXxoiVAwJ6aC0KuJUCI4FvBkrklQFEiHXfjxCVAGWTeLDTQJUDhpZ/ihNslQKrnYJjV5iVAcikiTibyJUA6a+MDd/0lQAKtpLnHCCZAy+5lbxgUJkCTMCclaR8mQFty6Nq5KiZAJLSpkAo2JkDs9WpGW0EmQLQ3LPyrTCZAfHntsfxXJkBFu65nTWMmQA39bx2ebiZA1j4x0+55JkCegPKIP4UmQGbCsz6QkCZALgR19OCbJkD3RTaqMacmQL+H91+CsiZAh8m4FdO9JkBQC3rLI8kmQBhNO4F01CZA4I78NsXfJkCo0L3sFesmQHESf6Jm9iZAOVRAWLcBJ0ABlgEOCA0nQMrXwsNYGCdAkhmEeakjJ0BaW0Uv+i4nQCOdBuVKOidA697HmptFJ0CzIIlQ7FAnQHxiSgY9XCdARKQLvI1nJ0AM5sxx3nInQNQnjicvfidAnWlP3X+JJ0BlqxCT0JQnQC3t0UghoCdA9i6T/nGrJ0C+cFS0wrYnQIayFWoTwidATvTWH2TNJ0AXNpjVtNgnQN93WYsF5CdAp7kaQVbvJ0Bw+9v2pvonQDg9naz3BShAAH9eYkgRKEDJwB8YmRwoQJEC4c3pJyhAWUSigzozKEAihmM5iz4oQOrHJO/bSShAsgnmpCxVKEB6S6dafWAoQEONaBDOayhAC88pxh53KEDTEOt7b4IoQJxSrDHAjShAZJRt5xCZKEBklG3nEJkoQJxSrDHAjShA0xDre2+CKEALzynGHncoQEONaBDOayhAekunWn1gKECyCeakLFUoQOrHJO/bSShAIoZjOYs+KEBZRKKDOjMoQJEC4c3pJyhAycAfGJkcKEAAf15iSBEoQDg9naz3BShAcPvb9qb6J0CnuRpBVu8nQN93WYsF5CdAFzaY1bTYJ0BO9NYfZM0nQIayFWoTwidAvnBUtMK2J0D2LpP+casnQC3t0UghoCdAZasQk9CUJ0CdaU/df4knQNQnjicvfidADObMcd5yJ0BEpAu8jWcnQHxiSgY9XCdAsyCJUOxQJ0Dr3seam0UnQCOdBuVKOidAWltFL/ouJ0CSGYR5qSMnQMrXwsNYGCdAAZYBDggNJ0A5VEBYtwEnQHESf6Jm9iZAqNC97BXrJkDgjvw2xd8mQBhNO4F01CZAUAt6yyPJJkCHybgV070mQL+H91+CsiZA90U2qjGnJkAuBHX04JsmQGbCsz6QkCZAnoDyiD+FJkDWPjHT7nkmQA39bx2ebiZARbuuZ01jJkB8ee2x/FcmQLQ3LPyrTCZA7PVqRltBJkAktKmQCjYmQFty6Nq5KiZAkzAnJWkfJkDL7mVvGBQmQAKtpLnHCCZAOmvjA3f9JUByKSJOJvIlQKrnYJjV5iVA4aWf4oTbJUAZZN4sNNAlQFEiHXfjxCVAiOBbwZK5JUDAnpoLQq4lQPhc2VXxoiVALxsYoKCXJUBn2VbqT4wlQJ+XlTT/gCVA1lXUfq51JUAOFBPJXWolQEbSURMNXyVAfpCQXbxTJUC1Ts+na0glQO0MDvIaPSVAJctMPMoxJUBciYuGeSYlQJRHytAoGyVAzAUJG9gPJUADxEdlhwQlQDuChq82+SRAc0DF+eXtJECr/gNEleIkQOK8Qo5E1yRAGnuB2PPLJEBSOcAio8AkQIn3/mxStSRAwbU9twGqJED5c3wBsZ4kQDAyu0tgkyRAaPD5lQ+IJECgrjjgvnwkQNhsdypucSRADyu2dB1mJEBH6fS+zFokQH+nMwl8TyRAtmVyUytEJEDuI7Gd2jgkQA=="},"shape":[200],"dtype":"float64","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"d1fdb5a1-a596-4f98-83b8-5f2ecc7a354b","attributes":{"filter":{"type":"object","name":"AllIndices","id":"458d0c60-67a1-46e4-a351-c13a53c533e9"}}},"glyph":{"type":"object","name":"Patch","id":"22d8c943-dcf3-4a90-830d-161318fcee22","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#e377c2","fill_alpha":0.5,"hatch_color":"#e377c2"}},"selection_glyph":{"type":"object","name":"Patch","id":"a814b546-bf0a-4019-93b3-a0039b4c700d","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#e377c2","fill_alpha":0.5,"hatch_color":"#e377c2"}},"nonselection_glyph":{"type":"object","name":"Patch","id":"d9c39c57-a69c-4f25-9769-0668ace05157","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":1,"fill_color":"#e377c2","fill_alpha":0.5,"hatch_color":"#e377c2","hatch_alpha":0.1}},"muted_glyph":{"type":"object","name":"Patch","id":"cd6dab97-3a36-4a88-9ae5-db57dd508067","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.2,"fill_color":"#e377c2","fill_alpha":0.2,"hatch_color":"#e377c2","hatch_alpha":0.2}}}},{"type":"object","name":"GlyphRenderer","id":"3db2b9d5-e46a-4807-b186-214f5b79bb45","attributes":{"name":"12","data_source":{"type":"object","name":"ColumnDataSource","id":"b7fd5472-bd65-4cdf-a1ce-33fea76d1a25","attributes":{"selected":{"type":"object","name":"Selection","id":"51340c4a-429c-4f6a-a44a-a8533aa1764b","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"39959a34-0416-41af-bf3d-ff461b87bdf9"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"da895f43-2e1b-4e73-bb30-75853a6333e4","attributes":{"filter":{"type":"object","name":"AllIndices","id":"27d5e930-44e4-4ca7-9c6a-680b60a664a3"}}},"glyph":{"type":"object","name":"Patch","id":"9df9ba0b-d420-41bf-953a-8c6544d00aca","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#8c564b","fill_alpha":0.5,"hatch_color":"#8c564b"}},"selection_glyph":{"type":"object","name":"Patch","id":"4ff71d9f-4734-4eee-bd39-a8b94c519eb8","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#8c564b","fill_alpha":0.5,"hatch_color":"#8c564b"}},"nonselection_glyph":{"type":"object","name":"Patch","id":"c6aa55f0-d395-4ddd-91bc-decbbeecc485","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":1,"fill_color":"#8c564b","fill_alpha":0.5,"hatch_color":"#8c564b","hatch_alpha":0.1}},"muted_glyph":{"type":"object","name":"Patch","id":"e764eb11-3806-493b-b818-51a2430eddb0","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.2,"fill_color":"#8c564b","fill_alpha":0.2,"hatch_color":"#8c564b","hatch_alpha":0.2}}}},{"type":"object","name":"GlyphRenderer","id":"511b0718-4af6-41ea-bccc-52136e8b3b60","attributes":{"name":"1","data_source":{"type":"object","name":"ColumnDataSource","id":"1357b27f-9741-494b-b2ec-c3358570bdba","attributes":{"selected":{"type":"object","name":"Selection","id":"5aefa7eb-6ce9-4a20-9e7a-4bb5d29acf91","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"361d4513-3bab-4eb7-b7af-f7a22c0c2a62"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"87badb4f-c6dc-43da-9a9a-e7699dbec872","attributes":{"filter":{"type":"object","name":"AllIndices","id":"6124083b-a425-4b85-a523-b711c2aa2a78"}}},"glyph":{"type":"object","name":"Patch","id":"ae225197-b875-470c-90d2-2bebee717e99","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#bcbd22","fill_alpha":0.5,"hatch_color":"#bcbd22"}},"selection_glyph":{"type":"object","name":"Patch","id":"60bb47d8-1104-4a8a-840c-c916af77610e","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"fill_color":"#bcbd22","fill_alpha":0.5,"hatch_color":"#bcbd22"}},"nonselection_glyph":{"type":"object","name":"Patch","id":"98e8625f-70e2-449c-95fd-e51e6b07acef","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":1,"fill_color":"#bcbd22","fill_alpha":0.5,"hatch_color":"#bcbd22","hatch_alpha":0.1}},"muted_glyph":{"type":"object","name":"Patch","id":"26cfa609-6c00-4f23-a6f9-3aa0bd0b14cd","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.2,"fill_color":"#bcbd22","fill_alpha":0.2,"hatch_color":"#bcbd22","hatch_alpha":0.2}}}}],"toolbar":{"type":"object","name":"Toolbar","id":"3d55a399-1d1d-43b6-b243-b73338f7b917","attributes":{"tools":[{"type":"object","name":"WheelZoomTool","id":"8284d5fd-7cd9-4676-92a5-7eed050b7c8e","attributes":{"tags":["hv_created"],"renderers":"auto","zoom_together":"none"}},{"type":"object","name":"HoverTool","id":"0db32642-f391-4af8-b11a-c9a0c5c3cffd","attributes":{"tags":["hv_created"],"renderers":[{"id":"58c7a5b5-6323-4799-874b-1dbacf7c455e"},{"id":"f82f288e-b575-4ffc-a254-d5425a39c33b"},{"id":"350f96c0-5b12-4235-9735-f39d34293aff"},{"id":"c1c1f94d-80d4-4ac9-ae55-407b3c61f60b"},{"id":"b71afc0d-a5d7-4e1b-b1c6-b622c489b590"},{"id":"db5198f8-9c92-455d-88cf-435bb441aed7"},{"id":"c155241d-e731-4c30-ba86-4dcc5c2793fb"},{"id":"ee4c17be-01fc-4aa6-ad10-bc3772f18f99"},{"id":"a2115a5a-af76-4912-8f3d-2d7562594984"},{"id":"bcc5a8ae-0213-4d8b-aef1-be87afcc44e3"},{"id":"3db2b9d5-e46a-4807-b186-214f5b79bb45"},{"id":"511b0718-4af6-41ea-bccc-52136e8b3b60"}],"tooltips":[["time.month","@{time_full_stop_month}"],["temperature","@{temperature}"],["Density","@{temperature_density}"]]}},{"type":"object","name":"SaveTool","id":"64279d43-a5d8-47f8-b8b6-4cf73deda731"},{"type":"object","name":"PanTool","id":"0003264b-a0cb-4c55-b7c4-9e8c89360250"},{"type":"object","name":"BoxZoomTool","id":"09bddd17-526e-4e93-b3fd-812d70a73dcf","attributes":{"dimensions":"both","overlay":{"type":"object","name":"BoxAnnotation","id":"49e47da5-305e-4b04-b342-9e5dad6963ee","attributes":{"syncable":false,"line_color":"black","line_alpha":1.0,"line_width":2,"line_dash":[4,4],"fill_color":"lightgrey","fill_alpha":0.5,"level":"overlay","visible":false,"left":{"type":"number","value":"nan"},"right":{"type":"number","value":"nan"},"top":{"type":"number","value":"nan"},"bottom":{"type":"number","value":"nan"},"left_units":"canvas","right_units":"canvas","top_units":"canvas","bottom_units":"canvas","handles":{"type":"object","name":"BoxInteractionHandles","id":"077d3808-9ab1-46fc-9c23-14e0ea505bd8","attributes":{"all":{"type":"object","name":"AreaVisuals","id":"4cc0808e-1b1f-4169-8484-48b0c9107e92","attributes":{"fill_color":"white","hover_fill_color":"lightgray"}}}}}}}},{"type":"object","name":"ResetTool","id":"d74a24e0-f23b-4469-95e9-b3d3a5dc4099"}],"active_drag":{"id":"0003264b-a0cb-4c55-b7c4-9e8c89360250"},"active_scroll":{"id":"8284d5fd-7cd9-4676-92a5-7eed050b7c8e"}}},"left":[{"type":"object","name":"LinearAxis","id":"7fe27b8e-f156-40ff-87c7-9ca8eb89c428","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"30252a6e-1de0-4833-852c-5ebf2b36d970","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"27fa2829-2e32-4e5a-88a3-f6993a7b3020"},"axis_label":"Density","major_label_policy":{"type":"object","name":"AllLabels","id":"d3ba5317-b4be-42ee-948e-1ec9f83bc191"}}}],"above":[{"type":"object","name":"Legend","id":"c868f747-5bc9-414c-a3fe-9322985d8cf3","attributes":{"location":[0,0],"orientation":"horizontal","title":"time.month","click_policy":"mute","items":[{"type":"object","name":"LegendItem","id":"8adb1ef1-d6aa-4150-a63d-e69a40e14904","attributes":{"label":{"type":"value","value":"2"},"renderers":[{"id":"58c7a5b5-6323-4799-874b-1dbacf7c455e"}]}},{"type":"object","name":"LegendItem","id":"9327f3fd-762f-44ed-a060-18df9b4210c4","attributes":{"label":{"type":"value","value":"3"},"renderers":[{"id":"f82f288e-b575-4ffc-a254-d5425a39c33b"}]}},{"type":"object","name":"LegendItem","id":"a9efe104-0c6d-46ec-9bc2-e36f16fb985d","attributes":{"label":{"type":"value","value":"4"},"renderers":[{"id":"350f96c0-5b12-4235-9735-f39d34293aff"}]}},{"type":"object","name":"LegendItem","id":"c7d7856e-6b61-4af2-89d4-16c1f165aa4f","attributes":{"label":{"type":"value","value":"5"},"renderers":[{"id":"c1c1f94d-80d4-4ac9-ae55-407b3c61f60b"}]}},{"type":"object","name":"LegendItem","id":"e280ee52-6e3c-4052-9532-bbe6d4894a24","attributes":{"label":{"type":"value","value":"6"},"renderers":[{"id":"b71afc0d-a5d7-4e1b-b1c6-b622c489b590"}]}},{"type":"object","name":"LegendItem","id":"974f845d-52ba-4d73-a750-4067278f73a3","attributes":{"label":{"type":"value","value":"7"},"renderers":[{"id":"db5198f8-9c92-455d-88cf-435bb441aed7"}]}},{"type":"object","name":"LegendItem","id":"914f8b19-f69b-42ca-9314-5e4896bae01b","attributes":{"label":{"type":"value","value":"8"},"renderers":[{"id":"c155241d-e731-4c30-ba86-4dcc5c2793fb"}]}},{"type":"object","name":"LegendItem","id":"317270e7-fad3-43e8-90a7-75f68ad98a85","attributes":{"label":{"type":"value","value":"9"},"renderers":[{"id":"ee4c17be-01fc-4aa6-ad10-bc3772f18f99"}]}},{"type":"object","name":"LegendItem","id":"f2bfd5d4-df48-48e3-a25b-fbf6510afc29","attributes":{"label":{"type":"value","value":"10"},"renderers":[{"id":"a2115a5a-af76-4912-8f3d-2d7562594984"}]}},{"type":"object","name":"LegendItem","id":"ce1db883-bcec-4f4f-85b3-5af20b32e797","attributes":{"label":{"type":"value","value":"11"},"renderers":[{"id":"bcc5a8ae-0213-4d8b-aef1-be87afcc44e3"}]}},{"type":"object","name":"LegendItem","id":"0a45d726-96d7-4997-a8cc-7d1e81e60a49","attributes":{"label":{"type":"value","value":"12"},"renderers":[{"id":"3db2b9d5-e46a-4807-b186-214f5b79bb45"}]}},{"type":"object","name":"LegendItem","id":"cbfd2971-a5c0-4e36-9c46-f878542663e1","attributes":{"label":{"type":"value","value":"1"},"renderers":[{"id":"511b0718-4af6-41ea-bccc-52136e8b3b60"}]}}]}}],"below":[{"type":"object","name":"LinearAxis","id":"f04399d7-68cf-412a-b36a-76d5254c547e","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"45218362-e523-4693-a925-3be7eb3a6e87","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"1aefc351-b4d7-46fe-a9f7-efee8f55bae7"},"axis_label":"temperature","major_label_policy":{"type":"object","name":"AllLabels","id":"5a82fdf7-ff69-46c3-bc2b-4c95d31b186e"}}}],"center":[{"type":"object","name":"Grid","id":"8b43c3b6-2bf9-48e3-a83f-a61ea8e037fb","attributes":{"axis":{"id":"f04399d7-68cf-412a-b36a-76d5254c547e"},"grid_line_color":null}},{"type":"object","name":"Grid","id":"0ef47f62-22ab-4355-80d4-af348c484c72","attributes":{"dimension":1,"axis":{"id":"7fe27b8e-f156-40ff-87c7-9ca8eb89c428"},"grid_line_color":null}}],"min_border_top":10,"min_border_bottom":10,"min_border_left":10,"min_border_right":10,"output_backend":"webgl"}},{"type":"object","name":"Spacer","id":"3a13b977-5b71-4547-b5cf-d21e732c9e67","attributes":{"name":"HSpacer00528","stylesheets":["\n:host(.pn-loading):before, .pn-loading:before {\n  background-color: #c3c3c3;\n  mask-size: auto calc(min(50%, 400px));\n  -webkit-mask-size: auto calc(min(50%, 400px));\n}",{"id":"0a147fed-34e7-4a4a-8408-6f8cc010434a"},{"id":"442234bc-c668-434d-b565-dd089549569d"},{"id":"40d14ae8-2f2d-4b4a-ae89-9d2c0548138c"}],"margin":0,"sizing_mode":"stretch_width","align":"start"}}]}}],"defs":[{"type":"model","name":"ReactiveHTML1"},{"type":"model","name":"FlexBox1","properties":[{"name":"align_content","kind":"Any","default":"flex-start"},{"name":"align_items","kind":"Any","default":"flex-start"},{"name":"flex_direction","kind":"Any","default":"row"},{"name":"flex_wrap","kind":"Any","default":"wrap"},{"name":"gap","kind":"Any","default":""},{"name":"justify_content","kind":"Any","default":"flex-start"}]},{"type":"model","name":"FloatPanel1","properties":[{"name":"config","kind":"Any","default":{"type":"map"}},{"name":"contained","kind":"Any","default":true},{"name":"position","kind":"Any","default":"right-top"},{"name":"offsetx","kind":"Any","default":null},{"name":"offsety","kind":"Any","default":null},{"name":"theme","kind":"Any","default":"primary"},{"name":"status","kind":"Any","default":"normalized"}]},{"type":"model","name":"GridStack1","properties":[{"name":"ncols","kind":"Any","default":null},{"name":"nrows","kind":"Any","default":null},{"name":"allow_resize","kind":"Any","default":true},{"name":"allow_drag","kind":"Any","default":true},{"name":"state","kind":"Any","default":[]}]},{"type":"model","name":"drag1","properties":[{"name":"slider_width","kind":"Any","default":5},{"name":"slider_color","kind":"Any","default":"black"},{"name":"value","kind":"Any","default":50}]},{"type":"model","name":"click1","properties":[{"name":"terminal_output","kind":"Any","default":""},{"name":"debug_name","kind":"Any","default":""},{"name":"clears","kind":"Any","default":0}]},{"type":"model","name":"FastWrapper1","properties":[{"name":"object","kind":"Any","default":null},{"name":"style","kind":"Any","default":null}]},{"type":"model","name":"NotificationArea1","properties":[{"name":"js_events","kind":"Any","default":{"type":"map"}},{"name":"max_notifications","kind":"Any","default":5},{"name":"notifications","kind":"Any","default":[]},{"name":"position","kind":"Any","default":"bottom-right"},{"name":"_clear","kind":"Any","default":0},{"name":"types","kind":"Any","default":[{"type":"map","entries":[["type","warning"],["background","#ffc107"],["icon",{"type":"map","entries":[["className","fas fa-exclamation-triangle"],["tagName","i"],["color","white"]]}]]},{"type":"map","entries":[["type","info"],["background","#007bff"],["icon",{"type":"map","entries":[["className","fas fa-info-circle"],["tagName","i"],["color","white"]]}]]}]}]},{"type":"model","name":"Notification","properties":[{"name":"background","kind":"Any","default":null},{"name":"duration","kind":"Any","default":3000},{"name":"icon","kind":"Any","default":null},{"name":"message","kind":"Any","default":""},{"name":"notification_type","kind":"Any","default":null},{"name":"_rendered","kind":"Any","default":false},{"name":"_destroyed","kind":"Any","default":false}]},{"type":"model","name":"TemplateActions1","properties":[{"name":"open_modal","kind":"Any","default":0},{"name":"close_modal","kind":"Any","default":0}]},{"type":"model","name":"BootstrapTemplateActions1","properties":[{"name":"open_modal","kind":"Any","default":0},{"name":"close_modal","kind":"Any","default":0}]},{"type":"model","name":"TemplateEditor1","properties":[{"name":"layout","kind":"Any","default":[]}]},{"type":"model","name":"MaterialTemplateActions1","properties":[{"name":"open_modal","kind":"Any","default":0},{"name":"close_modal","kind":"Any","default":0}]},{"type":"model","name":"ReactiveESM1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"JSComponent1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"ReactComponent1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"AnyWidgetComponent1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"request_value1","properties":[{"name":"fill","kind":"Any","default":"none"},{"name":"_synced","kind":"Any","default":null},{"name":"_request_sync","kind":"Any","default":0}]}]}};
+  var render_items = [{"docid":"c183b07c-7a52-46f8-ad3b-213236ea6a40","roots":{"f0f6cc41-1afd-4ac7-aa36-cdf4e13c88ad":"f095823d-e543-43c4-a88e-4b2e658ceb89"},"root_ids":["f0f6cc41-1afd-4ac7-aa36-cdf4e13c88ad"]}];
+  var docs = Object.values(docs_json)
+  if (!docs) {
+    return
+  }
+  const py_version = docs[0].version.replace('rc', '-rc.').replace('.dev', '-dev.')
+  async function embed_document(root) {
+    var Bokeh = get_bokeh(root)
+    await Bokeh.embed.embed_items_notebook(docs_json, render_items);
+    for (const render_item of render_items) {
+      for (const root_id of render_item.root_ids) {
+	const id_el = document.getElementById(root_id)
+	if (id_el.children.length && id_el.children[0].hasAttribute('data-root-id')) {
+	  const root_el = id_el.children[0]
+	  root_el.id = root_el.id + '-rendered'
+	  for (const child of root_el.children) {
+            // Ensure JupyterLab does not capture keyboard shortcuts
+            // see: https://jupyterlab.readthedocs.io/en/4.1.x/extension/notebook.html#keyboard-interaction-model
+	    child.setAttribute('data-lm-suppress-shortcuts', 'true')
+	  }
+	}
+      }
+    }
+  }
+  function get_bokeh(root) {
+    if (root.Bokeh === undefined) {
+      return null
+    } else if (root.Bokeh.version !== py_version) {
+      if (root.Bokeh.versions === undefined || !root.Bokeh.versions.has(py_version)) {
+	return null
+      }
+      return root.Bokeh.versions.get(py_version);
+    } else if (root.Bokeh.version === py_version) {
+      return root.Bokeh
+    }
+    return null
+  }
+  function is_loaded(root) {
+    var Bokeh = get_bokeh(root)
+    return (Bokeh != null && Bokeh.Panel !== undefined)
+  }
+  if (is_loaded(root)) {
+    embed_document(root);
+  } else {
+    var attempts = 0;
+    var timer = setInterval(function(root) {
+      if (is_loaded(root)) {
+        clearInterval(timer);
+        embed_document(root);
+      } else if (document.readyState == "complete") {
+        attempts++;
+        if (attempts > 200) {
+          clearInterval(timer);
+	  var Bokeh = get_bokeh(root)
+	  if (Bokeh == null || Bokeh.Panel == null) {
+            console.warn("Panel: ERROR: Unable to run Panel code because Bokeh or Panel library is missing");
+	  } else {
+	    console.warn("Panel: WARNING: Attempting to render but not all required libraries could be resolved.")
+	    embed_document(root)
+	  }
+        }
+      }
+    }, 25, root)
+  }
+})(window);</script></div></div>
+</div>
+</section>
+
+<div id="scroller-right">
+    This web page was generated from a Jupyter notebook and not all
+    interactivity will work on this website.
+</div>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="hist.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Hist</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="labels.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Labels</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/holoviz/hvplot/edit/main/doc/reference/tabular/kde.ipynb">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/reference/tabular/kde.ipynb">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item"><p class="nbsite-copyright-last-updated">
+    <span class="copyright">
+            &copy; Copyright 2016-2025 Holoviz contributors.
+    </span>
+    <span class="last-updated">Last updated on 2025-04-30.</span><br>
+</p></div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

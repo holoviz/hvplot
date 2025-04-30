@@ -1,0 +1,1624 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Violin &#8212; hvPlot 0.11.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsite.css?v=d9d93254" />
+    <link rel="stylesheet" type="text/css" href="../../_static/notebook.css?v=19946987" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css?v=0a3248cd" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alert.css?v=c26666be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/dataframe.css?v=a0f274c1" />
+    <link rel="stylesheet" type="text/css" href="../../_static/scroller.css?v=2dcde208" />
+    <link rel="stylesheet" type="text/css" href="../../_static/hv-sidebar-dropdown.css?v=3e2b0152" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=bab6b1ab" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=2088e4e3"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>
+    window.goatcounter = {
+        path: function(p) { return location.host + p }
+    }
+</script>
+    <script async="async" data-goatcounter="https://holoviz.goatcounter.com/count" src="../../_static/js/goatcounter.js?v=f53f84b8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'reference/tabular/violin';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="icon" href="../../_static/favicon.ico"/>
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Geopandas" href="../geopandas/index.html" />
+    <link rel="prev" title="Table" href="table.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.11.3" />
+    <meta name="docbuild:last-update" content="2025-04-30"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../_static/logo_horizontal.svg" class="logo__image only-light" alt="hvPlot 0.11.3 documentation - Home"/>
+    <img src="../../_static/logo_horizontal.svg" class="logo__image only-dark pst-js-only" alt="hvPlot 0.11.3 documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Reference Gallery
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../ref/index.html">
+    Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide.html">
+    Developer Guide
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../releases.html">
+    Releases
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../roadmap.html">
+    Roadmap
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../about.html">
+    About
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/holoviz/hvplot" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://twitter.com/HoloViews" title="Twitter" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-twitter-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Twitter</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discourse.holoviz.org/c/hvplot" title="Discourse" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discourse fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Discourse</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discord.gg/AXRHnJU6sP" title="Discord" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discord fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Discord</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Reference Gallery
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../ref/index.html">
+    Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide.html">
+    Developer Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../releases.html">
+    Releases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../roadmap.html">
+    Roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../about.html">
+    About
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/holoviz/hvplot" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://twitter.com/HoloViews" title="Twitter" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-twitter-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Twitter</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discourse.holoviz.org/c/hvplot" title="Discourse" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discourse fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Discourse</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discord.gg/AXRHnJU6sP" title="Discord" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discord fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Discord</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><!-- Adapted from sidebar-nav-bs.html (1.15.2) with the following changes
+
+  - Commented out the tag that adds the "Section Navigation" title
+  - Call generate_toctree_html with startdepth=0
+
+Please update this file when required when bumping the max pin of pydata-sphinx-theme.
+-->
+
+
+<nav class="bd-docs-nav bd-links"
+      aria-label="Section Navigation">
+  <!-- <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p> -->
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/getting_started_pandas.html">Using hvPlot as a Pandas user</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://holoviz.org/tutorial/index.html">HoloViz Tutorial</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../user_guide/index.html">User Guide</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Plotting.html">Plotting with Bokeh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Plotting_with_Matplotlib.html">Plotting with Matplotlib</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Plotting_with_Plotly.html">Plotting with Plotly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Interactive.html">Interactive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Widgets.html">Widgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Plotting_Extensions.html">Plotting Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Explorer.html">Exploring data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Viewing.html">Viewing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Subplots.html">Subplots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Streaming.html">Streaming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Gridded_Data.html">Gridded Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/NetworkX.html">Network Graphs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Geographic_Data.html">Geographic Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Timeseries_Data.html">Timeseries Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Large_Timeseries.html">Large Timeseries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/Statistical_Plots.html">Statistical Plots</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../index.html">Reference Gallery</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="index.html">Tabular</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="andrewscurves.html">Andrewscurves</a></li>
+<li class="toctree-l3"><a class="reference internal" href="area.html">Area</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bar.html">Bar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="barh.html">Barh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bivariate.html">Bivariate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="box.html">Box</a></li>
+<li class="toctree-l3"><a class="reference internal" href="errorbars.html">Errorbars</a></li>
+<li class="toctree-l3"><a class="reference internal" href="heatmap.html">Heatmap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hexbin.html">Hexbin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hist.html">Hist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="kde.html">Kde</a></li>
+<li class="toctree-l3"><a class="reference internal" href="labels.html">Labels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lagplot.html">Lagplot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="line.html">Line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ohlc.html">Ohlc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parallelcoordinates.html">Parallelcoordinates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="paths.html">Paths</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scatter.html">Scatter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scattermatrix.html">Scattermatrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="step.html">Step</a></li>
+<li class="toctree-l3"><a class="reference internal" href="table.html">Table</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Violin</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../geopandas/index.html">Geopandas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../geopandas/points.html">Points</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../geopandas/polygons.html">Polygons</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../xarray/index.html">Xarray</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../xarray/bar.html">Bar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../xarray/contour.html">Contour</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../xarray/contourf.html">Contourf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../xarray/hist.html">Hist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../xarray/image.html">Image</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../xarray/kde.html">Kde</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../xarray/line.html">Line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../xarray/quadmesh.html">Quadmesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../xarray/rgb.html">Rgb</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../xarray/vectorfield.html">Vectorfield</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../xarray/violin.html">Violin</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../ref/index.html">Reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../ref/installation.html">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ref/data_libraries.html">Supported data libraries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ref/plotting_extensions.html">Supported plotting extensions</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../ref/plotting_options/index.html">Plotting options</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/plotting_options/index.html">All Options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/plotting_options/data.html">Data Options</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../ref/api/index.html">API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.help.html">hvplot.help</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.hvplot_extension.html">hvplot.hvplot_extension</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.extension.html">hvplot.extension</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.output.html">hvplot.output</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.render.html">hvplot.render</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.save.html">hvplot.save</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.show.html">hvplot.show</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.area.html">hvplot.hvPlot.area</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.bar.html">hvplot.hvPlot.bar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.barh.html">hvplot.hvPlot.barh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.box.html">hvplot.hvPlot.box</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.bivariate.html">hvplot.hvPlot.bivariate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.contour.html">hvplot.hvPlot.contour</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.contourf.html">hvplot.hvPlot.contourf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.dataset.html">hvplot.hvPlot.dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.density.html">hvplot.hvPlot.density</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.errorbars.html">hvplot.hvPlot.errorbars</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.heatmap.html">hvplot.hvPlot.heatmap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.hexbin.html">hvplot.hvPlot.hexbin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.hist.html">hvplot.hvPlot.hist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.image.html">hvplot.hvPlot.image</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.kde.html">hvplot.hvPlot.kde</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.labels.html">hvplot.hvPlot.labels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.line.html">hvplot.hvPlot.line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.ohlc.html">hvplot.hvPlot.ohlc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.paths.html">hvplot.hvPlot.paths</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.points.html">hvplot.hvPlot.points</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.polygons.html">hvplot.hvPlot.polygons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.quadmesh.html">hvplot.hvPlot.quadmesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.rgb.html">hvplot.hvPlot.rgb</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.scatter.html">hvplot.hvPlot.scatter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.step.html">hvplot.hvPlot.step</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.table.html">hvplot.hvPlot.table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.vectorfield.html">hvplot.hvPlot.vectorfield</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.hvPlot.violin.html">hvplot.hvPlot.violin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.plotting.andrews_curves.html">hvplot.plotting.andrews_curves</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.plotting.lag_plot.html">hvplot.plotting.lag_plot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.plotting.parallel_coordinates.html">hvplot.plotting.parallel_coordinates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/manual/hvplot.plotting.scatter_matrix.html">hvplot.plotting.scatter_matrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.networkx.draw.html">hvplot.networkx.draw</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.networkx.draw_networkx.html">hvplot.networkx.draw_networkx</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.networkx.draw_networkx_nodes.html">hvplot.networkx.draw_networkx_nodes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.networkx.draw_networkx_edges.html">hvplot.networkx.draw_networkx_edges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.networkx.draw_networkx_labels.html">hvplot.networkx.draw_networkx_labels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.networkx.draw_circular.html">hvplot.networkx.draw_circular</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.networkx.draw_kamada_kawai.html">hvplot.networkx.draw_kamada_kawai</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.networkx.draw_random.html">hvplot.networkx.draw_random</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.networkx.draw_planar.html">hvplot.networkx.draw_planar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.networkx.draw_shell.html">hvplot.networkx.draw_shell</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.networkx.draw_spectral.html">hvplot.networkx.draw_spectral</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.networkx.draw_spring.html">hvplot.networkx.draw_spring</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.hvPlot.explorer.html">hvplot.hvPlot.explorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.ui.explorer.html">hvplot.ui.explorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.ui.hvPlotExplorer.html">hvplot.ui.hvPlotExplorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.ui.hvPlotExplorer.hvplot.html">hvplot.ui.hvPlotExplorer.hvplot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.ui.hvPlotExplorer.plot_code.html">hvplot.ui.hvPlotExplorer.plot_code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.ui.hvPlotExplorer.save.html">hvplot.ui.hvPlotExplorer.save</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.ui.hvPlotExplorer.servable.html">hvplot.ui.hvPlotExplorer.servable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.ui.hvPlotExplorer.settings.html">hvplot.ui.hvPlotExplorer.settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ref/api/generated/hvplot.ui.hvPlotExplorer.show.html">hvplot.ui.hvPlotExplorer.show</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../ref/api_compatibility/index.html">API compatibility</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../ref/api_compatibility/pandas/index.html">Pandas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../ref/api_compatibility/pandas/Pandas_API.html">Comparison with Pandas API</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../roadmap.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about.html">About</a></li>
+</ul>
+</div>
+</nav></div>
+        <div class="sidebar-primary-item">
+<div class="hv-sb-dd">
+  <div class="btn-group">
+    
+    <a href="https://holoviz.org" class="btn hv-sb-dd-value" target="_blank">HoloViz.org<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a>
+    
+    <button type="button" class="btn dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="visually-hidden"></span>
+    </button>
+    <ul class="dropdown-menu">
+      
+      
+        <li><a class="dropdown-item" href="https://param.holoviz.org" target="_blank" title="Assembling objects from many different libraries into a layout or app, whether in a Jupyter notebook or in a standalone servable dashboard">Panel<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+      
+      
+        <li><a class="dropdown-item" href="https://holoviews.org" target="_blank" title="Declarative objects for instantly visualizable data, building Bokeh plots from convenient high-level specifications">HoloViews<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://geoviews.org" target="_blank" title="Visualizable geographic data that that can be mixed and matched with HoloViews objects">GeoViews<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://datashader.org" target="_blank" title="Rasterizing huge datasets quickly as fixed-size images">Datashader<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://param.holoviz.org" target="_blank" title="Make your Python code clearer and more reliable by declaring Parameters">Param<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://lumen.holoviz.org" target="_blank" title="Framework for visual analytics that allows users to build data-driven dashboards from a simple YAML specification">Lumen<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://colorcet.holoviz.org" target="_blank" title="A wide range of perceptually uniform continuous colormaps and perceptually based categorical color sets for use with the other libraries">Colorcet<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+      <li><hr class="dropdown-divider"></li>
+      
+      
+      <li><a class="dropdown-item" href="https://examples.holoviz.org" target="_blank" title=" Visualization-focused examples using HoloViz for specific topics ">Examples Gallery<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+      <li><a class="dropdown-item" href="https://blog.holoviz.org" target="_blank" title="HoloViz blog">Blog<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+    </ul>
+  </div>
+</div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Reference Gallery</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Tabular</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Violin</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="violin">
+<h1>Violin<a class="headerlink" href="#violin" title="Link to this heading">#</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.pandas</span>  <span class="c1"># noqa</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><script type="esms-options">{"shimMode": true}</script><style>*[data-root-id],
+*[data-root-id] > * {
+  box-sizing: border-box;
+  font-family: var(--jp-ui-font-family);
+  font-size: var(--jp-ui-font-size1);
+  color: var(--vscode-editor-foreground, var(--jp-ui-font-color1));
+}
+
+/* Override VSCode background color */
+.cell-output-ipywidget-background:has(
+    > .cell-output-ipywidget-background > .lm-Widget > *[data-root-id]
+  ),
+.cell-output-ipywidget-background:has(> .lm-Widget > *[data-root-id]) {
+  background-color: transparent !important;
+}
+</style></div><script type="application/javascript">(function(root) {
+  function now() {
+    return new Date();
+  }
+
+  const force = true;
+  const py_version = '3.7.2'.replace('rc', '-rc.').replace('.dev', '-dev.');
+  const reloading = false;
+  const Bokeh = root.Bokeh;
+
+  // Set a timeout for this load but only if we are not already initializing
+  if (typeof (root._bokeh_timeout) === "undefined" || (force || !root._bokeh_is_initializing)) {
+    root._bokeh_timeout = Date.now() + 5000;
+    root._bokeh_failed_load = false;
+  }
+
+  function run_callbacks() {
+    try {
+      root._bokeh_onload_callbacks.forEach(function(callback) {
+        if (callback != null)
+          callback();
+      });
+    } finally {
+      delete root._bokeh_onload_callbacks;
+    }
+    console.debug("Bokeh: all callbacks have finished");
+  }
+
+  function load_libs(css_urls, js_urls, js_modules, js_exports, callback) {
+    if (css_urls == null) css_urls = [];
+    if (js_urls == null) js_urls = [];
+    if (js_modules == null) js_modules = [];
+    if (js_exports == null) js_exports = {};
+
+    root._bokeh_onload_callbacks.push(callback);
+
+    if (root._bokeh_is_loading > 0) {
+      // Don't load bokeh if it is still initializing
+      console.debug("Bokeh: BokehJS is being loaded, scheduling callback at", now());
+      return null;
+    } else if (js_urls.length === 0 && js_modules.length === 0 && Object.keys(js_exports).length === 0) {
+      // There is nothing to load
+      run_callbacks();
+      return null;
+    }
+
+    function on_load() {
+      root._bokeh_is_loading--;
+      if (root._bokeh_is_loading === 0) {
+        console.debug("Bokeh: all BokehJS libraries/stylesheets loaded");
+        run_callbacks()
+      }
+    }
+    window._bokeh_on_load = on_load
+
+    function on_error(e) {
+      const src_el = e.srcElement
+      console.error("failed to load " + (src_el.href || src_el.src));
+    }
+
+    const skip = [];
+    if (window.requirejs) {
+      window.requirejs.config({'packages': {}, 'paths': {}, 'shim': {}});
+      root._bokeh_is_loading = css_urls.length + 0;
+    } else {
+      root._bokeh_is_loading = css_urls.length + js_urls.length + js_modules.length + Object.keys(js_exports).length;
+    }
+
+    const existing_stylesheets = []
+    const links = document.getElementsByTagName('link')
+    for (let i = 0; i < links.length; i++) {
+      const link = links[i]
+      if (link.href != null) {
+        existing_stylesheets.push(link.href)
+      }
+    }
+    for (let i = 0; i < css_urls.length; i++) {
+      const url = css_urls[i];
+      const escaped = encodeURI(url)
+      if (existing_stylesheets.indexOf(escaped) !== -1) {
+        on_load()
+        continue;
+      }
+      const element = document.createElement("link");
+      element.onload = on_load;
+      element.onerror = on_error;
+      element.rel = "stylesheet";
+      element.type = "text/css";
+      element.href = url;
+      console.debug("Bokeh: injecting link tag for BokehJS stylesheet: ", url);
+      document.body.appendChild(element);
+    }    var existing_scripts = []
+    const scripts = document.getElementsByTagName('script')
+    for (let i = 0; i < scripts.length; i++) {
+      var script = scripts[i]
+      if (script.src != null) {
+        existing_scripts.push(script.src)
+      }
+    }
+    for (let i = 0; i < js_urls.length; i++) {
+      const url = js_urls[i];
+      const escaped = encodeURI(url)
+      if (skip.indexOf(escaped) !== -1 || existing_scripts.indexOf(escaped) !== -1) {
+        if (!window.requirejs) {
+          on_load();
+        }
+        continue;
+      }
+      const element = document.createElement('script');
+      element.onload = on_load;
+      element.onerror = on_error;
+      element.async = false;
+      element.src = url;
+      console.debug("Bokeh: injecting script tag for BokehJS library: ", url);
+      document.head.appendChild(element);
+    }
+    for (let i = 0; i < js_modules.length; i++) {
+      const url = js_modules[i];
+      const escaped = encodeURI(url)
+      if (skip.indexOf(escaped) !== -1 || existing_scripts.indexOf(escaped) !== -1) {
+        if (!window.requirejs) {
+          on_load();
+        }
+        continue;
+      }
+      var element = document.createElement('script');
+      element.onload = on_load;
+      element.onerror = on_error;
+      element.async = false;
+      element.src = url;
+      element.type = "module";
+      console.debug("Bokeh: injecting script tag for BokehJS library: ", url);
+      document.head.appendChild(element);
+    }
+    for (const name in js_exports) {
+      const url = js_exports[name];
+      const escaped = encodeURI(url)
+      if (skip.indexOf(escaped) >= 0 || root[name] != null) {
+        if (!window.requirejs) {
+          on_load();
+        }
+        continue;
+      }
+      var element = document.createElement('script');
+      element.onerror = on_error;
+      element.async = false;
+      element.type = "module";
+      console.debug("Bokeh: injecting script tag for BokehJS library: ", url);
+      element.textContent = `
+      import ${name} from "${url}"
+      window.${name} = ${name}
+      window._bokeh_on_load()
+      `
+      document.head.appendChild(element);
+    }
+    if (!js_urls.length && !js_modules.length) {
+      on_load()
+    }
+  };
+
+  function inject_raw_css(css) {
+    const element = document.createElement("style");
+    element.appendChild(document.createTextNode(css));
+    document.body.appendChild(element);
+  }
+
+  const js_urls = ["https://cdn.holoviz.org/panel/1.6.3/dist/bundled/reactiveesm/es-module-shims@^1.10.0/dist/es-module-shims.min.js", "https://cdn.bokeh.org/bokeh/release/bokeh-3.7.2.min.js", "https://cdn.bokeh.org/bokeh/release/bokeh-gl-3.7.2.min.js", "https://cdn.bokeh.org/bokeh/release/bokeh-widgets-3.7.2.min.js", "https://cdn.bokeh.org/bokeh/release/bokeh-tables-3.7.2.min.js", "https://cdn.holoviz.org/panel/1.6.3/dist/panel.min.js"];
+  const js_modules = [];
+  const js_exports = {};
+  const css_urls = [];
+  const inline_js = [    function(Bokeh) {
+      Bokeh.set_log_level("info");
+    },
+function(Bokeh) {} // ensure no trailing comma for IE
+  ];
+
+  function run_inline_js() {
+    if ((root.Bokeh !== undefined) || (force === true)) {
+      for (let i = 0; i < inline_js.length; i++) {
+        try {
+          inline_js[i].call(root, root.Bokeh);
+        } catch(e) {
+          if (!reloading) {
+            throw e;
+          }
+        }
+      }
+      // Cache old bokeh versions
+      if (Bokeh != undefined && !reloading) {
+        var NewBokeh = root.Bokeh;
+        if (Bokeh.versions === undefined) {
+          Bokeh.versions = new Map();
+        }
+        if (NewBokeh.version !== Bokeh.version) {
+          Bokeh.versions.set(NewBokeh.version, NewBokeh)
+        }
+        root.Bokeh = Bokeh;
+      }
+    } else if (Date.now() < root._bokeh_timeout) {
+      setTimeout(run_inline_js, 100);
+    } else if (!root._bokeh_failed_load) {
+      console.log("Bokeh: BokehJS failed to load within specified timeout.");
+      root._bokeh_failed_load = true;
+    }
+    root._bokeh_is_initializing = false
+  }
+
+  function load_or_wait() {
+    // Implement a backoff loop that tries to ensure we do not load multiple
+    // versions of Bokeh and its dependencies at the same time.
+    // In recent versions we use the root._bokeh_is_initializing flag
+    // to determine whether there is an ongoing attempt to initialize
+    // bokeh, however for backward compatibility we also try to ensure
+    // that we do not start loading a newer (Panel>=1.0 and Bokeh>3) version
+    // before older versions are fully initialized.
+    if (root._bokeh_is_initializing && Date.now() > root._bokeh_timeout) {
+      // If the timeout and bokeh was not successfully loaded we reset
+      // everything and try loading again
+      root._bokeh_timeout = Date.now() + 5000;
+      root._bokeh_is_initializing = false;
+      root._bokeh_onload_callbacks = undefined;
+      root._bokeh_is_loading = 0
+      console.log("Bokeh: BokehJS was loaded multiple times but one version failed to initialize.");
+      load_or_wait();
+    } else if (root._bokeh_is_initializing || (typeof root._bokeh_is_initializing === "undefined" && root._bokeh_onload_callbacks !== undefined)) {
+      setTimeout(load_or_wait, 100);
+    } else {
+      root._bokeh_is_initializing = true
+      root._bokeh_onload_callbacks = []
+      const bokeh_loaded = root.Bokeh != null && (root.Bokeh.version === py_version || (root.Bokeh.versions !== undefined && root.Bokeh.versions.has(py_version)));
+      if (!reloading && !bokeh_loaded) {
+        if (root.Bokeh) {
+          root.Bokeh = undefined;
+        }
+        console.debug("Bokeh: BokehJS not loaded, scheduling load and callback at", now());
+      }
+      load_libs(css_urls, js_urls, js_modules, js_exports, function() {
+        console.debug("Bokeh: BokehJS plotting callback run at", now());
+        run_inline_js();
+      });
+    }
+  }
+  // Give older versions of the autoload script a head-start to ensure
+  // they initialize before we start loading newer version.
+  setTimeout(load_or_wait, 100)
+}(window));</script><script type="application/javascript">
+if ((window.PyViz === undefined) || (window.PyViz instanceof HTMLElement)) {
+  window.PyViz = {comms: {}, comm_status:{}, kernels:{}, receivers: {}, plot_index: []}
+}
+
+
+    function JupyterCommManager() {
+    }
+
+    JupyterCommManager.prototype.register_target = function(plot_id, comm_id, msg_handler) {
+      if (window.comm_manager || ((window.Jupyter !== undefined) && (Jupyter.notebook.kernel != null))) {
+        var comm_manager = window.comm_manager || Jupyter.notebook.kernel.comm_manager;
+        comm_manager.register_target(comm_id, function(comm) {
+          comm.on_msg(msg_handler);
+        });
+      } else if ((plot_id in window.PyViz.kernels) && (window.PyViz.kernels[plot_id])) {
+        window.PyViz.kernels[plot_id].registerCommTarget(comm_id, function(comm) {
+          comm.onMsg = msg_handler;
+        });
+      } else if (typeof google != 'undefined' && google.colab.kernel != null) {
+        google.colab.kernel.comms.registerTarget(comm_id, (comm) => {
+          var messages = comm.messages[Symbol.asyncIterator]();
+          function processIteratorResult(result) {
+            var message = result.value;
+            console.log(message)
+            var content = {data: message.data, comm_id};
+            var buffers = []
+            for (var buffer of message.buffers || []) {
+              buffers.push(new DataView(buffer))
+            }
+            var metadata = message.metadata || {};
+            var msg = {content, buffers, metadata}
+            msg_handler(msg);
+            return messages.next().then(processIteratorResult);
+          }
+          return messages.next().then(processIteratorResult);
+        })
+      }
+    }
+
+    JupyterCommManager.prototype.get_client_comm = function(plot_id, comm_id, msg_handler) {
+      if (comm_id in window.PyViz.comms) {
+        return window.PyViz.comms[comm_id];
+      } else if (window.comm_manager || ((window.Jupyter !== undefined) && (Jupyter.notebook.kernel != null))) {
+        var comm_manager = window.comm_manager || Jupyter.notebook.kernel.comm_manager;
+        var comm = comm_manager.new_comm(comm_id, {}, {}, {}, comm_id);
+        if (msg_handler) {
+          comm.on_msg(msg_handler);
+        }
+      } else if ((plot_id in window.PyViz.kernels) && (window.PyViz.kernels[plot_id])) {
+        var comm = window.PyViz.kernels[plot_id].connectToComm(comm_id);
+        comm.open();
+        if (msg_handler) {
+          comm.onMsg = msg_handler;
+        }
+      } else if (typeof google != 'undefined' && google.colab.kernel != null) {
+        var comm_promise = google.colab.kernel.comms.open(comm_id)
+        comm_promise.then((comm) => {
+          window.PyViz.comms[comm_id] = comm;
+          if (msg_handler) {
+            var messages = comm.messages[Symbol.asyncIterator]();
+            function processIteratorResult(result) {
+              var message = result.value;
+              var content = {data: message.data};
+              var metadata = message.metadata || {comm_id};
+              var msg = {content, metadata}
+              msg_handler(msg);
+              return messages.next().then(processIteratorResult);
+            }
+            return messages.next().then(processIteratorResult);
+          }
+        }) 
+        var sendClosure = (data, metadata, buffers, disposeOnDone) => {
+          return comm_promise.then((comm) => {
+            comm.send(data, metadata, buffers, disposeOnDone);
+          });
+        };
+        var comm = {
+          send: sendClosure
+        };
+      }
+      window.PyViz.comms[comm_id] = comm;
+      return comm;
+    }
+    window.PyViz.comm_manager = new JupyterCommManager();
+    
+
+
+var JS_MIME_TYPE = 'application/javascript';
+var HTML_MIME_TYPE = 'text/html';
+var EXEC_MIME_TYPE = 'application/vnd.holoviews_exec.v0+json';
+var CLASS_NAME = 'output';
+
+/**
+ * Render data to the DOM node
+ */
+function render(props, node) {
+  var div = document.createElement("div");
+  var script = document.createElement("script");
+  node.appendChild(div);
+  node.appendChild(script);
+}
+
+/**
+ * Handle when a new output is added
+ */
+function handle_add_output(event, handle) {
+  var output_area = handle.output_area;
+  var output = handle.output;
+  if ((output.data == undefined) || (!output.data.hasOwnProperty(EXEC_MIME_TYPE))) {
+    return
+  }
+  var id = output.metadata[EXEC_MIME_TYPE]["id"];
+  var toinsert = output_area.element.find("." + CLASS_NAME.split(' ')[0]);
+  if (id !== undefined) {
+    var nchildren = toinsert.length;
+    var html_node = toinsert[nchildren-1].children[0];
+    html_node.innerHTML = output.data[HTML_MIME_TYPE];
+    var scripts = [];
+    var nodelist = html_node.querySelectorAll("script");
+    for (var i in nodelist) {
+      if (nodelist.hasOwnProperty(i)) {
+        scripts.push(nodelist[i])
+      }
+    }
+
+    scripts.forEach( function (oldScript) {
+      var newScript = document.createElement("script");
+      var attrs = [];
+      var nodemap = oldScript.attributes;
+      for (var j in nodemap) {
+        if (nodemap.hasOwnProperty(j)) {
+          attrs.push(nodemap[j])
+        }
+      }
+      attrs.forEach(function(attr) { newScript.setAttribute(attr.name, attr.value) });
+      newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+      oldScript.parentNode.replaceChild(newScript, oldScript);
+    });
+    if (JS_MIME_TYPE in output.data) {
+      toinsert[nchildren-1].children[1].textContent = output.data[JS_MIME_TYPE];
+    }
+    output_area._hv_plot_id = id;
+    if ((window.Bokeh !== undefined) && (id in Bokeh.index)) {
+      window.PyViz.plot_index[id] = Bokeh.index[id];
+    } else {
+      window.PyViz.plot_index[id] = null;
+    }
+  } else if (output.metadata[EXEC_MIME_TYPE]["server_id"] !== undefined) {
+    var bk_div = document.createElement("div");
+    bk_div.innerHTML = output.data[HTML_MIME_TYPE];
+    var script_attrs = bk_div.children[0].attributes;
+    for (var i = 0; i < script_attrs.length; i++) {
+      toinsert[toinsert.length - 1].childNodes[1].setAttribute(script_attrs[i].name, script_attrs[i].value);
+    }
+    // store reference to server id on output_area
+    output_area._bokeh_server_id = output.metadata[EXEC_MIME_TYPE]["server_id"];
+  }
+}
+
+/**
+ * Handle when an output is cleared or removed
+ */
+function handle_clear_output(event, handle) {
+  var id = handle.cell.output_area._hv_plot_id;
+  var server_id = handle.cell.output_area._bokeh_server_id;
+  if (((id === undefined) || !(id in PyViz.plot_index)) && (server_id !== undefined)) { return; }
+  var comm = window.PyViz.comm_manager.get_client_comm("hv-extension-comm", "hv-extension-comm", function () {});
+  if (server_id !== null) {
+    comm.send({event_type: 'server_delete', 'id': server_id});
+    return;
+  } else if (comm !== null) {
+    comm.send({event_type: 'delete', 'id': id});
+  }
+  delete PyViz.plot_index[id];
+  if ((window.Bokeh !== undefined) & (id in window.Bokeh.index)) {
+    var doc = window.Bokeh.index[id].model.document
+    doc.clear();
+    const i = window.Bokeh.documents.indexOf(doc);
+    if (i > -1) {
+      window.Bokeh.documents.splice(i, 1);
+    }
+  }
+}
+
+/**
+ * Handle kernel restart event
+ */
+function handle_kernel_cleanup(event, handle) {
+  delete PyViz.comms["hv-extension-comm"];
+  window.PyViz.plot_index = {}
+}
+
+/**
+ * Handle update_display_data messages
+ */
+function handle_update_output(event, handle) {
+  handle_clear_output(event, {cell: {output_area: handle.output_area}})
+  handle_add_output(event, handle)
+}
+
+function register_renderer(events, OutputArea) {
+  function append_mime(data, metadata, element) {
+    // create a DOM node to render to
+    var toinsert = this.create_output_subarea(
+    metadata,
+    CLASS_NAME,
+    EXEC_MIME_TYPE
+    );
+    this.keyboard_manager.register_events(toinsert);
+    // Render to node
+    var props = {data: data, metadata: metadata[EXEC_MIME_TYPE]};
+    render(props, toinsert[0]);
+    element.append(toinsert);
+    return toinsert
+  }
+
+  events.on('output_added.OutputArea', handle_add_output);
+  events.on('output_updated.OutputArea', handle_update_output);
+  events.on('clear_output.CodeCell', handle_clear_output);
+  events.on('delete.Cell', handle_clear_output);
+  events.on('kernel_ready.Kernel', handle_kernel_cleanup);
+
+  OutputArea.prototype.register_mime_type(EXEC_MIME_TYPE, append_mime, {
+    safe: true,
+    index: 0
+  });
+}
+
+if (window.Jupyter !== undefined) {
+  try {
+    var events = require('base/js/events');
+    var OutputArea = require('notebook/js/outputarea').OutputArea;
+    if (OutputArea.prototype.mime_types().indexOf(EXEC_MIME_TYPE) == -1) {
+      register_renderer(events, OutputArea);
+    }
+  } catch(err) {
+  }
+}
+</script><div class="output text_html"><div id='d8961f17-6181-43da-a369-ad8bdbda743b'>
+  <div id="c190379d-1702-4c22-bc40-1698756668af" data-root-id="d8961f17-6181-43da-a369-ad8bdbda743b" style="display: contents;"></div>
+</div>
+<script type="application/javascript">(function(root) {
+  var docs_json = {"83bd9a64-df0a-424f-856f-36966a8caf48":{"version":"3.7.2","title":"Bokeh Application","roots":[{"type":"object","name":"panel.models.browser.BrowserInfo","id":"d8961f17-6181-43da-a369-ad8bdbda743b"},{"type":"object","name":"panel.models.comm_manager.CommManager","id":"d33baf90-a45e-4c49-be17-b05991fc1377","attributes":{"plot_id":"d8961f17-6181-43da-a369-ad8bdbda743b","comm_id":"0d582d34b8cf43cca0f2c152dcc5ccdd","client_comm_id":"8d78592278354664946fe0527bbc3aa2"}}],"defs":[{"type":"model","name":"ReactiveHTML1"},{"type":"model","name":"FlexBox1","properties":[{"name":"align_content","kind":"Any","default":"flex-start"},{"name":"align_items","kind":"Any","default":"flex-start"},{"name":"flex_direction","kind":"Any","default":"row"},{"name":"flex_wrap","kind":"Any","default":"wrap"},{"name":"gap","kind":"Any","default":""},{"name":"justify_content","kind":"Any","default":"flex-start"}]},{"type":"model","name":"FloatPanel1","properties":[{"name":"config","kind":"Any","default":{"type":"map"}},{"name":"contained","kind":"Any","default":true},{"name":"position","kind":"Any","default":"right-top"},{"name":"offsetx","kind":"Any","default":null},{"name":"offsety","kind":"Any","default":null},{"name":"theme","kind":"Any","default":"primary"},{"name":"status","kind":"Any","default":"normalized"}]},{"type":"model","name":"GridStack1","properties":[{"name":"ncols","kind":"Any","default":null},{"name":"nrows","kind":"Any","default":null},{"name":"allow_resize","kind":"Any","default":true},{"name":"allow_drag","kind":"Any","default":true},{"name":"state","kind":"Any","default":[]}]},{"type":"model","name":"drag1","properties":[{"name":"slider_width","kind":"Any","default":5},{"name":"slider_color","kind":"Any","default":"black"},{"name":"value","kind":"Any","default":50}]},{"type":"model","name":"click1","properties":[{"name":"terminal_output","kind":"Any","default":""},{"name":"debug_name","kind":"Any","default":""},{"name":"clears","kind":"Any","default":0}]},{"type":"model","name":"FastWrapper1","properties":[{"name":"object","kind":"Any","default":null},{"name":"style","kind":"Any","default":null}]},{"type":"model","name":"NotificationArea1","properties":[{"name":"js_events","kind":"Any","default":{"type":"map"}},{"name":"max_notifications","kind":"Any","default":5},{"name":"notifications","kind":"Any","default":[]},{"name":"position","kind":"Any","default":"bottom-right"},{"name":"_clear","kind":"Any","default":0},{"name":"types","kind":"Any","default":[{"type":"map","entries":[["type","warning"],["background","#ffc107"],["icon",{"type":"map","entries":[["className","fas fa-exclamation-triangle"],["tagName","i"],["color","white"]]}]]},{"type":"map","entries":[["type","info"],["background","#007bff"],["icon",{"type":"map","entries":[["className","fas fa-info-circle"],["tagName","i"],["color","white"]]}]]}]}]},{"type":"model","name":"Notification","properties":[{"name":"background","kind":"Any","default":null},{"name":"duration","kind":"Any","default":3000},{"name":"icon","kind":"Any","default":null},{"name":"message","kind":"Any","default":""},{"name":"notification_type","kind":"Any","default":null},{"name":"_rendered","kind":"Any","default":false},{"name":"_destroyed","kind":"Any","default":false}]},{"type":"model","name":"TemplateActions1","properties":[{"name":"open_modal","kind":"Any","default":0},{"name":"close_modal","kind":"Any","default":0}]},{"type":"model","name":"BootstrapTemplateActions1","properties":[{"name":"open_modal","kind":"Any","default":0},{"name":"close_modal","kind":"Any","default":0}]},{"type":"model","name":"TemplateEditor1","properties":[{"name":"layout","kind":"Any","default":[]}]},{"type":"model","name":"MaterialTemplateActions1","properties":[{"name":"open_modal","kind":"Any","default":0},{"name":"close_modal","kind":"Any","default":0}]},{"type":"model","name":"ReactiveESM1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"JSComponent1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"ReactComponent1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"AnyWidgetComponent1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"request_value1","properties":[{"name":"fill","kind":"Any","default":"none"},{"name":"_synced","kind":"Any","default":null},{"name":"_request_sync","kind":"Any","default":0}]}]}};
+  var render_items = [{"docid":"83bd9a64-df0a-424f-856f-36966a8caf48","roots":{"d8961f17-6181-43da-a369-ad8bdbda743b":"c190379d-1702-4c22-bc40-1698756668af"},"root_ids":["d8961f17-6181-43da-a369-ad8bdbda743b"]}];
+  var docs = Object.values(docs_json)
+  if (!docs) {
+    return
+  }
+  const py_version = docs[0].version.replace('rc', '-rc.').replace('.dev', '-dev.')
+  async function embed_document(root) {
+    var Bokeh = get_bokeh(root)
+    await Bokeh.embed.embed_items_notebook(docs_json, render_items);
+    for (const render_item of render_items) {
+      for (const root_id of render_item.root_ids) {
+	const id_el = document.getElementById(root_id)
+	if (id_el.children.length && id_el.children[0].hasAttribute('data-root-id')) {
+	  const root_el = id_el.children[0]
+	  root_el.id = root_el.id + '-rendered'
+	  for (const child of root_el.children) {
+            // Ensure JupyterLab does not capture keyboard shortcuts
+            // see: https://jupyterlab.readthedocs.io/en/4.1.x/extension/notebook.html#keyboard-interaction-model
+	    child.setAttribute('data-lm-suppress-shortcuts', 'true')
+	  }
+	}
+      }
+    }
+  }
+  function get_bokeh(root) {
+    if (root.Bokeh === undefined) {
+      return null
+    } else if (root.Bokeh.version !== py_version) {
+      if (root.Bokeh.versions === undefined || !root.Bokeh.versions.has(py_version)) {
+	return null
+      }
+      return root.Bokeh.versions.get(py_version);
+    } else if (root.Bokeh.version === py_version) {
+      return root.Bokeh
+    }
+    return null
+  }
+  function is_loaded(root) {
+    var Bokeh = get_bokeh(root)
+    return (Bokeh != null && Bokeh.Panel !== undefined)
+  }
+  if (is_loaded(root)) {
+    embed_document(root);
+  } else {
+    var attempts = 0;
+    var timer = setInterval(function(root) {
+      if (is_loaded(root)) {
+        clearInterval(timer);
+        embed_document(root);
+      } else if (document.readyState == "complete") {
+        attempts++;
+        if (attempts > 200) {
+          clearInterval(timer);
+	  var Bokeh = get_bokeh(root)
+	  if (Bokeh == null || Bokeh.Panel == null) {
+            console.warn("Panel: ERROR: Unable to run Panel code because Bokeh or Panel library is missing");
+	  } else {
+	    console.warn("Panel: WARNING: Attempting to render but not all required libraries could be resolved.")
+	    embed_document(root)
+	  }
+        }
+      }
+    }, 25, root)
+  }
+})(window);</script></div></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">violin</span></code> plots are similar to box plots, but provide a better sense of the distribution of data. Note that <code class="docutils literal notranslate"><span class="pre">violin</span></code> plots depend on the <code class="docutils literal notranslate"><span class="pre">scipy</span></code> library.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">bokeh.sampledata.sprint</span><span class="w"> </span><span class="kn">import</span> <span class="n">sprint</span> <span class="k">as</span> <span class="n">df</span>
+
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Name</th>
+      <th>Country</th>
+      <th>Medal</th>
+      <th>Time</th>
+      <th>Year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Usain Bolt</td>
+      <td>JAM</td>
+      <td>GOLD</td>
+      <td>9.63</td>
+      <td>2012</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Yohan Blake</td>
+      <td>JAM</td>
+      <td>SILVER</td>
+      <td>9.75</td>
+      <td>2012</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Justin Gatlin</td>
+      <td>USA</td>
+      <td>BRONZE</td>
+      <td>9.79</td>
+      <td>2012</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Usain Bolt</td>
+      <td>JAM</td>
+      <td>GOLD</td>
+      <td>9.69</td>
+      <td>2008</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Richard Thompson</td>
+      <td>TRI</td>
+      <td>SILVER</td>
+      <td>9.89</td>
+      <td>2008</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">violin</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;Time&#39;</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="s1">&#39;Medal&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;Medal&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Sprint Time&#39;</span><span class="p">,</span>
+                 <span class="n">cmap</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gold&#39;</span><span class="p">,</span> <span class="s1">&#39;silver&#39;</span><span class="p">,</span> <span class="s1">&#39;brown&#39;</span><span class="p">],</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+                 <span class="n">width</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div id='0359b491-4c05-4f96-8602-a930bf9b6dcf'>
+  <div id="fb544a8c-05be-4b12-bf8b-d11b6890aa0e" data-root-id="0359b491-4c05-4f96-8602-a930bf9b6dcf" style="display: contents;"></div>
+</div>
+<script type="application/javascript">(function(root) {
+  var docs_json = {"c5f6ecc9-386e-4407-bf23-2a5ba11c8c64":{"version":"3.7.2","title":"Bokeh Application","roots":[{"type":"object","name":"Row","id":"0359b491-4c05-4f96-8602-a930bf9b6dcf","attributes":{"name":"Row00285","tags":["embedded"],"stylesheets":["\n:host(.pn-loading):before, .pn-loading:before {\n  background-color: #c3c3c3;\n  mask-size: auto calc(min(50%, 400px));\n  -webkit-mask-size: auto calc(min(50%, 400px));\n}",{"type":"object","name":"ImportedStyleSheet","id":"5ba6ecf5-6b89-4877-a9b8-cee6bcef8183","attributes":{"url":"https://cdn.holoviz.org/panel/1.6.3/dist/css/loading.css"}},{"type":"object","name":"ImportedStyleSheet","id":"fe798cc5-3fdf-449f-83b9-16366cff50ae","attributes":{"url":"https://cdn.holoviz.org/panel/1.6.3/dist/css/listpanel.css"}},{"type":"object","name":"ImportedStyleSheet","id":"6b553daa-8daa-4d1c-8b08-6120216357a5","attributes":{"url":"https://cdn.holoviz.org/panel/1.6.3/dist/bundled/theme/default.css"}},{"type":"object","name":"ImportedStyleSheet","id":"55a8a269-ab5e-4e2c-99f2-0dc94be203fb","attributes":{"url":"https://cdn.holoviz.org/panel/1.6.3/dist/bundled/theme/native.css"}}],"min_width":500,"margin":0,"sizing_mode":"stretch_width","align":"start","children":[{"type":"object","name":"Spacer","id":"0a329a46-8cba-45f3-92a4-66fc51087b2b","attributes":{"name":"HSpacer00289","stylesheets":["\n:host(.pn-loading):before, .pn-loading:before {\n  background-color: #c3c3c3;\n  mask-size: auto calc(min(50%, 400px));\n  -webkit-mask-size: auto calc(min(50%, 400px));\n}",{"id":"5ba6ecf5-6b89-4877-a9b8-cee6bcef8183"},{"id":"6b553daa-8daa-4d1c-8b08-6120216357a5"},{"id":"55a8a269-ab5e-4e2c-99f2-0dc94be203fb"}],"margin":0,"sizing_mode":"stretch_width","align":"start"}},{"type":"object","name":"Figure","id":"1bb63334-5b87-42ac-8948-79b314e5ecd5","attributes":{"width":500,"height":500,"margin":[5,10],"sizing_mode":"fixed","align":"start","x_range":{"type":"object","name":"FactorRange","id":"bf545160-ddca-41fd-ad3a-f00d390a7e2b","attributes":{"name":"Medal","tags":[[["Medal",null]],[]],"factors":["GOLD","SILVER","BRONZE"]}},"y_range":{"type":"object","name":"Range1d","id":"ac851e1b-1c73-4ad0-97c5-c1399e66d011","attributes":{"name":"Time","tags":[[["Time",null]],{"type":"map","entries":[["invert_yaxis",false],["autorange",false]]}],"start":8.442000000000002,"end":13.787999999999998,"reset_start":8.442000000000002,"reset_end":13.787999999999998}},"x_scale":{"type":"object","name":"CategoricalScale","id":"1f4f2bdd-c281-455e-b3e6-11260269191d"},"y_scale":{"type":"object","name":"LinearScale","id":"3b15e033-ec2d-42f4-9ace-966cbb3015c3"},"title":{"type":"object","name":"Title","id":"35ae2ccd-ec64-4dcf-984b-d9700c361a78","attributes":{"text_color":"black","text_font_size":"12pt"}},"renderers":[{"type":"object","name":"GlyphRenderer","id":"d1689952-919d-4ef4-ad35-b5f871749a94","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"c570ee7e-edf5-4196-a02e-faf89f02d7d3","attributes":{"selected":{"type":"object","name":"Selection","id":"f930767e-bbf4-43af-883d-ed5a8a6882d2","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"124ce658-f63a-4116-81ee-8944e8288a4b"},"data":{"type":"map","entries":[["ys",[{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}]],["xs",[[["GOLD",-1.4285251785096152e-07],["GOLD",-3.6457148120919296e-07],["GOLD",-8.992427059394402e-07],["GOLD",-2.1440361270143403e-06],["GOLD",-4.942179381370876e-06],["GOLD",-1.1015807414100194e-05],["GOLD",-2.374744494693984e-05],["GOLD",-4.952492390171662e-05],["GOLD",-9.99434548983396e-05],["GOLD",-0.00019522729756403436],["GOLD",-0.00036925828801170153],["GOLD",-0.0006765315641579562],["GOLD",-0.0012011458824638076],["GOLD",-0.0020675325217171885],["GOLD",-0.003452021908907032],["GOLD",-0.005593587694023908],["GOLD",-0.008801314363333326],["GOLD",-0.013455496540457116],["GOLD",-0.019999027232912275],["GOLD",-0.028916092603964702],["GOLD",-0.04069632245750574],["GOLD",-0.0557844930189269],["GOLD",-0.07451853178198177],["GOLD",-0.0970616406303268],["GOLD",-0.1233373395874689],["GOLD",-0.15297845131507407],["GOLD",-0.1853016845504494],["GOLD",-0.21931778137283559],["GOLD",-0.2537827787475308],["GOLD",-0.2872891134823354],["GOLD",-0.3183872982182234],["GOLD",-0.3457217286872374],["GOLD",-0.3681600969059853],["GOLD",-0.3848965023419133],["GOLD",-0.3955138571916648],["GOLD",-0.4],["GOLD",-0.3987211883913221],["GOLD",-0.392363294860872],["GOLD",-0.3818532044672347],["GOLD",-0.36827076614702053],["GOLD",-0.35275727558138537],["GOLD",-0.3364228386754624],["GOLD",-0.32025439956818746],["GOLD",-0.30502916181126444],["GOLD",-0.2912428847554031],["GOLD",-0.2790660765096188],["GOLD",-0.26834060405546806],["GOLD",-0.2586235271908956],["GOLD",-0.24927519869818912],["GOLD",-0.23957794846972236],["GOLD",-0.22886371491055968],["GOLD",-0.21662662298914],["GOLD",-0.20260052991488578],["GOLD",-0.18679051525493884],["GOLD",-0.16945818113305366],["GOLD",-0.15107013410035158],["GOLD",-0.13222471747455278],["GOLD",-0.11357310776871837],["GOLD",-0.09574800774624868],["GOLD",-0.07930808018849346],["GOLD",-0.06470088561463666],["GOLD",-0.05224287279006669],["GOLD",-0.04211262401490363],["GOLD",-0.03435306962231077],["GOLD",-0.028879288288320443],["GOLD",-0.025490139572701423],["GOLD",-0.023883661455130246],["GOLD",-0.023677325372381767],["GOLD",-0.0244344503707902],["GOLD",-0.025697164334921047],["GOLD",-0.027024441418197057],["GOLD",-0.02803149640825909],["GOLD",-0.028424996576264162],["GOLD",-0.028027971689893724],["GOLD",-0.0267894383974603],["GOLD",-0.02477650000175356],["GOLD",-0.02215032562239974],["GOLD",-0.019130870953363622],["GOLD",-0.015957422511853565],["GOLD",-0.012852398279489358],["GOLD",-0.009994329169867547],["GOLD",-0.007503179623915418],["GOLD",-0.005438066769707165],["GOLD",-0.0038048962090769948],["GOLD",-0.0025700132694844325],["GOLD",-0.0016757893620657734],["GOLD",-0.001054856589631162],["GOLD",-0.0006409976358547104],["GOLD",-0.0003760173871713144],["GOLD",-0.00021293527691278863],["GOLD",-0.00011640598819508638],["GOLD",-6.143147489805373e-05],["GOLD",-3.1296402586873946e-05],["GOLD",-1.5391669194299606e-05],["GOLD",-7.30743272526565e-06],["GOLD",-3.349127827605345e-06],["GOLD",-1.481789142144309e-06],["GOLD",-6.328909349275256e-07],["GOLD",-2.6095109448862574e-07],["GOLD",-1.0386689511239132e-07],["GOLD",1.0386689511239132e-07],["GOLD",2.6095109448862574e-07],["GOLD",6.328909349275256e-07],["GOLD",1.481789142144309e-06],["GOLD",3.349127827605345e-06],["GOLD",7.30743272526565e-06],["GOLD",1.5391669194299606e-05],["GOLD",3.1296402586873946e-05],["GOLD",6.143147489805373e-05],["GOLD",0.00011640598819508638],["GOLD",0.00021293527691278863],["GOLD",0.0003760173871713144],["GOLD",0.0006409976358547104],["GOLD",0.001054856589631162],["GOLD",0.0016757893620657734],["GOLD",0.0025700132694844325],["GOLD",0.0038048962090769948],["GOLD",0.005438066769707165],["GOLD",0.007503179623915418],["GOLD",0.009994329169867547],["GOLD",0.012852398279489358],["GOLD",0.015957422511853565],["GOLD",0.019130870953363622],["GOLD",0.02215032562239974],["GOLD",0.02477650000175356],["GOLD",0.0267894383974603],["GOLD",0.028027971689893724],["GOLD",0.028424996576264162],["GOLD",0.02803149640825909],["GOLD",0.027024441418197057],["GOLD",0.025697164334921047],["GOLD",0.0244344503707902],["GOLD",0.023677325372381767],["GOLD",0.023883661455130246],["GOLD",0.025490139572701423],["GOLD",0.028879288288320443],["GOLD",0.03435306962231077],["GOLD",0.04211262401490363],["GOLD",0.05224287279006669],["GOLD",0.06470088561463666],["GOLD",0.07930808018849346],["GOLD",0.09574800774624868],["GOLD",0.11357310776871837],["GOLD",0.13222471747455278],["GOLD",0.15107013410035158],["GOLD",0.16945818113305366],["GOLD",0.18679051525493884],["GOLD",0.20260052991488578],["GOLD",0.21662662298914],["GOLD",0.22886371491055968],["GOLD",0.23957794846972236],["GOLD",0.24927519869818912],["GOLD",0.2586235271908956],["GOLD",0.26834060405546806],["GOLD",0.2790660765096188],["GOLD",0.2912428847554031],["GOLD",0.30502916181126444],["GOLD",0.32025439956818746],["GOLD",0.3364228386754624],["GOLD",0.35275727558138537],["GOLD",0.36827076614702053],["GOLD",0.3818532044672347],["GOLD",0.392363294860872],["GOLD",0.3987211883913221],["GOLD",0.4],["GOLD",0.3955138571916648],["GOLD",0.3848965023419133],["GOLD",0.3681600969059853],["GOLD",0.3457217286872374],["GOLD",0.3183872982182234],["GOLD",0.2872891134823354],["GOLD",0.2537827787475308],["GOLD",0.21931778137283559],["GOLD",0.1853016845504494],["GOLD",0.15297845131507407],["GOLD",0.1233373395874689],["GOLD",0.0970616406303268],["GOLD",0.07451853178198177],["GOLD",0.0557844930189269],["GOLD",0.04069632245750574],["GOLD",0.028916092603964702],["GOLD",0.019999027232912275],["GOLD",0.013455496540457116],["GOLD",0.008801314363333326],["GOLD",0.005593587694023908],["GOLD",0.003452021908907032],["GOLD",0.0020675325217171885],["GOLD",0.0012011458824638076],["GOLD",0.0006765315641579562],["GOLD",0.00036925828801170153],["GOLD",0.00019522729756403436],["GOLD",9.99434548983396e-05],["GOLD",4.952492390171662e-05],["GOLD",2.374744494693984e-05],["GOLD",1.1015807414100194e-05],["GOLD",4.942179381370876e-06],["GOLD",2.1440361270143403e-06],["GOLD",8.992427059394402e-07],["GOLD",3.6457148120919296e-07],["GOLD",1.4285251785096152e-07]],[["SILVER",-1.3035247656608258e-07],["SILVER",-3.338894875109246e-07],["SILVER",-8.274475449168399e-07],["SILVER",-1.9842313142413327e-06],["SILVER",-4.604914952984969e-06],["SILVER",-1.034416632171638e-05],["SILVER",-2.2494941881991568e-05],["SILVER",-4.736578384599599e-05],["SILVER",-9.658602539026613e-05],["SILVER",-0.00019077319878286437],["SILVER",-0.0003650586305314115],["SILVER",-0.0006769305456290433],["SILVER",-0.0012166391668341143],["SILVER",-0.0021199335527675926],["SILVER",-0.0035821152835994133],["SILVER",-0.005871328310580883],["SILVER",-0.009337812180210093],["SILVER",-0.014414832984704577],["SILVER",-0.021606602935624407],["SILVER",-0.03145916306653023],["SILVER",-0.04451225506101261],["SILVER",-0.06123364020735431],["SILVER",-0.08194165749564347],["SILVER",-0.10672609280556533],["SILVER",-0.1353804131460567],["SILVER",-0.16735894581970556],["SILVER",-0.20177002905139518],["SILVER",-0.2374107848484877],["SILVER",-0.2728421609462714],["SILVER",-0.306496067923662],["SILVER",-0.33680160284631055],["SILVER",-0.3623156039058322],["SILVER",-0.38184407497003336],["SILVER",-0.3945441978724668],["SILVER",-0.4],["SILVER",-0.39826683995431456],["SILVER",-0.389880319318284],["SILVER",-0.3758249137739028],["SILVER",-0.35745831244387566],["SILVER",-0.33639088650741317],["SILVER",-0.3143265251090718],["SILVER",-0.29288020819642513],["SILVER",-0.27339645423850156],["SILVER",-0.25679779630546645],["SILVER",-0.24349095685764746],["SILVER",-0.2333495590113398],["SILVER",-0.2257776636776463],["SILVER",-0.21984190027334227],["SILVER",-0.21444607659548237],["SILVER",-0.20851477373373928],["SILVER",-0.20115332153514603],["SILVER",-0.19175985240366117],["SILVER",-0.18007784056135215],["SILVER",-0.1661907233693538],["SILVER",-0.15047044721885583],["SILVER",-0.1334971947051397],["SILVER",-0.11596806695840511],["SILVER",-0.09860943417158446],["SILVER",-0.08210289901340168],["SILVER",-0.06702997431860612],["SILVER",-0.05383662503773608],["SILVER",-0.042816068777152695],["SILVER",-0.03410658620632178],["SILVER",-0.027700392311674284],["SILVER",-0.02345974603453968],["SILVER",-0.021137316788807717],["SILVER",-0.020399137275186833],["SILVER",-0.02084980819354883],["SILVER",-0.02206042914070723],["SILVER",-0.023599580230223974],["SILVER",-0.025066506300569093],["SILVER",-0.026123871989560135],["SILVER",-0.026525837235778272],["SILVER",-0.026136580005291173],["SILVER",-0.024935282251050243],["SILVER",-0.023005940351254243],["SILVER",-0.02051351897907653],["SILVER",-0.017670946307476006],["SILVER",-0.014703298527973066],["SILVER",-0.011815697227084468],["SILVER",-0.009169985796930838],["SILVER",-0.00687272772351478],["SILVER",-0.004974316041675771],["SILVER",-0.0034767808689720584],["SILVER",-0.0023467063795369857],["SILVER",-0.0015295950220699359],["SILVER",-0.0009627860157332543],["SILVER",-0.0005852188718296706],["SILVER",-0.00034351199459428395],["SILVER",-0.00019471545009849708],["SILVER",-0.00010658443350555366],["SILVER",-5.6340666124959526e-05],["SILVER",-2.8759741790478137e-05],["SILVER",-1.4176949304356065e-05],["SILVER",-6.748626346488881e-06],["SILVER",-3.1022926901985143e-06],["SILVER",-1.3771617249892762e-06],["SILVER",-5.903667715205482e-07],["SILVER",-2.4439575230410684e-07],["SILVER",-9.77012651621191e-08],["SILVER",9.77012651621191e-08],["SILVER",2.4439575230410684e-07],["SILVER",5.903667715205482e-07],["SILVER",1.3771617249892762e-06],["SILVER",3.1022926901985143e-06],["SILVER",6.748626346488881e-06],["SILVER",1.4176949304356065e-05],["SILVER",2.8759741790478137e-05],["SILVER",5.6340666124959526e-05],["SILVER",0.00010658443350555366],["SILVER",0.00019471545009849708],["SILVER",0.00034351199459428395],["SILVER",0.0005852188718296706],["SILVER",0.0009627860157332543],["SILVER",0.0015295950220699359],["SILVER",0.0023467063795369857],["SILVER",0.0034767808689720584],["SILVER",0.004974316041675771],["SILVER",0.00687272772351478],["SILVER",0.009169985796930838],["SILVER",0.011815697227084468],["SILVER",0.014703298527973066],["SILVER",0.017670946307476006],["SILVER",0.02051351897907653],["SILVER",0.023005940351254243],["SILVER",0.024935282251050243],["SILVER",0.026136580005291173],["SILVER",0.026525837235778272],["SILVER",0.026123871989560135],["SILVER",0.025066506300569093],["SILVER",0.023599580230223974],["SILVER",0.02206042914070723],["SILVER",0.02084980819354883],["SILVER",0.020399137275186833],["SILVER",0.021137316788807717],["SILVER",0.02345974603453968],["SILVER",0.027700392311674284],["SILVER",0.03410658620632178],["SILVER",0.042816068777152695],["SILVER",0.05383662503773608],["SILVER",0.06702997431860612],["SILVER",0.08210289901340168],["SILVER",0.09860943417158446],["SILVER",0.11596806695840511],["SILVER",0.1334971947051397],["SILVER",0.15047044721885583],["SILVER",0.1661907233693538],["SILVER",0.18007784056135215],["SILVER",0.19175985240366117],["SILVER",0.20115332153514603],["SILVER",0.20851477373373928],["SILVER",0.21444607659548237],["SILVER",0.21984190027334227],["SILVER",0.2257776636776463],["SILVER",0.2333495590113398],["SILVER",0.24349095685764746],["SILVER",0.25679779630546645],["SILVER",0.27339645423850156],["SILVER",0.29288020819642513],["SILVER",0.3143265251090718],["SILVER",0.33639088650741317],["SILVER",0.35745831244387566],["SILVER",0.3758249137739028],["SILVER",0.389880319318284],["SILVER",0.39826683995431456],["SILVER",0.4],["SILVER",0.3945441978724668],["SILVER",0.38184407497003336],["SILVER",0.3623156039058322],["SILVER",0.33680160284631055],["SILVER",0.306496067923662],["SILVER",0.2728421609462714],["SILVER",0.2374107848484877],["SILVER",0.20177002905139518],["SILVER",0.16735894581970556],["SILVER",0.1353804131460567],["SILVER",0.10672609280556533],["SILVER",0.08194165749564347],["SILVER",0.06123364020735431],["SILVER",0.04451225506101261],["SILVER",0.03145916306653023],["SILVER",0.021606602935624407],["SILVER",0.014414832984704577],["SILVER",0.009337812180210093],["SILVER",0.005871328310580883],["SILVER",0.0035821152835994133],["SILVER",0.0021199335527675926],["SILVER",0.0012166391668341143],["SILVER",0.0006769305456290433],["SILVER",0.0003650586305314115],["SILVER",0.00019077319878286437],["SILVER",9.658602539026613e-05],["SILVER",4.736578384599599e-05],["SILVER",2.2494941881991568e-05],["SILVER",1.034416632171638e-05],["SILVER",4.604914952984969e-06],["SILVER",1.9842313142413327e-06],["SILVER",8.274475449168399e-07],["SILVER",3.338894875109246e-07],["SILVER",1.3035247656608258e-07]],[["BRONZE",-1.6481048927082683e-07],["BRONZE",-4.095702075490037e-07],["BRONZE",-9.868022988615446e-07],["BRONZE",-2.3052735997789677e-06],["BRONZE",-5.222038999434767e-06],["BRONZE",-1.1471512164267757e-05],["BRONZE",-2.444021084522648e-05],["BRONZE",-5.05053420930949e-05],["BRONZE",-0.0001012432746302021],["BRONZE",-0.00019689945715610773],["BRONZE",-0.0003715612931136374],["BRONZE",-0.0006804371800340211],["BRONZE",-0.0012094499656195668],["BRONZE",-0.0020869321061348723],["BRONZE",-0.003496520691192867],["BRONZE",-0.00568941726815545],["BRONZE",-0.00899312956719019],["BRONZE",-0.013812905650727323],["BRONZE",-0.02062166795980699],["BRONZE",-0.029934746756351546],["BRONZE",-0.04226738846910674],["BRONZE",-0.058075904864509476],["BRONZE",-0.07768708424881705],["BRONZE",-0.10122435795437026],["BRONZE",-0.1285421893778462],["BRONZE",-0.15918122360531536],["BRONZE",-0.19235525192302083],["BRONZE",-0.22697699258968093],["BRONZE",-0.2617237773338816],["BRONZE",-0.29513772302547236],["BRONZE",-0.3257492792615754],["BRONZE",-0.3522092972485203],["BRONZE",-0.37341346788249924],["BRONZE",-0.38860397397096635],["BRONZE",-0.3974359258795006],["BRONZE",-0.4],["BRONZE",-0.39679732627701386],["BRONZE",-0.3886679946310254],["BRONZE",-0.3766804919068969],["BRONZE",-0.36199548543862514],["BRONZE",-0.34572258650697785],["BRONZE",-0.3287915652147783],["BRONZE",-0.3118585458876492],["BRONZE",-0.29526236535456285],["BRONZE",-0.27903717555602553],["BRONZE",-0.26297645542485887],["BRONZE",-0.24673355856188867],["BRONZE",-0.22993733148578566],["BRONZE",-0.21229977784277212],["BRONZE",-0.19369633661866603],["BRONZE",-0.17420680091555776],["BRONZE",-0.15411406203070602],["BRONZE",-0.13386640978452494],["BRONZE",-0.11401524641939986],["BRONZE",-0.09514284020579786],["BRONZE",-0.077794130876354],["BRONZE",-0.06242329389418695],["BRONZE",-0.04936088489950769],["BRONZE",-0.038802157268382806],["BRONZE",-0.030812705394039488],["BRONZE",-0.025344784641199297],["BRONZE",-0.022256943016761507],["BRONZE",-0.021330941215098827],["BRONZE",-0.022282832094502422],["BRONZE",-0.024768629937543904],["BRONZE",-0.028388148672487915],["BRONZE",-0.032692336870772824],["BRONZE",-0.037199170683345766],["BRONZE",-0.04142086110398904],["BRONZE",-0.04490141882026887],["BRONZE",-0.04725963433035489],["BRONZE",-0.0482295799637048],["BRONZE",-0.04768987397499334],["BRONZE",-0.04567458538224995],["BRONZE",-0.04236242125213731],["BRONZE",-0.03804565371360507],["BRONZE",-0.03308470837199278],["BRONZE",-0.02785719012964935],["BRONZE",-0.02271066338197786],["BRONZE",-0.01792677554156685],["BRONZE",-0.013701024019839834],["BRONZE",-0.010138685789816644],["BRONZE",-0.007264198990978285],["BRONZE",-0.005039309707662181],["BRONZE",-0.0033847883939053403],["BRONZE",-0.00220124865255235],["BRONZE",-0.0013860655365291966],["BRONZE",-0.0008450365559688969],["BRONZE",-0.0004988204974356461],["BRONZE",-0.00028509535723229563],["BRONZE",-0.00015776586987537752],["BRONZE",-8.453041956996413e-05],["BRONZE",-4.385206500218092e-05],["BRONZE",-2.2026430841105453e-05],["BRONZE",-1.0712115988248413e-05],["BRONZE",-5.044097340736808e-06],["BRONZE",-2.2996868790646906e-06],["BRONZE",-1.0151518526697859e-06],["BRONZE",-4.338807394073058e-07],["BRONZE",-1.7955056971005956e-07],["BRONZE",1.7955056971005956e-07],["BRONZE",4.338807394073058e-07],["BRONZE",1.0151518526697859e-06],["BRONZE",2.2996868790646906e-06],["BRONZE",5.044097340736808e-06],["BRONZE",1.0712115988248413e-05],["BRONZE",2.2026430841105453e-05],["BRONZE",4.385206500218092e-05],["BRONZE",8.453041956996413e-05],["BRONZE",0.00015776586987537752],["BRONZE",0.00028509535723229563],["BRONZE",0.0004988204974356461],["BRONZE",0.0008450365559688969],["BRONZE",0.0013860655365291966],["BRONZE",0.00220124865255235],["BRONZE",0.0033847883939053403],["BRONZE",0.005039309707662181],["BRONZE",0.007264198990978285],["BRONZE",0.010138685789816644],["BRONZE",0.013701024019839834],["BRONZE",0.01792677554156685],["BRONZE",0.02271066338197786],["BRONZE",0.02785719012964935],["BRONZE",0.03308470837199278],["BRONZE",0.03804565371360507],["BRONZE",0.04236242125213731],["BRONZE",0.04567458538224995],["BRONZE",0.04768987397499334],["BRONZE",0.0482295799637048],["BRONZE",0.04725963433035489],["BRONZE",0.04490141882026887],["BRONZE",0.04142086110398904],["BRONZE",0.037199170683345766],["BRONZE",0.032692336870772824],["BRONZE",0.028388148672487915],["BRONZE",0.024768629937543904],["BRONZE",0.022282832094502422],["BRONZE",0.021330941215098827],["BRONZE",0.022256943016761507],["BRONZE",0.025344784641199297],["BRONZE",0.030812705394039488],["BRONZE",0.038802157268382806],["BRONZE",0.04936088489950769],["BRONZE",0.06242329389418695],["BRONZE",0.077794130876354],["BRONZE",0.09514284020579786],["BRONZE",0.11401524641939986],["BRONZE",0.13386640978452494],["BRONZE",0.15411406203070602],["BRONZE",0.17420680091555776],["BRONZE",0.19369633661866603],["BRONZE",0.21229977784277212],["BRONZE",0.22993733148578566],["BRONZE",0.24673355856188867],["BRONZE",0.26297645542485887],["BRONZE",0.27903717555602553],["BRONZE",0.29526236535456285],["BRONZE",0.3118585458876492],["BRONZE",0.3287915652147783],["BRONZE",0.34572258650697785],["BRONZE",0.36199548543862514],["BRONZE",0.3766804919068969],["BRONZE",0.3886679946310254],["BRONZE",0.39679732627701386],["BRONZE",0.4],["BRONZE",0.3974359258795006],["BRONZE",0.38860397397096635],["BRONZE",0.37341346788249924],["BRONZE",0.3522092972485203],["BRONZE",0.3257492792615754],["BRONZE",0.29513772302547236],["BRONZE",0.2617237773338816],["BRONZE",0.22697699258968093],["BRONZE",0.19235525192302083],["BRONZE",0.15918122360531536],["BRONZE",0.1285421893778462],["BRONZE",0.10122435795437026],["BRONZE",0.07768708424881705],["BRONZE",0.058075904864509476],["BRONZE",0.04226738846910674],["BRONZE",0.029934746756351546],["BRONZE",0.02062166795980699],["BRONZE",0.013812905650727323],["BRONZE",0.00899312956719019],["BRONZE",0.00568941726815545],["BRONZE",0.003496520691192867],["BRONZE",0.0020869321061348723],["BRONZE",0.0012094499656195668],["BRONZE",0.0006804371800340211],["BRONZE",0.0003715612931136374],["BRONZE",0.00019689945715610773],["BRONZE",0.0001012432746302021],["BRONZE",5.05053420930949e-05],["BRONZE",2.444021084522648e-05],["BRONZE",1.1471512164267757e-05],["BRONZE",5.222038999434767e-06],["BRONZE",2.3052735997789677e-06],["BRONZE",9.868022988615446e-07],["BRONZE",4.095702075490037e-07],["BRONZE",1.6481048927082683e-07]]]],["violin_fill_color",["GOLD","SILVER","BRONZE"]]]}}},"view":{"type":"object","name":"CDSView","id":"587bf737-52bc-4cfa-abc9-27fa9534dafb","attributes":{"filter":{"type":"object","name":"AllIndices","id":"9ef952c4-3b03-4f39-aba7-e65c7729aacb"}}},"glyph":{"type":"object","name":"Patches","id":"a5fd54ad-f158-469f-a3de-ddc5598ddc5c","attributes":{"xs":{"type":"field","field":"xs"},"ys":{"type":"field","field":"ys"},"line_color":{"type":"value","value":"#1f77b4"},"line_width":{"type":"value","value":0},"fill_color":{"type":"field","field":"violin_fill_color","transform":{"type":"object","name":"CategoricalColorMapper","id":"e399ed71-0d9e-4908-a3b2-db9d6676e03f","attributes":{"palette":["gold","silver","brown"],"factors":["GOLD","SILVER","BRONZE"]}}},"fill_alpha":{"type":"value","value":0.5}}},"selection_glyph":{"type":"object","name":"Patches","id":"0a663b0c-e335-49d1-8b3d-994304ee4639","attributes":{"xs":{"type":"field","field":"xs"},"ys":{"type":"field","field":"ys"},"line_color":{"type":"value","value":"#1f77b4"},"line_alpha":{"type":"value","value":1.0},"line_width":{"type":"value","value":0},"line_join":{"type":"value","value":"bevel"},"line_cap":{"type":"value","value":"butt"},"line_dash":{"type":"value","value":[]},"line_dash_offset":{"type":"value","value":0},"fill_color":{"type":"field","field":"violin_fill_color","transform":{"id":"e399ed71-0d9e-4908-a3b2-db9d6676e03f"}},"fill_alpha":{"type":"value","value":0.5},"hatch_color":{"type":"value","value":"black"},"hatch_alpha":{"type":"value","value":1.0},"hatch_scale":{"type":"value","value":12.0},"hatch_pattern":{"type":"value","value":null},"hatch_weight":{"type":"value","value":1.0}}},"nonselection_glyph":{"type":"object","name":"Patches","id":"2f090b47-e69d-489b-bc2a-d56de9be0dbf","attributes":{"xs":{"type":"field","field":"xs"},"ys":{"type":"field","field":"ys"},"line_color":{"type":"value","value":"#1f77b4"},"line_alpha":{"type":"value","value":0.1},"line_width":{"type":"value","value":0},"fill_color":{"type":"field","field":"violin_fill_color","transform":{"id":"e399ed71-0d9e-4908-a3b2-db9d6676e03f"}},"fill_alpha":{"type":"value","value":0.5},"hatch_alpha":{"type":"value","value":0.1}}},"muted_glyph":{"type":"object","name":"Patches","id":"bd52082d-9da9-43b0-94cd-748036df1744","attributes":{"xs":{"type":"field","field":"xs"},"ys":{"type":"field","field":"ys"},"line_color":{"type":"value","value":"#1f77b4"},"line_alpha":{"type":"value","value":0.2},"line_width":{"type":"value","value":0},"fill_color":{"type":"field","field":"violin_fill_color","transform":{"id":"e399ed71-0d9e-4908-a3b2-db9d6676e03f"}},"fill_alpha":{"type":"value","value":0.5},"hatch_alpha":{"type":"value","value":0.2}}}}},{"type":"object","name":"GlyphRenderer","id":"ea38073b-5a56-4676-901b-43d00a0efb63","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"83605dea-566a-4294-aba9-186eb2f23c92","attributes":{"selected":{"type":"object","name":"Selection","id":"d877fa94-8aa4-4699-9ab8-22b2bc075c57","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"179a6245-f32c-4c18-a6d2-e973971e59de"},"data":{"type":"map","entries":[["ys",[{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"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"},"shape":[200],"dtype":"float64","order":"little"}]],["xs",[[["GOLD",-1.4285251785096152e-07],["GOLD",-3.6457148120919296e-07],["GOLD",-8.992427059394402e-07],["GOLD",-2.1440361270143403e-06],["GOLD",-4.942179381370876e-06],["GOLD",-1.1015807414100194e-05],["GOLD",-2.374744494693984e-05],["GOLD",-4.952492390171662e-05],["GOLD",-9.99434548983396e-05],["GOLD",-0.00019522729756403436],["GOLD",-0.00036925828801170153],["GOLD",-0.0006765315641579562],["GOLD",-0.0012011458824638076],["GOLD",-0.0020675325217171885],["GOLD",-0.003452021908907032],["GOLD",-0.005593587694023908],["GOLD",-0.008801314363333326],["GOLD",-0.013455496540457116],["GOLD",-0.019999027232912275],["GOLD",-0.028916092603964702],["GOLD",-0.04069632245750574],["GOLD",-0.0557844930189269],["GOLD",-0.07451853178198177],["GOLD",-0.0970616406303268],["GOLD",-0.1233373395874689],["GOLD",-0.15297845131507407],["GOLD",-0.1853016845504494],["GOLD",-0.21931778137283559],["GOLD",-0.2537827787475308],["GOLD",-0.2872891134823354],["GOLD",-0.3183872982182234],["GOLD",-0.3457217286872374],["GOLD",-0.3681600969059853],["GOLD",-0.3848965023419133],["GOLD",-0.3955138571916648],["GOLD",-0.4],["GOLD",-0.3987211883913221],["GOLD",-0.392363294860872],["GOLD",-0.3818532044672347],["GOLD",-0.36827076614702053],["GOLD",-0.35275727558138537],["GOLD",-0.3364228386754624],["GOLD",-0.32025439956818746],["GOLD",-0.30502916181126444],["GOLD",-0.2912428847554031],["GOLD",-0.2790660765096188],["GOLD",-0.26834060405546806],["GOLD",-0.2586235271908956],["GOLD",-0.24927519869818912],["GOLD",-0.23957794846972236],["GOLD",-0.22886371491055968],["GOLD",-0.21662662298914],["GOLD",-0.20260052991488578],["GOLD",-0.18679051525493884],["GOLD",-0.16945818113305366],["GOLD",-0.15107013410035158],["GOLD",-0.13222471747455278],["GOLD",-0.11357310776871837],["GOLD",-0.09574800774624868],["GOLD",-0.07930808018849346],["GOLD",-0.06470088561463666],["GOLD",-0.05224287279006669],["GOLD",-0.04211262401490363],["GOLD",-0.03435306962231077],["GOLD",-0.028879288288320443],["GOLD",-0.025490139572701423],["GOLD",-0.023883661455130246],["GOLD",-0.023677325372381767],["GOLD",-0.0244344503707902],["GOLD",-0.025697164334921047],["GOLD",-0.027024441418197057],["GOLD",-0.02803149640825909],["GOLD",-0.028424996576264162],["GOLD",-0.028027971689893724],["GOLD",-0.0267894383974603],["GOLD",-0.02477650000175356],["GOLD",-0.02215032562239974],["GOLD",-0.019130870953363622],["GOLD",-0.015957422511853565],["GOLD",-0.012852398279489358],["GOLD",-0.009994329169867547],["GOLD",-0.007503179623915418],["GOLD",-0.005438066769707165],["GOLD",-0.0038048962090769948],["GOLD",-0.0025700132694844325],["GOLD",-0.0016757893620657734],["GOLD",-0.001054856589631162],["GOLD",-0.0006409976358547104],["GOLD",-0.0003760173871713144],["GOLD",-0.00021293527691278863],["GOLD",-0.00011640598819508638],["GOLD",-6.143147489805373e-05],["GOLD",-3.1296402586873946e-05],["GOLD",-1.5391669194299606e-05],["GOLD",-7.30743272526565e-06],["GOLD",-3.349127827605345e-06],["GOLD",-1.481789142144309e-06],["GOLD",-6.328909349275256e-07],["GOLD",-2.6095109448862574e-07],["GOLD",-1.0386689511239132e-07],["GOLD",1.0386689511239132e-07],["GOLD",2.6095109448862574e-07],["GOLD",6.328909349275256e-07],["GOLD",1.481789142144309e-06],["GOLD",3.349127827605345e-06],["GOLD",7.30743272526565e-06],["GOLD",1.5391669194299606e-05],["GOLD",3.1296402586873946e-05],["GOLD",6.143147489805373e-05],["GOLD",0.00011640598819508638],["GOLD",0.00021293527691278863],["GOLD",0.0003760173871713144],["GOLD",0.0006409976358547104],["GOLD",0.001054856589631162],["GOLD",0.0016757893620657734],["GOLD",0.0025700132694844325],["GOLD",0.0038048962090769948],["GOLD",0.005438066769707165],["GOLD",0.007503179623915418],["GOLD",0.009994329169867547],["GOLD",0.012852398279489358],["GOLD",0.015957422511853565],["GOLD",0.019130870953363622],["GOLD",0.02215032562239974],["GOLD",0.02477650000175356],["GOLD",0.0267894383974603],["GOLD",0.028027971689893724],["GOLD",0.028424996576264162],["GOLD",0.02803149640825909],["GOLD",0.027024441418197057],["GOLD",0.025697164334921047],["GOLD",0.0244344503707902],["GOLD",0.023677325372381767],["GOLD",0.023883661455130246],["GOLD",0.025490139572701423],["GOLD",0.028879288288320443],["GOLD",0.03435306962231077],["GOLD",0.04211262401490363],["GOLD",0.05224287279006669],["GOLD",0.06470088561463666],["GOLD",0.07930808018849346],["GOLD",0.09574800774624868],["GOLD",0.11357310776871837],["GOLD",0.13222471747455278],["GOLD",0.15107013410035158],["GOLD",0.16945818113305366],["GOLD",0.18679051525493884],["GOLD",0.20260052991488578],["GOLD",0.21662662298914],["GOLD",0.22886371491055968],["GOLD",0.23957794846972236],["GOLD",0.24927519869818912],["GOLD",0.2586235271908956],["GOLD",0.26834060405546806],["GOLD",0.2790660765096188],["GOLD",0.2912428847554031],["GOLD",0.30502916181126444],["GOLD",0.32025439956818746],["GOLD",0.3364228386754624],["GOLD",0.35275727558138537],["GOLD",0.36827076614702053],["GOLD",0.3818532044672347],["GOLD",0.392363294860872],["GOLD",0.3987211883913221],["GOLD",0.4],["GOLD",0.3955138571916648],["GOLD",0.3848965023419133],["GOLD",0.3681600969059853],["GOLD",0.3457217286872374],["GOLD",0.3183872982182234],["GOLD",0.2872891134823354],["GOLD",0.2537827787475308],["GOLD",0.21931778137283559],["GOLD",0.1853016845504494],["GOLD",0.15297845131507407],["GOLD",0.1233373395874689],["GOLD",0.0970616406303268],["GOLD",0.07451853178198177],["GOLD",0.0557844930189269],["GOLD",0.04069632245750574],["GOLD",0.028916092603964702],["GOLD",0.019999027232912275],["GOLD",0.013455496540457116],["GOLD",0.008801314363333326],["GOLD",0.005593587694023908],["GOLD",0.003452021908907032],["GOLD",0.0020675325217171885],["GOLD",0.0012011458824638076],["GOLD",0.0006765315641579562],["GOLD",0.00036925828801170153],["GOLD",0.00019522729756403436],["GOLD",9.99434548983396e-05],["GOLD",4.952492390171662e-05],["GOLD",2.374744494693984e-05],["GOLD",1.1015807414100194e-05],["GOLD",4.942179381370876e-06],["GOLD",2.1440361270143403e-06],["GOLD",8.992427059394402e-07],["GOLD",3.6457148120919296e-07],["GOLD",1.4285251785096152e-07]],[["SILVER",-1.3035247656608258e-07],["SILVER",-3.338894875109246e-07],["SILVER",-8.274475449168399e-07],["SILVER",-1.9842313142413327e-06],["SILVER",-4.604914952984969e-06],["SILVER",-1.034416632171638e-05],["SILVER",-2.2494941881991568e-05],["SILVER",-4.736578384599599e-05],["SILVER",-9.658602539026613e-05],["SILVER",-0.00019077319878286437],["SILVER",-0.0003650586305314115],["SILVER",-0.0006769305456290433],["SILVER",-0.0012166391668341143],["SILVER",-0.0021199335527675926],["SILVER",-0.0035821152835994133],["SILVER",-0.005871328310580883],["SILVER",-0.009337812180210093],["SILVER",-0.014414832984704577],["SILVER",-0.021606602935624407],["SILVER",-0.03145916306653023],["SILVER",-0.04451225506101261],["SILVER",-0.06123364020735431],["SILVER",-0.08194165749564347],["SILVER",-0.10672609280556533],["SILVER",-0.1353804131460567],["SILVER",-0.16735894581970556],["SILVER",-0.20177002905139518],["SILVER",-0.2374107848484877],["SILVER",-0.2728421609462714],["SILVER",-0.306496067923662],["SILVER",-0.33680160284631055],["SILVER",-0.3623156039058322],["SILVER",-0.38184407497003336],["SILVER",-0.3945441978724668],["SILVER",-0.4],["SILVER",-0.39826683995431456],["SILVER",-0.389880319318284],["SILVER",-0.3758249137739028],["SILVER",-0.35745831244387566],["SILVER",-0.33639088650741317],["SILVER",-0.3143265251090718],["SILVER",-0.29288020819642513],["SILVER",-0.27339645423850156],["SILVER",-0.25679779630546645],["SILVER",-0.24349095685764746],["SILVER",-0.2333495590113398],["SILVER",-0.2257776636776463],["SILVER",-0.21984190027334227],["SILVER",-0.21444607659548237],["SILVER",-0.20851477373373928],["SILVER",-0.20115332153514603],["SILVER",-0.19175985240366117],["SILVER",-0.18007784056135215],["SILVER",-0.1661907233693538],["SILVER",-0.15047044721885583],["SILVER",-0.1334971947051397],["SILVER",-0.11596806695840511],["SILVER",-0.09860943417158446],["SILVER",-0.08210289901340168],["SILVER",-0.06702997431860612],["SILVER",-0.05383662503773608],["SILVER",-0.042816068777152695],["SILVER",-0.03410658620632178],["SILVER",-0.027700392311674284],["SILVER",-0.02345974603453968],["SILVER",-0.021137316788807717],["SILVER",-0.020399137275186833],["SILVER",-0.02084980819354883],["SILVER",-0.02206042914070723],["SILVER",-0.023599580230223974],["SILVER",-0.025066506300569093],["SILVER",-0.026123871989560135],["SILVER",-0.026525837235778272],["SILVER",-0.026136580005291173],["SILVER",-0.024935282251050243],["SILVER",-0.023005940351254243],["SILVER",-0.02051351897907653],["SILVER",-0.017670946307476006],["SILVER",-0.014703298527973066],["SILVER",-0.011815697227084468],["SILVER",-0.009169985796930838],["SILVER",-0.00687272772351478],["SILVER",-0.004974316041675771],["SILVER",-0.0034767808689720584],["SILVER",-0.0023467063795369857],["SILVER",-0.0015295950220699359],["SILVER",-0.0009627860157332543],["SILVER",-0.0005852188718296706],["SILVER",-0.00034351199459428395],["SILVER",-0.00019471545009849708],["SILVER",-0.00010658443350555366],["SILVER",-5.6340666124959526e-05],["SILVER",-2.8759741790478137e-05],["SILVER",-1.4176949304356065e-05],["SILVER",-6.748626346488881e-06],["SILVER",-3.1022926901985143e-06],["SILVER",-1.3771617249892762e-06],["SILVER",-5.903667715205482e-07],["SILVER",-2.4439575230410684e-07],["SILVER",-9.77012651621191e-08],["SILVER",9.77012651621191e-08],["SILVER",2.4439575230410684e-07],["SILVER",5.903667715205482e-07],["SILVER",1.3771617249892762e-06],["SILVER",3.1022926901985143e-06],["SILVER",6.748626346488881e-06],["SILVER",1.4176949304356065e-05],["SILVER",2.8759741790478137e-05],["SILVER",5.6340666124959526e-05],["SILVER",0.00010658443350555366],["SILVER",0.00019471545009849708],["SILVER",0.00034351199459428395],["SILVER",0.0005852188718296706],["SILVER",0.0009627860157332543],["SILVER",0.0015295950220699359],["SILVER",0.0023467063795369857],["SILVER",0.0034767808689720584],["SILVER",0.004974316041675771],["SILVER",0.00687272772351478],["SILVER",0.009169985796930838],["SILVER",0.011815697227084468],["SILVER",0.014703298527973066],["SILVER",0.017670946307476006],["SILVER",0.02051351897907653],["SILVER",0.023005940351254243],["SILVER",0.024935282251050243],["SILVER",0.026136580005291173],["SILVER",0.026525837235778272],["SILVER",0.026123871989560135],["SILVER",0.025066506300569093],["SILVER",0.023599580230223974],["SILVER",0.02206042914070723],["SILVER",0.02084980819354883],["SILVER",0.020399137275186833],["SILVER",0.021137316788807717],["SILVER",0.02345974603453968],["SILVER",0.027700392311674284],["SILVER",0.03410658620632178],["SILVER",0.042816068777152695],["SILVER",0.05383662503773608],["SILVER",0.06702997431860612],["SILVER",0.08210289901340168],["SILVER",0.09860943417158446],["SILVER",0.11596806695840511],["SILVER",0.1334971947051397],["SILVER",0.15047044721885583],["SILVER",0.1661907233693538],["SILVER",0.18007784056135215],["SILVER",0.19175985240366117],["SILVER",0.20115332153514603],["SILVER",0.20851477373373928],["SILVER",0.21444607659548237],["SILVER",0.21984190027334227],["SILVER",0.2257776636776463],["SILVER",0.2333495590113398],["SILVER",0.24349095685764746],["SILVER",0.25679779630546645],["SILVER",0.27339645423850156],["SILVER",0.29288020819642513],["SILVER",0.3143265251090718],["SILVER",0.33639088650741317],["SILVER",0.35745831244387566],["SILVER",0.3758249137739028],["SILVER",0.389880319318284],["SILVER",0.39826683995431456],["SILVER",0.4],["SILVER",0.3945441978724668],["SILVER",0.38184407497003336],["SILVER",0.3623156039058322],["SILVER",0.33680160284631055],["SILVER",0.306496067923662],["SILVER",0.2728421609462714],["SILVER",0.2374107848484877],["SILVER",0.20177002905139518],["SILVER",0.16735894581970556],["SILVER",0.1353804131460567],["SILVER",0.10672609280556533],["SILVER",0.08194165749564347],["SILVER",0.06123364020735431],["SILVER",0.04451225506101261],["SILVER",0.03145916306653023],["SILVER",0.021606602935624407],["SILVER",0.014414832984704577],["SILVER",0.009337812180210093],["SILVER",0.005871328310580883],["SILVER",0.0035821152835994133],["SILVER",0.0021199335527675926],["SILVER",0.0012166391668341143],["SILVER",0.0006769305456290433],["SILVER",0.0003650586305314115],["SILVER",0.00019077319878286437],["SILVER",9.658602539026613e-05],["SILVER",4.736578384599599e-05],["SILVER",2.2494941881991568e-05],["SILVER",1.034416632171638e-05],["SILVER",4.604914952984969e-06],["SILVER",1.9842313142413327e-06],["SILVER",8.274475449168399e-07],["SILVER",3.338894875109246e-07],["SILVER",1.3035247656608258e-07]],[["BRONZE",-1.6481048927082683e-07],["BRONZE",-4.095702075490037e-07],["BRONZE",-9.868022988615446e-07],["BRONZE",-2.3052735997789677e-06],["BRONZE",-5.222038999434767e-06],["BRONZE",-1.1471512164267757e-05],["BRONZE",-2.444021084522648e-05],["BRONZE",-5.05053420930949e-05],["BRONZE",-0.0001012432746302021],["BRONZE",-0.00019689945715610773],["BRONZE",-0.0003715612931136374],["BRONZE",-0.0006804371800340211],["BRONZE",-0.0012094499656195668],["BRONZE",-0.0020869321061348723],["BRONZE",-0.003496520691192867],["BRONZE",-0.00568941726815545],["BRONZE",-0.00899312956719019],["BRONZE",-0.013812905650727323],["BRONZE",-0.02062166795980699],["BRONZE",-0.029934746756351546],["BRONZE",-0.04226738846910674],["BRONZE",-0.058075904864509476],["BRONZE",-0.07768708424881705],["BRONZE",-0.10122435795437026],["BRONZE",-0.1285421893778462],["BRONZE",-0.15918122360531536],["BRONZE",-0.19235525192302083],["BRONZE",-0.22697699258968093],["BRONZE",-0.2617237773338816],["BRONZE",-0.29513772302547236],["BRONZE",-0.3257492792615754],["BRONZE",-0.3522092972485203],["BRONZE",-0.37341346788249924],["BRONZE",-0.38860397397096635],["BRONZE",-0.3974359258795006],["BRONZE",-0.4],["BRONZE",-0.39679732627701386],["BRONZE",-0.3886679946310254],["BRONZE",-0.3766804919068969],["BRONZE",-0.36199548543862514],["BRONZE",-0.34572258650697785],["BRONZE",-0.3287915652147783],["BRONZE",-0.3118585458876492],["BRONZE",-0.29526236535456285],["BRONZE",-0.27903717555602553],["BRONZE",-0.26297645542485887],["BRONZE",-0.24673355856188867],["BRONZE",-0.22993733148578566],["BRONZE",-0.21229977784277212],["BRONZE",-0.19369633661866603],["BRONZE",-0.17420680091555776],["BRONZE",-0.15411406203070602],["BRONZE",-0.13386640978452494],["BRONZE",-0.11401524641939986],["BRONZE",-0.09514284020579786],["BRONZE",-0.077794130876354],["BRONZE",-0.06242329389418695],["BRONZE",-0.04936088489950769],["BRONZE",-0.038802157268382806],["BRONZE",-0.030812705394039488],["BRONZE",-0.025344784641199297],["BRONZE",-0.022256943016761507],["BRONZE",-0.021330941215098827],["BRONZE",-0.022282832094502422],["BRONZE",-0.024768629937543904],["BRONZE",-0.028388148672487915],["BRONZE",-0.032692336870772824],["BRONZE",-0.037199170683345766],["BRONZE",-0.04142086110398904],["BRONZE",-0.04490141882026887],["BRONZE",-0.04725963433035489],["BRONZE",-0.0482295799637048],["BRONZE",-0.04768987397499334],["BRONZE",-0.04567458538224995],["BRONZE",-0.04236242125213731],["BRONZE",-0.03804565371360507],["BRONZE",-0.03308470837199278],["BRONZE",-0.02785719012964935],["BRONZE",-0.02271066338197786],["BRONZE",-0.01792677554156685],["BRONZE",-0.013701024019839834],["BRONZE",-0.010138685789816644],["BRONZE",-0.007264198990978285],["BRONZE",-0.005039309707662181],["BRONZE",-0.0033847883939053403],["BRONZE",-0.00220124865255235],["BRONZE",-0.0013860655365291966],["BRONZE",-0.0008450365559688969],["BRONZE",-0.0004988204974356461],["BRONZE",-0.00028509535723229563],["BRONZE",-0.00015776586987537752],["BRONZE",-8.453041956996413e-05],["BRONZE",-4.385206500218092e-05],["BRONZE",-2.2026430841105453e-05],["BRONZE",-1.0712115988248413e-05],["BRONZE",-5.044097340736808e-06],["BRONZE",-2.2996868790646906e-06],["BRONZE",-1.0151518526697859e-06],["BRONZE",-4.338807394073058e-07],["BRONZE",-1.7955056971005956e-07],["BRONZE",1.7955056971005956e-07],["BRONZE",4.338807394073058e-07],["BRONZE",1.0151518526697859e-06],["BRONZE",2.2996868790646906e-06],["BRONZE",5.044097340736808e-06],["BRONZE",1.0712115988248413e-05],["BRONZE",2.2026430841105453e-05],["BRONZE",4.385206500218092e-05],["BRONZE",8.453041956996413e-05],["BRONZE",0.00015776586987537752],["BRONZE",0.00028509535723229563],["BRONZE",0.0004988204974356461],["BRONZE",0.0008450365559688969],["BRONZE",0.0013860655365291966],["BRONZE",0.00220124865255235],["BRONZE",0.0033847883939053403],["BRONZE",0.005039309707662181],["BRONZE",0.007264198990978285],["BRONZE",0.010138685789816644],["BRONZE",0.013701024019839834],["BRONZE",0.01792677554156685],["BRONZE",0.02271066338197786],["BRONZE",0.02785719012964935],["BRONZE",0.03308470837199278],["BRONZE",0.03804565371360507],["BRONZE",0.04236242125213731],["BRONZE",0.04567458538224995],["BRONZE",0.04768987397499334],["BRONZE",0.0482295799637048],["BRONZE",0.04725963433035489],["BRONZE",0.04490141882026887],["BRONZE",0.04142086110398904],["BRONZE",0.037199170683345766],["BRONZE",0.032692336870772824],["BRONZE",0.028388148672487915],["BRONZE",0.024768629937543904],["BRONZE",0.022282832094502422],["BRONZE",0.021330941215098827],["BRONZE",0.022256943016761507],["BRONZE",0.025344784641199297],["BRONZE",0.030812705394039488],["BRONZE",0.038802157268382806],["BRONZE",0.04936088489950769],["BRONZE",0.06242329389418695],["BRONZE",0.077794130876354],["BRONZE",0.09514284020579786],["BRONZE",0.11401524641939986],["BRONZE",0.13386640978452494],["BRONZE",0.15411406203070602],["BRONZE",0.17420680091555776],["BRONZE",0.19369633661866603],["BRONZE",0.21229977784277212],["BRONZE",0.22993733148578566],["BRONZE",0.24673355856188867],["BRONZE",0.26297645542485887],["BRONZE",0.27903717555602553],["BRONZE",0.29526236535456285],["BRONZE",0.3118585458876492],["BRONZE",0.3287915652147783],["BRONZE",0.34572258650697785],["BRONZE",0.36199548543862514],["BRONZE",0.3766804919068969],["BRONZE",0.3886679946310254],["BRONZE",0.39679732627701386],["BRONZE",0.4],["BRONZE",0.3974359258795006],["BRONZE",0.38860397397096635],["BRONZE",0.37341346788249924],["BRONZE",0.3522092972485203],["BRONZE",0.3257492792615754],["BRONZE",0.29513772302547236],["BRONZE",0.2617237773338816],["BRONZE",0.22697699258968093],["BRONZE",0.19235525192302083],["BRONZE",0.15918122360531536],["BRONZE",0.1285421893778462],["BRONZE",0.10122435795437026],["BRONZE",0.07768708424881705],["BRONZE",0.058075904864509476],["BRONZE",0.04226738846910674],["BRONZE",0.029934746756351546],["BRONZE",0.02062166795980699],["BRONZE",0.013812905650727323],["BRONZE",0.00899312956719019],["BRONZE",0.00568941726815545],["BRONZE",0.003496520691192867],["BRONZE",0.0020869321061348723],["BRONZE",0.0012094499656195668],["BRONZE",0.0006804371800340211],["BRONZE",0.0003715612931136374],["BRONZE",0.00019689945715610773],["BRONZE",0.0001012432746302021],["BRONZE",5.05053420930949e-05],["BRONZE",2.444021084522648e-05],["BRONZE",1.1471512164267757e-05],["BRONZE",5.222038999434767e-06],["BRONZE",2.3052735997789677e-06],["BRONZE",9.868022988615446e-07],["BRONZE",4.095702075490037e-07],["BRONZE",1.6481048927082683e-07]]]]]}}},"view":{"type":"object","name":"CDSView","id":"ae418266-2a27-4866-9dc2-c79a53f6634f","attributes":{"filter":{"type":"object","name":"AllIndices","id":"7f8b8668-3553-436e-852d-cf026fc915d8"}}},"glyph":{"type":"object","name":"MultiLine","id":"74722229-38e8-4711-b791-960a5333a908","attributes":{"xs":{"type":"field","field":"xs"},"ys":{"type":"field","field":"ys"}}},"selection_glyph":{"type":"object","name":"MultiLine","id":"8a3ad83d-3d13-46eb-97d9-388832327c3b","attributes":{"xs":{"type":"field","field":"xs"},"ys":{"type":"field","field":"ys"},"line_color":{"type":"value","value":"black"},"line_alpha":{"type":"value","value":1.0},"line_width":{"type":"value","value":1},"line_join":{"type":"value","value":"bevel"},"line_cap":{"type":"value","value":"butt"},"line_dash":{"type":"value","value":[]},"line_dash_offset":{"type":"value","value":0}}},"nonselection_glyph":{"type":"object","name":"MultiLine","id":"70ec0a1e-6a63-4355-bd96-b84338b0c533","attributes":{"xs":{"type":"field","field":"xs"},"ys":{"type":"field","field":"ys"},"line_alpha":{"type":"value","value":0.1}}},"muted_glyph":{"type":"object","name":"MultiLine","id":"7525f692-a51d-449e-9a40-1d9cd9352c51","attributes":{"xs":{"type":"field","field":"xs"},"ys":{"type":"field","field":"ys"},"line_alpha":{"type":"value","value":0.2}}}}},{"type":"object","name":"GlyphRenderer","id":"75c7bd3b-2a85-4469-a77d-8f96307fa2a7","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"7d119c2c-c4e2-4982-a531-88dfd1f140ce","attributes":{"selected":{"type":"object","name":"Selection","id":"b0443c60-0604-4479-b6a8-9128e309dbb2","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"779dbe26-d2ab-4495-b025-87a142debb9c"},"data":{"type":"map","entries":[["x",[["GOLD",0],["SILVER",0],["BRONZE",0]]],["y0",{"type":"ndarray","array":{"type":"bytes","data":"w/UoXI9CI0AAAAAAAIAjQBSuR+F6lCNA"},"shape":[3],"dtype":"float64","order":"little"}],["y1",{"type":"ndarray","array":{"type":"bytes","data":"AAAAAAAAKECamZmZmZkmQJqZmZmZmSZA"},"shape":[3],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"b1163e6c-d954-4fb5-af99-b359195e9162","attributes":{"filter":{"type":"object","name":"AllIndices","id":"8f621c70-543e-4471-8cca-8bebe1a52d3b"}}},"glyph":{"type":"object","name":"Segment","id":"0da34545-2715-4468-903a-53dc9d735f52","attributes":{"x0":{"type":"field","field":"x"},"y0":{"type":"field","field":"y0"},"x1":{"type":"field","field":"x"},"y1":{"type":"field","field":"y1"}}},"selection_glyph":{"type":"object","name":"Segment","id":"fffd6ab2-f4ac-414e-92e3-a29ee1cfd52c","attributes":{"x0":{"type":"field","field":"x"},"y0":{"type":"field","field":"y0"},"x1":{"type":"field","field":"x"},"y1":{"type":"field","field":"y1"},"line_color":{"type":"value","value":"black"},"line_alpha":{"type":"value","value":1.0},"line_width":{"type":"value","value":1},"line_join":{"type":"value","value":"bevel"},"line_cap":{"type":"value","value":"butt"},"line_dash":{"type":"value","value":[]},"line_dash_offset":{"type":"value","value":0}}},"nonselection_glyph":{"type":"object","name":"Segment","id":"ecedec56-9fb9-4f89-81e7-dbfbffa2a15b","attributes":{"x0":{"type":"field","field":"x"},"y0":{"type":"field","field":"y0"},"x1":{"type":"field","field":"x"},"y1":{"type":"field","field":"y1"},"line_alpha":{"type":"value","value":0.1}}},"muted_glyph":{"type":"object","name":"Segment","id":"52b177ca-1787-4b7b-a4c1-5a27e58d58f8","attributes":{"x0":{"type":"field","field":"x"},"y0":{"type":"field","field":"y0"},"x1":{"type":"field","field":"x"},"y1":{"type":"field","field":"y1"},"line_alpha":{"type":"value","value":0.2}}}}},{"type":"object","name":"GlyphRenderer","id":"285b1392-d093-486c-9751-58db5ed2df49","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"e64e3c06-e7e4-4531-b2aa-8eb4ff3e0fa2","attributes":{"selected":{"type":"object","name":"Selection","id":"8950cb7d-2228-4304-a92c-2a0b4dcf39ab","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"f48773e5-daaa-413b-8995-24f01d2bffd0"},"data":{"type":"map","entries":[["x",[["GOLD",0],["SILVER",0],["BRONZE",0]]],["bottom",{"type":"ndarray","array":{"type":"bytes","data":"CtejcD3qI0BSuB6F6xEkQKRwPQrXIyRA"},"shape":[3],"dtype":"float64","order":"little"}],["top",{"type":"ndarray","array":{"type":"bytes","data":"mpmZmZmZJUDNzMzMzMwlQM3MzMzMzCVA"},"shape":[3],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"cf80f113-cb27-4d92-b4e7-489b70a82503","attributes":{"filter":{"type":"object","name":"AllIndices","id":"a4afba83-22ec-4334-8d03-7a642854baff"}}},"glyph":{"type":"object","name":"VBar","id":"69d226ce-0625-434c-a63a-33898fbc2e8d","attributes":{"x":{"type":"field","field":"x"},"width":{"type":"value","value":0.1},"bottom":{"type":"field","field":"bottom"},"top":{"type":"field","field":"top"},"fill_color":{"type":"value","value":"black"}}},"selection_glyph":{"type":"object","name":"VBar","id":"df76bf0c-91d8-4b4b-a8d1-93ff2b993895","attributes":{"x":{"type":"field","field":"x"},"width":{"type":"value","value":0.1},"bottom":{"type":"field","field":"bottom"},"top":{"type":"field","field":"top"},"line_color":{"type":"value","value":"black"},"line_alpha":{"type":"value","value":1.0},"line_width":{"type":"value","value":1},"line_join":{"type":"value","value":"bevel"},"line_cap":{"type":"value","value":"butt"},"line_dash":{"type":"value","value":[]},"line_dash_offset":{"type":"value","value":0},"fill_color":{"type":"value","value":"black"},"fill_alpha":{"type":"value","value":1.0},"hatch_color":{"type":"value","value":"black"},"hatch_alpha":{"type":"value","value":1.0},"hatch_scale":{"type":"value","value":12.0},"hatch_pattern":{"type":"value","value":null},"hatch_weight":{"type":"value","value":1.0}}},"nonselection_glyph":{"type":"object","name":"VBar","id":"36698a0e-5e09-421d-ac0d-a87671ba8f2e","attributes":{"x":{"type":"field","field":"x"},"width":{"type":"value","value":0.1},"bottom":{"type":"field","field":"bottom"},"top":{"type":"field","field":"top"},"line_alpha":{"type":"value","value":0.1},"fill_color":{"type":"value","value":"black"},"fill_alpha":{"type":"value","value":0.1},"hatch_alpha":{"type":"value","value":0.1}}},"muted_glyph":{"type":"object","name":"VBar","id":"687aba49-4779-439b-9379-bec7ece82e84","attributes":{"x":{"type":"field","field":"x"},"width":{"type":"value","value":0.1},"bottom":{"type":"field","field":"bottom"},"top":{"type":"field","field":"top"},"line_alpha":{"type":"value","value":0.2},"fill_color":{"type":"value","value":"black"},"fill_alpha":{"type":"value","value":0.2},"hatch_alpha":{"type":"value","value":0.2}}}}},{"type":"object","name":"GlyphRenderer","id":"770b0373-94bf-4b18-aa8f-1d38a9c3a0c8","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"96edf9ee-1334-4470-bd7c-d522cb334d58","attributes":{"selected":{"type":"object","name":"Selection","id":"a1aa84c3-6b39-4208-bcaf-0b1c1f92709e","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"53e57f4d-050b-43f6-8670-dab815f329b0"},"data":{"type":"map","entries":[["x",[["GOLD",0],["SILVER",0],["BRONZE",0]]],["y",{"type":"ndarray","array":{"type":"bytes","data":"zczMzMyMJEDNzMzMzIwkQM3MzMzMzCRA"},"shape":[3],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"040fe106-d3b2-4fe6-afed-19c4d2c0c538","attributes":{"filter":{"type":"object","name":"AllIndices","id":"244014e2-c7cf-4048-9bff-6e6a40e80981"}}},"glyph":{"type":"object","name":"Scatter","id":"8e545e97-1378-4ca4-bff2-42d8b71605a4","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":{"type":"value","value":"white"},"fill_color":{"type":"value","value":"white"},"hatch_color":{"type":"value","value":"white"}}},"selection_glyph":{"type":"object","name":"Scatter","id":"7a8c3dd6-2177-45f3-b251-4a36299db52d","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"size":{"type":"value","value":4},"angle":{"type":"value","value":0.0},"line_color":{"type":"value","value":"white"},"line_alpha":{"type":"value","value":1.0},"line_width":{"type":"value","value":1},"line_join":{"type":"value","value":"bevel"},"line_cap":{"type":"value","value":"butt"},"line_dash":{"type":"value","value":[]},"line_dash_offset":{"type":"value","value":0},"fill_color":{"type":"value","value":"white"},"fill_alpha":{"type":"value","value":1.0},"hatch_color":{"type":"value","value":"white"},"hatch_alpha":{"type":"value","value":1.0},"hatch_scale":{"type":"value","value":12.0},"hatch_pattern":{"type":"value","value":null},"hatch_weight":{"type":"value","value":1.0},"marker":{"type":"value","value":"circle"}}},"nonselection_glyph":{"type":"object","name":"Scatter","id":"680b8813-2901-4069-b80a-dd0ab44fbaf5","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":{"type":"value","value":"white"},"line_alpha":{"type":"value","value":0.1},"fill_color":{"type":"value","value":"white"},"fill_alpha":{"type":"value","value":0.1},"hatch_color":{"type":"value","value":"white"},"hatch_alpha":{"type":"value","value":0.1}}},"muted_glyph":{"type":"object","name":"Scatter","id":"6a91a256-d072-4a67-ac85-50e981d4cb61","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":{"type":"value","value":"white"},"line_alpha":{"type":"value","value":0.2},"fill_color":{"type":"value","value":"white"},"fill_alpha":{"type":"value","value":0.2},"hatch_color":{"type":"value","value":"white"},"hatch_alpha":{"type":"value","value":0.2}}}}}],"toolbar":{"type":"object","name":"Toolbar","id":"82a986fd-7937-48dc-b946-5b239acc63b5","attributes":{"tools":[{"type":"object","name":"WheelZoomTool","id":"aa2372a8-1bf9-4767-8c99-442ad26f3278","attributes":{"tags":["hv_created"],"renderers":"auto","zoom_together":"none"}},{"type":"object","name":"SaveTool","id":"686ef5a4-0ac9-4a14-ad6e-ccc05397fb2a"},{"type":"object","name":"PanTool","id":"bb6a2628-e515-465a-9168-f6020a8e73af"},{"type":"object","name":"BoxZoomTool","id":"50c5cc72-0e59-4258-81a4-e4c0d275a354","attributes":{"dimensions":"both","overlay":{"type":"object","name":"BoxAnnotation","id":"30d97d9f-6156-43af-9ff1-3b607ef6bb6a","attributes":{"syncable":false,"line_color":"black","line_alpha":1.0,"line_width":2,"line_dash":[4,4],"fill_color":"lightgrey","fill_alpha":0.5,"level":"overlay","visible":false,"left":{"type":"number","value":"nan"},"right":{"type":"number","value":"nan"},"top":{"type":"number","value":"nan"},"bottom":{"type":"number","value":"nan"},"left_units":"canvas","right_units":"canvas","top_units":"canvas","bottom_units":"canvas","handles":{"type":"object","name":"BoxInteractionHandles","id":"0664ab75-9335-4312-bac7-dd4e2eb26d5c","attributes":{"all":{"type":"object","name":"AreaVisuals","id":"8a2110fa-2ffc-44dd-b24d-535534fb2be1","attributes":{"fill_color":"white","hover_fill_color":"lightgray"}}}}}}}},{"type":"object","name":"ResetTool","id":"76b1a4a4-608d-428a-b590-22292e481357"}],"active_drag":{"id":"bb6a2628-e515-465a-9168-f6020a8e73af"},"active_scroll":{"id":"aa2372a8-1bf9-4767-8c99-442ad26f3278"}}},"left":[{"type":"object","name":"LinearAxis","id":"658c9c70-b74d-423e-9b45-afaef4b9baf0","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"973d1c2e-d23a-4e15-99d7-ce5a37585080","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"a4242c5d-1529-425b-89fe-4c2054960169"},"axis_label":"Sprint Time","major_label_policy":{"type":"object","name":"AllLabels","id":"ed62b6d7-fc87-40de-91f9-2f307a4ddfd4"}}}],"below":[{"type":"object","name":"CategoricalAxis","id":"0e2733a4-6a10-4890-9278-21b63b9c005d","attributes":{"ticker":{"type":"object","name":"CategoricalTicker","id":"04e5f411-737e-486c-b74b-c83d91f35e64"},"formatter":{"type":"object","name":"CategoricalTickFormatter","id":"9188bc56-4e44-436f-a0f0-bc5aa4d6efb7"},"axis_label":"Medal","major_label_policy":{"type":"object","name":"AllLabels","id":"8644728a-b172-4aef-9b46-f646d20844de"}}}],"center":[{"type":"object","name":"Grid","id":"08e58261-38df-48bd-ba6a-20da4dac8cf4","attributes":{"axis":{"id":"0e2733a4-6a10-4890-9278-21b63b9c005d"},"grid_line_color":null}},{"type":"object","name":"Grid","id":"eb287a6c-e271-44d6-a4b4-1196df75c12e","attributes":{"dimension":1,"axis":{"id":"658c9c70-b74d-423e-9b45-afaef4b9baf0"},"grid_line_color":null}}],"min_border_top":10,"min_border_bottom":10,"min_border_left":10,"min_border_right":10,"output_backend":"webgl"}},{"type":"object","name":"Spacer","id":"3861c11c-1151-42c0-a47a-9b202b876689","attributes":{"name":"HSpacer00290","stylesheets":["\n:host(.pn-loading):before, .pn-loading:before {\n  background-color: #c3c3c3;\n  mask-size: auto calc(min(50%, 400px));\n  -webkit-mask-size: auto calc(min(50%, 400px));\n}",{"id":"5ba6ecf5-6b89-4877-a9b8-cee6bcef8183"},{"id":"6b553daa-8daa-4d1c-8b08-6120216357a5"},{"id":"55a8a269-ab5e-4e2c-99f2-0dc94be203fb"}],"margin":0,"sizing_mode":"stretch_width","align":"start"}}]}}],"defs":[{"type":"model","name":"ReactiveHTML1"},{"type":"model","name":"FlexBox1","properties":[{"name":"align_content","kind":"Any","default":"flex-start"},{"name":"align_items","kind":"Any","default":"flex-start"},{"name":"flex_direction","kind":"Any","default":"row"},{"name":"flex_wrap","kind":"Any","default":"wrap"},{"name":"gap","kind":"Any","default":""},{"name":"justify_content","kind":"Any","default":"flex-start"}]},{"type":"model","name":"FloatPanel1","properties":[{"name":"config","kind":"Any","default":{"type":"map"}},{"name":"contained","kind":"Any","default":true},{"name":"position","kind":"Any","default":"right-top"},{"name":"offsetx","kind":"Any","default":null},{"name":"offsety","kind":"Any","default":null},{"name":"theme","kind":"Any","default":"primary"},{"name":"status","kind":"Any","default":"normalized"}]},{"type":"model","name":"GridStack1","properties":[{"name":"ncols","kind":"Any","default":null},{"name":"nrows","kind":"Any","default":null},{"name":"allow_resize","kind":"Any","default":true},{"name":"allow_drag","kind":"Any","default":true},{"name":"state","kind":"Any","default":[]}]},{"type":"model","name":"drag1","properties":[{"name":"slider_width","kind":"Any","default":5},{"name":"slider_color","kind":"Any","default":"black"},{"name":"value","kind":"Any","default":50}]},{"type":"model","name":"click1","properties":[{"name":"terminal_output","kind":"Any","default":""},{"name":"debug_name","kind":"Any","default":""},{"name":"clears","kind":"Any","default":0}]},{"type":"model","name":"FastWrapper1","properties":[{"name":"object","kind":"Any","default":null},{"name":"style","kind":"Any","default":null}]},{"type":"model","name":"NotificationArea1","properties":[{"name":"js_events","kind":"Any","default":{"type":"map"}},{"name":"max_notifications","kind":"Any","default":5},{"name":"notifications","kind":"Any","default":[]},{"name":"position","kind":"Any","default":"bottom-right"},{"name":"_clear","kind":"Any","default":0},{"name":"types","kind":"Any","default":[{"type":"map","entries":[["type","warning"],["background","#ffc107"],["icon",{"type":"map","entries":[["className","fas fa-exclamation-triangle"],["tagName","i"],["color","white"]]}]]},{"type":"map","entries":[["type","info"],["background","#007bff"],["icon",{"type":"map","entries":[["className","fas fa-info-circle"],["tagName","i"],["color","white"]]}]]}]}]},{"type":"model","name":"Notification","properties":[{"name":"background","kind":"Any","default":null},{"name":"duration","kind":"Any","default":3000},{"name":"icon","kind":"Any","default":null},{"name":"message","kind":"Any","default":""},{"name":"notification_type","kind":"Any","default":null},{"name":"_rendered","kind":"Any","default":false},{"name":"_destroyed","kind":"Any","default":false}]},{"type":"model","name":"TemplateActions1","properties":[{"name":"open_modal","kind":"Any","default":0},{"name":"close_modal","kind":"Any","default":0}]},{"type":"model","name":"BootstrapTemplateActions1","properties":[{"name":"open_modal","kind":"Any","default":0},{"name":"close_modal","kind":"Any","default":0}]},{"type":"model","name":"TemplateEditor1","properties":[{"name":"layout","kind":"Any","default":[]}]},{"type":"model","name":"MaterialTemplateActions1","properties":[{"name":"open_modal","kind":"Any","default":0},{"name":"close_modal","kind":"Any","default":0}]},{"type":"model","name":"ReactiveESM1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"JSComponent1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"ReactComponent1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"AnyWidgetComponent1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"request_value1","properties":[{"name":"fill","kind":"Any","default":"none"},{"name":"_synced","kind":"Any","default":null},{"name":"_request_sync","kind":"Any","default":0}]}]}};
+  var render_items = [{"docid":"c5f6ecc9-386e-4407-bf23-2a5ba11c8c64","roots":{"0359b491-4c05-4f96-8602-a930bf9b6dcf":"fb544a8c-05be-4b12-bf8b-d11b6890aa0e"},"root_ids":["0359b491-4c05-4f96-8602-a930bf9b6dcf"]}];
+  var docs = Object.values(docs_json)
+  if (!docs) {
+    return
+  }
+  const py_version = docs[0].version.replace('rc', '-rc.').replace('.dev', '-dev.')
+  async function embed_document(root) {
+    var Bokeh = get_bokeh(root)
+    await Bokeh.embed.embed_items_notebook(docs_json, render_items);
+    for (const render_item of render_items) {
+      for (const root_id of render_item.root_ids) {
+	const id_el = document.getElementById(root_id)
+	if (id_el.children.length && id_el.children[0].hasAttribute('data-root-id')) {
+	  const root_el = id_el.children[0]
+	  root_el.id = root_el.id + '-rendered'
+	  for (const child of root_el.children) {
+            // Ensure JupyterLab does not capture keyboard shortcuts
+            // see: https://jupyterlab.readthedocs.io/en/4.1.x/extension/notebook.html#keyboard-interaction-model
+	    child.setAttribute('data-lm-suppress-shortcuts', 'true')
+	  }
+	}
+      }
+    }
+  }
+  function get_bokeh(root) {
+    if (root.Bokeh === undefined) {
+      return null
+    } else if (root.Bokeh.version !== py_version) {
+      if (root.Bokeh.versions === undefined || !root.Bokeh.versions.has(py_version)) {
+	return null
+      }
+      return root.Bokeh.versions.get(py_version);
+    } else if (root.Bokeh.version === py_version) {
+      return root.Bokeh
+    }
+    return null
+  }
+  function is_loaded(root) {
+    var Bokeh = get_bokeh(root)
+    return (Bokeh != null && Bokeh.Panel !== undefined)
+  }
+  if (is_loaded(root)) {
+    embed_document(root);
+  } else {
+    var attempts = 0;
+    var timer = setInterval(function(root) {
+      if (is_loaded(root)) {
+        clearInterval(timer);
+        embed_document(root);
+      } else if (document.readyState == "complete") {
+        attempts++;
+        if (attempts > 200) {
+          clearInterval(timer);
+	  var Bokeh = get_bokeh(root)
+	  if (Bokeh == null || Bokeh.Panel == null) {
+            console.warn("Panel: ERROR: Unable to run Panel code because Bokeh or Panel library is missing");
+	  } else {
+	    console.warn("Panel: WARNING: Attempting to render but not all required libraries could be resolved.")
+	    embed_document(root)
+	  }
+        }
+      }
+    }, 25, root)
+  }
+})(window);</script></div></div>
+</div>
+</section>
+
+<div id="scroller-right">
+    This web page was generated from a Jupyter notebook and not all
+    interactivity will work on this website.
+</div>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="table.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Table</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../geopandas/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Geopandas</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/holoviz/hvplot/edit/main/doc/reference/tabular/violin.ipynb">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/reference/tabular/violin.ipynb">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item"><p class="nbsite-copyright-last-updated">
+    <span class="copyright">
+            &copy; Copyright 2016-2025 Holoviz contributors.
+    </span>
+    <span class="last-updated">Last updated on 2025-04-30.</span><br>
+</p></div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,80 @@
+Traceback (most recent call last):
+  File "/Users/runner/work/hvplot/hvplot/.pixi/envs/docs/lib/python3.11/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/Users/runner/work/hvplot/hvplot/.pixi/envs/docs/lib/python3.11/site-packages/nbclient/client.py", line 1319, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/runner/work/hvplot/hvplot/.pixi/envs/docs/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/runner/work/hvplot/hvplot/.pixi/envs/docs/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/Users/runner/work/hvplot/hvplot/.pixi/envs/docs/lib/python3.11/site-packages/nbclient/client.py", line 709, in async_execute
+    await self.async_execute_cell(
+  File "/Users/runner/work/hvplot/hvplot/.pixi/envs/docs/lib/python3.11/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/Users/runner/work/hvplot/hvplot/.pixi/envs/docs/lib/python3.11/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+G = nx.dodecahedral_graph()
+
+shells = [[2, 3, 4, 5, 6], [8, 1, 0, 19, 18, 17, 16, 15, 14, 7], [9, 10, 11, 12, 13]]
+shell = hvnx.draw_shell(G, nlist=shells)
+
+pos = nx.nx_agraph.graphviz_layout(G)
+graphviz = hvnx.draw(G, pos=pos)
+
+layout = shell + graphviz
+layout
+------------------
+
+
+[31m---------------------------------------------------------------------------[39m
+[31mOSError[39m                                   Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[5][39m[32m, line 6[39m
+[32m      3[39m shells = [[[32m2[39m, [32m3[39m, [32m4[39m, [32m5[39m, [32m6[39m], [[32m8[39m, [32m1[39m, [32m0[39m, [32m19[39m, [32m18[39m, [32m17[39m, [32m16[39m, [32m15[39m, [32m14[39m, [32m7[39m], [[32m9[39m, [32m10[39m, [32m11[39m, [32m12[39m, [32m13[39m]]
+[32m      4[39m shell = hvnx.draw_shell(G, nlist=shells)
+[32m----> [39m[32m6[39m pos = [43mnx[49m[43m.[49m[43mnx_agraph[49m[43m.[49m[43mgraphviz_layout[49m[43m([49m[43mG[49m[43m)[49m
+[32m      7[39m graphviz = hvnx.draw(G, pos=pos)
+[32m      9[39m layout = shell + graphviz
+
+[36mFile [39m[32m~/work/hvplot/hvplot/.pixi/envs/docs/lib/python3.11/site-packages/networkx/drawing/nx_agraph.py:257[39m, in [36mgraphviz_layout[39m[34m(G, prog, root, args)[39m
+[32m    226[39m [38;5;28;01mdef[39;00m[38;5;250m [39m[34mgraphviz_layout[39m(G, prog=[33m"[39m[33mneato[39m[33m"[39m, root=[38;5;28;01mNone[39;00m, args=[33m"[39m[33m"[39m):
+[32m    227[39m [38;5;250m    [39m[33;03m"""Create node positions for G using Graphviz.[39;00m
+[32m    228[39m 
+[32m    229[39m [33;03m    Parameters[39;00m
+[32m   (...)[39m[32m    255[39m [33;03m    see https://gitlab.com/graphviz/graphviz/-/issues/1767 for more info.[39;00m
+[32m    256[39m [33;03m    """[39;00m
+[32m--> [39m[32m257[39m     [38;5;28;01mreturn[39;00m [43mpygraphviz_layout[49m[43m([49m[43mG[49m[43m,[49m[43m [49m[43mprog[49m[43m=[49m[43mprog[49m[43m,[49m[43m [49m[43mroot[49m[43m=[49m[43mroot[49m[43m,[49m[43m [49m[43margs[49m[43m=[49m[43margs[49m[43m)[49m
+
+[36mFile [39m[32m~/work/hvplot/hvplot/.pixi/envs/docs/lib/python3.11/site-packages/networkx/drawing/nx_agraph.py:307[39m, in [36mpygraphviz_layout[39m[34m(G, prog, root, args)[39m
+[32m    305[39m     args += [33mf[39m[33m"[39m[33m-Groot=[39m[38;5;132;01m{[39;00mroot[38;5;132;01m}[39;00m[33m"[39m
+[32m    306[39m A = to_agraph(G)
+[32m--> [39m[32m307[39m [43mA[49m[43m.[49m[43mlayout[49m[43m([49m[43mprog[49m[43m=[49m[43mprog[49m[43m,[49m[43m [49m[43margs[49m[43m=[49m[43margs[49m[43m)[49m
+[32m    308[39m node_pos = {}
+[32m    309[39m [38;5;28;01mfor[39;00m n [38;5;129;01min[39;00m G:
+
+[36mFile [39m[32m~/work/hvplot/hvplot/.pixi/envs/docs/lib/python3.11/site-packages/pygraphviz/agraph.py:1479[39m, in [36mAGraph.layout[39m[34m(self, prog, args)[39m
+[32m   1462[39m [38;5;250m[39m[33;03m"""Assign positions to nodes in graph.[39;00m
+[32m   1463[39m 
+[32m   1464[39m [33;03mOptional prog=['neato'|'dot'|'twopi'|'circo'|'fdp'|'nop'][39;00m
+[32m   (...)[39m[32m   1476[39m 
+[32m   1477[39m [33;03m"""[39;00m
+[32m   1478[39m output_fmt = [33m"[39m[33mdot[39m[33m"[39m
+[32m-> [39m[32m1479[39m data = [38;5;28;43mself[39;49m[43m.[49m[43m_run_prog[49m[43m([49m[43mprog[49m[43m,[49m[43m [49m[33;43m"[39;49m[33;43m [39;49m[33;43m"[39;49m[43m.[49m[43mjoin[49m[43m([49m[43m[[49m[43margs[49m[43m,[49m[43m [49m[33;43m"[39;49m[33;43m-T[39;49m[33;43m"[39;49m[43m,[49m[43m [49m[43moutput_fmt[49m[43m][49m[43m)[49m[43m)[49m
+[32m   1480[39m [38;5;28mself[39m.from_string(data)
+[32m   1481[39m [38;5;28mself[39m.has_layout = [38;5;28;01mTrue[39;00m
+
+[36mFile [39m[32m~/work/hvplot/hvplot/.pixi/envs/docs/lib/python3.11/site-packages/pygraphviz/agraph.py:1400[39m, in [36mAGraph._run_prog[39m[34m(self, prog, args)[39m
+[32m   1397[39m p.wait()
+[32m   1399[39m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m data:
+[32m-> [39m[32m1400[39m     [38;5;28;01mraise[39;00m [38;5;167;01mOSError[39;00m([33mb[39m[33m"[39m[33m"[39m.join(errors).decode([38;5;28mself[39m.encoding))
+[32m   1402[39m [38;5;28;01mif[39;00m [38;5;28mlen[39m(errors) > [32m0[39m:
+[32m   1403[39m     warnings.warn([33mb[39m[33m"[39m[33m"[39m.join(errors).decode([38;5;28mself[39m.encoding), [38;5;167;01mRuntimeWarning[39;00m)
+
+[31mOSError[39m: Format: "dot" not recognized. No formats found.
+Perhaps "dot -c" needs to be run (with installer's privileges) to register the plugins?
+
+

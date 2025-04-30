@@ -1,0 +1,1790 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>hvPlot &#8212; hvPlot 0.11.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="_static/nbsite.css?v=d9d93254" />
+    <link rel="stylesheet" type="text/css" href="_static/notebook.css?v=19946987" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery.css?v=0a3248cd" />
+    <link rel="stylesheet" type="text/css" href="_static/alert.css?v=c26666be" />
+    <link rel="stylesheet" type="text/css" href="_static/dataframe.css?v=a0f274c1" />
+    <link rel="stylesheet" type="text/css" href="_static/scroller.css?v=2dcde208" />
+    <link rel="stylesheet" type="text/css" href="_static/hv-sidebar-dropdown.css?v=3e2b0152" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=bab6b1ab" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=2088e4e3"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>
+    window.goatcounter = {
+        path: function(p) { return location.host + p }
+    }
+</script>
+    <script async="async" data-goatcounter="https://holoviz.goatcounter.com/count" src="_static/js/goatcounter.js?v=f53f84b8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tutorials" href="tutorials/index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.11.3" />
+    <meta name="docbuild:last-update" content="2025-04-30"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="#">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="_static/logo_horizontal.svg" class="logo__image only-light" alt="hvPlot 0.11.3 documentation - Home"/>
+    <img src="_static/logo_horizontal.svg" class="logo__image only-dark pst-js-only" alt="hvPlot 0.11.3 documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="user_guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="reference/index.html">
+    Reference Gallery
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="ref/index.html">
+    Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="developer_guide.html">
+    Developer Guide
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="releases.html">
+    Releases
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="roadmap.html">
+    Roadmap
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="about.html">
+    About
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/holoviz/hvplot" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://twitter.com/HoloViews" title="Twitter" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-twitter-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Twitter</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discourse.holoviz.org/c/hvplot" title="Discourse" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discourse fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Discourse</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discord.gg/AXRHnJU6sP" title="Discord" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discord fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Discord</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="user_guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="reference/index.html">
+    Reference Gallery
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="ref/index.html">
+    Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="developer_guide.html">
+    Developer Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="releases.html">
+    Releases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="about.html">
+    About
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/holoviz/hvplot" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://twitter.com/HoloViews" title="Twitter" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-twitter-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Twitter</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discourse.holoviz.org/c/hvplot" title="Discourse" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discourse fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Discourse</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discord.gg/AXRHnJU6sP" title="Discord" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discord fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Discord</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><!-- Adapted from sidebar-nav-bs.html (1.15.2) with the following changes
+
+  - Commented out the tag that adds the "Section Navigation" title
+  - Call generate_toctree_html with startdepth=0
+
+Please update this file when required when bumping the max pin of pydata-sphinx-theme.
+-->
+
+
+<nav class="bd-docs-nav bd-links"
+      aria-label="Section Navigation">
+  <!-- <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p> -->
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="tutorials/index.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/getting_started_pandas.html">Using hvPlot as a Pandas user</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://holoviz.org/tutorial/index.html">HoloViz Tutorial</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="user_guide/index.html">User Guide</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Plotting.html">Plotting with Bokeh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Plotting_with_Matplotlib.html">Plotting with Matplotlib</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Plotting_with_Plotly.html">Plotting with Plotly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Interactive.html">Interactive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Widgets.html">Widgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Plotting_Extensions.html">Plotting Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Explorer.html">Exploring data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Viewing.html">Viewing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Subplots.html">Subplots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Streaming.html">Streaming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Gridded_Data.html">Gridded Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/NetworkX.html">Network Graphs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Geographic_Data.html">Geographic Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Timeseries_Data.html">Timeseries Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Large_Timeseries.html">Large Timeseries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Statistical_Plots.html">Statistical Plots</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="reference/index.html">Reference Gallery</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="reference/tabular/index.html">Tabular</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/andrewscurves.html">Andrewscurves</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/area.html">Area</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/bar.html">Bar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/barh.html">Barh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/bivariate.html">Bivariate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/box.html">Box</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/errorbars.html">Errorbars</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/heatmap.html">Heatmap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/hexbin.html">Hexbin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/hist.html">Hist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/kde.html">Kde</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/labels.html">Labels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/lagplot.html">Lagplot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/line.html">Line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/ohlc.html">Ohlc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/parallelcoordinates.html">Parallelcoordinates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/paths.html">Paths</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/scatter.html">Scatter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/scattermatrix.html">Scattermatrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/step.html">Step</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/table.html">Table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/violin.html">Violin</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="reference/geopandas/index.html">Geopandas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/geopandas/points.html">Points</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/geopandas/polygons.html">Polygons</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="reference/xarray/index.html">Xarray</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/xarray/bar.html">Bar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/xarray/contour.html">Contour</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/xarray/contourf.html">Contourf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/xarray/hist.html">Hist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/xarray/image.html">Image</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/xarray/kde.html">Kde</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/xarray/line.html">Line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/xarray/quadmesh.html">Quadmesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/xarray/rgb.html">Rgb</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/xarray/vectorfield.html">Vectorfield</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/xarray/violin.html">Violin</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="ref/index.html">Reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="ref/installation.html">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ref/data_libraries.html">Supported data libraries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ref/plotting_extensions.html">Supported plotting extensions</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="ref/plotting_options/index.html">Plotting options</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="ref/plotting_options/index.html">All Options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/plotting_options/data.html">Data Options</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="ref/api/index.html">API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.help.html">hvplot.help</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.hvplot_extension.html">hvplot.hvplot_extension</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.extension.html">hvplot.extension</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.output.html">hvplot.output</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.render.html">hvplot.render</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.save.html">hvplot.save</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.show.html">hvplot.show</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.area.html">hvplot.hvPlot.area</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.bar.html">hvplot.hvPlot.bar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.barh.html">hvplot.hvPlot.barh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.box.html">hvplot.hvPlot.box</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.bivariate.html">hvplot.hvPlot.bivariate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.contour.html">hvplot.hvPlot.contour</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.contourf.html">hvplot.hvPlot.contourf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.dataset.html">hvplot.hvPlot.dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.density.html">hvplot.hvPlot.density</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.errorbars.html">hvplot.hvPlot.errorbars</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.heatmap.html">hvplot.hvPlot.heatmap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.hexbin.html">hvplot.hvPlot.hexbin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.hist.html">hvplot.hvPlot.hist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.image.html">hvplot.hvPlot.image</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.kde.html">hvplot.hvPlot.kde</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.labels.html">hvplot.hvPlot.labels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.line.html">hvplot.hvPlot.line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.ohlc.html">hvplot.hvPlot.ohlc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.paths.html">hvplot.hvPlot.paths</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.points.html">hvplot.hvPlot.points</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.polygons.html">hvplot.hvPlot.polygons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.quadmesh.html">hvplot.hvPlot.quadmesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.rgb.html">hvplot.hvPlot.rgb</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.scatter.html">hvplot.hvPlot.scatter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.step.html">hvplot.hvPlot.step</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.table.html">hvplot.hvPlot.table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.vectorfield.html">hvplot.hvPlot.vectorfield</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.violin.html">hvplot.hvPlot.violin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.plotting.andrews_curves.html">hvplot.plotting.andrews_curves</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.plotting.lag_plot.html">hvplot.plotting.lag_plot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.plotting.parallel_coordinates.html">hvplot.plotting.parallel_coordinates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.plotting.scatter_matrix.html">hvplot.plotting.scatter_matrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.networkx.draw.html">hvplot.networkx.draw</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.networkx.draw_networkx.html">hvplot.networkx.draw_networkx</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.networkx.draw_networkx_nodes.html">hvplot.networkx.draw_networkx_nodes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.networkx.draw_networkx_edges.html">hvplot.networkx.draw_networkx_edges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.networkx.draw_networkx_labels.html">hvplot.networkx.draw_networkx_labels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.networkx.draw_circular.html">hvplot.networkx.draw_circular</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.networkx.draw_kamada_kawai.html">hvplot.networkx.draw_kamada_kawai</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.networkx.draw_random.html">hvplot.networkx.draw_random</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.networkx.draw_planar.html">hvplot.networkx.draw_planar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.networkx.draw_shell.html">hvplot.networkx.draw_shell</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.networkx.draw_spectral.html">hvplot.networkx.draw_spectral</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.networkx.draw_spring.html">hvplot.networkx.draw_spring</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.hvPlot.explorer.html">hvplot.hvPlot.explorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.ui.explorer.html">hvplot.ui.explorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.ui.hvPlotExplorer.html">hvplot.ui.hvPlotExplorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.ui.hvPlotExplorer.hvplot.html">hvplot.ui.hvPlotExplorer.hvplot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.ui.hvPlotExplorer.plot_code.html">hvplot.ui.hvPlotExplorer.plot_code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.ui.hvPlotExplorer.save.html">hvplot.ui.hvPlotExplorer.save</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.ui.hvPlotExplorer.servable.html">hvplot.ui.hvPlotExplorer.servable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.ui.hvPlotExplorer.settings.html">hvplot.ui.hvPlotExplorer.settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.ui.hvPlotExplorer.show.html">hvplot.ui.hvPlotExplorer.show</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="ref/api_compatibility/index.html">API compatibility</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ref/api_compatibility/pandas/index.html">Pandas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="ref/api_compatibility/pandas/Pandas_API.html">Comparison with Pandas API</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
+</ul>
+</div>
+</nav></div>
+        <div class="sidebar-primary-item">
+<div class="hv-sb-dd">
+  <div class="btn-group">
+    
+    <a href="https://holoviz.org" class="btn hv-sb-dd-value" target="_blank">HoloViz.org<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a>
+    
+    <button type="button" class="btn dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="visually-hidden"></span>
+    </button>
+    <ul class="dropdown-menu">
+      
+      
+        <li><a class="dropdown-item" href="https://param.holoviz.org" target="_blank" title="Assembling objects from many different libraries into a layout or app, whether in a Jupyter notebook or in a standalone servable dashboard">Panel<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+      
+      
+        <li><a class="dropdown-item" href="https://holoviews.org" target="_blank" title="Declarative objects for instantly visualizable data, building Bokeh plots from convenient high-level specifications">HoloViews<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://geoviews.org" target="_blank" title="Visualizable geographic data that that can be mixed and matched with HoloViews objects">GeoViews<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://datashader.org" target="_blank" title="Rasterizing huge datasets quickly as fixed-size images">Datashader<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://param.holoviz.org" target="_blank" title="Make your Python code clearer and more reliable by declaring Parameters">Param<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://lumen.holoviz.org" target="_blank" title="Framework for visual analytics that allows users to build data-driven dashboards from a simple YAML specification">Lumen<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://colorcet.holoviz.org" target="_blank" title="A wide range of perceptually uniform continuous colormaps and perceptually based categorical color sets for use with the other libraries">Colorcet<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+      <li><hr class="dropdown-divider"></li>
+      
+      
+      <li><a class="dropdown-item" href="https://examples.holoviz.org" target="_blank" title=" Visualization-focused examples using HoloViz for specific topics ">Examples Gallery<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+      <li><a class="dropdown-item" href="https://blog.holoviz.org" target="_blank" title="HoloViz blog">Blog<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+    </ul>
+  </div>
+</div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none"></div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="hvplot">
+<h1>hvPlot<a class="headerlink" href="#hvplot" title="Link to this heading">#</a></h1>
+<p><em><strong>A familiar and high-level API for data exploration and visualization</strong></em></p>
+<a class="reference internal image-reference" href="_images/diagram.svg"><img alt="hvPlot diagram" class="align-center" src="_images/diagram.svg" style="width: 70%;" />
+</a>
+<p><strong><code class="docutils literal notranslate"><span class="pre">.hvplot()</span></code> is a powerful and interactive Pandas-like <code class="docutils literal notranslate"><span class="pre">.plot()</span></code> API</strong></p>
+<hr class="docutils" />
+<p class="sd-text-center"><a class="sd-sphinx-override sd-btn sd-text-wrap sd-btn-primary getting-started-button reference internal" href="tutorials/getting_started.html"><span class="doc">Get Started</span></a></p>
+<hr class="docutils" />
+<p>By replacing <code class="docutils literal notranslate"><span class="pre">.plot()</span></code> with <code class="docutils literal notranslate"><span class="pre">.hvplot()</span></code> you get an interactive figure. Try it out below!</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.pandas</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bokeh.sampledata.penguins</span><span class="w"> </span><span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">df</span>
+
+<span class="n">df</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;bill_length_mm&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;bill_depth_mm&#39;</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><script type="esms-options">{"shimMode": true}</script><style>*[data-root-id],
+*[data-root-id] > * {
+  box-sizing: border-box;
+  font-family: var(--jp-ui-font-family);
+  font-size: var(--jp-ui-font-size1);
+  color: var(--vscode-editor-foreground, var(--jp-ui-font-color1));
+}
+
+/* Override VSCode background color */
+.cell-output-ipywidget-background:has(
+    > .cell-output-ipywidget-background > .lm-Widget > *[data-root-id]
+  ),
+.cell-output-ipywidget-background:has(> .lm-Widget > *[data-root-id]) {
+  background-color: transparent !important;
+}
+</style></div><script type="application/javascript">(function(root) {
+  function now() {
+    return new Date();
+  }
+
+  const force = true;
+  const py_version = '3.7.2'.replace('rc', '-rc.').replace('.dev', '-dev.');
+  const reloading = false;
+  const Bokeh = root.Bokeh;
+
+  // Set a timeout for this load but only if we are not already initializing
+  if (typeof (root._bokeh_timeout) === "undefined" || (force || !root._bokeh_is_initializing)) {
+    root._bokeh_timeout = Date.now() + 5000;
+    root._bokeh_failed_load = false;
+  }
+
+  function run_callbacks() {
+    try {
+      root._bokeh_onload_callbacks.forEach(function(callback) {
+        if (callback != null)
+          callback();
+      });
+    } finally {
+      delete root._bokeh_onload_callbacks;
+    }
+    console.debug("Bokeh: all callbacks have finished");
+  }
+
+  function load_libs(css_urls, js_urls, js_modules, js_exports, callback) {
+    if (css_urls == null) css_urls = [];
+    if (js_urls == null) js_urls = [];
+    if (js_modules == null) js_modules = [];
+    if (js_exports == null) js_exports = {};
+
+    root._bokeh_onload_callbacks.push(callback);
+
+    if (root._bokeh_is_loading > 0) {
+      // Don't load bokeh if it is still initializing
+      console.debug("Bokeh: BokehJS is being loaded, scheduling callback at", now());
+      return null;
+    } else if (js_urls.length === 0 && js_modules.length === 0 && Object.keys(js_exports).length === 0) {
+      // There is nothing to load
+      run_callbacks();
+      return null;
+    }
+
+    function on_load() {
+      root._bokeh_is_loading--;
+      if (root._bokeh_is_loading === 0) {
+        console.debug("Bokeh: all BokehJS libraries/stylesheets loaded");
+        run_callbacks()
+      }
+    }
+    window._bokeh_on_load = on_load
+
+    function on_error(e) {
+      const src_el = e.srcElement
+      console.error("failed to load " + (src_el.href || src_el.src));
+    }
+
+    const skip = [];
+    if (window.requirejs) {
+      window.requirejs.config({'packages': {}, 'paths': {}, 'shim': {}});
+      root._bokeh_is_loading = css_urls.length + 0;
+    } else {
+      root._bokeh_is_loading = css_urls.length + js_urls.length + js_modules.length + Object.keys(js_exports).length;
+    }
+
+    const existing_stylesheets = []
+    const links = document.getElementsByTagName('link')
+    for (let i = 0; i < links.length; i++) {
+      const link = links[i]
+      if (link.href != null) {
+        existing_stylesheets.push(link.href)
+      }
+    }
+    for (let i = 0; i < css_urls.length; i++) {
+      const url = css_urls[i];
+      const escaped = encodeURI(url)
+      if (existing_stylesheets.indexOf(escaped) !== -1) {
+        on_load()
+        continue;
+      }
+      const element = document.createElement("link");
+      element.onload = on_load;
+      element.onerror = on_error;
+      element.rel = "stylesheet";
+      element.type = "text/css";
+      element.href = url;
+      console.debug("Bokeh: injecting link tag for BokehJS stylesheet: ", url);
+      document.body.appendChild(element);
+    }    var existing_scripts = []
+    const scripts = document.getElementsByTagName('script')
+    for (let i = 0; i < scripts.length; i++) {
+      var script = scripts[i]
+      if (script.src != null) {
+        existing_scripts.push(script.src)
+      }
+    }
+    for (let i = 0; i < js_urls.length; i++) {
+      const url = js_urls[i];
+      const escaped = encodeURI(url)
+      if (skip.indexOf(escaped) !== -1 || existing_scripts.indexOf(escaped) !== -1) {
+        if (!window.requirejs) {
+          on_load();
+        }
+        continue;
+      }
+      const element = document.createElement('script');
+      element.onload = on_load;
+      element.onerror = on_error;
+      element.async = false;
+      element.src = url;
+      console.debug("Bokeh: injecting script tag for BokehJS library: ", url);
+      document.head.appendChild(element);
+    }
+    for (let i = 0; i < js_modules.length; i++) {
+      const url = js_modules[i];
+      const escaped = encodeURI(url)
+      if (skip.indexOf(escaped) !== -1 || existing_scripts.indexOf(escaped) !== -1) {
+        if (!window.requirejs) {
+          on_load();
+        }
+        continue;
+      }
+      var element = document.createElement('script');
+      element.onload = on_load;
+      element.onerror = on_error;
+      element.async = false;
+      element.src = url;
+      element.type = "module";
+      console.debug("Bokeh: injecting script tag for BokehJS library: ", url);
+      document.head.appendChild(element);
+    }
+    for (const name in js_exports) {
+      const url = js_exports[name];
+      const escaped = encodeURI(url)
+      if (skip.indexOf(escaped) >= 0 || root[name] != null) {
+        if (!window.requirejs) {
+          on_load();
+        }
+        continue;
+      }
+      var element = document.createElement('script');
+      element.onerror = on_error;
+      element.async = false;
+      element.type = "module";
+      console.debug("Bokeh: injecting script tag for BokehJS library: ", url);
+      element.textContent = `
+      import ${name} from "${url}"
+      window.${name} = ${name}
+      window._bokeh_on_load()
+      `
+      document.head.appendChild(element);
+    }
+    if (!js_urls.length && !js_modules.length) {
+      on_load()
+    }
+  };
+
+  function inject_raw_css(css) {
+    const element = document.createElement("style");
+    element.appendChild(document.createTextNode(css));
+    document.body.appendChild(element);
+  }
+
+  const js_urls = ["https://cdn.holoviz.org/panel/1.6.3/dist/bundled/reactiveesm/es-module-shims@^1.10.0/dist/es-module-shims.min.js", "https://cdn.bokeh.org/bokeh/release/bokeh-3.7.2.min.js", "https://cdn.bokeh.org/bokeh/release/bokeh-gl-3.7.2.min.js", "https://cdn.bokeh.org/bokeh/release/bokeh-widgets-3.7.2.min.js", "https://cdn.bokeh.org/bokeh/release/bokeh-tables-3.7.2.min.js", "https://cdn.holoviz.org/panel/1.6.3/dist/panel.min.js"];
+  const js_modules = [];
+  const js_exports = {};
+  const css_urls = [];
+  const inline_js = [    function(Bokeh) {
+      Bokeh.set_log_level("info");
+    },
+function(Bokeh) {} // ensure no trailing comma for IE
+  ];
+
+  function run_inline_js() {
+    if ((root.Bokeh !== undefined) || (force === true)) {
+      for (let i = 0; i < inline_js.length; i++) {
+        try {
+          inline_js[i].call(root, root.Bokeh);
+        } catch(e) {
+          if (!reloading) {
+            throw e;
+          }
+        }
+      }
+      // Cache old bokeh versions
+      if (Bokeh != undefined && !reloading) {
+        var NewBokeh = root.Bokeh;
+        if (Bokeh.versions === undefined) {
+          Bokeh.versions = new Map();
+        }
+        if (NewBokeh.version !== Bokeh.version) {
+          Bokeh.versions.set(NewBokeh.version, NewBokeh)
+        }
+        root.Bokeh = Bokeh;
+      }
+    } else if (Date.now() < root._bokeh_timeout) {
+      setTimeout(run_inline_js, 100);
+    } else if (!root._bokeh_failed_load) {
+      console.log("Bokeh: BokehJS failed to load within specified timeout.");
+      root._bokeh_failed_load = true;
+    }
+    root._bokeh_is_initializing = false
+  }
+
+  function load_or_wait() {
+    // Implement a backoff loop that tries to ensure we do not load multiple
+    // versions of Bokeh and its dependencies at the same time.
+    // In recent versions we use the root._bokeh_is_initializing flag
+    // to determine whether there is an ongoing attempt to initialize
+    // bokeh, however for backward compatibility we also try to ensure
+    // that we do not start loading a newer (Panel>=1.0 and Bokeh>3) version
+    // before older versions are fully initialized.
+    if (root._bokeh_is_initializing && Date.now() > root._bokeh_timeout) {
+      // If the timeout and bokeh was not successfully loaded we reset
+      // everything and try loading again
+      root._bokeh_timeout = Date.now() + 5000;
+      root._bokeh_is_initializing = false;
+      root._bokeh_onload_callbacks = undefined;
+      root._bokeh_is_loading = 0
+      console.log("Bokeh: BokehJS was loaded multiple times but one version failed to initialize.");
+      load_or_wait();
+    } else if (root._bokeh_is_initializing || (typeof root._bokeh_is_initializing === "undefined" && root._bokeh_onload_callbacks !== undefined)) {
+      setTimeout(load_or_wait, 100);
+    } else {
+      root._bokeh_is_initializing = true
+      root._bokeh_onload_callbacks = []
+      const bokeh_loaded = root.Bokeh != null && (root.Bokeh.version === py_version || (root.Bokeh.versions !== undefined && root.Bokeh.versions.has(py_version)));
+      if (!reloading && !bokeh_loaded) {
+        if (root.Bokeh) {
+          root.Bokeh = undefined;
+        }
+        console.debug("Bokeh: BokehJS not loaded, scheduling load and callback at", now());
+      }
+      load_libs(css_urls, js_urls, js_modules, js_exports, function() {
+        console.debug("Bokeh: BokehJS plotting callback run at", now());
+        run_inline_js();
+      });
+    }
+  }
+  // Give older versions of the autoload script a head-start to ensure
+  // they initialize before we start loading newer version.
+  setTimeout(load_or_wait, 100)
+}(window));</script><script type="application/javascript">
+if ((window.PyViz === undefined) || (window.PyViz instanceof HTMLElement)) {
+  window.PyViz = {comms: {}, comm_status:{}, kernels:{}, receivers: {}, plot_index: []}
+}
+
+
+    function JupyterCommManager() {
+    }
+
+    JupyterCommManager.prototype.register_target = function(plot_id, comm_id, msg_handler) {
+      if (window.comm_manager || ((window.Jupyter !== undefined) && (Jupyter.notebook.kernel != null))) {
+        var comm_manager = window.comm_manager || Jupyter.notebook.kernel.comm_manager;
+        comm_manager.register_target(comm_id, function(comm) {
+          comm.on_msg(msg_handler);
+        });
+      } else if ((plot_id in window.PyViz.kernels) && (window.PyViz.kernels[plot_id])) {
+        window.PyViz.kernels[plot_id].registerCommTarget(comm_id, function(comm) {
+          comm.onMsg = msg_handler;
+        });
+      } else if (typeof google != 'undefined' && google.colab.kernel != null) {
+        google.colab.kernel.comms.registerTarget(comm_id, (comm) => {
+          var messages = comm.messages[Symbol.asyncIterator]();
+          function processIteratorResult(result) {
+            var message = result.value;
+            console.log(message)
+            var content = {data: message.data, comm_id};
+            var buffers = []
+            for (var buffer of message.buffers || []) {
+              buffers.push(new DataView(buffer))
+            }
+            var metadata = message.metadata || {};
+            var msg = {content, buffers, metadata}
+            msg_handler(msg);
+            return messages.next().then(processIteratorResult);
+          }
+          return messages.next().then(processIteratorResult);
+        })
+      }
+    }
+
+    JupyterCommManager.prototype.get_client_comm = function(plot_id, comm_id, msg_handler) {
+      if (comm_id in window.PyViz.comms) {
+        return window.PyViz.comms[comm_id];
+      } else if (window.comm_manager || ((window.Jupyter !== undefined) && (Jupyter.notebook.kernel != null))) {
+        var comm_manager = window.comm_manager || Jupyter.notebook.kernel.comm_manager;
+        var comm = comm_manager.new_comm(comm_id, {}, {}, {}, comm_id);
+        if (msg_handler) {
+          comm.on_msg(msg_handler);
+        }
+      } else if ((plot_id in window.PyViz.kernels) && (window.PyViz.kernels[plot_id])) {
+        var comm = window.PyViz.kernels[plot_id].connectToComm(comm_id);
+        comm.open();
+        if (msg_handler) {
+          comm.onMsg = msg_handler;
+        }
+      } else if (typeof google != 'undefined' && google.colab.kernel != null) {
+        var comm_promise = google.colab.kernel.comms.open(comm_id)
+        comm_promise.then((comm) => {
+          window.PyViz.comms[comm_id] = comm;
+          if (msg_handler) {
+            var messages = comm.messages[Symbol.asyncIterator]();
+            function processIteratorResult(result) {
+              var message = result.value;
+              var content = {data: message.data};
+              var metadata = message.metadata || {comm_id};
+              var msg = {content, metadata}
+              msg_handler(msg);
+              return messages.next().then(processIteratorResult);
+            }
+            return messages.next().then(processIteratorResult);
+          }
+        }) 
+        var sendClosure = (data, metadata, buffers, disposeOnDone) => {
+          return comm_promise.then((comm) => {
+            comm.send(data, metadata, buffers, disposeOnDone);
+          });
+        };
+        var comm = {
+          send: sendClosure
+        };
+      }
+      window.PyViz.comms[comm_id] = comm;
+      return comm;
+    }
+    window.PyViz.comm_manager = new JupyterCommManager();
+    
+
+
+var JS_MIME_TYPE = 'application/javascript';
+var HTML_MIME_TYPE = 'text/html';
+var EXEC_MIME_TYPE = 'application/vnd.holoviews_exec.v0+json';
+var CLASS_NAME = 'output';
+
+/**
+ * Render data to the DOM node
+ */
+function render(props, node) {
+  var div = document.createElement("div");
+  var script = document.createElement("script");
+  node.appendChild(div);
+  node.appendChild(script);
+}
+
+/**
+ * Handle when a new output is added
+ */
+function handle_add_output(event, handle) {
+  var output_area = handle.output_area;
+  var output = handle.output;
+  if ((output.data == undefined) || (!output.data.hasOwnProperty(EXEC_MIME_TYPE))) {
+    return
+  }
+  var id = output.metadata[EXEC_MIME_TYPE]["id"];
+  var toinsert = output_area.element.find("." + CLASS_NAME.split(' ')[0]);
+  if (id !== undefined) {
+    var nchildren = toinsert.length;
+    var html_node = toinsert[nchildren-1].children[0];
+    html_node.innerHTML = output.data[HTML_MIME_TYPE];
+    var scripts = [];
+    var nodelist = html_node.querySelectorAll("script");
+    for (var i in nodelist) {
+      if (nodelist.hasOwnProperty(i)) {
+        scripts.push(nodelist[i])
+      }
+    }
+
+    scripts.forEach( function (oldScript) {
+      var newScript = document.createElement("script");
+      var attrs = [];
+      var nodemap = oldScript.attributes;
+      for (var j in nodemap) {
+        if (nodemap.hasOwnProperty(j)) {
+          attrs.push(nodemap[j])
+        }
+      }
+      attrs.forEach(function(attr) { newScript.setAttribute(attr.name, attr.value) });
+      newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+      oldScript.parentNode.replaceChild(newScript, oldScript);
+    });
+    if (JS_MIME_TYPE in output.data) {
+      toinsert[nchildren-1].children[1].textContent = output.data[JS_MIME_TYPE];
+    }
+    output_area._hv_plot_id = id;
+    if ((window.Bokeh !== undefined) && (id in Bokeh.index)) {
+      window.PyViz.plot_index[id] = Bokeh.index[id];
+    } else {
+      window.PyViz.plot_index[id] = null;
+    }
+  } else if (output.metadata[EXEC_MIME_TYPE]["server_id"] !== undefined) {
+    var bk_div = document.createElement("div");
+    bk_div.innerHTML = output.data[HTML_MIME_TYPE];
+    var script_attrs = bk_div.children[0].attributes;
+    for (var i = 0; i < script_attrs.length; i++) {
+      toinsert[toinsert.length - 1].childNodes[1].setAttribute(script_attrs[i].name, script_attrs[i].value);
+    }
+    // store reference to server id on output_area
+    output_area._bokeh_server_id = output.metadata[EXEC_MIME_TYPE]["server_id"];
+  }
+}
+
+/**
+ * Handle when an output is cleared or removed
+ */
+function handle_clear_output(event, handle) {
+  var id = handle.cell.output_area._hv_plot_id;
+  var server_id = handle.cell.output_area._bokeh_server_id;
+  if (((id === undefined) || !(id in PyViz.plot_index)) && (server_id !== undefined)) { return; }
+  var comm = window.PyViz.comm_manager.get_client_comm("hv-extension-comm", "hv-extension-comm", function () {});
+  if (server_id !== null) {
+    comm.send({event_type: 'server_delete', 'id': server_id});
+    return;
+  } else if (comm !== null) {
+    comm.send({event_type: 'delete', 'id': id});
+  }
+  delete PyViz.plot_index[id];
+  if ((window.Bokeh !== undefined) & (id in window.Bokeh.index)) {
+    var doc = window.Bokeh.index[id].model.document
+    doc.clear();
+    const i = window.Bokeh.documents.indexOf(doc);
+    if (i > -1) {
+      window.Bokeh.documents.splice(i, 1);
+    }
+  }
+}
+
+/**
+ * Handle kernel restart event
+ */
+function handle_kernel_cleanup(event, handle) {
+  delete PyViz.comms["hv-extension-comm"];
+  window.PyViz.plot_index = {}
+}
+
+/**
+ * Handle update_display_data messages
+ */
+function handle_update_output(event, handle) {
+  handle_clear_output(event, {cell: {output_area: handle.output_area}})
+  handle_add_output(event, handle)
+}
+
+function register_renderer(events, OutputArea) {
+  function append_mime(data, metadata, element) {
+    // create a DOM node to render to
+    var toinsert = this.create_output_subarea(
+    metadata,
+    CLASS_NAME,
+    EXEC_MIME_TYPE
+    );
+    this.keyboard_manager.register_events(toinsert);
+    // Render to node
+    var props = {data: data, metadata: metadata[EXEC_MIME_TYPE]};
+    render(props, toinsert[0]);
+    element.append(toinsert);
+    return toinsert
+  }
+
+  events.on('output_added.OutputArea', handle_add_output);
+  events.on('output_updated.OutputArea', handle_update_output);
+  events.on('clear_output.CodeCell', handle_clear_output);
+  events.on('delete.Cell', handle_clear_output);
+  events.on('kernel_ready.Kernel', handle_kernel_cleanup);
+
+  OutputArea.prototype.register_mime_type(EXEC_MIME_TYPE, append_mime, {
+    safe: true,
+    index: 0
+  });
+}
+
+if (window.Jupyter !== undefined) {
+  try {
+    var events = require('base/js/events');
+    var OutputArea = require('notebook/js/outputarea').OutputArea;
+    if (OutputArea.prototype.mime_types().indexOf(EXEC_MIME_TYPE) == -1) {
+      register_renderer(events, OutputArea);
+    }
+  } catch(err) {
+  }
+}
+</script><div class="output text_html"><div id='6d8745ed-a13d-4df8-884b-97e8aa3d9b55'>
+  <div id="f73d6237-89e9-4ac4-8e29-353ad1907b5d" data-root-id="6d8745ed-a13d-4df8-884b-97e8aa3d9b55" style="display: contents;"></div>
+</div>
+<script type="application/javascript">(function(root) {
+  var docs_json = {"2107a1e6-6688-4532-9b49-198fed870b9a":{"version":"3.7.2","title":"Bokeh Application","roots":[{"type":"object","name":"panel.models.browser.BrowserInfo","id":"6d8745ed-a13d-4df8-884b-97e8aa3d9b55"},{"type":"object","name":"panel.models.comm_manager.CommManager","id":"c9f2bae8-8fea-4b24-8bd1-a6e2370bc01b","attributes":{"plot_id":"6d8745ed-a13d-4df8-884b-97e8aa3d9b55","comm_id":"29f9d4e3e25145e299c8491881d83243","client_comm_id":"3181c52894ee4108b42920cf400909f8"}}],"defs":[{"type":"model","name":"ReactiveHTML1"},{"type":"model","name":"FlexBox1","properties":[{"name":"align_content","kind":"Any","default":"flex-start"},{"name":"align_items","kind":"Any","default":"flex-start"},{"name":"flex_direction","kind":"Any","default":"row"},{"name":"flex_wrap","kind":"Any","default":"wrap"},{"name":"gap","kind":"Any","default":""},{"name":"justify_content","kind":"Any","default":"flex-start"}]},{"type":"model","name":"FloatPanel1","properties":[{"name":"config","kind":"Any","default":{"type":"map"}},{"name":"contained","kind":"Any","default":true},{"name":"position","kind":"Any","default":"right-top"},{"name":"offsetx","kind":"Any","default":null},{"name":"offsety","kind":"Any","default":null},{"name":"theme","kind":"Any","default":"primary"},{"name":"status","kind":"Any","default":"normalized"}]},{"type":"model","name":"GridStack1","properties":[{"name":"ncols","kind":"Any","default":null},{"name":"nrows","kind":"Any","default":null},{"name":"allow_resize","kind":"Any","default":true},{"name":"allow_drag","kind":"Any","default":true},{"name":"state","kind":"Any","default":[]}]},{"type":"model","name":"drag1","properties":[{"name":"slider_width","kind":"Any","default":5},{"name":"slider_color","kind":"Any","default":"black"},{"name":"value","kind":"Any","default":50}]},{"type":"model","name":"click1","properties":[{"name":"terminal_output","kind":"Any","default":""},{"name":"debug_name","kind":"Any","default":""},{"name":"clears","kind":"Any","default":0}]},{"type":"model","name":"FastWrapper1","properties":[{"name":"object","kind":"Any","default":null},{"name":"style","kind":"Any","default":null}]},{"type":"model","name":"NotificationArea1","properties":[{"name":"js_events","kind":"Any","default":{"type":"map"}},{"name":"max_notifications","kind":"Any","default":5},{"name":"notifications","kind":"Any","default":[]},{"name":"position","kind":"Any","default":"bottom-right"},{"name":"_clear","kind":"Any","default":0},{"name":"types","kind":"Any","default":[{"type":"map","entries":[["type","warning"],["background","#ffc107"],["icon",{"type":"map","entries":[["className","fas fa-exclamation-triangle"],["tagName","i"],["color","white"]]}]]},{"type":"map","entries":[["type","info"],["background","#007bff"],["icon",{"type":"map","entries":[["className","fas fa-info-circle"],["tagName","i"],["color","white"]]}]]}]}]},{"type":"model","name":"Notification","properties":[{"name":"background","kind":"Any","default":null},{"name":"duration","kind":"Any","default":3000},{"name":"icon","kind":"Any","default":null},{"name":"message","kind":"Any","default":""},{"name":"notification_type","kind":"Any","default":null},{"name":"_rendered","kind":"Any","default":false},{"name":"_destroyed","kind":"Any","default":false}]},{"type":"model","name":"TemplateActions1","properties":[{"name":"open_modal","kind":"Any","default":0},{"name":"close_modal","kind":"Any","default":0}]},{"type":"model","name":"BootstrapTemplateActions1","properties":[{"name":"open_modal","kind":"Any","default":0},{"name":"close_modal","kind":"Any","default":0}]},{"type":"model","name":"TemplateEditor1","properties":[{"name":"layout","kind":"Any","default":[]}]},{"type":"model","name":"MaterialTemplateActions1","properties":[{"name":"open_modal","kind":"Any","default":0},{"name":"close_modal","kind":"Any","default":0}]},{"type":"model","name":"ReactiveESM1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"JSComponent1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"ReactComponent1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"AnyWidgetComponent1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"request_value1","properties":[{"name":"fill","kind":"Any","default":"none"},{"name":"_synced","kind":"Any","default":null},{"name":"_request_sync","kind":"Any","default":0}]}]}};
+  var render_items = [{"docid":"2107a1e6-6688-4532-9b49-198fed870b9a","roots":{"6d8745ed-a13d-4df8-884b-97e8aa3d9b55":"f73d6237-89e9-4ac4-8e29-353ad1907b5d"},"root_ids":["6d8745ed-a13d-4df8-884b-97e8aa3d9b55"]}];
+  var docs = Object.values(docs_json)
+  if (!docs) {
+    return
+  }
+  const py_version = docs[0].version.replace('rc', '-rc.').replace('.dev', '-dev.')
+  async function embed_document(root) {
+    var Bokeh = get_bokeh(root)
+    await Bokeh.embed.embed_items_notebook(docs_json, render_items);
+    for (const render_item of render_items) {
+      for (const root_id of render_item.root_ids) {
+	const id_el = document.getElementById(root_id)
+	if (id_el.children.length && id_el.children[0].hasAttribute('data-root-id')) {
+	  const root_el = id_el.children[0]
+	  root_el.id = root_el.id + '-rendered'
+	  for (const child of root_el.children) {
+            // Ensure JupyterLab does not capture keyboard shortcuts
+            // see: https://jupyterlab.readthedocs.io/en/4.1.x/extension/notebook.html#keyboard-interaction-model
+	    child.setAttribute('data-lm-suppress-shortcuts', 'true')
+	  }
+	}
+      }
+    }
+  }
+  function get_bokeh(root) {
+    if (root.Bokeh === undefined) {
+      return null
+    } else if (root.Bokeh.version !== py_version) {
+      if (root.Bokeh.versions === undefined || !root.Bokeh.versions.has(py_version)) {
+	return null
+      }
+      return root.Bokeh.versions.get(py_version);
+    } else if (root.Bokeh.version === py_version) {
+      return root.Bokeh
+    }
+    return null
+  }
+  function is_loaded(root) {
+    var Bokeh = get_bokeh(root)
+    return (Bokeh != null && Bokeh.Panel !== undefined)
+  }
+  if (is_loaded(root)) {
+    embed_document(root);
+  } else {
+    var attempts = 0;
+    var timer = setInterval(function(root) {
+      if (is_loaded(root)) {
+        clearInterval(timer);
+        embed_document(root);
+      } else if (document.readyState == "complete") {
+        attempts++;
+        if (attempts > 200) {
+          clearInterval(timer);
+	  var Bokeh = get_bokeh(root)
+	  if (Bokeh == null || Bokeh.Panel == null) {
+            console.warn("Panel: ERROR: Unable to run Panel code because Bokeh or Panel library is missing");
+	  } else {
+	    console.warn("Panel: WARNING: Attempting to render but not all required libraries could be resolved.")
+	    embed_document(root)
+	  }
+        }
+      }
+    }, 25, root)
+  }
+})(window);</script></div><div class="output text_html"><div id='d236c21c-4d41-4ea3-b7d0-aae1af9bd56d'>
+  <div id="f8bba58e-905a-42ab-b9a0-883d12980fb0" data-root-id="d236c21c-4d41-4ea3-b7d0-aae1af9bd56d" style="display: contents;"></div>
+</div>
+<script type="application/javascript">(function(root) {
+  var docs_json = {"b0a3a2aa-8756-400d-b59a-2b75d8838291":{"version":"3.7.2","title":"Bokeh Application","roots":[{"type":"object","name":"Row","id":"d236c21c-4d41-4ea3-b7d0-aae1af9bd56d","attributes":{"name":"Row00301","tags":["embedded"],"stylesheets":["\n:host(.pn-loading):before, .pn-loading:before {\n  background-color: #c3c3c3;\n  mask-size: auto calc(min(50%, 400px));\n  -webkit-mask-size: auto calc(min(50%, 400px));\n}",{"type":"object","name":"ImportedStyleSheet","id":"8fab9878-b687-44a8-9c41-e78724b8d3a9","attributes":{"url":"https://cdn.holoviz.org/panel/1.6.3/dist/css/loading.css"}},{"type":"object","name":"ImportedStyleSheet","id":"456f462e-bd7c-49b2-9c14-872050112524","attributes":{"url":"https://cdn.holoviz.org/panel/1.6.3/dist/css/listpanel.css"}},{"type":"object","name":"ImportedStyleSheet","id":"3a7c2619-afc2-4e0f-b99b-d89c792c44fc","attributes":{"url":"https://cdn.holoviz.org/panel/1.6.3/dist/bundled/theme/default.css"}},{"type":"object","name":"ImportedStyleSheet","id":"77203d12-9ae7-4304-8cae-2e0a07e77b90","attributes":{"url":"https://cdn.holoviz.org/panel/1.6.3/dist/bundled/theme/native.css"}}],"min_width":700,"margin":0,"sizing_mode":"stretch_width","align":"start","children":[{"type":"object","name":"Spacer","id":"225a9d13-0221-462d-b522-38e0a1f43c0d","attributes":{"name":"HSpacer00305","stylesheets":["\n:host(.pn-loading):before, .pn-loading:before {\n  background-color: #c3c3c3;\n  mask-size: auto calc(min(50%, 400px));\n  -webkit-mask-size: auto calc(min(50%, 400px));\n}",{"id":"8fab9878-b687-44a8-9c41-e78724b8d3a9"},{"id":"3a7c2619-afc2-4e0f-b99b-d89c792c44fc"},{"id":"77203d12-9ae7-4304-8cae-2e0a07e77b90"}],"margin":0,"sizing_mode":"stretch_width","align":"start"}},{"type":"object","name":"Figure","id":"f42cbf80-7b21-4570-b40f-e5600649ee4d","attributes":{"width":700,"height":300,"margin":[5,10],"sizing_mode":"fixed","align":"start","x_range":{"type":"object","name":"Range1d","id":"f60bc8d9-da79-4f5d-861b-07f9a02c5476","attributes":{"name":"bill_length_mm","tags":[[["bill_length_mm",null]],[]],"start":30.921428571428574,"end":60.77857142857143,"reset_start":30.921428571428574,"reset_end":60.77857142857143}},"y_range":{"type":"object","name":"Range1d","id":"396de0cb-d935-4f4d-8b9d-5e2c239cba81","attributes":{"name":"bill_depth_mm","tags":[[["bill_depth_mm",null]],{"type":"map","entries":[["invert_yaxis",false],["autorange",false]]}],"start":12.26,"end":22.34,"reset_start":12.26,"reset_end":22.34}},"x_scale":{"type":"object","name":"LinearScale","id":"9c770a62-d59f-4665-b4f9-e028e75acb5e"},"y_scale":{"type":"object","name":"LinearScale","id":"dcaae4ae-8a0b-4d1e-bb8a-2c9de06936e8"},"title":{"type":"object","name":"Title","id":"760787b0-9af3-44f5-bcae-5f2e36ae0f3d","attributes":{"text_color":"black","text_font_size":"12pt"}},"renderers":[{"type":"object","name":"GlyphRenderer","id":"e28e72c2-a93d-47c5-8640-2cb5fe07e0bc","attributes":{"name":"Adelie","data_source":{"type":"object","name":"ColumnDataSource","id":"51802446-ea11-4b3d-af59-df0c9bc9fcef","attributes":{"selected":{"type":"object","name":"Selection","id":"e1af848e-bfb8-4718-b891-2722f6dffacd","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"fd764b38-7b20-4138-8b4c-7afed357f463"},"data":{"type":"map","entries":[["bill_length_mm",{"type":"ndarray","array":{"type":"bytes","data":"zczMzMyMQ0AAAAAAAMBDQGZmZmZmJkRAAAAAAAAA+H+amZmZmVlCQGZmZmZmpkNAMzMzMzNzQ0CamZmZmZlDQM3MzMzMDEFAAAAAAAAARUBmZmZmZuZCQGZmZmZm5kJAzczMzMyMREDNzMzMzExDQM3MzMzMTEFAzczMzMxMQkCamZmZmVlDQAAAAAAAQEVAMzMzMzMzQUAAAAAAAABHQGZmZmZm5kJAmpmZmZnZQkAzMzMzM/NBQJqZmZmZGUNAZmZmZmZmQ0BmZmZmZqZBQM3MzMzMTERAAAAAAABAREAzMzMzM/NCQAAAAAAAQERAAAAAAADAQ0CamZmZmZlCQAAAAAAAwENAMzMzMzNzREAzMzMzMzNCQJqZmZmZmUNAZmZmZmZmQ0CamZmZmRlFQM3MzMzMzEJAZmZmZmbmQ0AAAAAAAEBCQGZmZmZmZkRAAAAAAAAAQkDNzMzMzAxGQAAAAAAAgEJAzczMzMzMQ0DNzMzMzIxEQAAAAAAAwEJAAAAAAAAAQkBmZmZmZiZFQM3MzMzMzENAzczMzMwMREAAAAAAAIBBQAAAAAAAAEVAAAAAAABAQUAzMzMzM7NEQAAAAAAAgENAzczMzMxMREAAAAAAAEBCQM3MzMzMzEJAmpmZmZnZQUBmZmZmZqZEQM3MzMzMzEJAzczMzMyMREAzMzMzMzNCQM3MzMzMzERAAAAAAADAQUDNzMzMzIxEQDMzMzMz80FAZmZmZmbmREAAAAAAAMBAQJqZmZmZ2UNAzczMzMzMQ0BmZmZmZuZGQAAAAAAAwEFAZmZmZmZmRUAzMzMzM3NEQJqZmZmZmUJAmpmZmZkZQkDNzMzMzAxFQM3MzMzMTEFAMzMzMzNzRUCamZmZmVlCQM3MzMzMjEFAZmZmZmamQkBmZmZmZqZEQGZmZmZmJkJAMzMzMzNzQkBmZmZmZiZDQDMzMzMzc0NAmpmZmZnZQUDNzMzMzIxEQAAAAAAAAEFAzczMzMzMQ0CamZmZmRlCQGZmZmZmZkRAzczMzMwMQ0BmZmZmZiZEQM3MzMzMjEBAmpmZmZmZRUAAAAAAAIBBQAAAAAAAgERAmpmZmZnZQkBmZmZmZuZCQDMzMzMz80JAmpmZmZnZQ0DNzMzMzExDQJqZmZmZGUNAzczMzMwMQ0CamZmZmZlFQM3MzMzMDENAzczMzMzMRkCamZmZmdlDQJqZmZmZGUVAzczMzMzMQ0CamZmZmVlFQM3MzMzMTENAZmZmZmamQkCamZmZmdlBQM3MzMzMjERAmpmZmZkZQkCamZmZmdlCQJqZmZmZGURAMzMzMzOzRECamZmZmZlBQM3MzMzMTERAZmZmZmZmQ0AAAAAAAMBEQAAAAAAAgENAzczMzMwMRkAAAAAAAEBDQM3MzMzMjEVAZmZmZmZmQkAAAAAAAMBCQM3MzMzMDENAzczMzMyMREDNzMzMzMxBQJqZmZmZGURAAAAAAACAQkCamZmZmdlDQJqZmZmZGURAzczMzMxMREDNzMzMzAxAQJqZmZmZWURAZmZmZmamQkAAAAAAAIBDQJqZmZmZmUNAzczMzMxMQkAAAAAAAABCQGZmZmZm5kJAAAAAAAAAQkAAAAAAAMBEQA=="},"shape":[152],"dtype":"float64","order":"little"}],["bill_depth_mm",{"type":"ndarray","array":{"type":"bytes","data":"MzMzMzOzMkBmZmZmZmYxQAAAAAAAADJAAAAAAAAA+H/NzMzMzEwzQJqZmZmZmTRAzczMzMzMMUCamZmZmZkzQJqZmZmZGTJAMzMzMzMzNECamZmZmRkxQM3MzMzMTDFAmpmZmZmZMUAzMzMzMzM1QJqZmZmZGTVAzczMzMzMMUAAAAAAAAAzQDMzMzMzszRAZmZmZmZmMkAAAAAAAIA1QM3MzMzMTDJAMzMzMzOzMkAzMzMzMzMzQJqZmZmZGTJAMzMzMzMzMUBmZmZmZuYyQJqZmZmZmTJAZmZmZmbmMUCamZmZmZkyQGZmZmZm5jJAMzMzMzOzMECamZmZmRkyQM3MzMzMzDFAZmZmZmbmMkAAAAAAAAAxQJqZmZmZGTVAAAAAAAAANEAAAAAAAIAyQM3MzMzMTDNAmpmZmZkZM0AAAAAAAAAyQGZmZmZmZjJAAAAAAACAMkAzMzMzM7MzQGZmZmZm5jBAzczMzMzMMkAAAAAAAAAzQGZmZmZm5jJAZmZmZmbmMUAzMzMzMzM1QDMzMzMzszFAZmZmZmbmMkBmZmZmZuYxQAAAAAAAgDNAmpmZmZkZMkCamZmZmZkyQAAAAAAAgDFAzczMzMzMMkCamZmZmZkwQJqZmZmZGTNAZmZmZmbmMECamZmZmRk1QAAAAAAAADFAMzMzMzMzMkCamZmZmRkxQAAAAAAAADJAMzMzMzMzMECamZmZmRkzQJqZmZmZmTBAZmZmZmZmM0AAAAAAAAAzQGZmZmZmZjJAMzMzMzMzMUBmZmZmZuYyQAAAAAAAgDFAAAAAAACAMkDNzMzMzMwwQGZmZmZmZjNAmpmZmZkZMECamZmZmRkzQDMzMzMzMzFAmpmZmZmZMUDNzMzMzMwyQGZmZmZmZjNAzczMzMzMMUDNzMzMzEw0QAAAAAAAgDNAmpmZmZmZMkAzMzMzMzMzQM3MzMzMzDJAAAAAAAAAMkCamZmZmRkyQJqZmZmZGTFAmpmZmZkZMkDNzMzMzEwxQGZmZmZm5jJAmpmZmZmZMkAAAAAAAIAyQJqZmZmZGTBAAAAAAACAMkBmZmZmZuYxQAAAAAAAADRAAAAAAAAAMEAAAAAAAAA0QJqZmZmZmTJAZmZmZmbmMkAzMzMzMzMxQAAAAAAAADRAAAAAAAAAMUAAAAAAAAAzQAAAAAAAgDBAzczMzMxMNEAzMzMzM7MxQAAAAAAAgDNAMzMzMzOzNEDNzMzMzEwyQAAAAAAAADFAAAAAAACANEAAAAAAAAAxQJqZmZmZmTJAMzMzMzMzMUDNzMzMzMwzQAAAAAAAADFAAAAAAACAMkDNzMzMzMwvQAAAAAAAADNAmpmZmZmZMUDNzMzMzEwyQJqZmZmZGTFAAAAAAAAAMkBmZmZmZuYxQDMzMzMzMzNAAAAAAACAMkAAAAAAAIAyQJqZmZmZmTFAAAAAAACAMUAAAAAAAIAxQJqZmZmZGTRAAAAAAACAMEBmZmZmZuYxQJqZmZmZGTFAMzMzMzMzMUAAAAAAAAAvQAAAAAAAADFAzczMzMzMMEAzMzMzM7MyQJqZmZmZmTJAZmZmZmZmMkDNzMzMzMwxQJqZmZmZGTJAmpmZmZkZMUAAAAAAAIAyQA=="},"shape":[152],"dtype":"float64","order":"little"}],["species",["Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie","Adelie"]]]}}},"view":{"type":"object","name":"CDSView","id":"927ea5b0-4971-44b5-9750-95da584059f1","attributes":{"filter":{"type":"object","name":"AllIndices","id":"d4774ffe-2878-4330-b6ce-0ebb779c8ed4"}}},"glyph":{"type":"object","name":"Scatter","id":"1a2e6141-e619-4962-955f-696b5639ea7c","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"bill_length_mm"},"y":{"type":"field","field":"bill_depth_mm"},"size":{"type":"value","value":5.477225575051661},"line_color":{"type":"value","value":"#30a2da"},"fill_color":{"type":"value","value":"#30a2da"},"hatch_color":{"type":"value","value":"#30a2da"}}},"selection_glyph":{"type":"object","name":"Scatter","id":"69751979-bd09-4a16-b055-0dde398a9161","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"bill_length_mm"},"y":{"type":"field","field":"bill_depth_mm"},"size":{"type":"value","value":5.477225575051661},"angle":{"type":"value","value":0.0},"line_color":{"type":"value","value":"#30a2da"},"line_alpha":{"type":"value","value":1.0},"line_width":{"type":"value","value":1},"line_join":{"type":"value","value":"bevel"},"line_cap":{"type":"value","value":"butt"},"line_dash":{"type":"value","value":[]},"line_dash_offset":{"type":"value","value":0},"fill_color":{"type":"value","value":"#30a2da"},"fill_alpha":{"type":"value","value":1.0},"hatch_color":{"type":"value","value":"#30a2da"},"hatch_alpha":{"type":"value","value":1.0},"hatch_scale":{"type":"value","value":12.0},"hatch_pattern":{"type":"value","value":null},"hatch_weight":{"type":"value","value":1.0},"marker":{"type":"value","value":"circle"}}},"nonselection_glyph":{"type":"object","name":"Scatter","id":"ad280066-99bc-4774-b6e0-1236b332c15f","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"bill_length_mm"},"y":{"type":"field","field":"bill_depth_mm"},"size":{"type":"value","value":5.477225575051661},"line_color":{"type":"value","value":"#30a2da"},"line_alpha":{"type":"value","value":0.1},"fill_color":{"type":"value","value":"#30a2da"},"fill_alpha":{"type":"value","value":0.1},"hatch_color":{"type":"value","value":"#30a2da"},"hatch_alpha":{"type":"value","value":0.1}}},"muted_glyph":{"type":"object","name":"Scatter","id":"6bdee698-d9b4-4a7c-aafc-3539448d813a","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"bill_length_mm"},"y":{"type":"field","field":"bill_depth_mm"},"size":{"type":"value","value":5.477225575051661},"line_color":{"type":"value","value":"#30a2da"},"line_alpha":{"type":"value","value":0.2},"fill_color":{"type":"value","value":"#30a2da"},"fill_alpha":{"type":"value","value":0.2},"hatch_color":{"type":"value","value":"#30a2da"},"hatch_alpha":{"type":"value","value":0.2}}}}},{"type":"object","name":"GlyphRenderer","id":"cc202911-b02d-421f-b956-fe29729c111d","attributes":{"name":"Chinstrap","data_source":{"type":"object","name":"ColumnDataSource","id":"f4152877-2681-415e-ac3c-8676bb9b2b61","attributes":{"selected":{"type":"object","name":"Selection","id":"27fe0174-2562-47f8-ac5b-e38c7a4b8a96","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"0328a296-3c4b-41b8-a64e-f7e669871c03"},"data":{"type":"map","entries":[["bill_length_mm",{"type":"ndarray","array":{"type":"bytes","data":"AAAAAABAR0AAAAAAAABJQGZmZmZmpklAMzMzMzOzRkCamZmZmVlKQJqZmZmZmUZAzczMzMwMR0BmZmZmZqZJQAAAAAAAAEdAZmZmZmamSUDNzMzMzExHQJqZmZmZ2UlAAAAAAACAR0AAAAAAAABKQDMzMzMz80ZAAAAAAABASUBmZmZmZiZJQAAAAAAAAE1AMzMzMzMzR0CamZmZmZlIQDMzMzMzM0VAAAAAAABASECamZmZmZlFQM3MzMzMTElAmpmZmZlZR0AAAAAAAABKQAAAAAAAQElAAAAAAADASEAzMzMzMzNHQGZmZmZmZkpAMzMzMzNzRECamZmZmRlLQAAAAAAAQEVAAAAAAACASUCamZmZmdlIQAAAAAAAwEdAzczMzMzMR0AAAAAAAABKQDMzMzMzc0dAAAAAAADASkAAAAAAAIBIQJqZmZmZGUdAMzMzMzNzSUAAAAAAAMBGQDMzMzMzc0lAZmZmZmZmSUDNzMzMzAxJQAAAAAAAgEhAAAAAAADASUBmZmZmZuZIQM3MzMzMDEhAMzMzMzOzSUCamZmZmdlGQJqZmZmZWUlAAAAAAABARUCamZmZmRlKQJqZmZmZmUZAZmZmZmamSECamZmZmRlJQM3MzMzMzEZAMzMzMzPzSUBmZmZmZmZHQJqZmZmZ2UZAZmZmZmbmS0AAAAAAAMBFQM3MzMzMzEhAZmZmZmZmSUCamZmZmRlJQA=="},"shape":[68],"dtype":"float64","order":"little"}],["bill_depth_mm",{"type":"ndarray","array":{"type":"bytes","data":"ZmZmZmbmMUAAAAAAAIAzQDMzMzMzMzNAMzMzMzOzMkDNzMzMzMwzQM3MzMzMzDFAMzMzMzMzMkAzMzMzMzMyQGZmZmZm5jJAZmZmZmbmM0DNzMzMzMwxQM3MzMzMTDRAzczMzMxMMUCamZmZmRkyQJqZmZmZGTFAmpmZmZmZM0AAAAAAAAA0QM3MzMzMzDFAmpmZmZmZMkAzMzMzMzMyQM3MzMzMTDFAAAAAAACAMUCamZmZmZkwQGZmZmZmZjNAZmZmZmbmMUAAAAAAAAAzQGZmZmZmZjJAAAAAAAAAM0DNzMzMzMwxQAAAAAAAADRAmpmZmZmZMEDNzMzMzMw0QDMzMzMzszBAzczMzMzMMkCamZmZmZkyQM3MzMzMzDBAzczMzMxMMkAzMzMzM7M0QJqZmZmZmTBAZmZmZmbmM0AAAAAAAIAzQAAAAAAAgDFAmpmZmZkZM0AAAAAAAAAxQGZmZmZm5jFAAAAAAACAMkBmZmZmZuYxQJqZmZmZmTNAMzMzMzOzMkDNzMzMzEwxQGZmZmZmZjBAAAAAAAAAM0DNzMzMzEwxQDMzMzMzszNAzczMzMxMMUDNzMzMzMwyQJqZmZmZmTBAZmZmZmbmM0DNzMzMzMwyQGZmZmZmZjNAAAAAAACAM0AAAAAAAIAwQAAAAAAAADFAzczMzMzMM0CamZmZmRkyQDMzMzMzMzJAAAAAAAAAM0AzMzMzM7MyQA=="},"shape":[68],"dtype":"float64","order":"little"}],["species",["Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap","Chinstrap"]]]}}},"view":{"type":"object","name":"CDSView","id":"9557e036-c691-4393-982c-0c0b68c9fbeb","attributes":{"filter":{"type":"object","name":"AllIndices","id":"0420e067-78a5-485b-a087-f47179fc5b8d"}}},"glyph":{"type":"object","name":"Scatter","id":"48e6fe96-42dc-4ce6-a606-7509e4ba85a4","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"bill_length_mm"},"y":{"type":"field","field":"bill_depth_mm"},"size":{"type":"value","value":5.477225575051661},"line_color":{"type":"value","value":"#fc4f30"},"fill_color":{"type":"value","value":"#fc4f30"},"hatch_color":{"type":"value","value":"#fc4f30"}}},"selection_glyph":{"type":"object","name":"Scatter","id":"bb197cc2-db5e-463f-b9a3-6fa053c29ca4","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"bill_length_mm"},"y":{"type":"field","field":"bill_depth_mm"},"size":{"type":"value","value":5.477225575051661},"angle":{"type":"value","value":0.0},"line_color":{"type":"value","value":"#fc4f30"},"line_alpha":{"type":"value","value":1.0},"line_width":{"type":"value","value":1},"line_join":{"type":"value","value":"bevel"},"line_cap":{"type":"value","value":"butt"},"line_dash":{"type":"value","value":[]},"line_dash_offset":{"type":"value","value":0},"fill_color":{"type":"value","value":"#fc4f30"},"fill_alpha":{"type":"value","value":1.0},"hatch_color":{"type":"value","value":"#fc4f30"},"hatch_alpha":{"type":"value","value":1.0},"hatch_scale":{"type":"value","value":12.0},"hatch_pattern":{"type":"value","value":null},"hatch_weight":{"type":"value","value":1.0},"marker":{"type":"value","value":"circle"}}},"nonselection_glyph":{"type":"object","name":"Scatter","id":"47d1bfab-c53c-468f-8ce3-b8b711b04eab","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"bill_length_mm"},"y":{"type":"field","field":"bill_depth_mm"},"size":{"type":"value","value":5.477225575051661},"line_color":{"type":"value","value":"#fc4f30"},"line_alpha":{"type":"value","value":0.1},"fill_color":{"type":"value","value":"#fc4f30"},"fill_alpha":{"type":"value","value":0.1},"hatch_color":{"type":"value","value":"#fc4f30"},"hatch_alpha":{"type":"value","value":0.1}}},"muted_glyph":{"type":"object","name":"Scatter","id":"9ee8f89a-4804-4981-8499-604d51aef306","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"bill_length_mm"},"y":{"type":"field","field":"bill_depth_mm"},"size":{"type":"value","value":5.477225575051661},"line_color":{"type":"value","value":"#fc4f30"},"line_alpha":{"type":"value","value":0.2},"fill_color":{"type":"value","value":"#fc4f30"},"fill_alpha":{"type":"value","value":0.2},"hatch_color":{"type":"value","value":"#fc4f30"},"hatch_alpha":{"type":"value","value":0.2}}}}},{"type":"object","name":"GlyphRenderer","id":"607f1947-31b4-4553-8fdc-4a9200de6df0","attributes":{"name":"Gentoo","data_source":{"type":"object","name":"ColumnDataSource","id":"c34fb038-5973-405e-8318-f02eaeb0dfba","attributes":{"selected":{"type":"object","name":"Selection","id":"4fd938de-3090-47ab-8bdd-76b76bf96324","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"63e4594f-c1db-4bfd-8d64-5f4d423e6de4"},"data":{"type":"map","entries":[["bill_length_mm",{"type":"ndarray","array":{"type":"bytes","data":"zczMzMwMR0AAAAAAAABJQJqZmZmZWUhAAAAAAAAASUDNzMzMzMxHQAAAAAAAQEdAMzMzMzOzRkCamZmZmVlHQGZmZmZmpkVAZmZmZmZmR0AzMzMzM3NEQAAAAAAAgEhAAAAAAADARkAzMzMzMzNIQGZmZmZm5kZAZmZmZmamSEAAAAAAAABFQJqZmZmZmUhAmpmZmZkZR0CamZmZmVlIQJqZmZmZGUlAzczMzMyMRkAAAAAAAEBHQGZmZmZmJkdAMzMzMzNzRUDNzMzMzAxHQAAAAAAAQEZAZmZmZmbmR0CamZmZmRlIQAAAAAAAAElAZmZmZmamR0BmZmZmZmZFQM3MzMzMjEZAzczMzMzMTUDNzMzMzIxIQDMzMzMzM0hAzczMzMxMRUAzMzMzMzNGQAAAAAAAAEZAmpmZmZlZSECamZmZmVlFQM3MzMzMzEhAZmZmZmamRkDNzMzMzMxIQAAAAAAAQElAzczMzMzMRUAAAAAAAMBGQAAAAAAAQElAMzMzMzNzRkCamZmZmZlGQM3MzMzMTEdAAAAAAABASEDNzMzMzIxGQM3MzMzMDElAAAAAAABAR0AAAAAAAIBGQGZmZmZm5kVAAAAAAADARkCamZmZmZlFQDMzMzMzM0lAZmZmZmamRkCamZmZmRlHQJqZmZmZ2UZAZmZmZmYmS0BmZmZmZuZGQGZmZmZm5khAmpmZmZkZR0AAAAAAAMBIQAAAAAAAwEVAmpmZmZlZSUCamZmZmdlHQDMzMzMzM0dAmpmZmZkZSEAAAAAAAEBHQDMzMzMzM0dAzczMzMxMSEAAAAAAAMBHQM3MzMzMjElAmpmZmZmZRkCamZmZmZlGQM3MzMzMjEhAAAAAAABASkAzMzMzM7NHQAAAAAAAAElAMzMzMzNzRkBmZmZmZmZJQDMzMzMzs0VAZmZmZmamSUAAAAAAAMBHQM3MzMzMDEpAAAAAAADAR0CamZmZmRlKQAAAAAAAwEZAAAAAAADASEAAAAAAAEBGQGZmZmZmZklAMzMzMzOzSEAzMzMzM3NHQDMzMzMzM0hAzczMzMyMSUAAAAAAAEBIQDMzMzMz80tAmpmZmZmZR0DNzMzMzIxIQGZmZmZmpkdAZmZmZmZmR0CamZmZmdlEQDMzMzMzs0pAZmZmZmamRUDNzMzMzAxIQAAAAAAAQElAZmZmZmbmSEAAAAAAAMBFQAAAAAAAwElAmpmZmZkZR0DNzMzMzIxLQAAAAAAAQEZAZmZmZmZmSECamZmZmZlHQAAAAAAAAPh/ZmZmZmZmR0AzMzMzMzNJQJqZmZmZmUZAMzMzMzPzSEA="},"shape":[124],"dtype":"float64","order":"little"}],["bill_depth_mm",{"type":"ndarray","array":{"type":"bytes","data":"ZmZmZmZmKkDNzMzMzEwwQDMzMzMzMyxAZmZmZmZmLkAAAAAAAAAtQAAAAAAAACtAMzMzMzMzLUCamZmZmZkuQM3MzMzMzCpAzczMzMzMLkBmZmZmZmYrQJqZmZmZGTBAZmZmZmZmK0AzMzMzMzMtQDMzMzMzMy1AZmZmZmZmL0AAAAAAAAArQGZmZmZmZi5AAAAAAAAALUAzMzMzMzMuQJqZmZmZmSxAAAAAAAAALUAAAAAAAAAtQJqZmZmZmS9AMzMzMzMzKkAzMzMzMzMuQJqZmZmZmSxAAAAAAAAALkCamZmZmZksQJqZmZmZmS5AmpmZmZmZLkBmZmZmZmYsQAAAAAAAAC1AAAAAAAAAMUCamZmZmZktQM3MzMzMTDBAZmZmZmZmK0DNzMzMzEwxQDMzMzMzMytAZmZmZmZmL0BmZmZmZmYrQAAAAAAAADBAZmZmZmZmK0AAAAAAAAAuQM3MzMzMzC9AzczMzMzMK0DNzMzMzMwrQM3MzMzMzC9AmpmZmZmZKkCamZmZmZkvQGZmZmZmZixAMzMzMzMzLEDNzMzMzMwsQAAAAAAAAC5AzczMzMzMLEDNzMzMzMwuQM3MzMzMzCtAAAAAAAAALkAAAAAAAAAtQJqZmZmZmS5AmpmZmZmZK0DNzMzMzMwtQM3MzMzMzCtAZmZmZmZmL0BmZmZmZmYsQM3MzMzMzDBAzczMzMzMLEAzMzMzMzMwQGZmZmZmZixAAAAAAAAALkAAAAAAAAAuQDMzMzMzMy9AMzMzMzMzL0CamZmZmZktQAAAAAAAAC5AAAAAAAAAMEBmZmZmZmYsQM3MzMzMTDBAmpmZmZmZK0BmZmZmZmYwQAAAAAAAAC1AMzMzMzMzL0AzMzMzMzMtQM3MzMzMzC9AmpmZmZmZK0DNzMzMzEwxQM3MzMzMzCxAZmZmZmZmLEAAAAAAAAAsQAAAAAAAADFAAAAAAAAALkCamZmZmRkxQAAAAAAAAC1AmpmZmZkZMEBmZmZmZmYtQGZmZmZmZi9AmpmZmZmZL0AzMzMzMzMtQM3MzMzMzCxAAAAAAACAMEAAAAAAAAAuQAAAAAAAADFAAAAAAAAAL0AAAAAAAAAuQJqZmZmZmStAmpmZmZkZMEBmZmZmZmYtQJqZmZmZmS9AAAAAAAAALEAzMzMzMzMuQGZmZmZmZi5AzczMzMzML0BmZmZmZmYuQM3MzMzMTDBAMzMzMzMzLEAAAAAAAAAwQGZmZmZmZi9AMzMzMzMzMEBmZmZmZmYrQAAAAAAAAPh/mpmZmZmZLEBmZmZmZmYvQJqZmZmZmS1AmpmZmZkZMEA="},"shape":[124],"dtype":"float64","order":"little"}],["species",["Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo","Gentoo"]]]}}},"view":{"type":"object","name":"CDSView","id":"728b7975-3ece-44e6-88f3-403b6b1097f1","attributes":{"filter":{"type":"object","name":"AllIndices","id":"a346ed0a-15c7-40ac-bcde-1bc9a742b770"}}},"glyph":{"type":"object","name":"Scatter","id":"aba94bf9-0a2a-4c50-bf50-92fa4d597a49","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"bill_length_mm"},"y":{"type":"field","field":"bill_depth_mm"},"size":{"type":"value","value":5.477225575051661},"line_color":{"type":"value","value":"#e5ae38"},"fill_color":{"type":"value","value":"#e5ae38"},"hatch_color":{"type":"value","value":"#e5ae38"}}},"selection_glyph":{"type":"object","name":"Scatter","id":"0a946d79-a0c3-45b0-affc-304bc9c49a43","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"bill_length_mm"},"y":{"type":"field","field":"bill_depth_mm"},"size":{"type":"value","value":5.477225575051661},"angle":{"type":"value","value":0.0},"line_color":{"type":"value","value":"#e5ae38"},"line_alpha":{"type":"value","value":1.0},"line_width":{"type":"value","value":1},"line_join":{"type":"value","value":"bevel"},"line_cap":{"type":"value","value":"butt"},"line_dash":{"type":"value","value":[]},"line_dash_offset":{"type":"value","value":0},"fill_color":{"type":"value","value":"#e5ae38"},"fill_alpha":{"type":"value","value":1.0},"hatch_color":{"type":"value","value":"#e5ae38"},"hatch_alpha":{"type":"value","value":1.0},"hatch_scale":{"type":"value","value":12.0},"hatch_pattern":{"type":"value","value":null},"hatch_weight":{"type":"value","value":1.0},"marker":{"type":"value","value":"circle"}}},"nonselection_glyph":{"type":"object","name":"Scatter","id":"af567e59-4b59-4952-9db5-b6fa487d5958","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"bill_length_mm"},"y":{"type":"field","field":"bill_depth_mm"},"size":{"type":"value","value":5.477225575051661},"line_color":{"type":"value","value":"#e5ae38"},"line_alpha":{"type":"value","value":0.1},"fill_color":{"type":"value","value":"#e5ae38"},"fill_alpha":{"type":"value","value":0.1},"hatch_color":{"type":"value","value":"#e5ae38"},"hatch_alpha":{"type":"value","value":0.1}}},"muted_glyph":{"type":"object","name":"Scatter","id":"4dec51fa-edaa-4f56-9aca-d869053a2fef","attributes":{"tags":["apply_ranges"],"x":{"type":"field","field":"bill_length_mm"},"y":{"type":"field","field":"bill_depth_mm"},"size":{"type":"value","value":5.477225575051661},"line_color":{"type":"value","value":"#e5ae38"},"line_alpha":{"type":"value","value":0.2},"fill_color":{"type":"value","value":"#e5ae38"},"fill_alpha":{"type":"value","value":0.2},"hatch_color":{"type":"value","value":"#e5ae38"},"hatch_alpha":{"type":"value","value":0.2}}}}}],"toolbar":{"type":"object","name":"Toolbar","id":"8f0de0ec-0eae-4c85-a3bf-a11e2142244b","attributes":{"tools":[{"type":"object","name":"WheelZoomTool","id":"07d02883-55d3-41ac-bb3b-20d7e0c4ed99","attributes":{"tags":["hv_created"],"renderers":"auto","zoom_together":"none"}},{"type":"object","name":"HoverTool","id":"1ad081c3-9756-4a0f-9e84-2ab56963a993","attributes":{"tags":["hv_created"],"renderers":[{"id":"e28e72c2-a93d-47c5-8640-2cb5fe07e0bc"},{"id":"cc202911-b02d-421f-b956-fe29729c111d"},{"id":"607f1947-31b4-4553-8fdc-4a9200de6df0"}],"tooltips":[["species","@{species}"],["bill_length_mm","@{bill_length_mm}"],["bill_depth_mm","@{bill_depth_mm}"]]}},{"type":"object","name":"SaveTool","id":"19462c39-3e29-44fd-aeb8-3f40dac5c385"},{"type":"object","name":"PanTool","id":"6ad6e036-b9c0-423e-81f7-ce65d642f8e1"},{"type":"object","name":"BoxZoomTool","id":"ab9290f6-9585-456d-8ab8-2afdbabc7247","attributes":{"dimensions":"both","overlay":{"type":"object","name":"BoxAnnotation","id":"7933adab-0593-4946-9204-0393e3e7025d","attributes":{"syncable":false,"line_color":"black","line_alpha":1.0,"line_width":2,"line_dash":[4,4],"fill_color":"lightgrey","fill_alpha":0.5,"level":"overlay","visible":false,"left":{"type":"number","value":"nan"},"right":{"type":"number","value":"nan"},"top":{"type":"number","value":"nan"},"bottom":{"type":"number","value":"nan"},"left_units":"canvas","right_units":"canvas","top_units":"canvas","bottom_units":"canvas","handles":{"type":"object","name":"BoxInteractionHandles","id":"7fe1fd2a-ae3b-4ede-8128-cba6db1b285a","attributes":{"all":{"type":"object","name":"AreaVisuals","id":"b74afc52-1e46-44dd-8d65-b0b89a620b15","attributes":{"fill_color":"white","hover_fill_color":"lightgray"}}}}}}}},{"type":"object","name":"ResetTool","id":"4df8a7d4-aab1-4602-955f-66679bccee6f"}],"active_drag":{"id":"6ad6e036-b9c0-423e-81f7-ce65d642f8e1"},"active_scroll":{"id":"07d02883-55d3-41ac-bb3b-20d7e0c4ed99"}}},"left":[{"type":"object","name":"LinearAxis","id":"84df3175-fee5-4c47-a44a-d91ff43a8df1","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"6aa6f4e4-9ef8-4b29-9435-5e190c63fae3","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"283b2844-730c-4b84-8a09-d41c722dcd4c"},"axis_label":"bill_depth_mm","major_label_policy":{"type":"object","name":"AllLabels","id":"82ddc854-45eb-49a9-9612-b25683dce410"}}}],"right":[{"type":"object","name":"Legend","id":"7cd4afa1-6697-4393-9d37-2522f02385b4","attributes":{"location":[0,0],"title":"species","click_policy":"mute","items":[{"type":"object","name":"LegendItem","id":"f5944c29-3c51-488d-8deb-165349f41594","attributes":{"label":{"type":"value","value":"Adelie"},"renderers":[{"id":"e28e72c2-a93d-47c5-8640-2cb5fe07e0bc"}]}},{"type":"object","name":"LegendItem","id":"9b05ef59-a36a-40b6-bf4d-68f2d7e4985c","attributes":{"label":{"type":"value","value":"Chinstrap"},"renderers":[{"id":"cc202911-b02d-421f-b956-fe29729c111d"}]}},{"type":"object","name":"LegendItem","id":"4560d7be-f553-46e7-9a55-0bcabfc346a8","attributes":{"label":{"type":"value","value":"Gentoo"},"renderers":[{"id":"607f1947-31b4-4553-8fdc-4a9200de6df0"}]}}]}}],"below":[{"type":"object","name":"LinearAxis","id":"ac511c43-e105-4ecb-a65d-b0c3b45510e6","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"12a8fab3-c8c8-4039-99e4-608b00f520db","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"8fb39b93-ed8b-46ec-8bcc-253ba73342bb"},"axis_label":"bill_length_mm","major_label_policy":{"type":"object","name":"AllLabels","id":"cf0d02cc-4770-4a3b-9924-cfc189240742"}}}],"center":[{"type":"object","name":"Grid","id":"422fd802-73b4-45a3-94d3-16f4b2fe2f8b","attributes":{"axis":{"id":"ac511c43-e105-4ecb-a65d-b0c3b45510e6"},"grid_line_color":null}},{"type":"object","name":"Grid","id":"fa28a3ae-988d-4a1c-a0a2-cec475da2090","attributes":{"dimension":1,"axis":{"id":"84df3175-fee5-4c47-a44a-d91ff43a8df1"},"grid_line_color":null}}],"min_border_top":10,"min_border_bottom":10,"min_border_left":10,"min_border_right":10,"output_backend":"webgl"}},{"type":"object","name":"Spacer","id":"20d4ed81-343d-40db-aa6a-530b4575cb7d","attributes":{"name":"HSpacer00306","stylesheets":["\n:host(.pn-loading):before, .pn-loading:before {\n  background-color: #c3c3c3;\n  mask-size: auto calc(min(50%, 400px));\n  -webkit-mask-size: auto calc(min(50%, 400px));\n}",{"id":"8fab9878-b687-44a8-9c41-e78724b8d3a9"},{"id":"3a7c2619-afc2-4e0f-b99b-d89c792c44fc"},{"id":"77203d12-9ae7-4304-8cae-2e0a07e77b90"}],"margin":0,"sizing_mode":"stretch_width","align":"start"}}]}}],"defs":[{"type":"model","name":"ReactiveHTML1"},{"type":"model","name":"FlexBox1","properties":[{"name":"align_content","kind":"Any","default":"flex-start"},{"name":"align_items","kind":"Any","default":"flex-start"},{"name":"flex_direction","kind":"Any","default":"row"},{"name":"flex_wrap","kind":"Any","default":"wrap"},{"name":"gap","kind":"Any","default":""},{"name":"justify_content","kind":"Any","default":"flex-start"}]},{"type":"model","name":"FloatPanel1","properties":[{"name":"config","kind":"Any","default":{"type":"map"}},{"name":"contained","kind":"Any","default":true},{"name":"position","kind":"Any","default":"right-top"},{"name":"offsetx","kind":"Any","default":null},{"name":"offsety","kind":"Any","default":null},{"name":"theme","kind":"Any","default":"primary"},{"name":"status","kind":"Any","default":"normalized"}]},{"type":"model","name":"GridStack1","properties":[{"name":"ncols","kind":"Any","default":null},{"name":"nrows","kind":"Any","default":null},{"name":"allow_resize","kind":"Any","default":true},{"name":"allow_drag","kind":"Any","default":true},{"name":"state","kind":"Any","default":[]}]},{"type":"model","name":"drag1","properties":[{"name":"slider_width","kind":"Any","default":5},{"name":"slider_color","kind":"Any","default":"black"},{"name":"value","kind":"Any","default":50}]},{"type":"model","name":"click1","properties":[{"name":"terminal_output","kind":"Any","default":""},{"name":"debug_name","kind":"Any","default":""},{"name":"clears","kind":"Any","default":0}]},{"type":"model","name":"FastWrapper1","properties":[{"name":"object","kind":"Any","default":null},{"name":"style","kind":"Any","default":null}]},{"type":"model","name":"NotificationArea1","properties":[{"name":"js_events","kind":"Any","default":{"type":"map"}},{"name":"max_notifications","kind":"Any","default":5},{"name":"notifications","kind":"Any","default":[]},{"name":"position","kind":"Any","default":"bottom-right"},{"name":"_clear","kind":"Any","default":0},{"name":"types","kind":"Any","default":[{"type":"map","entries":[["type","warning"],["background","#ffc107"],["icon",{"type":"map","entries":[["className","fas fa-exclamation-triangle"],["tagName","i"],["color","white"]]}]]},{"type":"map","entries":[["type","info"],["background","#007bff"],["icon",{"type":"map","entries":[["className","fas fa-info-circle"],["tagName","i"],["color","white"]]}]]}]}]},{"type":"model","name":"Notification","properties":[{"name":"background","kind":"Any","default":null},{"name":"duration","kind":"Any","default":3000},{"name":"icon","kind":"Any","default":null},{"name":"message","kind":"Any","default":""},{"name":"notification_type","kind":"Any","default":null},{"name":"_rendered","kind":"Any","default":false},{"name":"_destroyed","kind":"Any","default":false}]},{"type":"model","name":"TemplateActions1","properties":[{"name":"open_modal","kind":"Any","default":0},{"name":"close_modal","kind":"Any","default":0}]},{"type":"model","name":"BootstrapTemplateActions1","properties":[{"name":"open_modal","kind":"Any","default":0},{"name":"close_modal","kind":"Any","default":0}]},{"type":"model","name":"TemplateEditor1","properties":[{"name":"layout","kind":"Any","default":[]}]},{"type":"model","name":"MaterialTemplateActions1","properties":[{"name":"open_modal","kind":"Any","default":0},{"name":"close_modal","kind":"Any","default":0}]},{"type":"model","name":"ReactiveESM1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"JSComponent1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"ReactComponent1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"AnyWidgetComponent1","properties":[{"name":"esm_constants","kind":"Any","default":{"type":"map"}}]},{"type":"model","name":"request_value1","properties":[{"name":"fill","kind":"Any","default":"none"},{"name":"_synced","kind":"Any","default":null},{"name":"_request_sync","kind":"Any","default":0}]}]}};
+  var render_items = [{"docid":"b0a3a2aa-8756-400d-b59a-2b75d8838291","roots":{"d236c21c-4d41-4ea3-b7d0-aae1af9bd56d":"f8bba58e-905a-42ab-b9a0-883d12980fb0"},"root_ids":["d236c21c-4d41-4ea3-b7d0-aae1af9bd56d"]}];
+  var docs = Object.values(docs_json)
+  if (!docs) {
+    return
+  }
+  const py_version = docs[0].version.replace('rc', '-rc.').replace('.dev', '-dev.')
+  async function embed_document(root) {
+    var Bokeh = get_bokeh(root)
+    await Bokeh.embed.embed_items_notebook(docs_json, render_items);
+    for (const render_item of render_items) {
+      for (const root_id of render_item.root_ids) {
+	const id_el = document.getElementById(root_id)
+	if (id_el.children.length && id_el.children[0].hasAttribute('data-root-id')) {
+	  const root_el = id_el.children[0]
+	  root_el.id = root_el.id + '-rendered'
+	  for (const child of root_el.children) {
+            // Ensure JupyterLab does not capture keyboard shortcuts
+            // see: https://jupyterlab.readthedocs.io/en/4.1.x/extension/notebook.html#keyboard-interaction-model
+	    child.setAttribute('data-lm-suppress-shortcuts', 'true')
+	  }
+	}
+      }
+    }
+  }
+  function get_bokeh(root) {
+    if (root.Bokeh === undefined) {
+      return null
+    } else if (root.Bokeh.version !== py_version) {
+      if (root.Bokeh.versions === undefined || !root.Bokeh.versions.has(py_version)) {
+	return null
+      }
+      return root.Bokeh.versions.get(py_version);
+    } else if (root.Bokeh.version === py_version) {
+      return root.Bokeh
+    }
+    return null
+  }
+  function is_loaded(root) {
+    var Bokeh = get_bokeh(root)
+    return (Bokeh != null && Bokeh.Panel !== undefined)
+  }
+  if (is_loaded(root)) {
+    embed_document(root);
+  } else {
+    var attempts = 0;
+    var timer = setInterval(function(root) {
+      if (is_loaded(root)) {
+        clearInterval(timer);
+        embed_document(root);
+      } else if (document.readyState == "complete") {
+        attempts++;
+        if (attempts > 200) {
+          clearInterval(timer);
+	  var Bokeh = get_bokeh(root)
+	  if (Bokeh == null || Bokeh.Panel == null) {
+            console.warn("Panel: ERROR: Unable to run Panel code because Bokeh or Panel library is missing");
+	  } else {
+	    console.warn("Panel: WARNING: Attempting to render but not all required libraries could be resolved.")
+	    embed_document(root)
+	  }
+        }
+      }
+    }, 25, root)
+  }
+})(window);</script></div></div>
+</div>
+<hr class="docutils" />
+<p><code class="docutils literal notranslate"><span class="pre">.hvplot()</span></code> can generate plots from <a class="reference external" href="https://pandas.pydata.org/">Pandas</a> DataFrames and many other data structures of the PyData ecosystem:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-0">
+Xarray</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.xarray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+
+<span class="n">xr_ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">tutorial</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="s1">&#39;air_temperature&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">()</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="s1">&#39;2013-06-01 12:00&#39;</span><span class="p">)</span>
+<span class="n">xr_ds</span><span class="o">.</span><span class="n">hvplot</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="Works with XArray" class="align-center" src="_images/xarray.gif" />
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-1">
+Pandas</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.pandas</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bokeh.sampledata.autompg</span><span class="w"> </span><span class="kn">import</span> <span class="n">autompg_clean</span> <span class="k">as</span> <span class="n">df</span>
+
+<span class="n">table</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;origin&#39;</span><span class="p">,</span> <span class="s1">&#39;mfr&#39;</span><span class="p">])[</span><span class="s1">&#39;mpg&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">table</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="s1">&#39;mfr&#39;</span><span class="p">,</span> <span class="s1">&#39;mpg&#39;</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="s1">&#39;origin&#39;</span><span class="p">,</span> <span class="n">stacked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="Works with Pandas" class="align-center" src="_images/pandas.gif" />
+</div>
+<input id="sd-tab-item-2" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-2">
+Dask</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">dask</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.dask</span>
+
+<span class="n">df_dask</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">from_pandas</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">npartitions</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">df_dask</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;bill_length_mm&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;bill_depth_mm&#39;</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="Works with Dask" class="align-center" src="_images/dask.gif" />
+</div>
+<input id="sd-tab-item-3" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-3">
+GeoPandas</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span><span class="o">,</span><span class="w"> </span><span class="nn">geodatasets</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.pandas</span>
+
+<span class="n">chicago</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">geodatasets</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s2">&quot;geoda.chicago_commpop&quot;</span><span class="p">))</span>
+<span class="n">chicago</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">polygons</span><span class="p">(</span><span class="n">geo</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;POP2010&#39;</span><span class="p">,</span> <span class="n">hover_cols</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="Works with GeoPandas" class="align-center" src="_images/geopandas.gif" />
+</div>
+<input id="sd-tab-item-4" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-4">
+Polars</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">polars</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.polars</span>
+
+<span class="n">df_polars</span> <span class="o">=</span> <span class="n">polars</span><span class="o">.</span><span class="n">from_pandas</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="n">df_polars</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;bill_length_mm&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;bill_depth_mm&#39;</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="Works with Polars" class="align-center" src="_images/dask.gif" />
+</div>
+<input id="sd-tab-item-5" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-5">
+DuckDB</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">duckdb</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.duckdb</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bokeh.sampledata.autompg</span><span class="w"> </span><span class="kn">import</span> <span class="n">autompg_clean</span> <span class="k">as</span> <span class="n">df</span>
+
+<span class="n">df_duckdb</span> <span class="o">=</span> <span class="n">duckdb</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="n">table</span> <span class="o">=</span> <span class="n">df_duckdb</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;origin&#39;</span><span class="p">,</span> <span class="s1">&#39;mfr&#39;</span><span class="p">])[</span><span class="s1">&#39;mpg&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">table</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="s1">&#39;mfr&#39;</span><span class="p">,</span> <span class="s1">&#39;mpg&#39;</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="s1">&#39;origin&#39;</span><span class="p">,</span> <span class="n">stacked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="Works with DuckDB" class="align-center" src="_images/pandas.gif" />
+</div>
+<input id="sd-tab-item-6" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-6">
+Intake</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.intake</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hvplot.sample_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">catalogue</span> <span class="k">as</span> <span class="n">cat</span>
+
+<span class="n">cat</span><span class="o">.</span><span class="n">us_crime</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;Violent Crime rate&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="Works with Intake" class="align-center" src="_images/intake.gif" />
+</div>
+<input id="sd-tab-item-7" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-7">
+NetworkX</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.networkx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">hvnx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">networkx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nx</span>
+
+<span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">petersen_graph</span><span class="p">()</span>
+<span class="n">hvnx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="Works with Networkx" class="align-center" src="_images/networkx.gif" />
+</div>
+<input id="sd-tab-item-8" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-8">
+Streamz</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.streamz</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">streamz.dataframe</span><span class="w"> </span><span class="kn">import</span> <span class="n">Random</span>
+
+<span class="n">df_streamz</span> <span class="o">=</span> <span class="n">Random</span><span class="p">(</span><span class="n">interval</span><span class="o">=</span><span class="s1">&#39;200ms&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;50ms&#39;</span><span class="p">)</span>
+<span class="n">df_streamz</span><span class="o">.</span><span class="n">hvplot</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="Works with Streamz" class="align-center" src="_images/streamz_demo.gif" />
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">.hvplot()</span></code> can generate plots with <a class="reference external" href="https://bokeh.org/">Bokeh</a> (default), <a class="reference external" href="https://matplotlib.org/">Matplotlib</a> or <a class="reference external" href="https://plotly.com/">Plotly</a>.</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-9" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-9">
+Bokeh</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.pandas</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bokeh.sampledata.penguins</span><span class="w"> </span><span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">df</span>
+
+<span class="n">df</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;bill_length_mm&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;bill_depth_mm&#39;</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="Works with Bokeh (default)" class="align-center" src="_images/bokeh.gif" />
+</div>
+<input id="sd-tab-item-10" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-10">
+Matplotlib</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.pandas</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bokeh.sampledata.penguins</span><span class="w"> </span><span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">df</span>
+
+<span class="n">hvplot</span><span class="o">.</span><span class="n">extension</span><span class="p">(</span><span class="s1">&#39;matplotlib&#39;</span><span class="p">)</span>
+
+<span class="n">df</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;bill_length_mm&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;bill_depth_mm&#39;</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="Works with Matplotlib" class="align-center" src="_images/matplotlib.png" />
+</div>
+<input id="sd-tab-item-11" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-11">
+Plotly</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.pandas</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bokeh.sampledata.penguins</span><span class="w"> </span><span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">df</span>
+
+<span class="n">hvplot</span><span class="o">.</span><span class="n">extension</span><span class="p">(</span><span class="s1">&#39;plotly&#39;</span><span class="p">)</span>
+
+<span class="n">df</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;bill_length_mm&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;bill_depth_mm&#39;</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="Works with Plotly" class="align-center" src="_images/plotly.gif" />
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">.hvplot()</span></code> sources its power in the <a class="reference external" href="https://holoviz.org/">HoloViz</a> ecosystem. With <a class="reference external" href="https://holoviews.org/">HoloViews</a> you get the ability to easily layout and overlay plots, with <a class="reference external" href="https://panel.holoviz.org">Panel</a> you can get more interactive control of your plots with widgets, with <a class="reference external" href="https://datashader.org/">DataShader</a> you can visualize and interactively explore very large data, and with <a class="reference external" href="https://geoviews.org/">GeoViews</a> you can create geographic plots.</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-12" name="sd-tab-set-2" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-12">
+Layout</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.pandas</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hvplot.sample_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">us_crime</span> <span class="k">as</span> <span class="n">df</span>
+
+<span class="n">plot1</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">hvplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;Violent Crime rate&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+<span class="n">plot2</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">hvplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;Burglary rate&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+<span class="n">plot1</span> <span class="o">+</span> <span class="n">plot2</span>
+</pre></div>
+</div>
+<img alt="laying out plots" class="align-center" src="_images/layout.gif" />
+</div>
+<input id="sd-tab-item-13" name="sd-tab-set-2" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-13">
+Overlay</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.pandas</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bokeh.sampledata.penguins</span><span class="w"> </span><span class="kn">import</span> <span class="n">data</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;species&#39;</span><span class="p">)[</span><span class="s1">&#39;bill_length_mm&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="n">dff</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">errorbars</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">yerr1</span><span class="o">=</span><span class="s1">&#39;std&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="overlaying plots" class="align-center" src="_images/overlay.png" />
+</div>
+<input id="sd-tab-item-14" name="sd-tab-set-2" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-14">
+Widgets</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.pandas</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bokeh.sampledata.penguins</span><span class="w"> </span><span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">df</span>
+
+<span class="n">df</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;bill_length_mm&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;bill_depth_mm&#39;</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="s1">&#39;island&#39;</span><span class="p">,</span> <span class="n">widget_location</span><span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="more control with widgets" class="align-center" src="_images/widgets.gif" />
+</div>
+<input id="sd-tab-item-15" name="sd-tab-set-2" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-15">
+Large Data</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.pandas</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hvplot.sample_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">catalogue</span> <span class="k">as</span> <span class="n">cat</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">airline_flights</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="n">df</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;distance&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;airtime&#39;</span><span class="p">,</span> <span class="n">rasterize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cnorm</span><span class="o">=</span><span class="s1">&#39;eq_hist&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="visualize and explore large data" class="align-center" src="_images/large_data.gif" />
+</div>
+<input id="sd-tab-item-16" name="sd-tab-set-2" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-16">
+Geographic plots</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.xarray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span><span class="o">,</span><span class="w"> </span><span class="nn">cartopy.crs</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">crs</span>
+
+<span class="n">air_ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">tutorial</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="s1">&#39;air_temperature&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="n">air_ds</span><span class="o">.</span><span class="n">air</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="s1">&#39;2013-06-01 12:00&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">quadmesh</span><span class="p">(</span>
+    <span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="n">crs</span><span class="o">.</span><span class="n">Orthographic</span><span class="p">(</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span> <span class="n">project</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">global_extent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">coastline</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<img alt="geographic plots" class="align-center" src="_images/geo.gif" />
+</div>
+</div>
+<hr class="docutils" />
+<p><strong><code class="docutils literal notranslate"><span class="pre">.interactive()</span></code> to turn data pipelines into widget-based interactive applications</strong></p>
+<p>By starting a data pipeline with <a class="reference internal" href="user_guide/Interactive.html"><span class="doc std std-doc"><code class="docutils literal notranslate"><span class="pre">.interactive()</span></code></span></a> you can then inject widgets into an extract and transform data pipeline. The pipeline output dynamically updates with widget changes, making data exploration in Jupyter notebooks in particular a lot more efficient.</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-17" name="sd-tab-set-3" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-17">
+Pandas</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.pandas</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">panel</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bokeh.sampledata.penguins</span><span class="w"> </span><span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">df</span>
+
+<span class="n">w_sex</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">MultiSelect</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Sex&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;MALE&#39;</span><span class="p">],</span> <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;MALE&#39;</span><span class="p">,</span> <span class="s1">&#39;FEMALE&#39;</span><span class="p">])</span>
+<span class="n">w_body_mass</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">FloatSlider</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Min body mass&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">2700</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">6300</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+
+<span class="n">dfi</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">interactive</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+<span class="n">dfi</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">dfi</span><span class="p">[</span><span class="s1">&#39;sex&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">w_sex</span><span class="p">))</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">dfi</span><span class="p">[</span><span class="s1">&#39;body_mass_g&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">w_body_mass</span><span class="p">)][</span><span class="s1">&#39;bill_length_mm&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="interactive app from pandas" class="align-center" src="_images/interactive_pandas.gif" />
+</div>
+<input id="sd-tab-item-18" name="sd-tab-set-3" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-18">
+Xarray</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.xarray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">panel</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+
+<span class="n">w_time</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">tutorial</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="s1">&#39;air_temperature&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">air</span>
+<span class="n">da</span><span class="o">.</span><span class="n">interactive</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">w_time</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">-</span> <span class="n">da</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="interactive app from xarray" class="align-center" src="_images/interactive_xarray.gif" />
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">.interactive()</span></code> supports displaying the pipeline output with <code class="docutils literal notranslate"><span class="pre">.hvplot()</span></code>. You can even output to any other output that <a class="reference external" href="https://panel.holoviz.org/reference/index.html">Panel</a> supports using <code class="docutils literal notranslate"><span class="pre">.pipe(...)</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.xarray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">panel</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+
+<span class="n">da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">tutorial</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="s1">&#39;air_temperature&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">air</span>
+<span class="n">w_quantile</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">FloatSlider</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;quantile&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">w_time</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">da</span><span class="o">.</span><span class="n">interactive</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span> \
+<span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">w_time</span><span class="p">)</span> \
+<span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="n">w_quantile</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="s1">&#39;lon&#39;</span><span class="p">)</span> \
+<span class="o">.</span><span class="n">hvplot</span><span class="p">(</span><span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Air Temperature [K]&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="interactive pipeline with an hvplot output" class="align-center" src="_images/interactive_hvplot.gif" />
+<p><strong><code class="docutils literal notranslate"><span class="pre">.hvplot.explorer()</span></code> to explore data in a web application</strong></p>
+<p>The <em>Explorer</em> is a <a class="reference external" href="https://panel.holoviz.org">Panel</a> web application that can be displayed in a Jupyter notebook and that can be used to quickly create customized plots.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.pandas</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bokeh.sampledata.penguins</span><span class="w"> </span><span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">df</span>
+
+<span class="n">hvexplorer</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">explorer</span><span class="p">()</span>
+<span class="n">hvexplorer</span>
+</pre></div>
+</div>
+<img alt="explore data with the hvplot explorer" class="align-center" src="_images/explorer.gif" />
+<div class="toctree-wrapper compound">
+</div>
+</section>
+
+<div id="scroller-right">
+    This web page was generated from a Jupyter notebook and not all
+    interactivity will work on this website.
+</div>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="right-next"
+       href="tutorials/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Tutorials</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/holoviz/hvplot/edit/main/doc/index.md">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+
+  <div class="tocsection sourcelink">
+    <a href="_sources/index.md">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item"><p class="nbsite-copyright-last-updated">
+    <span class="copyright">
+            &copy; Copyright 2016-2025 Holoviz contributors.
+    </span>
+    <span class="last-updated">Last updated on 2025-04-30.</span><br>
+</p></div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

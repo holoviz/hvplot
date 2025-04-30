@@ -1,0 +1,1175 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Developer Guide &#8212; hvPlot 0.11.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="_static/nbsite.css?v=d9d93254" />
+    <link rel="stylesheet" type="text/css" href="_static/notebook.css?v=19946987" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery.css?v=0a3248cd" />
+    <link rel="stylesheet" type="text/css" href="_static/alert.css?v=c26666be" />
+    <link rel="stylesheet" type="text/css" href="_static/dataframe.css?v=a0f274c1" />
+    <link rel="stylesheet" type="text/css" href="_static/scroller.css?v=2dcde208" />
+    <link rel="stylesheet" type="text/css" href="_static/hv-sidebar-dropdown.css?v=3e2b0152" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=bab6b1ab" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=2088e4e3"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>
+    window.goatcounter = {
+        path: function(p) { return location.host + p }
+    }
+</script>
+    <script async="async" data-goatcounter="https://holoviz.goatcounter.com/count" src="_static/js/goatcounter.js?v=f53f84b8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'developer_guide';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Releases" href="releases.html" />
+    <link rel="prev" title="Comparison with Pandas API" href="ref/api_compatibility/pandas/Pandas_API.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.11.3" />
+    <meta name="docbuild:last-update" content="2025-04-30"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="_static/logo_horizontal.svg" class="logo__image only-light" alt="hvPlot 0.11.3 documentation - Home"/>
+    <img src="_static/logo_horizontal.svg" class="logo__image only-dark pst-js-only" alt="hvPlot 0.11.3 documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="user_guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="reference/index.html">
+    Reference Gallery
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="ref/index.html">
+    Reference
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Developer Guide
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="releases.html">
+    Releases
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="roadmap.html">
+    Roadmap
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="about.html">
+    About
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/holoviz/hvplot" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://twitter.com/HoloViews" title="Twitter" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-twitter-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Twitter</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discourse.holoviz.org/c/hvplot" title="Discourse" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discourse fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Discourse</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discord.gg/AXRHnJU6sP" title="Discord" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discord fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Discord</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="user_guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="reference/index.html">
+    Reference Gallery
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="ref/index.html">
+    Reference
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Developer Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="releases.html">
+    Releases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="about.html">
+    About
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/holoviz/hvplot" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://twitter.com/HoloViews" title="Twitter" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-twitter-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Twitter</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discourse.holoviz.org/c/hvplot" title="Discourse" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discourse fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Discourse</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discord.gg/AXRHnJU6sP" title="Discord" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discord fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Discord</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><!-- Adapted from sidebar-nav-bs.html (1.15.2) with the following changes
+
+  - Commented out the tag that adds the "Section Navigation" title
+  - Call generate_toctree_html with startdepth=0
+
+Please update this file when required when bumping the max pin of pydata-sphinx-theme.
+-->
+
+
+<nav class="bd-docs-nav bd-links"
+      aria-label="Section Navigation">
+  <!-- <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p> -->
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="tutorials/index.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/getting_started_pandas.html">Using hvPlot as a Pandas user</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://holoviz.org/tutorial/index.html">HoloViz Tutorial</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="user_guide/index.html">User Guide</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Plotting.html">Plotting with Bokeh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Plotting_with_Matplotlib.html">Plotting with Matplotlib</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Plotting_with_Plotly.html">Plotting with Plotly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Interactive.html">Interactive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Widgets.html">Widgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Plotting_Extensions.html">Plotting Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Explorer.html">Exploring data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Viewing.html">Viewing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Subplots.html">Subplots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Streaming.html">Streaming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Gridded_Data.html">Gridded Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/NetworkX.html">Network Graphs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Geographic_Data.html">Geographic Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Timeseries_Data.html">Timeseries Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Large_Timeseries.html">Large Timeseries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/Statistical_Plots.html">Statistical Plots</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="reference/index.html">Reference Gallery</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="reference/tabular/index.html">Tabular</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/andrewscurves.html">Andrewscurves</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/area.html">Area</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/bar.html">Bar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/barh.html">Barh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/bivariate.html">Bivariate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/box.html">Box</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/errorbars.html">Errorbars</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/heatmap.html">Heatmap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/hexbin.html">Hexbin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/hist.html">Hist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/kde.html">Kde</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/labels.html">Labels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/lagplot.html">Lagplot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/line.html">Line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/ohlc.html">Ohlc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/parallelcoordinates.html">Parallelcoordinates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/paths.html">Paths</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/scatter.html">Scatter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/scattermatrix.html">Scattermatrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/step.html">Step</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/table.html">Table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/tabular/violin.html">Violin</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="reference/geopandas/index.html">Geopandas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/geopandas/points.html">Points</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/geopandas/polygons.html">Polygons</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="reference/xarray/index.html">Xarray</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/xarray/bar.html">Bar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/xarray/contour.html">Contour</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/xarray/contourf.html">Contourf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/xarray/hist.html">Hist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/xarray/image.html">Image</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/xarray/kde.html">Kde</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/xarray/line.html">Line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/xarray/quadmesh.html">Quadmesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/xarray/rgb.html">Rgb</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/xarray/vectorfield.html">Vectorfield</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/xarray/violin.html">Violin</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="ref/index.html">Reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="ref/installation.html">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ref/data_libraries.html">Supported data libraries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ref/plotting_extensions.html">Supported plotting extensions</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="ref/plotting_options/index.html">Plotting options</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="ref/plotting_options/index.html">All Options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/plotting_options/data.html">Data Options</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="ref/api/index.html">API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.help.html">hvplot.help</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.hvplot_extension.html">hvplot.hvplot_extension</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.extension.html">hvplot.extension</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.output.html">hvplot.output</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.render.html">hvplot.render</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.save.html">hvplot.save</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.show.html">hvplot.show</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.area.html">hvplot.hvPlot.area</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.bar.html">hvplot.hvPlot.bar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.barh.html">hvplot.hvPlot.barh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.box.html">hvplot.hvPlot.box</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.bivariate.html">hvplot.hvPlot.bivariate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.contour.html">hvplot.hvPlot.contour</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.contourf.html">hvplot.hvPlot.contourf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.dataset.html">hvplot.hvPlot.dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.density.html">hvplot.hvPlot.density</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.errorbars.html">hvplot.hvPlot.errorbars</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.heatmap.html">hvplot.hvPlot.heatmap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.hexbin.html">hvplot.hvPlot.hexbin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.hist.html">hvplot.hvPlot.hist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.image.html">hvplot.hvPlot.image</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.kde.html">hvplot.hvPlot.kde</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.labels.html">hvplot.hvPlot.labels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.line.html">hvplot.hvPlot.line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.ohlc.html">hvplot.hvPlot.ohlc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.paths.html">hvplot.hvPlot.paths</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.points.html">hvplot.hvPlot.points</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.polygons.html">hvplot.hvPlot.polygons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.quadmesh.html">hvplot.hvPlot.quadmesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.rgb.html">hvplot.hvPlot.rgb</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.scatter.html">hvplot.hvPlot.scatter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.step.html">hvplot.hvPlot.step</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.table.html">hvplot.hvPlot.table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.vectorfield.html">hvplot.hvPlot.vectorfield</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.hvPlot.violin.html">hvplot.hvPlot.violin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.plotting.andrews_curves.html">hvplot.plotting.andrews_curves</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.plotting.lag_plot.html">hvplot.plotting.lag_plot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.plotting.parallel_coordinates.html">hvplot.plotting.parallel_coordinates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/manual/hvplot.plotting.scatter_matrix.html">hvplot.plotting.scatter_matrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.networkx.draw.html">hvplot.networkx.draw</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.networkx.draw_networkx.html">hvplot.networkx.draw_networkx</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.networkx.draw_networkx_nodes.html">hvplot.networkx.draw_networkx_nodes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.networkx.draw_networkx_edges.html">hvplot.networkx.draw_networkx_edges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.networkx.draw_networkx_labels.html">hvplot.networkx.draw_networkx_labels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.networkx.draw_circular.html">hvplot.networkx.draw_circular</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.networkx.draw_kamada_kawai.html">hvplot.networkx.draw_kamada_kawai</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.networkx.draw_random.html">hvplot.networkx.draw_random</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.networkx.draw_planar.html">hvplot.networkx.draw_planar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.networkx.draw_shell.html">hvplot.networkx.draw_shell</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.networkx.draw_spectral.html">hvplot.networkx.draw_spectral</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.networkx.draw_spring.html">hvplot.networkx.draw_spring</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.hvPlot.explorer.html">hvplot.hvPlot.explorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.ui.explorer.html">hvplot.ui.explorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.ui.hvPlotExplorer.html">hvplot.ui.hvPlotExplorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.ui.hvPlotExplorer.hvplot.html">hvplot.ui.hvPlotExplorer.hvplot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.ui.hvPlotExplorer.plot_code.html">hvplot.ui.hvPlotExplorer.plot_code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.ui.hvPlotExplorer.save.html">hvplot.ui.hvPlotExplorer.save</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.ui.hvPlotExplorer.servable.html">hvplot.ui.hvPlotExplorer.servable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.ui.hvPlotExplorer.settings.html">hvplot.ui.hvPlotExplorer.settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/api/generated/hvplot.ui.hvPlotExplorer.show.html">hvplot.ui.hvPlotExplorer.show</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="ref/api_compatibility/index.html">API compatibility</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ref/api_compatibility/pandas/index.html">Pandas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="ref/api_compatibility/pandas/Pandas_API.html">Comparison with Pandas API</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
+</ul>
+</div>
+</nav></div>
+        <div class="sidebar-primary-item">
+<div class="hv-sb-dd">
+  <div class="btn-group">
+    
+    <a href="https://holoviz.org" class="btn hv-sb-dd-value" target="_blank">HoloViz.org<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a>
+    
+    <button type="button" class="btn dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="visually-hidden"></span>
+    </button>
+    <ul class="dropdown-menu">
+      
+      
+        <li><a class="dropdown-item" href="https://param.holoviz.org" target="_blank" title="Assembling objects from many different libraries into a layout or app, whether in a Jupyter notebook or in a standalone servable dashboard">Panel<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+      
+      
+        <li><a class="dropdown-item" href="https://holoviews.org" target="_blank" title="Declarative objects for instantly visualizable data, building Bokeh plots from convenient high-level specifications">HoloViews<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://geoviews.org" target="_blank" title="Visualizable geographic data that that can be mixed and matched with HoloViews objects">GeoViews<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://datashader.org" target="_blank" title="Rasterizing huge datasets quickly as fixed-size images">Datashader<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://param.holoviz.org" target="_blank" title="Make your Python code clearer and more reliable by declaring Parameters">Param<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://lumen.holoviz.org" target="_blank" title="Framework for visual analytics that allows users to build data-driven dashboards from a simple YAML specification">Lumen<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+        <li><a class="dropdown-item" href="https://colorcet.holoviz.org" target="_blank" title="A wide range of perceptually uniform continuous colormaps and perceptually based categorical color sets for use with the other libraries">Colorcet<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+      <li><hr class="dropdown-divider"></li>
+      
+      
+      <li><a class="dropdown-item" href="https://examples.holoviz.org" target="_blank" title=" Visualization-focused examples using HoloViz for specific topics ">Examples Gallery<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+      <li><a class="dropdown-item" href="https://blog.holoviz.org" target="_blank" title="HoloViz blog">Blog<i class="fa fa-external-link hv-icon" aria-hidden="true"></i></a></li>
+      
+      
+      
+    </ul>
+  </div>
+</div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Developer Guide</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="developer-guide">
+<span id="devguide-setup"></span><h1>Developer Guide<a class="headerlink" href="#developer-guide" title="Link to this heading">#</a></h1>
+<p>The hvPlot library is a project that provides a wide range of data interfaces and an extensible set of plotting backends, which means the development and testing process involves a broad set of libraries.</p>
+<p>This guide describes how to install and configure development environments.</p>
+<p>If you have any problems with the steps here, please reach out in the <code class="docutils literal notranslate"><span class="pre">dev</span></code> channel on <a class="reference external" href="https://discord.gg/rb6gPXbdAr">Discord</a> or on <a class="reference external" href="https://discourse.holoviz.org/">Discourse</a>.</p>
+<section id="tl-dr">
+<h2>TL;DR<a class="headerlink" href="#tl-dr" title="Link to this heading">#</a></h2>
+<ol class="arabic simple" start="0">
+<li><p>Open an <a class="reference external" href="https://github.com/holoviz/hvplot/issues">issue on Github</a> if needed</p></li>
+<li><p>Fork and clone <a class="reference external" href="https://github.com/holoviz/hvplot">hvPlot’s Github repository</a></p></li>
+<li><p>Install <a class="reference external" href="https://pixi.sh"><code class="docutils literal notranslate"><span class="pre">pixi</span></code></a></p></li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">run</span> <span class="pre">setup-dev</span></code> to create your development environment</p></li>
+<li><p>Make some changes and run:</p></li>
+</ol>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">run</span> <span class="pre">test-unit</span></code> if you updated the source code to run the unit tests</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">run</span> <span class="pre">test-example</span></code> if you updated the notebooks to run them</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">run</span> <span class="pre">docs-build</span></code> if you need to build the website locally</p></li>
+</ul>
+<ol class="arabic simple" start="5">
+<li><p>Open a Pull Request</p></li>
+</ol>
+</section>
+<section id="preliminaries">
+<h2>Preliminaries<a class="headerlink" href="#preliminaries" title="Link to this heading">#</a></h2>
+<section id="basic-understanding-of-how-to-contribute-to-open-source">
+<h3>Basic understanding of how to contribute to Open Source<a class="headerlink" href="#basic-understanding-of-how-to-contribute-to-open-source" title="Link to this heading">#</a></h3>
+<p>If this is your first open-source contribution, please study one
+or more of the below resources.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://youtu.be/RGd5cOXpCQw">How to Get Started with Contributing to Open Source | Video</a></p></li>
+<li><p><a class="reference external" href="https://youtu.be/jTTf4oLkvaM">Contributing to Open-Source Projects as a New Python Developer | Video</a></p></li>
+<li><p><a class="reference external" href="https://www.educative.io/blog/contribue-open-source-python-project">How to Contribute to an Open Source Python Project | Blog post</a></p></li>
+</ul>
+</section>
+<section id="git">
+<h3>Git<a class="headerlink" href="#git" title="Link to this heading">#</a></h3>
+<p>The hvPlot source code is stored in a <a class="reference external" href="https://git-scm.com">Git</a> source control repository. The first step to working on hvPlot is to install Git onto your system. There are different ways to do this, depending on whether you use Windows, Mac, or Linux.</p>
+<p>To install Git on any platform, refer to the <a class="reference external" href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">Installing Git</a> section of the <a class="reference external" href="https://git-scm.com/book/en/v2">Pro Git Book</a>.</p>
+<p>To contribute to hvPlot, you will also need <a class="reference external" href="https://github.com/join">Github account</a> and knowledge of the <a class="reference external" href="https://docs.github.com/en/get-started/quickstart/contributing-to-projects"><em>fork and pull request workflow</em></a>.</p>
+</section>
+<section id="pixi">
+<h3>Pixi<a class="headerlink" href="#pixi" title="Link to this heading">#</a></h3>
+<p>Developing all aspects of hvPlot requires a wide range of packages in different environments, but for new contributors the <code class="docutils literal notranslate"><span class="pre">default</span></code> environment will be more than enough.</p>
+<p>To make this more manageable, Pixi manages the developer experience. To install Pixi, follow <a class="reference external" href="https://pixi.sh/latest/#installation">this guide</a>.</p>
+<section id="glossary">
+<h4>Glossary<a class="headerlink" href="#glossary" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><p><em>Tasks</em>: A task is what can be run with <code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">run</span> <span class="pre">&lt;task-name&gt;</span></code>. Tasks can be anything from installing packages to running tests.</p></li>
+<li><p><em>Environments</em>: An environment is a set of packages installed in a virtual environment. Each environment has a name; you can run tasks in a specific environment with the <code class="docutils literal notranslate"><span class="pre">-e</span></code> flag. For example, <code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">run</span> <span class="pre">-e</span> <span class="pre">test-core</span> <span class="pre">test-unit</span></code> will run the <code class="docutils literal notranslate"><span class="pre">test-unit</span></code> task in the <code class="docutils literal notranslate"><span class="pre">test-core</span></code> environment.</p></li>
+<li><p><em>Lock-file</em>: A lock-file is a file that contains all the information about the environments.</p></li>
+</ul>
+<p>For more information, see the <a class="reference external" href="https://pixi.sh/latest/">Pixi documentation</a>.</p>
+<div class="info admonition">
+<p class="admonition-title">Note</p>
+<p>The first time you run <code class="docutils literal notranslate"><span class="pre">pixi</span></code>, it will create a <code class="docutils literal notranslate"><span class="pre">.pixi</span></code> directory in the source directory.
+This directory will contain all the files needed for the virtual environments.
+The <code class="docutils literal notranslate"><span class="pre">.pixi</span></code> directory can be large, so it is advised not to put the source directory into a cloud-synced directory.</p>
+</div>
+</section>
+</section>
+</section>
+<section id="installing-the-project">
+<h2>Installing the Project<a class="headerlink" href="#installing-the-project" title="Link to this heading">#</a></h2>
+<section id="cloning-the-project">
+<h3>Cloning the Project<a class="headerlink" href="#cloning-the-project" title="Link to this heading">#</a></h3>
+<p>The source code for the hvPlot project is hosted on <a class="reference external" href="https://github.com/holoviz/hvplot">GitHub</a>. The first thing you need to do is clone the repository.</p>
+<ol class="arabic simple">
+<li><p>Go to <a class="reference external" href="https://github.com/holoviz/hvplot">github.com/holoviz/hvplot</a></p></li>
+<li><p><a class="reference external" href="https://docs.github.com/en/get-started/quickstart/contributing-to-projects">Fork the repository</a></p></li>
+<li><p>Run in your terminal: <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/&lt;Your</span> <span class="pre">Username</span> <span class="pre">Here&gt;/hvplot</span></code></p></li>
+</ol>
+<p>The instructions for cloning above created a <code class="docutils literal notranslate"><span class="pre">hvplot</span></code> directory at your file system location.
+This <code class="docutils literal notranslate"><span class="pre">hvplot</span></code> directory is the <em>source checkout</em> for the remainder of this document, and your current working directory is this directory.</p>
+</section>
+</section>
+<section id="start-developing">
+<h2>Start developing<a class="headerlink" href="#start-developing" title="Link to this heading">#</a></h2>
+<p>To start developing, run the following command, this will create an environment called <code class="docutils literal notranslate"><span class="pre">default</span></code> (in <code class="docutils literal notranslate"><span class="pre">.pixi/envs</span></code>), install hvPlot in <a class="reference external" href="https://pip.pypa.io/en/stable/topics/local-project-installs/#editable-installs">editable mode</a>, download test datasets, and install <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pixi<span class="w"> </span>run<span class="w"> </span>setup-dev
+</pre></div>
+</div>
+<div class="info admonition">
+<p class="admonition-title">Note</p>
+<p>The first time you run it, it will create a <code class="docutils literal notranslate"><span class="pre">pixi.lock</span></code> file with information for all available environments.
+This command will take a minute or so to run.</p>
+</div>
+<p>All available tasks can be found by running <code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">task</span> <span class="pre">list</span></code>, the following sections will give a brief introduction to the most common tasks.</p>
+<section id="syncing-git-tags-with-upstream-repository">
+<h3>Syncing Git tags with upstream repository<a class="headerlink" href="#syncing-git-tags-with-upstream-repository" title="Link to this heading">#</a></h3>
+<p>If you are working from a forked repository of hvPlot, you will need to sync the tags with the upstream repository.
+This is needed because the hvPlot version number depends on <a class="reference external" href="https://git-scm.com/book/en/v2/Git-Basics-Tagging"><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">tags</span></code></a>.
+Syncing the git tags can be done with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pixi<span class="w"> </span>run<span class="w"> </span>sync-git-tags
+</pre></div>
+</div>
+</section>
+</section>
+<section id="developer-environment">
+<h2>Developer Environment<a class="headerlink" href="#developer-environment" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">default</span></code> environment is meant to provide all the tools needed to develop hvPlot.</p>
+<p>This environment is created by running <code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">run</span> <span class="pre">setup-dev</span></code>. Run <code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">shell</span></code> to activate it; this is equivalent to <code class="docutils literal notranslate"><span class="pre">source</span> <span class="pre">venv/bin/activate</span></code> in a Python virtual environment or <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">activate</span></code> in a conda environment.</p>
+<p>If you need to run a command directly instead of via <code class="docutils literal notranslate"><span class="pre">pixi</span></code>, activate the environment and run the command (e.g. <code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">shell</span></code> and <code class="docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">hvplot/tests/&lt;somefile.py&gt;</span></code>).</p>
+<section id="vs-code">
+<h3>VS Code<a class="headerlink" href="#vs-code" title="Link to this heading">#</a></h3>
+<p>This environment can also be selected in your IDE. In VS Code, this can be done by running the command <code class="docutils literal notranslate"><span class="pre">Python:</span> <span class="pre">Select</span> <span class="pre">Interpreter</span></code> and choosing <code class="docutils literal notranslate"><span class="pre">{'default':</span> <span class="pre">Pixi}</span></code>.</p>
+<p style="text-align: center">
+  <img
+    src="https://assets.holoviews.org/static/dev_guide/001.png"
+    alt="001"
+    style="width: 45%; display: inline-block"
+  />
+  <img
+    src="https://assets.holoviews.org/static/dev_guide/002.png"
+    alt="002"
+    style="width: 45%; display: inline-block"
+  />
+</p>
+<p>To confirm you are using this dev environment, check the bottom right corner:</p>
+<p><img alt="003" src="https://assets.holoviews.org/static/dev_guide/003.png" /></p>
+</section>
+<section id="jupyter-lab">
+<h3>Jupyter Lab<a class="headerlink" href="#jupyter-lab" title="Link to this heading">#</a></h3>
+<p>You can launch Jupyter lab with the <code class="docutils literal notranslate"><span class="pre">default</span></code> environment with <code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">run</span> <span class="pre">lab</span></code>. This can be advantageous when you need to edit the documentation or debug an example notebook.</p>
+</section>
+</section>
+<section id="linting">
+<h2>Linting<a class="headerlink" href="#linting" title="Link to this heading">#</a></h2>
+<p>hvPlot uses <a class="reference external" href="https://pre-commit.com/"><code class="docutils literal notranslate"><span class="pre">pre-commit</span></code></a> to lint and format the source code. <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> is installed automatically when running <code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">run</span> <span class="pre">setup-dev</span></code>; it can also be installed with <code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">run</span> <span class="pre">lint-install</span></code>.
+<code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> runs all the linters when a commit is made locally. Linting can be forced to run for all the files with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pixi<span class="w"> </span>run<span class="w"> </span>lint
+</pre></div>
+</div>
+<div class="info admonition">
+<p class="admonition-title">Note</p>
+<p>Alternatively, if you have <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> installed elsewhere you can run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pre-commit<span class="w"> </span>install<span class="w">  </span><span class="c1"># To install</span>
+pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files<span class="w">  </span><span class="c1"># To run on all files</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Link to this heading">#</a></h2>
+<p>To help keep hvPlot maintainable, all Pull Requests (PR) with code changes should typically be accompanied by relevant tests. While exceptions may be made for specific circumstances, the default assumption should be that a Pull Request without tests will not be merged.</p>
+<p>There are three types of tasks and five environments related to tests.</p>
+<section id="unit-tests">
+<h3>Unit tests<a class="headerlink" href="#unit-tests" title="Link to this heading">#</a></h3>
+<p>Unit tests are usually small tests executed with <a class="reference external" href="https://docs.pytest.org">pytest</a>. They can be found in <code class="docutils literal notranslate"><span class="pre">hvplot/tests/</span></code>.
+Unit tests can be run with the <code class="docutils literal notranslate"><span class="pre">test-unit</span></code> task:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pixi<span class="w"> </span>run<span class="w"> </span>test-unit
+</pre></div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">Advanced usage</p>
+<p>The task is available in the following environments: <code class="docutils literal notranslate"><span class="pre">test-39</span></code>, <code class="docutils literal notranslate"><span class="pre">test-310</span></code>, <code class="docutils literal notranslate"><span class="pre">test-311</span></code>, <code class="docutils literal notranslate"><span class="pre">test-312</span></code>, and <code class="docutils literal notranslate"><span class="pre">test-core</span></code>. Where the first ones have the same environments except for different Python versions, and <code class="docutils literal notranslate"><span class="pre">test-core</span></code> only has a core set of dependencies.</p>
+<p>You can run the task in a specific environment with the <code class="docutils literal notranslate"><span class="pre">-e</span></code> flag. For example, to run the <code class="docutils literal notranslate"><span class="pre">test-unit</span></code> task in the <code class="docutils literal notranslate"><span class="pre">test-39</span></code> environment, you can run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>test-39<span class="w"> </span>test-unit
+</pre></div>
+</div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">Advanced usage</p>
+<p>Currently, an editable install needs to be run in each environment. So, if you want to install in the <code class="docutils literal notranslate"><span class="pre">test-core</span></code> environment, you can add <code class="docutils literal notranslate"><span class="pre">--environment</span></code> / <code class="docutils literal notranslate"><span class="pre">-e</span></code> to the command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>test-core<span class="w"> </span>install
+</pre></div>
+</div>
+</div>
+</section>
+<section id="example-tests">
+<h3>Example tests<a class="headerlink" href="#example-tests" title="Link to this heading">#</a></h3>
+<p>hvPlot’s documentation consists mainly of Jupyter Notebooks. The example tests execute all the notebooks and fail if an error is raised. Example tests are possible thanks to <a class="reference external" href="https://nbval.readthedocs.io/">nbval</a> and can be found in the <code class="docutils literal notranslate"><span class="pre">doc/</span></code> folder.
+Example tests can be run with the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pixi<span class="w"> </span>run<span class="w"> </span>test-example
+</pre></div>
+</div>
+</section>
+</section>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">#</a></h2>
+<p>The documentation can be built with the command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pixi<span class="w"> </span>run<span class="w"> </span>docs-build
+</pre></div>
+</div>
+<p>As hvPlot uses notebooks for much of the documentation, this takes a little while. You can disable:</p>
+<ul class="simple">
+<li><p>Executing all the notebooks by setting the environment variable <code class="docutils literal notranslate"><span class="pre">HVPLOT_EXECUTE_NBS</span></code> to <code class="docutils literal notranslate"><span class="pre">false</span></code></p></li>
+<li><p>Building the gallery with <code class="docutils literal notranslate"><span class="pre">HVPLOT_REFERENCE_GALLERY=&quot;false&quot;</span></code></p></li>
+<li><p>Running the user guide notebooks with <code class="docutils literal notranslate"><span class="pre">HVPLOT_EXECUTE_NBS_USER_GUIDE=&quot;false&quot;</span></code></p></li>
+<li><p>Running the getting started notebooks with <code class="docutils literal notranslate"><span class="pre">HVPLOT_EXECUTE_NBS_TUTORIALS=&quot;false&quot;</span></code></p></li>
+</ul>
+<p>A development version of hvPlot can be found <a class="reference external" href="https://holoviz-dev.github.io/hvplot/">here</a>. You can ask a maintainer if they want to make a dev release for your PR, but there is no guarantee they will say yes.</p>
+<section id="link-to-hvplot-objects">
+<h3>Link to hvPlot objects<a class="headerlink" href="#link-to-hvplot-objects" title="Link to this heading">#</a></h3>
+<div class="highlight-md notranslate"><div class="highlight"><pre><span></span>{meth}`hvplot.hvPlot.scatter`
+{meth}`&lt;obj&gt;.scatter() &lt;hvplot.hvPlot.scatter&gt;`
+</pre></div>
+</div>
+</section>
+<section id="intersphinx">
+<h3>Intersphinx<a class="headerlink" href="#intersphinx" title="Link to this heading">#</a></h3>
+<p>The Sphinx Intersphinx extension allows linking to references in other projects that use this extension. For example:</p>
+<ol class="arabic simple">
+<li><p>Run this command to find all the references of the HoloViews site <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">sphinx.ext.intersphinx</span> <span class="pre">https://holoviews.org/objects.inv</span></code>. Alternatively, running <code class="docutils literal notranslate"><span class="pre">myst-inv</span> <span class="pre">https://holoviews.org/objects.inv</span></code> provides the same content but in a more structured way.</p></li>
+<li><p>Extend <code class="docutils literal notranslate"><span class="pre">intersphinx_mapping</span></code> in <code class="docutils literal notranslate"><span class="pre">conf.py</span></code>. The key is up to you and will be used to refer to this site later in the links.</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">intersphinx_mapping</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;holoviews&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;https://holoviews.org/&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>Link to something on another site:</p></li>
+</ol>
+<ul>
+<li><p>If it is in a docstring, use this RST syntax:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>:class:`holoviews:holoviews.element.Scatter`
+</pre></div>
+</div>
+</li>
+<li><p>If it is in a document, there are multiple syntaxes available check <a class="reference external" href="https://myst-parser.readthedocs.io/en/latest/syntax/cross-referencing.html">myst-parser’s docs</a> for more details:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>{class}`holoviews:holoviews.element.Scatter`
+[Some text](inv:holoviews#holoviews.element.Scatter)
+&lt;inv:holoviews:py:class#holoviews.element.Scatter&gt;
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+</section>
+<section id="build">
+<h2>Build<a class="headerlink" href="#build" title="Link to this heading">#</a></h2>
+<p>hvPlot has two build tasks to build a Python (for pypi.org) and a Conda package (for anaconda.org).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pixi<span class="w"> </span>run<span class="w"> </span>build-pip
+pixi<span class="w"> </span>run<span class="w"> </span>build-conda
+</pre></div>
+</div>
+</section>
+<section id="continuous-integration">
+<h2>Continuous Integration<a class="headerlink" href="#continuous-integration" title="Link to this heading">#</a></h2>
+<p>Every push to the <code class="docutils literal notranslate"><span class="pre">main</span></code> branch or any PR branch on GitHub automatically triggers a test build with <a class="reference external" href="https://github.com/features/actions">GitHub Actions</a>.</p>
+<p>You can see the list of all current and previous builds at <a class="reference external" href="https://github.com/holoviz/hvplot/actions">this URL</a></p>
+<section id="etiquette">
+<h3>Etiquette<a class="headerlink" href="#etiquette" title="Link to this heading">#</a></h3>
+<p>GitHub Actions provides free build workers for open-source projects. A few considerations will help you be considerate of others needing these limited resources:</p>
+<ul class="simple">
+<li><p>Run the tests locally before opening or pushing to an opened PR.</p></li>
+<li><p>Group commits to meaningful chunks of work before pushing to GitHub (i.e., don’t push on every commit).</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="ref/api_compatibility/pandas/Pandas_API.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Comparison with Pandas API</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="releases.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Releases</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tl-dr">TL;DR</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminaries">Preliminaries</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-understanding-of-how-to-contribute-to-open-source">Basic understanding of how to contribute to Open Source</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#git">Git</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pixi">Pixi</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#glossary">Glossary</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-the-project">Installing the Project</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cloning-the-project">Cloning the Project</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#start-developing">Start developing</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#syncing-git-tags-with-upstream-repository">Syncing Git tags with upstream repository</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#developer-environment">Developer Environment</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#vs-code">VS Code</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#jupyter-lab">Jupyter Lab</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linting">Linting</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#testing">Testing</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unit-tests">Unit tests</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#example-tests">Example tests</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#link-to-hvplot-objects">Link to hvPlot objects</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#intersphinx">Intersphinx</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#build">Build</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#continuous-integration">Continuous Integration</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#etiquette">Etiquette</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/holoviz/hvplot/edit/main/doc/developer_guide.md">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+
+  <div class="tocsection sourcelink">
+    <a href="_sources/developer_guide.md">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item"><p class="nbsite-copyright-last-updated">
+    <span class="copyright">
+            &copy; Copyright 2016-2025 Holoviz contributors.
+    </span>
+    <span class="last-updated">Last updated on 2025-04-30.</span><br>
+</p></div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
