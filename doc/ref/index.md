@@ -12,4 +12,5 @@ Supported data libraries <data_libraries>
 Supported plotting extensions <plotting_extensions>
 Plotting options <plotting_options/index>
 API <api/index>
+API compatibility <api_compatibility/index>
 ```
