@@ -1563,7 +1563,7 @@ class HoloViewsConverter:
             except Exception as e:
                 if attr_labels is True:
                     param.main.param.warning(
-                        'Unable to auto label using xarray attrs ' f'because {e}'
+                        f'Unable to auto label using xarray attrs because {e}'
                     )
 
     def _process_plot(self):
@@ -2108,8 +2108,8 @@ class HoloViewsConverter:
                 f'{tile_source} tiles not recognized. tiles must be either True, a '
                 'xyzservices.TileProvider instance, a HoloViews'
                 + (' or Geoviews' if lib == 'geoviews' else '')
-                + " basemap string "
-                f"(one of {', '.join(sorted(sources))}), a HoloViews Tiles instance"
+                + ' basemap string '
+                f'(one of {", ".join(sorted(sources))}), a HoloViews Tiles instance'
                 + (', a Geoviews WMTS instance' if lib == 'geoviews' else '')
                 + '.'
             )
@@ -2965,8 +2965,8 @@ class HoloViewsConverter:
         nbands = len(data.coords[bands])
         if nbands < 3:
             raise ValueError(
-                'Selected bands coordinate (%s) has only %d channels,'
-                'expected at least three channels to convert to RGB.' % (bands, nbands)
+                f'Selected bands coordinate ({bands}) has only {nbands:d} channels,'
+                'expected at least three channels to convert to RGB.'
             )
 
         params = dict(self._relabel)
