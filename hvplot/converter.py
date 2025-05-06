@@ -1,5 +1,6 @@
 import difflib
 import sys
+import warnings
 from functools import partial
 
 import param
@@ -803,6 +804,12 @@ class HoloViewsConverter:
         subcoordinate_y=None,
         **kwds,
     ):
+        if debug:
+            warnings.warn(
+                '`debug` has been deprecated and will be removed in a future version.',
+                DeprecationWarning,
+            )
+
         # Process data and related options
         self._redim = fields
         self.use_index = use_index
