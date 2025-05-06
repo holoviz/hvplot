@@ -807,7 +807,7 @@ class HoloViewsConverter:
         if debug:
             warnings.warn(
                 '`debug` has been deprecated and will be removed in a future version.',
-                DeprecationWarning,
+                FutureWarning,
             )
 
         # Process data and related options
