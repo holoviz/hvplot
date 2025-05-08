@@ -79,6 +79,7 @@ from .util import (
     import_datashader,
     import_geoviews,
     is_mpl_cmap,
+    _find_stack_level,
 )
 from .utilities import hvplot_extension
 
@@ -808,6 +809,7 @@ class HoloViewsConverter:
             warnings.warn(
                 '`debug` has been deprecated and will be removed in a future version.',
                 FutureWarning,
+                stacklevel=_find_stack_level(),
             )
 
         # Process data and related options
