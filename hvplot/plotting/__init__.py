@@ -1,7 +1,7 @@
 import warnings
 
 import holoviews as hv
-from ..util import with_hv_extension, is_duckdb, is_polars
+from ..util import with_hv_extension, is_duckdb, is_polars, _find_stack_level
 
 from .core import hvPlot, hvPlotTabular  # noqa
 
@@ -43,6 +43,7 @@ def plot(data, kind, **kwargs):
             'deprecated and will be removed in a future version. '
             'Use `import hvplot.duckdb` instead.',
             FutureWarning,
+            stacklevel=_find_stack_level(),
         )
         from .core import hvPlotTabularDuckDB
 
