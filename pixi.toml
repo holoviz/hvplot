@@ -147,7 +147,7 @@ streamz = ">=0.3.0"
 xarray = ">=0.18.2"
 xyzservices = ">=2022.9.0"
 geodatasets = ">=2023.12.0"
-hvsampledata = "*"
+hvsampledata = ">=0.1.2"
 
 # =================== TESTS ===================
 
