@@ -1,5 +1,6 @@
 import difflib
 import sys
+import warnings
 from functools import partial
 
 import param
@@ -812,6 +813,12 @@ class HoloViewsConverter:
         subcoordinate_y=None,
         **kwds,
     ):
+        if debug:
+            warnings.warn(
+                '`debug` has been deprecated and will be removed in a future version.',
+                FutureWarning,
+            )
+
         # Process data and related options
         self._redim = fields
         self.use_index = use_index
@@ -2974,8 +2981,8 @@ class HoloViewsConverter:
         nbands = len(data.coords[bands])
         if nbands < 3:
             raise ValueError(
-                'Selected bands coordinate (%s) has only %d channels,'
-                'expected at least three channels to convert to RGB.' % (bands, nbands)
+                f'Selected bands coordinate ({bands}) has only {nbands:d} channels,'
+                'expected at least three channels to convert to RGB.'
             )
 
         params = dict(self._relabel)

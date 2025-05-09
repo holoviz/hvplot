@@ -1,9 +1,9 @@
 [build-system]
 requires = [
-    "setuptools >=30.3.0",
-    "setuptools_scm >=6",
+    "hatchling >=1.25.0",
+    "hatch-vcs >=0.4.0",
 ]
-build-backend = "setuptools.build_meta"
+build-backend = "hatchling.build"
 
 [project]
 name = "hvplot"
@@ -151,7 +151,7 @@ examples-tests = [
 # Additional packages required to build the docs
 doc = [
     "hvplot[examples]",
-    "nbsite >=0.8.6",
+    "nbsite >=0.9.0a2",
     "sphinxext-rediraffe",
     "numpydoc",
     "sphinxcontrib-mermaid",
@@ -173,14 +173,18 @@ dev-extras = [
     "setuptools_scm >= 6"
 ]
 
-[tool.setuptools]
-include-package-data = true
+[tool.hatch.version]
+source = "vcs"
+raw-options = { version_scheme = "no-guess-dev" }
 
-[tool.setuptools.packages.find]
+[tool.hatch.build.targets.wheel]
 include = ["hvplot"]
 
-[tool.setuptools_scm]
-version_file = "hvplot/_version.py"
+[tool.hatch.build.targets.sdist]
+include = ["hvplot", "scripts", "doc"]
+
+[tool.hatch.build.hooks.vcs]
+version-file = "hvplot/_version.py"
 
 [tool.pytest.ini_options]
 addopts = "-v --pyargs"
