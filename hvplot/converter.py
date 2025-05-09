@@ -228,9 +228,19 @@ class HoloViewsConverter:
 
     Size And Layout Options
     -----------------------
-    fontscale : number
-        Scales the size of all fonts by the same amount, e.g. fontscale=1.5
-        enlarges all fonts (title, xticks, labels etc.) by 50%
+    aspect : str or float or None, default=None
+        The aspect ratio mode of the plot. By default, a plot may
+        select its own appropriate aspect ratio but sometimes it may
+        be necessary to force a square aspect ratio (e.g. to display
+        the plot as an element of a grid). The modes 'auto' and
+        'equal' correspond to the axis modes of the same name in
+        matplotlib, a numeric value specifying the ratio between plot
+        width and height may also be passed. To control the aspect
+        ratio between the axis scales use the ``data_aspect`` option
+        instead.
+    data_aspect : float or None, default=None
+        Defines the aspect of the axis scaling, i.e. the ratio of
+        y-unit to x-unit.
     frame_width/frame_height : int
         The width and height of the data area of the plot
     max_width/max_height : int
@@ -256,19 +266,6 @@ class HoloViewsConverter:
 
     Axis Options
     ------------
-    aspect : str or float or None, default=None
-        The aspect ratio mode of the plot. By default, a plot may
-        select its own appropriate aspect ratio but sometimes it may
-        be necessary to force a square aspect ratio (e.g. to display
-        the plot as an element of a grid). The modes 'auto' and
-        'equal' correspond to the axis modes of the same name in
-        matplotlib, a numeric value specifying the ratio between plot
-        width and height may also be passed. To control the aspect
-        ratio between the axis scales use the ``data_aspect`` option
-        instead.
-    data_aspect : float or None, default=None
-        Defines the aspect of the axis scaling, i.e. the ratio of
-        y-unit to x-unit.
     autorange : Literal['x', 'y'] or None, default=None
         Whether to enable auto-ranging along the x- or y-axis when
         zooming. Requires HoloViews >= 1.16.
@@ -379,6 +376,9 @@ class HoloViewsConverter:
         Lower and upper bound of the color scale
     cnorm : str, default='linear'
         Color scaling which must be one of 'linear', 'log' or 'eq_hist'
+    fontscale : number
+        Scales the size of all fonts by the same amount, e.g. fontscale=1.5
+        enlarges all fonts (title, xticks, labels etc.) by 50%
     fontsize : number or dict or None, default=None
         Set title, label and legend text to the same fontsize. Finer control
         by using a dict: {'title': '15pt', 'ylabel': '5px', 'ticks': 20}
@@ -512,7 +512,8 @@ class HoloViewsConverter:
     ]
 
     _size_layout_options = [
-        'fontscale',
+        'aspect',
+        'data_aspect',
         'frame_height',
         'frame_width',
         'height',
@@ -526,8 +527,6 @@ class HoloViewsConverter:
     ]
 
     _axis_config_options = [
-        'aspect',
-        'data_aspect',
         'autorange',
         'clabel',
         'flip_xaxis',
@@ -573,6 +572,7 @@ class HoloViewsConverter:
         'clim',
         'color',
         'colormap',
+        'fontscale',
         'fontsize',
         'c',
         'cmap',
