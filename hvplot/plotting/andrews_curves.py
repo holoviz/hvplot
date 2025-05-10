@@ -59,7 +59,7 @@ def andrews_curves(
     t = np.linspace(-np.pi, np.pi, samples)
     vals = data.drop(class_column, axis=1).values.T
 
-    curves = np.outer(vals[0], np.ones_like(t))
+    curves = np.outer(vals[0] / np.sqrt(2), np.ones_like(t))
     for i in range(1, len(vals)):
         ft = ((i + 1) // 2) * t
         if i % 2 == 1:
@@ -69,7 +69,7 @@ def andrews_curves(
 
     df = pd.DataFrame(
         {
-            't': np.tile(np.arange(samples), curves.shape[0]),
+            't': np.tile(t, curves.shape[0]),
             'sample': np.repeat(np.arange(curves.shape[0]), curves.shape[1]),
             'value': curves.ravel(),
             class_column: np.repeat(data[class_column], samples),
