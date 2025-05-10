@@ -69,7 +69,7 @@ def andrews_curves(
 
     df = pd.DataFrame(
         {
-            't': np.tile(np.arange(samples), curves.shape[0]),
+            't': np.tile(t, curves.shape[0]),
             'sample': np.repeat(np.arange(curves.shape[0]), curves.shape[1]),
             'value': curves.ravel(),
             class_column: np.repeat(data[class_column], samples),
