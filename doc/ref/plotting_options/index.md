@@ -63,6 +63,7 @@ reference page of each plotting method (e.g. {meth}`hvplot.hvPlot.scatter`) or b
 ```{eval-rst}
 .. plotting-options-table:: Styling Options
 ```
+See [this page](./styling) for more information on these options.
 
 ## Interactivity Options
 
@@ -103,4 +104,5 @@ Options for handling live data streams:
 
 All Options <self>
 Data Options <data>
+Styling Options <styling>
 ```
