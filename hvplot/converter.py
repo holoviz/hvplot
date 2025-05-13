@@ -227,16 +227,13 @@ class HoloViewsConverter:
 
     Size And Layout Options
     -----------------------
-    aspect : str or float or None, default=None
-        The aspect ratio mode of the plot. By default, a plot may
-        select its own appropriate aspect ratio but sometimes it may
-        be necessary to force a square aspect ratio (e.g. to display
-        the plot as an element of a grid). The modes 'auto' and
-        'equal' correspond to the axis modes of the same name in
-        matplotlib, a numeric value specifying the ratio between plot
-        width and height may also be passed. To control the aspect
-        ratio between the axis scales use the ``data_aspect`` option
-        instead.
+    aspect : float or {'equal', 'square'} or None, default=None
+        Sets the width-to-height ratio of the plot. When None (the default),
+        HoloViews chooses an appropriate aspect automatically. Use
+        'equal' or 'square' to modify the unit ratio between axes,
+        or supply a numeric value (e.g. 2.0) for a custom ratio.
+        To control the scaling of individual axis units, use the
+        ``data_aspect`` option instead.
     data_aspect : float or None, default=None
         Defines the aspect of the axis scaling, i.e. the ratio of
         y-unit to x-unit.
