@@ -154,12 +154,6 @@ class HoloViewsConverter:
         Label for the data, typically used in the plot title or legends.
     persist : bool, default=False
         Whether to persist the data in memory when using dask.
-    robust : bool or None, default=None
-        If True and clim are absent, the colormap range is computed
-        with 2nd and 98th percentiles instead of the extreme values
-        for image elements. For RGB elements, clips the "RGB", or
-        raw reflectance values between 2nd and 98th percentiles.
-        Follows the same logic as xarray's robust option.
     row : str or None, default=None
         Column name to use for splitting the plot into separate subplots by rows.
     col : str or None, default=None
@@ -168,12 +162,6 @@ class HoloViewsConverter:
         Whether to sort the x-axis by date before plotting
     subplots : bool, default=False
         Whether to display data in separate subplots when using the ``by`` parameter.
-    symmetric : bool or None, default=None
-        Whether the data are symmetric around zero. If left unset, the data
-        will be checked for symmetry as long as the size is less than
-        ``check_symmetric_max``.
-    check_symmetric_max : int, default=1000000
-        Size above which to stop checking for symmetry by default on the data.
     transforms : dict, default={}
         A dictionary of HoloViews dim transforms to apply before plotting
     use_dask : bool, default=False
@@ -229,9 +217,6 @@ class HoloViewsConverter:
 
     Size And Layout Options
     -----------------------
-    fontscale : number
-        Scales the size of all fonts by the same amount, e.g. fontscale=1.5
-        enlarges all fonts (title, xticks, labels etc.) by 50%
     frame_width/frame_height : int
         The width and height of the data area of the plot
     max_width/max_height : int
@@ -380,6 +365,9 @@ class HoloViewsConverter:
         Lower and upper bound of the color scale
     cnorm : str, default='linear'
         Color scaling which must be one of 'linear', 'log' or 'eq_hist'
+    fontscale : number
+        Scales the size of all fonts by the same amount, e.g. fontscale=1.5
+        enlarges all fonts (title, xticks, labels etc.) by 50%
     fontsize : number or dict or None, default=None
         Set title, label and legend text to the same fontsize. Finer control
         by using a dict: {'title': '15pt', 'ylabel': '5px', 'ticks': 20}
@@ -390,6 +378,19 @@ class HoloViewsConverter:
         rendering towards the (more visible) top of the ``cmap`` range,
         thus avoiding washout of the lower values.  Has no effect if
         ``cnorm!=`eq_hist``.
+    robust : bool or None, default=None
+        If True and clim are absent, the colormap range is computed
+        with 2nd and 98th percentiles instead of the extreme values
+        for image elements. For RGB elements, clips the "RGB", or
+        raw reflectance values between 2nd and 98th percentiles.
+        Follows the same logic as xarray's robust option.
+    symmetric : bool or None, default=None
+        Whether the data are symmetric around zero. If left unset, the data
+        will be checked for symmetry as long as the size is less than
+        ``check_symmetric_max``.
+    check_symmetric_max : int, default=1000000
+        Size above which to stop checking for symmetry by default on the data.
+
 
     Resampling Options
     ------------------
@@ -487,13 +488,10 @@ class HoloViewsConverter:
         'kind',
         'label',
         'persist',
-        'robust',
         'row',
         'col',
         'sort_date',
         'subplots',
-        'symmetric',
-        'check_symmetric_max',
         'transforms',
         'use_dask',
         'use_index',
@@ -513,7 +511,6 @@ class HoloViewsConverter:
     ]
 
     _size_layout_options = [
-        'fontscale',
         'frame_height',
         'frame_width',
         'height',
@@ -575,11 +572,15 @@ class HoloViewsConverter:
         'color',
         'colormap',
         'fontsize',
+        'fontscale',
         'c',
         'cmap',
         'color_key',
         'cnorm',
         'rescale_discrete_levels',
+        'robust',
+        'symmetric',
+        'check_symmetric_max',
     ]
 
     _resample_options = [
