@@ -105,5 +105,5 @@ Options for handling live data streams:
 
 All Options <self>
 Data Options <data>
-Grid and Legend Options <grid_legend>
+Grid And Legend Options <grid_legend>
 ```
