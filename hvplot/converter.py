@@ -152,7 +152,8 @@ class HoloViewsConverter:
         By default, this grouping dimension is labeled 'Variable'.
         Setting ``group_label`` overrides this default label.
 
-        Note: ``group_label`` only applies when plotting multiple columns and does not control grouping with ``by``.
+        .. note::
+           ``group_label`` only applies when plotting multiple columns and does not control grouping with ``by``.
     kind : str, default='line'
         The type of plot to generate.
     label : str or None, default=None
