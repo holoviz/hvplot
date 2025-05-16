@@ -461,6 +461,10 @@ class HoloViewsConverter:
         Applies a resampling operation (datashade, rasterize or downsample) if
         the number of individual data points present in the current zoom range
         is above this threshold. The raw plot is displayed otherwise.
+    selector : datashader.Reduction or None, default=None
+        Datashader reduction to use when applying rasterize or datashade operation,
+        to select additional information to add to the hover tooltip.
+        Valid options include: ``ds.min``, ``ds.max``, ``ds.first``, and ``ds.last``.
     threshold : float, default=0.5
         When using ``dynspread``, this value defines the minimum density of overlapping points
         required before the spreading operation is applied.
@@ -604,6 +608,7 @@ class HoloViewsConverter:
         'dynspread',
         'max_px',
         'precompute',
+        'selector',
         'threshold',
     ]
 
@@ -788,6 +793,7 @@ class HoloViewsConverter:
         debug=False,
         framewise=True,
         aggregator=None,
+        selector=None,
         projection=None,
         global_extent=None,
         geo=False,
@@ -911,6 +917,7 @@ class HoloViewsConverter:
         self.downsample = downsample
         self.dynspread = dynspread
         self.aggregator = aggregator
+        self.selector = selector
         self.precompute = precompute
         self.x_sampling = x_sampling
         self.y_sampling = y_sampling
@@ -1968,7 +1975,8 @@ class HoloViewsConverter:
         categorical, agg = self._process_categorical_datashader()
         if agg:
             opts['aggregator'] = agg
-
+        if self.selector:
+            opts['selector'] = self.selector
         if self.precompute:
             opts['precompute'] = self.precompute
         if self.x_sampling:
