@@ -1,15 +1,19 @@
-name: Auto-label new issues with "triage"
+name: Auto-label new issues with "TRIAGE"
 
 on:
   issues:
-    types: [opened]
-
+    types:
+      - reopened
+      - opened
 jobs:
   add-triage-label:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
-      - name: Add TRIAGE label
-        uses: actions-ecosystem/action-add-labels@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          labels: TRIAGE
+      - run: gh issue edit "$NUMBER" --add-label "$LABELS"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.issue.number }}
+          LABELS: TRIAGE
