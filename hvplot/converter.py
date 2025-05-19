@@ -320,11 +320,11 @@ class HoloViewsConverter:
     Interactivity Options
     ---------------------
     hover : bool or None, default=None
-        Whether to show hover tooltips, default is True unless datashade is
-        True in which case hover is False by default
+        Whether to show hover tooltips, default is True unless ``datashade=True``
+        in which case hover is False by default
     hover_cols : list or str, default=[]
         Additional columns to add to the hover tool or 'all' which will
-        includes all columns (including indexes if use_index is True).
+        include all columns (including indexes if ``use_index=True``).
     hover_formatters : dict or None, default=None
         A dict of formatting options for the hover tooltip.
     hover_tooltips : list[str] or list[tuple] or None, default=None
