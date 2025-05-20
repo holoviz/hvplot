@@ -211,8 +211,8 @@ pygraphviz = "*"
 
 [feature.test.tasks]
 test-unit-geo = 'pytest -v hvplot --geo'
-test-unit-cov = 'pytest -v hvplot --cov=hvplot --cov-append'
-test-unit-geo-cov = 'pytest -v hvplot --geo --cov=hvplot --cov-append'
+test-unit-cov = 'pytest -v hvplot --cov=hvplot --cov-branch --cov-append'
+test-unit-geo-cov = 'pytest -v hvplot --geo --cov=hvplot --cov-branch --cov-append'
 
 [feature.test-core.tasks]
 test-unit = 'pytest -v hvplot'

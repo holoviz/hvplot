@@ -1140,12 +1140,6 @@ class HoloViewsConverter:
         ) and self.kind in ('scatter', 'line', 'area'):
             agg = ds.reductions.count_cat(self.group_label)
             categorical = True
-
-        (
-            (isinstance(self.y, list) and len(self.y) > 1)
-            or (self.y is None and len(set(self.variables) - set(self.indexes)) > 1)
-        )
-
         return categorical, agg
 
     def _process_symmetric(self, symmetric, clim, check_symmetric_max):
