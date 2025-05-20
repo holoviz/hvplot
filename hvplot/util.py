@@ -4,6 +4,7 @@ Provides utilities to convert data and projections
 
 import inspect
 import itertools
+import os
 import textwrap
 import sys
 
@@ -1045,3 +1046,32 @@ def _get_docstring_group_parameters(option_group: str) -> list:
     with _patch_numpy_docstring():
         cdoc = NumpyDocString(HoloViewsConverter.__doc__)
         return cdoc[option_group]
+
+
+def _find_stack_level() -> int:
+    """
+    Find the first place in the stack that is not inside hvplot
+    (tests notwithstanding).
+    Inspired by: pandas.util._exceptions.find_stack_level
+    """
+    import hvplot
+
+    pkg_dir = os.path.dirname(hvplot.__file__)
+    test_dir = os.path.join(pkg_dir, 'tests')
+
+    # https://stackoverflow.com/questions/17407119/python-inspect-stack-is-slow
+    frame = inspect.currentframe()
+    try:
+        n = 0
+        while frame:
+            filename = inspect.getfile(frame)
+            if filename.startswith(pkg_dir) and not filename.startswith(test_dir):
+                frame = frame.f_back
+                n += 1
+            else:
+                break
+    finally:
+        # See note in
+        # https://docs.python.org/3/library/inspect.html#inspect.Traceback
+        del frame
+    return n
