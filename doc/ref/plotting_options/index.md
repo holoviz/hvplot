@@ -34,6 +34,8 @@ Customization options for plot sizes and overall layout, including responsive mo
 .. plotting-options-table:: Size And Layout Options
 ```
 
+See [this page](./size_layout) for more information on these options.
+
 ## Axis Options
 
 Customization options for axis appearance and behavior, including labels, limits, tick formatting, and axis scaling:
@@ -106,4 +108,5 @@ Options for handling live data streams:
 All Options <self>
 Data Options <data>
 Grid And Legend Options <grid_legend>
+Size And Layout Options <size_layout>
 ```
