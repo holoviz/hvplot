@@ -159,6 +159,16 @@ class TestChart1D(ComparisonTestCase):
                 'Volume {m3}': ['1', '2', '3'],
             }
         )
+        self.df_hist = pd.DataFrame(
+            {
+                'z': [
+                    1,
+                    1,
+                    4,
+                    4,
+                ]
+            }
+        )
 
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
     def test_wide_chart(self, kind, element):
@@ -343,6 +353,13 @@ class TestChart1D(ComparisonTestCase):
         assert not plot_0.opts['axiswise']
         assert plot_0.range('x') == (1, 6)
         assert plot_1.range('y') == (1, 6)
+
+    def test_histogram_log_bins(self):
+        df = pd.DataFrame({'z': [1, 1, 4, 4]})
+        plot_logx = df.hvplot.hist(bins=2, logx=True)
+        plot_loglog = df.hvplot.hist(bins=2, loglog=True)
+        np.testing.assert_array_equal(plot_logx.data['z'], np.array([1.0, 2.0, 4.0]))
+        np.testing.assert_array_equal(plot_loglog.data['z'], np.array([1.0, 2.0, 4.0]))
 
     def test_scatter_color_internally_set_to_dim(self):
         altered_df = self.cat_df.copy().rename(columns={'category': 'red'})
@@ -601,6 +618,7 @@ class TestChart1DDask(TestChart1D):
         self.cat_df_index = dd.from_pandas(self.cat_df_index, npartitions=3)
         self.cat_df_index_y = dd.from_pandas(self.cat_df_index_y, npartitions=3)
         self.cat_only_df = dd.from_pandas(self.cat_only_df, npartitions=1)
+        self.df_hist = dd.from_pandas(self.df_hist, npartitions=1)
 
     def test_by_datetime_accessor(self):
         raise SkipTest("Can't expand dt accessor columns when using dask")
