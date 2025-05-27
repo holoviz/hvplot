@@ -1538,9 +1538,9 @@ class hvPlotTabular(hvPlotBase):
         columns : string or sequence
             The field(s) to display as columns.
         sortable : bool, optional
-            If True the columns are sortable. Default is False.
+            If True the columns are sortable. Default is True.
         selectable : bool, optional
-            If True the cells are selectable. Default is False. # Todo: Describe how to use this
+            If True the cells are selectable. Default is True.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('table')`.
             See :ref:`plot-options` for more information.
