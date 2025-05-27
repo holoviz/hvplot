@@ -159,16 +159,7 @@ class TestChart1D(ComparisonTestCase):
                 'Volume {m3}': ['1', '2', '3'],
             }
         )
-        self.df_hist = pd.DataFrame(
-            {
-                'z': [
-                    1,
-                    1,
-                    4,
-                    4,
-                ]
-            }
-        )
+        self.df_hist = pd.DataFrame({'z': [1, 1, 4, 4]})
 
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
     def test_wide_chart(self, kind, element):
