@@ -777,6 +777,8 @@ class hvPlotTabular(hvPlotBase):
 
         .. code-block::
 
+            import pandas as pd
+
             data = pd.DataFrame({
                 "open": [100, 101, 102],
                 "high": [104, 105, 110],
