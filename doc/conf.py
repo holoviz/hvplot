@@ -23,6 +23,9 @@ description = 'A high-level plotting API for the PyData ecosystem built on HoloV
 version = release = base_version(hvplot.__version__)  # noqa
 nbbuild_cell_timeout = 600
 
+# Useful for SEO on a versioned site
+html_baseurl = 'https://hvplot.holoviz.org/en/docs/latest/'
+
 exclude_patterns = ['governance']
 
 html_static_path += ['_static']  # noqa
