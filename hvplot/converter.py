@@ -2600,6 +2600,7 @@ class HoloViewsConverter:
             'bin_range': self.kwds.get('bin_range', None),
             'normed': self.kwds.get('normed', False),
             'cumulative': self.kwds.get('cumulative', False),
+            'log': self._plot_opts.get('logx', False),
         }
         if 'bins' in self.kwds:
             bins = self.kwds['bins']

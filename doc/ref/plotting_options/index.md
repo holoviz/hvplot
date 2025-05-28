@@ -52,6 +52,8 @@ Options for setting the grid or legend of plots as well as colorbar options:
 .. plotting-options-table:: Grid And Legend Options
 ```
 
+See [this page](./grid_legend) for more information on these options.
+
 (plotting-options-styling)=
 ## Styling Options
 
@@ -107,5 +109,6 @@ Options for handling live data streams:
 All Options <self>
 Data Options <data>
 Styling Options <styling>
+Grid And Legend Options <grid_legend>
 Size And Layout Options <size_layout>
 ```
