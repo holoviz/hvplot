@@ -579,7 +579,6 @@ class HoloViewsConverter:
         'colormap',
         'fontscale',
         'fontsize',
-        'fontscale',
         'c',
         'cmap',
         'color_key',
