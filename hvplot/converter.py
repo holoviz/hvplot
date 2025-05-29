@@ -574,6 +574,7 @@ class HoloViewsConverter:
         'hover_formatters',
         'hover_tooltips',
         'tools',
+        'widget_location',
     ]
 
     _style_options = [
