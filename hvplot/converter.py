@@ -313,9 +313,10 @@ class HoloViewsConverter:
 
     Interactivity Options
     ---------------------
-    hover : bool or None, default=None
+    hover : bool or str or None, default=None
         Whether to show hover tooltips, default is True unless ``datashade=True``
-        in which case hover is False by default
+        in which case hover is False by default. Also accepts ``'hline'``
+        and ``'vline'`` to change the hit-testing mode.
     hover_cols : list or str, default=[]
         Additional columns to add to the hover tool or 'all' which will
         include all columns (including indexes if ``use_index=True``).
