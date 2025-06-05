@@ -363,9 +363,8 @@ class HoloViewsConverter:
         Accepts the same values as `cmap`. See `cmap` for more details.
         Only one of ``cmap``, ``colormap``, or ``color_key`` can be specified at a time.
     color_key : str or list or dict or None, default=None
-        Defines a categorical colormap for datashaded plots where distinct
-        colors must be assigned to different categories. The number of colors
-        must match or exceed the number of unique categories in the dataset.
+        Alias for ``cmap``. Accepts the same values as ``cmap``.
+        See ``cmap`` for more details.
         Only one of ``cmap``, ``colormap``, or ``color_key`` can be specified at a time.
     clim : tuple or None, default=None
         Lower and upper bound of the color scale
