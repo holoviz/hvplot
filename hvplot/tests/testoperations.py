@@ -324,6 +324,22 @@ class TestDatashader(ComparisonTestCase):
         assert isinstance(element, eltype)
         assert len(element) == 0
 
+    def test_selector_rasterize(self):
+        from datashader.reductions import first
+
+        expected = first('category')
+        plot = self.df.hvplot.points('x', 'y', rasterize=True, selector=expected)
+        actual = plot.callback.inputs[0].callback.operation.p['selector']
+        assert actual is expected
+
+    def test_selector_datashade(self):
+        from datashader.reductions import first
+
+        expected = first('category')
+        plot = self.df.hvplot.points('x', 'y', datashade=True, selector=expected)
+        actual = plot.callback.inputs[0].callback.operation.p['selector']
+        assert actual is expected
+
 
 class TestChart2D(ComparisonTestCase):
     def setUp(self):
