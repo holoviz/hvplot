@@ -77,6 +77,8 @@ Bokeh specific options for adding hover tools as well as other interactive tools
 .. plotting-options-table:: Interactivity Options
 ```
 
+See [this page](./interactivity) for more information on these options.
+
 ## Resampling Options
 
 Performance related options for handling large datasets, including downsampling, rasterization, and dynamic plot updates (most of these options require [Datashader](https://datashader.org/) to be installed):
@@ -109,6 +111,7 @@ Options for handling live data streams:
 All Options <self>
 Data Options <data>
 Styling Options <styling>
+Interactivity Options <interactivity>
 Grid And Legend Options <grid_legend>
 Size And Layout Options <size_layout>
 ```
