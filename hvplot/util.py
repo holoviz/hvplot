@@ -381,7 +381,6 @@ def process_crs(crs):
         try:
             return proj_to_cartopy(wkt)  # should be all proj4 or wkt strings
         except Exception as e:
-            print('Failed')
             errors.append(e)
 
     if isinstance(crs, (str, int)):
