@@ -143,6 +143,31 @@ def proj_to_cartopy(proj):
 
     import cartopy.crs as ccrs
 
+    PROJ_TO_CCRS = {
+        'longlat': ccrs.PlateCarree,
+        'tmerc': ccrs.TransverseMercator,
+        'lcc': ccrs.LambertConformal,
+        'merc': ccrs.Mercator,
+        'utm': ccrs.UTM,
+        'stere': ccrs.Stereographic,
+        'ob_tran': ccrs.RotatedPole,
+        'aea': ccrs.AlbersEqualArea,
+        'eqdc': ccrs.EquidistantConic,
+        'aeqd': ccrs.AzimuthalEquidistant,
+        'gnom': ccrs.Gnomonic,
+        'ortho': ccrs.Orthographic,
+        'robin': ccrs.Robinson,
+        'moll': ccrs.Mollweide,
+        'sinu': ccrs.Sinusoidal,
+        'eck4': ccrs.EckertIV,
+        'geos': ccrs.Geostationary,
+        'nsper': ccrs.NearsidePerspective,
+        'laea': ccrs.LambertAzimuthalEqualArea,
+        'cea': ccrs.LambertCylindrical,
+        'mill': ccrs.Miller,
+        'vandg': ccrs.InterruptedGoodeHomolosine,  # closest equivalent
+    }
+
     try:
         from osgeo import osr
 
@@ -209,53 +234,12 @@ def proj_to_cartopy(proj):
         except Exception:
             pass
         if k == 'proj':
-            if v == 'longlat':
-                cl = ccrs.PlateCarree
-            elif v == 'tmerc':
-                cl = ccrs.TransverseMercator
-                kw_proj['approx'] = True
-            elif v == 'lcc':
-                cl = ccrs.LambertConformal
-            elif v == 'merc':
-                cl = ccrs.Mercator
-            elif v == 'utm':
-                cl = ccrs.UTM
-            elif v == 'stere':
-                cl = ccrs.Stereographic
-            elif v == 'ob_tran':
-                cl = ccrs.RotatedPole
-            elif v == 'aea':
-                cl = ccrs.AlbersEqualArea
-            elif v == 'eqdc':
-                cl = ccrs.EquidistantConic
-            elif v == 'aeqd':
-                cl = ccrs.AzimuthalEquidistant
-            elif v == 'gnom':
-                cl = ccrs.Gnomonic
-            elif v == 'ortho':
-                cl = ccrs.Orthographic
-            elif v == 'robin':
-                cl = ccrs.Robinson
-            elif v == 'moll':
-                cl = ccrs.Mollweide
-            elif v == 'sinu':
-                cl = ccrs.Sinusoidal
-            elif v == 'eck4':
-                cl = ccrs.EckertIV
-            elif v == 'geos':
-                cl = ccrs.Geostationary
-            elif v == 'nsper':
-                cl = ccrs.NearsidePerspective
-            elif v == 'laea':
-                cl = ccrs.LambertAzimuthalEqualArea
-            elif v == 'cea':
-                cl = ccrs.LambertCylindrical
-            elif v == 'mill':
-                cl = ccrs.Miller
-            elif v == 'vandg':
-                cl = ccrs.InterruptedGoodeHomolosine  # closest equivalent
+            if v in PROJ_TO_CCRS:
+                cl = PROJ_TO_CCRS[v]
             else:
                 raise NotImplementedError(f'Unknown projection {v}')
+            if v == 'tmerc':
+                kw_proj['approx'] = True
         if k in km_proj:
             if k == 'zone':
                 v = int(v)
