@@ -1359,7 +1359,7 @@ class hvPlotTabular(hvPlotBase):
             The number of bins in the histogram, or an explicit set of bin edges
             or a method to find the optimal set of bin edges, e.g. 'auto', 'fd',
             'scott' etc. For more documentation on these approaches see the
-            :class:`numpy:numpy.histogram_bin_edges` documentation. Default is 20.
+            :func:`numpy.histogram_bin_edges` documentation. Default is 20.
         bin_range: tuple, optional
             The lower and upper range of the bins.
             Default is the minimum and maximum values of the continuous data.

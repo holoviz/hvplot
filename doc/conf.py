@@ -82,6 +82,7 @@ extensions += [  # noqa
     'sphinxext.rediraffe',
     'numpydoc',
     'sphinxcontrib.mermaid',
+    'sphinx.ext.intersphinx',
     # Custom extensions
     'backend_styling_options',
     'plotting_options_table',
@@ -217,9 +218,8 @@ intersphinx_mapping = {
         'https://pandas.pydata.org/pandas-docs/stable/objects.inv',
     ),
     'panel': ('https://panel.holoviz.org/', None),
+    'numpy': ('https://numpy.org/doc/stable/', None),
 }
-# See https://docs.readthedocs.com/platform/stable/guides/intersphinx.html
-intersphinx_disabled_reftypes = ['*']
 
 # To avoid this warning
 # hvplot/ui.py:docstring of hvplot.ui.hvPlotExplorer:43: WARNING: autosummary: stub file not found 'hvplot.ui.hvPlotExplorer.hvplot'. Check your autosummary_generate setting.
