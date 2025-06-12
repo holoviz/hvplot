@@ -224,6 +224,36 @@ def proj_to_cartopy(proj):
                 cl = ccrs.Stereographic
             elif v == 'ob_tran':
                 cl = ccrs.RotatedPole
+            elif v == 'aea':
+                cl = ccrs.AlbersEqualArea
+            elif v == 'eqdc':
+                cl = ccrs.EquidistantConic
+            elif v == 'aeqd':
+                cl = ccrs.AzimuthalEquidistant
+            elif v == 'gnom':
+                cl = ccrs.Gnomonic
+            elif v == 'ortho':
+                cl = ccrs.Orthographic
+            elif v == 'robin':
+                cl = ccrs.Robinson
+            elif v == 'moll':
+                cl = ccrs.Mollweide
+            elif v == 'sinu':
+                cl = ccrs.Sinusoidal
+            elif v == 'eck4':
+                cl = ccrs.EckertIV
+            elif v == 'geos':
+                cl = ccrs.Geostationary
+            elif v == 'nsper':
+                cl = ccrs.NearsidePerspective
+            elif v == 'laea':
+                cl = ccrs.LambertAzimuthalEqualArea
+            elif v == 'cea':
+                cl = ccrs.LambertCylindrical
+            elif v == 'mill':
+                cl = ccrs.Miller
+            elif v == 'vandg':
+                cl = ccrs.InterruptedGoodeHomolosine  # closest equivalent
             else:
                 raise NotImplementedError(f'Unknown projection {v}')
         if k in km_proj:
@@ -256,13 +286,37 @@ def proj_to_cartopy(proj):
         if 'central_longitude' in kw_proj:
             kw_proj['pole_longitude'] = kw_proj['central_longitude'] - 180
             kw_proj.pop('central_longitude', None)
+    elif cl.__name__ in [
+        'Gnomonic',
+        'AzimuthalEquidistant',
+        'Orthographic',
+        'LambertAzimuthalEqualArea',
+        'LambertCylindrical',
+    ]:
+        kw_proj.pop('false_easting', None)
+        kw_proj.pop('false_northing', None)
+        kw_proj.pop('latitude_true_scale', None)
+    elif cl.__name__ in ['Robinson', 'Mollweide', 'Sinusoidal', 'EckertIV', 'Miller']:
+        # Global projections - remove most parameters except central longitude
+        kw_proj = {k: v for k, v in kw_proj.items() if k in ['central_longitude']}
+    elif cl.__name__ == 'Geostationary':
+        kw_proj.pop('false_easting', None)
+        kw_proj.pop('false_northing', None)
+        kw_proj.pop('latitude_true_scale', None)
+    elif cl.__name__ == 'NearsidePerspective':
+        kw_proj.pop('false_easting', None)
+        kw_proj.pop('false_northing', None)
+        kw_proj.pop('latitude_true_scale', None)
+    elif cl.__name__ == 'LambertCylindrical':
+        kw_proj.pop('latitude_true_scale', None)
     else:
         kw_proj.pop('latitude_true_scale', None)
 
     try:
         return cl(globe=globe, **kw_proj)
     except TypeError:
-        del kw_proj['approx']
+        if 'approx' in kw_proj:
+            del kw_proj['approx']
 
     return cl(globe=globe, **kw_proj)
 
@@ -311,6 +365,8 @@ def process_crs(crs):
             return getattr(ccrs, crs)()
         elif crs == 'GOOGLE_MERCATOR':
             return getattr(ccrs, crs)
+        else:
+            crs = pyproj.CRS.from_wkt(crs).to_wkt()
     elif isinstance(crs, pyproj.CRS):
         crs = crs.to_wkt()
 
@@ -325,6 +381,7 @@ def process_crs(crs):
         try:
             return proj_to_cartopy(wkt)  # should be all proj4 or wkt strings
         except Exception as e:
+            print('Failed')
             errors.append(e)
 
     if isinstance(crs, (str, int)):
