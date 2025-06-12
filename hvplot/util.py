@@ -349,8 +349,6 @@ def process_crs(crs):
             return getattr(ccrs, crs)()
         elif crs == 'GOOGLE_MERCATOR':
             return getattr(ccrs, crs)
-        else:
-            crs = pyproj.CRS.from_wkt(crs).to_wkt()
     elif isinstance(crs, pyproj.CRS):
         crs = crs.to_wkt()
 
