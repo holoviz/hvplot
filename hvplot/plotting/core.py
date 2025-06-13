@@ -496,25 +496,10 @@ class hvPlotTabular(hvPlotBase):
             A color or a Field name to draw the color of the marker from
         s : int, optional, also available as 'size'
             The size of the marker
-        by : string, optional
-            A single field or list of fields to group by. All the subgroups are visualized.
-        groupby: string, list, optional
-            A single field or list of fields to group and filter by. Adds one or more widgets to
-            select the subgroup(s) to visualize.
         scale: number, optional
             Scaling factor to apply to point scaling.
         logz : bool
             Whether to apply log scaling to the z-axis. Default is False.
-        color : str or array-like, optional.
-            The color for each of the series. Possible values are:
-
-            A single color string referred to by name, RGB or RGBA code, for instance 'red' or
-            '#a98d19.
-
-            A sequence of color strings referred to by name, RGB or RGBA code, which will be used
-            for each series recursively. For instance ['green','yellow'] each field’s line will be
-            filled in green or yellow, alternatively. If there is only a single series to be
-            plotted, then only the first color from the color list will be used.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('scatter')`.
             See :ref:`plot-options` for more information.
@@ -791,6 +776,8 @@ class hvPlotTabular(hvPlotBase):
         --------
 
         .. code-block::
+
+            import pandas as pd
 
             data = pd.DataFrame({
                 "open": [100, 101, 102],
@@ -1372,7 +1359,7 @@ class hvPlotTabular(hvPlotBase):
             The number of bins in the histogram, or an explicit set of bin edges
             or a method to find the optimal set of bin edges, e.g. 'auto', 'fd',
             'scott' etc. For more documentation on these approaches see the
-            :class:`numpy:numpy.histogram_bin_edges` documentation. Default is 20.
+            :func:`numpy.histogram_bin_edges` documentation. Default is 20.
         bin_range: tuple, optional
             The lower and upper range of the bins.
             Default is the minimum and maximum values of the continuous data.
@@ -1551,9 +1538,9 @@ class hvPlotTabular(hvPlotBase):
         columns : string or sequence
             The field(s) to display as columns.
         sortable : bool, optional
-            If True the columns are sortable. Default is False.
+            If True the columns are sortable. Default is True.
         selectable : bool, optional
-            If True the cells are selectable. Default is False. # Todo: Describe how to use this
+            If True the cells are selectable. Default is True.
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('table')`.
             See :ref:`plot-options` for more information.

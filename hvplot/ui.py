@@ -71,7 +71,7 @@ def explorer(data, **kwargs):
     -------
     hvplotExplorer
         Panel component to explore the data and design your plot. See
-        :class:`hvplot.ui.hvplotExplorer` for details.
+        :class:`hvplot.ui.hvPlotExplorer` for details.
 
     Examples
     --------
