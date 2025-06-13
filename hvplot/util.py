@@ -144,28 +144,28 @@ def proj_to_cartopy(proj):
     import cartopy.crs as ccrs
 
     PROJ_TO_CCRS = {
-        'longlat': ccrs.PlateCarree,
-        'tmerc': ccrs.TransverseMercator,
-        'lcc': ccrs.LambertConformal,
-        'merc': ccrs.Mercator,
-        'utm': ccrs.UTM,
-        'stere': ccrs.Stereographic,
-        'ob_tran': ccrs.RotatedPole,
-        'aea': ccrs.AlbersEqualArea,
-        'eqdc': ccrs.EquidistantConic,
-        'aeqd': ccrs.AzimuthalEquidistant,
-        'gnom': ccrs.Gnomonic,
-        'ortho': ccrs.Orthographic,
-        'robin': ccrs.Robinson,
-        'moll': ccrs.Mollweide,
-        'sinu': ccrs.Sinusoidal,
-        'eck4': ccrs.EckertIV,
-        'geos': ccrs.Geostationary,
-        'nsper': ccrs.NearsidePerspective,
-        'laea': ccrs.LambertAzimuthalEqualArea,
-        'cea': ccrs.LambertCylindrical,
-        'mill': ccrs.Miller,
-        'vandg': ccrs.InterruptedGoodeHomolosine,  # closest equivalent
+        'longlat': 'PlateCarree',
+        'tmerc': 'TransverseMercator',
+        'lcc': 'LambertConformal',
+        'merc': 'Mercator',
+        'utm': 'UTM',
+        'stere': 'Stereographic',
+        'ob_tran': 'RotatedPole',
+        'aea': 'AlbersEqualArea',
+        'eqdc': 'EquidistantConic',
+        'aeqd': 'AzimuthalEquidistant',
+        'gnom': 'Gnomonic',
+        'ortho': 'Orthographic',
+        'robin': 'Robinson',
+        'moll': 'Mollweide',
+        'sinu': 'Sinusoidal',
+        'eck4': 'EckertIV',
+        'geos': 'Geostationary',
+        'nsper': 'NearsidePerspective',
+        'laea': 'LambertAzimuthalEqualArea',
+        'cea': 'LambertCylindrical',
+        'mill': 'Miller',
+        'vandg': 'InterruptedGoodeHomolosine',
     }
 
     try:
@@ -235,7 +235,7 @@ def proj_to_cartopy(proj):
             pass
         if k == 'proj':
             if v in PROJ_TO_CCRS:
-                cl = PROJ_TO_CCRS[v]
+                cl = getattr(ccrs, PROJ_TO_CCRS[v])
             else:
                 raise NotImplementedError(f'Unknown projection {v}')
             if v == 'tmerc':
@@ -256,42 +256,48 @@ def proj_to_cartopy(proj):
         kw_proj['standard_parallels'] = (kw_std['lat_1'], kw_std['lat_2'])
 
     # mercatoooor
-    if cl.__name__ == 'Mercator':
+    # Use issubclass to check projection class types
+    if issubclass(cl, ccrs.Mercator):
         kw_proj.pop('false_easting', None)
         kw_proj.pop('false_northing', None)
         if 'scale_factor' in kw_proj:
             kw_proj.pop('latitude_true_scale', None)
-    elif cl.__name__ == 'Stereographic':
+    elif issubclass(cl, ccrs.Stereographic):
         kw_proj.pop('scale_factor', None)
         if 'latitude_true_scale' in kw_proj:
             kw_proj['true_scale_latitude'] = kw_proj['latitude_true_scale']
             kw_proj.pop('latitude_true_scale', None)
-    elif cl.__name__ == 'RotatedPole':
+    elif issubclass(cl, ccrs.RotatedPole):
         if 'central_longitude' in kw_proj:
             kw_proj['pole_longitude'] = kw_proj['central_longitude'] - 180
             kw_proj.pop('central_longitude', None)
-    elif cl.__name__ in [
-        'Gnomonic',
-        'AzimuthalEquidistant',
-        'Orthographic',
-        'LambertAzimuthalEqualArea',
-        'LambertCylindrical',
-    ]:
+    elif issubclass(
+        cl,
+        (
+            ccrs.Gnomonic,
+            ccrs.AzimuthalEquidistant,
+            ccrs.Orthographic,
+            ccrs.LambertAzimuthalEqualArea,
+            ccrs.LambertCylindrical,
+        ),
+    ):
         kw_proj.pop('false_easting', None)
         kw_proj.pop('false_northing', None)
         kw_proj.pop('latitude_true_scale', None)
-    elif cl.__name__ in ['Robinson', 'Mollweide', 'Sinusoidal', 'EckertIV', 'Miller']:
+    elif issubclass(
+        cl, (ccrs.Robinson, ccrs.Mollweide, ccrs.Sinusoidal, ccrs.EckertIV, ccrs.Miller)
+    ):
         # Global projections - remove most parameters except central longitude
         kw_proj = {k: v for k, v in kw_proj.items() if k in ['central_longitude']}
-    elif cl.__name__ == 'Geostationary':
+    elif issubclass(cl, ccrs.Geostationary):
         kw_proj.pop('false_easting', None)
         kw_proj.pop('false_northing', None)
         kw_proj.pop('latitude_true_scale', None)
-    elif cl.__name__ == 'NearsidePerspective':
+    elif issubclass(cl, ccrs.NearsidePerspective):
         kw_proj.pop('false_easting', None)
         kw_proj.pop('false_northing', None)
         kw_proj.pop('latitude_true_scale', None)
-    elif cl.__name__ == 'LambertCylindrical':
+    elif issubclass(cl, ccrs.LambertCylindrical):
         kw_proj.pop('latitude_true_scale', None)
     else:
         kw_proj.pop('latitude_true_scale', None)
@@ -299,8 +305,7 @@ def proj_to_cartopy(proj):
     try:
         return cl(globe=globe, **kw_proj)
     except TypeError:
-        if 'approx' in kw_proj:
-            del kw_proj['approx']
+        kw_proj.pop('approx', None)
 
     return cl(globe=globe, **kw_proj)
 

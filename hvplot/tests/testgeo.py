@@ -490,14 +490,11 @@ class TestGeoUtil(TestCase):
         crs = proj_to_cartopy(albers_wkt)
 
         assert isinstance(crs, self.ccrs.AlbersEqualArea)
-        # Check that the projection parameters are correctly parsed
-        # Note: proj4_params might be available depending on cartopy version
-        if hasattr(crs, 'proj4_params'):
-            assert crs.proj4_params['proj'] == 'aea'
-            assert crs.proj4_params['lat_0'] == 23.0
-            assert crs.proj4_params['lon_0'] == -96.0
-            assert crs.proj4_params['lat_1'] == 29.5
-            assert crs.proj4_params['lat_2'] == 45.5
+        assert crs.proj4_params['proj'] == 'aea'
+        assert crs.proj4_params['lat_0'] == 23.0
+        assert crs.proj4_params['lon_0'] == -96.0
+        assert crs.proj4_params['lat_1'] == 29.5
+        assert crs.proj4_params['lat_2'] == 45.5
 
     def test_proj_to_cartopy_albers_equal_area_proj4(self):
         """Test Albers Equal Area projection from PROJ4 string"""
@@ -510,6 +507,10 @@ class TestGeoUtil(TestCase):
         assert isinstance(crs, self.ccrs.AlbersEqualArea)
 
     def test_proj_to_cartopy_additional_projections(self):
+        """
+        Test that various PROJ.4 projection strings are correctly mapped to their
+        expected Cartopy CRS classes by `proj_to_cartopy`.
+        """
         """Test various newly added projections"""
         from ..util import proj_to_cartopy
 
