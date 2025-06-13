@@ -219,6 +219,7 @@ intersphinx_mapping = {
     ),
     'panel': ('https://panel.holoviz.org/', None),
     'numpy': ('https://numpy.org/doc/stable/', None),
+    'xarray': ('https://docs.xarray.dev/en/stable/', None),
 }
 
 # To avoid this warning
