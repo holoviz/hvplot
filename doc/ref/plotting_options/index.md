@@ -114,4 +114,7 @@ Styling Options <styling>
 Interactivity Options <interactivity>
 Grid And Legend Options <grid_legend>
 Size And Layout Options <size_layout>
+Resampling Options <resampling>
+Geographic Options <geographic>
+Streaming Options <streaming>
 ```
