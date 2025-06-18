@@ -1,0 +1,8 @@
+# statistical
+
+```{toctree}
+:hidden:
+:glob:
+
+*
+```

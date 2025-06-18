@@ -1,0 +1,8 @@
+# categorical
+
+```{toctree}
+:hidden:
+:glob:
+
+*
+```

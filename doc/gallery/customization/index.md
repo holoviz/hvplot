@@ -1,0 +1,8 @@
+# customization
+
+```{toctree}
+:hidden:
+:glob:
+
+*
+```

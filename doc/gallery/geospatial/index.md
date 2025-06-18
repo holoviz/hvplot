@@ -1,0 +1,8 @@
+# geospatial
+
+```{toctree}
+:hidden:
+:glob:
+
+*
+```
