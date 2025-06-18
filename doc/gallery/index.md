@@ -1,10 +1,12 @@
-# hvPlot Gallery
+# Gallery
 
 Explore a curated set of example visualizations using hvPlot with different backends and datasets.
 
 ```{toctree}
 :titlesonly:
 :hidden:
+:maxdepth: 2
+
 
 basic-charts/index
 time-series/index
