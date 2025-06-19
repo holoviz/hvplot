@@ -4,45 +4,41 @@ Explore a curated set of example visualizations using hvPlot with different back
 
 ## Basic Charts
 
-::::{grid} 1 2 2 3
+::::{grid} 1 2 2 4
 :gutter: 1 1 1 2
 
 :::{grid-item-card} **Simple Line Plot**
 :link: basic-charts/simple_line
 :link-type: doc
-:image: basic-charts/thumbnails/simple_line.png
-:alt: Simple Line Plot
+:img-top: thumbnails/simple_line.png
+:img-alt: Simple Line Plot
 
-
-A basic line chart example.
+A basic line chart.
 :::
 
 :::{grid-item-card} **Simple Bar Chart**
 :link: basic-charts/simple_bar
 :link-type: doc
-:image: basic-charts/thumbnails/simple_bar.png
-:alt: Simple Bar Chart
+:img-top: thumbnails/simple_bar.png
+:img-alt: Simple Bar Chart
 
-
-A basic bar chart example.
+A basic bar chart.
 :::
 
 :::{grid-item-card} **Simple Scatter Plot**
 :link: basic-charts/simple_scatter
 :link-type: doc
-:image: basic-charts/thumbnails/simple_scatter.png
-:alt: Simple Scatter Plot
+:img-top: thumbnails/simple_scatter.png
+:img-alt: Simple Scatter Plot
 
-
-A basic scatter plot example.
+A basic scatter plot.
 :::
 
 :::{grid-item-card} **Simple Area Chart**
 :link: basic-charts/simple_area
 :link-type: doc
-:image: basic-charts/thumbnails/simple_area.png
-:alt: Simple Area Chart
-
+:img-top: thumbnails/simple_area.png
+:img-alt: Simple Area Chart
 
 A simple filled-area chart.
 :::
@@ -50,9 +46,8 @@ A simple filled-area chart.
 :::{grid-item-card} **Simple Histogram**
 :link: basic-charts/simple_histogram
 :link-type: doc
-:image: basic-charts/thumbnails/simple_histogram.png
-:alt: Simple Histogram
-
+:img-top: thumbnails/simple_histogram.png
+:img-alt: Simple Histogram
 
 A histogram to visualize distributions.
 :::
@@ -60,9 +55,8 @@ A histogram to visualize distributions.
 :::{grid-item-card} **Simple Box Plot**
 :link: basic-charts/simple_boxplot
 :link-type: doc
-:image: basic-charts/thumbnails/simple_boxplot.png
-:alt: Simple Boxplot
-
+:img-top: thumbnails/simple_boxplot.png
+:img-alt: Simple Boxplot
 
 A box plot grouped by categories.
 :::
@@ -70,9 +64,8 @@ A box plot grouped by categories.
 :::{grid-item-card} **Basic Heatmap**
 :link: basic-charts/basic_heatmap
 :link-type: doc
-:image: basic-charts/thumbnails/basic_heatmap.png
-:alt: Basic Heatmap
-
+:img-top: thumbnails/basic_heatmap.png
+:img-alt: Basic Heatmap
 
 A 2D heatmap.
 :::
@@ -80,11 +73,10 @@ A 2D heatmap.
 :::{grid-item-card} **Simple Step Chart**
 :link: basic-charts/simple_step
 :link-type: doc
-:image: basic-charts/thumbnails/simple_step.png
-:alt: Simple Step Chart
+:img-top: thumbnails/simple_step.png
+:img-alt: Simple Step Chart
 
-
-A step function chart example.
+A step function chart.
 :::
 
 ::::
