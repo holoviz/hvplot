@@ -1,7 +1,5 @@
 # Basic Charts
 
-A collection of simple charts demonstrating foundational hvPlot chart types using Bokeh and Matplotlib backends.
-
 ```{toctree}
 :titlesonly:
 :hidden:

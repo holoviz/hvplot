@@ -68,6 +68,62 @@ Explore a curated set of example visualizations using hvPlot with different back
 
 ## Time Series
 
+::::{grid} 1 2 2 4
+:gutter: 1 1 1 2
+:margin: 0
+
+:::{grid-item-card} **Line**
+:link: time-series/time_series_line
+:link-type: doc
+:img-bottom: thumbnails/time_series_line.png
+:img-alt: Time Series Line Plot
+:::
+
+:::{grid-item-card} **Bar**
+:link: time-series/time_series_bar
+:link-type: doc
+:img-bottom: thumbnails/time_series_bar.png
+:img-alt: Time Series Bar Plot
+:::
+
+:::{grid-item-card} **Area**
+:link: time-series/area_time_series
+:link-type: doc
+:img-bottom: thumbnails/area_time_series.png
+:img-alt: Time Series Area Plot
+:::
+
+:::{grid-item-card} **Multi Series**
+:link: time-series/multi_series_line
+:link-type: doc
+:img-bottom: thumbnails/multi_series_line.png
+:img-alt: Multi Series Line Plot
+:::
+
+:::{grid-item-card} **Dual Axis**
+:link: time-series/dual_axis_timeseries
+:link-type: doc
+:img-bottom: thumbnails/dual_axis_timeseries.png
+:img-alt: Dual Axis Timeseries
+:::
+
+:::{grid-item-card} **Step Timeseries**
+:link: time-series/step_time_series
+:link-type: doc
+:img-bottom: thumbnails/step_time_series.png
+:img-alt: Step Time Series Plot
+:::
+
+:::{grid-item-card} **Forecast Bands**
+:link: time-series/forcast_bands
+:link-type: doc
+:img-bottom: thumbnails/forcast_bands.png
+:img-alt: Forecast Bands
+:::
+
+::::
+
+
 ```{toctree}
 :titlesonly:
 :hidden:
