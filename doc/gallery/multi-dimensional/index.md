@@ -1,4 +1,4 @@
-# multi dimensional
+# Multi-Dimensional
 
 ```{toctree}
 :hidden:

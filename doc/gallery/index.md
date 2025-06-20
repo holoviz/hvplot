@@ -6,80 +6,67 @@ Explore a curated set of example visualizations using hvPlot with different back
 
 ::::{grid} 1 2 2 4
 :gutter: 1 1 1 2
+:margin: 0
 
-:::{grid-item-card} **Simple Line Plot**
+:::{grid-item-card} **Line**
 :link: basic-charts/simple_line
 :link-type: doc
-:img-top: thumbnails/simple_line.png
+:img-bottom: thumbnails/simple_line.png
 :img-alt: Simple Line Plot
-
-A basic line chart.
 :::
 
-:::{grid-item-card} **Simple Bar Chart**
+:::{grid-item-card} **Bar**
 :link: basic-charts/simple_bar
 :link-type: doc
-:img-top: thumbnails/simple_bar.png
+:img-bottom: thumbnails/simple_bar.png
 :img-alt: Simple Bar Chart
-
-A basic bar chart.
 :::
 
-:::{grid-item-card} **Simple Scatter Plot**
+:::{grid-item-card} **Scatter**
 :link: basic-charts/simple_scatter
 :link-type: doc
-:img-top: thumbnails/simple_scatter.png
+:img-bottom: thumbnails/simple_scatter.png
 :img-alt: Simple Scatter Plot
-
-A basic scatter plot.
 :::
 
-:::{grid-item-card} **Simple Area Chart**
+:::{grid-item-card} **Area**
 :link: basic-charts/simple_area
 :link-type: doc
-:img-top: thumbnails/simple_area.png
+:img-bottom: thumbnails/simple_area.png
 :img-alt: Simple Area Chart
-
-A simple filled-area chart.
 :::
 
-:::{grid-item-card} **Simple Histogram**
+:::{grid-item-card} **Histogram**
 :link: basic-charts/simple_histogram
 :link-type: doc
-:img-top: thumbnails/simple_histogram.png
+:img-bottom: thumbnails/simple_histogram.png
 :img-alt: Simple Histogram
-
-A histogram to visualize distributions.
 :::
 
-:::{grid-item-card} **Simple Box Plot**
+:::{grid-item-card} **Box Plot**
 :link: basic-charts/simple_boxplot
 :link-type: doc
-:img-top: thumbnails/simple_boxplot.png
+:img-bottom: thumbnails/simple_boxplot.png
 :img-alt: Simple Boxplot
-
-A box plot grouped by categories.
 :::
 
-:::{grid-item-card} **Basic Heatmap**
+:::{grid-item-card} **Heatmap**
 :link: basic-charts/basic_heatmap
 :link-type: doc
-:img-top: thumbnails/basic_heatmap.png
+:img-bottom: thumbnails/basic_heatmap.png
 :img-alt: Basic Heatmap
-
-A 2D heatmap.
 :::
 
-:::{grid-item-card} **Simple Step Chart**
+:::{grid-item-card} **Step Chart**
 :link: basic-charts/simple_step
 :link-type: doc
-:img-top: thumbnails/simple_step.png
+:img-bottom: thumbnails/simple_step.png
 :img-alt: Simple Step Chart
-
-A step function chart.
 :::
 
 ::::
+
+## Time Series
 
 ```{toctree}
 :titlesonly:

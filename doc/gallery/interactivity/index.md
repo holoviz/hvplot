@@ -1,4 +1,4 @@
-# interactivity
+# Interactivity
 
 ```{toctree}
 :hidden:

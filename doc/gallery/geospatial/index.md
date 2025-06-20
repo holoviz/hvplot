@@ -1,4 +1,4 @@
-# geospatial
+# Geo-spatial
 
 ```{toctree}
 :hidden:

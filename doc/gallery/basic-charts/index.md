@@ -7,12 +7,12 @@ A collection of simple charts demonstrating foundational hvPlot chart types usin
 :hidden:
 :maxdepth: 2
 
-Area Chart <simple_area>
-Bar Chart <simple_bar>
-Box Plot <simple_boxplot>
-Histogram <simple_histogram>
 Line Plot <simple_line>
+Bar Chart <simple_bar>
 Scatter Plot <simple_scatter>
-Step Chart <simple_step>
+Area Chart <simple_area>
+Histogram <simple_histogram>
+Box Plot <simple_boxplot>
 Heatmap <basic_heatmap>
+Step Chart <simple_step>
 ```

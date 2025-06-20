@@ -1,4 +1,4 @@
-# categorical
+# Categorical
 
 ```{toctree}
 :hidden:

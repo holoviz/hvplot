@@ -1,4 +1,4 @@
-# customization
+# Advanced Customization
 
 ```{toctree}
 :hidden:

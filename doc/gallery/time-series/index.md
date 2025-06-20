@@ -1,4 +1,4 @@
-# time series
+# Time Series
 
 ```{toctree}
 :hidden:

@@ -1,4 +1,4 @@
-# statistical
+# Statistical
 
 ```{toctree}
 :hidden:
