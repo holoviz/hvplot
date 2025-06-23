@@ -6,7 +6,7 @@ hvPlot's plotting API exposes three main types of options:
 
 - **Plot kind specific**: options specific to each plot kind; for example, `marker` is not a generic option but is specific to {meth}`hvplot.hvPlot.scatter`.
 - **Generic**: options that can be passed to most of the plotting methods/kinds; these are the options displayed in the tables below, such as `width` or `title`.
-- **Plotting backend and method/kind specific styling options**: in addition to the generic [Styling Options](plotting-options-styling), hvPlot exposes styling options that are specific to a particular plotting backend and plot kind. With these options, it is possible to customize each component in detail, exposing all the options a plotting backend exposes in HoloViews (they are applied to the specific HoloViews Element(s) returned by a plotting call, for example {class}`holoviews:holoviews.element.Scatter` for {meth}`hvplot.hvPlot.scatter`). These usually include options to color the line and fill color, alpha and style. These options  can be found on the reference page of each plotting method (e.g. {meth}`hvplot.hvPlot.scatter`).
+- **Plotting backend and method/kind specific styling options**: in addition to the generic [Styling Options](plotting-options-styling), hvPlot exposes styling options that are specific to a particular plotting backend and plot kind. With these options, it is possible to customize each component in detail, exposing all the options a plotting backend exposes in HoloViews (they are applied to the specific HoloViews Element(s) returned by a plotting call, for example {class}`holoviews:holoviews.element.Scatter` for {meth}`hvplot.hvPlot.scatter`). These usually include options to color the line and fill color, alpha and style. These options can be found on the reference page of each plotting method (e.g. {meth}`hvplot.hvPlot.scatter`).
 
 The {func}`hvplot.help` function can be used to interactively display these options:
 
@@ -55,6 +55,7 @@ Options for setting the grid or legend of plots as well as colorbar options:
 See [this page](./grid_legend) for more information on these options.
 
 (plotting-options-styling)=
+
 ## Styling Options
 
 Visual styling options to adjust colors, fonts, and other aesthetic elements of the plot.
@@ -67,6 +68,7 @@ reference page of each plotting method (e.g. {meth}`hvplot.hvPlot.scatter`) or b
 ```{eval-rst}
 .. plotting-options-table:: Styling Options
 ```
+
 See [this page](./styling) for more information on these options.
 
 ## Interactivity Options
@@ -87,6 +89,8 @@ Performance related options for handling large datasets, including downsampling,
 .. plotting-options-table:: Resampling Options
 ```
 
+See [this page](./resampling) for more information on these options.
+
 ## Geographic Options
 
 Options for geographic plots, including map projections, tile overlays, and geographic features like coastlines and borders:
@@ -95,6 +99,8 @@ Options for geographic plots, including map projections, tile overlays, and geog
 .. plotting-options-table:: Geographic Options
 ```
 
+See [this page](./geographic) for more information on these options.
+
 ## Streaming Options
 
 Options for handling live data streams:
@@ -102,6 +108,8 @@ Options for handling live data streams:
 ```{eval-rst}
 .. plotting-options-table:: Streaming Options
 ```
+
+See [this page](./streaming) for more information on these options.
 
 ```{toctree}
 :titlesonly:
