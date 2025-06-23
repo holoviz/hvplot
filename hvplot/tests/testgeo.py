@@ -511,7 +511,6 @@ class TestGeoUtil(TestCase):
         Test that various PROJ.4 projection strings are correctly mapped to their
         expected Cartopy CRS classes by `proj_to_cartopy`.
         """
-        """Test various newly added projections"""
         from ..util import proj_to_cartopy
 
         test_cases = [
