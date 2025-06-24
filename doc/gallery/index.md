@@ -2,6 +2,7 @@
 
 Explore a curated set of example visualizations using hvPlot with different backends and datasets.
 
+(basic-charts)=
 ## Basic Charts
 
 ::::{grid} 1 2 2 4
@@ -66,6 +67,7 @@ Explore a curated set of example visualizations using hvPlot with different back
 
 ::::
 
+(time-series)=
 ## Time Series
 
 ::::{grid} 1 2 2 4
@@ -123,6 +125,70 @@ Explore a curated set of example visualizations using hvPlot with different back
 
 ::::
 
+(categorical)=
+## Categorical
+
+::::{grid} 1 2 2 4
+:gutter: 1 1 1 2
+:margin: 0
+
+:::{grid-item-card} **Grouped Bars by Sex**
+:link: categorical/grouped_bar
+:link-type: doc
+:img-bottom: thumbnails/grouped_bar.png
+:img-alt: Grouped Bar Plot
+:::
+
+:::{grid-item-card} **Grouped Bars by Island**
+:link: categorical/category_bar
+:link-type: doc
+:img-bottom: thumbnails/category_bar.png
+:img-alt: Categorical Bar Plot
+:::
+
+:::{grid-item-card} **Horizontal Bars**
+:link: categorical/horizontal_bar
+:link-type: doc
+:img-bottom: thumbnails/horizontal_bar.png
+:img-alt: Horizontal Bar Plot
+:::
+
+:::{grid-item-card} **Stacked Bars**
+:link: categorical/stacked_bar
+:link-type: doc
+:img-bottom: thumbnails/stacked_bar.png
+:img-alt: Stacked Bar Plot
+:::
+
+:::{grid-item-card} **Heatmap**
+:link: categorical/category_heatmap
+:link-type: doc
+:img-bottom: thumbnails/category_heatmap.png
+:img-alt: Heatmap Plot
+:::
+
+:::{grid-item-card} **Violin Plot**
+:link: categorical/violin
+:link-type: doc
+:img-bottom: thumbnails/violin.png
+:img-alt: Violin Plot
+:::
+
+:::{grid-item-card} **Box Plot**
+:link: categorical/boxplot
+:link-type: doc
+:img-bottom: thumbnails/boxplot.png
+:img-alt: Grouped Box Plot
+:::
+
+:::{grid-item-card} **Jittered Strip Plot**
+:link: categorical/strip_jitter
+:link-type: doc
+:img-bottom: thumbnails/strip_jitter.png
+:img-alt: Jittered Strip Plot
+:::
+
+::::
 
 ```{toctree}
 :titlesonly:
