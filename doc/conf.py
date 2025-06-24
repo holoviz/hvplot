@@ -23,6 +23,9 @@ description = 'A high-level plotting API for the PyData ecosystem built on HoloV
 version = release = base_version(hvplot.__version__)  # noqa
 nbbuild_cell_timeout = 600
 
+# Useful for SEO on a versioned site
+html_baseurl = 'https://hvplot.holoviz.org/en/docs/latest/'
+
 exclude_patterns = ['governance']
 
 html_static_path += ['_static']  # noqa
@@ -208,12 +211,14 @@ autosummary_generate = True
 # autosummary_generate_overwrite = False
 
 intersphinx_mapping = {
+    'cartopy': ('https://scitools.org.uk/cartopy/docs/latest/', None),
     'holoviews': ('https://holoviews.org/', None),
     'pandas': (
         'https://pandas.pydata.org/pandas-docs/stable/',
         'https://pandas.pydata.org/pandas-docs/stable/objects.inv',
     ),
     'panel': ('https://panel.holoviz.org/', None),
+    'pyproj': ('https://pyproj4.github.io/pyproj/stable/', None),
 }
 # See https://docs.readthedocs.com/platform/stable/guides/intersphinx.html
 intersphinx_disabled_reftypes = ['*']

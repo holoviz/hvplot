@@ -6,7 +6,7 @@ hvPlot's plotting API exposes three main types of options:
 
 - **Plot kind specific**: options specific to each plot kind; for example, `marker` is not a generic option but is specific to {meth}`hvplot.hvPlot.scatter`.
 - **Generic**: options that can be passed to most of the plotting methods/kinds; these are the options displayed in the tables below, such as `width` or `title`.
-- **Plotting backend and method/kind specific styling options**: in addition to the generic [Styling Options](plotting-options-styling), hvPlot exposes styling options that are specific to a particular plotting backend and plot kind. With these options, it is possible to customize each component in detail, exposing all the options a plotting backend exposes in HoloViews (they are applied to the specific HoloViews Element(s) returned by a plotting call, for example {class}`holoviews:holoviews.element.Scatter` for {meth}`hvplot.hvPlot.scatter`). These usually include options to color the line and fill color, alpha and style. These options  can be found on the reference page of each plotting method (e.g. {meth}`hvplot.hvPlot.scatter`).
+- **Plotting backend and method/kind specific styling options**: in addition to the generic [Styling Options](plotting-options-styling), hvPlot exposes styling options that are specific to a particular plotting backend and plot kind. With these options, it is possible to customize each component in detail, exposing all the options a plotting backend exposes in HoloViews (they are applied to the specific HoloViews Element(s) returned by a plotting call, for example {class}`holoviews:holoviews.element.Scatter` for {meth}`hvplot.hvPlot.scatter`). These usually include options to color the line and fill color, alpha and style. These options can be found on the reference page of each plotting method (e.g. {meth}`hvplot.hvPlot.scatter`).
 
 The {func}`hvplot.help` function can be used to interactively display these options:
 
@@ -34,6 +34,8 @@ Customization options for plot sizes and overall layout, including responsive mo
 .. plotting-options-table:: Size And Layout Options
 ```
 
+See [this page](./size_layout) for more information on these options.
+
 ## Axis Options
 
 Customization options for axis appearance and behavior, including labels, limits, tick formatting, and axis scaling:
@@ -50,7 +52,10 @@ Options for setting the grid or legend of plots as well as colorbar options:
 .. plotting-options-table:: Grid And Legend Options
 ```
 
+See [this page](./grid_legend) for more information on these options.
+
 (plotting-options-styling)=
+
 ## Styling Options
 
 Visual styling options to adjust colors, fonts, and other aesthetic elements of the plot.
@@ -64,6 +69,8 @@ reference page of each plotting method (e.g. {meth}`hvplot.hvPlot.scatter`) or b
 .. plotting-options-table:: Styling Options
 ```
 
+See [this page](./styling) for more information on these options.
+
 ## Interactivity Options
 
 Bokeh specific options for adding hover tools as well as other interactive tools like tap tool and box select tool:
@@ -71,6 +78,8 @@ Bokeh specific options for adding hover tools as well as other interactive tools
 ```{eval-rst}
 .. plotting-options-table:: Interactivity Options
 ```
+
+See [this page](./interactivity) for more information on these options.
 
 ## Resampling Options
 
@@ -80,6 +89,8 @@ Performance related options for handling large datasets, including downsampling,
 .. plotting-options-table:: Resampling Options
 ```
 
+See [this page](./resampling) for more information on these options.
+
 ## Geographic Options
 
 Options for geographic plots, including map projections, tile overlays, and geographic features like coastlines and borders:
@@ -87,6 +98,8 @@ Options for geographic plots, including map projections, tile overlays, and geog
 ```{eval-rst}
 .. plotting-options-table:: Geographic Options
 ```
+
+See [this page](./geographic) for more information on these options.
 
 ## Streaming Options
 
@@ -96,6 +109,8 @@ Options for handling live data streams:
 .. plotting-options-table:: Streaming Options
 ```
 
+See [this page](./streaming) for more information on these options.
+
 ```{toctree}
 :titlesonly:
 :hidden:
@@ -103,4 +118,11 @@ Options for handling live data streams:
 
 All Options <self>
 Data Options <data>
+Styling Options <styling>
+Interactivity Options <interactivity>
+Grid And Legend Options <grid_legend>
+Size And Layout Options <size_layout>
+Resampling Options <resampling>
+Geographic Options <geographic>
+Streaming Options <streaming>
 ```
