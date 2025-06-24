@@ -217,6 +217,9 @@ line-length = 99
 extend-select = [
     "UP",
 ]
+ignore = [
+    "UP038",  # Use `X | Y` in `isinstance` call instead of `(X, Y)`
+]
 
 [tool.ruff.format]
 quote-style = "single"
