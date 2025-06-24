@@ -52,7 +52,7 @@ from pandas import DatetimeIndex, MultiIndex
 
 from .backend_transforms import _transfer_opts_cur_backend
 from .util import (
-    HV_GE_1_21_0,
+    _HV_GE_1_21_0,
     filter_opts,
     is_tabular,
     is_series,
@@ -926,7 +926,7 @@ class HoloViewsConverter:
                 'downsample) must be enabled when resample_when is set.'
             )
         if selector is not None:
-            if not HV_GE_1_21_0:
+            if not _HV_GE_1_21_0:
                 msg = 'selector requires holoviews>=1.21.'
                 raise ImportError(msg)
             if not (datashade or rasterize):
