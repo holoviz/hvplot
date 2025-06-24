@@ -325,20 +325,37 @@ class TestDatashader(ComparisonTestCase):
         assert len(element) == 0
 
     def test_selector_rasterize(self):
-        from datashader.reductions import first
+        from datashader.reductions import first, min
 
-        expected = first('category')
-        plot = self.df.hvplot.points('x', 'y', rasterize=True, selector=expected)
-        actual = plot.callback.inputs[0].callback.operation.p['selector']
-        assert actual is expected
+        test_cases = [
+            ('first', first()),
+            (('min', 'number'), min('number')),
+            (first('category'), first('category')),
+        ]
+        for selector, expected_selector in test_cases:
+            with self.subTest(selector=str(selector)):
+                plot = self.df.hvplot.points('x', 'y', rasterize=True, selector=selector)
+                actual = plot.callback.inputs[0].callback.operation.p['selector']
+                assert actual == expected_selector
 
     def test_selector_datashade(self):
-        from datashader.reductions import first
+        from datashader.reductions import first, min
 
-        expected = first('category')
-        plot = self.df.hvplot.points('x', 'y', datashade=True, selector=expected)
-        actual = plot.callback.inputs[0].callback.operation.p['selector']
-        assert actual is expected
+        test_cases = [
+            ('first', first()),
+            (('min', 'number'), min('number')),
+            (first('category'), first('category')),
+        ]
+        for selector, expected_selector in test_cases:
+            with self.subTest(selector=str(selector)):
+                plot = self.df.hvplot.points('x', 'y', datashade=True, selector=selector)
+                actual = plot.callback.inputs[0].callback.operation.p['selector']
+                assert actual == expected_selector
+
+    def test_selector_when_datashade_is_true_set_hover_to_true_by_default(self):
+        plot = self.df.hvplot(x='x', y='y', datashade=True, selector='first')
+        opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
+        assert 'hover' in opts.get('tools')
 
 
 class TestChart2D(ComparisonTestCase):
