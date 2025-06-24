@@ -419,28 +419,29 @@ class HoloViewsConverter:
         Controls the application of downsampling to the plotted data,
         which is particularly useful for large timeseries datasets to
         reduce the amount of data sent to browser and improve
-        visualization performance. Requires HoloViews >= 1.16. Additional
-        dependencies: Installing the ``tsdownsample`` library is required
-        for using any downsampling methods other than the default 'lttb'.
+        visualization performance.
 
         Acceptable values:
 
-        - False: No downsampling is applied.
-        - True: Applies downsampling using HoloViews' default algorithm
+        - ``False``: No downsampling is applied.
+        - ``True``: Applies downsampling using HoloViews' default algorithm
           (LTTB - Largest Triangle Three Buckets).
-        - 'lttb': Explicitly applies the Largest Triangle Three Buckets
-          algorithm.
-        - 'minmax': Applies the MinMax algorithm, selecting the minimum
+        - ``'lttb'``: Explicitly applies the Largest Triangle Three Buckets
+          algorithm. Uses ``tsdownsample`` if installed.
+        - ``'minmax'``: Applies the MinMax algorithm, selecting the minimum
           and maximum values in each bin. Requires ``tsdownsample``.
-        - 'm4': Applies the M4 algorithm, selecting the minimum, maximum,
+        - ``'m4'``: Applies the M4 algorithm, selecting the minimum, maximum,
           first, and last values in each bin. Requires ``tsdownsample``.
-        - 'minmax-lttb': Combines MinMax and LTTB algorithms for
+        - ``'minmax-lttb'``: Combines MinMax and LTTB algorithms for
           downsampling, first applying MinMax to reduce to a preliminary
           set of points, then LTTB for further reduction. Requires
           ``tsdownsample``.
 
         Other string values corresponding to supported algorithms in
         HoloViews may also be used.
+
+        .. note::
+           Requires ``holoviews>=1.16``.
     dynspread : bool, default=False
         For plots generated with datashade=True or rasterize=True,
         automatically increase the point size when the data is sparse
@@ -461,9 +462,9 @@ class HoloViewsConverter:
         Whether to apply rasterization using the Datashader library,
         returning an aggregated Image (to be colormapped by the
         plotting backend) instead of individual points
-    resample_when : int, default=None
+    resample_when : int or None, default=None
         Applies a resampling operation (datashade, rasterize or downsample) if
-        the number of individual data points present in the current zoom range
+        the number of individual data points present in the current viewport
         is above this threshold. The raw plot is displayed otherwise.
     threshold : float, default=0.5
         When using ``dynspread``, this value defines the minimum density of overlapping points
