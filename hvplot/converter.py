@@ -52,6 +52,7 @@ from pandas import DatetimeIndex, MultiIndex
 
 from .backend_transforms import _transfer_opts_cur_backend
 from .util import (
+    HV_GE_1_21_0,
     filter_opts,
     is_tabular,
     is_series,
@@ -924,9 +925,13 @@ class HoloViewsConverter:
                 'At least one resampling operation (rasterize, datashader, '
                 'downsample) must be enabled when resample_when is set.'
             )
-        if selector is not None and not (datashade or rasterize):
-            msg = 'rasterize or datashade must be enabled when selector is set.'
-            raise ValueError(msg)
+        if selector is not None:
+            if not HV_GE_1_21_0:
+                msg = 'selector requires holoviews>=1.21.'
+                raise ImportError(msg)
+            if not (datashade or rasterize):
+                msg = 'rasterize or datashade must be enabled when selector is set.'
+                raise ValueError(msg)
         self.resample_when = resample_when
         self.datashade = datashade
         self.rasterize = rasterize

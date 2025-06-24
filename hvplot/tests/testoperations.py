@@ -324,6 +324,12 @@ class TestDatashader(ComparisonTestCase):
         assert isinstance(element, eltype)
         assert len(element) == 0
 
+    def test_selector_error_if_no_datashading_operation(self):
+        with pytest.raises(
+            ValueError, match='rasterize or datashade must be enabled when selector is set'
+        ):
+            self.df.hvplot.points('x', 'y', selector='first')
+
     def test_selector_rasterize(self):
         from datashader.reductions import first, min
 
