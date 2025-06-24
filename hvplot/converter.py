@@ -407,7 +407,7 @@ class HoloViewsConverter:
 
     Resampling Options
     ------------------
-    aggregator : str datashader.Reduction or None, default=None
+    aggregator : str or datashader.Reduction or None, default=None
         Aggregator to use when applying rasterize or datashade operation
         (valid options include 'mean', 'count', 'min', 'max' and more, and
         datashader reduction objects)
@@ -466,10 +466,17 @@ class HoloViewsConverter:
         Applies a resampling operation (datashade, rasterize or downsample) if
         the number of individual data points present in the current viewport
         is above this threshold. The raw plot is displayed otherwise.
-    selector : datashader.Reduction or None, default=None
-        Datashader reduction to use when applying rasterize or datashade operation,
-        to select additional information to add to the hover tooltip.
-        Valid options include: ``ds.min``, ``ds.max``, ``ds.first``, and ``ds.last``.
+    selector : datashader.Reduction | str | tuple | None, default=None
+        Datashader reduction to apply during a ``rasterize`` or ``datashade``
+        operation, used to select additional information for inclusion in the
+        hover tooltip. Supported options include:
+
+        - string: only ``'first'`` and ``'last'``
+        - tuple of two strings: ``(<reduction>, <column>)``, e.g. ``('min', 'value')``.
+        - Datashader object: ``ds.first``, ``ds.last``, ``ds.min``, and ``ds.max``.
+
+        .. versionadded:: 0.12.0
+           Requires ``holoviews>=1.21``.
     threshold : float, default=0.5
         When using ``dynspread``, this value defines the minimum density of overlapping points
         required before the spreading operation is applied.
@@ -917,6 +924,9 @@ class HoloViewsConverter:
                 'At least one resampling operation (rasterize, datashader, '
                 'downsample) must be enabled when resample_when is set.'
             )
+        if selector is not None and not (datashade or rasterize):
+            msg = 'rasterize or datashade must be enabled when selector is set.'
+            raise ValueError(msg)
         self.resample_when = resample_when
         self.datashade = datashade
         self.rasterize = rasterize
@@ -1969,14 +1979,19 @@ class HoloViewsConverter:
             layers = _transfer_opts_cur_backend(layers)
             return layers
 
-        import_datashader()
+        ds = import_datashader()
         from holoviews.operation.datashader import datashade, rasterize, dynspread
 
         categorical, agg = self._process_categorical_datashader()
         if agg:
             opts['aggregator'] = agg
         if self.selector:
-            opts['selector'] = self.selector
+            selector = self.selector
+            if isinstance(selector, str):
+                selector = getattr(ds, selector)()
+            elif isinstance(selector, tuple):
+                selector = getattr(ds, selector[0])(selector[1])
+            opts['selector'] = selector
         if self.precompute:
             opts['precompute'] = self.precompute
         if self.x_sampling:
