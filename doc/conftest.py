@@ -37,12 +37,6 @@ if not find_spec('geoviews'):
         'user_guide/Integrations.ipynb',
     ]
 
-# Gives weird solve on Python 3.9
-if not find_spec('ibis') or sys.version_info[:2] == (3, 9):
-    collect_ignore_glob += [
-        'ref/data_libraries.ipynb',
-    ]
-
 try:
     webdriver_control.create()
 except RuntimeError:
