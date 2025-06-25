@@ -11,7 +11,7 @@ dynamic = ["version"]
 description = "A high-level plotting API for the PyData ecosystem built on HoloViews."
 readme = "README.md"
 license = { text = "BSD" }
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 authors = [
     { name = "Philipp Rudiger", email = "developers@holoviz.org" },
 ]
@@ -21,7 +21,6 @@ maintainers = [
 classifiers = [
         "License :: OSI Approved :: BSD License",
         "Development Status :: 5 - Production/Stable",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
@@ -217,6 +216,9 @@ line-length = 99
 [tool.ruff.lint]
 extend-select = [
     "UP",
+]
+ignore = [
+    "UP038",  # Use `X | Y` in `isinstance` call instead of `(X, Y)`
 ]
 
 [tool.ruff.format]
