@@ -4,6 +4,7 @@ Provides utilities to convert data and projections
 
 import inspect
 import itertools
+import os
 import textwrap
 import sys
 
@@ -142,6 +143,31 @@ def proj_to_cartopy(proj):
 
     import cartopy.crs as ccrs
 
+    PROJ_TO_CCRS = {
+        'longlat': 'PlateCarree',
+        'tmerc': 'TransverseMercator',
+        'lcc': 'LambertConformal',
+        'merc': 'Mercator',
+        'utm': 'UTM',
+        'stere': 'Stereographic',
+        'ob_tran': 'RotatedPole',
+        'aea': 'AlbersEqualArea',
+        'eqdc': 'EquidistantConic',
+        'aeqd': 'AzimuthalEquidistant',
+        'gnom': 'Gnomonic',
+        'ortho': 'Orthographic',
+        'robin': 'Robinson',
+        'moll': 'Mollweide',
+        'sinu': 'Sinusoidal',
+        'eck4': 'EckertIV',
+        'geos': 'Geostationary',
+        'nsper': 'NearsidePerspective',
+        'laea': 'LambertAzimuthalEqualArea',
+        'cea': 'LambertCylindrical',
+        'mill': 'Miller',
+        'vandg': 'InterruptedGoodeHomolosine',
+    }
+
     try:
         from osgeo import osr
 
@@ -208,23 +234,12 @@ def proj_to_cartopy(proj):
         except Exception:
             pass
         if k == 'proj':
-            if v == 'longlat':
-                cl = ccrs.PlateCarree
-            elif v == 'tmerc':
-                cl = ccrs.TransverseMercator
-                kw_proj['approx'] = True
-            elif v == 'lcc':
-                cl = ccrs.LambertConformal
-            elif v == 'merc':
-                cl = ccrs.Mercator
-            elif v == 'utm':
-                cl = ccrs.UTM
-            elif v == 'stere':
-                cl = ccrs.Stereographic
-            elif v == 'ob_tran':
-                cl = ccrs.RotatedPole
+            if v in PROJ_TO_CCRS:
+                cl = getattr(ccrs, PROJ_TO_CCRS[v])
             else:
                 raise NotImplementedError(f'Unknown projection {v}')
+            if v == 'tmerc':
+                kw_proj['approx'] = True
         if k in km_proj:
             if k == 'zone':
                 v = int(v)
@@ -241,27 +256,56 @@ def proj_to_cartopy(proj):
         kw_proj['standard_parallels'] = (kw_std['lat_1'], kw_std['lat_2'])
 
     # mercatoooor
-    if cl.__name__ == 'Mercator':
+    # Use issubclass to check projection class types
+    if issubclass(cl, ccrs.Mercator):
         kw_proj.pop('false_easting', None)
         kw_proj.pop('false_northing', None)
         if 'scale_factor' in kw_proj:
             kw_proj.pop('latitude_true_scale', None)
-    elif cl.__name__ == 'Stereographic':
+    elif issubclass(cl, ccrs.Stereographic):
         kw_proj.pop('scale_factor', None)
         if 'latitude_true_scale' in kw_proj:
             kw_proj['true_scale_latitude'] = kw_proj['latitude_true_scale']
             kw_proj.pop('latitude_true_scale', None)
-    elif cl.__name__ == 'RotatedPole':
+    elif issubclass(cl, ccrs.RotatedPole):
         if 'central_longitude' in kw_proj:
             kw_proj['pole_longitude'] = kw_proj['central_longitude'] - 180
             kw_proj.pop('central_longitude', None)
+    elif issubclass(
+        cl,
+        (
+            ccrs.Gnomonic,
+            ccrs.AzimuthalEquidistant,
+            ccrs.Orthographic,
+            ccrs.LambertAzimuthalEqualArea,
+            ccrs.LambertCylindrical,
+        ),
+    ):
+        kw_proj.pop('false_easting', None)
+        kw_proj.pop('false_northing', None)
+        kw_proj.pop('latitude_true_scale', None)
+    elif issubclass(
+        cl, (ccrs.Robinson, ccrs.Mollweide, ccrs.Sinusoidal, ccrs.EckertIV, ccrs.Miller)
+    ):
+        # Global projections - remove most parameters except central longitude
+        kw_proj = {k: v for k, v in kw_proj.items() if k in ['central_longitude']}
+    elif issubclass(cl, ccrs.Geostationary):
+        kw_proj.pop('false_easting', None)
+        kw_proj.pop('false_northing', None)
+        kw_proj.pop('latitude_true_scale', None)
+    elif issubclass(cl, ccrs.NearsidePerspective):
+        kw_proj.pop('false_easting', None)
+        kw_proj.pop('false_northing', None)
+        kw_proj.pop('latitude_true_scale', None)
+    elif issubclass(cl, ccrs.LambertCylindrical):
+        kw_proj.pop('latitude_true_scale', None)
     else:
         kw_proj.pop('latitude_true_scale', None)
 
     try:
         return cl(globe=globe, **kw_proj)
     except TypeError:
-        del kw_proj['approx']
+        kw_proj.pop('approx', None)
 
     return cl(globe=globe, **kw_proj)
 
@@ -1045,3 +1089,32 @@ def _get_docstring_group_parameters(option_group: str) -> list:
     with _patch_numpy_docstring():
         cdoc = NumpyDocString(HoloViewsConverter.__doc__)
         return cdoc[option_group]
+
+
+def _find_stack_level() -> int:
+    """
+    Find the first place in the stack that is not inside hvplot
+    (tests notwithstanding).
+    Inspired by: pandas.util._exceptions.find_stack_level
+    """
+    import hvplot
+
+    pkg_dir = os.path.dirname(hvplot.__file__)
+    test_dir = os.path.join(pkg_dir, 'tests')
+
+    # https://stackoverflow.com/questions/17407119/python-inspect-stack-is-slow
+    frame = inspect.currentframe()
+    try:
+        n = 0
+        while frame:
+            filename = inspect.getfile(frame)
+            if filename.startswith(pkg_dir) and not filename.startswith(test_dir):
+                frame = frame.f_back
+                n += 1
+            else:
+                break
+    finally:
+        # See note in
+        # https://docs.python.org/3/library/inspect.html#inspect.Traceback
+        del frame
+    return n

@@ -14,18 +14,18 @@ repos:
         exclude: (\.min\.js$|\.svg$)
       - id: trailing-whitespace
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.7.2
+    rev: v0.11.8
     hooks:
       - id: ruff
       - id: ruff-format
         exclude: \.ipynb$
   - repo: https://github.com/hoxbro/clean_notebook
-    rev: v0.1.15
+    rev: v0.1.17
     hooks:
       - id: clean-notebook
         args: [-i, tags]
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.3.0
+    rev: v2.4.1
     hooks:
       - id: codespell
         exclude: (\.min\.js$|\.svg$|\.html$)
