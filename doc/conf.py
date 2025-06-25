@@ -215,6 +215,9 @@ if os.getenv('HVPLOT_EXECUTE_NBS_TUTORIALS') in ('False', 'false', '0'):
 if os.getenv('HVPLOT_EXECUTE_NBS') in ('False', 'false', '0'):
     nb_execution_mode = 'off'
 
+# TODO: remove that, used for debugging now.
+nb_execution_mode = 'off'
+
 # We replace the automatically generated stub files by notebooks
 # that include the API ref and some examples.
 autosummary_generate = True
