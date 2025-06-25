@@ -29,8 +29,13 @@ try:
 except ImportError:
     panel_available = False
 
+# To be deprecated.
 hv_version = Version(hv.__version__)
 bokeh_version = Version(bokeh.__version__)
+
+_HV_VERSION = hv_version.release
+_HV_GE_1_21_0 = _HV_VERSION >= (1, 12, 0)
+
 _fugue_ipython = None  # To be set to True in tests to mock ipython
 
 
