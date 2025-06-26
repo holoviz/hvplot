@@ -190,6 +190,43 @@ Explore a curated set of example visualizations using hvPlot with different back
 
 ::::
 
+(statistical)=
+## Statistical
+
+::::{grid} 1 2 2 4
+:gutter: 1 1 1 2
+:margin: 0
+
+:::{grid-item-card} **Histogram**
+:link: statistical/histogram
+:link-type: doc
+:img-bottom: thumbnails/histogram.png
+:img-alt: Histogram
+:::
+
+:::{grid-item-card} **KDE Plot**
+:link: statistical/density_plot
+:link-type: doc
+:img-bottom: thumbnails/density_plot.png
+:img-alt: KDE Plot
+:::
+
+:::{grid-item-card} **Hexbin**
+:link: statistical/hexbin
+:link-type: doc
+:img-bottom: thumbnails/hexbin.png
+:img-alt: Hexbin Plot
+:::
+
+:::{grid-item-card} **Correlation Heatmap**
+:link: statistical/correlation_heatmap
+:link-type: doc
+:img-bottom: thumbnails/correlation_heatmap.png
+:img-alt: Correlation Heatmap
+:::
+
+::::
+
 ```{toctree}
 :titlesonly:
 :hidden:
