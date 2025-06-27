@@ -408,7 +408,7 @@ class HoloViewsConverter:
 
     Resampling Options
     ------------------
-    aggregator : str or datashader.Reduction or None, default=None
+    aggregator : str, datashader.Reduction, or None, default=None
         Aggregator to use when applying rasterize or datashade operation
         (valid options include 'mean', 'count', 'min', 'max' and more, and
         datashader reduction objects)
@@ -478,6 +478,7 @@ class HoloViewsConverter:
 
         .. versionadded:: 0.12.0
            Requires ``holoviews>=1.21``.
+           Requires ``bokeh>=3.7``.
     threshold : float, default=0.5
         When using ``dynspread``, this value defines the minimum density of overlapping points
         required before the spreading operation is applied.
@@ -1065,7 +1066,7 @@ class HoloViewsConverter:
         if kind == 'errorbars':
             hover = False
         elif hover is None:
-            hover = not self.datashade if not self.selector else True
+            hover = True if self.selector else not self.datashade
         if hover and not any(
             t for t in tools if isinstance(t, HoverTool) or t in ['hover', 'vline', 'hline']
         ):
