@@ -52,6 +52,7 @@ from pandas import DatetimeIndex, MultiIndex
 
 from .backend_transforms import _transfer_opts_cur_backend
 from .util import (
+    _HV_GE_1_21_0,
     filter_opts,
     is_tabular,
     is_series,
@@ -407,7 +408,7 @@ class HoloViewsConverter:
 
     Resampling Options
     ------------------
-    aggregator : str datashader.Reduction or None, default=None
+    aggregator : str, datashader.Reduction, or None, default=None
         Aggregator to use when applying rasterize or datashade operation
         (valid options include 'mean', 'count', 'min', 'max' and more, and
         datashader reduction objects)
@@ -466,6 +467,18 @@ class HoloViewsConverter:
         Applies a resampling operation (datashade, rasterize or downsample) if
         the number of individual data points present in the current viewport
         is above this threshold. The raw plot is displayed otherwise.
+    selector : datashader.Reduction | str | tuple | None, default=None
+        Datashader reduction to apply during a ``rasterize`` or ``datashade``
+        operation, used to select additional information for inclusion in the
+        hover tooltip. Supported options include:
+
+        - string: only ``'first'`` and ``'last'``
+        - tuple of two strings: ``(<reduction>, <column>)``, e.g. ``('min', 'value')``.
+        - Datashader object: ``ds.first``, ``ds.last``, ``ds.min``, and ``ds.max``.
+
+        .. versionadded:: 0.12.0
+           Requires ``holoviews>=1.21``.
+           Requires ``bokeh>=3.7``.
     threshold : float, default=0.5
         When using ``dynspread``, this value defines the minimum density of overlapping points
         required before the spreading operation is applied.
@@ -610,6 +623,7 @@ class HoloViewsConverter:
         'dynspread',
         'max_px',
         'precompute',
+        'selector',
         'threshold',
     ]
 
@@ -794,6 +808,7 @@ class HoloViewsConverter:
         debug=False,
         framewise=True,
         aggregator=None,
+        selector=None,
         projection=None,
         global_extent=None,
         geo=False,
@@ -911,12 +926,20 @@ class HoloViewsConverter:
                 'At least one resampling operation (rasterize, datashader, '
                 'downsample) must be enabled when resample_when is set.'
             )
+        if selector is not None:
+            if not _HV_GE_1_21_0:
+                msg = 'selector requires holoviews>=1.21.'
+                raise ImportError(msg)
+            if not (datashade or rasterize):
+                msg = 'rasterize or datashade must be enabled when selector is set.'
+                raise ValueError(msg)
         self.resample_when = resample_when
         self.datashade = datashade
         self.rasterize = rasterize
         self.downsample = downsample
         self.dynspread = dynspread
         self.aggregator = aggregator
+        self.selector = selector
         self.precompute = precompute
         self.x_sampling = x_sampling
         self.y_sampling = y_sampling
@@ -1043,7 +1066,7 @@ class HoloViewsConverter:
         if kind == 'errorbars':
             hover = False
         elif hover is None:
-            hover = not self.datashade
+            hover = True if self.selector else not self.datashade
         if hover and not any(
             t for t in tools if isinstance(t, HoverTool) or t in ['hover', 'vline', 'hline']
         ):
@@ -1962,13 +1985,24 @@ class HoloViewsConverter:
             layers = _transfer_opts_cur_backend(layers)
             return layers
 
-        import_datashader()
+        ds = import_datashader()
         from holoviews.operation.datashader import datashade, rasterize, dynspread
 
         categorical, agg = self._process_categorical_datashader()
         if agg:
             opts['aggregator'] = agg
-
+        if self.selector:
+            selector = self.selector
+            try:
+                if isinstance(selector, str):
+                    selector = getattr(ds, selector)()
+                elif isinstance(selector, tuple):
+                    selector = getattr(ds, selector[0])(selector[1])
+            except AttributeError as e:
+                sel = selector[0] if isinstance(selector, tuple) else selector
+                msg = f'Invalid selector value {sel!r}.'
+                raise ValueError(msg) from e
+            opts['selector'] = selector
         if self.precompute:
             opts['precompute'] = self.precompute
         if self.x_sampling:
