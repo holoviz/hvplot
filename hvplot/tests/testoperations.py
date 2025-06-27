@@ -330,11 +330,16 @@ class TestDatashader(ComparisonTestCase):
         ):
             self.df.hvplot.points('x', 'y', selector='first')
 
+    @parameterized.expand([('bad',), (('bad', 'number'),)])
+    def test_selector_error_if_bad_string_value(self, selector):
+        with pytest.raises(ValueError, match='Invalid selector value'):
+            self.df.hvplot.points('x', 'y', rasterize=True, selector=selector)
+
     def test_selector_rasterize(self):
         from datashader.reductions import first, min
 
         test_cases = [
-            ('first', first()),
+            ('foo', first()),
             (('min', 'number'), min('number')),
             (first('category'), first('category')),
         ]

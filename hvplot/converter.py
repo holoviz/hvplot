@@ -1993,10 +1993,15 @@ class HoloViewsConverter:
             opts['aggregator'] = agg
         if self.selector:
             selector = self.selector
-            if isinstance(selector, str):
-                selector = getattr(ds, selector)()
-            elif isinstance(selector, tuple):
-                selector = getattr(ds, selector[0])(selector[1])
+            try:
+                if isinstance(selector, str):
+                    selector = getattr(ds, selector)()
+                elif isinstance(selector, tuple):
+                    selector = getattr(ds, selector[0])(selector[1])
+            except AttributeError as e:
+                sel = selector[0] if isinstance(selector, tuple) else selector
+                msg = f'Invalid selector value {sel!r}.'
+                raise ValueError(msg) from e
             opts['selector'] = selector
         if self.precompute:
             opts['precompute'] = self.precompute
