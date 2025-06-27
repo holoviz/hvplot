@@ -339,7 +339,7 @@ class TestDatashader(ComparisonTestCase):
         from datashader.reductions import first, min
 
         test_cases = [
-            ('foo', first()),
+            ('first', first()),
             (('min', 'number'), min('number')),
             (first('category'), first('category')),
         ]
