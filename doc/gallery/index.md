@@ -167,20 +167,6 @@ Explore a curated set of example visualizations using hvPlot with different back
 :img-alt: Heatmap Plot
 :::
 
-:::{grid-item-card} **Violin Plot**
-:link: categorical/violin
-:link-type: doc
-:img-bottom: thumbnails/violin.png
-:img-alt: Violin Plot
-:::
-
-:::{grid-item-card} **Box Plot**
-:link: categorical/boxplot
-:link-type: doc
-:img-bottom: thumbnails/boxplot.png
-:img-alt: Grouped Box Plot
-:::
-
 :::{grid-item-card} **Jittered Strip Plot**
 :link: categorical/strip_jitter
 :link-type: doc
@@ -204,7 +190,7 @@ Explore a curated set of example visualizations using hvPlot with different back
 :img-alt: Histogram
 :::
 
-:::{grid-item-card} **KDE Plot**
+:::{grid-item-card} **Density**
 :link: statistical/density_plot
 :link-type: doc
 :img-bottom: thumbnails/density_plot.png
@@ -223,6 +209,20 @@ Explore a curated set of example visualizations using hvPlot with different back
 :link-type: doc
 :img-bottom: thumbnails/correlation_heatmap.png
 :img-alt: Correlation Heatmap
+:::
+
+:::{grid-item-card} **Violin Plot**
+:link: statistical/violin
+:link-type: doc
+:img-bottom: thumbnails/violin.png
+:img-alt: Violin Plot
+:::
+
+:::{grid-item-card} **Box Plot**
+:link: statistical/boxplot
+:link-type: doc
+:img-bottom: thumbnails/boxplot.png
+:img-alt: Grouped Box Plot
 :::
 
 ::::
