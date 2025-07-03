@@ -227,6 +227,42 @@ Explore a curated set of example visualizations using hvPlot with different back
 
 ::::
 
+(geospatial)=
+## GeoSpatial
+::::{grid} 1 2 2 4
+:gutter: 1 1 1 2
+:margin: 0
+
+:::{grid-item-card} **GeoPoints**
+:link: geospatial/geopoints
+:link-type: doc
+:img-bottom: thumbnails/geopoints.png
+:img-alt: Simple Map Plot
+:::
+
+:::{grid-item-card} **Datashaded Earthquake Map**
+:link: geospatial/datashade_map
+:link-type: doc
+:img-bottom: thumbnails/datashade_map.png
+:img-alt: Datashaded Earthquake Map
+:::
+
+:::{grid-item-card} **Map Overlay**
+:link: geospatial/map_overlay
+:link-type: doc
+:img-bottom: thumbnails/map_overlay.png
+:img-alt: Map Overlay with Tiles
+:::
+
+:::{grid-item-card} **Polygon Plot**
+:link: geospatial/polygon_map
+:link-type: doc
+:img-bottom: thumbnails/polygon_map.png
+:img-alt: Geographic Polygon Plot
+:::
+
+::::
+
 ```{toctree}
 :titlesonly:
 :hidden:
