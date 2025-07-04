@@ -263,6 +263,45 @@ Explore a curated set of example visualizations using hvPlot with different back
 
 ::::
 
+(multi-dimensional)=
+## Multi-Dimensional
+
+::::{grid} 1 2 2 4
+:gutter: 1 1 1 2
+:margin: 0
+
+:::{grid-item-card} **Multidimensional Scatter**
+:link: multi-dimensional/scatter_multi
+:link-type: doc
+:img-bottom: thumbnails/scatter_multi.png
+:img-alt: Scatter plot with color and size encoding
+:::
+
+:::{grid-item-card} **Xarray Image Plot**
+:link: multi-dimensional/xarray_image
+:link-type: doc
+:img-bottom: thumbnails/xarray_image.png
+:img-alt: 2D xarray image plot
+:::
+
+:::{grid-item-card} **Groupby Over Time**
+:link: multi-dimensional/groupby
+:link-type: doc
+:img-bottom: thumbnails/groupby.png
+:img-alt: Groupby interactive plot
+:::
+
+:::{grid-item-card} **Scatter Matrix**
+:link: multi-dimensional/scatter_matrix
+:link-type: doc
+:img-bottom: thumbnails/scatter_matrix.png
+:img-alt: Scatter matrix plot
+:::
+
+::::
+
+
+
 ```{toctree}
 :titlesonly:
 :hidden:
