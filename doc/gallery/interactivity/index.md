@@ -1,0 +1,8 @@
+# Interactivity
+
+```{toctree}
+:hidden:
+:glob:
+
+*
+```
