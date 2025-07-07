@@ -229,6 +229,7 @@ Explore a curated set of example visualizations using hvPlot with different back
 
 (geospatial)=
 ## GeoSpatial
+
 ::::{grid} 1 2 2 4
 :gutter: 1 1 1 2
 :margin: 0
@@ -300,7 +301,40 @@ Explore a curated set of example visualizations using hvPlot with different back
 
 ::::
 
+(interactivity)=
+## Interactivity
 
+:::{note}
+The examples in this section require a **live Python process** (e.g., Jupyter Notebook, JupyterLab, or Panel app)
+and will not function on static documentation pages.
+:::
+
+::::{grid} 1 2 2 4
+:gutter: 1 1 1 2
+:margin: 0
+
+:::{grid-item-card} **Groupby with Widget**
+:link: interactivity/groupby_widget
+:link-type: doc
+:img-bottom: thumbnails/groupby_widget.png
+:img-alt: Groupby with widget
+:::
+
+:::{grid-item-card} **Interactive Panel App**
+:link: interactivity/penguins_app
+:link-type: doc
+:img-bottom: thumbnails/penguins_app.png
+:img-alt: Panel app with dropdown and slider
+:::
+
+:::{grid-item-card} **Function Plot**
+:link: interactivity/sine_curve
+:link-type: doc
+:img-bottom: thumbnails/sine_curve.png
+:img-alt: Interactive sine function plot
+:::
+
+::::
 
 ```{toctree}
 :titlesonly:
