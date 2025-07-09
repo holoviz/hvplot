@@ -336,6 +336,35 @@ and will not function on static documentation pages.
 
 ::::
 
+(customization)=
+## Advanced Customization
+::::{grid} 1 2 2 4
+:gutter: 1 1 1 2
+:margin: 0
+
+:::{grid-item-card} **OHLC Plots**
+:link: customization/ohlc
+:link-type: doc
+:img-bottom: thumbnails/ohlc.png
+:img-alt: Apple stocks OHLC plot
+:::
+
+:::{grid-item-card} **Stem Plot**
+:link: customization/stem_plot
+:link-type: doc
+:img-bottom: thumbnails/stem_plot.png
+:img-alt: Simulated Stem Plot using HoloViews Elements
+:::
+
+:::{grid-item-card} **Paths Plot**
+:link: customization/paths_labels
+:link-type: doc
+:img-bottom: thumbnails/paths.png
+:img-alt: Paths Plot from NY to Delhi
+:::
+
+::::
+
 ```{toctree}
 :titlesonly:
 :hidden:
