@@ -1,3 +1,7 @@
+<head>
+    <meta http-equiv='refresh' content='0; URL=../index.html#geospatial'>
+</head>
+
 # Geo-spatial
 
 ```{toctree}
