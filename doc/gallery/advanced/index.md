@@ -1,8 +1,8 @@
 <head>
-    <meta http-equiv='refresh' content='0; URL=../index.html#customization'>
+    <meta http-equiv='refresh' content='0; URL=../index.html#advanced'>
 </head>
 
-# Advanced Customization
+# Advanced Plots
 
 ```{toctree}
 :hidden:
