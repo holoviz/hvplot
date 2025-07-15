@@ -37,13 +37,6 @@ Explore a curated set of example visualizations using hvPlot with different back
 :img-alt: Simple Area Chart
 :::
 
-:::{grid-item-card} Histogram
-:link: basic-charts/simple_histogram
-:link-type: doc
-:img-bottom: thumbnails/simple_histogram.png
-:img-alt: Simple Histogram
-:::
-
 :::{grid-item-card} Box Plot
 :link: basic-charts/simple_boxplot
 :link-type: doc
@@ -121,6 +114,13 @@ Explore a curated set of example visualizations using hvPlot with different back
 :link-type: doc
 :img-bottom: thumbnails/forcast_bands.png
 :img-alt: Forecast Bands
+:::
+
+:::{grid-item-card} OHLC Plots
+:link: time-series/ohlc
+:link-type: doc
+:img-bottom: thumbnails/ohlc.png
+:img-alt: Apple stocks OHLC plot
 :::
 
 ::::
@@ -341,13 +341,6 @@ and will not function on static documentation pages.
 ::::{grid} 1 2 2 4
 :gutter: 1 1 1 2
 :margin: 0
-
-:::{grid-item-card} OHLC Plots
-:link: advanced/ohlc
-:link-type: doc
-:img-bottom: thumbnails/ohlc.png
-:img-alt: Apple stocks OHLC plot
-:::
 
 :::{grid-item-card} Stem Plot
 :link: advanced/stem_plot
