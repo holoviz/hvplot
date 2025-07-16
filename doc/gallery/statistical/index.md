@@ -14,4 +14,5 @@ Hexbin <hexbin>
 correlation_heatmap
 Violin Plot <violin>
 Box Plot <boxplot>
+Bivariate Plot <bivariate>
 ```

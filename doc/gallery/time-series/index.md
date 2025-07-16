@@ -16,4 +16,5 @@ Dual Axis <dual_axis_timeseries>
 Step Timeseries <step_time_series>
 Forecast Bands <forcast_bands>
 OHLC plot <ohlc>
+Lag Plot <lag_plot>
 ```

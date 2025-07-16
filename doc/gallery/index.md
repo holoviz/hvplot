@@ -123,6 +123,13 @@ Explore a curated set of example visualizations using hvPlot with different back
 :img-alt: Apple stocks OHLC plot
 :::
 
+:::{grid-item-card} Lag Plot
+:link: time-series/lag_plot
+:link-type: doc
+:img-bottom: thumbnails/lag_plot.png
+:img-alt: Lag Plot
+:::
+
 ::::
 
 (categorical)=
@@ -225,6 +232,13 @@ Explore a curated set of example visualizations using hvPlot with different back
 :img-alt: Grouped Box Plot
 :::
 
+:::{grid-item-card} Bivariate Plot
+:link: statistical/bivariate
+:link-type: doc
+:img-bottom: thumbnails/bivariate.png
+:img-alt: Bivariate plot
+:::
+
 ::::
 
 (geospatial)=
@@ -297,6 +311,13 @@ Explore a curated set of example visualizations using hvPlot with different back
 :link-type: doc
 :img-bottom: thumbnails/scatter_matrix.png
 :img-alt: Scatter matrix plot
+:::
+
+:::{grid-item-card} Quadmesh
+:link: multi-dimensional/quadmesh
+:link-type: doc
+:img-bottom: thumbnails/quadmesh.png
+:img-alt: Quadmesh plot
 :::
 
 ::::
