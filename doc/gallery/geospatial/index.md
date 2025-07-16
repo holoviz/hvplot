@@ -12,4 +12,5 @@ geopoints
 map_overlay
 datashade_map
 polygon_map
+Paths Plot <paths_labels>
 ```

@@ -1,6 +1,7 @@
 # Gallery
 
 Explore a curated set of example visualizations using hvPlot with different backends and datasets.
+For more examples using hvPlot and other HoloViz tools to solve real world problems, see the [examples website](https://examples.holoviz.org/gallery/index.html).
 
 (basic-charts)=
 ## Basic Charts
@@ -242,13 +243,13 @@ Explore a curated set of example visualizations using hvPlot with different back
 ::::
 
 (geospatial)=
-## GeoSpatial
+## Geospatial
 
 ::::{grid} 1 2 2 4
 :gutter: 1 1 1 2
 :margin: 0
 
-:::{grid-item-card} GeoPoints
+:::{grid-item-card} GeoPoints Plot
 :link: geospatial/geopoints
 :link-type: doc
 :img-bottom: thumbnails/geopoints.png
@@ -274,6 +275,13 @@ Explore a curated set of example visualizations using hvPlot with different back
 :link-type: doc
 :img-bottom: thumbnails/polygon_map.png
 :img-alt: Geographic Polygon Plot
+:::
+
+:::{grid-item-card} Paths Plot
+:link: geospatial/paths_labels
+:link-type: doc
+:img-bottom: thumbnails/paths.png
+:img-alt: Paths Plot from NY to Delhi
 :::
 
 ::::
@@ -370,13 +378,6 @@ and will not function on static documentation pages.
 :img-alt: Simulated Stem Plot using HoloViews Elements
 :::
 
-:::{grid-item-card} Paths Plot
-:link: advanced/paths_labels
-:link-type: doc
-:img-bottom: thumbnails/paths.png
-:img-alt: Paths Plot from NY to Delhi
-:::
-
 ::::
 
 ```{toctree}
@@ -393,5 +394,4 @@ geospatial/index
 multi-dimensional/index
 interactivity/index
 advanced/index
-case-studies/index
 ```

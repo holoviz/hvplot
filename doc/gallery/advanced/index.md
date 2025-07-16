@@ -9,5 +9,4 @@
 :glob:
 
 Stem Plot <stem_plot>
-Paths Plot <paths_labels>
 ```
