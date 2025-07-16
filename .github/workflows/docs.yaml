@@ -61,7 +61,7 @@ jobs:
       - name: report failure
         if: failure()
         run: cat /tmp/sphinx-*.log | tail -n 100
-      - uses: holoviz-dev/holoviz_tasks/docs-publish@docs_publish
+      - uses: holoviz-dev/holoviz_tasks/docs-publish@v0
         with:
           s3-url: s3://hvplot.holoviz.org
           s3-cloudfront-id: E13QSRL36ILGWH
