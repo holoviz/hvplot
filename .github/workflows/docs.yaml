@@ -17,6 +17,9 @@ on:
         - dryrun
         required: true
         default: dryrun
+      version:
+        description: 'Version tag X.X.X (required if target is main)'
+        required: false
   schedule:
     - cron: '0 15 * * SUN'
 
@@ -36,46 +39,35 @@ jobs:
 
   docs_build:
     name: Build Documentation
+    needs: [pixi_lock]
     runs-on: 'macos-latest'
     timeout-minutes: 120
     env:
       DISPLAY: ":99.0"
+      VERSION: ${{ inputs.version }}
     steps:
+      - name: Validate version
+        if: ${{ inputs.target == 'main' }}
+        run: |
+          if [[ -z "$VERSION" || ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ 'version' is required and must match format X.X.X (e.g. 0.11.1) when target is 'main'"
+            exit 1
+          fi
       - uses: holoviz-dev/holoviz_tasks/pixi_install@v0
         with:
           environments: docs
       - name: Build documentation
         run: pixi run -e docs docs-build
-      - name: Set and echo git ref
-        id: vars
-        run: |
-          echo "Deploying from ref ${GITHUB_REF#refs/*/}"
-          echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
       - name: report failure
         if: failure()
         run: cat /tmp/sphinx-*.log | tail -n 100
-      - name: Deploy dev
-        uses: peaceiris/actions-gh-pages@v4
-        if: |
-          (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'dev') ||
-          (github.event_name == 'push' && (contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc')))
+      - uses: holoviz-dev/holoviz_tasks/docs-publish@v0
         with:
-          personal_token: ${{ secrets.ACCESS_TOKEN }}
-          external_repository: holoviz-dev/hvplot
-          publish_dir: ./builtdocs
-          force_orphan: true
-          exclude_assets: '.doctrees'
-      - name: Deploy main
-        if: |
-          (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'main') ||
-          (github.event_name == 'push' && !(contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc')))
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./builtdocs
-          cname: hvplot.holoviz.org
-          force_orphan: true
-          exclude_assets: '.doctrees'
+          s3-url: s3://hvplot.holoviz.org
+          s3-cloudfront-id: E13QSRL36ILGWH
+          s3-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          s3-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          version: ${{ inputs.version }}
 
   pip_build_docs:
     name: Build Documentation (pip)
