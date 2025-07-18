@@ -13,6 +13,7 @@ KDE Plot <density_plot>
 Hexbin <hexbin>
 correlation_heatmap
 Violin Plot <violin>
+Violin Plot with Jitter <violin_scatter>
 Box Plot <boxplot>
 Bivariate Plot <bivariate>
 ```

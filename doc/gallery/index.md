@@ -226,6 +226,13 @@ For more examples using hvPlot and other HoloViz tools to solve real world probl
 :img-alt: Violin Plot
 :::
 
+:::{grid-item-card} Violin Plot with Jitter
+:link: statistical/violin_scatter
+:link-type: doc
+:img-bottom: thumbnails/violin_scatter.png
+:img-alt: Jittered Violin Plot
+:::
+
 :::{grid-item-card} Box Plot
 :link: statistical/boxplot
 :link-type: doc
