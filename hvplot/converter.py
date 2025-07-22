@@ -264,7 +264,9 @@ class HoloViewsConverter:
     ------------
     autorange : Literal['x', 'y'] or None, default=None
         Whether to enable auto-ranging along the x- or y-axis when
-        zooming. Requires HoloViews >= 1.16.
+        zooming. Only applies to the Bokeh backend.
+
+        .. versionadded:: 0.9.0
     flip_xaxis/flip_yaxis : bool or None, default=None
         Whether to flip the axis left to right or up and down respectively
     framewise : bool, default=True
@@ -279,26 +281,46 @@ class HoloViewsConverter:
         Rotates the axis ticks along the x-axis by the specified
         number of degrees.
     shared_axes : bool, default=True
-        Whether to link axes between plots
+        Whether to link axes between plots.
     subcoordinate_y : bool or dict or None, default=None
        Whether to enable sub-coordinate y systems for this plot. Accepts also a
        dictionary of related options to pass down to HoloViews,
        e.g. ``{'subcoordinate_scale': 2}``.
+
+       .. versionadded:: 0.11.0
     title : str or None, default=None
         Title for the plot
-    xaxis/yaxis : str or None
-        Whether to show the x/y-axis and whether to place it at the
-        'top'/'bottom' and 'left'/'right' respectively.
+    xaxis : str or bool or None
+        Whether to show the x-axis and whether to place it at the top or
+        bottom. A bare axis means that an axis line is still displayed but
+        there are no axis ticks and labels. Valid options include:
+        ``bottom`` (default), ``bottom-bare``, ``top``, ``top-bare``,
+        ``None`` (no axis at all), ``True`` (same as ``bottom``), and
+        ``False`` (same as ``None``).
+    yaxis : str or bool or None
+        Whether to show the y-axis and whether to place it at the left or
+        right. A bare axis means that an axis line is still displayed but
+        there are no axis ticks and labels. Valid options include:
+        ``left`` (default), ``left-bare``, ``right``, ``right-bare``,
+        ``None`` (no axis at all), ``True`` (same as ``left``), and
+        ``False`` (same as ``None``).
     xformatter/yformatter : str or bokeh.TickFormatter or None, default=None
         Formatter for the x-axis and y-axis (accepts printf formatter,
         e.g. '%.3f', and bokeh TickFormatter)
     xlabel/ylabel/clabel : str or None, default=None
         Axis labels for the x-axis, y-axis, and colorbar
-    xlim/ylim : tuple or list or None, default=None
-        Plot limits of the x- and y-axis
-    xticks/yticks/cticks : int or list or None, default=None
-        Ticks along x-axis, y-axis, and colorbar specified as an integer, list of
-        ticks positions, or list of tuples of the tick positions and labels
+    xlim/ylim : tuple or None, default=None
+        Plot limits of the x- and y-axis. One bound can be left unset by
+        using ``None`` (e.g. ``xlim=(10, None)`` means there is no upper bound).
+    xticks/yticks/cticks : int or list or np.ndarray or None, default=None
+        Ticks along x-axis and y-axis, as an integer, list of ticks positions,
+        Numpy ndarray, or list of tuples of the tick positions and labels.
+        Also accepts a Bokeh ``Ticker`` instance when the Bokeh plotting backend
+        is enabled.
+
+        .. versionadded:: 0.11.0
+           ``cticks`` was added in this version and is only supported by the
+           Bokeh plotting backend.
 
     Grid And Legend Options
     -----------------------
