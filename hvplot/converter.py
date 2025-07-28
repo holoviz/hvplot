@@ -52,6 +52,7 @@ from pandas import DatetimeIndex, MultiIndex
 
 from .backend_transforms import _transfer_opts_cur_backend
 from .util import (
+    _HV_GE_1_21_0,
     filter_opts,
     is_tabular,
     is_series,
@@ -263,7 +264,9 @@ class HoloViewsConverter:
     ------------
     autorange : Literal['x', 'y'] or None, default=None
         Whether to enable auto-ranging along the x- or y-axis when
-        zooming. Requires HoloViews >= 1.16.
+        zooming. Only applies to the Bokeh backend.
+
+        .. versionadded:: 0.9.0
     flip_xaxis/flip_yaxis : bool or None, default=None
         Whether to flip the axis left to right or up and down respectively
     framewise : bool, default=True
@@ -278,26 +281,46 @@ class HoloViewsConverter:
         Rotates the axis ticks along the x-axis by the specified
         number of degrees.
     shared_axes : bool, default=True
-        Whether to link axes between plots
+        Whether to link axes between plots.
     subcoordinate_y : bool or dict or None, default=None
        Whether to enable sub-coordinate y systems for this plot. Accepts also a
        dictionary of related options to pass down to HoloViews,
        e.g. ``{'subcoordinate_scale': 2}``.
+
+       .. versionadded:: 0.11.0
     title : str or None, default=None
         Title for the plot
-    xaxis/yaxis : str or None
-        Whether to show the x/y-axis and whether to place it at the
-        'top'/'bottom' and 'left'/'right' respectively.
+    xaxis : str or bool or None
+        Whether to show the x-axis and whether to place it at the top or
+        bottom. A bare axis means that an axis line is still displayed but
+        there are no axis ticks and labels. Valid options include:
+        ``bottom`` (default), ``bottom-bare``, ``top``, ``top-bare``,
+        ``None`` (no axis at all), ``True`` (same as ``bottom``), and
+        ``False`` (same as ``None``).
+    yaxis : str or bool or None
+        Whether to show the y-axis and whether to place it at the left or
+        right. A bare axis means that an axis line is still displayed but
+        there are no axis ticks and labels. Valid options include:
+        ``left`` (default), ``left-bare``, ``right``, ``right-bare``,
+        ``None`` (no axis at all), ``True`` (same as ``left``), and
+        ``False`` (same as ``None``).
     xformatter/yformatter : str or bokeh.TickFormatter or None, default=None
         Formatter for the x-axis and y-axis (accepts printf formatter,
         e.g. '%.3f', and bokeh TickFormatter)
     xlabel/ylabel/clabel : str or None, default=None
         Axis labels for the x-axis, y-axis, and colorbar
-    xlim/ylim : tuple or list or None, default=None
-        Plot limits of the x- and y-axis
-    xticks/yticks/cticks : int or list or None, default=None
-        Ticks along x-axis, y-axis, and colorbar specified as an integer, list of
-        ticks positions, or list of tuples of the tick positions and labels
+    xlim/ylim : tuple or None, default=None
+        Plot limits of the x- and y-axis. One bound can be left unset by
+        using ``None`` (e.g. ``xlim=(10, None)`` means there is no upper bound).
+    xticks/yticks/cticks : int or list or np.ndarray or None, default=None
+        Ticks along x-axis and y-axis, as an integer, list of ticks positions,
+        Numpy ndarray, or list of tuples of the tick positions and labels.
+        Also accepts a Bokeh ``Ticker`` instance when the Bokeh plotting backend
+        is enabled.
+
+        .. versionadded:: 0.11.0
+           ``cticks`` was added in this version and is only supported by the
+           Bokeh plotting backend.
 
     Grid And Legend Options
     -----------------------
@@ -407,7 +430,7 @@ class HoloViewsConverter:
 
     Resampling Options
     ------------------
-    aggregator : str datashader.Reduction or None, default=None
+    aggregator : str, datashader.Reduction, or None, default=None
         Aggregator to use when applying rasterize or datashade operation
         (valid options include 'mean', 'count', 'min', 'max' and more, and
         datashader reduction objects)
@@ -419,28 +442,29 @@ class HoloViewsConverter:
         Controls the application of downsampling to the plotted data,
         which is particularly useful for large timeseries datasets to
         reduce the amount of data sent to browser and improve
-        visualization performance. Requires HoloViews >= 1.16. Additional
-        dependencies: Installing the ``tsdownsample`` library is required
-        for using any downsampling methods other than the default 'lttb'.
+        visualization performance.
 
         Acceptable values:
 
-        - False: No downsampling is applied.
-        - True: Applies downsampling using HoloViews' default algorithm
+        - ``False``: No downsampling is applied.
+        - ``True``: Applies downsampling using HoloViews' default algorithm
           (LTTB - Largest Triangle Three Buckets).
-        - 'lttb': Explicitly applies the Largest Triangle Three Buckets
-          algorithm.
-        - 'minmax': Applies the MinMax algorithm, selecting the minimum
+        - ``'lttb'``: Explicitly applies the Largest Triangle Three Buckets
+          algorithm. Uses ``tsdownsample`` if installed.
+        - ``'minmax'``: Applies the MinMax algorithm, selecting the minimum
           and maximum values in each bin. Requires ``tsdownsample``.
-        - 'm4': Applies the M4 algorithm, selecting the minimum, maximum,
+        - ``'m4'``: Applies the M4 algorithm, selecting the minimum, maximum,
           first, and last values in each bin. Requires ``tsdownsample``.
-        - 'minmax-lttb': Combines MinMax and LTTB algorithms for
+        - ``'minmax-lttb'``: Combines MinMax and LTTB algorithms for
           downsampling, first applying MinMax to reduce to a preliminary
           set of points, then LTTB for further reduction. Requires
           ``tsdownsample``.
 
         Other string values corresponding to supported algorithms in
         HoloViews may also be used.
+
+        .. note::
+           Requires ``holoviews>=1.16``.
     dynspread : bool, default=False
         For plots generated with datashade=True or rasterize=True,
         automatically increase the point size when the data is sparse
@@ -461,10 +485,22 @@ class HoloViewsConverter:
         Whether to apply rasterization using the Datashader library,
         returning an aggregated Image (to be colormapped by the
         plotting backend) instead of individual points
-    resample_when : int, default=None
+    resample_when : int or None, default=None
         Applies a resampling operation (datashade, rasterize or downsample) if
-        the number of individual data points present in the current zoom range
+        the number of individual data points present in the current viewport
         is above this threshold. The raw plot is displayed otherwise.
+    selector : datashader.Reduction | str | tuple | None, default=None
+        Datashader reduction to apply during a ``rasterize`` or ``datashade``
+        operation, used to select additional information for inclusion in the
+        hover tooltip. Supported options include:
+
+        - string: only ``'first'`` and ``'last'``
+        - tuple of two strings: ``(<reduction>, <column>)``, e.g. ``('min', 'value')``.
+        - Datashader object: ``ds.first``, ``ds.last``, ``ds.min``, and ``ds.max``.
+
+        .. versionadded:: 0.12.0
+           Requires ``holoviews>=1.21``.
+           Requires ``bokeh>=3.7``.
     threshold : float, default=0.5
         When using ``dynspread``, this value defines the minimum density of overlapping points
         required before the spreading operation is applied.
@@ -609,6 +645,7 @@ class HoloViewsConverter:
         'dynspread',
         'max_px',
         'precompute',
+        'selector',
         'threshold',
     ]
 
@@ -793,6 +830,7 @@ class HoloViewsConverter:
         debug=False,
         framewise=True,
         aggregator=None,
+        selector=None,
         projection=None,
         global_extent=None,
         geo=False,
@@ -910,12 +948,20 @@ class HoloViewsConverter:
                 'At least one resampling operation (rasterize, datashader, '
                 'downsample) must be enabled when resample_when is set.'
             )
+        if selector is not None:
+            if not _HV_GE_1_21_0:
+                msg = 'selector requires holoviews>=1.21.'
+                raise ImportError(msg)
+            if not (datashade or rasterize):
+                msg = 'rasterize or datashade must be enabled when selector is set.'
+                raise ValueError(msg)
         self.resample_when = resample_when
         self.datashade = datashade
         self.rasterize = rasterize
         self.downsample = downsample
         self.dynspread = dynspread
         self.aggregator = aggregator
+        self.selector = selector
         self.precompute = precompute
         self.x_sampling = x_sampling
         self.y_sampling = y_sampling
@@ -1042,7 +1088,7 @@ class HoloViewsConverter:
         if kind == 'errorbars':
             hover = False
         elif hover is None:
-            hover = not self.datashade
+            hover = True if self.selector else not self.datashade
         if hover and not any(
             t for t in tools if isinstance(t, HoverTool) or t in ['hover', 'vline', 'hline']
         ):
@@ -1961,13 +2007,24 @@ class HoloViewsConverter:
             layers = _transfer_opts_cur_backend(layers)
             return layers
 
-        import_datashader()
+        ds = import_datashader()
         from holoviews.operation.datashader import datashade, rasterize, dynspread
 
         categorical, agg = self._process_categorical_datashader()
         if agg:
             opts['aggregator'] = agg
-
+        if self.selector:
+            selector = self.selector
+            try:
+                if isinstance(selector, str):
+                    selector = getattr(ds, selector)()
+                elif isinstance(selector, tuple):
+                    selector = getattr(ds, selector[0])(selector[1])
+            except AttributeError as e:
+                sel = selector[0] if isinstance(selector, tuple) else selector
+                msg = f'Invalid selector value {sel!r}.'
+                raise ValueError(msg) from e
+            opts['selector'] = selector
         if self.precompute:
             opts['precompute'] = self.precompute
         if self.x_sampling:

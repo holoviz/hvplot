@@ -17,10 +17,6 @@ default = [
     "dev",
 ]
 
-[environments.test-39]
-features = ["py39", "required", "test-core", "test", "example", "geo", "graphviz", "test-example"]
-no-default-feature = true
-
 [environments.test-310]
 features = ["py310", "required", "test-core", "test", "example", "geo", "graphviz", "test-example"]
 no-default-feature = true
@@ -74,9 +70,6 @@ sync-git-tags = 'python scripts/sync_git_tags.py hvplot'
 
 [feature.required.activation.env]
 PYTHONIOENCODING = "utf-8"
-
-[feature.py39.dependencies]
-python = "3.9.*"
 
 [feature.py310.dependencies]
 python = "3.10.*"
@@ -231,7 +224,7 @@ channels = [
     "conda-forge"
 ]
 [feature.doc.dependencies]
-nbsite = ">=0.9.0a2"
+nbsite = ">=0.9.0a10"
 sphinxext-rediraffe = "*"
 numpydoc = "*"
 sphinxcontrib-mermaid = "*"
@@ -248,6 +241,7 @@ _docs-install = 'python -m pip install --no-deps --disable-pip-version-check -e 
 # Depends on _docs-install instead of install as install
 # in the default environment
 docs-build = { depends-on = ["_docs-install", "docs-build-sphinx"] }
+docs-server = 'python -m http.server 5500 --directory ./builtdocs'
 
 # ================== BUILD ====================
 
