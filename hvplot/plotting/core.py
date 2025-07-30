@@ -509,7 +509,7 @@ class hvPlotTabular(hvPlotBase):
         s : int, optional, also available as 'size'
             The size of the marker.
         scale: number, optional
-            Scaling factor to apply to point scaling.
+            Scaling factor to apply to point scaling. Default is 1.
         logz : bool
             Whether to apply log scaling to the z-axis. Default is False.
         **kwds : optional
@@ -1683,8 +1683,18 @@ class hvPlotTabular(hvPlotBase):
         A `points` plot visualizes positions in a 2D space. This is useful for example for
         geographic plots.
 
-        There is no assumption that 'y' depends on 'x'. This is different from a `scatter` plot
-        which assumes that `y` depends `x`.
+        Although the :meth:`hvplot.hvPlot.scatter` plot is superficially
+        similar to the ``points`` plot (they can generate plots that look
+        identical), the two plot types are semantically quite different.
+        The fundamental difference is that ``scatter`` is used to visualize
+        data where the y variable is dependent, unlike ``points``.
+
+        This difference means that ``points`` plots can most naturally
+        overlay with other plots that express independent variables in
+        two-dimensional space, such as raster types like
+        :meth:`hvplot.hvPlot.image`. Conversely, ``scatter`` expresses a
+        dependent relationship between x and y and thus most naturally
+        overlay with chart types such as :meth:`hvplot.hvPlot.line`.
 
         Reference: https://hvplot.holoviz.org/reference/geopandas/points.html
 
@@ -1702,7 +1712,7 @@ class hvPlotTabular(hvPlotBase):
             The marker shape specified above can be any supported by matplotlib, e.g. s, d, o etc.
             See https://matplotlib.org/stable/api/markers_api.html.
         scale: number, optional
-            Scaling factor to apply to point scaling.
+            Scaling factor to apply to point scaling. Default is 1.
         logz : bool
             Whether to apply log scaling to the z-axis. Default is False.
         **kwds : optional
@@ -1742,9 +1752,9 @@ class hvPlotTabular(hvPlotBase):
 
     def vectorfield(self, x=None, y=None, angle=None, mag=None, **kwds):
         """
-        vectorfield visualizes vectors given by the (`x `, `y`) starting point,
-        a magnitude (`mag`) and an `angle`. A `vectorfield` plot is also known
-        as a `quiver` plot.
+        vectorfield visualizes vectors given by the (``x``, ``y``) starting point,
+        a magnitude (``mag``) and an `angle`. A ``vectorfield`` plot is also known
+        as a ``quiver`` plot.
 
         Reference: https://hvplot.holoviz.org/reference/xarray/vectorfield.html
 
@@ -1755,7 +1765,7 @@ class hvPlotTabular(hvPlotBase):
         y : string
             Field name to draw y-positions from
         mag : string
-            Magnitude
+            Magnitude.
         angle : string
             Angle in radians.
         **kwds : optional
@@ -1764,7 +1774,7 @@ class hvPlotTabular(hvPlotBase):
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.Points` / Panel object
+        :class:`holoviews:holoviews.element.VectorField` / Panel object
             You can `print` the object to study its composition and run:
 
             .. code-block::
@@ -1816,9 +1826,6 @@ class hvPlotTabular(hvPlotBase):
             The dimension to color the polygons by
         logz : bool
             Enables logarithmic colormapping. Default is False.
-        geo : bool, optional
-            Whether the plot should be treated as geographic (and assume
-            PlateCarree, i.e. lat/lon coordinates).
         **kwds : optional
             Additional keywords arguments are documented in `hvplot.help('polygons')`.
             See :ref:`plot-options` for more information.
@@ -2210,7 +2217,7 @@ class hvPlot(hvPlotTabular):
             The data variable to plot
         colorbar: boolean
             Whether to display a colorbar
-        kwds : optional
+        **kwds : optional
             To see all the keyword arguments available, run `hvplot.help('image')`.
             See :ref:`plot-options` for more information.
 
