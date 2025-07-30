@@ -38,17 +38,15 @@ Customization options for axis appearance and behavior, including labels, limits
 
 See [this page](./axis) for more information on these options.
 
-## [Legend Options](./legend)
+## [Color And Colormap Options](./color_colormap)
 
-Options for setting the grid or legend of plots as well as colorbar options:
+Visual styling options to adjust colors and colormapping:
 
 ```{eval-rst}
-.. plotting-options-table:: Legend Options
+.. plotting-options-table:: Color And Colormap Options
 ```
 
-See [this page](./legend) for more information on these options.
-
-(plotting-options-styling)=
+See [this page](./color_colormap) for more information on these options.
 
 ## [Styling Options](./styling)
 
@@ -63,6 +61,16 @@ Visual styling options to adjust colors, fonts, and other aesthetic elements of 
 ```
 
 See [this page](./styling) for more information on these options.
+
+## [Legend Options](./legend)
+
+Options for setting the grid or legend of plots as well as colorbar options:
+
+```{eval-rst}
+.. plotting-options-table:: Legend Options
+```
+
+See [this page](./legend) for more information on these options.
 
 ## [Interactivity Options](./interactivity)
 
@@ -115,10 +123,12 @@ See [this page](./streaming) for more information on these options.
 
 All Options <self>
 Data Options <data>
-Styling Options <styling>
-Interactivity Options <interactivity>
-Legend Options <legend>
 Size And Layout Options <size_layout>
+Axis Options <axis>
+Color And Colormap Options <color_colormap>
+Styling Options <styling>
+Legend Options <legend>
+Interactivity Options <interactivity>
 Resampling Options <resampling>
 Geographic Options <geographic>
 Streaming Options <streaming>

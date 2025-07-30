@@ -331,11 +331,7 @@ class HoloViewsConverter:
            Bokeh plotting backend.
 
     Legend Options
-    -----------------------
-    colorbar : bool or None, default=None
-        Enables a colorbar. Enabled by default for these plots: bivariate,
-        contour, contourf, heatmap, image, hexbin, quadmesh, polygons. Enabled
-        by default for rasterized plots.
+    --------------
     legend : bool or str or None, default=None
         Whether to show a legend, or a legend position
         ('top', 'bottom', 'left', 'right')
@@ -356,8 +352,8 @@ class HoloViewsConverter:
     tools : list, default=[]
         List of tool instances or strings (e.g. ['tap', 'box_select'])
 
-    Styling Options
-    ---------------
+    Color And Colormap Options
+    --------------------------
     bgcolor : str or None, default=None
         Background color of the data area of the plot
     color : str or list or column name or None, default=None
@@ -388,6 +384,10 @@ class HoloViewsConverter:
 
         You can override these defaults by explicitly setting ``cmap=<colormap_name>``.
         Only one of ``cmap``, ``colormap``, or ``color_key`` can be specified at a time.
+    colorbar : bool or None, default=None
+        Enables a colorbar. Enabled by default for these plots: bivariate,
+        contour, contourf, heatmap, image, hexbin, quadmesh, polygons. Enabled
+        by default for rasterized plots.
     colormap : str or list  or colormap object or None, default=None
         Alias for ``cmap``. The colormap to apply when applying color mapping.
         Accepts the same values as `cmap`. See `cmap` for more details.
@@ -400,14 +400,6 @@ class HoloViewsConverter:
         Lower and upper bound of the color scale
     cnorm : str, default='linear'
         Color scaling which must be one of ``'linear'``, ``'log'`` or ``'eq_hist'``.
-    fontscale : number
-        Scales the size of all fonts by the same amount, e.g. fontscale=1.5
-        enlarges all fonts (title, xticks, labels etc.) by 50%
-    fontsize : number or dict or None, default=None
-        Set title, label and legend text to the same fontsize. Finer control
-        by using a dict: {'title': '15pt', 'ylabel': '5px', 'ticks': 20}
-    grid : bool or None, default=None
-        Whether to show a grid.
     rescale_discrete_levels : bool or None, default=None
         If ``cnorm='eq_hist'`` and there are only a few discrete values,
         then ``rescale_discrete_levels=True`` (the default) decreases
@@ -428,6 +420,16 @@ class HoloViewsConverter:
     check_symmetric_max : int, default=1000000
         Size above which to stop checking for symmetry by default on the data.
 
+    Styling Options
+    ---------------
+    fontscale : number
+        Scales the size of all fonts by the same amount, e.g. fontscale=1.5
+        enlarges all fonts (title, xticks, labels etc.) by 50%
+    fontsize : number or dict or None, default=None
+        Set title, label and legend text to the same fontsize. Finer control
+        by using a dict: {'title': '15pt', 'ylabel': '5px', 'ticks': 20}
+    grid : bool or None, default=None
+        Whether to show a grid.
 
     Resampling Options
     ------------------
@@ -604,7 +606,6 @@ class HoloViewsConverter:
     ]
 
     _legend_options = [
-        'colorbar',
         'legend',
     ]
 
@@ -616,14 +617,12 @@ class HoloViewsConverter:
         'tools',
     ]
 
-    _style_options = [
+    _color_options = [
         'bgcolor',
         'clim',
         'color',
+        'colorbar',
         'colormap',
-        'fontscale',
-        'fontsize',
-        'grid',
         'c',
         'cmap',
         'color_key',
@@ -632,6 +631,12 @@ class HoloViewsConverter:
         'robust',
         'symmetric',
         'check_symmetric_max',
+    ]
+
+    _style_options = [
+        'fontscale',
+        'fontsize',
+        'grid',
     ]
 
     _resample_options = [
@@ -661,6 +666,7 @@ class HoloViewsConverter:
         'size_layout': 'Size And Layout Options',
         'axis': 'Axis Options',
         'legend': 'Legend Options',
+        'color': 'Color And Colormap Options',
         'interactivity': 'Interactivity Options',
         'style': 'Styling Options',
         'resampling': 'Resampling Options',
@@ -674,6 +680,7 @@ class HoloViewsConverter:
         'axis': _axis_config_options,
         'legend': _legend_options,
         'interactivity': _interactivity_options,
+        'color': _color_options,
         'style': _style_options,
         'resampling': _resample_options,
         'streaming': _stream_options,
@@ -1825,7 +1832,12 @@ class HoloViewsConverter:
         # See e.g. alpha for Area plots with plotly:
         # https://github.com/holoviz/holoviews/issues/5226
         if self._backend_compat == 'bokeh':
-            combined_opts = combined_opts + self._style_options + self._interactivity_options
+            combined_opts = (
+                combined_opts
+                + self._color_options
+                + self._style_opts
+                + self._interactivity_options
+            )
         for mismatch in mismatches:
             suggestions = difflib.get_close_matches(mismatch, combined_opts)
             param.main.param.warning(
