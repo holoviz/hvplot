@@ -2,19 +2,11 @@
 
 # Plotting Options
 
-hvPlot's plotting API exposes three main types of options:
+hvPlot offers many ways to control the appearance and behavior of your plots. This page documents all of the **generic options** that can be applied to most plots ({meth}`hvplot.hvPlot.scatter`, {meth}`hvplot.hvPlot.line`, etc.) regardless of which plotting backend you are using (Bokeh, Matplotlib, etc.). Most plot types also offer additional options beyond the generic ones documented here. Those additional options depend on the specific type of plot (e.g. `marker` for {meth}`hvplot.hvPlot.scatter`) and the specific plotting backend (e.g. `line_width` for {meth}`hvplot.hvPlot.line` with Bokeh). The latter group of options is often styling related. These additional options are documented in the reference page for the plot type (e.g. {meth}`hvplot.hvPlot.scatter` for a scatter plot).
 
-- **Plot kind specific**: options specific to each plot kind; for example, `marker` is not a generic option but is specific to {meth}`hvplot.hvPlot.scatter`.
-- **Generic**: options that can be passed to most of the plotting methods/kinds; these are the options displayed in the tables below, such as `width` or `title`.
-- **Plotting backend and method/kind specific styling options**: in addition to the generic [Styling Options](plotting-options-styling), hvPlot exposes styling options that are specific to a particular plotting backend and plot kind. With these options, it is possible to customize each component in detail, exposing all the options a plotting backend exposes in HoloViews (they are applied to the specific HoloViews Element(s) returned by a plotting call, for example {class}`holoviews:holoviews.element.Scatter` for {meth}`hvplot.hvPlot.scatter`). These usually include options to color the line and fill color, alpha and style. These options can be found on the reference page of each plotting method (e.g. {meth}`hvplot.hvPlot.scatter`).
+The plotting options can be displayed interactively for a plot type and the active plotting backend using {func}`hvplot.help`, e.g. `hvplot.help('scatter')`. The function prints all the options by default. Its output can be reduced by setting to `False` the keywords `generic` (to exclude the generic options), `docstring` (to exclude the plot type docstring), and `style` (to exclude the backend-specific styling options).
 
-The {func}`hvplot.help` function can be used to interactively display these options:
-
-- `docstring=True` to display the method docstring, including its specific options.
-- `generic=True` to display the docstring of all the generic options.
-- `style=True` to display a listing of all the plotting backend specific style options.
-
-The following tables list all the generic plotting options that can be used to customize hvPlot's plots.
+The sections below cover the generic options available for all plots, grouped into categories depending on what the options control.
 
 ## Data Options
 
