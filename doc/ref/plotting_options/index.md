@@ -38,15 +38,15 @@ Customization options for axis appearance and behavior, including labels, limits
 
 See [this page](./axis) for more information on these options.
 
-## [Grid And Legend Options](./grid_legend)
+## [Legend Options](./legend)
 
 Options for setting the grid or legend of plots as well as colorbar options:
 
 ```{eval-rst}
-.. plotting-options-table:: Grid And Legend Options
+.. plotting-options-table:: Legend Options
 ```
 
-See [this page](./grid_legend) for more information on these options.
+See [this page](./legend) for more information on these options.
 
 (plotting-options-styling)=
 
@@ -117,7 +117,7 @@ All Options <self>
 Data Options <data>
 Styling Options <styling>
 Interactivity Options <interactivity>
-Grid And Legend Options <grid_legend>
+Legend Options <legend>
 Size And Layout Options <size_layout>
 Resampling Options <resampling>
 Geographic Options <geographic>

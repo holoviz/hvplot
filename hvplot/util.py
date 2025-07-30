@@ -917,7 +917,7 @@ def _get_doc_and_signature(
         'style',
         'axis',
         'size_layout',
-        'grid_legend',
+        'legend',
         'streaming',
     ]
     extra_kwargs = kind_opts + list(

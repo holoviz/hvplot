@@ -330,14 +330,12 @@ class HoloViewsConverter:
            ``cticks`` was added in this version and is only supported by the
            Bokeh plotting backend.
 
-    Grid And Legend Options
+    Legend Options
     -----------------------
     colorbar : bool or None, default=None
         Enables a colorbar. Enabled by default for these plots: bivariate,
         contour, contourf, heatmap, image, hexbin, quadmesh, polygons. Enabled
         by default for rasterized plots.
-    grid : bool or None, default=None
-        Whether to show a grid
     legend : bool or str or None, default=None
         Whether to show a legend, or a legend position
         ('top', 'bottom', 'left', 'right')
@@ -408,6 +406,8 @@ class HoloViewsConverter:
     fontsize : number or dict or None, default=None
         Set title, label and legend text to the same fontsize. Finer control
         by using a dict: {'title': '15pt', 'ylabel': '5px', 'ticks': 20}
+    grid : bool or None, default=None
+        Whether to show a grid.
     rescale_discrete_levels : bool or None, default=None
         If ``cnorm='eq_hist'`` and there are only a few discrete values,
         then ``rescale_discrete_levels=True`` (the default) decreases
@@ -603,9 +603,8 @@ class HoloViewsConverter:
         'cticks',
     ]
 
-    _grid_legend_options = [
+    _legend_options = [
         'colorbar',
-        'grid',
         'legend',
     ]
 
@@ -624,6 +623,7 @@ class HoloViewsConverter:
         'colormap',
         'fontscale',
         'fontsize',
+        'grid',
         'c',
         'cmap',
         'color_key',
@@ -660,7 +660,7 @@ class HoloViewsConverter:
         'geographic': 'Geographic Options',
         'size_layout': 'Size And Layout Options',
         'axis': 'Axis Options',
-        'grid_legend': 'Grid And Legend Options',
+        'legend': 'Legend Options',
         'interactivity': 'Interactivity Options',
         'style': 'Styling Options',
         'resampling': 'Resampling Options',
@@ -672,7 +672,7 @@ class HoloViewsConverter:
         'geographic': _geo_options,
         'size_layout': _size_layout_options,
         'axis': _axis_config_options,
-        'grid_legend': _grid_legend_options,
+        'legend': _legend_options,
         'interactivity': _interactivity_options,
         'style': _style_options,
         'resampling': _resample_options,
@@ -1814,7 +1814,7 @@ class HoloViewsConverter:
             self._data_options
             + self._size_layout_options
             + self._axis_config_options
-            + self._grid_legend_options
+            + self._legend_options
             + self._resample_options
             + self._geo_options
             + kind_opts
