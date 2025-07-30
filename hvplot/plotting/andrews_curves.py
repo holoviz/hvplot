@@ -36,16 +36,16 @@ def andrews_curves(
 
     Parameters
     ----------
-    frame : DataFrame
+    data : DataFrame
         Data to be plotted, preferably normalized to (0.0, 1.0)
     class_column : str
         Column name containing class names
     samples : int, optional
-        Number of samples to draw
+        Number of samples to draw. Default is 200.
     alpha : float, optional
-        The transparency of the lines
-    cmap/colormap : str or colormap object
-        Colormap to use for groups
+        The transparency of the lines. Default is 0.5.
+    cmap/colormap : str or colormap object, optional
+        Colormap to use for groups. Default to Colorcet's ``glasbey_category10``.
 
     Returns
     -------

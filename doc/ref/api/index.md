@@ -203,9 +203,17 @@ It is also available from the top-level `explorer` function:
 .. currentmodule:: hvplot.ui
 
 .. autosummary::
-   :toctree: generated/
 
     explorer
+```
+
+
+```{toctree}
+:hidden: true
+:maxdepth: 2
+:titlesonly: true
+
+hvplot.hvPlot.explorer <manual/hvplot.hvPlot.explorer>
 ```
 
 Calling the `explorer` function/method returns an `hvPlotExplorer` object:

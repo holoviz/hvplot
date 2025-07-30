@@ -44,31 +44,34 @@ def scatter_matrix(
     data : DataFrame
         The data to plot. Every column is compared to every other column.
     c : str, optional
-        Column to color by
+        Column to color by.
     chart : str, optional
-        Chart type for the off-diagonal plots (one of 'scatter', 'bivariate', 'hexbin')
+        Chart type for the off-diagonal plots (one of ``'scatter'``,
+        ``'bivariate'``, ``'hexbin'``). Default is ``'scatter'`.
     diagonal : str, optional
-        Chart type for the diagonal plots (one of 'hist', 'kde')
+        Chart type for the diagonal plots (one of ``'hist'``, ``'kde'``).
+        Default is ``'hist'``.
     alpha : float, optional
-        Transparency level for the off-diagonal plots
+        Transparency level for the off-diagonal plots. Default is 0.5.
     nonselection_alpha : float, optional
-        Transparency level for nonselected object in the off-diagonal plots
+        Transparency level for nonselected object in the off-diagonal plots.
+        Default is 0.1.
     tools : list of str, optional
-        Interaction tools to include
-        Defaults are 'box_select' and 'lasso_select'
+        Interaction tools to include. Defaults are ``'box_select'`` and
+        ``'lasso_select'``.
     cmap/colormap : str or colormap object, optional
         Colormap to use when ``c`` is set.
         Default is `Category10 <https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md#category10>`.
     diagonal_kwds/hist_kwds/density_kwds : dict, optional
-        Keyword options for the diagonal plots
+        Keyword options for the diagonal plots.
     datashade : bool, default=False
         Whether to apply rasterization and shading (colormapping) using
         the Datashader library, returning an RGB object instead of
-        individual points
+        individual points.
     rasterize : bool, default=False
         Whether to apply rasterization using the Datashader library,
         returning an aggregated Image (to be colormapped by the
-        plotting backend) instead of individual points
+        plotting backend) instead of individual points.
     dynspread : bool, default=False
         For plots generated with datashade=True or rasterize=True,
         automatically increase the point size when the data is sparse

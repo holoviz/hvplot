@@ -400,7 +400,7 @@ class HoloViewsConverter:
     clim : tuple or None, default=None
         Lower and upper bound of the color scale
     cnorm : str, default='linear'
-        Color scaling which must be one of 'linear', 'log' or 'eq_hist'
+        Color scaling which must be one of ``'linear'``, ``'log'`` or ``'eq_hist'``.
     fontscale : number
         Scales the size of all fonts by the same amount, e.g. fontscale=1.5
         enlarges all fonts (title, xticks, labels etc.) by 50%
