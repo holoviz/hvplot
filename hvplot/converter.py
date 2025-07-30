@@ -134,30 +134,35 @@ class HoloViewsConverter:
         to see warning if the attrs can't be found, set to False to disable
         the behavior.
     by : str or list of str or None, default=None
-        Dimension(s) by which to group the data categories.
-        An NdOverlay is returned by default unless ``subplots=True``, then an NdLayout is returned.
+        Dimension(s) by which to group the data categories. An
+        :ref:`holoviews:reference/containers/bokeh/NdOverlay` is
+        returned by default unless ``subplots=True``, then an
+        :ref:`holoviews:reference/containers/bokeh/NdLayout` is returned.
     dynamic : bool, default=True
         Whether to return a dynamic plot which sends updates on widget and
         zoom/pan events or whether all the data should be embedded
         (warning: for large groupby operations embedded data can become
-        very large if dynamic=False)
+        very large if ``dynamic=False``).
     fields : dict, default={}
         A dictionary of fields for renaming or transforming data dimensions.
     groupby : str or list or None, default=None
-        Dimension(s) by which to group data, enabling widgets.
-        Returns a DynamicMap if ``dynamic=True``, else returns a HoloMap.
-        See ``dynamic`` for more information.
+        Dimension(s) by which to group data, enabling widgets. Returns a
+        :ref:`holoviews:reference/containers/bokeh/DynamicMap` if
+        ``dynamic=True``, else returns a
+        :ref:`holoviews:reference/containers/bokeh/HoloMap`. See ``dynamic``
+        for more information.
     group_label : str or None, default=None
         Sets a custom label for the dimension created when plotting multiple columns.
         When multiple columns are plotted (e.g., multiple y values), hvPlot automatically reshapes the data from wide to long format.
         It creates a new grouping dimension that holds the original column names.
-        By default, this grouping dimension is labeled 'Variable'.
+        By default, this grouping dimension is labeled ``'Variable'``.
         Setting ``group_label`` overrides this default label.
 
         .. note::
            ``group_label`` only applies when plotting multiple columns and does not control grouping with ``by``.
     kind : str, default='line'
-        The type of plot to generate.
+        The type of plot to generate. Should only be set when calling
+        ``hvplot()`` directly.
     label : str or None, default=None
         Label for the data, typically used in the plot title or legends.
     persist : bool, default=False
@@ -229,8 +234,8 @@ class HoloViewsConverter:
     -----------------------
     aspect : float or {'equal', 'square'} or None, default=None
         Sets the width-to-height ratio of the plot. When None (the default),
-        HoloViews chooses an appropriate aspect automatically. Use
-        'equal' or 'square' to modify the unit ratio between axes,
+        hvPlot chooses an appropriate aspect automatically. Use
+        ``'equal'`` or ``'square'`` to modify the unit ratio between axes,
         or supply a numeric value (e.g. 2.0) for a custom ratio.
         To control the scaling of individual axis units, use the
         ``data_aspect`` option instead.
@@ -276,15 +281,15 @@ class HoloViewsConverter:
 
         .. versionadded:: 0.9.0
     flip_xaxis/flip_yaxis : bool or None, default=None
-        Whether to flip the axis left to right or up and down respectively
+        Whether to flip the axis left to right or up and down respectively.
     framewise : bool, default=True
         Whether to compute the axis ranges frame-by-frame when using dynamic plots.
     invert : bool, default=False
-        Swaps x- and y-axis
+        Swaps x- and y-axis.
     logx/logy : bool, default=False
-        Enables logarithmic x- and y-axis respectively
+        Enables logarithmic x- and y-axis respectively.
     loglog : bool or None, default=None
-        Enables logarithmic x- and y-axis
+        Enables logarithmic x- and y-axis.
     rot : number or None, default=None
         Rotates the axis ticks along the x-axis by the specified
         number of degrees.
@@ -297,7 +302,7 @@ class HoloViewsConverter:
 
        .. versionadded:: 0.11.0
     title : str or None, default=None
-        Title for the plot
+        Title for the plot.
     xaxis : str or bool or None
         Whether to show the x-axis and whether to place it at the top or
         bottom. A bare axis means that an axis line is still displayed but
@@ -314,9 +319,9 @@ class HoloViewsConverter:
         ``False`` (same as ``None``).
     xformatter/yformatter : str or bokeh.TickFormatter or None, default=None
         Formatter for the x-axis and y-axis (accepts printf formatter,
-        e.g. '%.3f', and bokeh TickFormatter)
+        e.g. '%.3f', and bokeh TickFormatter).
     xlabel/ylabel/clabel : str or None, default=None
-        Axis labels for the x-axis, y-axis, and colorbar
+        Axis labels for the x-axis, y-axis, and colorbar.
     xlim/ylim : tuple or None, default=None
         Plot limits of the x- and y-axis. One bound can be left unset by
         using ``None`` (e.g. ``xlim=(10, None)`` means there is no upper bound).
@@ -333,8 +338,10 @@ class HoloViewsConverter:
     Legend Options
     --------------
     legend : bool or str or None, default=None
-        Whether to show a legend, or a legend position
-        ('top', 'bottom', 'left', 'right')
+        Whether to show a legend, or a legend position. A cardinal position
+        (``'top'``, ``'bottom'``, ``'left'``, ``'right'`` (default)) or a
+        corner placement (``'top_left'``, ``'top_right'``, ``'bottom_left'``,
+        ``'bottom_right'``).
 
     Interactivity Options
     ---------------------
@@ -358,10 +365,12 @@ class HoloViewsConverter:
         Background color of the data area of the plot
     color : str or list or column name or None, default=None
         Defines the color(s) to use for the plot. Accepts:
-        - a single color name (e.g., 'red', 'blue')
-        - a HEX color code (e.g., '#ff5733')
+
+        - a single color name (e.g., ``'red'``, ``'blue'``)
+        - a HEX color code (e.g., ``'#ff5733'``)
         - a list of colors for multiple elements
         - a column name from the dataset to map colors based on values.
+
     c : str or list or column name or None, default=None
         Alias for ``color``. If both ``color`` and ``c`` are provided,
         the ``color`` keyword takes precedence.
@@ -370,7 +379,8 @@ class HoloViewsConverter:
 
         Accepts:
 
-        - a predefined colormap name from Bokeh, Matplotlib, or Colorcet (e.g., 'viridis', 'plasma')
+        - a predefined colormap name from Bokeh, Matplotlib, or Colorcet
+          (e.g., ``'viridis'``, ``'plasma'``)
         - a list of named colors or HEX color codes.
         - a dictionary mapping categories to colors for discrete colormaps.
         - A colormap object from HoloViews or Matplotlib.
@@ -385,12 +395,12 @@ class HoloViewsConverter:
         You can override these defaults by explicitly setting ``cmap=<colormap_name>``.
         Only one of ``cmap``, ``colormap``, or ``color_key`` can be specified at a time.
     colorbar : bool or None, default=None
-        Enables a colorbar. Enabled by default for these plots: bivariate,
-        contour, contourf, heatmap, image, hexbin, quadmesh, polygons. Enabled
-        by default for rasterized plots.
+        Enables a colorbar. Enabled by default for these plots: ``bivariate``,
+        ``contour``, ``contourf``, ``heatmap``, ``image``, ``hexbin``, ``quadmesh``,
+        ``polygons``. Enabled by default for rasterized plots.
     colormap : str or list  or colormap object or None, default=None
-        Alias for ``cmap``. The colormap to apply when applying color mapping.
-        Accepts the same values as `cmap`. See `cmap` for more details.
+        Alias for ``cmap``. Accepts the same values as ``cmap``.
+        See ``cmap`` for more details.
         Only one of ``cmap``, ``colormap``, or ``color_key`` can be specified at a time.
     color_key : str or list or dict or None, default=None
         Alias for ``cmap``. Accepts the same values as ``cmap``.
@@ -408,8 +418,8 @@ class HoloViewsConverter:
         thus avoiding washout of the lower values.  Has no effect if
         ``cnorm!=`eq_hist``.
     robust : bool or None, default=None
-        If True and clim are absent, the colormap range is computed
-        with 2nd and 98th percentiles instead of the extreme values
+        If this option is True and no ``clim`` was provided, the colormap range
+        is computed with 2nd and 98th percentiles instead of the extreme values
         for image elements. For RGB elements, clips the "RGB", or
         raw reflectance values between 2nd and 98th percentiles.
         Follows the same logic as xarray's robust option.
@@ -424,10 +434,10 @@ class HoloViewsConverter:
     ---------------
     fontscale : number
         Scales the size of all fonts by the same amount, e.g. fontscale=1.5
-        enlarges all fonts (title, xticks, labels etc.) by 50%
+        enlarges all fonts (title, xticks, labels etc.) by 50%.
     fontsize : number or dict or None, default=None
         Set title, label and legend text to the same fontsize. Finer control
-        by using a dict: {'title': '15pt', 'ylabel': '5px', 'ticks': 20}
+        by using a dict: ``{'title': '15pt', 'ylabel': '5px', 'ticks': 20}``.
     grid : bool or None, default=None
         Whether to show a grid.
 
@@ -435,8 +445,8 @@ class HoloViewsConverter:
     ------------------
     aggregator : str, datashader.Reduction, or None, default=None
         Aggregator to use when applying rasterize or datashade operation
-        (valid options include 'mean', 'count', 'min', 'max' and more, and
-        datashader reduction objects)
+        (valid options include ``'mean'``, ``'count'``, ``'min'``, ``'max'``
+        and more, and datashader reduction objects)
     datashade : bool, default=False
         Whether to apply rasterization and shading (colormapping) using
         the Datashader library, returning an RGB object instead of
@@ -465,13 +475,10 @@ class HoloViewsConverter:
 
         Other string values corresponding to supported algorithms in
         HoloViews may also be used.
-
-        .. note::
-           Requires ``holoviews>=1.16``.
     dynspread : bool, default=False
         For plots generated with datashade=True or rasterize=True,
         automatically increase the point size when the data is sparse
-        so that individual points become more visible
+        so that individual points become more visible.
     max_px : int, default=3
         The maximum size in pixels for dynamically spreading elements in sparse data using ``dynspread``.
         This helps to increase the visibility of sparse data points.
@@ -487,7 +494,7 @@ class HoloViewsConverter:
     rasterize : bool, default=False
         Whether to apply rasterization using the Datashader library,
         returning an aggregated Image (to be colormapped by the
-        plotting backend) instead of individual points
+        plotting backend) instead of individual points.
     resample_when : int or None, default=None
         Applies a resampling operation (datashade, rasterize or downsample) if
         the number of individual data points present in the current viewport
