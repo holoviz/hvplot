@@ -8,7 +8,7 @@ The plotting options can be displayed interactively for a plot type and the acti
 
 The sections below cover the generic options available for all plots, grouped into categories depending on what the options control.
 
-## Data Options
+## [Data Options](./data)
 
 For organizing, grouping, and transforming the dataset before visualization, including labels, sorting, and indexing:
 
@@ -18,7 +18,7 @@ For organizing, grouping, and transforming the dataset before visualization, inc
 
 See [this page](./data) for more information on these options.
 
-## Size And Layout Options
+## [Size And Layout Options](./size_layout)
 
 Customization options for plot sizes and overall layout, including responsive mode:
 
@@ -28,7 +28,7 @@ Customization options for plot sizes and overall layout, including responsive mo
 
 See [this page](./size_layout) for more information on these options.
 
-## Axis Options
+## [Axis Options](./axis)
 
 Customization options for axis appearance and behavior, including labels, limits, tick formatting, and axis scaling:
 
@@ -36,7 +36,9 @@ Customization options for axis appearance and behavior, including labels, limits
 .. plotting-options-table:: Axis Options
 ```
 
-## Grid And Legend Options
+See [this page](./axis) for more information on these options.
+
+## [Grid And Legend Options](./grid_legend)
 
 Options for setting the grid or legend of plots as well as colorbar options:
 
@@ -48,14 +50,14 @@ See [this page](./grid_legend) for more information on these options.
 
 (plotting-options-styling)=
 
-## Styling Options
-
-Visual styling options to adjust colors, fonts, and other aesthetic elements of the plot.
+## [Styling Options](./styling)
 
 :::{note}
 These are the styling options shared by all the supported plotting backends. Backend-specific options can be found on the
-reference page of each plotting method (e.g. {meth}`hvplot.hvPlot.scatter`) or by executing `hvplot.help('scatter', docstring=False, generic=False, style=True)`.
+reference page of each plotting method (e.g. {meth}`hvplot.hvPlot.scatter`) or by running `hvplot.help('scatter', docstring=False, generic=False, style=True)`.
 :::
+
+Visual styling options to adjust colors, fonts, and other aesthetic elements of the plot:
 
 ```{eval-rst}
 .. plotting-options-table:: Styling Options
@@ -63,7 +65,7 @@ reference page of each plotting method (e.g. {meth}`hvplot.hvPlot.scatter`) or b
 
 See [this page](./styling) for more information on these options.
 
-## Interactivity Options
+## [Interactivity Options](./interactivity)
 
 ::: {note}
 These options only apply to the interactive plotting backends (e.g. [Bokeh](plot-ext-bokeh)), not to the static backend [Matplotlib](plot-ext-matplotlib).
@@ -77,7 +79,7 @@ Bokeh specific options for adding hover tools as well as other interactive tools
 
 See [this page](./interactivity) for more information on these options.
 
-## Resampling Options
+## [Resampling Options](./resampling)
 
 Performance related options for handling large datasets, including downsampling, rasterization, and dynamic plot updates (most of these options require [Datashader](https://datashader.org/) to be installed):
 
@@ -87,7 +89,7 @@ Performance related options for handling large datasets, including downsampling,
 
 See [this page](./resampling) for more information on these options.
 
-## Geographic Options
+## [Geographic Options](./geographic)
 
 Options for geographic plots, including map projections, tile overlays, and geographic features like coastlines and borders:
 
@@ -97,7 +99,7 @@ Options for geographic plots, including map projections, tile overlays, and geog
 
 See [this page](./geographic) for more information on these options.
 
-## Streaming Options
+## [Streaming Options](./streaming)
 
 Options for handling live data streams:
 
