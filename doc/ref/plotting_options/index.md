@@ -65,6 +65,10 @@ See [this page](./styling) for more information on these options.
 
 ## Interactivity Options
 
+::: {note}
+These options only apply to the interactive plotting backends (e.g. [Bokeh](plot-ext-bokeh)), not to the static backend [Matplotlib](plot-ext-matplotlib).
+:::
+
 Bokeh specific options for adding hover tools as well as other interactive tools like tap tool and box select tool:
 
 ```{eval-rst}
