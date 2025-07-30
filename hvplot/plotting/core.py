@@ -130,6 +130,7 @@ class hvPlotBase:
         The `explorer` plot allows you to interactively explore your data.
 
         Reference: https://hvplot.holoviz.org/user_guide/Explorer.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -176,6 +177,7 @@ class hvPlotTabular(hvPlotBase):
     For more detailed options use a specific plotting method, e.g. `df.hvplot.line`.
 
     Reference: https://hvplot.holoviz.org/reference/index.html
+    Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
     Parameters
     ----------
@@ -189,8 +191,8 @@ class hvPlotTabular(hvPlotBase):
         The kind of plot to generate, e.g. 'area', 'bar', 'line', 'scatter' etc. To see the
         available plots run `print(df.hvplot.__all__)`.
     **kwds : optional
-        Additional keywords arguments are documented in `hvplot.help('scatter')` or similar
-        depending on the kind of plot.
+        Additional keywords arguments are documented in :ref:`plot-options`.
+
 
     Returns
     -------
@@ -277,6 +279,7 @@ class hvPlotTabular(hvPlotBase):
         The `line` plot connects the points with a continuous curve.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/line.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -302,8 +305,8 @@ class hvPlotTabular(hvPlotBase):
             filled in green or yellow, alternatively. If there is only a single series to be
             plotted, then only the first color from the color list will be used.
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('line')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('line')`` for the full method documentation.
 
         Returns
         -------
@@ -379,6 +382,7 @@ class hvPlotTabular(hvPlotBase):
         of the same options available.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/step.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -407,8 +411,8 @@ class hvPlotTabular(hvPlotBase):
             filled in green or yellow, alternatively. If there is only a single series to be
             plotted, then only the first color from the color list will be used.
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('step')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('step')`` for the full method documentation.
 
         Returns
         -------
@@ -481,6 +485,7 @@ class hvPlotTabular(hvPlotBase):
         The `scatter` plot is a good first way to plot data with non continuous axes.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/scatter.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -513,8 +518,8 @@ class hvPlotTabular(hvPlotBase):
         logz : bool
             Whether to apply log scaling to the z-axis. Default is False.
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('scatter')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('scatter')`` for the full method documentation.
 
         Returns
         -------
@@ -584,6 +589,7 @@ class hvPlotTabular(hvPlotBase):
         lines.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/area.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -597,8 +603,8 @@ class hvPlotTabular(hvPlotBase):
         stacked : boolean, optional
             Whether to stack multiple areas. Default is True.
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('area')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('area')`` for the full method documentation.
 
         Returns
         -------
@@ -667,6 +673,7 @@ class hvPlotTabular(hvPlotBase):
         indicate the variability.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/errorbars.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -680,8 +687,8 @@ class hvPlotTabular(hvPlotBase):
         yerr2 : string, optional
             Field name to draw positive errors from
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('errorbars')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('errorbars')`` for the full method documentation.
 
         Returns
         -------
@@ -754,6 +761,7 @@ class hvPlotTabular(hvPlotBase):
         The `ohlc` plot visualizes the open, high, low and close prices of stocks and other assets.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/ohlc.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -771,8 +779,8 @@ class hvPlotTabular(hvPlotBase):
         neg_color : string, optional
             The color indicating a negative change. Default is red.
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('ohlc')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('ohlc')`` for the full method documentation.
 
         Returns
         -------
@@ -821,6 +829,7 @@ class hvPlotTabular(hvPlotBase):
         aggregation variable (on which an aggregation is computed).
 
         Reference: https://hvplot.holoviz.org/reference/tabular/heatmap.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -844,8 +853,8 @@ class hvPlotTabular(hvPlotBase):
             Function to compute statistics for heatmap, for example ``np.mean``.
             If omitted, no aggregation is applied and duplicate values are dropped.
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('heatmap')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('heatmap')`` for the full method documentation.
 
         Returns
         -------
@@ -903,6 +912,7 @@ class hvPlotTabular(hvPlotBase):
         `hexbin` offers a straightforward method for plotting dense data.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/hexbin.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -928,8 +938,8 @@ class hvPlotTabular(hvPlotBase):
             The display threshold before a bin is shown, by default bins with
             a count of less than 1 are hidden
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('hexbin')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('hexbin')`` for the full method documentation.
 
         Returns
         -------
@@ -1000,6 +1010,7 @@ class hvPlotTabular(hvPlotBase):
         are too dense to plot each point individually.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/bivariate.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -1022,8 +1033,8 @@ class hvPlotTabular(hvPlotBase):
             to specify the contour levels. Default is 10.
 
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('bivariate')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('bivariate')`` for the full method documentation.
 
         Returns
         -------
@@ -1092,6 +1103,7 @@ class hvPlotTabular(hvPlotBase):
         The bars are of equal width which allows for instant comparison of data.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/bar.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -1114,8 +1126,8 @@ class hvPlotTabular(hvPlotBase):
             A sequence of color strings referred to by name, RGB or RGBA code, which will be used
             for each series recursively. For instance ['red', 'green','blue'].
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('bar')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('bar')`` for the full method documentation.
 
         Returns
         -------
@@ -1185,14 +1197,15 @@ class hvPlotTabular(hvPlotBase):
         `barh` can be used on dataframes with regular Index or MultiIndex.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/barh.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
         stacked : bool, optional
             If True, creates a stacked horizontal bar plot. Default is False.
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('barh')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('barh')`` for the full method documentation.
 
         Returns
         -------
@@ -1249,6 +1262,7 @@ class hvPlotTabular(hvPlotBase):
         `box` plots are most useful when grouped by additional dimensions.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/box.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -1258,8 +1272,8 @@ class hvPlotTabular(hvPlotBase):
         by : string or sequence
             Field in the *long* data to group by.
         kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('box')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('box')`` for the full method documentation.
 
         Returns
         -------
@@ -1317,6 +1331,7 @@ class hvPlotTabular(hvPlotBase):
         Note that `violin` plots depend on the `scipy` library.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/violin.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -1326,8 +1341,8 @@ class hvPlotTabular(hvPlotBase):
         by : string or sequence
             Field in the *long* data to group by.
         kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('violin')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('violin')`` for the full method documentation.
 
         Returns
         -------
@@ -1384,6 +1399,7 @@ class hvPlotTabular(hvPlotBase):
         A `histogram` displays an approximate representation of the distribution of continuous data.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/hist.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -1412,8 +1428,8 @@ class hvPlotTabular(hvPlotBase):
             in that bin plus all bins for smaller values. The last bin gives the
             total number of data points. Default is False.
         kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('hist')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('hist')`` for the full method documentation.
 
         Returns
         -------
@@ -1496,6 +1512,7 @@ class hvPlotTabular(hvPlotBase):
         ``density`` is an alias of ``kde``.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/kde.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -1517,8 +1534,8 @@ class hvPlotTabular(hvPlotBase):
         ind : optional
             Not supported.
         kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('kde')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('kde')`` for the full method documentation.
 
         Returns
         -------
@@ -1595,14 +1612,15 @@ class hvPlotTabular(hvPlotBase):
         Displays a 'table'.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/table.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
         columns : string or sequence
             The field(s) to display as columns.
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('table')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('table')`` for the full method documentation.
 
         Returns
         -------
@@ -1643,8 +1661,8 @@ class hvPlotTabular(hvPlotBase):
         Parameters
         ----------
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('dataset')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('dataset')`` for the full method documentation.
 
         Returns
         -------
@@ -1696,6 +1714,7 @@ class hvPlotTabular(hvPlotBase):
         overlay with chart types such as :meth:`hvplot.hvPlot.line`.
 
         Reference: https://hvplot.holoviz.org/reference/geopandas/points.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -1715,8 +1734,8 @@ class hvPlotTabular(hvPlotBase):
         logz : bool
             Whether to apply log scaling to the z-axis. Default is False.
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('points')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('points')`` for the full method documentation.
 
         Returns
         -------
@@ -1756,6 +1775,7 @@ class hvPlotTabular(hvPlotBase):
         as a ``quiver`` plot.
 
         Reference: https://hvplot.holoviz.org/reference/xarray/vectorfield.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -1768,8 +1788,8 @@ class hvPlotTabular(hvPlotBase):
         angle : string
             Angle in radians.
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('vectorfield')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('vectorfield')`` for the full method documentation.
 
         Returns
         -------
@@ -1818,6 +1838,7 @@ class hvPlotTabular(hvPlotBase):
         Polygon plot for geopandas dataframes.
 
         Reference: https://hvplot.holoviz.org/reference/geopandas/polygons.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -1826,8 +1847,8 @@ class hvPlotTabular(hvPlotBase):
         logz : bool
             Enables logarithmic colormapping. Default is False.
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('polygons')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('polygons')`` for the full method documentation.
 
         Returns
         -------
@@ -1875,8 +1896,8 @@ class hvPlotTabular(hvPlotBase):
         Parameters
         ----------
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('paths')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('paths')`` for the full method documentation.
 
         Returns
         -------
@@ -1905,6 +1926,7 @@ class hvPlotTabular(hvPlotBase):
         operator.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/labels.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -1917,8 +1939,8 @@ class hvPlotTabular(hvPlotBase):
             provide a template string containing the column names to
             automatically format the text, e.g. "{col1}, {col2}".
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('labels')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('labels')`` for the full method documentation.
 
         Returns
         -------
@@ -2103,6 +2125,7 @@ class hvPlot(hvPlotTabular):
     For more detailed options use a specific plotting method, e.g. `df.hvplot.line`.
 
     Reference: https://hvplot.holoviz.org/reference/index.html
+    Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
     Parameters
     ----------
@@ -2116,8 +2139,7 @@ class hvPlot(hvPlotTabular):
         The kind of plot to generate, e.g. 'area', 'bar', 'line', 'scatter' etc. To see the
         available plots run `print(df.hvplot.__all__)`.
     **kwds : optional
-        Additional keywords arguments are documented in `hvplot.help('scatter')` or similar
-        depending on the kind of plot.
+        Additional keywords arguments are documented in :ref:`plot-options`.
 
     Returns
     -------
@@ -2205,6 +2227,7 @@ class hvPlot(hvPlotTabular):
         `longitude` fields and a third dependent field.
 
         Reference: https://hvplot.holoviz.org/reference/xarray/image.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -2217,8 +2240,8 @@ class hvPlot(hvPlotTabular):
         colorbar: boolean
             Whether to display a colorbar
         **kwds : optional
-            To see all the keyword arguments available, run `hvplot.help('image')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('image')`` for the full method documentation.
 
         Returns
         -------
@@ -2261,6 +2284,7 @@ class hvPlot(hvPlotTabular):
         "bands".
 
         Reference: https://hvplot.holoviz.org/reference/xarray/rgb.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -2276,8 +2300,8 @@ class hvPlot(hvPlotTabular):
         z : string, optional
             The data variable to plot
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('rgb')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('rgb')`` for the full method documentation.
 
         Returns
         -------
@@ -2315,6 +2339,7 @@ class hvPlot(hvPlotTabular):
         to set ``project=True``.
 
         Reference: https://hvplot.holoviz.org/reference/xarray/quadmesh.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -2327,8 +2352,8 @@ class hvPlot(hvPlotTabular):
         colorbar: boolean
             Whether to display a colorbar
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('quadmesh')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('quadmesh')`` for the full method documentation.
 
         Returns
         -------
@@ -2368,6 +2393,7 @@ class hvPlot(hvPlotTabular):
         scalar field over gridded data.
 
         Reference: https://hvplot.holoviz.org/reference/xarray/contour.html
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -2385,8 +2411,8 @@ class hvPlot(hvPlotTabular):
         logz: bool, optional
             Whether to apply log scaling to the z-axis. Default is False.
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('contour')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('contour')`` for the full method documentation.
 
         Returns
         -------
@@ -2457,8 +2483,8 @@ class hvPlot(hvPlotTabular):
         logz: bool, optional
             Whether to apply log scaling to the z-axis. Default is False
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('contourf')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('contourf')`` for the full method documentation.
 
         See Also
         --------
