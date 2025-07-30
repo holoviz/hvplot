@@ -130,6 +130,7 @@ class hvPlotBase:
         The `explorer` plot allows you to interactively explore your data.
 
         Reference: https://hvplot.holoviz.org/user_guide/Explorer.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
@@ -177,6 +178,7 @@ class hvPlotTabular(hvPlotBase):
     For more detailed options use a specific plotting method, e.g. `df.hvplot.line`.
 
     Reference: https://hvplot.holoviz.org/reference/index.html
+
     Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
     Parameters
@@ -279,6 +281,7 @@ class hvPlotTabular(hvPlotBase):
         The `line` plot connects the points with a continuous curve.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/line.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
@@ -382,6 +385,7 @@ class hvPlotTabular(hvPlotBase):
         of the same options available.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/step.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
@@ -485,6 +489,7 @@ class hvPlotTabular(hvPlotBase):
         The `scatter` plot is a good first way to plot data with non continuous axes.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/scatter.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
@@ -589,6 +594,7 @@ class hvPlotTabular(hvPlotBase):
         lines.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/area.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
@@ -673,6 +679,7 @@ class hvPlotTabular(hvPlotBase):
         indicate the variability.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/errorbars.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
@@ -761,6 +768,7 @@ class hvPlotTabular(hvPlotBase):
         The `ohlc` plot visualizes the open, high, low and close prices of stocks and other assets.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/ohlc.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
@@ -829,6 +837,7 @@ class hvPlotTabular(hvPlotBase):
         aggregation variable (on which an aggregation is computed).
 
         Reference: https://hvplot.holoviz.org/reference/tabular/heatmap.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
@@ -912,6 +921,7 @@ class hvPlotTabular(hvPlotBase):
         `hexbin` offers a straightforward method for plotting dense data.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/hexbin.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
@@ -1010,6 +1020,7 @@ class hvPlotTabular(hvPlotBase):
         are too dense to plot each point individually.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/bivariate.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
@@ -1103,6 +1114,7 @@ class hvPlotTabular(hvPlotBase):
         The bars are of equal width which allows for instant comparison of data.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/bar.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
@@ -1197,6 +1209,7 @@ class hvPlotTabular(hvPlotBase):
         `barh` can be used on dataframes with regular Index or MultiIndex.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/barh.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
@@ -1262,6 +1275,7 @@ class hvPlotTabular(hvPlotBase):
         `box` plots are most useful when grouped by additional dimensions.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/box.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
@@ -1331,6 +1345,7 @@ class hvPlotTabular(hvPlotBase):
         Note that `violin` plots depend on the `scipy` library.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/violin.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
@@ -1399,6 +1414,7 @@ class hvPlotTabular(hvPlotBase):
         A `histogram` displays an approximate representation of the distribution of continuous data.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/hist.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
@@ -1512,6 +1528,7 @@ class hvPlotTabular(hvPlotBase):
         ``density`` is an alias of ``kde``.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/kde.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
@@ -1612,6 +1629,7 @@ class hvPlotTabular(hvPlotBase):
         Displays a 'table'.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/table.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
@@ -1714,6 +1732,7 @@ class hvPlotTabular(hvPlotBase):
         overlay with chart types such as :meth:`hvplot.hvPlot.line`.
 
         Reference: https://hvplot.holoviz.org/reference/geopandas/points.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
@@ -1775,6 +1794,7 @@ class hvPlotTabular(hvPlotBase):
         as a ``quiver`` plot.
 
         Reference: https://hvplot.holoviz.org/reference/xarray/vectorfield.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
@@ -1838,6 +1858,7 @@ class hvPlotTabular(hvPlotBase):
         Polygon plot for geopandas dataframes.
 
         Reference: https://hvplot.holoviz.org/reference/geopandas/polygons.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
@@ -1926,6 +1947,7 @@ class hvPlotTabular(hvPlotBase):
         operator.
 
         Reference: https://hvplot.holoviz.org/reference/tabular/labels.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
@@ -2125,6 +2147,7 @@ class hvPlot(hvPlotTabular):
     For more detailed options use a specific plotting method, e.g. `df.hvplot.line`.
 
     Reference: https://hvplot.holoviz.org/reference/index.html
+
     Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
     Parameters
@@ -2227,6 +2250,7 @@ class hvPlot(hvPlotTabular):
         `longitude` fields and a third dependent field.
 
         Reference: https://hvplot.holoviz.org/reference/xarray/image.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
@@ -2284,6 +2308,7 @@ class hvPlot(hvPlotTabular):
         "bands".
 
         Reference: https://hvplot.holoviz.org/reference/xarray/rgb.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
@@ -2339,6 +2364,7 @@ class hvPlot(hvPlotTabular):
         to set ``project=True``.
 
         Reference: https://hvplot.holoviz.org/reference/xarray/quadmesh.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
@@ -2393,6 +2419,7 @@ class hvPlot(hvPlotTabular):
         scalar field over gridded data.
 
         Reference: https://hvplot.holoviz.org/reference/xarray/contour.html
+
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
