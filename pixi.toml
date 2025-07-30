@@ -2,6 +2,7 @@
 name = "hvplot"
 channels = ["pyviz/label/dev",  "conda-forge"]
 platforms = ["linux-64", "osx-arm64", "osx-64", "win-64"]
+preview = ["pixi-build"] # temp until 0.1.4 release
 
 [environments]
 default = [
@@ -140,8 +141,10 @@ streamz = ">=0.3.0"
 xarray = ">=0.18.2"
 xyzservices = ">=2022.9.0"
 geodatasets = ">=2023.12.0"
-hvsampledata = ">=0.1.2"
+# hvsampledata = ">=0.1.2"
 
+[feature.example.pypi-dependencies]
+hvsampledata = { git = "https://github.com/holoviz/hvsampledata.git", rev = "v0.1.4a3" } # temp until 0.1.4 release
 # =================== TESTS ===================
 
 [feature.test-core.dependencies]
