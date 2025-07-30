@@ -20,7 +20,7 @@ See [this page](./data) for more information on these options.
 
 ## [Size And Layout Options](./size_layout)
 
-Customization options for plot sizes and overall layout, including responsive mode:
+Customization options for plot sizes and overall layout, including responsive mode and widget location:
 
 ```{eval-rst}
 .. plotting-options-table:: Size And Layout Options
@@ -53,8 +53,7 @@ See [this page](./grid_legend) for more information on these options.
 ## [Styling Options](./styling)
 
 :::{note}
-These are the styling options shared by all the supported plotting backends. Backend-specific options can be found on the
-reference page of each plotting method (e.g. {meth}`hvplot.hvPlot.scatter`) or by running `hvplot.help('scatter', docstring=False, generic=False, style=True)`.
+These are the styling options shared by all the supported plotting backends. Backend-specific options can be found on the reference page of each plotting method (e.g. {meth}`hvplot.hvPlot.scatter`) or by executing `hvplot.help('scatter', docstring=False, generic=False, style=True)`.
 :::
 
 Visual styling options to adjust colors, fonts, and other aesthetic elements of the plot:
@@ -91,7 +90,7 @@ See [this page](./resampling) for more information on these options.
 
 ## [Geographic Options](./geographic)
 
-Options for geographic plots, including map projections, tile overlays, and geographic features like coastlines and borders:
+Options for geographic plots, including map projections, tile overlays, and geographic features like coastlines and borders (most of these options require [GeoViews](https://geoviews.org) to be installed):
 
 ```{eval-rst}
 .. plotting-options-table:: Geographic Options
