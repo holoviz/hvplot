@@ -439,7 +439,7 @@ class hvPlotTabular(hvPlotBase):
         References
         ----------
 
-        - Bokeh: https://docs.bokeh.org/en/latest/docs/user_guide/plotting.html#scatter-markers
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/basic/scatters/color_scatter.html
         - HoloViews: https://holoviews.org/reference/elements/matplotlib/Scatter.html
         - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.scatter.html
         - Plotly: https://plotly.com/python/line-and-scatter/
@@ -488,7 +488,7 @@ class hvPlotTabular(hvPlotBase):
         References
         ----------
 
-        - Bokeh: https://docs.bokeh.org/en/latest/docs/user_guide/plotting.html#directed-areas
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/user_guide/basic/areas.html#directed-areas
         - HoloViews: https://holoviews.org/reference/elements/matplotlib/Area.html
         - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.area.html
         - Plotly: https://plotly.com/python/filled-area-plots/
@@ -539,7 +539,7 @@ class hvPlotTabular(hvPlotBase):
         References
         ----------
 
-        - Bokeh: https://docs.bokeh.org/en/latest/docs/user_guide/annotations.html#whiskers
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/basic/annotations/whisker.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/ErrorBars.html
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.errorbar.html
         - Pandas: https://pandas.pydata.org/docs/user_guide/visualization.html#visualization-errorbars
@@ -590,7 +590,7 @@ class hvPlotTabular(hvPlotBase):
         References
         ----------
 
-        - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/candlestick.html
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/topics/timeseries/candlestick.html
         - Matplotlib: https://www.statology.org/matplotlib-python-candlestick-chart/
         - Plotly: https://plotly.com/python/ohlc-charts/
         - Wikipedia: https://en.wikipedia.org/wiki/Candlestick_chart
@@ -649,7 +649,7 @@ class hvPlotTabular(hvPlotBase):
         References
         ----------
 
-        - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/categorical_heatmap.html
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/topics/categorical/heatmap_unemployment.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/HeatMap.html
         - Matplotlib: https://matplotlib.org/stable/gallery/images_contours_and_fields/image_annotated_heatmap.html
         - Plotly: https://plotly.com/python/heatmaps/
@@ -967,7 +967,7 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-        - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/boxplot.html
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/topics/stats/boxplot.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/BoxWhisker.html
         - Matplotlib: https://matplotlib.org/stable/plot_types/stats/boxplot_plot.html#sphx-glr-plot-types-stats-boxplot-plot-py
         - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.boxplot.html
@@ -1082,7 +1082,7 @@ class hvPlotTabular(hvPlotBase):
         References
         ----------
 
-        - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/histogram.html
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/topics/stats/histogram.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Histogram.html
         - Pandas: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.plot.hist.html
         - Plotly: https://plotly.com/python/histograms/
@@ -1348,7 +1348,6 @@ class hvPlotTabular(hvPlotBase):
         References
         ----------
 
-        - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/quiver.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/VectorField.html
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.quiver.html
         - Plotly: https://plotly.com/python/quiver-plots/
@@ -1755,7 +1754,7 @@ class hvPlot(hvPlotTabular):
         References
         ----------
 
-        - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/image.html
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/topics/images/image.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Image.html
         - Matplotlib: https://matplotlib.org/stable/tutorials/introductory/images.html
         - Plotly: https://plotly.com/python/imshow/
