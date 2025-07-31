@@ -135,9 +135,9 @@ class HoloViewsConverter:
         the behavior.
     by : str or list of str or None, default=None
         Dimension(s) by which to group the data categories. An
-        :ref:`holoviews:reference/containers/bokeh/NdOverlay` is
+        :doc:`holoviews:reference/containers/bokeh/NdOverlay` is
         returned by default unless ``subplots=True``, then an
-        :ref:`holoviews:reference/containers/bokeh/NdLayout` is returned.
+        :doc:`holoviews:reference/containers/bokeh/NdLayout` is returned.
     dynamic : bool, default=True
         Whether to return a dynamic plot which sends updates on widget and
         zoom/pan events or whether all the data should be embedded
@@ -147,9 +147,9 @@ class HoloViewsConverter:
         A dictionary of fields for renaming or transforming data dimensions.
     groupby : str or list or None, default=None
         Dimension(s) by which to group data, enabling widgets. Returns a
-        :ref:`holoviews:reference/containers/bokeh/DynamicMap` if
+        :doc:`holoviews:reference/containers/bokeh/DynamicMap` if
         ``dynamic=True``, else returns a
-        :ref:`holoviews:reference/containers/bokeh/HoloMap`. See ``dynamic``
+        :doc:`holoviews:reference/containers/bokeh/HoloMap`. See ``dynamic``
         for more information.
     group_label : str or None, default=None
         Sets a custom label for the dimension created when plotting multiple columns.
