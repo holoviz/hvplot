@@ -39,6 +39,25 @@ _HV_GE_1_21_0 = _HV_VERSION >= (1, 21, 0)
 _fugue_ipython = None  # To be set to True in tests to mock ipython
 
 
+class _UndefinedType:
+    """
+    Dummy value to signal completely undefined values rather than
+    simple None values.
+    """
+
+    def __bool__(self):
+        # Haven't defined whether Undefined is falsy or truthy,
+        # so to avoid subtle bugs raise an error when it
+        # is used in a comparison without `is`.
+        raise RuntimeError('Use `is` to compare Undefined')
+
+    def __repr__(self):
+        return '<Undefined>'
+
+
+_Undefined = _UndefinedType()
+
+
 def with_hv_extension(func, extension='bokeh', logo=False):
     """If hv.extension is not loaded, load before calling function"""
 
