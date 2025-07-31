@@ -37,9 +37,9 @@ def parallel_coordinates(
     cols : list, optional
         A list of column names to use
     alpha : float, optional
-        The transparency of the lines
-    cmap/colormap : str or colormap object
-        Colormap to use for groups
+        The transparency of the lines. Default is 0.5.
+    cmap/colormap : str or colormap object, optional
+        Colormap to use for groups. Default to Colorcet's ``glasbey_category10``.
 
     Returns
     -------

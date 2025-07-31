@@ -908,17 +908,19 @@ def _get_doc_and_signature(
     backend_style_opts = _get_backend_style_options(kind, backend=backend)
     if style:
         formatter += '\n{style}'
-    style_opts = 'Styling options\n---------------\n' + '\n'.join(sorted(backend_style_opts))
+    style_opts = f'{backend.title()} Styling options\n---------------\n' + '\n'.join(
+        sorted(backend_style_opts)
+    )
 
     parameters = []
     # The options are built in this order in the signature and the docstring.
     groups = [
         'data',
-        'style',
-        'axis',
         'size_layout',
-        'grid_legend',
-        'streaming',
+        'axis',
+        'color',
+        'style',
+        'legend',
     ]
     extra_kwargs = kind_opts + list(
         itertools.chain.from_iterable([converter._options_groups[group] for group in groups])
@@ -939,6 +941,10 @@ def _get_doc_and_signature(
     if kind in converter._geo_types and find_spec('geoviews'):
         extra_kwargs.extend(converter._options_groups['geographic'])
         out_doc_sections.append(doc_sections[converter._docstring_sections['geographic']])
+
+    # Put streaming options towards the end.
+    extra_kwargs.extend(converter._options_groups['streaming'])
+    out_doc_sections.append(doc_sections[converter._docstring_sections['streaming']])
 
     extra_kwargs.extend(backend_style_opts)
 

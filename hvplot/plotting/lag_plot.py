@@ -15,10 +15,10 @@ def lag_plot(data, lag=1, **kwds):
 
     Parameters
     ----------
-    data : Series
+    data : Series or DataFrame
         The time series to visualize.
-    lag : int, default 1
-        Lag length of the scatter plot.
+    lag : int, optional
+        Lag length of the scatter plot. Default is 1.
     **kwds : optional
         hvplot.scatter options
 
