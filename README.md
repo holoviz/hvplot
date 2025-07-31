@@ -1,4 +1,9 @@
-# hvPlot makes data analysis and visualization simple <img src="https://github.com/holoviz/hvplot/blob/main/doc/_static/logo.png?raw=true" style="width:2em;margin-bottom:-15px">
+<p align="center">
+  <a href="https://hvplot.holoviz.org"><img src="https://github.com/holoviz/hvplot/blob/main/doc/_static/logo_horizontal.svg?raw=true" alt="hvPlot"></a>
+</p>
+<p align="center">
+    <em>hvPlot makes data analysis and visualization simple</em>
+</p>
 
 |    |    |
 | --- | --- |
