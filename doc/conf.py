@@ -112,7 +112,7 @@ nbsite_gallery_conf = {
     'examples_dir': '.',
     'galleries': {
         'reference': {
-            'title': 'Reference Gallery',
+            'title': 'Gallery',
             'intro': (
                 'Find the list of supported libraries on `this page <../ref/data_libraries.html>`_.'
             ),
