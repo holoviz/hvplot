@@ -11,7 +11,28 @@ jobs:
     permissions:
       issues: write
     steps:
-      - run: gh issue edit "$NUMBER" --add-label "$LABELS"
+      - name: Check if issue needs triage
+        id: check-labels
+        run: |
+          # Get current labels - if any exist, the issue has been looked at
+          label_count=$(gh issue view "$NUMBER" --json labels --jq '.labels | length')
+          echo "Number of existing labels: $label_count"
+
+          if [ "$label_count" -eq 0 ]; then
+            needs_triage=true
+          else
+            needs_triage=false
+          fi
+
+          echo "needs_triage=$needs_triage" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.issue.number }}
+
+      - name: Add triage label
+        if: steps.check-labels.outputs.needs_triage == 'true'
+        run: gh issue edit "$NUMBER" --add-label "$LABELS"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
