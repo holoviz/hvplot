@@ -131,8 +131,6 @@ class hvPlotBase:
 
         Reference: https://hvplot.holoviz.org/user_guide/Explorer.html
 
-        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
-
         Parameters
         ----------
         x : string, optional
@@ -177,7 +175,7 @@ class hvPlotTabular(hvPlotBase):
 
     For more detailed options use a specific plotting method, e.g. `df.hvplot.line`.
 
-    Reference: https://hvplot.holoviz.org/reference/index.html
+    Reference: https://hvplot.holoviz.org/ref/api/index.html
 
     Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -280,7 +278,7 @@ class hvPlotTabular(hvPlotBase):
         """
         The `line` plot connects the points with a continuous curve.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/line.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.line.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -384,7 +382,7 @@ class hvPlotTabular(hvPlotBase):
         The `step` plot can be used pretty much anytime the `line` plot might be used, and has many
         of the same options available.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/step.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.step.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -488,7 +486,7 @@ class hvPlotTabular(hvPlotBase):
 
         The `scatter` plot is a good first way to plot data with non continuous axes.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/scatter.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.scatter.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -593,7 +591,7 @@ class hvPlotTabular(hvPlotBase):
         The `area` plot can be used to color the area under a line or to color the space between two
         lines.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/area.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.area.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -678,7 +676,7 @@ class hvPlotTabular(hvPlotBase):
         They are usually overlaid with other plots such as `scatter` , `line` or `bar` plots to
         indicate the variability.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/errorbars.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.errorbars.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -767,7 +765,7 @@ class hvPlotTabular(hvPlotBase):
         """
         The `ohlc` plot visualizes the open, high, low and close prices of stocks and other assets.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/ohlc.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.ohlc.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -836,7 +834,7 @@ class hvPlotTabular(hvPlotBase):
         (in which case no aggregate will be computed) or as a set of two axis variables and one
         aggregation variable (on which an aggregation is computed).
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/heatmap.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.heatmap.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -920,7 +918,7 @@ class hvPlotTabular(hvPlotBase):
 
         `hexbin` offers a straightforward method for plotting dense data.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/hexbin.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.hexbin.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -1019,7 +1017,7 @@ class hvPlotTabular(hvPlotBase):
         Bivariate plots can be a useful alternative to scatter plots, if the data
         are too dense to plot each point individually.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/bivariate.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.bivariate.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -1113,7 +1111,7 @@ class hvPlotTabular(hvPlotBase):
         represents the categories and the y axis represents the value scale.
         The bars are of equal width which allows for instant comparison of data.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/bar.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.bar.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -1208,7 +1206,7 @@ class hvPlotTabular(hvPlotBase):
 
         `barh` can be used on dataframes with regular Index or MultiIndex.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/barh.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.barh.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -1274,7 +1272,7 @@ class hvPlotTabular(hvPlotBase):
 
         `box` plots are most useful when grouped by additional dimensions.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/box.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.box.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -1344,7 +1342,7 @@ class hvPlotTabular(hvPlotBase):
 
         Note that `violin` plots depend on the `scipy` library.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/violin.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.violin.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -1413,7 +1411,7 @@ class hvPlotTabular(hvPlotBase):
         """
         A `histogram` displays an approximate representation of the distribution of continuous data.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/hist.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.hist.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -1527,7 +1525,7 @@ class hvPlotTabular(hvPlotBase):
 
         ``density`` is an alias of ``kde``.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/kde.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.kde.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -1628,7 +1626,7 @@ class hvPlotTabular(hvPlotBase):
         """
         Displays a 'table'.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/table.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.table.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -1731,7 +1729,7 @@ class hvPlotTabular(hvPlotBase):
         dependent relationship between x and y and thus most naturally
         overlay with chart types such as :meth:`hvplot.hvPlot.line`.
 
-        Reference: https://hvplot.holoviz.org/reference/geopandas/points.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.points.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -1793,7 +1791,7 @@ class hvPlotTabular(hvPlotBase):
         a magnitude (``mag``) and an `angle`. A ``vectorfield`` plot is also known
         as a ``quiver`` plot.
 
-        Reference: https://hvplot.holoviz.org/reference/xarray/vectorfield.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.vectorfield.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -1857,7 +1855,7 @@ class hvPlotTabular(hvPlotBase):
         """
         Polygon plot for geopandas dataframes.
 
-        Reference: https://hvplot.holoviz.org/reference/geopandas/polygons.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.polygons.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -1946,7 +1944,7 @@ class hvPlotTabular(hvPlotBase):
         `labels` are mostly useful when overlaid on top of other plots using the `*`
         operator.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/labels.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.labels.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -2146,7 +2144,7 @@ class hvPlot(hvPlotTabular):
 
     For more detailed options use a specific plotting method, e.g. `df.hvplot.line`.
 
-    Reference: https://hvplot.holoviz.org/reference/index.html
+    Reference: https://hvplot.holoviz.org/ref/api/index.html
 
     Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -2249,7 +2247,7 @@ class hvPlot(hvPlotTabular):
         You can use `image` to display for example geographic data with independent `latitude` and
         `longitude` fields and a third dependent field.
 
-        Reference: https://hvplot.holoviz.org/reference/xarray/image.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.image.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -2307,7 +2305,7 @@ class hvPlot(hvPlotTabular):
         `rgb`  can be used to display images that are distributed as three separate "channels" or
         "bands".
 
-        Reference: https://hvplot.holoviz.org/reference/xarray/rgb.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.rgb.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -2363,7 +2361,7 @@ class hvPlot(hvPlotTabular):
         the values to the pixel. When rasterizing geographic plots, it is recommended
         to set ``project=True``.
 
-        Reference: https://hvplot.holoviz.org/reference/xarray/quadmesh.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.quadmesh.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -2418,7 +2416,7 @@ class hvPlot(hvPlotTabular):
         A contour plot displays isolines representing constant values in a 2D
         scalar field over gridded data.
 
-        Reference: https://hvplot.holoviz.org/reference/xarray/contour.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.contour.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
