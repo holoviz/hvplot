@@ -143,25 +143,6 @@ class hvPlotBase:
         Returns
         -------
         The corresponding explorer type based on data, e.g. hvplot.ui.hvDataFrameExplorer.
-
-        Examples
-        --------
-
-        .. code-block:
-
-            import hvplot.pandas
-            import pandas as pd
-
-            df = pd.DataFrame(
-                {
-                    "actual": [100, 150, 125, 140, 145, 135, 123],
-                    "forecast": [90, 160, 125, 150, 141, 141, 120],
-                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
-                    "date": pd.date_range("2022-01-03", "2022-01-09"),
-                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-                },
-            )
-            df.hvplot.explorer()
         """
         from ..ui import explorer as ui_explorer
 
@@ -321,47 +302,6 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import pandas as pd
-
-            df = pd.DataFrame(
-                {
-                    "actual": [100, 150, 125, 140, 145, 135, 123],
-                    "forecast": [90, 160, 125, 150, 141, 141, 120],
-                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
-                    "date": pd.date_range("2022-01-03", "2022-01-09"),
-                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-                },
-            )
-            line = df.hvplot.line(
-                x="numerical",
-                y=["actual", "forecast"],
-                ylabel="value",
-                legend="bottom",
-                height=500,
-                color=["steelblue", "teal"],
-                alpha=0.7,
-                line_width=5,
-            )
-            line
-
-        You can can add *markers* to a `line` plot by overlaying with a `scatter` plot.
-
-        .. code-block::
-
-            markers = df.hvplot.scatter(
-                x="numerical", y=["actual", "forecast"], color=["steelblue", "teal"], size=50
-            )
-            line * markers
-
-        Please note that you can pass widgets or reactive functions as arguments instead of
-        literal values, c.f. https://hvplot.holoviz.org/user_guide/Widgets.html.
-
         References
         ----------
 
@@ -427,46 +367,6 @@ class hvPlotTabular(hvPlotBase):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
-
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import pandas as pd
-
-            df = pd.DataFrame(
-                {
-                    "actual": [100, 150, 125, 140, 145, 135, 123],
-                    "forecast": [90, 160, 125, 150, 141, 141, 120],
-                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
-                    "date": pd.date_range("2022-01-03", "2022-01-09"),
-                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-                },
-            )
-            step = df.hvplot.step(
-                x="numerical",
-                y=["actual", "forecast"],
-                ylabel="value",
-                legend="bottom",
-                height=500,
-                color=["#f16a6f", "#1e85f7"],
-                line_width=5,
-            )
-            step
-
-        You can can add *markers* to a `step` plot by overlaying with a `scatter` plot.
-
-        .. code-block::
-
-            markers = df.hvplot.scatter(
-                x="numerical", y=["actual", "forecast"], color=["#f16a6f", "#1e85f7"], size=100
-            )
-            step * markers
-
-        Please note that you can pass widgets or reactive functions as arguments instead of
-        literal values, c.f. https://hvplot.holoviz.org/user_guide/Widgets.html.
 
         References
         ----------
@@ -536,43 +436,6 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import pandas as pd
-
-            df = pd.DataFrame(
-                {
-                    "actual": [100, 150, 125, 140, 145, 135, 123],
-                    "forecast": [90, 160, 125, 150, 141, 141, 120],
-                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
-                    "date": pd.date_range("2022-01-03", "2022-01-09"),
-                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-                },
-            )
-            scatter = df.hvplot.scatter(
-                x="numerical",
-                y=["actual", "forecast"],
-                ylabel="value",
-                legend="bottom",
-                height=500,
-                color=["#f16a6f", "#1e85f7"],
-                size=100,
-            )
-            scatter
-
-        You can overlay the `scatter` markers on for example a `line` plot
-
-        .. code-block::
-
-            line = df.hvplot.line(
-                x="numerical", y=["actual", "forecast"], color=["#f16a6f", "#1e85f7"], line_width=5
-            )
-            scatter * line
-
         References
         ----------
 
@@ -621,40 +484,6 @@ class hvPlotTabular(hvPlotBase):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
-
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import pandas as pd
-
-            df = pd.DataFrame(
-                {
-                    "actual": [100, 150, 125, 140, 145, 135, 123],
-                    "forecast": [90, 160, 125, 150, 141, 141, 120],
-                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
-                    "date": pd.date_range("2022-01-03", "2022-01-09"),
-                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-                },
-            )
-            df["min"] = df[["actual", "forecast"]].min(axis=1)
-            df["max"] = df[["actual", "forecast"]].max(axis=1)
-
-            area = df.hvplot.area(
-                x="numerical",
-                y="min",
-                y2="max",
-                ylabel="value",
-                legend="bottom",
-                height=500,
-                color=["#55a194"],
-                alpha=0.7,
-                line_width=2,
-                ylim=(0, 200),
-            )
-            area
 
         References
         ----------
@@ -707,48 +536,6 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import pandas as pd
-
-            df = pd.DataFrame(
-                {
-                    "actual": [100, 150, 125, 140, 145, 135, 123],
-                    "forecast": [90, 160, 125, 150, 141, 141, 120],
-                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
-                    "date": pd.date_range("2022-01-03", "2022-01-09"),
-                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-                },
-            )
-            df["min"] = df[["actual", "forecast"]].min(axis=1)
-            df["max"] = df[["actual", "forecast"]].max(axis=1)
-            df["mean"] = df[["actual", "forecast"]].mean(axis=1)
-            df["yerr2"] = df["max"] - df["mean"]
-            df["yerr1"] = df["mean"] - df["min"]
-
-            errorbars = df.hvplot.errorbars(
-                x="numerical",
-                y="mean",
-                yerr1="yerr1",
-                yerr2="yerr2",
-                legend="bottom",
-                height=500,
-                alpha=0.5,
-                line_width=2,
-            )
-            errorbars
-
-        Normally you would overlay the `errorbars` on for example a `scatter` plot.
-
-        .. code-block::
-
-            mean = df.hvplot.scatter(x="numerical", y=["mean"], color=["#55a194"], size=50)
-            errorbars * mean
-
         References
         ----------
 
@@ -799,22 +586,6 @@ class hvPlotTabular(hvPlotBase):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
-
-        Examples
-        --------
-
-        .. code-block::
-
-            import pandas as pd
-
-            data = pd.DataFrame({
-                "open": [100, 101, 102],
-                "high": [104, 105, 110],
-                "low": [94, 97, 99],
-                "close": [101, 99, 103],
-            }, index=[pd.Timestamp("2022-08-01"), pd.Timestamp("2022-08-02"), pd.Timestamp("2022-08-03")])
-            ohlc = data.hvplot.ohlc(pos_color="#55a194", neg_color="#f16a6f")
-            ohlc
 
         References
         ----------
@@ -874,21 +645,6 @@ class hvPlotTabular(hvPlotBase):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
-
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import numpy as np
-            from bokeh.sampledata import sea_surface_temperature as sst
-
-            df = sst.sea_surface_temperature
-            df.hvplot.heatmap(
-                x="time.month", y="time.day", C="temperature", reduce_function=np.mean,
-                height=500, width=500, colorbar=False, cmap="blues"
-            )
 
         References
         ----------
@@ -960,22 +716,6 @@ class hvPlotTabular(hvPlotBase):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
-
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import pandas as pd
-            import numpy as np
-
-            n = 500
-            df = pd.DataFrame({
-                "x": 2 + 2 * np.random.standard_normal(n),
-                "y": 2 + 2 * np.random.standard_normal(n),
-            })
-            df.hvplot.hexbin("x", "y", clabel="Count", cmap="plasma_r", height=400, width=500)
 
         References
         ----------
@@ -1057,25 +797,6 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            from bokeh.sampledata.autompg import autompg_clean as df
-
-            bivariate = df.hvplot.bivariate("accel", "mpg", filled=True, cmap="blues")
-            bivariate
-
-        To get a better intuitive understanding of the `bivariate` plot, you can try overlaying the
-        corresponding scatter plot.
-
-        .. code-block::
-
-            scatter = df.hvplot.scatter("accel", "mpg")
-            bivariate * scatter
-
         References
         ----------
 
@@ -1151,38 +872,6 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import pandas as pd
-
-            df = pd.DataFrame(
-                {
-                    "actual": [100, 150, 125, 140, 145, 135, 123],
-                    "forecast": [90, 160, 125, 150, 141, 141, 120],
-                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
-                    "date": pd.date_range("2022-01-03", "2022-01-09"),
-                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-                },
-            )
-            bar = df.hvplot.bar(x="string", y="actual", color="#f16a6f", legend="bottom", xlabel="day", ylabel="value")
-            bar
-
-        You can overlay for example a line plot via
-
-        .. code-block::
-
-            forecast_line = df.hvplot.line(x="string", y="forecast", color="#1e85f7", line_width=5, legend="bottom")
-            forecast_markers = df.hvplot.scatter(x="string", y="forecast", color="#1e85f7", size=100, legend="bottom")
-            bar * forecast_line * forecast_markers
-
-        .. code-block::
-
-            df.hvplot.bar(stacked=True, rot=90, color=["#457278", "#615078"])
-
         References
         ----------
 
@@ -1230,29 +919,6 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import pandas as pd
-
-            df = pd.DataFrame(
-                {
-                    "speed": [0.1, 17.5, 40, 48, 52, 69, 88],
-                    "lifespan": [2, 8, 70, 1.5, 25, 12, 28],
-                },
-                index=["snail", "pig", "elephant", "rabbit", "giraffe", "coyote", "horse"],
-            )
-            df.hvplot.barh(color=["#457278", "#615078"])
-
-        You can stack the bars by setting `stacked=True`
-
-        .. code-block::
-
-            df.hvplot.barh(stacked=True, color=["#457278", "#615078"])
-
         References
         ----------
 
@@ -1299,31 +965,6 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
-        Examples
-        --------
-
-        Here is an example using *wide* data.
-
-        .. code-block::
-
-            import hvplot.pandas
-            import numpy as np
-            import pandas as pd
-
-            data = np.random.randn(25, 4)
-            df = pd.DataFrame(data, columns=list('ABCD'))
-            df.hvplot.box()
-
-        Here is an example using *long* data and the `by` argument.
-
-        .. code-block::
-
-            import hvplot.pandas  # noqa
-            import pandas as pd
-            age_list = [8, 10, 12, 14, 72, 74, 76, 78, 20, 25, 30, 35, 60, 85]
-            df = pd.DataFrame({"gender": list("MMMMMMMMFFFFFF"), "age": age_list})
-            df.hvplot.box(y='age', by='gender', height=400, width=400, legend=False, ylim=(0, None))
-
         References
         ----------
         - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/boxplot.html
@@ -1368,31 +1009,6 @@ class hvPlotTabular(hvPlotBase):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
-
-        Examples
-        --------
-
-        Here is an example using *wide* data.
-
-        .. code-block::
-
-            import hvplot.pandas
-            import numpy as np
-            import pandas as pd
-
-            data = np.random.randn(25, 4)
-            df = pd.DataFrame(data, columns=list('ABCD'))
-            df.hvplot.violin(ylim=(-5, 5))
-
-        Here is an example using *long* data and the `by` argument.
-
-        .. code-block::
-
-            import hvplot.pandas  # noqa
-            import pandas as pd
-            age_list = [8, 10, 12, 14, 72, 74, 76, 78, 20, 25, 30, 35, 60, 85]
-            df = pd.DataFrame({"gender": list("MMMMMMMMFFFFFF"), "age": age_list})
-            df.hvplot.violin(y='age', by='gender', height=400, width=400, legend=False, ylim=(-100, 200))
 
         References
         ----------
@@ -1462,35 +1078,6 @@ class hvPlotTabular(hvPlotBase):
         kde : Kernel Density Estimate plot.
         bivariate : 2D KDE plot.
         contour : Isolines plot for gridded data.
-
-        Examples
-        --------
-
-        Lets display some *wide* data created by rolling two dices
-
-        .. code-block::
-
-            import hvplot.pandas
-            import numpy as np
-            import pandas as pd
-
-            df = pd.DataFrame(np.random.randint(1, 7, 6000), columns = ['one'])
-            df['two'] = df['one'] + np.random.randint(1, 7, 6000)
-            df.hvplot.hist(bins=12, alpha=0.5, color=["lightgreen", "pink"])
-
-        If you want to show the distribution of the values of a categorical column,
-        you can use Pandas' method `value_counts` and `bar` as shown below
-
-        .. code-block::
-
-            import hvplot.pandas
-            import pandas as pd
-
-            data = pd.DataFrame({
-                "library": ["bokeh", "plotly", "matplotlib", "bokeh", "matplotlib", "matplotlib"]
-            })
-
-            data["library"].value_counts().hvplot.bar()
 
         References
         ----------
@@ -1570,36 +1157,6 @@ class hvPlotTabular(hvPlotBase):
         bivariate : 2D KDE plot.
         contour : Isolines plot for gridded data.
 
-        Examples
-        --------
-
-        Lets display a 'kde' plot from *wide* data
-
-        .. code-block::
-
-            import hvplot.pandas
-            import numpy as np
-            import pandas as pd
-
-            df = pd.DataFrame({
-                'x': [1, 2, 2.5, 3, 3.5, 4, 5],
-                'y': [4, 4, 4.5, 5, 5.5, 6, 6],
-            })
-            df.hvplot.kde(color=["orange", "green"])
-
-        Lets display a 'kde' plot from *long* data using the 'by' attribute
-
-        .. code-block::
-
-            import hvplot.pandas # noqa
-            import pandas as pd
-            import numpy as np
-            df = pd.DataFrame({
-                'category': list('xxxxxxxyyyyyyy'),
-                'value': [1, 2, 2.5, 3, 3.5, 4, 5, 4, 4, 4.5, 5, 5.5, 6, 6],
-            })
-            df.hvplot.kde(by='category', filled=False)
-
         References
         ----------
 
@@ -1611,7 +1168,7 @@ class hvPlotTabular(hvPlotBase):
 
         Notes
         -----
-        This function requires `scipy` to be installed.
+        This function requires ``scipy`` to be installed.
         """
 
         return self(kind='kde', x=None, y=y, by=by, **kwds)
@@ -1650,16 +1207,6 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            from bokeh.sampledata.autompg import autompg_clean as df
-
-            df.hvplot.table(columns=['origin', 'name', 'yr'], sortable=True, selectable=True)
-
         References
         ----------
 
@@ -1691,17 +1238,6 @@ class hvPlotTabular(hvPlotBase):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
-
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import pandas as pd
-
-            data = pd.DataFrame({"x": ['a', 'b', 'c'], "y": [1, 2, 3]})
-            data.hvplot.dataset()
 
         References
         ----------
@@ -1766,18 +1302,6 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import pandas as pd
-
-            data = pd.DataFrame(dict(x=[49.9, 50.0, 50.1, 50.2], y=[50.2, 49.9, 50.0, 50.2]))
-            plot = data.hvplot.points(color="green", size=100, marker="square")
-            plot
-
         References
         ----------
 
@@ -1821,25 +1345,6 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import numpy as np
-            import pandas as pd
-
-            data = pd.DataFrame(
-                dict(
-                    x=[49.9, 50.0, 50.1, 50.2],
-                    y=[50.2, 49.9, 50.0, 50.2],
-                    angle=[2 * np.pi, np.pi, np.pi, np.pi],
-                    mag=[0.01, 0.02, -0.02, -0.01],
-                )
-            )
-            data.hvplot.vectorfield(x="x", y="y", angle="angle", mag="mag")
-
         References
         ----------
 
@@ -1880,18 +1385,6 @@ class hvPlotTabular(hvPlotBase):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
-
-        Examples
-        --------
-
-        .. code-block::
-
-            import geopandas as gpd
-            import geodatasets
-            import hvplot.pandas
-
-            chicago = gpd.read_file(geodatasets.get_path("geoda.chicago_commpop"))
-            chicago.hvplot.polygons(geo=True, c='POP2010', hover_cols='all')
         """
         return self(x, y, c=c, kind='polygons', **kwds)
 
@@ -1973,24 +1466,6 @@ class hvPlotTabular(hvPlotBase):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
-
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import pandas as pd
-
-            df = pd.DataFrame(
-                {'City': ['Buenos Aires', 'Brasilia', 'Santiago', 'Bogota', 'Caracas'],
-                'Country': ['Argentina', 'Brazil', 'Chile', 'Colombia', 'Venezuela'],
-                'Latitude': [-34.58, -15.78, -33.45, 4.60, 10.48],
-                'Longitude': [-58.66, -47.91, -70.66, -74.08, -66.86],
-                'Color': ['blue', 'green', 'white', 'black', 'yellow']})
-
-            df.hvplot.points(x='Longitude', y='Latitude') * \
-            df.hvplot.labels(x='Longitude', y='Latitude', text='City', text_baseline="bottom")
 
         References
         ----------
@@ -2277,17 +1752,6 @@ class hvPlot(hvPlotTabular):
 
             to learn more about its parameters and options.
 
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.xarray
-            import xarray as xr
-
-            ds = xr.tutorial.open_dataset('air_temperature')
-            ds.hvplot.image(x='lon', y='lat', z='air', groupby='time', cmap='kbc_r')
-
         References
         ----------
 
@@ -2391,17 +1855,6 @@ class hvPlot(hvPlotTabular):
 
             to learn more about its parameters and options.
 
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.xarray
-            import xarray as xr
-
-            ds = xr.tutorial.open_dataset('rasm')
-            ds.Tair.hvplot.quadmesh(x='xc', y='yc', geo=True, widget_location='bottom')
-
         References
         ----------
 
@@ -2455,28 +1908,6 @@ class hvPlot(hvPlotTabular):
         --------
         contourf : Filled contour plot.
 
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.xarray
-            import xarray as xr
-
-            ds = xr.tutorial.open_dataset("air_temperature")
-            ds.hvplot.contour(
-                geo=True,
-                tiles="EsriImagery",
-                z="air",
-                x="lon",
-                y="lat",
-                levels=20,
-                clabel="T [K]",
-                line_width=2,
-                label="Mean Air temperature [K]",
-                cmap="reds",
-            )
-
         References
         ----------
 
@@ -2526,28 +1957,6 @@ class hvPlot(hvPlotTabular):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
-
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.xarray
-            import xarray as xr
-
-            ds = xr.tutorial.open_dataset("air_temperature")
-            ds.hvplot.contourf(
-                geo=True,
-                coastline=True,
-                z="air",
-                x="lon",
-                y="lat",
-                levels=20,
-                clabel="T [K]",
-                line_width=2,
-                label="Mean Air temperature [K]",
-                cmap="reds",
-            )
 
         References
         ----------
