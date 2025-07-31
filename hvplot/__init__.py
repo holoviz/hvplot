@@ -81,6 +81,7 @@ from .plotting import (
     scatter_matrix,  # noqa
     plot,  # noqa
 )
+from . import sampledata  # noqa
 
 # Define '__version__'
 try:
