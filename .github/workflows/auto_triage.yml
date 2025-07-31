@@ -16,7 +16,7 @@ jobs:
         run: |
           # Get current labels and issue type - if any exist, the issue has been looked at
           label_count=$(gh issue view "$NUMBER" --json labels --jq '.labels | length')
-          issue_type=$(gh issue view "$NUMBER" --json issueType --jq '.issueType')
+          issue_type=$(gh api repos/$GH_REPO/issues/$NUMBER --jq '.type')
           echo "Number of existing labels: $label_count"
           echo "Issue type: $issue_type"
 
