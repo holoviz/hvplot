@@ -47,7 +47,7 @@ def scatter_matrix(
         Column to color by.
     chart : str, optional
         Chart type for the off-diagonal plots (one of ``'scatter'``,
-        ``'bivariate'``, ``'hexbin'``). Default is ``'scatter'`.
+        ``'bivariate'``, ``'hexbin'``). Default is ``'scatter'``.
     diagonal : str, optional
         Chart type for the diagonal plots (one of ``'hist'``, ``'kde'``).
         Default is ``'hist'``.
@@ -61,7 +61,7 @@ def scatter_matrix(
         ``'lasso_select'``.
     cmap/colormap : str or colormap object, optional
         Colormap to use when ``c`` is set.
-        Default is `Category10 <https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md#category10>`.
+        Default is ``Category10`` (see `<https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md#category10>`_).
     diagonal_kwds/hist_kwds/density_kwds : dict, optional
         Keyword options for the diagonal plots.
     datashade : bool, default=False
