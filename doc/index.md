@@ -434,7 +434,7 @@ align: center
 
 Tutorials <tutorials/index>
 User Guide <user_guide/index>
-Reference Gallery <reference/index>
+Gallery <reference/index>
 Reference <ref/index>
 Developer Guide <developer_guide>
 Releases <releases>

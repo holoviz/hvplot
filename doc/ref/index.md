@@ -5,7 +5,7 @@ The reference section includes the API reference and pages that provide detailed
 ```{toctree}
 :titlesonly:
 :includehidden:
-:maxdepth: 2
+:maxdepth: 1
 
 Installation <installation>
 Supported data libraries <data_libraries>
