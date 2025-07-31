@@ -1842,7 +1842,7 @@ class HoloViewsConverter:
             combined_opts = (
                 combined_opts
                 + self._color_options
-                + self._style_opts
+                + self._style_options
                 + self._interactivity_options
             )
         for mismatch in mismatches:
