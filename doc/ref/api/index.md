@@ -17,6 +17,17 @@
    show
 ```
 
+## Sample Data
+
+The [sampledata](manual/sampledata.md) module provides convenient access to sample datasets for learning and prototyping.
+
+```{toctree}
+:maxdepth: 1
+:hidden:
+
+hvplot.sampledata <manual/sampledata>
+```
+
 (api-plotting)=
 ## Plotting
 
