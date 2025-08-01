@@ -596,6 +596,45 @@ class TestOptions:
         opts = Store.lookup_options(backend, plot, 'plot')
         assert opts.kwargs['backend_opts'] == bo
 
+    @pytest.mark.parametrize(
+        'backend',
+        [
+            'bokeh',
+            'matplotlib',
+            pytest.param(
+                'plotly',
+                marks=pytest.mark.skip(reason='legend_cols not supported w/ plotly'),
+            ),
+        ],
+        indirect=True,
+    )
+    def test_legend_cols(self, df, backend):
+        plot = df.hvplot.scatter('x', 'y', by='category', legend_cols=2)
+        opts = Store.lookup_options(backend, plot, 'plot')
+        assert opts.kwargs['legend_cols'] == 2
+
+    @pytest.mark.parametrize(
+        'backend',
+        [
+            'bokeh',
+            'matplotlib',
+            pytest.param(
+                'plotly',
+                marks=pytest.mark.skip(reason='legend_opts not supported w/ plotly'),
+            ),
+        ],
+        indirect=True,
+    )
+    def test_legend_opts(self, df, backend):
+        if backend == 'bokeh':
+            lo = {'spacing': 20}
+        elif backend == 'matplotlib':
+            lo = {'labelspacing': 2}
+
+        plot = df.hvplot.scatter('x', 'y', by='category', legend_opts=lo)
+        opts = Store.lookup_options(backend, plot, 'plot')
+        assert opts.kwargs['legend_opts'] == lo
+
 
 @pytest.fixture(scope='module')
 def da():
