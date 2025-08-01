@@ -442,6 +442,12 @@ class HoloViewsConverter:
 
     Styling Options
     ---------------
+    backend_opts : dict or None, optional
+        A dictionary of custom options to apply to the plot or subcomponents of
+        the plot. The keys in the dictionary mirror attribute access on the
+        underlying plotting backend objects stored in the plot's handles, e.g.
+        ``{'hover.attachment': 'vertical'}`` will index the hover in the handles
+        and then set the attachment.
     fontscale : number
         Scales the size of all fonts by the same amount, e.g. fontscale=1.5
         enlarges all fonts (title, xticks, labels etc.) by 50%.
@@ -653,6 +659,7 @@ class HoloViewsConverter:
     ]
 
     _style_options = [
+        'backend_opts',
         'fontscale',
         'fontsize',
         'grid',
@@ -885,6 +892,7 @@ class HoloViewsConverter:
         rescale_discrete_levels=None,
         autorange=None,
         subcoordinate_y=None,
+        backend_opts=None,
         **kwds,
     ):
         if debug:
@@ -1144,6 +1152,9 @@ class HoloViewsConverter:
             else:
                 plot_opts['autohide_toolbar'] = autohide_toolbar
         plot_opts['tools'] = tools
+
+        if backend_opts is not None:
+            plot_opts['backend_opts'] = backend_opts
 
         if self.crs and global_extent:
             plot_opts['global_extent'] = global_extent

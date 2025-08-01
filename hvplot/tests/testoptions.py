@@ -575,6 +575,27 @@ class TestOptions:
         opts = Store.lookup_options(backend, plot, 'plot')
         assert opts.kwargs['autohide_toolbar'] is True
 
+    @pytest.mark.parametrize(
+        'backend',
+        [
+            'bokeh',
+            'matplotlib',
+            pytest.param(
+                'plotly',
+                marks=pytest.mark.skip(reason='backend_opts not supported w/ plotly'),
+            ),
+        ],
+        indirect=True,
+    )
+    def test_backend_opts(self, df, backend):
+        if backend == 'bokeh':
+            bo = {'plot.xgrid.grid_line_color': 'grey'}
+        elif backend == 'matplotlib':
+            bo = {'axes.frame_on': False}
+        plot = df.hvplot.scatter('x', 'y', backend_opts=bo)
+        opts = Store.lookup_options(backend, plot, 'plot')
+        assert opts.kwargs['backend_opts'] == bo
+
 
 @pytest.fixture(scope='module')
 def da():
