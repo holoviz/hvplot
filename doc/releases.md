@@ -4,11 +4,11 @@ See [the HoloViz blog](https://blog.holoviz.org/#category=hvplot) for a visual s
 
 ## Version 0.12.0 (2025-08-01)
 
-This minor release brings extensive documentation improvements, exposes new HoloViews options, and brings a few bugfixes. Check out the release blog post for a visual overview of the key updates.
+This minor release brings extensive documentation improvements, exposes new HoloViews options, and brings a few bugfixes. Check out the [release blog post](https://blog.holoviz.org/posts/hvplot_release_0.12/) for a visual overview of the key updates.
 
 - 📚 Major expansion and improvement of the reference documentation, covering all plotting options and methods
 - 🔢 Ability to switch between multiple versions of hvPlot on the website
-- 🔍 A new `selector` option for sample hover info on datashaded plots
+- 🔍 A new `selector` option for sample hover info on datashaded plotsunindent.
 - 🧰 Toolbar customization with `toolbar` and `autohide_toolbar`
 - 📊 Flexible legends with the new `legend_cols` and `legend_opts` options
 - 🖌️ Advanced styling enabled by the `backend_opts` option
