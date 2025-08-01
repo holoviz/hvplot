@@ -362,8 +362,8 @@ class HoloViewsConverter:
     hover_formatters : dict or None, default=None
         A dict of formatting options for the hover tooltip.
 
-        .. deprecated 0.12
-        User ``hover_tooltips`` instead.
+        .. deprecated:: 0.12
+           Use ``hover_tooltips`` instead.
     hover_tooltips : list[str] or list[tuple] or None, default=None
         A list of dimensions to be displayed in the hover tooltip.
     toolbar : str or bool or None, optional
