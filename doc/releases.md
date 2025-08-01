@@ -2,6 +2,73 @@
 
 See [the HoloViz blog](https://blog.holoviz.org/#category=hvplot) for a visual summary of the major features added in a selection of releases.
 
+## Version 0.12.0 (2025-08-01)
+
+This minor release brings extensive documentation improvements, exposes new HoloViews options, and brings a few bugfixes. Check out the release blog post for a visual overview of the key updates.
+
+- 📚 Major expansion and improvement of the reference documentation, covering all plotting options and methods
+- 🔢 Ability to switch between multiple versions of hvPlot on the website
+- 🔍 A new `selector` option for sample hover info on datashaded plots
+- 🧰 Toolbar customization with `toolbar` and `autohide_toolbar`
+- 📊 Flexible legends with the new `legend_cols` and `legend_opts` options
+- 🖌️ Advanced styling enabled by the `backend_opts` option
+- 📦 A new `sampledata` module for easy access to sample datasets
+- 🐍 Dropped Python 3.9 support
+
+Many thanks to @ahuang11, @hoxbro, @Azaya89, and @maximlt for their contributions!
+
+Enhancements:
+
+- Add the `selector` option to display sample information on hover for rasterized/datashaded plots ([#1585](https://github.com/holoviz/hvplot/pull/1585))
+- Add the `toolbar` and `autohide_toolbar` options ([#1634](https://github.com/holoviz/hvplot/pull/1634))
+- Add the `backend_opts` option ([#1635](https://github.com/holoviz/hvplot/pull/1635))
+- Add the `legend_cols` and `legend_opts` options ([#1636](https://github.com/holoviz/hvplot/pull/1636))
+- Add support for log10 binning for histograms with `logx` and `loglog` ([#1593](https://github.com/holoviz/hvplot/pull/1593))
+- Add the `sampledata` module ([#1628](https://github.com/holoviz/hvplot/pull/1628))
+
+Bug Fixes:
+
+- Fix handling CRS translation ([#1600](https://github.com/holoviz/hvplot/pull/1600))
+- Remove unused piece of code ([#1588](https://github.com/holoviz/hvplot/pull/1588))
+- Minor fixes to `andrews_curves` ([#1563](https://github.com/holoviz/hvplot/pull/1563))
+
+Documentation:
+
+- Document all the plotting options:
+  - Document the data options ([#1555](https://github.com/holoviz/hvplot/pull/1555))
+  - Document the size and layout options ([#1545](https://github.com/holoviz/hvplot/pull/1545))
+  - Document the grid and legend options ([#1576](https://github.com/holoviz/hvplot/pull/1576))
+  - Document the styling options ([#1574](https://github.com/holoviz/hvplot/pull/1574))
+  - Document the interactivity options ([#1587](https://github.com/holoviz/hvplot/pull/1587))
+  - Document resampling, geographic, and streaming options ([#1601](https://github.com/holoviz/hvplot/pull/1601))
+  - Document axis options and minor changes ([#1618](https://github.com/holoviz/hvplot/pull/1618))
+- Improve the documentation of all the plotting methods and functions ([#1548](https://github.com/holoviz/hvplot/pull/1548))
+- Add a version switcher to the site ([#1533](https://github.com/holoviz/hvplot/pull/1533), [#1597](https://github.com/holoviz/hvplot/pull/1597))
+- Various documentation enhancements ([#1625](https://github.com/holoviz/hvplot/pull/1625))
+- Improve the logo sizing in the README ([#1632](https://github.com/holoviz/hvplot/pull/1632))
+
+Deprecation:
+
+- Deprecate `hover_formatters` ([#1637](https://github.com/holoviz/hvplot/pull/1637))
+- Deprecate the `debug` argument ([#1560](https://github.com/holoviz/hvplot/pull/1560))
+- Deprecate handling of DuckDB objects in the plot function ([#1561](https://github.com/holoviz/hvplot/pull/1561))
+
+Compatibility:
+
+- Drop Python 3.9 support ([#1608](https://github.com/holoviz/hvplot/pull/1608))
+
+Packaging:
+
+- Build sdist and wheel with hatchling instead of setuptools ([#1558](https://github.com/holoviz/hvplot/pull/1558))
+
+Infrastructure / Tests:
+
+- Enable branch coverage ([#1589](https://github.com/holoviz/hvplot/pull/1589))
+- Add auto-label action ([#1584](https://github.com/holoviz/hvplot/pull/1584))
+- Bump pre-commit and run on all files ([#1559](https://github.com/holoviz/hvplot/pull/1559))
+
+[Full Changelog](https://github.com/holoviz/hvplot/compare/v0.11.3...v0.12.0)
+
 ## Version 0.11.3 (2025-04-30)
 
 The 0.11.3 release is a patch release that brings a few bugfixes, migrates the developer tooling to [pixi](https://pixi.sh), and most importantly kicks off a large project - partially [funded by NumFocus](https://opencollective.com/holoviz/projects/holoviz-2024-sdg-r3) - aiming to improve the documentation by adopting the [Diátaxis](https://diataxis.fr/) framework. This release brings a new *Reference* section including a complete API reference, a new *Tutorials* section with a refactored version of the Getting Started and a new tutorial for users coming from Pandas. Many thanks to @Azaya89, @hoxbro, and @maximlt for their contributions!
