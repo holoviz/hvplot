@@ -528,6 +528,53 @@ class TestOptions:
         opts = Store.lookup_options(backend, plot, 'plot')
         assert opts.kwargs['bgcolor'] == 'black'
 
+    @pytest.mark.parametrize(
+        'backend',
+        [
+            'bokeh',
+            pytest.param(
+                'matplotlib',
+                marks=pytest.mark.skip(reason='toolbar not supported w/ matplotlib'),
+            ),
+            pytest.param(
+                'plotly',
+                marks=pytest.mark.skip(reason='toolbar not supported w/ plotly'),
+            ),
+        ],
+        indirect=True,
+    )
+    @pytest.mark.parametrize(
+        'toolbar', ['right', 'left', 'above', 'below', None, False, True, 'disable']
+    )
+    def test_toolbar(self, df, backend, toolbar):
+        plot = df.hvplot.scatter('x', 'y', toolbar=toolbar)
+        opts = Store.lookup_options(backend, plot, 'plot')
+        if toolbar is True:
+            toolbar = 'right'
+        elif toolbar is False:
+            toolbar = None
+        assert opts.kwargs['toolbar'] == toolbar
+
+    @pytest.mark.parametrize(
+        'backend',
+        [
+            'bokeh',
+            pytest.param(
+                'matplotlib',
+                marks=pytest.mark.skip(reason='autohide_toolbar not supported w/ matplotlib'),
+            ),
+            pytest.param(
+                'plotly',
+                marks=pytest.mark.skip(reason='autohide_toolbar not supported w/ plotly'),
+            ),
+        ],
+        indirect=True,
+    )
+    def test_autohide_toolbar(self, df, backend):
+        plot = df.hvplot.scatter('x', 'y', autohide_toolbar=True)
+        opts = Store.lookup_options(backend, plot, 'plot')
+        assert opts.kwargs['autohide_toolbar'] is True
+
 
 @pytest.fixture(scope='module')
 def da():

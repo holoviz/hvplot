@@ -53,6 +53,7 @@ from pandas import DatetimeIndex, MultiIndex
 from .backend_transforms import _transfer_opts_cur_backend
 from .util import (
     _HV_GE_1_21_0,
+    _Undefined,
     filter_opts,
     is_tabular,
     is_series,
@@ -356,6 +357,15 @@ class HoloViewsConverter:
         A dict of formatting options for the hover tooltip.
     hover_tooltips : list[str] or list[tuple] or None, default=None
         A list of dimensions to be displayed in the hover tooltip.
+    toolbar : str or bool or None, optional
+        Whether to display a toolbar and where to place it. Displayed by
+        default, disabled with ``'disable'``, ``None`` or ``False``. Location
+        must be one ``'above'``, ``'below'``, ``'left'``, or ``'right'``
+        (the default).
+    autohide_toolbar : bool, optional
+        Whether to automatically hide the toolbar until the user hovers over
+        the plot. This keyword has no effect if the toolbar is disabled
+        (``toolbar=None``). Default is False.
     tools : list, default=[]
         List of tool instances or strings (e.g. ['tap', 'box_select'])
 
@@ -621,6 +631,8 @@ class HoloViewsConverter:
         'hover_cols',
         'hover_formatters',
         'hover_tooltips',
+        'toolbar',
+        'autohide_toolbar',
         'tools',
     ]
 
@@ -857,6 +869,8 @@ class HoloViewsConverter:
         y_sampling=None,
         pixel_ratio=None,
         project=False,
+        toolbar=_Undefined,
+        autohide_toolbar=False,
         tools=[],
         attr_labels=None,
         coastline=False,
@@ -1115,6 +1129,20 @@ class HoloViewsConverter:
                 plot_opts['hover_tooltips'] = hover_tooltips
             if hover_formatters:
                 plot_opts['hover_formatters'] = hover_formatters
+        if toolbar is not _Undefined:
+            if toolbar is False:
+                toolbar = None
+            elif toolbar is True:
+                toolbar = 'right'
+            plot_opts['toolbar'] = toolbar
+        if autohide_toolbar:
+            if not _HV_GE_1_21_0:
+                warnings.warn(
+                    'autohide_toolbar requires holoviews>=1.21, skipped.',
+                    stacklevel=_find_stack_level(),
+                )
+            else:
+                plot_opts['autohide_toolbar'] = autohide_toolbar
         plot_opts['tools'] = tools
 
         if self.crs and global_extent:
