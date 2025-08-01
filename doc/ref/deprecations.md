@@ -4,7 +4,7 @@ List of currently deprecated APIs:
 
 | Warning | Description |
 |-|-|
-| `DeprecationWarning` since `0.12.0` | `hover_formatter` argument, use `hover_tooltips` instead. |
+| `DeprecationWarning` since `0.12.0` | `hover_formatters` argument, use `hover_tooltips` instead. |
 | `FutureWarning` since `0.12.0` | Passing DuckDB objects to `hvplot.plotting.plot`, use `import hvplot.duckdb` instead. |
 | `FutureWarning` since `0.12.0` | `debug` argument |
 
