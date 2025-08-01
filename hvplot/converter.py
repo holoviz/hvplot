@@ -361,6 +361,9 @@ class HoloViewsConverter:
         include all columns (including indexes if ``use_index=True``).
     hover_formatters : dict or None, default=None
         A dict of formatting options for the hover tooltip.
+
+        .. deprecated 0.12
+        User ``hover_tooltips`` instead.
     hover_tooltips : list[str] or list[tuple] or None, default=None
         A list of dimensions to be displayed in the hover tooltip.
     toolbar : str or bool or None, optional
@@ -1151,6 +1154,12 @@ class HoloViewsConverter:
             if hover_tooltips:
                 plot_opts['hover_tooltips'] = hover_tooltips
             if hover_formatters:
+                warnings.warn(
+                    'hover_formatters has been deprecated and will be removed '
+                    'in a future version. Use hover_tooltips instead.',
+                    DeprecationWarning,
+                    stacklevel=_find_stack_level(),
+                )
                 plot_opts['hover_formatters'] = hover_formatters
         if toolbar is not _Undefined:
             if toolbar is False:
