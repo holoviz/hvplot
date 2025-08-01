@@ -343,6 +343,12 @@ class HoloViewsConverter:
         (``'top'``, ``'bottom'``, ``'left'``, ``'right'`` (default)) or a
         corner placement (``'top_left'``, ``'top_right'``, ``'bottom_left'``,
         ``'bottom_right'``).
+    legend_cols : int or None, default=None
+        Number of columns in the legend.
+    legend_opts : dict or None, default=None
+        Allows setting specific styling options for the legend. They keys
+        should be attributes of the ``Legend`` model for Bokeh and keyword
+        arguments of the ``Axes.legen`` method for Matplotlib.
 
     Interactivity Options
     ---------------------
@@ -630,6 +636,8 @@ class HoloViewsConverter:
 
     _legend_options = [
         'legend',
+        'legend_cols',
+        'legend_opts',
     ]
 
     _interactivity_options = [
@@ -835,6 +843,8 @@ class HoloViewsConverter:
         dynamic=True,
         grid=None,
         legend=None,
+        legend_cols=None,
+        legend_opts=None,
         rot=None,
         title=None,
         xlim=None,
@@ -1046,6 +1056,11 @@ class HoloViewsConverter:
                 'The legend option should be a boolean or '
                 f'a valid legend position (i.e. one of {list(self._legend_positions)}).'
             )
+        if legend_cols is not None:
+            plot_opts['legend_cols'] = legend_cols
+        if legend_opts is not None:
+            plot_opts['legend_opts'] = legend_opts
+
         if subcoordinate_y:
             plot_opts['subcoordinate_y'] = True
             if isinstance(subcoordinate_y, dict):
