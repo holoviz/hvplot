@@ -130,8 +130,10 @@ def show(obj, title=None, port=0, **kwargs):
         return _pn.pane.HoloViews(obj).show(title, port, **kwargs)
     elif isinstance(obj, _pn.viewable.Viewable):
         return obj.show(title, port, **kwargs)
+    elif isinstance(obj, param.rx):
+        return _pn.panel(obj).show(title, port, **kwargs)
     else:
-        raise ValueError('{type(obj).__name__} type object not recognized and cannot be shown.')
+        raise ValueError(f'{type(obj).__name__} type object not recognized and cannot be shown.')
 
 
 class hvplot_extension(_hv.extension):
