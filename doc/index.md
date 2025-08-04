@@ -433,7 +433,6 @@ align: center
 :maxdepth: 2
 
 Tutorials <tutorials/index>
-How-To Guides <how_to/index>
 User Guide <user_guide/index>
 Gallery <reference/index>
 Reference <ref/index>
