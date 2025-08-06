@@ -46,6 +46,9 @@ jobs:
       DISPLAY: ":99.0"
       VERSION: ${{ inputs.version }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Validate version
         if: ${{ inputs.target == 'main' }}
         run: |
@@ -62,7 +65,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: hvplot-docs
-          path: hvplot/builtdocs
+          path: ./builtdocs/
       - name: report failure
         if: failure()
         run: cat /tmp/sphinx-*.log | tail -n 100
