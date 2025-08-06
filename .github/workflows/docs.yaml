@@ -58,6 +58,11 @@ jobs:
           environments: docs
       - name: Build documentation
         run: pixi run -e docs docs-build
+      - name: Upload docs artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hvplot-docs
+          path: hvplot/builtdocs
       - name: report failure
         if: failure()
         run: cat /tmp/sphinx-*.log | tail -n 100
