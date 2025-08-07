@@ -7,4 +7,6 @@ How-to guides are practical, problem-oriented instructions that help you accompl
 :hidden:
 :maxdepth: 2
 
+load_switch_plotting_extensions
+style_plots_by_backend
 ```
