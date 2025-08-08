@@ -22,3 +22,9 @@ def test_plotting_plot_duckdb():
     relation = duckdb.from_df(makeDataFrame(), connection=connection)
     with pytest.warns(FutureWarning):
         plot(relation, 'line')
+
+
+def test_converter_argument_hover_formatters():
+    df = pd.DataFrame({'x': [0, 1], 'y': [0, 1]})
+    with pytest.warns(DeprecationWarning):
+        HoloViewsConverter(df, 'x', 'y', hover_formatters={'@{y}': 'printf'})

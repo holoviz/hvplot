@@ -53,6 +53,7 @@ from pandas import DatetimeIndex, MultiIndex
 from .backend_transforms import _transfer_opts_cur_backend
 from .util import (
     _HV_GE_1_21_0,
+    _Undefined,
     filter_opts,
     is_tabular,
     is_series,
@@ -342,6 +343,12 @@ class HoloViewsConverter:
         (``'top'``, ``'bottom'``, ``'left'``, ``'right'`` (default)) or a
         corner placement (``'top_left'``, ``'top_right'``, ``'bottom_left'``,
         ``'bottom_right'``).
+    legend_cols : int or None, default=None
+        Number of columns in the legend.
+    legend_opts : dict or None, default=None
+        Allows setting specific styling options for the legend. They keys
+        should be attributes of the ``Legend`` model for Bokeh and keyword
+        arguments of the ``Axes.legen`` method for Matplotlib.
 
     Interactivity Options
     ---------------------
@@ -354,8 +361,20 @@ class HoloViewsConverter:
         include all columns (including indexes if ``use_index=True``).
     hover_formatters : dict or None, default=None
         A dict of formatting options for the hover tooltip.
+
+        .. deprecated:: 0.12
+           Use ``hover_tooltips`` instead.
     hover_tooltips : list[str] or list[tuple] or None, default=None
         A list of dimensions to be displayed in the hover tooltip.
+    toolbar : str or bool or None, optional
+        Whether to display a toolbar and where to place it. Displayed by
+        default, disabled with ``'disable'``, ``None`` or ``False``. Location
+        must be one ``'above'``, ``'below'``, ``'left'``, or ``'right'``
+        (the default).
+    autohide_toolbar : bool, optional
+        Whether to automatically hide the toolbar until the user hovers over
+        the plot. This keyword has no effect if the toolbar is disabled
+        (``toolbar=None``). Default is False.
     tools : list, default=[]
         List of tool instances or strings (e.g. ['tap', 'box_select'])
 
@@ -432,6 +451,12 @@ class HoloViewsConverter:
 
     Styling Options
     ---------------
+    backend_opts : dict or None, optional
+        A dictionary of custom options to apply to the plot or subcomponents of
+        the plot. The keys in the dictionary mirror attribute access on the
+        underlying plotting backend objects stored in the plot's handles, e.g.
+        ``{'hover.attachment': 'vertical'}`` will index the hover in the handles
+        and then set the attachment.
     fontscale : number
         Scales the size of all fonts by the same amount, e.g. fontscale=1.5
         enlarges all fonts (title, xticks, labels etc.) by 50%.
@@ -614,6 +639,8 @@ class HoloViewsConverter:
 
     _legend_options = [
         'legend',
+        'legend_cols',
+        'legend_opts',
     ]
 
     _interactivity_options = [
@@ -621,6 +648,8 @@ class HoloViewsConverter:
         'hover_cols',
         'hover_formatters',
         'hover_tooltips',
+        'toolbar',
+        'autohide_toolbar',
         'tools',
     ]
 
@@ -641,6 +670,7 @@ class HoloViewsConverter:
     ]
 
     _style_options = [
+        'backend_opts',
         'fontscale',
         'fontsize',
         'grid',
@@ -816,6 +846,8 @@ class HoloViewsConverter:
         dynamic=True,
         grid=None,
         legend=None,
+        legend_cols=None,
+        legend_opts=None,
         rot=None,
         title=None,
         xlim=None,
@@ -857,6 +889,8 @@ class HoloViewsConverter:
         y_sampling=None,
         pixel_ratio=None,
         project=False,
+        toolbar=_Undefined,
+        autohide_toolbar=False,
         tools=[],
         attr_labels=None,
         coastline=False,
@@ -871,6 +905,7 @@ class HoloViewsConverter:
         rescale_discrete_levels=None,
         autorange=None,
         subcoordinate_y=None,
+        backend_opts=None,
         **kwds,
     ):
         if debug:
@@ -1024,6 +1059,11 @@ class HoloViewsConverter:
                 'The legend option should be a boolean or '
                 f'a valid legend position (i.e. one of {list(self._legend_positions)}).'
             )
+        if legend_cols is not None:
+            plot_opts['legend_cols'] = legend_cols
+        if legend_opts is not None:
+            plot_opts['legend_opts'] = legend_opts
+
         if subcoordinate_y:
             plot_opts['subcoordinate_y'] = True
             if isinstance(subcoordinate_y, dict):
@@ -1114,8 +1154,31 @@ class HoloViewsConverter:
             if hover_tooltips:
                 plot_opts['hover_tooltips'] = hover_tooltips
             if hover_formatters:
+                warnings.warn(
+                    'hover_formatters has been deprecated and will be removed '
+                    'in a future version. Use hover_tooltips instead.',
+                    DeprecationWarning,
+                    stacklevel=_find_stack_level(),
+                )
                 plot_opts['hover_formatters'] = hover_formatters
+        if toolbar is not _Undefined:
+            if toolbar is False:
+                toolbar = None
+            elif toolbar is True:
+                toolbar = 'right'
+            plot_opts['toolbar'] = toolbar
+        if autohide_toolbar:
+            if not _HV_GE_1_21_0:
+                warnings.warn(
+                    'autohide_toolbar requires holoviews>=1.21, skipped.',
+                    stacklevel=_find_stack_level(),
+                )
+            else:
+                plot_opts['autohide_toolbar'] = autohide_toolbar
         plot_opts['tools'] = tools
+
+        if backend_opts is not None:
+            plot_opts['backend_opts'] = backend_opts
 
         if self.crs and global_extent:
             plot_opts['global_extent'] = global_extent
