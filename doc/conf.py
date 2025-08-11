@@ -232,6 +232,7 @@ intersphinx_mapping = {
     'numpy': ('https://numpy.org/doc/stable/', None),
     'xarray': ('https://docs.xarray.dev/en/stable/', None),
     'pyproj': ('https://pyproj4.github.io/pyproj/stable/', None),
+    'python': ('https://docs.python.org/3', None),
 }
 
 # To avoid this warning
