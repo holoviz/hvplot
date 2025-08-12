@@ -309,7 +309,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/line.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Curve.html
         - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.line.html
@@ -546,7 +545,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/basic/annotations/whisker.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/ErrorBars.html
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.errorbar.html
@@ -597,7 +595,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/topics/timeseries/candlestick.html
         - Matplotlib: https://www.statology.org/matplotlib-python-candlestick-chart/
         - Plotly: https://plotly.com/python/ohlc-charts/
@@ -657,7 +654,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/topics/categorical/heatmap_unemployment.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/HeatMap.html
         - Matplotlib: https://matplotlib.org/stable/gallery/images_contours_and_fields/image_annotated_heatmap.html
@@ -729,7 +725,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/hexbin.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/HexTiles.html
         - Plotly: https://plotly.com/python/hexbin-mapbox/
@@ -809,7 +804,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - ggplot: https://bio304-class.github.io/bio304-fall2017/ggplot-bivariate.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Bivariate.html
         - Plotly: https://plotly.com/python/2d-histogram-contour/
@@ -932,7 +926,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/hbar.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Bars.html
         - Matplotlib: https://matplotlib.org/stable/gallery/lines_bars_and_markers/barh.html
@@ -1025,7 +1018,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - Seaborn: https://seaborn.pydata.org/generated/seaborn.violinplot.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Violin.html
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.violinplot.html
@@ -1178,7 +1170,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Distribution.html
         - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.kde.html
         - Plotly: https://plotly.com/python/distplot/
@@ -1229,7 +1220,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Table.html
         - Plotly: https://plotly.com/python/table/
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.table.html
@@ -1264,7 +1254,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - HoloViews Tabular: https://holoviews.org/getting_started/Tabular_Datasets.html
         - HoloViews Gridded: https://holoviews.org/getting_started/Gridded_Datasets.html
         """
@@ -1328,7 +1317,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Points.html
         """
         return self(x, y, kind='points', **kwds)
@@ -1471,7 +1459,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Path.html
         """
         return self(x, y, c=c, kind='paths', **kwds)
@@ -1516,7 +1503,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/text.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Labels.html
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.text.html#matplotlib.pyplot.text
@@ -1801,7 +1787,6 @@ class hvPlot(hvPlotTabular):
 
         References
         ----------
-
         - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/topics/images/image.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Image.html
         - Matplotlib: https://matplotlib.org/stable/tutorials/introductory/images.html
@@ -1851,7 +1836,6 @@ class hvPlot(hvPlotTabular):
 
         References
         ----------
-
         - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/image_rgba.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/RGB.html
         - Matplotlib: https://matplotlib.org/stable/tutorials/introductory/images.html
@@ -1904,7 +1888,6 @@ class hvPlot(hvPlotTabular):
 
         References
         ----------
-
         - HoloViews: https://holoviews.org/reference/elements/bokeh/QuadMesh.html
         """
         return self(x, y, z=z, kind='quadmesh', colorbar=colorbar, **kwds)
@@ -1957,7 +1940,6 @@ class hvPlot(hvPlotTabular):
 
         References
         ----------
-
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Contours.html
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.contour.html
         - Plotly: https://plotly.com/python/contour-plots/
