@@ -7,4 +7,7 @@ How-to guides are practical, problem-oriented instructions that help you accompl
 :hidden:
 :maxdepth: 2
 
+save_plots
+display_plots
+use_panel_for_display
 ```
