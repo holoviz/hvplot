@@ -222,6 +222,7 @@ Calling the `explorer` function/method returns an `hvPlotExplorer` object:
    :toctree: generated/
 
     hvPlotExplorer
+    hvPlotExplorer.code
     hvPlotExplorer.hvplot
     hvPlotExplorer.plot_code
     hvPlotExplorer.save
