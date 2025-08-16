@@ -129,7 +129,7 @@ class hvPlotBase:
         """
         The `explorer` plot allows you to interactively explore your data.
 
-        Reference: https://hvplot.holoviz.org/user_guide/Explorer.html
+        Reference: https://hvplot.holoviz.org/tutorials/explorer_getting_started.html
 
         Parameters
         ----------
