@@ -20,6 +20,7 @@ Get started with hvPlot using this quick tutorial.
 
 Get started with hvPlot as a Pandas user.
 :::
+
 ::::
 
 ## External tutorials
