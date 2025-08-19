@@ -39,20 +39,14 @@ conda install conda-forge::hvsampledata
 
 ## Available Datasets
 
-The `hvsampledata` package provides the following datasets, all accessible through `hvplot.sampledata.<function_name>()`.
-
-You can inspect the datasets through the `__all__` attribute which exposes its public datasets:
+The `hvsampledata` package provides the following datasets, all accessible through `hvplot.sampledata.<function_name>()`. You can inspect the datasets through the `__all__` attribute which exposes its public datasets:
 
 ```python
 import hvsampledata as hvs
 
 print(hvs.__all__[1:])
 ```
-This will print a list of all dataset functions available in your installed version of hvsampledata.
-
-:::{note}
-The first entry, __version__, is metadata and not a dataset, so we slice it off with [1:]. The remaining names are all dataset functions you can call, e.g `hvplot.sampledata.penguins("pandas")`
-:::
+This will print a list of all dataset functions available in your installed version of hvsampledata. The first entry, __version__, is metadata and not a dataset, so we slice it off with `[1:]`. The remaining names are all dataset functions you can call, e.g `hvplot.sampledata.penguins("pandas")`.
 
 :::{admonition} Notes
 :class: note
