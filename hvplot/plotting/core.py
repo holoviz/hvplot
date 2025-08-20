@@ -1096,6 +1096,7 @@ class hvPlotTabular(hvPlotBase):
             y=y,
             by=by,
             bins=bins,
+            bin_range=bin_range,
             normed=normed,
             cumulative=cumulative,
             **kwds,
