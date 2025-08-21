@@ -7,4 +7,6 @@ How-to guides are practical, problem-oriented instructions that help you accompl
 :hidden:
 :maxdepth: 2
 
+multivariate_statistical_plots
+time_series_lag_plots
 ```
