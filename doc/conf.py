@@ -111,17 +111,34 @@ nbsite_gallery_conf = {
     'github_project': 'hvplot',
     'examples_dir': '.',
     'galleries': {
-        'reference': {
+        'gallery': {
             'title': 'Gallery',
             'intro': (
-                'Find the list of supported libraries on `this page <../ref/data_libraries.html>`_.'
+                'Explore a curated set of example visualizations using hvPlot '
+                'with different backends and datasets. For more examples using '
+                'hvPlot and other HoloViz tools to solve real world problems, '
+                'see the '
+                '`HoloViz Examples website <https://examples.holoviz.org>`_.'
             ),
             'sections': [
-                'tabular',
-                'geopandas',
-                'xarray',
+                {
+                    'path': 'basic-charts',
+                    'title': 'Basic Charts',
+                },
+                'categorical',
+                'multidimensional',
+                'statistical',
+                {
+                    'path': 'time-series',
+                    'title': 'Time Series',
+                },
+                'geospatial',
+                'interactivity',
             ],
             'skip_rst_notebook_directive': True,
+            'no_image_thumb': True,
+            'titles_from_files': True,
+            'card_title_below': True,
         }
     },
     'thumbnail_url': 'https://assets.holoviz.org/hvplot/thumbnails',
