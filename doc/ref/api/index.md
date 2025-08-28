@@ -229,3 +229,50 @@ Calling the `explorer` function/method returns an `hvPlotExplorer` object:
     hvPlotExplorer.settings
     hvPlotExplorer.show
 ```
+
+## Sample Data
+
+The `sampledata` module provides convenient access to sample datasets from [hvsampledata](https://github.com/holoviz/hvsampledata) for learning and prototyping. While hvPlot itself does not require these datasets to function, installing `hvsampledata` allows you to easily reproduce the examples in the documentation, gallery and tutorials locally.
+
+### Installation
+
+If you installed hvPlot with minimal dependencies, you may need to install `hvsampledata` separately:
+
+::::{tab-set}
+
+:::{tab-item} pip
+
+```bash
+pip install hvsampledata
+```
+
+:::
+
+:::{tab-item} conda
+
+```bash
+conda install conda-forge::hvsampledata
+```
+
+:::
+::::
+
+### Usage
+
+```python
+import hvplot.pandas  # noqa
+import hvplot.xarray  # noqa
+
+penguins = hvplot.sampledata.penguins("pandas")
+air_temp = hvplot.sampledata.air_temperature("xarray")
+landsat = hvplot.sampledata.landsat_rgb("rioxarray")
+us_states = hvplot.sampledata.us_states("geopandas")
+```
+:::{admonition} Notes
+:class: note
+- All datasets include comprehensive metadata and documentation
+- Some datasets require additional dependencies e.g geopandas for Geographic datasets, xarray for Gridded datasets etc.
+- Data types and schemas are preserved across different engines where possible
+
+See the [GitHub Repository](https://github.com/holoviz/hvsampledata) for more information.
+:::
