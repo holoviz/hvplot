@@ -26,7 +26,7 @@ nbbuild_cell_timeout = 600
 # Useful for SEO on a versioned site
 html_baseurl = 'https://hvplot.holoviz.org/en/docs/latest/'
 
-exclude_patterns = ['governance', 'reference']
+exclude_patterns = ['governance']
 
 html_static_path += ['_static']  # noqa
 
@@ -190,6 +190,74 @@ nb_execution_excludepatterns = [
 ]
 # cell execution timeout in seconds (-1 to ignore, 30 by default)
 nb_execution_timeout = 240
+
+if os.getenv('HVPLOT_GALLERY') not in ('False', 'false', '0'):
+    rediraffe_redirects.update(
+        {
+            # When the old reference gallery was removed
+            'reference/tabular/andrewscurves': 'ref/api/manual/hvplot.plotting.andrews_curves',
+            'reference/tabular/area': 'ref/api/manual/hvplot.hvPlot.area',
+            'reference/tabular/bar': 'ref/api/manual/hvplot.hvPlot.bar',
+            'reference/tabular/barh': 'ref/api/manual/hvplot.hvPlot.barh',
+            'reference/tabular/bivariate': 'ref/api/manual/hvplot.hvPlot.bivariate',
+            'reference/tabular/box': 'ref/api/manual/hvplot.hvPlot.box',
+            'reference/tabular/errorbars': 'ref/api/manual/hvplot.hvPlot.errorbars',
+            'reference/tabular/heatmap': 'ref/api/manual/hvplot.hvPlot.heatmap',
+            'reference/tabular/hexbin': 'ref/api/manual/hvplot.hvPlot.hexbin',
+            'reference/tabular/hist': 'ref/api/manual/hvplot.hvPlot.hist',
+            'reference/tabular/kde': 'ref/api/manual/hvplot.hvPlot.kde',
+            'reference/tabular/labels': 'ref/api/manual/hvplot.hvPlot.labels',
+            'reference/tabular/lagplot': 'ref/api/manual/hvplot.plotting.lag_plot',
+            'reference/tabular/line': 'ref/api/manual/hvplot.hvPlot.line',
+            'reference/tabular/ohlc': 'ref/api/manual/hvplot.hvPlot.ohlc',
+            'reference/tabular/parallelcoordinates': 'ref/api/manual/hvplot.plotting.parallel_coordinates',
+            'reference/tabular/scatter': 'ref/api/manual/hvplot.hvPlot.scatter',
+            'reference/tabular/scattermatrix': 'ref/api/manual/hvplot.plotting.scatter_matrix',
+            'reference/tabular/step': 'ref/api/manual/hvplot.hvPlot.step',
+            'reference/tabular/table': 'ref/api/manual/hvplot.hvPlot.table',
+            'reference/tabular/violin': 'ref/api/manual/hvplot.hvPlot.violin',
+            'reference/geopandas/points': 'ref/api/manual/hvplot.hvPlot.points',
+            'reference/geopandas/polygons': 'ref/api/manual/hvplot.hvPlot.polygons',
+            'reference/xarray/bar': 'ref/api/manual/hvplot.hvPlot.bar',
+            'reference/xarray/contour': 'ref/api/manual/hvplot.hvPlot.contour',
+            'reference/xarray/contourf': 'ref/api/manual/hvplot.hvPlot.contourf',
+            'reference/xarray/hist': 'ref/api/manual/hvplot.hvPlot.hist',
+            'reference/xarray/image': 'ref/api/manual/hvplot.hvPlot.image',
+            'reference/xarray/kde': 'ref/api/manual/hvplot.hvPlot.kde',
+            'reference/xarray/line': 'ref/api/manual/hvplot.hvPlot.line',
+            'reference/xarray/quadmesh': 'ref/api/manual/hvplot.hvPlot.quadmesh',
+            'reference/xarray/rgb': 'ref/api/manual/hvplot.hvPlot.rgb',
+            'reference/xarray/vectorfield': 'ref/api/manual/hvplot.hvPlot.vectorfield',
+            'reference/xarray/violin': 'ref/api/manual/hvplot.hvPlot.violin',
+            # When the pandas section was renamed tabular:
+            'reference/pandas/andrewscurves': 'reference/tabular/andrewscurves',
+            'reference/pandas/area': 'reference/tabular/area',
+            'reference/pandas/bar': 'reference/tabular/bar',
+            'reference/pandas/barh': 'reference/tabular/barh',
+            'reference/pandas/bivariate': 'reference/tabular/bivariate',
+            'reference/pandas/box': 'reference/tabular/box',
+            'reference/pandas/errorbars': 'reference/tabular/errorbars',
+            'reference/pandas/heatmap': 'reference/tabular/heatmap',
+            'reference/pandas/hexbin': 'reference/tabular/hexbin',
+            'reference/pandas/hist': 'reference/tabular/hist',
+            'reference/pandas/kde': 'reference/tabular/kde',
+            'reference/pandas/labels': 'reference/tabular/labels',
+            'reference/pandas/lagplot': 'reference/tabular/lagplot',
+            'reference/pandas/line': 'reference/tabular/line',
+            'reference/pandas/ohlc': 'reference/tabular/ohlc',
+            'reference/pandas/parallelcoordinates': 'reference/tabular/parallelcoordinates',
+            'reference/pandas/scatter': 'reference/tabular/scatter',
+            'reference/pandas/scattermatrix': 'reference/tabular/scattermatrix',
+            'reference/pandas/step': 'reference/tabular/step',
+            'reference/pandas/table': 'reference/tabular/table',
+            'reference/pandas/violin': 'reference/tabular/violin',
+        }
+    )
+else:
+    if 'nbsite.gallery' in extensions:
+        extensions.remove('nbsite.gallery')
+    exclude_patterns.append('gallery')
+    nb_execution_excludepatterns.append('gallery/**/*.ipynb')
 
 if os.getenv('HVPLOT_EXECUTE_NBS_USER_GUIDE') in ('False', 'false', '0'):
     nb_execution_excludepatterns.append('user_guide/**/*.ipynb')
