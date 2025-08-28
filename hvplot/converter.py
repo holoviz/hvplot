@@ -345,10 +345,15 @@ class HoloViewsConverter:
         ``'bottom_right'``).
     legend_cols : int or None, default=None
         Number of columns in the legend.
+
+        .. versionadded:: 0.12.0
+
     legend_opts : dict or None, default=None
         Allows setting specific styling options for the legend. They keys
         should be attributes of the ``Legend`` model for Bokeh and keyword
         arguments of the ``Axes.legen`` method for Matplotlib.
+
+        .. versionadded:: 0.12.0
 
     Interactivity Options
     ---------------------
@@ -371,10 +376,15 @@ class HoloViewsConverter:
         default, disabled with ``'disable'``, ``None`` or ``False``. Location
         must be one ``'above'``, ``'below'``, ``'left'``, or ``'right'``
         (the default).
+
+        .. versionadded:: 0.12.0
+
     autohide_toolbar : bool, optional
         Whether to automatically hide the toolbar until the user hovers over
         the plot. This keyword has no effect if the toolbar is disabled
         (``toolbar=None``). Default is False.
+
+        .. versionadded:: 0.12.0
     tools : list, default=[]
         List of tool instances or strings (e.g. ['tap', 'box_select'])
 
@@ -457,6 +467,8 @@ class HoloViewsConverter:
         underlying plotting backend objects stored in the plot's handles, e.g.
         ``{'hover.attachment': 'vertical'}`` will index the hover in the handles
         and then set the attachment.
+
+        .. versionadded:: 0.12.0
     fontscale : number
         Scales the size of all fonts by the same amount, e.g. fontscale=1.5
         enlarges all fonts (title, xticks, labels etc.) by 50%.
@@ -2757,7 +2769,7 @@ class HoloViewsConverter:
                 hist_opts['bins'] = bins
 
         if not isinstance(y, (list, tuple)):
-            if 'bin_range' not in self.kwds:
+            if hist_opts['bin_range'] is None:
                 ys = data[y]
                 ymin, ymax = (ys.min(), ys.max())
                 if is_dask(ys):
@@ -2780,7 +2792,7 @@ class HoloViewsConverter:
                 .opts(compat_opts, backend=self._backend_compat)
             )
 
-        if 'bin_range' not in self.kwds and not self._norm_opts.get('axiswise'):
+        if hist_opts['bin_range'] is None and not self._norm_opts.get('axiswise'):
             ranges = []
             for col in y:
                 ys = data[col]

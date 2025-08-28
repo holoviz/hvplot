@@ -111,17 +111,40 @@ nbsite_gallery_conf = {
     'github_project': 'hvplot',
     'examples_dir': '.',
     'galleries': {
-        'reference': {
+        'gallery': {
             'title': 'Gallery',
             'intro': (
-                'Find the list of supported libraries on `this page <../ref/data_libraries.html>`_.'
+                'Explore a curated set of example visualizations using hvPlot '
+                'with different backends and datasets. For more examples using '
+                'hvPlot and other HoloViz tools to solve real world problems, '
+                'see the '
+                '`HoloViz Examples website <https://examples.holoviz.org>`_.'
             ),
             'sections': [
-                'tabular',
-                'geopandas',
-                'xarray',
+                {
+                    'path': 'basic-charts',
+                    'title': 'Basic Charts',
+                },
+                'categorical',
+                'multidimensional',
+                'statistical',
+                {
+                    'path': 'time-series',
+                    'title': 'Time Series',
+                },
+                'geospatial',
+                'gridded',
+                {
+                    'path': 'big-data',
+                    'title': 'Big Data',
+                },
+                'interactivity',
+                'annotations',
             ],
             'skip_rst_notebook_directive': True,
+            'no_image_thumb': True,
+            'titles_from_files': True,
+            'card_title_below': True,
         }
     },
     'thumbnail_url': 'https://assets.holoviz.org/hvplot/thumbnails',
@@ -174,9 +197,44 @@ nb_execution_excludepatterns = [
 # cell execution timeout in seconds (-1 to ignore, 30 by default)
 nb_execution_timeout = 240
 
-if os.getenv('HVPLOT_REFERENCE_GALLERY') not in ('False', 'false', '0'):
+if os.getenv('HVPLOT_GALLERY') not in ('False', 'false', '0'):
     rediraffe_redirects.update(
         {
+            # When the old reference gallery was removed
+            'reference/tabular/andrewscurves': 'ref/api/manual/hvplot.plotting.andrews_curves',
+            'reference/tabular/area': 'ref/api/manual/hvplot.hvPlot.area',
+            'reference/tabular/bar': 'ref/api/manual/hvplot.hvPlot.bar',
+            'reference/tabular/barh': 'ref/api/manual/hvplot.hvPlot.barh',
+            'reference/tabular/bivariate': 'ref/api/manual/hvplot.hvPlot.bivariate',
+            'reference/tabular/box': 'ref/api/manual/hvplot.hvPlot.box',
+            'reference/tabular/errorbars': 'ref/api/manual/hvplot.hvPlot.errorbars',
+            'reference/tabular/heatmap': 'ref/api/manual/hvplot.hvPlot.heatmap',
+            'reference/tabular/hexbin': 'ref/api/manual/hvplot.hvPlot.hexbin',
+            'reference/tabular/hist': 'ref/api/manual/hvplot.hvPlot.hist',
+            'reference/tabular/kde': 'ref/api/manual/hvplot.hvPlot.kde',
+            'reference/tabular/labels': 'ref/api/manual/hvplot.hvPlot.labels',
+            'reference/tabular/lagplot': 'ref/api/manual/hvplot.plotting.lag_plot',
+            'reference/tabular/line': 'ref/api/manual/hvplot.hvPlot.line',
+            'reference/tabular/ohlc': 'ref/api/manual/hvplot.hvPlot.ohlc',
+            'reference/tabular/parallelcoordinates': 'ref/api/manual/hvplot.plotting.parallel_coordinates',
+            'reference/tabular/scatter': 'ref/api/manual/hvplot.hvPlot.scatter',
+            'reference/tabular/scattermatrix': 'ref/api/manual/hvplot.plotting.scatter_matrix',
+            'reference/tabular/step': 'ref/api/manual/hvplot.hvPlot.step',
+            'reference/tabular/table': 'ref/api/manual/hvplot.hvPlot.table',
+            'reference/tabular/violin': 'ref/api/manual/hvplot.hvPlot.violin',
+            'reference/geopandas/points': 'ref/api/manual/hvplot.hvPlot.points',
+            'reference/geopandas/polygons': 'ref/api/manual/hvplot.hvPlot.polygons',
+            'reference/xarray/bar': 'ref/api/manual/hvplot.hvPlot.bar',
+            'reference/xarray/contour': 'ref/api/manual/hvplot.hvPlot.contour',
+            'reference/xarray/contourf': 'ref/api/manual/hvplot.hvPlot.contourf',
+            'reference/xarray/hist': 'ref/api/manual/hvplot.hvPlot.hist',
+            'reference/xarray/image': 'ref/api/manual/hvplot.hvPlot.image',
+            'reference/xarray/kde': 'ref/api/manual/hvplot.hvPlot.kde',
+            'reference/xarray/line': 'ref/api/manual/hvplot.hvPlot.line',
+            'reference/xarray/quadmesh': 'ref/api/manual/hvplot.hvPlot.quadmesh',
+            'reference/xarray/rgb': 'ref/api/manual/hvplot.hvPlot.rgb',
+            'reference/xarray/vectorfield': 'ref/api/manual/hvplot.hvPlot.vectorfield',
+            'reference/xarray/violin': 'ref/api/manual/hvplot.hvPlot.violin',
             # When the pandas section was renamed tabular:
             'reference/pandas/andrewscurves': 'reference/tabular/andrewscurves',
             'reference/pandas/area': 'reference/tabular/area',
@@ -204,8 +262,8 @@ if os.getenv('HVPLOT_REFERENCE_GALLERY') not in ('False', 'false', '0'):
 else:
     if 'nbsite.gallery' in extensions:
         extensions.remove('nbsite.gallery')
-    exclude_patterns.append('reference')
-    nb_execution_excludepatterns.append('reference/**/*.ipynb')
+    exclude_patterns.append('gallery')
+    nb_execution_excludepatterns.append('gallery/**/*.ipynb')
 
 if os.getenv('HVPLOT_EXECUTE_NBS_USER_GUIDE') in ('False', 'false', '0'):
     nb_execution_excludepatterns.append('user_guide/**/*.ipynb')

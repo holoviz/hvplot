@@ -133,7 +133,12 @@ jobs:
       - name: Test Geo
         run: pixi run -e ${{ matrix.environment }} test-unit-geo-cov
       - name: Test Examples
-        run: pixi run -e ${{ matrix.environment }} test-example
+        run: |
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            HVPLOT_INCLUDE_SLOW_EXAMPLES=1 pixi run -e ${{ matrix.environment }} test-example
+          else
+            pixi run -e ${{ matrix.environment }} test-example
+          fi
       - uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
