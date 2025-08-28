@@ -2769,7 +2769,7 @@ class HoloViewsConverter:
                 hist_opts['bins'] = bins
 
         if not isinstance(y, (list, tuple)):
-            if 'bin_range' not in self.kwds:
+            if hist_opts['bin_range'] is None:
                 ys = data[y]
                 ymin, ymax = (ys.min(), ys.max())
                 if is_dask(ys):
@@ -2792,7 +2792,7 @@ class HoloViewsConverter:
                 .opts(compat_opts, backend=self._backend_compat)
             )
 
-        if 'bin_range' not in self.kwds and not self._norm_opts.get('axiswise'):
+        if hist_opts['bin_range'] is None and not self._norm_opts.get('axiswise'):
             ranges = []
             for col in y:
                 ys = data[col]
