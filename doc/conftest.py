@@ -1,3 +1,4 @@
+import os
 import sys
 
 from importlib.util import find_spec
@@ -7,10 +8,18 @@ import dask
 from packaging.version import Version
 from bokeh.io.webdriver import webdriver_control
 
+# Examples that are slow to run and/or download large files.
+SLOW_EXAMPLES = [
+    'gallery/geospatial/datashade_map.ipynb',
+]
 
 collect_ignore_glob = [
     'user_guide/Streaming.ipynb',
 ]
+
+# Slow examples are excluded by default.
+if os.getenv('HVPLOT_INCLUDE_SLOW_EXAMPLES'):
+    collect_ignore_glob.extend(SLOW_EXAMPLES)
 
 # On MacOs, Python 3.12 and 3.13, got the following error running this:
 # `pos = layout(G)`
@@ -26,12 +35,8 @@ if not find_spec('pygraphviz') or (
 if not find_spec('geoviews'):
     collect_ignore_glob += [
         'tutorials/getting_started.ipynb',
-        'reference/geopandas/*.ipynb',
-        'reference/xarray/contour.ipynb',
-        'reference/xarray/contourf.ipynb',
-        'reference/xarray/image.ipynb',
-        'reference/xarray/quadmesh.ipynb',
-        'reference/xarray/vectorfield.ipynb',
+        'gallery/geospatial/*.ipynb',
+        'gallery/gridded/rgb_satellite_imagery.ipynb',
         'user_guide/Explorer.ipynb',
         'user_guide/Geographic_Data.ipynb',
         'user_guide/Integrations.ipynb',

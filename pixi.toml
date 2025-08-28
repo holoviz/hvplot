@@ -225,7 +225,7 @@ channels = [
     "conda-forge"
 ]
 [feature.doc.dependencies]
-nbsite = ">=0.9.0a10"
+nbsite = ">=0.9.0a12"
 sphinxext-rediraffe = "*"
 numpydoc = "*"
 sphinxcontrib-mermaid = "*"
