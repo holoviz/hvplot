@@ -143,25 +143,6 @@ class hvPlotBase:
         Returns
         -------
         The corresponding explorer type based on data, e.g. hvplot.ui.hvDataFrameExplorer.
-
-        Examples
-        --------
-
-        .. code-block:
-
-            import hvplot.pandas
-            import pandas as pd
-
-            df = pd.DataFrame(
-                {
-                    "actual": [100, 150, 125, 140, 145, 135, 123],
-                    "forecast": [90, 160, 125, 150, 141, 141, 120],
-                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
-                    "date": pd.date_range("2022-01-03", "2022-01-09"),
-                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-                },
-            )
-            df.hvplot.explorer()
         """
         from ..ui import explorer as ui_explorer
 
@@ -175,7 +156,9 @@ class hvPlotTabular(hvPlotBase):
 
     For more detailed options use a specific plotting method, e.g. `df.hvplot.line`.
 
-    Reference: https://hvplot.holoviz.org/reference/index.html
+    Reference: https://hvplot.holoviz.org/ref/api/index.html
+
+    Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
     Parameters
     ----------
@@ -189,8 +172,8 @@ class hvPlotTabular(hvPlotBase):
         The kind of plot to generate, e.g. 'area', 'bar', 'line', 'scatter' etc. To see the
         available plots run `print(df.hvplot.__all__)`.
     **kwds : optional
-        Additional keywords arguments are documented in `hvplot.help('scatter')` or similar
-        depending on the kind of plot.
+        Additional keywords arguments are documented in :ref:`plot-options`.
+
 
     Returns
     -------
@@ -276,7 +259,9 @@ class hvPlotTabular(hvPlotBase):
         """
         The `line` plot connects the points with a continuous curve.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/line.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.line.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -302,8 +287,8 @@ class hvPlotTabular(hvPlotBase):
             filled in green or yellow, alternatively. If there is only a single series to be
             plotted, then only the first color from the color list will be used.
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('line')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('line')`` for the full method documentation.
 
         Returns
         -------
@@ -316,47 +301,6 @@ class hvPlotTabular(hvPlotBase):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
-
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import pandas as pd
-
-            df = pd.DataFrame(
-                {
-                    "actual": [100, 150, 125, 140, 145, 135, 123],
-                    "forecast": [90, 160, 125, 150, 141, 141, 120],
-                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
-                    "date": pd.date_range("2022-01-03", "2022-01-09"),
-                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-                },
-            )
-            line = df.hvplot.line(
-                x="numerical",
-                y=["actual", "forecast"],
-                ylabel="value",
-                legend="bottom",
-                height=500,
-                color=["steelblue", "teal"],
-                alpha=0.7,
-                line_width=5,
-            )
-            line
-
-        You can can add *markers* to a `line` plot by overlaying with a `scatter` plot.
-
-        .. code-block::
-
-            markers = df.hvplot.scatter(
-                x="numerical", y=["actual", "forecast"], color=["steelblue", "teal"], size=50
-            )
-            line * markers
-
-        Please note that you can pass widgets or reactive functions as arguments instead of
-        literal values, c.f. https://hvplot.holoviz.org/user_guide/Widgets.html.
 
         References
         ----------
@@ -378,7 +322,9 @@ class hvPlotTabular(hvPlotBase):
         The `step` plot can be used pretty much anytime the `line` plot might be used, and has many
         of the same options available.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/step.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.step.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -394,7 +340,8 @@ class hvPlotTabular(hvPlotBase):
             A single field or list of fields to group and filter by. Adds one or more widgets to
             select the subgroup(s) to visualize.
         where: string, optional
-            The interpolation method. One of 'mid', 'pre', 'post'. Default is 'mid'.
+            Controls the transition point of the step along the x-axis. One of
+            ``'mid'``, ``'pre'``, ``'post'``. Default is ``'mid'``.
         color : str or array-like, optional.
             The color for each of the series. Possible values are:
 
@@ -406,8 +353,8 @@ class hvPlotTabular(hvPlotBase):
             filled in green or yellow, alternatively. If there is only a single series to be
             plotted, then only the first color from the color list will be used.
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('step')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('step')`` for the full method documentation.
 
         Returns
         -------
@@ -420,46 +367,6 @@ class hvPlotTabular(hvPlotBase):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
-
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import pandas as pd
-
-            df = pd.DataFrame(
-                {
-                    "actual": [100, 150, 125, 140, 145, 135, 123],
-                    "forecast": [90, 160, 125, 150, 141, 141, 120],
-                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
-                    "date": pd.date_range("2022-01-03", "2022-01-09"),
-                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-                },
-            )
-            step = df.hvplot.step(
-                x="numerical",
-                y=["actual", "forecast"],
-                ylabel="value",
-                legend="bottom",
-                height=500,
-                color=["#f16a6f", "#1e85f7"],
-                line_width=5,
-            )
-            step
-
-        You can can add *markers* to a `step` plot by overlaying with a `scatter` plot.
-
-        .. code-block::
-
-            markers = df.hvplot.scatter(
-                x="numerical", y=["actual", "forecast"], color=["#f16a6f", "#1e85f7"], size=100
-            )
-            step * markers
-
-        Please note that you can pass widgets or reactive functions as arguments instead of
-        literal values, c.f. https://hvplot.holoviz.org/user_guide/Widgets.html.
 
         References
         ----------
@@ -479,7 +386,9 @@ class hvPlotTabular(hvPlotBase):
 
         The `scatter` plot is a good first way to plot data with non continuous axes.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/scatter.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.scatter.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -490,34 +399,30 @@ class hvPlotTabular(hvPlotBase):
             Field name(s) to draw y-positions from. If not specified, all numerical
             fields are used.
         marker : string, optional
-            The marker shape specified above can be any supported by matplotlib, e.g. s, d, o etc.
-            See https://matplotlib.org/stable/api/markers_api.html.
+            The marker shape depends on the activated plotting backend:
+
+            - Bokeh: Bokeh marker styles and a subset of Matplotlib styles, e.g.
+              ``'circle'`` (default), ``'dot'``, ``'cross'``, ``'x'``, ``'square'``
+              for Bokeh markers and ``'+'``, ``'x'``, ``'s'`` for Matplotlib-
+              compatible markers.
+              See https://docs.bokeh.org/en/latest/docs/examples/basic/scatters/markertypes.html
+              for the list of Bokeh markers.
+            - Matplotlib: Any supported marker, e.g. ``'s'`` (square), ``'x'``
+              (cross), ``'+'``, etc.
+              See https://matplotlib.org/stable/api/markers_api.html for the list
+              of Matplotlib markers.
         c : string, optional
-            A color or a Field name to draw the color of the marker from
+            A color or a field name to draw the color of the marker from. Alias of
+            ``color``.
         s : int, optional, also available as 'size'
-            The size of the marker
-        by : string, optional
-            A single field or list of fields to group by. All the subgroups are visualized.
-        groupby: string, list, optional
-            A single field or list of fields to group and filter by. Adds one or more widgets to
-            select the subgroup(s) to visualize.
+            The size of the marker.
         scale: number, optional
-            Scaling factor to apply to point scaling.
+            Scaling factor to apply to point scaling. Default is 1.
         logz : bool
             Whether to apply log scaling to the z-axis. Default is False.
-        color : str or array-like, optional.
-            The color for each of the series. Possible values are:
-
-            A single color string referred to by name, RGB or RGBA code, for instance 'red' or
-            '#a98d19.
-
-            A sequence of color strings referred to by name, RGB or RGBA code, which will be used
-            for each series recursively. For instance ['green','yellow'] each field’s line will be
-            filled in green or yellow, alternatively. If there is only a single series to be
-            plotted, then only the first color from the color list will be used.
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('scatter')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('scatter')`` for the full method documentation.
 
         Returns
         -------
@@ -531,47 +436,10 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import pandas as pd
-
-            df = pd.DataFrame(
-                {
-                    "actual": [100, 150, 125, 140, 145, 135, 123],
-                    "forecast": [90, 160, 125, 150, 141, 141, 120],
-                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
-                    "date": pd.date_range("2022-01-03", "2022-01-09"),
-                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-                },
-            )
-            scatter = df.hvplot.scatter(
-                x="numerical",
-                y=["actual", "forecast"],
-                ylabel="value",
-                legend="bottom",
-                height=500,
-                color=["#f16a6f", "#1e85f7"],
-                size=100,
-            )
-            scatter
-
-        You can overlay the `scatter` markers on for example a `line` plot
-
-        .. code-block::
-
-            line = df.hvplot.line(
-                x="numerical", y=["actual", "forecast"], color=["#f16a6f", "#1e85f7"], line_width=5
-            )
-            scatter * line
-
         References
         ----------
 
-        - Bokeh: https://docs.bokeh.org/en/latest/docs/user_guide/plotting.html#scatter-markers
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/basic/scatters/color_scatter.html
         - HoloViews: https://holoviews.org/reference/elements/matplotlib/Scatter.html
         - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.scatter.html
         - Plotly: https://plotly.com/python/line-and-scatter/
@@ -586,7 +454,9 @@ class hvPlotTabular(hvPlotBase):
         The `area` plot can be used to color the area under a line or to color the space between two
         lines.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/area.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.area.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -600,8 +470,8 @@ class hvPlotTabular(hvPlotBase):
         stacked : boolean, optional
             Whether to stack multiple areas. Default is True.
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('area')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('area')`` for the full method documentation.
 
         Returns
         -------
@@ -615,44 +485,10 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import pandas as pd
-
-            df = pd.DataFrame(
-                {
-                    "actual": [100, 150, 125, 140, 145, 135, 123],
-                    "forecast": [90, 160, 125, 150, 141, 141, 120],
-                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
-                    "date": pd.date_range("2022-01-03", "2022-01-09"),
-                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-                },
-            )
-            df["min"] = df[["actual", "forecast"]].min(axis=1)
-            df["max"] = df[["actual", "forecast"]].max(axis=1)
-
-            area = df.hvplot.area(
-                x="numerical",
-                y="min",
-                y2="max",
-                ylabel="value",
-                legend="bottom",
-                height=500,
-                color=["#55a194"],
-                alpha=0.7,
-                line_width=2,
-                ylim=(0, 200),
-            )
-            area
-
         References
         ----------
 
-        - Bokeh: https://docs.bokeh.org/en/latest/docs/user_guide/plotting.html#directed-areas
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/user_guide/basic/areas.html#directed-areas
         - HoloViews: https://holoviews.org/reference/elements/matplotlib/Area.html
         - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.area.html
         - Plotly: https://plotly.com/python/filled-area-plots/
@@ -669,7 +505,9 @@ class hvPlotTabular(hvPlotBase):
         They are usually overlaid with other plots such as `scatter` , `line` or `bar` plots to
         indicate the variability.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/errorbars.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.errorbars.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -683,8 +521,8 @@ class hvPlotTabular(hvPlotBase):
         yerr2 : string, optional
             Field name to draw positive errors from
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('errorbars')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('errorbars')`` for the full method documentation.
 
         Returns
         -------
@@ -698,52 +536,10 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import pandas as pd
-
-            df = pd.DataFrame(
-                {
-                    "actual": [100, 150, 125, 140, 145, 135, 123],
-                    "forecast": [90, 160, 125, 150, 141, 141, 120],
-                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
-                    "date": pd.date_range("2022-01-03", "2022-01-09"),
-                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-                },
-            )
-            df["min"] = df[["actual", "forecast"]].min(axis=1)
-            df["max"] = df[["actual", "forecast"]].max(axis=1)
-            df["mean"] = df[["actual", "forecast"]].mean(axis=1)
-            df["yerr2"] = df["max"] - df["mean"]
-            df["yerr1"] = df["mean"] - df["min"]
-
-            errorbars = df.hvplot.errorbars(
-                x="numerical",
-                y="mean",
-                yerr1="yerr1",
-                yerr2="yerr2",
-                legend="bottom",
-                height=500,
-                alpha=0.5,
-                line_width=2,
-            )
-            errorbars
-
-        Normally you would overlay the `errorbars` on for example a `scatter` plot.
-
-        .. code-block::
-
-            mean = df.hvplot.scatter(x="numerical", y=["mean"], color=["#55a194"], size=50)
-            errorbars * mean
-
         References
         ----------
 
-        - Bokeh: https://docs.bokeh.org/en/latest/docs/user_guide/annotations.html#whiskers
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/basic/annotations/whisker.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/ErrorBars.html
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.errorbar.html
         - Pandas: https://pandas.pydata.org/docs/user_guide/visualization.html#visualization-errorbars
@@ -756,7 +552,9 @@ class hvPlotTabular(hvPlotBase):
         """
         The `ohlc` plot visualizes the open, high, low and close prices of stocks and other assets.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/ohlc.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.ohlc.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -765,6 +563,8 @@ class hvPlotTabular(hvPlotBase):
             refers to date values.
         y : list or tuple, optional
             Field names of the OHLC fields. Default is ["open", "high", "low", "close"]
+        bar_width: number, optional
+            Bar width. Default is 0.5.
         line_color : string, optional
             The line color. Default is black
         pos_color : string, optional
@@ -772,8 +572,8 @@ class hvPlotTabular(hvPlotBase):
         neg_color : string, optional
             The color indicating a negative change. Default is red.
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('ohlc')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('ohlc')`` for the full method documentation.
 
         Returns
         -------
@@ -787,24 +587,10 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
-        Examples
-        --------
-
-        .. code-block::
-
-            data = pd.DataFrame({
-                "open": [100, 101, 102],
-                "high": [104, 105, 110],
-                "low": [94, 97, 99],
-                "close": [101, 99, 103],
-            }, index=[pd.Timestamp("2022-08-01"), pd.Timestamp("2022-08-02"), pd.Timestamp("2022-08-03")])
-            ohlc = data.hvplot.ohlc(pos_color="#55a194", neg_color="#f16a6f")
-            ohlc
-
         References
         ----------
 
-        - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/candlestick.html
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/topics/timeseries/candlestick.html
         - Matplotlib: https://www.statology.org/matplotlib-python-candlestick-chart/
         - Plotly: https://plotly.com/python/ohlc-charts/
         - Wikipedia: https://en.wikipedia.org/wiki/Candlestick_chart
@@ -815,17 +601,26 @@ class hvPlotTabular(hvPlotBase):
         """
         `heatmap` visualises tabular data indexed by two key dimensions as a grid of colored values.
         This allows spotting correlations in multivariate data and provides a high-level overview
-        of how the two variables are plotted.
+        of how the two variables are plotted. The data can either be shaped as a 2-D array
+        (in which case no aggregate will be computed) or as a set of two axis variables and one
+        aggregation variable (on which an aggregation is computed).
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/heatmap.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.heatmap.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
         x : string, optional
-            Field name to draw x coordinates from. If not specified, the index is used. Can refer
-            to continuous and categorical data.
-        y : string
-            Field name to draw y-positions from. Can refer to continuous and categorical data.
+            Field name to draw x-positions from. In the data as an array
+            case, setting x to None assumes drawing x labels from the column names,
+            which can be explicitly declared by setting x to ``'columns'``.
+            Can refer to continuous and categorical data.
+        y : string, optional
+            Field name to draw y-positions from. In the data as an array
+            case, setting y to None assumes drawing y labels from the index,
+            which can be explicitly declared by setting y to ``'index'`` or
+            to the index name. Can refer to continuous and categorical data.
         C : string, optional
             Field to draw heatmap color from. If not specified a simple count will be used.
         colorbar: boolean, optional
@@ -833,11 +628,11 @@ class hvPlotTabular(hvPlotBase):
         logz : bool
             Whether to apply log scaling to the z-axis. Default is False.
         reduce_function : function, optional
-            Function to compute statistics for heatmap, for example `np.mean`.
+            Function to compute statistics for heatmap, for example ``np.mean``.
             If omitted, no aggregation is applied and duplicate values are dropped.
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('heatmap')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('heatmap')`` for the full method documentation.
 
         Returns
         -------
@@ -851,25 +646,10 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import numpy as np
-            from bokeh.sampledata import sea_surface_temperature as sst
-
-            df = sst.sea_surface_temperature
-            df.hvplot.heatmap(
-                x="time.month", y="time.day", C="temperature", reduce_function=np.mean,
-                height=500, width=500, colorbar=False, cmap="blues"
-            )
-
         References
         ----------
 
-        - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/categorical_heatmap.html
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/topics/categorical/heatmap_unemployment.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/HeatMap.html
         - Matplotlib: https://matplotlib.org/stable/gallery/images_contours_and_fields/image_annotated_heatmap.html
         - Plotly: https://plotly.com/python/heatmaps/
@@ -894,7 +674,9 @@ class hvPlotTabular(hvPlotBase):
 
         `hexbin` offers a straightforward method for plotting dense data.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/hexbin.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.hexbin.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -907,7 +689,7 @@ class hvPlotTabular(hvPlotBase):
         colorbar: boolean, optional
             Whether to display a colorbar. Default is True.
         reduce_function : function, optional
-            Function to compute statistics for hexbins, for example `np.mean`.
+            Function to compute statistics for hexbins, for example ``np.mean``.
             Default aggregation is a count of the values in the area.
         gridsize: int or tuple, optional
             Number of hexagonal bins along x- and y-axes. Defaults to uniform
@@ -920,8 +702,8 @@ class hvPlotTabular(hvPlotBase):
             The display threshold before a bin is shown, by default bins with
             a count of less than 1 are hidden
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('hexbin')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('hexbin')`` for the full method documentation.
 
         Returns
         -------
@@ -934,22 +716,6 @@ class hvPlotTabular(hvPlotBase):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
-
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import pandas as pd
-            import numpy as np
-
-            n = 500
-            df = pd.DataFrame({
-                "x": 2 + 2 * np.random.standard_normal(n),
-                "y": 2 + 2 * np.random.standard_normal(n),
-            })
-            df.hvplot.hexbin("x", "y", clabel="Count", cmap="plasma_r", height=400, width=500)
 
         References
         ----------
@@ -975,13 +741,25 @@ class hvPlotTabular(hvPlotBase):
         self, x=None, y=None, colorbar=True, bandwidth=None, cut=3, filled=False, levels=10, **kwds
     ):
         """
-        A bivariate, density plot uses nested contours (or contours plus colors) to indicate
-        regions of higher local density.
+        A bivariate plot uses nested contours (or contours combined with color)
+        to indicate regions of higher local density.
 
-        `bivariate` plots can be a useful alternative to scatter plots, if your data are too dense
-        to plot each point individually.
+        Bivariate plots provide a convenient way to visualize a 2D distribution
+        of values as a Kernel Density Estimate (KDE) and therefore provide a 2D
+        extension to :py:meth:`~.kde`. KDE is a non-parametric way to estimate
+        the probability density function of a random variable.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/bivariate.html
+        The KDE works by placing a Gaussian kernel at each sample with the supplied
+        bandwidth, which are then summed to produce the density estimate. By default
+        the bandwidth is determined using the Scott's method, which usually produces
+        good results, but it may be overridden by an explicit value.
+
+        Bivariate plots can be a useful alternative to scatter plots, if the data
+        are too dense to plot each point individually.
+
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.bivariate.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -989,21 +767,23 @@ class hvPlotTabular(hvPlotBase):
             Field name to draw x-positions from. If not specified, the index is used.
         y : string, optional
             Field name to draw y-positions from
-        colorbar: boolean
+        colorbar : boolean
             Whether to display a colorbar
-        bandwidth: int, optional
-            The bandwidth of the kernel for the density estimate. Default is None.
-        cut: int, optional
+        bandwidth : float, optional
+            Allows supplying explicit bandwidth value of the kernel for the
+            density estimate, rather than relying on Scott. Higher value
+            yields smoother contours. Default is None.
+        cut : float, optional
             Draw the estimate to cut * bw from the extreme data points. Default is 3.
         filled : bool, optional
             If True the contours will be filled. Default is False.
-        levels: int or list, optional
+        levels : int or list, optional
             The number of contour lines to draw or a list of scalar values used
             to specify the contour levels. Default is 10.
 
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('bivariate')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('bivariate')`` for the full method documentation.
 
         Returns
         -------
@@ -1017,25 +797,6 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            from bokeh.sampledata.autompg import autompg_clean as df
-
-            bivariate = df.hvplot.bivariate("accel", "mpg", filled=True, cmap="blues")
-            bivariate
-
-        To get a better intuitive understanding of the `bivariate` plot, you can try overlaying the
-        corresponding scatter plot.
-
-        .. code-block::
-
-            scatter = df.hvplot.scatter("accel", "mpg")
-            bivariate * scatter
-
         References
         ----------
 
@@ -1044,7 +805,11 @@ class hvPlotTabular(hvPlotBase):
         - Plotly: https://plotly.com/python/2d-histogram-contour/
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.contour.html
         - Seaborn: https://seaborn.pydata.org/generated/seaborn.kdeplot.html
-        - Wiki: https://en.wikipedia.org/wiki/Bivariate_analysis
+        - Wiki: https://en.wikipedia.org/wiki/Kernel_density_estimation
+
+        Notes
+        -----
+        This function requires `scipy` to be installed.
         """
         return self(
             x,
@@ -1067,7 +832,9 @@ class hvPlotTabular(hvPlotBase):
         represents the categories and the y axis represents the value scale.
         The bars are of equal width which allows for instant comparison of data.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/bar.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.bar.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -1090,8 +857,8 @@ class hvPlotTabular(hvPlotBase):
             A sequence of color strings referred to by name, RGB or RGBA code, which will be used
             for each series recursively. For instance ['red', 'green','blue'].
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('bar')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('bar')`` for the full method documentation.
 
         Returns
         -------
@@ -1104,38 +871,6 @@ class hvPlotTabular(hvPlotBase):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
-
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import pandas as pd
-
-            df = pd.DataFrame(
-                {
-                    "actual": [100, 150, 125, 140, 145, 135, 123],
-                    "forecast": [90, 160, 125, 150, 141, 141, 120],
-                    "numerical": [1.1, 1.9, 3.2, 3.8, 4.3, 5.0, 5.5],
-                    "date": pd.date_range("2022-01-03", "2022-01-09"),
-                    "string": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-                },
-            )
-            bar = df.hvplot.bar(x="string", y="actual", color="#f16a6f", legend="bottom", xlabel="day", ylabel="value")
-            bar
-
-        You can overlay for example a line plot via
-
-        .. code-block::
-
-            forecast_line = df.hvplot.line(x="string", y="forecast", color="#1e85f7", line_width=5, legend="bottom")
-            forecast_markers = df.hvplot.scatter(x="string", y="forecast", color="#1e85f7", size=100, legend="bottom")
-            bar * forecast_line * forecast_markers
-
-        .. code-block::
-
-            df.hvplot.bar(stacked=True, rot=90, color=["#457278", "#615078"])
 
         References
         ----------
@@ -1160,15 +895,17 @@ class hvPlotTabular(hvPlotBase):
 
         `barh` can be used on dataframes with regular Index or MultiIndex.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/barh.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.barh.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
         stacked : bool, optional
             If True, creates a stacked horizontal bar plot. Default is False.
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('barh')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('barh')`` for the full method documentation.
 
         Returns
         -------
@@ -1181,29 +918,6 @@ class hvPlotTabular(hvPlotBase):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
-
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import pandas as pd
-
-            df = pd.DataFrame(
-                {
-                    "speed": [0.1, 17.5, 40, 48, 52, 69, 88],
-                    "lifespan": [2, 8, 70, 1.5, 25, 12, 28],
-                },
-                index=["snail", "pig", "elephant", "rabbit", "giraffe", "coyote", "horse"],
-            )
-            df.hvplot.barh(color=["#457278", "#615078"])
-
-        You can stack the bars by setting `stacked=True`
-
-        .. code-block::
-
-            df.hvplot.barh(stacked=True, color=["#457278", "#615078"])
 
         References
         ----------
@@ -1224,7 +938,9 @@ class hvPlotTabular(hvPlotBase):
 
         `box` plots are most useful when grouped by additional dimensions.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/box.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.box.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -1234,8 +950,8 @@ class hvPlotTabular(hvPlotBase):
         by : string or sequence
             Field in the *long* data to group by.
         kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('box')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('box')`` for the full method documentation.
 
         Returns
         -------
@@ -1249,34 +965,9 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
-        Examples
-        --------
-
-        Here is an example using *wide* data.
-
-        .. code-block::
-
-            import hvplot.pandas
-            import numpy as np
-            import pandas as pd
-
-            data = np.random.randn(25, 4)
-            df = pd.DataFrame(data, columns=list('ABCD'))
-            df.hvplot.box()
-
-        Here is an example using *long* data and the `by` argument.
-
-        .. code-block::
-
-            import hvplot.pandas  # noqa
-            import pandas as pd
-            age_list = [8, 10, 12, 14, 72, 74, 76, 78, 20, 25, 30, 35, 60, 85]
-            df = pd.DataFrame({"gender": list("MMMMMMMMFFFFFF"), "age": age_list})
-            df.hvplot.box(y='age', by='gender', height=400, width=400, legend=False, ylim=(0, None))
-
         References
         ----------
-        - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/boxplot.html
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/topics/stats/boxplot.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/BoxWhisker.html
         - Matplotlib: https://matplotlib.org/stable/plot_types/stats/boxplot_plot.html#sphx-glr-plot-types-stats-boxplot-plot-py
         - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.boxplot.html
@@ -1292,7 +983,9 @@ class hvPlotTabular(hvPlotBase):
 
         Note that `violin` plots depend on the `scipy` library.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/violin.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.violin.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -1302,8 +995,8 @@ class hvPlotTabular(hvPlotBase):
         by : string or sequence
             Field in the *long* data to group by.
         kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('violin')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('violin')`` for the full method documentation.
 
         Returns
         -------
@@ -1316,31 +1009,6 @@ class hvPlotTabular(hvPlotBase):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
-
-        Examples
-        --------
-
-        Here is an example using *wide* data.
-
-        .. code-block::
-
-            import hvplot.pandas
-            import numpy as np
-            import pandas as pd
-
-            data = np.random.randn(25, 4)
-            df = pd.DataFrame(data, columns=list('ABCD'))
-            df.hvplot.violin(ylim=(-5, 5))
-
-        Here is an example using *long* data and the `by` argument.
-
-        .. code-block::
-
-            import hvplot.pandas  # noqa
-            import pandas as pd
-            age_list = [8, 10, 12, 14, 72, 74, 76, 78, 20, 25, 30, 35, 60, 85]
-            df = pd.DataFrame({"gender": list("MMMMMMMMFFFFFF"), "age": age_list})
-            df.hvplot.violin(y='age', by='gender', height=400, width=400, legend=False, ylim=(-100, 200))
 
         References
         ----------
@@ -1359,7 +1027,9 @@ class hvPlotTabular(hvPlotBase):
         """
         A `histogram` displays an approximate representation of the distribution of continuous data.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/hist.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.hist.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -1372,7 +1042,7 @@ class hvPlotTabular(hvPlotBase):
             The number of bins in the histogram, or an explicit set of bin edges
             or a method to find the optimal set of bin edges, e.g. 'auto', 'fd',
             'scott' etc. For more documentation on these approaches see the
-            :class:`numpy:numpy.histogram_bin_edges` documentation. Default is 20.
+            :func:`numpy.histogram_bin_edges` documentation. Default is 20.
         bin_range: tuple, optional
             The lower and upper range of the bins.
             Default is the minimum and maximum values of the continuous data.
@@ -1388,8 +1058,8 @@ class hvPlotTabular(hvPlotBase):
             in that bin plus all bins for smaller values. The last bin gives the
             total number of data points. Default is False.
         kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('hist')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('hist')`` for the full method documentation.
 
         Returns
         -------
@@ -1403,39 +1073,16 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
-        Examples
+        See Also
         --------
-
-        Lets display some *wide* data created by rolling two dices
-
-        .. code-block::
-
-            import hvplot.pandas
-            import numpy as np
-            import pandas as pd
-
-            df = pd.DataFrame(np.random.randint(1, 7, 6000), columns = ['one'])
-            df['two'] = df['one'] + np.random.randint(1, 7, 6000)
-            df.hvplot.hist(bins=12, alpha=0.5, color=["lightgreen", "pink"])
-
-        If you want to show the distribution of the values of a categorical column,
-        you can use Pandas' method `value_counts` and `bar` as shown below
-
-        .. code-block::
-
-            import hvplot.pandas
-            import pandas as pd
-
-            data = pd.DataFrame({
-                "library": ["bokeh", "plotly", "matplotlib", "bokeh", "matplotlib", "matplotlib"]
-            })
-
-            data["library"].value_counts().hvplot.bar()
+        kde : Kernel Density Estimate plot.
+        bivariate : 2D KDE plot.
+        contour : Isolines plot for gridded data.
 
         References
         ----------
 
-        - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/histogram.html
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/topics/stats/histogram.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Histogram.html
         - Pandas: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.plot.hist.html
         - Plotly: https://plotly.com/python/histograms/
@@ -1456,11 +1103,18 @@ class hvPlotTabular(hvPlotBase):
 
     def kde(self, y=None, by=None, **kwds):
         """
-        The Kernel density estimate (`kde`) plot shows the distribution and spread of the data.
+        The Kernel density estimate (`kde`) plot shows the distribution of the data.
 
-        The `kde` and `density` plots are the same.
+        The KDE works by placing a Gaussian kernel at each sample with the supplied
+        bandwidth, which are then summed to produce the density estimate. By default
+        the bandwidth is determined using the Scott's method, which usually produces
+        good results, but it may be overridden by an explicit value.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/kde.html
+        ``density`` is an alias of ``kde``.
+
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.kde.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -1470,16 +1124,20 @@ class hvPlotTabular(hvPlotBase):
         by : string or sequence
             Field(s) in the data to group by.
         bandwidth : float, optional
-            The bandwidth of the kernel for the density estimate. Default is None.
-        cut :
-            Draw the estimate to cut * bw from the extreme data points.
-        n_samples : int, optional
-            Number of samples to compute the KDE over. Default is 100.
+            Allows supplying explicit bandwidth value of the kernel for the
+            density estimate, rather than relying on Scott. Higher value
+            yields smoother contours. Default is None.
+        cut : float, optional
+            Draw the estimate to cut * bw from the extreme data points. Default is 3.
         filled :
             Whether the bivariate contours should be filled. Default is True.
+        bw_method : optional
+            Not supported.
+        ind : optional
+            Not supported.
         kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('kde')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('kde')`` for the full method documentation.
 
         Returns
         -------
@@ -1493,35 +1151,11 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
-        Examples
+        See Also
         --------
-
-        Lets display a 'kde' plot from *wide* data
-
-        .. code-block::
-
-            import hvplot.pandas
-            import numpy as np
-            import pandas as pd
-
-            df = pd.DataFrame({
-                'x': [1, 2, 2.5, 3, 3.5, 4, 5],
-                'y': [4, 4, 4.5, 5, 5.5, 6, 6],
-            })
-            df.hvplot.kde(color=["orange", "green"])
-
-        Lets display a 'kde' plot from *long* data using the 'by' attribute
-
-        .. code-block::
-
-            import hvplot.pandas # noqa
-            import pandas as pd
-            import numpy as np
-            df = pd.DataFrame({
-                'category': list('xxxxxxxyyyyyyy'),
-                'value': [1, 2, 2.5, 3, 3.5, 4, 5, 4, 4, 4.5, 5, 5.5, 6, 6],
-            })
-            df.hvplot.kde(by='category', filled=False)
+        hist : Histogram plot.
+        bivariate : 2D KDE plot.
+        contour : Isolines plot for gridded data.
 
         References
         ----------
@@ -1531,7 +1165,12 @@ class hvPlotTabular(hvPlotBase):
         - Plotly: https://plotly.com/python/distplot/
         - Seaborn: https://seaborn.pydata.org/generated/seaborn.kdeplot.html
         - Wiki: https://en.wikipedia.org/wiki/Kernel_density_estimation
+
+        Notes
+        -----
+        This function requires ``scipy`` to be installed.
         """
+
         return self(kind='kde', x=None, y=y, by=by, **kwds)
 
     def density(self, y=None, by=None, **kwds):
@@ -1544,19 +1183,17 @@ class hvPlotTabular(hvPlotBase):
         """
         Displays a 'table'.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/table.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.table.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
         columns : string or sequence
             The field(s) to display as columns.
-        sortable : bool, optional
-            If True the columns are sortable. Default is False.
-        selectable : bool, optional
-            If True the cells are selectable. Default is False. # Todo: Describe how to use this
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('table')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('table')`` for the full method documentation.
 
         Returns
         -------
@@ -1570,16 +1207,6 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            from bokeh.sampledata.autompg import autompg_clean as df
-
-            df.hvplot.table(columns=['origin', 'name', 'yr'], sortable=True, selectable=True)
-
         References
         ----------
 
@@ -1591,14 +1218,14 @@ class hvPlotTabular(hvPlotBase):
 
     def dataset(self, columns=None, **kwds):
         """
-        The 'dataset' wraps a tabular or gridded dataset and can be further transformed and
-        annotated via methods from HoloViews.
+        Wraps the dataset in a :class:`holoviews:holoviews.element.Dataset`
+        object, for further processing with HoloViews.
 
         Parameters
         ----------
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('dataset')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('dataset')`` for the full method documentation.
 
         Returns
         -------
@@ -1611,17 +1238,6 @@ class hvPlotTabular(hvPlotBase):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
-
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import pandas as pd
-
-            data = pd.DataFrame({"x": ['a', 'b', 'c'], "y": [1, 2, 3]})
-            data.hvplot.dataset()
 
         References
         ----------
@@ -1636,10 +1252,22 @@ class hvPlotTabular(hvPlotBase):
         A `points` plot visualizes positions in a 2D space. This is useful for example for
         geographic plots.
 
-        There is no assumption that 'y' depends on 'x'. This is different from a `scatter` plot
-        which assumes that `y` depends `x`.
+        Although the :meth:`hvplot.hvPlot.scatter` plot is superficially
+        similar to the ``points`` plot (they can generate plots that look
+        identical), the two plot types are semantically quite different.
+        The fundamental difference is that ``scatter`` is used to visualize
+        data where the y variable is dependent, unlike ``points``.
 
-        Reference: https://hvplot.holoviz.org/reference/geopandas/points.html
+        This difference means that ``points`` plots can most naturally
+        overlay with other plots that express independent variables in
+        two-dimensional space, such as raster types like
+        :meth:`hvplot.hvPlot.image`. Conversely, ``scatter`` expresses a
+        dependent relationship between x and y and thus most naturally
+        overlay with chart types such as :meth:`hvplot.hvPlot.line`.
+
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.points.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -1655,12 +1283,12 @@ class hvPlotTabular(hvPlotBase):
             The marker shape specified above can be any supported by matplotlib, e.g. s, d, o etc.
             See https://matplotlib.org/stable/api/markers_api.html.
         scale: number, optional
-            Scaling factor to apply to point scaling.
+            Scaling factor to apply to point scaling. Default is 1.
         logz : bool
             Whether to apply log scaling to the z-axis. Default is False.
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('points')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('points')`` for the full method documentation.
 
         Returns
         -------
@@ -1673,18 +1301,6 @@ class hvPlotTabular(hvPlotBase):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
-
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import pandas as pd
-
-            data = pd.DataFrame(dict(x=[49.9, 50.0, 50.1, 50.2], y=[50.2, 49.9, 50.0, 50.2]))
-            plot = data.hvplot.points(color="green", size=100, marker="square")
-            plot
 
         References
         ----------
@@ -1695,11 +1311,13 @@ class hvPlotTabular(hvPlotBase):
 
     def vectorfield(self, x=None, y=None, angle=None, mag=None, **kwds):
         """
-        vectorfield visualizes vectors given by the (`x `, `y`) starting point,
-        a magnitude (`mag`) and an `angle`. A `vectorfield` plot is also known
-        as a `quiver` plot.
+        vectorfield visualizes vectors given by the (``x``, ``y``) starting point,
+        a magnitude (``mag``) and an `angle`. A ``vectorfield`` plot is also known
+        as a ``quiver`` plot.
 
-        Reference: https://hvplot.holoviz.org/reference/xarray/vectorfield.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.vectorfield.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -1708,16 +1326,16 @@ class hvPlotTabular(hvPlotBase):
         y : string
             Field name to draw y-positions from
         mag : string
-            Magnitude
+            Magnitude.
         angle : string
             Angle in radians.
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('vectorfield')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('vectorfield')`` for the full method documentation.
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.Points` / Panel object
+        :class:`holoviews:holoviews.element.VectorField` / Panel object
             You can `print` the object to study its composition and run:
 
             .. code-block::
@@ -1727,29 +1345,9 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import numpy as np
-            import pandas as pd
-
-            data = pd.DataFrame(
-                dict(
-                    x=[49.9, 50.0, 50.1, 50.2],
-                    y=[50.2, 49.9, 50.0, 50.2],
-                    angle=[2 * np.pi, np.pi, np.pi, np.pi],
-                    mag=[0.01, 0.02, -0.02, -0.01],
-                )
-            )
-            data.hvplot.vectorfield(x="x", y="y", angle="angle", mag="mag")
-
         References
         ----------
 
-        - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/quiver.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/VectorField.html
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.quiver.html
         - Plotly: https://plotly.com/python/quiver-plots/
@@ -1761,7 +1359,9 @@ class hvPlotTabular(hvPlotBase):
         """
         Polygon plot for geopandas dataframes.
 
-        Reference: https://hvplot.holoviz.org/reference/geopandas/polygons.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.polygons.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -1769,12 +1369,9 @@ class hvPlotTabular(hvPlotBase):
             The dimension to color the polygons by
         logz : bool
             Enables logarithmic colormapping. Default is False.
-        geo : bool, optional
-            Whether the plot should be treated as geographic (and assume
-            PlateCarree, i.e. lat/lon coordinates).
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('polygons')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('polygons')`` for the full method documentation.
 
         Returns
         -------
@@ -1787,30 +1384,31 @@ class hvPlotTabular(hvPlotBase):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
-
-        Examples
-        --------
-
-        .. code-block::
-
-            import geopandas as gpd
-            import geodatasets
-            import hvplot.pandas
-
-            chicago = gpd.read_file(geodatasets.get_path("geoda.chicago_commpop"))
-            chicago.hvplot.polygons(geo=True, c='POP2010', hover_cols='all')
         """
         return self(x, y, c=c, kind='polygons', **kwds)
 
     def paths(self, x=None, y=None, c=None, **kwds):
         """
-        LineString and LineRing plot for geopandas dataframes.
+        Plot one or more collection of lines.
+
+        Each path is a collection of independent x and y coordinates,
+        represented from:
+
+        - tabular data: 1 path
+        - gridded data: 1 path
+        - GeoPandas GeoDataFrame: as many paths as LineString/MultiLineString
+          as geometries contained in the dtaset
+
+        Options like ``color`` or ``line_width`` are vectorized, i.e. each
+        sub-line of a path can be displayed separately based on another dimension.
+        For example, each sub-line of a hurricane path can be plotted with
+        a color based on the wind speed.
 
         Parameters
         ----------
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('paths')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('paths')`` for the full method documentation.
 
         Returns
         -------
@@ -1838,7 +1436,9 @@ class hvPlotTabular(hvPlotBase):
         `labels` are mostly useful when overlaid on top of other plots using the `*`
         operator.
 
-        Reference: https://hvplot.holoviz.org/reference/tabular/labels.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.labels.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -1851,8 +1451,8 @@ class hvPlotTabular(hvPlotBase):
             provide a template string containing the column names to
             automatically format the text, e.g. "{col1}, {col2}".
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('labels')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('labels')`` for the full method documentation.
 
         Returns
         -------
@@ -1865,24 +1465,6 @@ class hvPlotTabular(hvPlotBase):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
-
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.pandas
-            import pandas as pd
-
-            df = pd.DataFrame(
-                {'City': ['Buenos Aires', 'Brasilia', 'Santiago', 'Bogota', 'Caracas'],
-                'Country': ['Argentina', 'Brazil', 'Chile', 'Colombia', 'Venezuela'],
-                'Latitude': [-34.58, -15.78, -33.45, 4.60, 10.48],
-                'Longitude': [-58.66, -47.91, -70.66, -74.08, -66.86],
-                'Color': ['blue', 'green', 'white', 'black', 'yellow']})
-
-            df.hvplot.points(x='Longitude', y='Latitude') * \
-            df.hvplot.labels(x='Longitude', y='Latitude', text='City', text_baseline="bottom")
 
         References
         ----------
@@ -2036,7 +1618,9 @@ class hvPlot(hvPlotTabular):
 
     For more detailed options use a specific plotting method, e.g. `df.hvplot.line`.
 
-    Reference: https://hvplot.holoviz.org/reference/index.html
+    Reference: https://hvplot.holoviz.org/ref/api/index.html
+
+    Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
     Parameters
     ----------
@@ -2050,8 +1634,7 @@ class hvPlot(hvPlotTabular):
         The kind of plot to generate, e.g. 'area', 'bar', 'line', 'scatter' etc. To see the
         available plots run `print(df.hvplot.__all__)`.
     **kwds : optional
-        Additional keywords arguments are documented in `hvplot.help('scatter')` or similar
-        depending on the kind of plot.
+        Additional keywords arguments are documented in :ref:`plot-options`.
 
     Returns
     -------
@@ -2138,7 +1721,9 @@ class hvPlot(hvPlotTabular):
         You can use `image` to display for example geographic data with independent `latitude` and
         `longitude` fields and a third dependent field.
 
-        Reference: https://hvplot.holoviz.org/reference/xarray/image.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.image.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -2150,9 +1735,9 @@ class hvPlot(hvPlotTabular):
             The data variable to plot
         colorbar: boolean
             Whether to display a colorbar
-        kwds : optional
-            To see all the keyword arguments available, run `hvplot.help('image')`.
-            See :ref:`plot-options` for more information.
+        **kwds : optional
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('image')`` for the full method documentation.
 
         Returns
         -------
@@ -2166,21 +1751,10 @@ class hvPlot(hvPlotTabular):
 
             to learn more about its parameters and options.
 
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.xarray
-            import xarray as xr
-
-            ds = xr.tutorial.open_dataset('air_temperature')
-            ds.hvplot.image(x='lon', y='lat', z='air', groupby='time', cmap='kbc_r')
-
         References
         ----------
 
-        - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/image.html
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/topics/images/image.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Image.html
         - Matplotlib: https://matplotlib.org/stable/tutorials/introductory/images.html
         - Plotly: https://plotly.com/python/imshow/
@@ -2194,21 +1768,26 @@ class hvPlot(hvPlotTabular):
         `rgb`  can be used to display images that are distributed as three separate "channels" or
         "bands".
 
-        Reference: https://hvplot.holoviz.org/reference/xarray/rgb.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.rgb.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
         x : string, optional
-            The coordinate variable along the x-axis
+            The coordinate variable along the x-axis. By default the third
+            coordinate of the dataset.
         y : string, optional
-            The coordinate variable along the y-axis
+            The coordinate variable along the y-axis. By default the second
+            coordinate of the dataset.
         bands : string, optional
-            The coordinate variable to draw the RGB channels from
+            The coordinate variable to draw the RGB channels from. By default
+            the first coordinate of the dataset.
         z : string, optional
             The data variable to plot
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('rgb')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('rgb')`` for the full method documentation.
 
         Returns
         -------
@@ -2238,10 +1817,16 @@ class hvPlot(hvPlotTabular):
         """
         QuadMesh plot
 
-        `quadmesh` allows you to plot values on an irregular grid by representing each value as a
-        polygon.
+        ``quadmesh`` allows you to plot values on an irregular grid by representing each value as a
+        polygon. It is often useful for displaying projected geographic datasets.
+        Note that this method can be slower than ``image``. To reduce the render
+        time or the size of the saved plot, set ``rasterize=True`` to aggregate
+        the values to the pixel. When rasterizing geographic plots, it is recommended
+        to set ``project=True``.
 
-        Reference: https://hvplot.holoviz.org/reference/xarray/quadmesh.html
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.quadmesh.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -2254,8 +1839,8 @@ class hvPlot(hvPlotTabular):
         colorbar: boolean
             Whether to display a colorbar
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('quadmesh')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('quadmesh')`` for the full method documentation.
 
         Returns
         -------
@@ -2269,17 +1854,6 @@ class hvPlot(hvPlotTabular):
 
             to learn more about its parameters and options.
 
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.xarray
-            import xarray as xr
-
-            ds = xr.tutorial.open_dataset('rasm')
-            ds.Tair.hvplot.quadmesh(x='xc', y='yc', geo=True, widget_location='bottom')
-
         References
         ----------
 
@@ -2289,9 +1863,14 @@ class hvPlot(hvPlotTabular):
 
     def contour(self, x=None, y=None, z=None, colorbar=True, levels=5, logz=False, **kwds):
         """
-        Line contour plot
+        Line contour plot.
 
-        Reference: https://hvplot.holoviz.org/reference/xarray/contour.html
+        A contour plot displays isolines representing constant values in a 2D
+        scalar field over gridded data.
+
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.contour.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
@@ -2301,16 +1880,16 @@ class hvPlot(hvPlotTabular):
             The coordinate variable along the y-axis
         z : string, optional
             The data variable to plot
-        colorbar: boolean
-            Whether to display a colorbar
+        colorbar: boolean, optional
+            Whether to display a colorbar. Default is True.
         levels: int or list, optional
             The number of contour lines to draw or a list of scalar values used
-            to specify the contour levels. Default is 5
+            to specify the contour levels. Default is 5.
         logz: bool, optional
-            Whether to apply log scaling to the z-axis. Default is False
+            Whether to apply log scaling to the z-axis. Default is False.
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('contour')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('contour')`` for the full method documentation.
 
         Returns
         -------
@@ -2324,27 +1903,9 @@ class hvPlot(hvPlotTabular):
 
             to learn more about its parameters and options.
 
-        Examples
+        See Also
         --------
-
-        .. code-block::
-
-            import hvplot.xarray
-            import xarray as xr
-
-            ds = xr.tutorial.open_dataset("air_temperature")
-            ds.hvplot.contour(
-                geo=True,
-                tiles="EsriImagery",
-                z="air",
-                x="lon",
-                y="lat",
-                levels=20,
-                clabel="T [K]",
-                line_width=2,
-                label="Mean Air temperature [K]",
-                cmap="reds",
-            )
+        contourf : Filled contour plot.
 
         References
         ----------
@@ -2377,8 +1938,12 @@ class hvPlot(hvPlotTabular):
         logz: bool, optional
             Whether to apply log scaling to the z-axis. Default is False
         **kwds : optional
-            Additional keywords arguments are documented in `hvplot.help('contourf')`.
-            See :ref:`plot-options` for more information.
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('contourf')`` for the full method documentation.
+
+        See Also
+        --------
+        contour : Line contour plot.
 
         Returns
         -------
@@ -2391,28 +1956,6 @@ class hvPlot(hvPlotTabular):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
-
-        Examples
-        --------
-
-        .. code-block::
-
-            import hvplot.xarray
-            import xarray as xr
-
-            ds = xr.tutorial.open_dataset("air_temperature")
-            ds.hvplot.contourf(
-                geo=True,
-                coastline=True,
-                z="air",
-                x="lon",
-                y="lat",
-                levels=20,
-                clabel="T [K]",
-                line_width=2,
-                label="Mean Air temperature [K]",
-                cmap="reds",
-            )
 
         References
         ----------

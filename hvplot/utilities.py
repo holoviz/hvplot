@@ -139,7 +139,7 @@ class hvplot_extension(_hv.extension):
     Helper utility used to load hvPlot/HoloViews extensions and control
     the notebook environment.
 
-    Extends :func:`holoviews:holoviews.util.extension` by adding `compatibility`.
+    Extends :class:`holoviews.util.extension` by adding `compatibility`.
 
     Notes
     -----

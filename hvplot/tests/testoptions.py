@@ -528,6 +528,113 @@ class TestOptions:
         opts = Store.lookup_options(backend, plot, 'plot')
         assert opts.kwargs['bgcolor'] == 'black'
 
+    @pytest.mark.parametrize(
+        'backend',
+        [
+            'bokeh',
+            pytest.param(
+                'matplotlib',
+                marks=pytest.mark.skip(reason='toolbar not supported w/ matplotlib'),
+            ),
+            pytest.param(
+                'plotly',
+                marks=pytest.mark.skip(reason='toolbar not supported w/ plotly'),
+            ),
+        ],
+        indirect=True,
+    )
+    @pytest.mark.parametrize(
+        'toolbar', ['right', 'left', 'above', 'below', None, False, True, 'disable']
+    )
+    def test_toolbar(self, df, backend, toolbar):
+        plot = df.hvplot.scatter('x', 'y', toolbar=toolbar)
+        opts = Store.lookup_options(backend, plot, 'plot')
+        if toolbar is True:
+            toolbar = 'right'
+        elif toolbar is False:
+            toolbar = None
+        assert opts.kwargs['toolbar'] == toolbar
+
+    @pytest.mark.parametrize(
+        'backend',
+        [
+            'bokeh',
+            pytest.param(
+                'matplotlib',
+                marks=pytest.mark.skip(reason='autohide_toolbar not supported w/ matplotlib'),
+            ),
+            pytest.param(
+                'plotly',
+                marks=pytest.mark.skip(reason='autohide_toolbar not supported w/ plotly'),
+            ),
+        ],
+        indirect=True,
+    )
+    def test_autohide_toolbar(self, df, backend):
+        plot = df.hvplot.scatter('x', 'y', autohide_toolbar=True)
+        opts = Store.lookup_options(backend, plot, 'plot')
+        assert opts.kwargs['autohide_toolbar'] is True
+
+    @pytest.mark.parametrize(
+        'backend',
+        [
+            'bokeh',
+            'matplotlib',
+            pytest.param(
+                'plotly',
+                marks=pytest.mark.skip(reason='backend_opts not supported w/ plotly'),
+            ),
+        ],
+        indirect=True,
+    )
+    def test_backend_opts(self, df, backend):
+        if backend == 'bokeh':
+            bo = {'plot.xgrid.grid_line_color': 'grey'}
+        elif backend == 'matplotlib':
+            bo = {'axes.frame_on': False}
+        plot = df.hvplot.scatter('x', 'y', backend_opts=bo)
+        opts = Store.lookup_options(backend, plot, 'plot')
+        assert opts.kwargs['backend_opts'] == bo
+
+    @pytest.mark.parametrize(
+        'backend',
+        [
+            'bokeh',
+            'matplotlib',
+            pytest.param(
+                'plotly',
+                marks=pytest.mark.skip(reason='legend_cols not supported w/ plotly'),
+            ),
+        ],
+        indirect=True,
+    )
+    def test_legend_cols(self, df, backend):
+        plot = df.hvplot.scatter('x', 'y', by='category', legend_cols=2)
+        opts = Store.lookup_options(backend, plot, 'plot')
+        assert opts.kwargs['legend_cols'] == 2
+
+    @pytest.mark.parametrize(
+        'backend',
+        [
+            'bokeh',
+            'matplotlib',
+            pytest.param(
+                'plotly',
+                marks=pytest.mark.skip(reason='legend_opts not supported w/ plotly'),
+            ),
+        ],
+        indirect=True,
+    )
+    def test_legend_opts(self, df, backend):
+        if backend == 'bokeh':
+            lo = {'spacing': 20}
+        elif backend == 'matplotlib':
+            lo = {'labelspacing': 2}
+
+        plot = df.hvplot.scatter('x', 'y', by='category', legend_opts=lo)
+        opts = Store.lookup_options(backend, plot, 'plot')
+        assert opts.kwargs['legend_opts'] == lo
+
 
 @pytest.fixture(scope='module')
 def da():

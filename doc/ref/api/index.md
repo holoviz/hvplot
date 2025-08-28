@@ -192,9 +192,16 @@ The explorer interface can easily be created from the `hvPlot` / `.hvplot` names
 .. currentmodule:: hvplot
 
 .. autosummary::
-   :toctree: generated/
 
     hvPlot.explorer
+```
+
+```{toctree}
+:hidden: true
+:maxdepth: 2
+:titlesonly: true
+
+hvplot.hvPlot.explorer <manual/hvplot.hvPlot.explorer>
 ```
 
 It is also available from the top-level `explorer` function:

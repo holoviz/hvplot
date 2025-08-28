@@ -46,7 +46,7 @@ uv pip install hvplot --prerelease allow
 
 ## From anaconda.org
 
-hvPlot is distributed on 3 channels on [anaconda.org](https://anaconda.org/):
+hvPlot is distributed on 3 channels on [anaconda.org](https://anaconda.org):
 
 - [`conda-forge`](https://github.com/conda-forge/hvplot-feedstock): Community maintained channel
 - [`defaults`](https://github.com/AnacondaRecipes/hvplot-feedstock/): Anaconda maintained channel (free under certain conditions only, check Anaconda's Terms of Services)
