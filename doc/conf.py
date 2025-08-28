@@ -134,6 +134,10 @@ nbsite_gallery_conf = {
                 },
                 'geospatial',
                 'gridded',
+                {
+                    'path': 'big-data',
+                    'title': 'Big Data',
+                },
                 'interactivity',
             ],
             'skip_rst_notebook_directive': True,
