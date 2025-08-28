@@ -204,6 +204,8 @@ Example tests can be run with the following command:
 pixi run test-example
 ```
 
+Slow example tests are excluded by default. Set the environment variable `HVPLOT_INCLUDE_SLOW_EXAMPLES` (e.g. to `1`) to include them.
+
 ## Documentation
 
 The documentation can be built with the command:
