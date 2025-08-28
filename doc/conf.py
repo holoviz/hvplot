@@ -133,6 +133,7 @@ nbsite_gallery_conf = {
                     'title': 'Time Series',
                 },
                 'geospatial',
+                'gridded',
                 'interactivity',
             ],
             'skip_rst_notebook_directive': True,

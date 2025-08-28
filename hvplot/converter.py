@@ -1616,6 +1616,7 @@ class HoloViewsConverter:
                 indexes = [c for c in self.data.columns if c not in self.data.columns]
 
             if len(indexes) == 2 and not (x or y or by):
+                # This is where the first case goes.
                 if kind == 'heatmap':
                     x, y = indexes
                 elif kind in ('bar', 'barh'):
@@ -2398,6 +2399,8 @@ class HoloViewsConverter:
         elif element is ErrorBars and self.kwds.get('yerr1'):
             ys += [self.kwds['yerr1']]
         kdims, vdims = self._get_dimensions([x], ys)
+        print('kdims vdims', kdims, vdims)
+        print('self.by', self.by)
 
         if self.by:
             if element is Bars and not self.subplots:
@@ -2651,10 +2654,14 @@ class HoloViewsConverter:
 
     def bar(self, x=None, y=None, data=None):
         self._error_if_unavailable('bar')
+        print(x, y)
         data, x, y = self._process_chart_args(data, x, y, categories=self.by)
+        print(x, y)
         if (x or self.by) and y and (self.by or not isinstance(y, (list, tuple) or len(y) == 1)):
             y = y[0] if isinstance(y, (list, tuple)) else y
+            print('single')
             return self.single_chart(Bars, x, y, data)
+        print('category')
         return self._category_plot(Bars, x, list(y), data)
 
     def barh(self, x=None, y=None, data=None):
