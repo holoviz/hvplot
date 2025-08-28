@@ -139,6 +139,7 @@ nbsite_gallery_conf = {
                     'title': 'Big Data',
                 },
                 'interactivity',
+                'annotations',
             ],
             'skip_rst_notebook_directive': True,
             'no_image_thumb': True,
