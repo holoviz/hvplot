@@ -2,7 +2,6 @@
 name = "hvplot"
 channels = ["pyviz/label/dev",  "conda-forge"]
 platforms = ["linux-64", "osx-arm64", "osx-64", "win-64"]
-preview = ["pixi-build"] # temp until 0.1.4 release
 
 [environments]
 default = [
