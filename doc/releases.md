@@ -2,6 +2,32 @@
 
 See [the HoloViz blog](https://blog.holoviz.org/#category=hvplot) for a visual summary of the major features added in a selection of releases.
 
+## Version 0.12.1 (2025-08-29)
+
+The 0.12.1 release is a patch release that brings a few bugfixes and enhancements, and most importantly adds a new extended [Gallery](https://hvplot.holoviz.org/en/docs/latest/gallery/index.html) top-level section with about 50 examples, replacing the previous and limited *Reference Gallery*. Many thanks to @kmnhan (first contribution!), @hoxbro, @Azaya89, and @maximlt for their contributions!
+
+Enhancements:
+
+- `hvplot.show` supports displaying Param/Panel reactive expressions ([#1651](https://github.com/holoviz/hvplot/pull/1651))
+
+Bug Fixes:
+
+- Fix error raised when importing `sampledata` and `hvsampledata` is not installed ([#1649](https://github.com/holoviz/hvplot/pull/1649))
+- Ensure the `hist` plotting method uses `bin_range` ([#1663](https://github.com/holoviz/hvplot/pull/1663))
+
+Documentation:
+
+- Add new examples Gallery and remove the old Reference Gallery ([#1603](https://github.com/holoviz/hvplot/pull/1603))
+- Add admonitions to keywords added in version 0.12.0 ([#1650](https://github.com/holoviz/hvplot/pull/1650))
+- Document the `sampledata` module added in version 0.12.0 ([#1646](https://github.com/holoviz/hvplot/pull/1646))
+
+Infrastructure / Tests:
+
+- Upload documentation build artifacts ([#1655](https://github.com/holoviz/hvplot/pull/1655))
+- Fix auto-triage bot ([#1631](https://github.com/holoviz/hvplot/pull/1631))
+
+[Full Changelog](https://github.com/holoviz/hvplot/compare/v0.12.0...v0.12.1)
+
 ## Version 0.12.0 (2025-08-01)
 
 This minor release brings extensive documentation improvements, exposes new HoloViews options, and brings a few bugfixes. Check out the [release blog post](https://blog.holoviz.org/posts/hvplot_release_0.12/) for a visual overview of the key updates.
