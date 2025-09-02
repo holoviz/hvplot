@@ -55,12 +55,16 @@ pip = "*"
 # Required
 bokeh = ">=3.1"
 colorcet = ">=2"
-holoviews = ">=1.19.0"
+# holoviews = ">=1.19.0"  # NOTE: REVERT
 numpy = ">=1.21"
 packaging = "*"
 pandas = ">=1.3"
-panel = ">=1.0"
+# panel = ">=1.0"
 param = ">=1.12.0,<3.0"
+
+[feature.required.pypi-dependencies]
+holoviews = { git = "https://github.com/holoviz/holoviews" , branch = "feat_narwhals"}  # NOTE: REVERT
+panel = ">=1.8.0rc0"  # Until an release
 
 [feature.required.tasks]
 download-data = 'python scripts/download_data.py'
@@ -205,11 +209,11 @@ pygraphviz = "*"
 
 [feature.test.tasks]
 test-unit-geo = 'pytest -v hvplot --geo'
-test-unit-cov = 'pytest -v hvplot --cov=hvplot --cov-branch --cov-append'
+test-unit-cov = 'pytest hvplot --cov=hvplot --cov-branch --cov-append -k polars'  # NOTE: REVERT
 test-unit-geo-cov = 'pytest -v hvplot --geo --cov=hvplot --cov-branch --cov-append'
 
 [feature.test-core.tasks]
-test-unit = 'pytest -v hvplot'
+test-unit = 'pytest hvplot -k polars'  # NOTE: REVERT
 
 [feature.test-example.tasks]
 test-example = 'pytest -n logical --dist loadscope --nbval-lax -p no:python'
