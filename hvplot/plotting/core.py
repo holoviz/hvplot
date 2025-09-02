@@ -1600,15 +1600,21 @@ class hvPlotTabularPolars(hvPlotTabular):
                 # Reorder the columns as in the data.
                 columns = sorted(columns, key=lambda c: column_names.index(c))
 
-        if isinstance(self._data, pl.DataFrame):
-            data = self._data.select(columns).to_pandas()
+        if isinstance(self._data, (pl.LazyFrame, pl.DataFrame)):
+            data = self._data.select(columns)  # .to_pandas()
         elif isinstance(self._data, pl.Series):
-            data = self._data.to_pandas()
-        elif isinstance(self._data, pl.LazyFrame):
-            data = self._data.select(columns).collect().to_pandas()
+            data = self._data.to_frame()  # .to_pandas()
+        # elif isinstance(self._data, pl.LazyFrame):
+        #     data = self._data.select(columns).collect()# .to_pandas()
         else:
             raise ValueError('Only Polars DataFrame, Series, and LazyFrame are supported')
 
+        x = x or 'index'
+        if x == 'index':
+            data = data.with_row_index()
+        import narwhals as nw
+
+        data = nw.from_native(data)
         return HoloViewsConverter(data, x, y, kind=kind, **params)
 
 
