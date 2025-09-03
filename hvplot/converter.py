@@ -2657,7 +2657,7 @@ class HoloViewsConverter:
         # df = melt(data, id_vars=[x], var_name=self.group_label, value_name=self.value_label)
 
         data = nw.from_native(data)
-        data = data.select([y + [x]])
+        data = data.select([*y, x])
         df = data.unpivot(
             index=x,
             variable_name=self.group_label,
