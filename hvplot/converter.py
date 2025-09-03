@@ -56,6 +56,7 @@ from .util import (
     _HV_GE_1_21_0,
     _Undefined,
     filter_opts,
+    is_narwhals,
     is_tabular,
     is_series,
     is_dask,
@@ -3293,6 +3294,8 @@ class HoloViewsConverter:
         data, x, y, _ = self._process_gridded_args(data, x, y, z=None)
         params = dict(self._relabel)
 
+        if is_narwhals(self.data) and x == 'index':
+            x = None
         if not (x and y):
             if is_geodataframe(data):
                 x, y = ('Longitude', 'Latitude') if self.geo else ('x', 'y')
@@ -3304,11 +3307,7 @@ class HoloViewsConverter:
         redim = self._merge_redim(
             {self._color_dim: self._dim_ranges['c']} if self._color_dim else {}
         )
-        if isinstance(y, list):
-            dims = [x], [y]
-        else:
-            dims = ([x, y], [])
-        kdims, vdims = self._get_dimensions(*dims)
+        kdims, vdims = self._get_dimensions([x, y], [])
         if self.gridded_data:
             vdims = Dataset(data).vdims
         element = self._get_element(kind)
