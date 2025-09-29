@@ -660,6 +660,13 @@ class TestOptions:
         assert opts.kwargs['grid'] is True
         assert opts.kwargs['gridstyle'] == {'ygrid_line_alpha': 0, 'xgrid_line_dash': 'dashed'}
 
+    def test_grid_line_dict(self, df, backend):
+        grid_dict = {'ygrid_line_alpha': 0, 'xgrid_line_dash': 'dashed'}
+        plot = df.hvplot('x', 'y', grid=grid_dict)
+        opts = Store.lookup_options(backend, plot, 'plot')
+        assert opts.kwargs['grid'] is True
+        assert opts.kwargs['gridstyle'] == grid_dict
+
 
 @pytest.fixture(scope='module')
 def da():
