@@ -635,6 +635,31 @@ class TestOptions:
         opts = Store.lookup_options(backend, plot, 'plot')
         assert opts.kwargs['legend_opts'] == lo
 
+    @pytest.mark.parametrize('grid_bool', [True, False])
+    def test_grid_boolean(self, df, backend, grid_bool):
+        plot = df.hvplot('x', 'y', grid=grid_bool)
+        opts = Store.lookup_options(backend, plot, 'plot')
+        assert opts.kwargs['grid'] is grid_bool
+
+    def test_grid_x(self, df, backend):
+        plot = df.hvplot('x', 'y', grid='x')
+        opts = Store.lookup_options(backend, plot, 'plot')
+        assert opts.kwargs['grid'] is True
+        assert opts.kwargs['gridstyle'] == {'ygrid_line_alpha': 0}
+
+    def test_grid_y(self, df, backend):
+        plot = df.hvplot('x', 'y', grid='y')
+        opts = Store.lookup_options(backend, plot, 'plot')
+        assert opts.kwargs['grid'] is True
+        assert opts.kwargs['gridstyle'] == {'xgrid_line_alpha': 0}
+
+    @pytest.mark.parameterize('grid_str', ['x-dashed', 'xdashed', 'x.dashed', 'x_dashed'])
+    def test_grid_line_dash(self, df, backend, grid_str):
+        plot = df.hvplot('x', 'y', grid=grid_str)
+        opts = Store.lookup_options(backend, plot, 'plot')
+        assert opts.kwargs['grid'] is True
+        assert opts.kwargs['gridstyle'] == {'ygrid_line_alpha': 0, 'xgrid_line_dash': 'dashed'}
+
 
 @pytest.fixture(scope='module')
 def da():

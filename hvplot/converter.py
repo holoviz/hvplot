@@ -475,8 +475,11 @@ class HoloViewsConverter:
     fontsize : number or dict or None, default=None
         Set title, label and legend text to the same fontsize. Finer control
         by using a dict: ``{'title': '15pt', 'ylabel': '5px', 'ticks': 20}``.
-    grid : bool or None, default=None
-        Whether to show a grid.
+    grid : bool, str, or None, default=None
+        Whether to show a grid. If True, shows grid on both axes.
+        If ``'x'`` or ``'y'``, shows grid only on the specified axis.
+        Suffix with ``'dashed'``, ``'dotted'``, ``'dotdash'``, or ``'dashdot'``
+        to change the grid line style, e.g. ``'x-dashed'``.
 
     Resampling Options
     ------------------
@@ -1059,7 +1062,16 @@ class HoloViewsConverter:
             plot_opts['logy'] = logy
 
         if grid is not None:
-            plot_opts['show_grid'] = grid
+            if isinstance(grid, str):
+                gridstyle = {}
+                axis = grid[0]
+                other_axis = 'x' if axis == 'y' else 'y'
+                if len(grid) > 0:
+                    line_dash = grid[1:].lstrip('-').lstrip('.').lstrip('_')
+                    gridstyle[f'{axis}grid_line_dash'] = line_dash
+                gridstyle[f'{other_axis}grid_line_alpha'] = 0
+                plot_opts['gridstyle'] = gridstyle
+            plot_opts['show_grid'] = bool(grid)
 
         if legend is not None:
             plot_opts['show_legend'] = bool(legend)
