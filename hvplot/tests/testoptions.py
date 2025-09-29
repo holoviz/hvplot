@@ -653,7 +653,7 @@ class TestOptions:
         assert opts.kwargs['grid'] is True
         assert opts.kwargs['gridstyle'] == {'xgrid_line_alpha': 0}
 
-    @pytest.mark.parameterize('grid_str', ['x-dashed', 'xdashed', 'x.dashed', 'x_dashed'])
+    @pytest.mark.parametrize('grid_str', ['x-dashed', 'xdashed', 'x.dashed', 'x_dashed'])
     def test_grid_line_dash(self, df, backend, grid_str):
         plot = df.hvplot('x', 'y', grid=grid_str)
         opts = Store.lookup_options(backend, plot, 'plot')
