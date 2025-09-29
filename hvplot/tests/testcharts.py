@@ -535,6 +535,15 @@ class TestChart1D(ComparisonTestCase):
         ]
         assert list(plot.data['label']) == ['-58.7E -34.58N', '-47.9E -15.78N', '-70.7E -33.45N']
 
+    def test_labels_default_y(self):
+        edge_df = self.edge_df.copy().drop(columns=['Volume'])
+        plot = edge_df.hvplot.labels('Longitude', 'Latitude')
+        assert list(plot.dimensions()) == [
+            Dimension('Longitude'),
+            Dimension('Latitude'),
+        ]
+        assert list(plot.data['label']) == ['-34.58', '15.78', '-33.45']
+
     def test_labels_by(self):
         plot = self.edge_df.hvplot.labels(
             'Longitude', 'Latitude', text='{Longitude:.1f}E {Latitude:.2f}N', by='Volume {m3}'
