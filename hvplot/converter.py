@@ -82,9 +82,9 @@ from .util import (
     import_geoviews,
     is_mpl_cmap,
     _find_stack_level,
-    _convert_limits_for_tiles,
-    _is_within_latlon_bounds,
-    _transform_data_to_mercator,
+    is_within_latlon_bounds,
+    convert_latlon_to_mercator,
+    convert_limit_to_mercator,
 )
 from .utilities import hvplot_extension
 
@@ -1007,7 +1007,16 @@ class HoloViewsConverter:
             # to disable automatic projection of tiles
             self.output_projection = projection
         elif tiles and not self.geo and (xlim or ylim):
-            xlim, ylim = _convert_limits_for_tiles(data, x, y, xlim, ylim)
+            should_convert = (
+                not is_geodataframe(data)
+                and x is not None
+                and y is not None
+                and is_within_latlon_bounds(data, x, y)
+            )
+
+            if should_convert:
+                xlim = convert_limit_to_mercator(xlim, is_x_axis=True)
+                ylim = convert_limit_to_mercator(ylim, is_x_axis=False)
 
         # Operations
         if resample_when is not None and not any([rasterize, datashade, downsample]):
@@ -2534,8 +2543,16 @@ class HoloViewsConverter:
         elif is_geodataframe(data):
             if getattr(data, 'crs', None) is not None:
                 data = data.to_crs(epsg=3857)
-        elif _is_within_latlon_bounds(data, x, y):
-            data, x, y = _transform_data_to_mercator(data, x, y)
+        elif is_within_latlon_bounds(data, x, y):
+            data = data.copy()
+            easting, northing = convert_latlon_to_mercator(data[x], data[y])
+            new_x = 'x' if 'x' not in data else 'x_'
+            new_y = 'y' if 'y' not in data else 'y_'
+            data[new_x] = easting
+            data[new_y] = northing
+            if is_xarray(data):
+                data = data.swap_dims({x: new_x, y: new_y})
+            x, y = new_x, new_y
         return data, x, y
 
     def chart(self, element, x, y, data=None):
