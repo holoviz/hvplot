@@ -1484,7 +1484,7 @@ class hvPlotTabularDuckDB(hvPlotTabular):
     def _get_converter(self, x=None, y=None, kind=None, **kwds):
         import duckdb
 
-        if Version(duckdb.__version__).release < (1, 4, 0):
+        if Version(duckdb.__version__).release < (1, 4, 1):
             from duckdb.typing import (
                 BIGINT,
                 FLOAT,
