@@ -123,8 +123,8 @@ class TestAnnotationNotGeo:
         points = plot.get(1)
         
         # Check that the coordinates were converted
-        assert 'lon' not in points.data.columns
-        assert 'lat' not in points.data.columns
+        assert 'x' in points.data.columns or 'x_' in points.data.columns
+        assert 'y' in points.data.columns or 'y_' in points.data.columns
         
         # Calculate expected xlim and ylim in Web Mercator
         xlim_expected_0, _ = lon_lat_to_easting_northing(-130, 0)
@@ -160,3 +160,57 @@ class TestAnnotationNotGeo:
         assert abs(x_range_end - xlim_expected_1) < 100000
         assert abs(y_range_start - ylim_expected_0) < 100000
         assert abs(y_range_end - ylim_expected_1) < 100000
+
+    def test_xlim_ylim_not_converted_without_tiles(self):
+        """Test that xlim and ylim are NOT converted when tiles=False"""
+        # Create a dataframe with lat/lon-like data
+        df = pd.DataFrame({
+            'lon': [-120.0, -100.0, -80.0],
+            'lat': [30.0, 35.0, 40.0],
+            'value': [1, 2, 3]
+        })
+        
+        # Plot without tiles - xlim/ylim should NOT be converted
+        plot = df.hvplot.points('lon', 'lat', xlim=(-130, -70), ylim=(25, 45))
+        
+        # Get the plot opts - note: without tiles it's a Points element, not an overlay
+        bk_plot = bk_renderer.get_plot(plot)
+        
+        # Check that xlim and ylim were NOT converted (still in lat/lon range)
+        x_range_start = bk_plot.handles['plot'].x_range.start
+        x_range_end = bk_plot.handles['plot'].x_range.end
+        y_range_start = bk_plot.handles['plot'].y_range.start
+        y_range_end = bk_plot.handles['plot'].y_range.end
+        
+        # Values should still be in lat/lon range
+        assert -140 < x_range_start < -120
+        assert -80 < x_range_end < -60
+        assert 20 < y_range_start < 30
+        assert 40 < y_range_end < 50
+
+    def test_xlim_ylim_out_of_bounds_not_converted(self):
+        """Test that xlim and ylim are NOT converted when values are outside lat/lon bounds"""
+        # Create a dataframe with arbitrary data
+        df = pd.DataFrame({
+            'x': [1000.0, 2000.0, 3000.0],
+            'y': [500.0, 600.0, 700.0],
+            'value': [1, 2, 3]
+        })
+        
+        # Plot with tiles but xlim/ylim outside lat/lon bounds
+        plot = df.hvplot.points('x', 'y', tiles=True, xlim=(1000, 3000), ylim=(400, 800))
+        
+        # Get the plot opts
+        bk_plot = bk_renderer.get_plot(plot.get(1))
+        
+        # Check that xlim and ylim were NOT converted (still in original range)
+        x_range_start = bk_plot.handles['plot'].x_range.start
+        x_range_end = bk_plot.handles['plot'].x_range.end
+        y_range_start = bk_plot.handles['plot'].y_range.start
+        y_range_end = bk_plot.handles['plot'].y_range.end
+        
+        # Values should still be in original range (not Web Mercator)
+        assert 900 < x_range_start < 1100
+        assert 2900 < x_range_end < 3100
+        assert 300 < y_range_start < 500
+        assert 700 < y_range_end < 900
