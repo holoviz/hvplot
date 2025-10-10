@@ -5,7 +5,7 @@ from importlib.util import find_spec
 
 import dask
 
-from packaging.version import Version
+from packaging.version import Version, parse
 from bokeh.io.webdriver import webdriver_control
 
 # Examples that are slow to run and/or download large files.
@@ -41,6 +41,16 @@ if not find_spec('geoviews'):
         'user_guide/Geographic_Data.ipynb',
         'user_guide/Integrations.ipynb',
     ]
+
+try:
+    import ibis
+    import duckdb
+
+    # 'Ibis <= 10.8.0 is incompatible with DuckDB >= 1.4')
+    if parse(ibis.__version__) <= parse('10.8.0') and parse(duckdb.__version__) >= parse('1.4'):
+        collect_ignore_glob += ['doc/ref/data_libraries.ipynb']
+except ImportError:
+    pass
 
 try:
     webdriver_control.create()
