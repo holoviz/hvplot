@@ -541,6 +541,7 @@ class TestChart1D(ComparisonTestCase):
         assert list(plot.dimensions()) == [
             Dimension('Longitude'),
             Dimension('Latitude'),
+            Dimension('Latitude'),
         ]
         assert list(plot.data['label']) == ['-34.58', '15.78', '-33.45']
 
