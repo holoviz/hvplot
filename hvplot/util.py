@@ -21,6 +21,7 @@ import numpy as np
 import pandas as pd
 import param
 import holoviews as hv
+from holoviews.util.transform import lon_lat_to_easting_northing
 
 try:
     import panel as pn
@@ -408,6 +409,89 @@ def process_crs(crs):
         'WKT string, cartopy CRS instance, cartopy CRS class name string, '
         'pyproj.Proj, or pyproj.CRS.'
     ) from Exception(*errors)
+
+
+def _is_within_latlon_bounds(data, x, y):
+    """Return True when finite lat/lon bounds are detected."""
+
+    if is_lazy_data(data):
+        return False
+
+    try:
+        min_x = np.min(data[x])
+        max_x = np.max(data[x])
+        min_y = np.min(data[y])
+        max_y = np.max(data[y])
+    except (KeyError, ValueError, TypeError):
+        return False
+
+    x_ok = -180 <= min_x <= 360 and -180 <= max_x <= 360
+    y_ok = -90 <= min_y <= 90 and -90 <= max_y <= 90
+    return bool(x_ok and y_ok)
+
+
+def _convert_latlon_to_mercator(lon, lat):
+    """Convert lon/lat values to Web Mercator easting/northing."""
+    lon_normalized = (lon + 180) % 360 - 180
+    return lon_lat_to_easting_northing(lon_normalized, lat)
+
+
+def _convert_limit_to_mercator(limit, is_x_axis=True):
+    """Convert axis limits to Web Mercator coordinates when possible."""
+
+    if not limit:
+        return None
+
+    try:
+        v0, v1 = limit
+    except (TypeError, ValueError):
+        return limit
+
+    if is_x_axis:
+        if not (-180 <= v0 <= 360 and -180 <= v1 <= 360):
+            return limit
+        v0_merc, _ = _convert_latlon_to_mercator(v0, 0)
+        v1_merc, _ = _convert_latlon_to_mercator(v1, 0)
+    else:
+        if not (-90 <= v0 <= 90 and -90 <= v1 <= 90):
+            return limit
+        _, v0_merc = _convert_latlon_to_mercator(0, v0)
+        _, v1_merc = _convert_latlon_to_mercator(0, v1)
+
+    return (v0_merc, v1_merc)
+
+
+def _transform_data_to_mercator(data, x, y):
+    """Project data columns from lon/lat to Web Mercator."""
+
+    data = data.copy()
+    easting, northing = lon_lat_to_easting_northing(data[x], data[y])
+    new_x = 'x' if 'x' not in data else 'x_'
+    new_y = 'y' if 'y' not in data else 'y_'
+    data[new_x] = easting
+    data[new_y] = northing
+
+    if is_xarray(data):
+        data = data.swap_dims({x: new_x, y: new_y})
+    return data, new_x, new_y
+
+
+def _convert_limits_for_tiles(data, x, y, xlim, ylim):
+    """Convert axis limits when tiles are enabled without geo=True."""
+
+    should_convert = (
+        not is_geodataframe(data)
+        and x is not None
+        and y is not None
+        and _is_within_latlon_bounds(data, x, y)
+    )
+
+    if not should_convert:
+        return xlim, ylim
+
+    converted_xlim = _convert_limit_to_mercator(xlim, is_x_axis=True)
+    converted_ylim = _convert_limit_to_mercator(ylim, is_x_axis=False)
+    return converted_xlim, converted_ylim
 
 
 def is_list_like(obj):
