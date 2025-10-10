@@ -1006,28 +1006,47 @@ class HoloViewsConverter:
         elif tiles and not self.geo and (xlim or ylim):
             # Automatically convert xlim/ylim to Web Mercator when tiles are used
             # without geo=True, similar to how data coordinates are converted
-            # Check if xlim is within lat/lon bounds and convert
-            if xlim:
-                x0, x1 = xlim
-                xlim_in_bounds = -180 <= x0 <= 360 and -180 <= x1 <= 360
-                if xlim_in_bounds:
-                    # Normalize to -180 to 180 range for better ticks
-                    x0_norm = (x0 + 180) % 360 - 180
-                    x1_norm = (x1 + 180) % 360 - 180
-                    # Convert to Web Mercator (easting only depends on longitude)
-                    x0_merc, _ = lon_lat_to_easting_northing(x0_norm, 0)
-                    x1_merc, _ = lon_lat_to_easting_northing(x1_norm, 0)
-                    xlim = (x0_merc, x1_merc)
+            # First check if the data itself is in lat/lon bounds (same logic as _process_tiles_without_geo)
+            should_convert = False
+            if not is_geodataframe(data) and x is not None and y is not None:
+                try:
+                    if not is_lazy_data(data):
+                        # Check data bounds to determine if conversion should happen
+                        min_x = np.min(data[x])
+                        max_x = np.max(data[x])
+                        min_y = np.min(data[y])
+                        max_y = np.max(data[y])
+                        x_within_bounds = -180 <= min_x <= 360 and -180 <= max_x <= 360
+                        y_within_bounds = -90 <= min_y <= 90 and -90 <= max_y <= 90
+                        should_convert = x_within_bounds and y_within_bounds
+                except (KeyError, ValueError, TypeError):
+                    # If we can't check data bounds, don't convert
+                    pass
             
-            # Check if ylim is within lat/lon bounds and convert
-            if ylim:
-                y0, y1 = ylim
-                ylim_in_bounds = -90 <= y0 <= 90 and -90 <= y1 <= 90
-                if ylim_in_bounds:
-                    # Convert to Web Mercator (northing only depends on latitude)
-                    _, y0_merc = lon_lat_to_easting_northing(0, y0)
-                    _, y1_merc = lon_lat_to_easting_northing(0, y1)
-                    ylim = (y0_merc, y1_merc)
+            # Only convert xlim/ylim if data is in lat/lon bounds
+            if should_convert:
+                # Check if xlim is within lat/lon bounds and convert
+                if xlim:
+                    x0, x1 = xlim
+                    xlim_in_bounds = -180 <= x0 <= 360 and -180 <= x1 <= 360
+                    if xlim_in_bounds:
+                        # Normalize to -180 to 180 range for better ticks
+                        x0_norm = (x0 + 180) % 360 - 180
+                        x1_norm = (x1 + 180) % 360 - 180
+                        # Convert to Web Mercator (easting only depends on longitude)
+                        x0_merc, _ = lon_lat_to_easting_northing(x0_norm, 0)
+                        x1_merc, _ = lon_lat_to_easting_northing(x1_norm, 0)
+                        xlim = (x0_merc, x1_merc)
+                
+                # Check if ylim is within lat/lon bounds and convert
+                if ylim:
+                    y0, y1 = ylim
+                    ylim_in_bounds = -90 <= y0 <= 90 and -90 <= y1 <= 90
+                    if ylim_in_bounds:
+                        # Convert to Web Mercator (northing only depends on latitude)
+                        _, y0_merc = lon_lat_to_easting_northing(0, y0)
+                        _, y1_merc = lon_lat_to_easting_northing(0, y1)
+                        ylim = (y0_merc, y1_merc)
 
         # Operations
         if resample_when is not None and not any([rasterize, datashade, downsample]):
