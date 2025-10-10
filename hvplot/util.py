@@ -446,13 +446,11 @@ def convert_limit_to_mercator(limit, is_x_axis=True):
     if is_x_axis:
         if not (-180 <= v0 <= 360 and -180 <= v1 <= 360):
             return limit
-        v0_merc, _ = convert_latlon_to_mercator(v0, 0)
-        v1_merc, _ = convert_latlon_to_mercator(v1, 0)
+        (v0_merc, v1_merc), _ = convert_latlon_to_mercator(np.array([v0, v1]), (0, 0))
     else:
         if not (-90 <= v0 <= 90 and -90 <= v1 <= 90):
             return limit
-        _, v0_merc = convert_latlon_to_mercator(0, v0)
-        _, v1_merc = convert_latlon_to_mercator(0, v1)
+        _, (v0_merc, v1_merc) = convert_latlon_to_mercator(np.array([0, 0]), (v0, v1))
 
     return (v0_merc, v1_merc)
 
