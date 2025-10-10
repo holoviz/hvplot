@@ -48,7 +48,7 @@ try:
 
     # 'Ibis <= 10.8.0 is incompatible with DuckDB >= 1.4')
     if parse(ibis.__version__) <= parse('10.8.0') and parse(duckdb.__version__) >= parse('1.4'):
-        collect_ignore_glob += ['doc/ref/data_libraries.ipynb']
+        collect_ignore_glob += ['ref/data_libraries.ipynb']
 except ImportError:
     pass
 
