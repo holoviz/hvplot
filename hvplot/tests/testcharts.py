@@ -543,7 +543,8 @@ class TestChart1D(ComparisonTestCase):
             Dimension('Latitude'),
             Dimension('Latitude'),
         ]
-        assert list(plot.data['label']) == ['-34.58', '15.78', '-33.45']
+        assert plot.kdims == ['Longitude', 'Latitude']
+        assert plot.vdims == ['Latitude']
 
     def test_labels_by(self):
         plot = self.edge_df.hvplot.labels(
