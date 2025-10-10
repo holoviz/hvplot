@@ -413,10 +413,6 @@ def process_crs(crs):
 
 def is_within_latlon_bounds(data, x, y):
     """Return True when finite lat/lon bounds are detected."""
-
-    if is_lazy_data(data):
-        return False
-
     try:
         min_x = np.min(data[x])
         max_x = np.max(data[x])
