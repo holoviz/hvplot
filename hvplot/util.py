@@ -480,7 +480,7 @@ def is_dask(data):
 
 
 def is_duckdb(data):
-    if not check_library(data, 'duckdb'):
+    if not any((check_library(data, 'duckdb'), check_library(data, '_duckdb'))):
         return False
     import duckdb
 

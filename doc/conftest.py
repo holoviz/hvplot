@@ -5,7 +5,7 @@ from importlib.util import find_spec
 
 import dask
 
-from packaging.version import Version
+from packaging.version import Version, parse
 from bokeh.io.webdriver import webdriver_control
 
 # Examples that are slow to run and/or download large files.
@@ -43,6 +43,16 @@ if not find_spec('geoviews'):
     ]
 
 try:
+    import ibis
+    import duckdb
+
+    # 'Ibis <= 10.8.0 is incompatible with DuckDB >= 1.4')
+    if parse(ibis.__version__) <= parse('10.8.0') and parse(duckdb.__version__) >= parse('1.4'):
+        collect_ignore_glob += ['ref/data_libraries.ipynb']
+except ImportError:
+    pass
+
+try:
     webdriver_control.create()
 except RuntimeError:
     # hvplot.save() with bokeh
@@ -74,3 +84,28 @@ else:
         collect_ignore_glob += [
             'user_guide/Gridded_Data.ipynb',
         ]
+
+
+def pytest_runtest_makereport(item, call):
+    """
+    Skip tests that fail because "the kernel died before replying to kernel_info"
+    this is a common error when running the example tests in CI.
+
+    Inspired from: https://stackoverflow.com/questions/32451811
+
+    """
+    from _pytest.runner import pytest_runtest_makereport
+
+    tr = pytest_runtest_makereport(item, call)
+
+    if call.excinfo is not None:
+        msgs = [
+            'Kernel died before replying to kernel_info',
+            "Kernel didn't respond in 60 seconds",
+        ]
+        for msg in msgs:
+            if call.excinfo.type is RuntimeError and call.excinfo.value.args[0] in msg:
+                tr.outcome = 'skipped'
+                tr.wasxfail = f'reason: {msg}'
+
+    return tr
