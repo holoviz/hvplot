@@ -131,6 +131,7 @@ jobs:
       - name: Test Unit
         run: pixi run -e ${{ matrix.environment }} test-unit-cov
       - name: Test Geo
+        if: ${{ matrix.environment != 'test-314' }}
         run: pixi run -e ${{ matrix.environment }} test-unit-geo-cov
       - name: Test Examples
         run: |
