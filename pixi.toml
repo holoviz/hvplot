@@ -33,8 +33,12 @@ no-default-feature = true
 features = ["py313", "required", "test-core", "test", "example", "geo", "graphviz", "test-example"]
 no-default-feature = true
 
+[environments.test-314]
+features = ["py314", "required", "test-core", "test-314", "example-314", "graphviz", "test-example"]  # geo
+no-default-feature = true
+
 [environments.test-core]
-features = ["py313", "required", "test-core"]
+features = ["py314", "required", "test-core"]
 no-default-feature = true
 
 [environments.docs]
@@ -73,24 +77,26 @@ PYTHONIOENCODING = "utf-8"
 
 [feature.py310.dependencies]
 python = "3.10.*"
-bokeh_sampledata = "*"
 
 [feature.py311.dependencies]
 python = "3.11.*"
-bokeh_sampledata = "*"
 
 [feature.py312.dependencies]
 python = "3.12.*"
-bokeh_sampledata = "*"
 
 [feature.py312.activation.env]
 COVERAGE_CORE = "sysmon"
 
 [feature.py313.dependencies]
 python = "3.13.*"
-bokeh_sampledata = "*"
 
 [feature.py313.activation.env]
+COVERAGE_CORE = "sysmon"
+
+[feature.py314.dependencies]
+python = "3.14.*"
+
+[feature.py314.activation.env]
 COVERAGE_CORE = "sysmon"
 
 # =================== DEV ===================
@@ -143,6 +149,39 @@ xyzservices = ">=2022.9.0"
 geodatasets = ">=2023.12.0"
 hvsampledata = ">=0.1.4a2"
 
+[feature.example-314.dependencies]
+dask = "*"  # dask[dataframe]
+# datashader = ">=0.6.5"
+duckdb = "*"
+qpd = ">=0.4.4"
+fugue-sql-antlr = ">=0.2.0"
+sqlglot = "*"
+jinja2 = "*"
+fugue = "*"
+ibis-duckdb = ">=9.0.0"  # ibis-framework[duckdb]
+intake-parquet = ">=0.2.3"
+intake-xarray = ">=0.5.0,<2"
+intake  = ">=0.6.5,<2.0.0"
+ipywidgets = "*"
+networkx = ">=2.6.3"
+matplotlib = "*"
+notebook = ">=5.4"
+# numba = ">=0.51.0"
+pillow = ">=8.2.0"
+plotly = "*"
+polars = "*"
+pooch = ">=1.6.0"
+s3fs = ">=2022.1.0"
+scikit-image = ">=0.17.2"
+scikit-learn = ">=1.4.0"
+scipy = ">=1.5.3"
+selenium  = ">=3.141.0"
+streamz = ">=0.3.0"
+xarray = ">=0.18.2"
+xyzservices = ">=2022.9.0"
+geodatasets = ">=2023.12.0"
+hvsampledata = ">=0.1.4a2"
+
 # =================== TESTS ===================
 
 [feature.test-core.dependencies]
@@ -159,7 +198,7 @@ pytest = "*"
 ruff = "*"
 scipy = "*"
 xarray = "*"
-# bokeh_sampledata = "*" (only available starting from Python 3.10)
+bokeh_sampledata = "*"
 psutil = "*"
 cftime = "*"
 numpydoc = "*"
@@ -186,6 +225,18 @@ ibis-duckdb = ">=9.0.0"  # ibis-framework[duckdb]
 polars = "*"
 dask = "*"
 spatialpandas = "*"
+duckdb = "*"
+
+[feature.test-314.dependencies]
+qpd = ">=0.4.4"
+fugue-sql-antlr = ">=0.2.0"
+sqlglot = "*"
+jinja2 = "*"
+fugue = "*"
+ibis-duckdb = ">=9.0.0"  # ibis-framework[duckdb]
+polars = "*"
+dask = "*"
+# spatialpandas = "*"
 duckdb = "*"
 
 [feature.geo.dependencies]
