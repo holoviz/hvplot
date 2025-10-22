@@ -13,6 +13,7 @@ from contextlib import contextmanager
 from functools import lru_cache, wraps
 from importlib.util import find_spec
 from types import FunctionType
+import warnings
 
 from packaging.version import Version
 
@@ -411,28 +412,49 @@ def process_crs(crs):
     ) from Exception(*errors)
 
 
-def is_within_latlon_bounds(data, x, y):
-    """Return True when finite lat/lon bounds are detected."""
+def is_within_latlon_bounds(data: pd.DataFrame | dict, x: str, y: str) -> bool:
+    """
+    Return True when finite lat/lon bounds are detected.
+    If unexpected data is encountered, return False.
+    """
     try:
         min_x = np.min(data[x])
         max_x = np.max(data[x])
         min_y = np.min(data[y])
         max_y = np.max(data[y])
-    except (KeyError, ValueError, TypeError):
+    except Exception as e:
+        warnings.warn(f'Could not determine lat/lon bounds: {e}')
         return False
 
     x_ok = -180 <= min_x <= 360 and -180 <= max_x <= 360
     y_ok = -90 <= min_y <= 90 and -90 <= max_y <= 90
-    return bool(x_ok and y_ok)
+    return x_ok and y_ok
 
 
-def convert_latlon_to_mercator(lon, lat):
+def convert_latlon_to_mercator(lon: np.ndarray, lat: np.ndarray):
     """Convert lon/lat values to Web Mercator easting/northing."""
+    # ticks are better with -180 to 180
     lon_normalized = (lon + 180) % 360 - 180
     return lon_lat_to_easting_northing(lon_normalized, lat)
 
 
-def convert_limit_to_mercator(limit, is_x_axis=True):
+def _is_valid_bound(v):
+    """
+    Check if a bound value is valid (not None or NaN).
+    """
+    return v is not None and not (isinstance(v, float) and np.isnan(v))
+
+
+def _bounds_in_range(v0, v1, min_val, max_val):
+    """
+    Check if both bounds are valid and in range.
+    """
+    if not (_is_valid_bound(v0) and _is_valid_bound(v1)):
+        return False
+    return min_val <= v0 <= max_val and min_val <= v1 <= max_val
+
+
+def convert_limit_to_mercator(limit: tuple | None, is_x_axis=True) -> tuple | None:
     """Convert axis limits to Web Mercator coordinates when possible."""
 
     if not limit:
@@ -440,15 +462,16 @@ def convert_limit_to_mercator(limit, is_x_axis=True):
 
     try:
         v0, v1 = limit
-    except (TypeError, ValueError):
+    except Exception as e:
+        warnings.warn(f'Could not unpack limit {limit}: {e}')
         return limit
 
     if is_x_axis:
-        if not (-180 <= v0 <= 360 and -180 <= v1 <= 360):
+        if not _bounds_in_range(v0, v1, -180, 360):
             return limit
         (v0_merc, v1_merc), _ = convert_latlon_to_mercator(np.array([v0, v1]), (0, 0))
     else:
-        if not (-90 <= v0 <= 90 and -90 <= v1 <= 90):
+        if not _bounds_in_range(v0, v1, -90, 90):
             return limit
         _, (v0_merc, v1_merc) = convert_latlon_to_mercator(np.array([0, 0]), (v0, v1))
 
