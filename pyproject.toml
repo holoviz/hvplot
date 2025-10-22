@@ -205,6 +205,8 @@ filterwarnings = [
     "ignore: 'xdrlib' is deprecated and slated for removal in Python 3.13:DeprecationWarning:metpy.io.nexrad",
     # 2023-09: See https://github.com/python-streamz/streamz/issues/460
     "ignore: pkg_resources is deprecated as an API:DeprecationWarning:streamz.plugins",
+    # 2025-10
+    "ignore:'_UnionGenericAlias' is deprecated and slated for removal in Python 3.17", # OK
 ]
 
 [tool.codespell]
