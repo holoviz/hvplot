@@ -27,12 +27,12 @@ if not find_spec('geoviews'):  # geo examples
         'gallery/geospatial/*.ipynb',
         'gallery/gridded/rgb_satellite_imagery.ipynb',
         'ref/api/manual/hvplot.hvPlot.paths.ipynb',
-        'ref/api/manual/hvplot.hvPlot.points.ipynb'
-        'ref/api/manual/hvplot.hvPlot.polygons.ipynb'
-        'ref/api/manual/hvplot.hvPlot.quadmesh.ipynb'
-        'ref/api/manual/hvplot.hvPlot.rgb.ipynb'
-        'ref/api/manual/hvplot.hvPlot.vectorfield.ipynb'
-        'ref/data_libraries.ipynb'
+        'ref/api/manual/hvplot.hvPlot.points.ipynb',
+        'ref/api/manual/hvplot.hvPlot.polygons.ipynb',
+        'ref/api/manual/hvplot.hvPlot.quadmesh.ipynb',
+        'ref/api/manual/hvplot.hvPlot.rgb.ipynb',
+        'ref/api/manual/hvplot.hvPlot.vectorfield.ipynb',
+        'ref/data_libraries.ipynb',
         'ref/plotting_options/geographic.ipynb',
         'user_guide/Explorer.ipynb',
         'user_guide/Geographic_Data.ipynb',
