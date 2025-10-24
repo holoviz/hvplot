@@ -415,8 +415,8 @@ The *Explorer* is a [Panel](https://panel.holoviz.org) web application that can 
 
 ```python
 import hvplot.pandas
-from bokeh.sampledata.penguins import data as df
 
+df = hvplot.sampledata.penguins("pandas").dropna()
 hvexplorer = df.hvplot.explorer()
 hvexplorer
 ```
