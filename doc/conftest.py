@@ -1,5 +1,4 @@
 import os
-import sys
 
 from importlib.util import find_spec
 
@@ -21,26 +20,41 @@ collect_ignore_glob = [
 if os.getenv('HVPLOT_INCLUDE_SLOW_EXAMPLES'):
     collect_ignore_glob.extend(SLOW_EXAMPLES)
 
-# On MacOs, Python 3.12 and 3.13, got the following error running this:
-# `pos = layout(G)`
-# => OSError: Format: "dot" not recognized. No formats found.
-# Fixed locally by running `dot -c`
-if not find_spec('pygraphviz') or (
-    sys.platform == 'darwin' and sys.version_info[:2] in [(3, 12), (3, 13)]
-):
-    collect_ignore_glob += [
-        'user_guide/NetworkX.ipynb',
-    ]
 
-if not find_spec('geoviews'):
+if not find_spec('geoviews'):  # geo examples
     collect_ignore_glob += [
         'tutorials/getting_started.ipynb',
         'gallery/geospatial/*.ipynb',
         'gallery/gridded/rgb_satellite_imagery.ipynb',
+        'ref/api/manual/hvplot.hvPlot.paths.ipynb',
+        'ref/api/manual/hvplot.hvPlot.points.ipynb',
+        'ref/api/manual/hvplot.hvPlot.polygons.ipynb',
+        'ref/api/manual/hvplot.hvPlot.quadmesh.ipynb',
+        'ref/api/manual/hvplot.hvPlot.rgb.ipynb',
+        'ref/api/manual/hvplot.hvPlot.vectorfield.ipynb',
+        'ref/data_libraries.ipynb',
+        'ref/plotting_options/geographic.ipynb',
         'user_guide/Explorer.ipynb',
         'user_guide/Geographic_Data.ipynb',
         'user_guide/Integrations.ipynb',
     ]
+
+if not find_spec('datashader'):
+    collect_ignore_glob += [
+        'ref/api/manual/hvplot.plotting.scatter_matrix.ipynb',
+        'ref/plotting_options/resampling.ipynb',
+        'user_guide/Gridded_Data.ipynb',
+        'user_guide/Large_Timeseries.ipynb',
+        'user_guide/Plotting.ipynb',
+        'user_guide/Plotting_with_Matplotlib.ipynb',
+        'user_guide/Plotting_with_Plotly.ipynb',
+    ]
+
+if not find_spec('streamz'):
+    collect_ignore_glob += [
+        'ref/plotting_options/streaming.ipynb',
+    ]
+
 
 try:
     import ibis
@@ -52,16 +66,17 @@ try:
 except ImportError:
     pass
 
-try:
-    webdriver_control.create()
-except RuntimeError:
-    # hvplot.save() with bokeh
-    collect_ignore_glob += [
-        'user_guide/Viewing.ipynb',
-        'user_guide/NetworkX.ipynb',
-    ]
-finally:
-    webdriver_control.cleanup()
+if find_spec('selenium'):
+    try:
+        webdriver_control.create()
+    except RuntimeError:
+        # hvplot.save() with bokeh
+        collect_ignore_glob += [
+            'user_guide/Viewing.ipynb',
+            'user_guide/NetworkX.ipynb',
+        ]
+    finally:
+        webdriver_control.cleanup()
 
 
 if Version(dask.__version__).release < (2025, 1, 0):
