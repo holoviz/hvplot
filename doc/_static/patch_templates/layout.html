@@ -1,0 +1,6 @@
+{% extends "!layout.html" %}
+
+{% block extrahead %}
+  {{ super() }}
+  <link rel="preload" href="/switcher.json" as="fetch" crossorigin="anonymous">
+{% endblock %}
