@@ -2411,6 +2411,14 @@ class HoloViewsConverter:
             ys += [self.kwds['yerr1']]
         kdims, vdims = self._get_dimensions([x], ys)
 
+        # Automatically exclude internal style columns from hover tooltips
+        # if hover_tooltips was not explicitly set by the user
+        internal_cols = {'_color', '_size'}
+        if 'hover_tooltips' not in self._plot_opts and any(v in internal_cols for v in vdims):
+            hover_dims = [d for d in kdims + vdims if d not in internal_cols]
+            if hover_dims:
+                cur_opts[element.name]['hover_tooltips'] = [(d, f'@{{{d}}}') for d in hover_dims]
+
         if self.by:
             if element is Bars and not self.subplots:
                 if not support_index(data) and any(y in self.indexes for y in ys):
