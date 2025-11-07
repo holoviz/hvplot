@@ -90,6 +90,81 @@ class TestChart2D(ComparisonTestCase):
 
         assert render(ndoverlay, 'bokeh').xaxis.axis_label == 'time (s)'
 
+    def test_color_series_excluded_from_default_hover(self):
+        color_series = self.cat_df['category'].map({'A': 'red', 'B': 'blue'})
+        plot = self.cat_df.hvplot.scatter(x='x', y='y', color=color_series)
+
+        # Check hover_tooltips option
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        hover_tooltips = opts.kwargs.get('hover_tooltips')
+
+        # hover_tooltips should be set and not include _color
+        assert hover_tooltips is not None
+        tooltip_dims = [tt[0] if isinstance(tt, tuple) else tt for tt in hover_tooltips]
+        assert '_color' not in tooltip_dims
+        assert 'x' in tooltip_dims
+        assert 'y' in tooltip_dims
+
+    def test_size_series_excluded_from_default_hover(self):
+        size_series = self.cat_df['y'] / 10
+        plot = self.cat_df.hvplot.scatter(x='x', y='y', s=size_series)
+
+        assert '_size' in plot.data.columns
+
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        hover_tooltips = opts.kwargs.get('hover_tooltips')
+
+        # hover_tooltips should be set and not include _size
+        assert hover_tooltips is not None
+        tooltip_dims = [tt[0] if isinstance(tt, tuple) else tt for tt in hover_tooltips]
+        assert '_size' not in tooltip_dims
+        assert 'x' in tooltip_dims
+        assert 'y' in tooltip_dims
+
+    def test_explicit_hover_tooltips_respected_with_internal_columns(self):
+        color_series = self.cat_df['category'].map({'A': 'red', 'B': 'blue'})
+        plot = self.cat_df.hvplot.scatter(
+            x='x', y='y', color=color_series, hover_tooltips=[('x', '@x'), ('color', '@_color')]
+        )
+
+        # Explicit hover_tooltips should be used
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        hover_tooltips = opts.kwargs.get('hover_tooltips')
+        assert hover_tooltips == [('x', '@x'), ('color', '@_color')]
+
+    def test_color_column_name_shown_in_hover(self):
+        plot = self.cat_df.hvplot.scatter(x='x', y='y', color='category')
+
+        assert 'category' in [d.name for d in plot.vdims]
+        assert '_color' not in plot.data.columns
+
+    def test_color_with_cmap_dict_shown_in_hover(self):
+        plot = self.cat_df.hvplot.scatter(
+            x='x', y='y', color='category', cmap={'A': 'red', 'B': 'blue'}
+        )
+
+        assert 'category' in [d.name for d in plot.vdims]
+        assert '_color' not in plot.data.columns
+
+    def test_both_color_and_size_series_excluded_from_hover(self):
+        color_series = self.cat_df['category'].map({'A': 'red', 'B': 'blue'})
+        size_series = self.cat_df['y'] / 10
+        plot = self.cat_df.hvplot.scatter(x='x', y='y', color=color_series, s=size_series)
+
+        # Both should be in data
+        assert '_color' in plot.data.columns
+        assert '_size' in plot.data.columns
+
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        hover_tooltips = opts.kwargs.get('hover_tooltips')
+
+        assert hover_tooltips is not None
+        tooltip_dims = [tt[0] if isinstance(tt, tuple) else tt for tt in hover_tooltips]
+        assert '_color' not in tooltip_dims
+        assert '_size' not in tooltip_dims
+        assert 'x' in tooltip_dims
+        assert 'y' in tooltip_dims
+
 
 class TestChart2DDask(TestChart2D):
     def setUp(self):
@@ -122,6 +197,19 @@ class TestChart2DDask(TestChart2D):
         self.assertEqual(
             plot, element(self.cat_df.reset_index(), ['x', 'y'], ['index', 'category'])
         )
+
+    # Skip Series.map() tests as they don't work with Dask
+    def test_color_series_excluded_from_default_hover(self):
+        raise SkipTest('Series.map() not supported with Dask DataFrames')
+
+    def test_size_series_excluded_from_default_hover(self):
+        raise SkipTest('Series.map() not supported with Dask DataFrames')
+
+    def test_explicit_hover_tooltips_respected_with_internal_columns(self):
+        raise SkipTest('Series.map() not supported with Dask DataFrames')
+
+    def test_both_color_and_size_series_excluded_from_hover(self):
+        raise SkipTest('Series.map() not supported with Dask DataFrames')
 
 
 class TestChart1D(ComparisonTestCase):
@@ -644,96 +732,3 @@ def test_cmap_LinearSegmentedColormap():
     data = np.arange(25).reshape(5, 5)
     xr_da = xr.DataArray(data)
     xr_da.hvplot.image(cmap=mpl.colormaps['viridis'])
-
-
-# Tests for https://github.com/holoviz/hvplot/pull/1690
-class TestInternalColumnsHover:
-    @pytest.fixture(autouse=True)
-    def setup(self):
-        import hvplot.pandas  # noqa
-
-        self.df = pd.DataFrame(
-            {'x': [1, 2, 3, 4, 5], 'y': [2, 4, 6, 8, 10], 'category': ['A', 'B', 'A', 'B', 'A']}
-        )
-
-    def test_color_series_creates_internal_color_column(self):
-        color_series = self.df['category'].map({'A': 'red', 'B': 'blue'})
-        plot = self.df.hvplot.scatter(x='x', y='y', color=color_series)
-
-        assert '_color' in plot.data.columns
-        assert '_color' in [d.name for d in plot.vdims]
-
-    def test_color_series_excluded_from_default_hover(self):
-        color_series = self.df['category'].map({'A': 'red', 'B': 'blue'})
-        plot = self.df.hvplot.scatter(x='x', y='y', color=color_series)
-
-        # Check hover_tooltips option
-        opts = Store.lookup_options('bokeh', plot, 'plot')
-        hover_tooltips = opts.kwargs.get('hover_tooltips')
-
-        # hover_tooltips should be set and not include _color
-        assert hover_tooltips is not None
-        tooltip_dims = [tt[0] if isinstance(tt, tuple) else tt for tt in hover_tooltips]
-        assert '_color' not in tooltip_dims
-        assert 'x' in tooltip_dims
-        assert 'y' in tooltip_dims
-
-    def test_size_series_excluded_from_default_hover(self):
-        size_series = self.df['y'] / 10
-        plot = self.df.hvplot.scatter(x='x', y='y', s=size_series)
-
-        assert '_size' in plot.data.columns
-
-        opts = Store.lookup_options('bokeh', plot, 'plot')
-        hover_tooltips = opts.kwargs.get('hover_tooltips')
-
-        # hover_tooltips should be set and not include _size
-        assert hover_tooltips is not None
-        tooltip_dims = [tt[0] if isinstance(tt, tuple) else tt for tt in hover_tooltips]
-        assert '_size' not in tooltip_dims
-        assert 'x' in tooltip_dims
-        assert 'y' in tooltip_dims
-
-    def test_explicit_hover_tooltips_respected_with_internal_columns(self):
-        color_series = self.df['category'].map({'A': 'red', 'B': 'blue'})
-        plot = self.df.hvplot.scatter(
-            x='x', y='y', color=color_series, hover_tooltips=[('x', '@x'), ('color', '@_color')]
-        )
-
-        # Explicit hover_tooltips should be used
-        opts = Store.lookup_options('bokeh', plot, 'plot')
-        hover_tooltips = opts.kwargs.get('hover_tooltips')
-        assert hover_tooltips == [('x', '@x'), ('color', '@_color')]
-
-    def test_color_column_name_shown_in_hover(self):
-        plot = self.df.hvplot.scatter(x='x', y='y', color='category')
-
-        assert 'category' in [d.name for d in plot.vdims]
-        assert '_color' not in plot.data.columns
-
-    def test_color_with_cmap_dict_shown_in_hover(self):
-        plot = self.df.hvplot.scatter(
-            x='x', y='y', color='category', cmap={'A': 'red', 'B': 'blue'}
-        )
-
-        assert 'category' in [d.name for d in plot.vdims]
-        assert '_color' not in plot.data.columns
-
-    def test_both_color_and_size_series_excluded_from_hover(self):
-        color_series = self.df['category'].map({'A': 'red', 'B': 'blue'})
-        size_series = self.df['y'] / 10
-        plot = self.df.hvplot.scatter(x='x', y='y', color=color_series, s=size_series)
-
-        # Both should be in data
-        assert '_color' in plot.data.columns
-        assert '_size' in plot.data.columns
-
-        opts = Store.lookup_options('bokeh', plot, 'plot')
-        hover_tooltips = opts.kwargs.get('hover_tooltips')
-
-        assert hover_tooltips is not None
-        tooltip_dims = [tt[0] if isinstance(tt, tuple) else tt for tt in hover_tooltips]
-        assert '_color' not in tooltip_dims
-        assert '_size' not in tooltip_dims
-        assert 'x' in tooltip_dims
-        assert 'y' in tooltip_dims
