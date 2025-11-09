@@ -412,7 +412,7 @@ def process_crs(crs):
     ) from Exception(*errors)
 
 
-def is_within_latlon_bounds(data: pd.DataFrame | dict, x: str, y: str) -> bool:
+def _is_within_latlon_bounds(data: pd.DataFrame | dict, x: str, y: str) -> bool:
     """
     Return True when finite lat/lon bounds are detected.
     If unexpected data is encountered, return False.
@@ -431,7 +431,7 @@ def is_within_latlon_bounds(data: pd.DataFrame | dict, x: str, y: str) -> bool:
         return False
 
 
-def convert_latlon_to_mercator(lon: np.ndarray, lat: np.ndarray):
+def _convert_latlon_to_mercator(lon: np.ndarray, lat: np.ndarray):
     """Convert lon/lat values to Web Mercator easting/northing."""
     # ticks are better with -180 to 180
     lon_normalized = (lon + 180) % 360 - 180
@@ -454,7 +454,7 @@ def _bounds_in_range(v0, v1, min_val, max_val):
     return min_val <= v0 <= max_val and min_val <= v1 <= max_val
 
 
-def convert_limit_to_mercator(limit: tuple | None, is_x_axis=True) -> tuple | None:
+def _convert_limit_to_mercator(limit: tuple | None, is_x_axis=True) -> tuple | None:
     """Convert axis limits to Web Mercator coordinates when possible."""
     if not limit:
         return None
@@ -465,11 +465,11 @@ def convert_limit_to_mercator(limit: tuple | None, is_x_axis=True) -> tuple | No
         if is_x_axis:
             if not _bounds_in_range(v0, v1, -180, 360):
                 return limit
-            (v0_merc, v1_merc), _ = convert_latlon_to_mercator(np.array([v0, v1]), (0, 0))
+            (v0_merc, v1_merc), _ = _convert_latlon_to_mercator(np.array([v0, v1]), (0, 0))
         else:
             if not _bounds_in_range(v0, v1, -90, 90):
                 return limit
-            _, (v0_merc, v1_merc) = convert_latlon_to_mercator(np.array([0, 0]), (v0, v1))
+            _, (v0_merc, v1_merc) = _convert_latlon_to_mercator(np.array([0, 0]), (v0, v1))
 
         return (v0_merc, v1_merc)
     except Exception as e:

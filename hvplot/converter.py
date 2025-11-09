@@ -82,9 +82,9 @@ from .util import (
     import_geoviews,
     is_mpl_cmap,
     _find_stack_level,
-    is_within_latlon_bounds,
-    convert_latlon_to_mercator,
-    convert_limit_to_mercator,
+    _is_within_latlon_bounds,
+    _convert_latlon_to_mercator,
+    _convert_limit_to_mercator,
 )
 from .utilities import hvplot_extension
 
@@ -1011,12 +1011,12 @@ class HoloViewsConverter:
                 not is_geodataframe(data)
                 and x is not None
                 and y is not None
-                and is_within_latlon_bounds(data, x, y)
+                and _is_within_latlon_bounds(data, x, y)
             )
 
             if should_convert:
-                xlim = convert_limit_to_mercator(xlim, is_x_axis=True)
-                ylim = convert_limit_to_mercator(ylim, is_x_axis=False)
+                xlim = _convert_limit_to_mercator(xlim, is_x_axis=True)
+                ylim = _convert_limit_to_mercator(ylim, is_x_axis=False)
 
         # Operations
         if resample_when is not None and not any([rasterize, datashade, downsample]):
@@ -2543,9 +2543,9 @@ class HoloViewsConverter:
         elif is_geodataframe(data):
             if getattr(data, 'crs', None) is not None:
                 data = data.to_crs(epsg=3857)
-        elif is_within_latlon_bounds(data, x, y):
+        elif _is_within_latlon_bounds(data, x, y):
             data = data.copy()
-            easting, northing = convert_latlon_to_mercator(data[x], data[y])
+            easting, northing = _convert_latlon_to_mercator(data[x], data[y])
             new_x = 'x' if 'x' not in data else 'x_'
             new_y = 'y' if 'y' not in data else 'y_'
             data[new_x] = easting
