@@ -412,23 +412,32 @@ def process_crs(crs):
     ) from Exception(*errors)
 
 
-def _is_within_latlon_bounds(data: pd.DataFrame | dict, x: str, y: str) -> bool:
+def _is_within_latlon_bounds(data, x: str, y: str) -> bool:
     """
     Return True when finite lat/lon bounds are detected.
     If unexpected data is encountered, return False.
     """
     try:
-        min_x = np.min(data[x])
-        max_x = np.max(data[x])
-        min_y = np.min(data[y])
-        max_y = np.max(data[y])
-
+        min_x = np.nanmin(data[x])
+        max_x = np.nanmax(data[x])
         x_ok = -180 <= min_x <= 360 and -180 <= max_x <= 360
-        y_ok = -90 <= min_y <= 90 and -90 <= max_y <= 90
-        return x_ok and y_ok
     except Exception as e:
-        warnings.warn(f'Could not determine lat/lon bounds: {e}')
+        warnings.warn(
+            f'Could not determine longitude bounds from variable {x!r}: {e}',
+            stacklevel=_find_stack_level(),
+        )
         return False
+    try:
+        min_y = np.nanmin(data[y])
+        max_y = np.nanmax(data[y])
+        y_ok = -90 <= min_y <= 90 and -90 <= max_y <= 90
+    except Exception as e:
+        warnings.warn(
+            f'Could not determine latitude bounds from variable {y!r}: {e}',
+            stacklevel=_find_stack_level(),
+        )
+        return False
+    return x_ok and y_ok
 
 
 def _convert_latlon_to_mercator(lon: np.ndarray, lat: np.ndarray):
