@@ -85,6 +85,7 @@ from .util import (
     _is_within_latlon_bounds,
     _convert_latlon_to_mercator,
     _convert_limit_to_mercator,
+    _generate_unique_name,
 )
 from .utilities import hvplot_extension
 
@@ -2546,8 +2547,9 @@ class HoloViewsConverter:
         elif _is_within_latlon_bounds(data, x, y):
             data = data.copy()
             easting, northing = _convert_latlon_to_mercator(data[x], data[y])
-            new_x = 'x' if 'x' not in data else 'x_'
-            new_y = 'y' if 'y' not in data else 'y_'
+            names = list(data)
+            new_x = _generate_unique_name('x', names)
+            new_y = _generate_unique_name('y', names)
             data[new_x] = easting
             data[new_y] = northing
             if is_xarray(data):

@@ -30,6 +30,7 @@ from hvplot.util import (
     _is_valid_bound,
     _bounds_in_range,
     _convert_limit_to_mercator,
+    _generate_unique_name,
 )
 
 
@@ -349,6 +350,11 @@ def test_is_list_like():
     assert is_list_like(pd.Series(['a', 'b']))
     assert is_list_like(pd.Index(['a', 'b']))
     assert is_list_like(np.array(['a', 'b']))
+
+
+@pytest.mark.parametrize('name,uname', [('a', 'a'), ('b', 'b_'), ('c_', 'c__')])
+def test_generate_unique_name(name, uname):
+    assert _generate_unique_name(name, ['b', 'c_']) == uname
 
 
 def test_convert_col_names_to_str():

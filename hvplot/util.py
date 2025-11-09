@@ -8,7 +8,7 @@ import os
 import textwrap
 import sys
 
-from collections.abc import Hashable
+from collections.abc import Hashable, Sequence
 from contextlib import contextmanager
 from functools import lru_cache, wraps
 from importlib.util import find_spec
@@ -1215,3 +1215,9 @@ def _find_stack_level() -> int:
         # https://docs.python.org/3/library/inspect.html#inspect.Traceback
         del frame
     return n
+
+
+def _generate_unique_name(name: str, names: Sequence[str], suffix: str = '_') -> str:
+    while name in names:
+        name += suffix
+    return name
