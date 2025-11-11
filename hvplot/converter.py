@@ -1789,7 +1789,11 @@ class HoloViewsConverter:
         color = kwds.pop('color', kwds.pop('c', None))
 
         if color is not None:
-            if (self.datashade or self.rasterize) and color in [self.x, self.y]:
+            if (
+                (self.datashade or self.rasterize)
+                and isinstance(color, str)
+                and color in [self.x, self.y]
+            ):
                 self.data = self.data.assign(_color=self.data[color])
                 style_opts['color'] = color = '_color'
                 self.variables.append('_color')
@@ -1800,12 +1804,12 @@ class HoloViewsConverter:
             else:
                 style_opts['color'] = color
 
-            if (
-                not isinstance(color, list)
-                and color in self.variables
-                and 'c' in self._kind_options.get(kind, [])
-            ):
-                if self.data[color].dtype.kind in 'OSU':
+            color_dim = self._validate_dim(color)
+            if color_dim is None and isinstance(color, str) and color in self.variables:
+                color_dim = color
+
+            if color_dim is not None and 'c' in self._kind_options.get(kind, []):
+                if self.data[color_dim].dtype.kind in 'OSU':
                     cmap = cmap or self._default_cmaps['categorical']
                 else:
                     plot_opts['colorbar'] = plot_opts.get('colorbar', True)
@@ -1832,9 +1836,10 @@ class HoloViewsConverter:
         else:
             color = style_opts.get('color')
 
+        color_is_dim = isinstance(color, dim)
         for k, v in style.items():
             if isinstance(v, Cycle) and isinstance(v, str):
-                if color == cmap:
+                if not color_is_dim and color == cmap:
                     if color not in Palette.colormaps and color.title() in Palette.colormaps:
                         color = color.title()
                     else:
