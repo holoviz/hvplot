@@ -1748,6 +1748,11 @@ class HoloViewsConverter:
         else:
             valid_opts = []
 
+        if 's' in kwds and 'size' not in kwds:
+            kwds['size'] = kwds.pop('s')
+        if 'c' in kwds and 'color' not in kwds:
+            kwds['color'] = kwds.pop('c')
+
         cmap_opts = ('cmap', 'colormap', 'color_key')
         categorical_cmaps = [
             'accent',
