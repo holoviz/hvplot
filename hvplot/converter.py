@@ -1851,7 +1851,7 @@ class HoloViewsConverter:
                     style_opts[k] = color
 
         # Size
-        size = kwds.pop('size', kwds.pop('s', None))
+        size = kwds.pop('size', None)
         if size is not None:
             scale = kwds.get('scale', 1)
             if self.datashade or self.rasterize:
