@@ -94,6 +94,9 @@ class TestChart2D(ComparisonTestCase):
         color_series = self.cat_df['category'].map({'A': 'red', 'B': 'blue'})
         plot = self.cat_df.hvplot.scatter(x='x', y='y', color=color_series)
 
+        assert '_color' in plot.data.columns
+        assert '_color' in plot.vdims
+
         # Check hover_tooltips option
         opts = Store.lookup_options('bokeh', plot, 'plot')
         hover_tooltips = opts.kwargs.get('hover_tooltips')
@@ -110,6 +113,7 @@ class TestChart2D(ComparisonTestCase):
         plot = self.cat_df.hvplot.scatter(x='x', y='y', s=size_series)
 
         assert '_size' in plot.data.columns
+        assert '_size' in plot.vdims
 
         opts = Store.lookup_options('bokeh', plot, 'plot')
         hover_tooltips = opts.kwargs.get('hover_tooltips')
