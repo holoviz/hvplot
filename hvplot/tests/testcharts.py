@@ -127,14 +127,15 @@ class TestChart2D(ComparisonTestCase):
 
     def test_explicit_hover_tooltips_respected_with_internal_columns(self):
         color_series = self.cat_df['category'].map({'A': 'red', 'B': 'blue'})
+        expected_htt = [('x', '@x'), ('color', '@_color')]
         plot = self.cat_df.hvplot.scatter(
-            x='x', y='y', color=color_series, hover_tooltips=[('x', '@x'), ('color', '@_color')]
+            x='x', y='y', color=color_series, hover_tooltips=expected_htt
         )
 
         # Explicit hover_tooltips should be used
         opts = Store.lookup_options('bokeh', plot, 'plot')
         hover_tooltips = opts.kwargs.get('hover_tooltips')
-        assert hover_tooltips == [('x', '@x'), ('color', '@_color')]
+        assert hover_tooltips == expected_htt
 
     def test_color_column_name_shown_in_hover(self):
         plot = self.cat_df.hvplot.scatter(x='x', y='y', color='category')
