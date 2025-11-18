@@ -47,7 +47,7 @@ from holoviews.plotting.bokeh import OverlayPlot, colormap_generator
 from holoviews.plotting.util import process_cmap
 from holoviews.operation import histogram, apply_when
 from holoviews.streams import Buffer, Pipe
-from holoviews.util.transform import dim, lon_lat_to_easting_northing
+from holoviews.util.transform import dim
 from pandas import DatetimeIndex, MultiIndex
 
 from .backend_transforms import _transfer_opts_cur_backend
@@ -82,6 +82,10 @@ from .util import (
     import_geoviews,
     is_mpl_cmap,
     _find_stack_level,
+    _is_within_latlon_bounds,
+    _convert_latlon_to_mercator,
+    _convert_limit_to_mercator,
+    _generate_unique_name,
 )
 from .utilities import hvplot_extension
 
@@ -1003,6 +1007,17 @@ class HoloViewsConverter:
         elif projection is False:
             # to disable automatic projection of tiles
             self.output_projection = projection
+        elif tiles and not self.geo and (xlim or ylim):
+            should_convert = (
+                not is_geodataframe(data)
+                and x is not None
+                and y is not None
+                and _is_within_latlon_bounds(data, x, y)
+            )
+
+            if should_convert:
+                xlim = _convert_limit_to_mercator(xlim, is_x_axis=True)
+                ylim = _convert_limit_to_mercator(ylim, is_x_axis=False)
 
         # Operations
         if resample_when is not None and not any([rasterize, datashade, downsample]):
@@ -2537,26 +2552,17 @@ class HoloViewsConverter:
         elif is_geodataframe(data):
             if getattr(data, 'crs', None) is not None:
                 data = data.to_crs(epsg=3857)
-        else:
-            min_x = np.min(data[x])
-            max_x = np.max(data[x])
-            min_y = np.min(data[y])
-            max_y = np.max(data[y])
-
-            x_within_bounds = -180 <= min_x <= 360 and -180 <= max_x <= 360
-            y_within_bounds = -90 <= min_y <= 90 and -90 <= max_y <= 90
-            if x_within_bounds and y_within_bounds:
-                data = data.copy()
-                lons_180 = (data[x] + 180) % 360 - 180  # ticks are better with -180 to 180
-                easting, northing = lon_lat_to_easting_northing(lons_180, data[y])
-                new_x = 'x' if 'x' not in data else 'x_'  # quick existing var check
-                new_y = 'y' if 'y' not in data else 'y_'
-                data[new_x] = easting
-                data[new_y] = northing
-                if is_xarray(data):
-                    data = data.swap_dims({x: new_x, y: new_y})
-                x = new_x
-                y = new_y
+        elif _is_within_latlon_bounds(data, x, y):
+            data = data.copy()
+            easting, northing = _convert_latlon_to_mercator(data[x], data[y])
+            names = list(data)
+            new_x = _generate_unique_name('x', names)
+            new_y = _generate_unique_name('y', names)
+            data[new_x] = easting
+            data[new_y] = northing
+            if is_xarray(data):
+                data = data.swap_dims({x: new_x, y: new_y})
+            x, y = new_x, new_y
         return data, x, y
 
     def chart(self, element, x, y, data=None):
