@@ -27,7 +27,6 @@ from hvplot.util import (
     is_geodataframe,
     _is_within_latlon_bounds,
     _convert_latlon_to_mercator,
-    _is_valid_bound,
     _bounds_in_range,
     _convert_limit_to_mercator,
     _generate_unique_name,
@@ -448,36 +447,20 @@ class TestIsWithinLatlonBounds:
     def test_missing_column(self):
         """Return False and warn when column doesn't exist."""
         df = pd.DataFrame({'x': [1, 2, 3], 'y': [4, 5, 6]})
-        with pytest.warns(UserWarning, match='Could not determine lat/lon bounds'):
+        with pytest.warns(
+            UserWarning, match="Could not determine longitude bounds from variable 'lon'"
+        ):
             result = _is_within_latlon_bounds(df, 'lon', 'lat')
         assert not result
 
     def test_non_numeric_values(self):
         """Return False and warn for non-numeric data."""
         df = pd.DataFrame({'lon': ['a', 'b', 'c'], 'lat': [45, 60, 75]})
-        with pytest.warns(UserWarning, match='Could not determine lat/lon bounds'):
+        with pytest.warns(
+            UserWarning, match="Could not determine longitude bounds from variable 'lon'"
+        ):
             result = _is_within_latlon_bounds(df, 'lon', 'lat')
         assert not result
-
-
-class TestIsValidBound:
-    """Test _is_valid_bound helper function."""
-
-    def test_valid_numeric_values(self):
-        """Return True for valid numeric values."""
-        assert _is_valid_bound(0)
-        assert _is_valid_bound(42)
-        assert _is_valid_bound(-45.5)
-        assert _is_valid_bound(3.14)
-
-    def test_invalid_values(self):
-        """Return False for None and NaN."""
-        assert not _is_valid_bound(None)
-        assert not _is_valid_bound(np.nan)
-
-    def test_string_values(self):
-        """Return True for string values."""
-        assert _is_valid_bound('45')
 
 
 class TestBoundsInRange:
@@ -501,21 +484,13 @@ class TestBoundsInRange:
         """Return False when both bounds exceed range."""
         assert not _bounds_in_range(-200, 400, -180, 360)
 
-    def test_first_bound_none(self):
-        """Return False when first bound is None."""
-        assert not _bounds_in_range(None, 0, -180, 360)
-
-    def test_second_bound_none(self):
-        """Return False when second bound is None."""
-        assert not _bounds_in_range(0, None, -180, 360)
-
     def test_first_bound_nan(self):
-        """Return False when first bound is NaN."""
-        assert not _bounds_in_range(np.nan, 0, -180, 360)
+        """Return True when first bound is NaN."""
+        assert _bounds_in_range(np.nan, 0, -180, 360)
 
     def test_second_bound_nan(self):
-        """Return False when second bound is NaN."""
-        assert not _bounds_in_range(0, np.nan, -180, 360)
+        """Return True when second bound is NaN."""
+        assert _bounds_in_range(0, np.nan, -180, 360)
 
 
 class TestConvertLatlonToMercator:
@@ -589,28 +564,32 @@ class TestConvertLimitToMercator:
         assert result == limits
 
     def test_x_limits_with_none(self):
-        """Return original limits when x bound is None."""
+        """Return np.nan limit when x bound is None."""
         limits = (0, None)
         result = _convert_limit_to_mercator(limits, is_x_axis=True)
-        assert result == limits
+        assert result[0] == limits[0]
+        assert np.isnan(result[1])
 
     def test_y_limits_with_none(self):
-        """Return original limits when y bound is None."""
-        limits = (None, 45)
+        """Return np.nan limit when y bound is None."""
+        limits = (None, 0)
         result = _convert_limit_to_mercator(limits, is_x_axis=False)
-        assert result == limits
+        np.testing.assert_almost_equal(result[1], limits[1])
+        assert np.isnan(result[0])
 
     def test_x_limits_with_nan(self):
         """Return original limits when x bound is NaN."""
         limits = (0, np.nan)
         result = _convert_limit_to_mercator(limits, is_x_axis=True)
-        assert result == limits
+        assert result[0] == limits[0]
+        assert np.isnan(result[1])
 
     def test_y_limits_with_nan(self):
         """Return original limits when y bound is NaN."""
-        limits = (np.nan, 45)
+        limits = (np.nan, 0)
         result = _convert_limit_to_mercator(limits, is_x_axis=False)
-        assert result == limits
+        np.testing.assert_almost_equal(result[1], limits[1])
+        assert np.isnan(result[0])
 
     def test_unpacking_error_too_many_values(self):
         """Return original and warn when unpacking too many values."""
@@ -638,9 +617,10 @@ class TestConvertLimitToMercator:
         result = _convert_limit_to_mercator(original, is_x_axis=True)
         assert result != original and result[0] != original[0]
 
-    def test_converted_x_limits_ordered(self):
+    @pytest.mark.parametrize('bounds', [(0, 90), (190, 250), (170, -170), (350, 10)])
+    def test_converted_x_limits_ordered(self, bounds):
         """Ensure converted x-axis limits maintain order."""
-        result = _convert_limit_to_mercator((0, 90), is_x_axis=True)
+        result = _convert_limit_to_mercator(bounds, is_x_axis=True)
         assert result[0] < result[1]
 
     def test_converted_y_limits_ordered(self):

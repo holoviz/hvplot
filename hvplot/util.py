@@ -440,41 +440,58 @@ def _is_within_latlon_bounds(data, x: str, y: str) -> bool:
     return x_ok and y_ok
 
 
-def _convert_latlon_to_mercator(lon: np.ndarray, lat: np.ndarray):
+def _convert_latlon_to_mercator(lon: np.ndarray, lat: np.ndarray, lon_180: bool = True):
     """Convert lon/lat values to Web Mercator easting/northing."""
-    # ticks are better with -180 to 180
-    lon_normalized = (lon + 180) % 360 - 180
-    return lon_lat_to_easting_northing(lon_normalized, lat)
-
-
-def _is_valid_bound(v):
-    """
-    Check if a bound value is valid (not None or NaN).
-    """
-    return v is not None and not (isinstance(v, float) and np.isnan(v))
+    if lon_180:
+        # ticks are better displayed with -180 to 180
+        lon = (lon + 180) % 360 - 180
+    else:
+        lon = lon % 360
+    return lon_lat_to_easting_northing(lon, lat)
 
 
 def _bounds_in_range(v0, v1, min_val, max_val):
     """
     Check if both bounds are valid and in range.
     """
-    if not (_is_valid_bound(v0) and _is_valid_bound(v1)):
+    if np.isfinite(v0) and np.isfinite(v1):
+        return min_val <= v0 <= max_val and min_val <= v1 <= max_val
+    elif np.isfinite(v0) and not np.isfinite(v1):
+        return min_val <= v0 <= max_val
+    elif not np.isfinite(v0) and np.isfinite(v1):
+        return min_val <= v1 <= max_val
+    else:
+        # Both bounds are not finite so they can't be within range.
         return False
-    return min_val <= v0 <= max_val and min_val <= v1 <= max_val
 
 
 def _convert_limit_to_mercator(limit: tuple | None, is_x_axis=True) -> tuple | None:
     """Convert axis limits to Web Mercator coordinates when possible."""
+    try:
+        import pandas as pd
+    except ModuleNotFoundError:
+        pd = None
+
     if not limit:
         return None
 
     try:
         v0, v1 = limit
 
+        v0 = np.nan if v0 is None or (pd and pd.isna(v0)) or not np.isfinite(v0) else v0
+        v1 = np.nan if v1 is None or (pd and pd.isna(v1)) or not np.isfinite(v1) else v1
+
         if is_x_axis:
             if not _bounds_in_range(v0, v1, -180, 360):
                 return limit
-            (v0_merc, v1_merc), _ = _convert_latlon_to_mercator(np.array([v0, v1]), (0, 0))
+            lon_180 = (
+                (np.isnan(v0) or np.isnan(v1))
+                or ((v0 <= 0 or v1 >= 0) and (v0 >= 180 or v1 <= 180))
+                or (v1 < v0 and v0 > 180)
+            )
+            (v0_merc, v1_merc), _ = _convert_latlon_to_mercator(
+                np.array([v0, v1]), (0, 0), lon_180
+            )
         else:
             if not _bounds_in_range(v0, v1, -90, 90):
                 return limit
