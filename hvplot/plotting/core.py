@@ -135,9 +135,9 @@ class hvPlotBase:
 
         Parameters
         ----------
-        x : string, optional
+        x : str, optional
             The coordinate variable along the x-axis
-        y : string, optional
+        y : str, optional
             The coordinate variable along the y-axis
         **kwds : optional
             Additional keywords arguments typically passed to hvplot's call.
@@ -164,13 +164,13 @@ class hvPlotTabular(hvPlotBase):
 
     Parameters
     ----------
-    x : string, optional
+    x : str, optional
         Field name(s) to draw x-positions from. If not specified, the index is
         used.
-    y : string or list, optional
+    y : str or list, optional
         Field name(s) to draw y-positions from. If not specified, all numerical
         fields are used.
-    kind : string, optional
+    kind : str, optional
         The kind of plot to generate, e.g. 'area', 'bar', 'line', 'scatter' etc. To see the
         available plots run `print(df.hvplot.__all__)`.
     **kwds : optional
@@ -259,7 +259,11 @@ class hvPlotTabular(hvPlotBase):
 
     def line(self, x=None, y=None, **kwds):
         """
-        The `line` plot connects the points with a continuous curve.
+        Create a line plot that connects data points with continuous curves.
+
+        A line plot displays data as a series of data points connected by
+        straight line segments. It is commonly used to visualize trends and
+        changes over continuous variables such as time.
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.line.html
 
@@ -267,18 +271,18 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
-        x : string, optional
+        x : str, optional
             Field name(s) to draw x-positions from. If not specified, the index is
             used. Can refer to continuous and categorical data.
-        y : string or list, optional
+        y : str or list of str, optional
             Field name(s) to draw y-positions from. If not specified, all numerical
             fields are used.
-        by : string, optional
+        by : str or list of str, optional
             A single column or list of columns to group by. All the subgroups are visualized.
-        groupby: string, list, optional
+        groupby : str or list of str, optional
             A single field or list of fields to group and filter by. Adds one or more widgets to
             select the subgroup(s) to visualize.
-        color : str or array-like, optional.
+        color : str or list of str, optional.
             The color for each of the series. Possible values are:
 
             A single color string referred to by name, RGB or RGBA code, for instance 'red' or
@@ -289,15 +293,16 @@ class hvPlotTabular(hvPlotBase):
             filled in green or yellow, alternatively. If there is only a single series to be
             plotted, then only the first color from the color list will be used.
         **kwds : optional
-            Additional keywords arguments are documented in :ref:`plot-options`.
+            Additional keyword arguments documented in :ref:`plot-options`.
             Run ``hvplot.help('line')`` for the full method documentation.
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.Curve` / Panel object
-            You can `print` the object to study its composition and run:
+        :class:`holoviews:holoviews.element.Curve` or Panel object
+            A HoloViews Curve element or Panel object if using Panel widgets.
+            You can ``print`` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -306,7 +311,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/line.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Curve.html
         - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.line.html
@@ -319,10 +323,11 @@ class hvPlotTabular(hvPlotBase):
 
     def step(self, x=None, y=None, where='mid', **kwds):
         """
-        The `step` plot connects the points with piece-wise constant curves.
+        Create a step plot that connects data points with piece-wise constant curves.
 
-        The `step` plot can be used pretty much anytime the `line` plot might be used, and has many
-        of the same options available.
+        A step plot displays data using horizontal and vertical line segments,
+        creating a stepped appearance. It is useful for visualizing discrete
+        changes in data values over continuous intervals.
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.step.html
 
@@ -330,40 +335,41 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
-        x : string, optional
+        x : str, optional
             Field name(s) to draw x-positions from. If not specified, the index is
-            used. Must refer to continuous data. Not categorical data.
-        y : string or list, optional
+            used. Must refer to continuous data, not categorical data.
+        y : str or list of str, optional
             Field name(s) to draw y-positions from. If not specified, all numerical
             fields are used.
-        by : string, optional
-            A single field or list of fields to group by. All the subgroups are visualized.
-        groupby: string, list, optional
-            A single field or list of fields to group and filter by. Adds one or more widgets to
+        by : str or list of str, optional
+            Field name(s) to group by. All subgroups are visualized separately.
+        groupby : str or list of str, optional
+            Field name(s) to group and filter by. Adds one or more widgets to
             select the subgroup(s) to visualize.
-        where: string, optional
-            Controls the transition point of the step along the x-axis. One of
-            ``'mid'``, ``'pre'``, ``'post'``. Default is ``'mid'``.
-        color : str or array-like, optional.
-            The color for each of the series. Possible values are:
+        where : {'mid', 'pre', 'post'}, default 'mid'
+            Controls the transition point of the step along the x-axis:
 
-            A single color string referred to by name, RGB or RGBA code, for instance 'red' or
-            '#a98d19.
+            - 'mid': Steps are centered on x values
+            - 'pre': Steps extend left from x values
+            - 'post': Steps extend right from x values
+        color : str or list of str, optional
+            Color(s) for the step series. Can be:
 
-            A sequence of color strings referred to by name, RGB or RGBA code, which will be used
-            for each series recursively. For instance ['green','yellow'] each field's line will be
-            filled in green or yellow, alternatively. If there is only a single series to be
-            plotted, then only the first color from the color list will be used.
+            - A single color string (name, RGB, or RGBA code), e.g., 'red' or '#a98d19'
+            - A sequence of color strings used recursively for each series
+
+            For multiple series, colors are applied cyclically.
         **kwds : optional
-            Additional keywords arguments are documented in :ref:`plot-options`.
+            Additional keyword arguments documented in :ref:`plot-options`.
             Run ``hvplot.help('step')`` for the full method documentation.
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.Curve` / Panel object
-            You can `print` the object to study its composition and run:
+        :class:`holoviews:holoviews.element.Curve` or Panel object
+            A HoloViews Curve element or Panel object if using Panel widgets.
+            You can ``print`` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -372,7 +378,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/step.html
         - HoloViews: https://holoviews.org/gallery/demos/bokeh/step_chart.html
         - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.line.html (use `draw_style='step'`)
@@ -383,10 +388,11 @@ class hvPlotTabular(hvPlotBase):
 
     def scatter(self, x=None, y=None, **kwds):
         """
-        The `scatter` plot visualizes your points as markers in 2D space. You can visualize
-        one more dimension by using colors.
+        Create a scatter plot that displays data points as markers in 2D space.
 
-        The `scatter` plot is a good first way to plot data with non continuous axes.
+        A scatter plot uses individual markers to represent data points, making it
+        ideal for exploring relationships between two continuous variables and
+        identifying patterns, correlations, or outliers in the data.
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.scatter.html
 
@@ -394,44 +400,40 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
-        x : string, optional
+        x : str, optional
             Field name(s) to draw x-positions from. If not specified, the index is
             used. Can refer to continuous and categorical data.
-        y : string or list, optional
+        y : str or list of str, optional
             Field name(s) to draw y-positions from. If not specified, all numerical
             fields are used.
-        marker : string, optional
-            The marker shape depends on the activated plotting backend:
+        marker : str, optional
+            The marker shape. Options depend on the plotting backend:
 
-            - Bokeh: Bokeh marker styles and a subset of Matplotlib styles, e.g.
-              ``'circle'`` (default), ``'dot'``, ``'cross'``, ``'x'``, ``'square'``
-              for Bokeh markers and ``'+'``, ``'x'``, ``'s'`` for Matplotlib-
-              compatible markers.
+            - Bokeh: 'circle' (default), 'dot', 'cross', 'x', 'square', etc.
               See https://docs.bokeh.org/en/latest/docs/examples/basic/scatters/markertypes.html
-              for the list of Bokeh markers.
-            - Matplotlib: Any supported marker, e.g. ``'s'`` (square), ``'x'``
-              (cross), ``'+'``, etc.
-              See https://matplotlib.org/stable/api/markers_api.html for the list
-              of Matplotlib markers.
-        c : string, optional
-            A color or a field name to draw the color of the marker from. Alias of
-            ``color``.
-        s : int, optional, also available as 'size'
-            The size of the marker.
-        scale: number, optional
-            Scaling factor to apply to point scaling. Default is 1.
-        logz : bool
-            Whether to apply log scaling to the z-axis. Default is False.
+              for the complete list of Bokeh markers.
+            - Matplotlib: 's' (square), 'x' (cross), '+', 'o' (circle), etc.
+              See https://matplotlib.org/stable/api/markers_api.html
+              for the complete list of Matplotlib markers.
+        c : str, optional
+            Field name to color markers by, or a single color name. Alias for ``color``.
+        s : int, optional
+            Size of the markers. Also available as 'size'.
+        scale : float, default 1.0
+            Scaling factor to apply to marker sizing.
+        logz : bool, default False
+            Whether to apply log scaling to the color axis.
         **kwds : optional
-            Additional keywords arguments are documented in :ref:`plot-options`.
+            Additional keyword arguments documented in :ref:`plot-options`.
             Run ``hvplot.help('scatter')`` for the full method documentation.
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.Scatter` / Panel object
-            You can `print` the object to study its composition and run:
+        :class:`holoviews:holoviews.element.Scatter` or Panel object
+            A HoloViews Scatter element or Panel object if using Panel widgets.
+            You can ``print`` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -440,7 +442,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/basic/scatters/color_scatter.html
         - HoloViews: https://holoviews.org/reference/elements/matplotlib/Scatter.html
         - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.scatter.html
@@ -453,8 +454,11 @@ class hvPlotTabular(hvPlotBase):
 
     def area(self, x=None, y=None, y2=None, stacked=True, **kwds):
         """
-        The `area` plot can be used to color the area under a line or to color the space between two
-        lines.
+        Create an area plot that fills the region between curves and axes.
+
+        An area plot displays quantitative data by filling the area between a curve
+        and the axis (or between two curves). It is useful for showing cumulative
+        totals, part-to-whole relationships, and trends over continuous data.
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.area.html
 
@@ -462,25 +466,28 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
-        x : string, optional
+        x : str, optional
             Field name(s) to draw x-positions from. If not specified, the index is
             used. Can refer to continuous and categorical data.
-        y : string, optional
-            Field name to draw the first y-position from
-        y2 : string, optional
-            Field name to draw the second y-position from
-        stacked : boolean, optional
-            Whether to stack multiple areas. Default is True.
+        y : str, optional
+            Field name for the primary y-positions that define the area boundary.
+        y2 : str, optional
+            Field name for secondary y-positions. When specified, the area is
+            filled between ``y`` and ``y2`` curves.
+        stacked : bool, default True
+            Whether to stack multiple areas on top of each other. When False,
+            areas are overlaid with transparency.
         **kwds : optional
-            Additional keywords arguments are documented in :ref:`plot-options`.
+            Additional keyword arguments documented in :ref:`plot-options`.
             Run ``hvplot.help('area')`` for the full method documentation.
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.Area` / Panel object
-            You can `print` the object to study its composition and run:
+        :class:`holoviews:holoviews.element.Area` or Panel object
+            A HoloViews Area element or Panel object if using Panel widgets.
+            You can ``print`` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -489,7 +496,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - Bokeh: https://docs.bokeh.org/en/latest/docs/user_guide/basic/areas.html#directed-areas
         - HoloViews: https://holoviews.org/reference/elements/matplotlib/Area.html
         - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.area.html
@@ -513,25 +519,26 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
-        x : string, optional
+        x : str, optional
             Field name to draw the x-position from. If not specified, the index is
             used. Can refer to continuous and categorical data.
-        y : string, optional
-            Field name to draw the y-position from
-        yerr1 : string, optional
-            Field name to draw symmetric / negative errors from
-        yerr2 : string, optional
-            Field name to draw positive errors from
+        y : str, optional
+            Field name to draw the y-position from.
+        yerr1 : str, optional
+            Field name to draw symmetric / negative errors from.
+        yerr2 : str, optional
+            Field name to draw positive errors from.
         **kwds : optional
-            Additional keywords arguments are documented in :ref:`plot-options`.
+            Additional keyword arguments are documented in :ref:`plot-options`.
             Run ``hvplot.help('errorbars')`` for the full method documentation.
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.ErrorBars` / Panel object
+        :class:`holoviews:holoviews.element.ErrorBars` or Panel object
+            A HoloViews ErrorBars element or Panel object if using Panel widgets.
             You can `print` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -540,7 +547,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/basic/annotations/whisker.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/ErrorBars.html
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.errorbar.html
@@ -560,29 +566,29 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
-        x : string, optional
+        x : str, optional
             Field name to draw x coordinates from. If not specified, the index is used. Normally
             refers to date values.
         y : list or tuple, optional
-            Field names of the OHLC fields. Default is ["open", "high", "low", "close"]
-        bar_width: number, optional
+            Field names of the OHLC fields. Default is ["open", "high", "low", "close"].
+        bar_width : float, optional
             Bar width. Default is 0.5.
-        line_color : string, optional
-            The line color. Default is black
-        pos_color : string, optional
+        line_color : str, optional
+            The line color. Default is black.
+        pos_color : str, optional
             The color indicating a positive change. Default is green.
-        neg_color : string, optional
+        neg_color : str, optional
             The color indicating a negative change. Default is red.
         **kwds : optional
-            Additional keywords arguments are documented in :ref:`plot-options`.
+            Additional keyword arguments are documented in :ref:`plot-options`.
             Run ``hvplot.help('ohlc')`` for the full method documentation.
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.Rectangles` / Panel object
+        :class:`holoviews:holoviews.element.Rectangles` or Panel object
             You can `print` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -591,7 +597,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/topics/timeseries/candlestick.html
         - Matplotlib: https://www.statology.org/matplotlib-python-candlestick-chart/
         - Plotly: https://plotly.com/python/ohlc-charts/
@@ -613,35 +618,36 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
-        x : string, optional
+        x : str, optional
             Field name to draw x-positions from. In the data as an array
             case, setting x to None assumes drawing x labels from the column names,
             which can be explicitly declared by setting x to ``'columns'``.
             Can refer to continuous and categorical data.
-        y : string, optional
+        y : str, optional
             Field name to draw y-positions from. In the data as an array
             case, setting y to None assumes drawing y labels from the index,
             which can be explicitly declared by setting y to ``'index'`` or
             to the index name. Can refer to continuous and categorical data.
-        C : string, optional
+        C : str, optional
             Field to draw heatmap color from. If not specified a simple count will be used.
-        colorbar: boolean, optional
+        colorbar : bool, optional
             Whether to display a colorbar. Default is True.
-        logz : bool
+        logz : bool, optional
             Whether to apply log scaling to the z-axis. Default is False.
         reduce_function : function, optional
             Function to compute statistics for heatmap, for example ``np.mean``.
             If omitted, no aggregation is applied and duplicate values are dropped.
         **kwds : optional
-            Additional keywords arguments are documented in :ref:`plot-options`.
+            Additional keyword arguments are documented in :ref:`plot-options`.
             Run ``hvplot.help('heatmap')`` for the full method documentation.
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.HeatMap` / Panel object
+        :class:`holoviews:holoviews.element.HeatMap` or Panel object
+            A HoloViews HeatMap element or Panel object if using Panel widgets.
             You can `print` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -650,7 +656,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/topics/categorical/heatmap_unemployment.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/HeatMap.html
         - Matplotlib: https://matplotlib.org/stable/gallery/images_contours_and_fields/image_annotated_heatmap.html
@@ -682,37 +687,38 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
-        x : string, optional
+        x : str, optional
             Field name to draw x coordinates from. If not specified, the index is used.
-        y : string
-            Field name to draw y-positions from
-        C : string, optional
+        y : str
+            Field name to draw y-positions from.
+        C : str, optional
             Field to draw hexbin color from. If not specified a simple count will be used.
-        colorbar: boolean, optional
+        colorbar : bool, optional
             Whether to display a colorbar. Default is True.
         reduce_function : function, optional
             Function to compute statistics for hexbins, for example ``np.mean``.
             Default aggregation is a count of the values in the area.
-        gridsize: int or tuple, optional
+        gridsize : int or tuple, optional
             Number of hexagonal bins along x- and y-axes. Defaults to uniform
-            sampling along both axes when setting and integer but independent
+            sampling along both axes when setting an integer but independent
             bin sampling can be specified a tuple of integers corresponding to
             the number of bins along each axis. Default is 50.
-        logz : bool
+        logz : bool, optional
             Whether to apply log scaling to the z-axis. Default is False.
-        min_count : number, optional
+        min_count : int, optional
             The display threshold before a bin is shown, by default bins with
-            a count of less than 1 are hidden
+            a count of less than 1 are hidden.
         **kwds : optional
-            Additional keywords arguments are documented in :ref:`plot-options`.
+            Additional keyword arguments are documented in :ref:`plot-options`.
             Run ``hvplot.help('hexbin')`` for the full method documentation.
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.HexTiles` / Panel object
+        :class:`holoviews:holoviews.element.HexTiles` or Panel object
+            A HoloViews HexTiles element or Panel object if using Panel widgets.
             You can `print` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -721,7 +727,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - Bokeh: https://docs.bokeh.org/en/latest/docs/gallery/hexbin.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/HexTiles.html
         - Plotly: https://plotly.com/python/hexbin-mapbox/
@@ -765,12 +770,12 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
-        x : string, optional
+        x : str, optional
             Field name to draw x-positions from. If not specified, the index is used.
-        y : string, optional
-            Field name to draw y-positions from
-        colorbar : boolean
-            Whether to display a colorbar
+        y : str, optional
+            Field name to draw y-positions from.
+        colorbar : bool, optional
+            Whether to display a colorbar. Default is True.
         bandwidth : float, optional
             Allows supplying explicit bandwidth value of the kernel for the
             density estimate, rather than relying on Scott. Higher value
@@ -782,17 +787,17 @@ class hvPlotTabular(hvPlotBase):
         levels : int or list, optional
             The number of contour lines to draw or a list of scalar values used
             to specify the contour levels. Default is 10.
-
         **kwds : optional
-            Additional keywords arguments are documented in :ref:`plot-options`.
+            Additional keyword arguments are documented in :ref:`plot-options`.
             Run ``hvplot.help('bivariate')`` for the full method documentation.
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.Bivariate` / Panel object
+        :class:`holoviews:holoviews.element.Bivariate` or Panel object
+            A HoloViews Bivariate element or Panel object if using Panel widgets.
             You can `print` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -801,7 +806,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - ggplot: https://bio304-class.github.io/bio304-fall2017/ggplot-bivariate.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Bivariate.html
         - Plotly: https://plotly.com/python/2d-histogram-contour/
@@ -827,12 +831,11 @@ class hvPlotTabular(hvPlotBase):
 
     def bar(self, x=None, y=None, stacked=False, **kwds):
         """
-        A vertical bar plot
+        Create a vertical bar chart for categorical data comparison.
 
-        A `bar` plot represents categorical data with rectangular bars
-        with heights proportional to the values that they represent. The x-axis
-        represents the categories and the y axis represents the value scale.
-        The bars are of equal width which allows for instant comparison of data.
+        A bar chart displays categorical data using rectangular bars with heights
+        proportional to the values they represent. It is ideal for comparing
+        quantities across different categories and showing rankings or differences.
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.bar.html
 
@@ -840,34 +843,31 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
-        x : string, optional
-            Field name to draw x-positions from. If not specified, the index is used.
-        y : string, optional
-            Field name to draw y-positions from. If not specified, all numerical
+        x : str, optional
+            Field name for categorical x-axis positions. If not specified, the index is used.
+        y : str or list of str, optional
+            Field name(s) for bar heights. If not specified, all numerical
             fields are used.
-        stacked : bool, optional
-            If True, creates a stacked bar plot. Default is False.
-        color : str or array-like, optional.
-            The color for each of the series. Possible values are:
+        stacked : bool, default False
+            Whether to stack multiple series on top of each other. When True,
+            bars are stacked vertically; when False, bars are grouped side-by-side.
+        color : str or list of str, optional
+            Color specification for bars. Can be:
 
-            The name of the field to draw the colors from. The field can contain numerical values or strings
-            representing colors.
-
-            A single color string referred to by name, RGB or RGBA code, for instance 'red' or
-            '#a98d19'.
-
-            A sequence of color strings referred to by name, RGB or RGBA code, which will be used
-            for each series recursively. For instance ['red', 'green','blue'].
+            - Field name containing numerical values or color strings
+            - Single color string (name, RGB, or RGBA code), e.g., 'red' or '#a98d19'
+            - Sequence of colors applied to each series, e.g., ['red', 'green', 'blue']
         **kwds : optional
-            Additional keywords arguments are documented in :ref:`plot-options`.
+            Additional keyword arguments documented in :ref:`plot-options`.
             Run ``hvplot.help('bar')`` for the full method documentation.
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.Bars` / Panel object
-            You can `print` the object to study its composition and run:
+        :class:`holoviews:holoviews.element.Bars` or Panel object
+            A HoloViews Bars element or Panel object if using Panel widgets.
+            You can ``print`` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -876,7 +876,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/vbar.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Bars.html
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.bar.html
@@ -903,18 +902,24 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
+        x : str, optional
+            Field name to draw values from. If not specified, the index is used.
+        y : str, optional
+            Field name to draw categories from. If not specified, all numerical
+            columns are used.
         stacked : bool, optional
             If True, creates a stacked horizontal bar plot. Default is False.
         **kwds : optional
-            Additional keywords arguments are documented in :ref:`plot-options`.
+            Additional keyword arguments are documented in :ref:`plot-options`.
             Run ``hvplot.help('barh')`` for the full method documentation.
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.Bars` / Panel object
+        :class:`holoviews:holoviews.element.Bars` or Panel object
+            A HoloViews Bars element or Panel object if using Panel widgets.
             You can `print` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -923,7 +928,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/hbar.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Bars.html
         - Matplotlib: https://matplotlib.org/stable/gallery/lines_bars_and_markers/barh.html
@@ -946,21 +950,22 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
-        y : string or sequence
+        y : str or sequence, optional
             Field(s) in the *wide* data to compute distribution from. If none is provided all
             numerical fields will be used.
-        by : string or sequence
+        by : str or sequence, optional
             Field in the *long* data to group by.
-        kwds : optional
-            Additional keywords arguments are documented in :ref:`plot-options`.
+        **kwds : optional
+            Additional keyword arguments are documented in :ref:`plot-options`.
             Run ``hvplot.help('box')`` for the full method documentation.
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.BoxWhisker` / Panel object
+        :class:`holoviews:holoviews.element.BoxWhisker` or Panel object
+            A HoloViews BoxWhisker element or Panel object if using Panel widgets.
             You can `print` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -991,21 +996,22 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
-        y : string or sequence
+        y : str or sequence, optional
             Field(s) in the *wide* data to compute distribution from. If none is provided all
             numerical fields will be used.
-        by : string or sequence
+        by : str or sequence, optional
             Field in the *long* data to group by.
-        kwds : optional
-            Additional keywords arguments are documented in :ref:`plot-options`.
+        **kwds : optional
+            Additional keyword arguments are documented in :ref:`plot-options`.
             Run ``hvplot.help('violin')`` for the full method documentation.
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.Violin` / Panel object
+        :class:`holoviews:holoviews.element.Violin` or Panel object
+            A HoloViews Violin element or Panel object if using Panel widgets.
             You can `print` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -1014,7 +1020,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - Seaborn: https://seaborn.pydata.org/generated/seaborn.violinplot.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Violin.html
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.violinplot.html
@@ -1027,7 +1032,11 @@ class hvPlotTabular(hvPlotBase):
         self, y=None, by=None, bins=20, bin_range=None, normed=False, cumulative=False, **kwds
     ):
         """
-        A `histogram` displays an approximate representation of the distribution of continuous data.
+        Create a histogram that displays the distribution of continuous data.
+
+        A histogram represents the frequency distribution of data by dividing it
+        into bins and showing the count or density for each bin. It is fundamental
+        for understanding the shape, central tendency, and spread of data distributions.
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.hist.html
 
@@ -1035,40 +1044,42 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
-        y : string or sequence
-            Field(s) in the *wide* data to compute the distribution(s) from.
-            Please note the fields should contain continuous data. Not categorical.
-        by : string or sequence
-            Field(s) in the *long* data to group by.
-        bins : int or string or np.ndarray or list or tuple, optional
-            The number of bins in the histogram, or an explicit set of bin edges
-            or a method to find the optimal set of bin edges, e.g. 'auto', 'fd',
-            'scott' etc. For more documentation on these approaches see the
-            :func:`numpy.histogram_bin_edges` documentation. Default is 20.
-        bin_range: tuple, optional
-            The lower and upper range of the bins.
-            Default is the minimum and maximum values of the continuous data.
-        normed : str or bool, optional
-            Controls normalization behavior.  If ``True`` or ``'integral'``, then
-            ``density=True`` is passed to np.histogram, and the distribution
-            is normalized such that the integral is unity.  If ``False``,
-            then the frequencies will be raw counts. If ``'height'``, then the
-            frequencies are normalized such that the max bin height is unity.
-            Default is False.
-        cumulative: bool, optional
-            If True, then a histogram is computed where each bin gives the counts
-            in that bin plus all bins for smaller values. The last bin gives the
-            total number of data points. Default is False.
-        kwds : optional
-            Additional keywords arguments are documented in :ref:`plot-options`.
+        y : str or list of str, optional
+            Field name(s) to compute distribution from. Should contain continuous
+            data, not categorical. If not specified, all numerical fields are used.
+        by : str or list of str, optional
+            Field name(s) to group data by before computing histograms.
+        bins : int, str, array-like, default 20
+            Bin specification. Can be:
+
+            - int: Number of equal-width bins
+            - str: Method for automatic bin selection ('auto', 'fd', 'scott', etc.)
+            - array-like: Explicit bin edges
+
+            See :func:`numpy.histogram_bin_edges` for automatic methods.
+        bin_range : tuple, optional
+            Lower and upper range of bins as (min, max). If not specified,
+            uses the data range.
+        normed : bool or str, default False
+            Normalization mode:
+
+            - False: Raw frequency counts
+            - True or 'integral': Density normalized so integral equals 1
+            - 'height': Normalized so maximum bin height equals 1
+        cumulative : bool, default False
+            If True, compute cumulative histogram where each bin represents
+            the count up to that bin.
+        **kwds : optional
+            Additional keyword arguments documented in :ref:`plot-options`.
             Run ``hvplot.help('hist')`` for the full method documentation.
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.Histogram` / Panel object
-            You can `print` the object to study its composition and run:
+        :class:`holoviews:holoviews.element.Histogram` or Panel object
+            A HoloViews Histogram element or Panel object if using Panel widgets.
+            You can ``print`` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -1083,7 +1094,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/topics/stats/histogram.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Histogram.html
         - Pandas: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.plot.hist.html
@@ -1121,10 +1131,10 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
-        y : string or sequence
+        y : str or sequence, optional
             Field(s) in the data to compute distribution on. If not specified all numerical fields
             are used.
-        by : string or sequence
+        by : str or sequence, optional
             Field(s) in the data to group by.
         bandwidth : float, optional
             Allows supplying explicit bandwidth value of the kernel for the
@@ -1132,22 +1142,23 @@ class hvPlotTabular(hvPlotBase):
             yields smoother contours. Default is None.
         cut : float, optional
             Draw the estimate to cut * bw from the extreme data points. Default is 3.
-        filled :
+        filled : bool, optional
             Whether the bivariate contours should be filled. Default is True.
         bw_method : optional
             Not supported.
         ind : optional
             Not supported.
-        kwds : optional
-            Additional keywords arguments are documented in :ref:`plot-options`.
+        **kwds : optional
+            Additional keyword arguments are documented in :ref:`plot-options`.
             Run ``hvplot.help('kde')`` for the full method documentation.
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.Distribution` / Panel object
+        :class:`holoviews:holoviews.element.Distribution` or Panel object
+            A HoloViews Distribution element or Panel object if using Panel widgets.
             You can `print` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -1162,7 +1173,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Distribution.html
         - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.kde.html
         - Plotly: https://plotly.com/python/distplot/
@@ -1192,18 +1202,19 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
-        columns : string or sequence
+        columns : str or sequence, optional
             The field(s) to display as columns.
         **kwds : optional
-            Additional keywords arguments are documented in :ref:`plot-options`.
+            Additional keyword arguments are documented in :ref:`plot-options`.
             Run ``hvplot.help('table')`` for the full method documentation.
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.Table` / Panel object
+        :class:`holoviews:holoviews.element.Table` or Panel object
+            A HoloViews Table element or Panel object if using Panel widgets.
             You can `print` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -1212,7 +1223,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Table.html
         - Plotly: https://plotly.com/python/table/
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.table.html
@@ -1226,16 +1236,19 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
+        columns : str or sequence, optional
+            The field(s) to include in the dataset.
         **kwds : optional
-            Additional keywords arguments are documented in :ref:`plot-options`.
+            Additional keyword arguments are documented in :ref:`plot-options`.
             Run ``hvplot.help('dataset')`` for the full method documentation.
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.Dataset` / Panel object
+        :class:`holoviews:holoviews.element.Dataset` or Panel object
+            A HoloViews Dataset element or Panel object if using Panel widgets.
             You can `print` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -1244,7 +1257,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - HoloViews Tabular: https://holoviews.org/getting_started/Tabular_Datasets.html
         - HoloViews Gridded: https://holoviews.org/getting_started/Gridded_Datasets.html
         """
@@ -1274,31 +1286,32 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
-        x : string, optional
+        x : str, optional
             The coordinate variable along the x-axis. Default is the first numeric field.
-        y : string, optional
+        y : str, optional
             The coordinate variable along the y-axis. Default is the second numeric field.
-        c : string, optional
-            The dimension to color the points by
-        s : int, optional, also available as 'size'
-            The size of the marker
-        marker : string, optional
+        c : str, optional
+            The dimension to color the points by.
+        s : int, optional
+            The size of the marker. Also available as 'size'.
+        marker : str, optional
             The marker shape specified above can be any supported by matplotlib, e.g. s, d, o etc.
             See https://matplotlib.org/stable/api/markers_api.html.
-        scale: number, optional
+        scale : float, optional
             Scaling factor to apply to point scaling. Default is 1.
-        logz : bool
+        logz : bool, optional
             Whether to apply log scaling to the z-axis. Default is False.
         **kwds : optional
-            Additional keywords arguments are documented in :ref:`plot-options`.
+            Additional keyword arguments are documented in :ref:`plot-options`.
             Run ``hvplot.help('points')`` for the full method documentation.
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.Points` / Panel object
+        :class:`holoviews:holoviews.element.Points` or Panel object
+            A HoloViews Points element or Panel object if using Panel widgets.
             You can `print` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -1307,16 +1320,17 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Points.html
         """
         return self(x, y, kind='points', **kwds)
 
     def vectorfield(self, x=None, y=None, angle=None, mag=None, **kwds):
         """
-        vectorfield visualizes vectors given by the (``x``, ``y``) starting point,
-        a magnitude (``mag``) and an `angle`. A ``vectorfield`` plot is also known
-        as a ``quiver`` plot.
+        Create a vector field plot showing direction and magnitude at each point.
+
+        A vector field plot (also known as a quiver plot) displays vectors at
+        specified coordinates, each defined by a magnitude and angle. It is useful
+        for visualizing flow fields, gradients, forces, or any directional data.
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.vectorfield.html
 
@@ -1324,24 +1338,26 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
-        x : string
-            Field name to draw x-positions from
-        y : string
-            Field name to draw y-positions from
-        mag : string
-            Magnitude.
-        angle : string
-            Angle in radians.
+        x : str, required
+            Field name for x-coordinates of vector origins.
+        y : str, required
+            Field name for y-coordinates of vector origins.
+        angle : str, required
+            Field name containing vector angles in radians. The angle is measured
+            counterclockwise from the positive x-axis.
+        mag : str, required
+            Field name containing vector magnitudes (lengths).
         **kwds : optional
-            Additional keywords arguments are documented in :ref:`plot-options`.
+            Additional keyword arguments documented in :ref:`plot-options`.
             Run ``hvplot.help('vectorfield')`` for the full method documentation.
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.VectorField` / Panel object
-            You can `print` the object to study its composition and run:
+        :class:`holoviews:holoviews.element.VectorField` or Panel object
+            A HoloViews VectorField element or Panel object if using Panel widgets.
+            You can ``print`` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -1350,7 +1366,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - HoloViews: https://holoviews.org/reference/elements/bokeh/VectorField.html
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.quiver.html
         - Plotly: https://plotly.com/python/quiver-plots/
@@ -1360,7 +1375,12 @@ class hvPlotTabular(hvPlotBase):
 
     def polygons(self, x=None, y=None, c=None, **kwds):
         """
-        Polygon plot for geopandas dataframes.
+        Create a polygon plot for visualizing geometric shapes and regions.
+
+        A polygon plot displays closed geometric shapes defined by their boundary
+        coordinates. It is commonly used with geographic data (e.g., GeoPandas
+        GeoDataFrames) to visualize administrative boundaries, regions, or any
+        other area-based data.
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.polygons.html
 
@@ -1368,20 +1388,28 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
-        c : string, optional
-            The dimension to color the polygons by
-        logz : bool
-            Enables logarithmic colormapping. Default is False.
+        x : str, optional
+            Field name for x-coordinates. For GeoPandas data, this is typically
+            handled automatically from geometry columns.
+        y : str, optional
+            Field name for y-coordinates. For GeoPandas data, this is typically
+            handled automatically from geometry columns.
+        c : str, optional
+            Field name to color polygons by. Can be numerical (for continuous
+            color mapping) or categorical (for discrete colors).
+        logz : bool, default False
+            Whether to apply logarithmic scaling to the color mapping.
         **kwds : optional
-            Additional keywords arguments are documented in :ref:`plot-options`.
+            Additional keyword arguments documented in :ref:`plot-options`.
             Run ``hvplot.help('polygons')`` for the full method documentation.
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.Polygons` / Panel object
-            You can `print` the object to study its composition and run:
+        :class:`holoviews:holoviews.element.Polygons` or Panel object
+            A HoloViews Polygons element or Panel object if using Panel widgets.
+            You can ``print`` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -1409,16 +1437,23 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
+        x : str, optional
+            Field name to draw x-coordinates from. If not specified, the index is used.
+        y : str, optional
+            Field name to draw y-coordinates from.
+        c : str, optional
+            Field to color the paths by.
         **kwds : optional
-            Additional keywords arguments are documented in :ref:`plot-options`.
+            Additional keyword arguments are documented in :ref:`plot-options`.
             Run ``hvplot.help('paths')`` for the full method documentation.
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.Path` / Panel object
+        :class:`holoviews:holoviews.element.Path` or Panel object
+            A HoloViews Path element or Panel object if using Panel widgets.
             You can `print` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -1427,7 +1462,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Path.html
         """
         return self(x, y, c=c, kind='paths', **kwds)
@@ -1445,24 +1479,25 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
-        x : string, optional
-            The coordinate variable along the x-axis
-        y : string, optional
-            The coordinate variable along the y-axis
-        text : string, optional
+        x : str, optional
+            The coordinate variable along the x-axis.
+        y : str, optional
+            The coordinate variable along the y-axis.
+        text : str, optional
             The column to draw the text labels from; it's also possible to
             provide a template string containing the column names to
             automatically format the text, e.g. "{col1}, {col2}".
         **kwds : optional
-            Additional keywords arguments are documented in :ref:`plot-options`.
+            Additional keyword arguments are documented in :ref:`plot-options`.
             Run ``hvplot.help('labels')`` for the full method documentation.
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.Labels` / Panel object
+        :class:`holoviews:holoviews.element.Labels` or Panel object
+            A HoloViews Labels element or Panel object if using Panel widgets.
             You can `print` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -1471,7 +1506,6 @@ class hvPlotTabular(hvPlotBase):
 
         References
         ----------
-
         - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/text.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Labels.html
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.text.html#matplotlib.pyplot.text
@@ -1643,13 +1677,13 @@ class hvPlot(hvPlotTabular):
 
     Parameters
     ----------
-    x : string, optional
+    x : str, optional
         Field name(s) to draw x-positions from. If not specified, the index is
         used.
-    y : string or list, optional
+    y : str or list, optional
         Field name(s) to draw y-positions from. If not specified, all numerical
         fields are used.
-    kind : string, optional
+    kind : str, optional
         The kind of plot to generate, e.g. 'area', 'bar', 'line', 'scatter' etc. To see the
         available plots run `print(df.hvplot.__all__)`.
     **kwds : optional
@@ -1746,13 +1780,13 @@ class hvPlot(hvPlotTabular):
 
         Parameters
         ----------
-        x : string, optional
+        x : str, optional
             The coordinate variable along the x-axis
-        y : string, optional
+        y : str, optional
             The coordinate variable along the y-axis
-        z : string, optional
+        z : str, optional
             The data variable to plot
-        colorbar: boolean
+        colorbar: bool
             Whether to display a colorbar
         **kwds : optional
             Additional keywords arguments are documented in :ref:`plot-options`.
@@ -1760,7 +1794,7 @@ class hvPlot(hvPlotTabular):
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.Image` / Panel object
+        :class:`holoviews:holoviews.element.Image` or Panel object
             You can `print` the object to study its composition and run:
 
             .. code-block::
@@ -1772,7 +1806,6 @@ class hvPlot(hvPlotTabular):
 
         References
         ----------
-
         - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/topics/images/image.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Image.html
         - Matplotlib: https://matplotlib.org/stable/tutorials/introductory/images.html
@@ -1793,16 +1826,16 @@ class hvPlot(hvPlotTabular):
 
         Parameters
         ----------
-        x : string, optional
+        x : str, optional
             The coordinate variable along the x-axis. By default the third
             coordinate of the dataset.
-        y : string, optional
+        y : str, optional
             The coordinate variable along the y-axis. By default the second
             coordinate of the dataset.
-        bands : string, optional
+        bands : str, optional
             The coordinate variable to draw the RGB channels from. By default
             the first coordinate of the dataset.
-        z : string, optional
+        z : str, optional
             The data variable to plot
         **kwds : optional
             Additional keywords arguments are documented in :ref:`plot-options`.
@@ -1810,7 +1843,7 @@ class hvPlot(hvPlotTabular):
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.RGB` / Panel object
+        :class:`holoviews:holoviews.element.RGB` or Panel object
             You can `print` the object to study its composition and run:
 
             .. code-block::
@@ -1822,7 +1855,6 @@ class hvPlot(hvPlotTabular):
 
         References
         ----------
-
         - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/image_rgba.html
         - HoloViews: https://holoviews.org/reference/elements/bokeh/RGB.html
         - Matplotlib: https://matplotlib.org/stable/tutorials/introductory/images.html
@@ -1849,13 +1881,13 @@ class hvPlot(hvPlotTabular):
 
         Parameters
         ----------
-        x : string, optional
+        x : str, optional
             The coordinate variable along the x-axis
-        y : string, optional
+        y : str, optional
             The coordinate variable along the y-axis
-        z : string, optional
+        z : str, optional
             The data variable to plot
-        colorbar: boolean
+        colorbar: bool
             Whether to display a colorbar
         **kwds : optional
             Additional keywords arguments are documented in :ref:`plot-options`.
@@ -1863,7 +1895,7 @@ class hvPlot(hvPlotTabular):
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.QuadMesh` / Panel object
+        :class:`holoviews:holoviews.element.QuadMesh` or Panel object
             You can `print` the object to study its composition and run:
 
             .. code-block::
@@ -1875,7 +1907,6 @@ class hvPlot(hvPlotTabular):
 
         References
         ----------
-
         - HoloViews: https://holoviews.org/reference/elements/bokeh/QuadMesh.html
         """
         return self(x, y, z=z, kind='quadmesh', colorbar=colorbar, **kwds)
@@ -1893,13 +1924,13 @@ class hvPlot(hvPlotTabular):
 
         Parameters
         ----------
-        x : string, optional
+        x : str, optional
             The coordinate variable along the x-axis
-        y : string, optional
+        y : str, optional
             The coordinate variable along the y-axis
-        z : string, optional
+        z : str, optional
             The data variable to plot
-        colorbar: boolean, optional
+        colorbar: bool, optional
             Whether to display a colorbar. Default is True.
         levels: int or list, optional
             The number of contour lines to draw or a list of scalar values used
@@ -1912,7 +1943,7 @@ class hvPlot(hvPlotTabular):
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.Contours` / Panel object
+        :class:`holoviews:holoviews.element.Contours` or Panel object
             You can `print` the object to study its composition and run:
 
             .. code-block::
@@ -1928,7 +1959,6 @@ class hvPlot(hvPlotTabular):
 
         References
         ----------
-
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Contours.html
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.contour.html
         - Plotly: https://plotly.com/python/contour-plots/
@@ -1937,27 +1967,34 @@ class hvPlot(hvPlotTabular):
 
     def contourf(self, x=None, y=None, z=None, colorbar=True, levels=5, logz=False, **kwds):
         """
-        Filled contour plot
+        Create a filled contour plot for gridded data visualization.
 
-        Reference. https://hvplot.holoviz.org/reference/xarray/contourf.html
+        A filled contour plot displays smooth color-filled regions representing
+        different value ranges in 2D scalar fields. It is useful for visualizing
+        continuous data distributions, topographic maps, or any gridded data
+        where you want to show smooth transitions between values.
+
+        Reference: https://hvplot.holoviz.org/reference/xarray/contourf.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
         Parameters
         ----------
-        x : string, optional
-            The coordinate variable along the x-axis
-        y : string, optional
-            The coordinate variable along the y-axis
-        z : string, optional
-            The data variable to plot
-        colorbar: boolean
-            Whether to display a colorbar
-        levels: int, optional
-            The number of contour lines to draw or a list of scalar values used
-            to specify the contour levels. Default is 5
-        logz: bool, optional
-            Whether to apply log scaling to the z-axis. Default is False
+        x : str, optional
+            Field name for the x-axis coordinate variable.
+        y : str, optional
+            Field name for the y-axis coordinate variable.
+        z : str, optional
+            Field name for the data variable to plot as filled contours.
+        colorbar : bool, default True
+            Whether to display a colorbar showing the value-to-color mapping.
+        levels : int or list, default 5
+            Number of contour levels to draw, or explicit list of scalar values
+            defining the contour boundaries.
+        logz : bool, default False
+            Whether to apply logarithmic scaling to the z-axis values.
         **kwds : optional
-            Additional keywords arguments are documented in :ref:`plot-options`.
+            Additional keyword arguments documented in :ref:`plot-options`.
             Run ``hvplot.help('contourf')`` for the full method documentation.
 
         See Also
@@ -1966,10 +2003,11 @@ class hvPlot(hvPlotTabular):
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.Contours` / Panel object
-            You can `print` the object to study its composition and run:
+        :class:`holoviews:holoviews.element.Contours` or Panel object
+            A HoloViews Contours element or Panel object if using Panel widgets.
+            You can ``print`` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -1978,7 +2016,6 @@ class hvPlot(hvPlotTabular):
 
         References
         ----------
-
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Contours.html
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.contour.html
         - Plotly: https://plotly.com/python/contour-plots/
