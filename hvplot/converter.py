@@ -1763,6 +1763,11 @@ class HoloViewsConverter:
         else:
             valid_opts = []
 
+        if 's' in kwds and 'size' not in kwds:
+            kwds['size'] = kwds.pop('s')
+        if 'c' in kwds and 'color' not in kwds:
+            kwds['color'] = kwds.pop('c')
+
         cmap_opts = ('cmap', 'colormap', 'color_key')
         categorical_cmaps = [
             'accent',
@@ -1799,7 +1804,11 @@ class HoloViewsConverter:
         color = kwds.pop('color', kwds.pop('c', None))
 
         if color is not None:
-            if (self.datashade or self.rasterize) and color in [self.x, self.y]:
+            if (
+                (self.datashade or self.rasterize)
+                and isinstance(color, str)
+                and color in [self.x, self.y]
+            ):
                 self.data = self.data.assign(_color=self.data[color])
                 style_opts['color'] = color = '_color'
                 self.variables.append('_color')
@@ -1810,12 +1819,12 @@ class HoloViewsConverter:
             else:
                 style_opts['color'] = color
 
-            if (
-                not isinstance(color, list)
-                and color in self.variables
-                and 'c' in self._kind_options.get(kind, [])
-            ):
-                if self.data[color].dtype.kind in 'OSU':
+            color_dim = self._validate_dim(color)
+            if color_dim is None and isinstance(color, str) and color in self.variables:
+                color_dim = color
+
+            if color_dim is not None and 'c' in self._kind_options.get(kind, []):
+                if self.data[color_dim].dtype.kind in 'OSU':
                     cmap = cmap or self._default_cmaps['categorical']
                 else:
                     plot_opts['colorbar'] = plot_opts.get('colorbar', True)
@@ -1842,9 +1851,10 @@ class HoloViewsConverter:
         else:
             color = style_opts.get('color')
 
+        color_is_dim = isinstance(color, dim)
         for k, v in style.items():
             if isinstance(v, Cycle) and isinstance(v, str):
-                if color == cmap:
+                if not color_is_dim and color == cmap:
                     if color not in Palette.colormaps and color.title() in Palette.colormaps:
                         color = color.title()
                     else:
@@ -1856,7 +1866,10 @@ class HoloViewsConverter:
                     style_opts[k] = color
 
         # Size
-        size = kwds.pop('size', kwds.pop('s', None))
+        size = kwds.pop('size', None)
+        # Determine the correct option name based on backend
+        # Bokeh uses 'size', matplotlib uses 's'
+        size_opt_name = 's' if self._backend_compat == 'matplotlib' else 'size'
         if size is not None:
             scale = kwds.get('scale', 1)
             if self.datashade or self.rasterize:
@@ -1868,14 +1881,16 @@ class HoloViewsConverter:
             if isinstance(size, (np.ndarray, pd.Series)):
                 size = np.sqrt(size) * scale
                 self.data = self.data.assign(_size=size)
-                style_opts['size'] = '_size'
+                style_opts[size_opt_name] = '_size'
                 self.variables.append('_size')
             elif isinstance(size, str):
-                style_opts['size'] = np.sqrt(dim(size)) * scale
-            elif not isinstance(size, dim):
-                style_opts['size'] = np.sqrt(size) * scale
-        elif 'size' in valid_opts:
-            style_opts['size'] = np.sqrt(30)
+                style_opts[size_opt_name] = np.sqrt(dim(size)) * scale
+            elif isinstance(size, dim):
+                style_opts[size_opt_name] = size * scale if scale != 1 else size
+            else:
+                style_opts[size_opt_name] = np.sqrt(size) * scale
+        elif 'size' in valid_opts or 's' in valid_opts:
+            style_opts[size_opt_name] = np.sqrt(30)
 
         # Marker
         if 'marker' in kwds and 'marker' in self._kind_options[self.kind]:
@@ -2331,6 +2346,9 @@ class HoloViewsConverter:
     def _get_dimensions(self, kdims, vdims):
         for style in ('color', 'size', 'marker', 'alpha'):
             dimension = self._style_opts.get(style)
+            # For matplotlib backend, 'size' is stored as 's'
+            if dimension is None and style == 'size':
+                dimension = self._style_opts.get('s')
             dimensions = (kdims if kdims else []) + vdims
             dimension = self._validate_dim(dimension)
             if dimension is None:
