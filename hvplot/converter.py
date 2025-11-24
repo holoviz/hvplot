@@ -1852,6 +1852,9 @@ class HoloViewsConverter:
 
         # Size
         size = kwds.pop('size', None)
+        # Determine the correct option name based on backend
+        # Bokeh uses 'size', matplotlib uses 's'
+        size_opt_name = 's' if self._backend_compat == 'matplotlib' else 'size'
         if size is not None:
             scale = kwds.get('scale', 1)
             if self.datashade or self.rasterize:
@@ -1863,14 +1866,16 @@ class HoloViewsConverter:
             if isinstance(size, (np.ndarray, pd.Series)):
                 size = np.sqrt(size) * scale
                 self.data = self.data.assign(_size=size)
-                style_opts['size'] = '_size'
+                style_opts[size_opt_name] = '_size'
                 self.variables.append('_size')
             elif isinstance(size, str):
-                style_opts['size'] = np.sqrt(dim(size)) * scale
-            elif not isinstance(size, dim):
-                style_opts['size'] = np.sqrt(size) * scale
-        elif 'size' in valid_opts:
-            style_opts['size'] = np.sqrt(30)
+                style_opts[size_opt_name] = np.sqrt(dim(size)) * scale
+            elif isinstance(size, dim):
+                style_opts[size_opt_name] = size * scale if scale != 1 else size
+            else:
+                style_opts[size_opt_name] = np.sqrt(size) * scale
+        elif 'size' in valid_opts or 's' in valid_opts:
+            style_opts[size_opt_name] = np.sqrt(30)
 
         # Marker
         if 'marker' in kwds and 'marker' in self._kind_options[self.kind]:
