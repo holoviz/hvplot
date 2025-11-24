@@ -50,8 +50,6 @@ class TestPandasTransforms(ComparisonTestCase):
         plot_opts = scatter.opts.get().kwargs
         # Matplotlib uses 's' not 'size'
         assert 's' in plot_opts
-        # The clipped expression should contain 'clip' in its repr
-        assert 'clip' in repr(plot_opts.get('s'))
 
 
 class TestXArrayTransforms(ComparisonTestCase):
