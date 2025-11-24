@@ -2331,6 +2331,9 @@ class HoloViewsConverter:
     def _get_dimensions(self, kdims, vdims):
         for style in ('color', 'size', 'marker', 'alpha'):
             dimension = self._style_opts.get(style)
+            # For matplotlib backend, 'size' is stored as 's'
+            if dimension is None and style == 'size':
+                dimension = self._style_opts.get('s')
             dimensions = (kdims if kdims else []) + vdims
             dimension = self._validate_dim(dimension)
             if dimension is None:
