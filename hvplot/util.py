@@ -440,9 +440,9 @@ def _is_within_latlon_bounds(data, x: str, y: str) -> bool:
     return x_ok and y_ok
 
 
-def _convert_latlon_to_mercator(lon: np.ndarray, lat: np.ndarray, lon_180: bool = True):
+def _convert_latlon_to_mercator(lon: np.ndarray, lat: np.ndarray, use_lon_180: bool = True):
     """Convert lon/lat values to Web Mercator easting/northing."""
-    if lon_180:
+    if use_lon_180:
         # ticks are better displayed with -180 to 180
         lon = (lon + 180) % 360 - 180
     else:
@@ -484,13 +484,13 @@ def _convert_limit_to_mercator(limit: tuple | None, is_x_axis=True) -> tuple | N
         if is_x_axis:
             if not _bounds_in_range(v0, v1, -180, 360):
                 return limit
-            lon_180 = (
+            use_lon_180 = (
                 (np.isnan(v0) or np.isnan(v1))
                 or ((v0 <= 0 or v1 >= 0) and (v0 >= 180 or v1 <= 180))
                 or (v1 < v0 and v0 > 180)
             )
             (v0_merc, v1_merc), _ = _convert_latlon_to_mercator(
-                np.array([v0, v1]), (0, 0), lon_180
+                np.array([v0, v1]), (0, 0), use_lon_180
             )
         else:
             if not _bounds_in_range(v0, v1, -90, 90):
