@@ -1,10 +1,11 @@
 # Roadmap
 
 ## hvPlot 1.0
+To be released in 2026. 
 
 ### 1. Documentation
 
-In 2025, we have obtained a Small Development Grant from NumFocus that allowed us to significantly update the documentation, adding a new Reference section with a description of all the plotting options and an automated API reference, a new examples gallery, and new tutorials.
+In 2025, we obtained a Small Development Grant from NumFocus that allowed us to significantly update the documentation, adding a new Reference section with a description of all the plotting options and an automated API reference, a new examples gallery, and new tutorials.
 
 To complete this documentation update, we need now to convert the user guides into How-To guides, Tutorials, and Explanation pages.
 
