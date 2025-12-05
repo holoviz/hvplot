@@ -1,7 +1,7 @@
 # Roadmap
 
 ## hvPlot 1.0
-To be released in 2026. 
+To be released in 2026.
 
 ### 1. Documentation
 
