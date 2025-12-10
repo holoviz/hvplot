@@ -552,3 +552,79 @@ class TestGeoUtil(TestCase):
 
         crs = proj_to_cartopy(proj4_string)
         assert isinstance(crs, self.ccrs.NearsidePerspective)
+
+
+class TestWindBarbs(TestCase):
+    def setUp(self):
+        if sys.platform == 'win32':
+            raise SkipTest('Skip geo tests on windows for now')
+        try:
+            import geoviews  # noqa
+        except ImportError:
+            raise SkipTest('geoviews not available')
+        import hvplot.pandas  # noqa
+
+    def test_barbs_with_uv_components(self):
+        """Test wind barbs plot with u and v components"""
+        import geoviews as gv
+        
+        df = pd.DataFrame({
+            'lon': np.linspace(-10, 10, 20),
+            'lat': np.linspace(-10, 10, 20),
+            'u': np.random.randn(20) * 5,
+            'v': np.random.randn(20) * 5,
+        })
+        
+        plot = df.hvplot.barbs(x='lon', y='lat', u='u', v='v', geo=True)
+        assert isinstance(plot, gv.WindBarbs)
+        assert plot.kdims[0].name == 'lon'
+        assert plot.kdims[1].name == 'lat'
+        assert plot.vdims[0].name == 'u'
+        assert plot.vdims[1].name == 'v'
+
+    def test_barbs_with_angle_mag(self):
+        """Test wind barbs plot with angle and magnitude"""
+        import geoviews as gv
+        
+        df = pd.DataFrame({
+            'lon': np.linspace(-10, 10, 20),
+            'lat': np.linspace(-10, 10, 20),
+            'angle': np.random.uniform(0, 2*np.pi, 20),
+            'mag': np.random.uniform(0, 10, 20),
+        })
+        
+        plot = df.hvplot.barbs(x='lon', y='lat', angle='angle', mag='mag', geo=True)
+        assert isinstance(plot, gv.WindBarbs)
+        assert plot.kdims[0].name == 'lon'
+        assert plot.kdims[1].name == 'lat'
+        assert plot.vdims[0].name == 'angle'
+        assert plot.vdims[1].name == 'mag'
+
+    def test_barbs_without_geo(self):
+        """Test wind barbs plot without geo=True"""
+        import geoviews as gv
+        
+        df = pd.DataFrame({
+            'x': np.linspace(0, 10, 10),
+            'y': np.linspace(0, 10, 10),
+            'u': np.random.randn(10),
+            'v': np.random.randn(10),
+        })
+        
+        plot = df.hvplot.barbs(x='x', y='y', u='u', v='v')
+        assert isinstance(plot, gv.WindBarbs)
+
+    def test_barbs_via_kind(self):
+        """Test wind barbs using kind='barbs'"""
+        import geoviews as gv
+        
+        df = pd.DataFrame({
+            'lon': np.linspace(-10, 10, 10),
+            'lat': np.linspace(-10, 10, 10),
+            'u': np.random.randn(10),
+            'v': np.random.randn(10),
+        })
+        
+        plot = df.hvplot(x='lon', y='lat', u='u', v='v', kind='barbs', geo=True)
+        assert isinstance(plot, gv.WindBarbs)
+

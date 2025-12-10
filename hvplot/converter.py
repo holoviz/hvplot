@@ -581,7 +581,7 @@ class HoloViewsConverter:
     _geom_types = ['paths', 'polygons']
 
     _geo_types = sorted(
-        _gridded_types + _geom_types + ['points', 'vectorfield', 'labels', 'hexbin', 'bivariate']
+        _gridded_types + _geom_types + ['points', 'vectorfield', 'labels', 'hexbin', 'bivariate', 'barbs']
     )
 
     _stats_types = ['hist', 'kde', 'violin', 'box', 'density']
@@ -3287,6 +3287,39 @@ class HoloViewsConverter:
 
         element = self._get_element('vectorfield')
         cur_opts, compat_opts = self._get_compat_opts('VectorField')
+        if self.geo:
+            params['crs'] = self.crs
+        return redim_(
+            element(data, [x, y], z, **params),
+            **redim,
+        ).apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
+
+    def barbs(self, x=None, y=None, angle=None, mag=None, u=None, v=None, data=None):
+        self._error_if_unavailable('barbs')
+        data, x, y, _ = self._process_gridded_args(data, x, y, z=None)
+
+        if not (x and y):
+            x, y = list(k for k, v in data.coords.items() if v.size > 1)
+
+        # Get angle/mag or u/v from kwds
+        angle = self.kwds.get('angle')
+        mag = self.kwds.get('mag')
+        u = self.kwds.get('u')
+        v = self.kwds.get('v')
+        
+        # Determine which dimensions to use
+        if u is not None and v is not None:
+            z = [u, v] + self.hover_cols
+        elif angle is not None and mag is not None:
+            z = [angle, mag] + self.hover_cols
+        else:
+            raise ValueError("barbs requires either (u, v) or (angle, mag) parameters")
+            
+        redim = self._merge_redim({z[1]: self._dim_ranges['c']})
+        params = dict(self._relabel)
+
+        element = self._get_element('barbs')
+        cur_opts, compat_opts = self._get_compat_opts('WindBarbs')
         if self.geo:
             params['crs'] = self.crs
         return redim_(
