@@ -559,15 +559,14 @@ class TestWindBarbs(TestCase):
         if sys.platform == 'win32':
             raise SkipTest('Skip geo tests on windows for now')
         try:
-            import geoviews  # noqa
+            import geoviews as gv  # noqa
+            self.gv = gv
         except ImportError:
             raise SkipTest('geoviews not available')
         import hvplot.pandas  # noqa
 
     def test_barbs_with_uv_components(self):
         """Test wind barbs plot with u and v components"""
-        import geoviews as gv
-        
         df = pd.DataFrame({
             'lon': np.linspace(-10, 10, 20),
             'lat': np.linspace(-10, 10, 20),
@@ -576,7 +575,7 @@ class TestWindBarbs(TestCase):
         })
         
         plot = df.hvplot.barbs(x='lon', y='lat', u='u', v='v', geo=True)
-        assert isinstance(plot, gv.WindBarbs)
+        assert isinstance(plot, self.gv.WindBarbs)
         assert plot.kdims[0].name == 'lon'
         assert plot.kdims[1].name == 'lat'
         assert plot.vdims[0].name == 'u'
@@ -584,8 +583,6 @@ class TestWindBarbs(TestCase):
 
     def test_barbs_with_angle_mag(self):
         """Test wind barbs plot with angle and magnitude"""
-        import geoviews as gv
-        
         df = pd.DataFrame({
             'lon': np.linspace(-10, 10, 20),
             'lat': np.linspace(-10, 10, 20),
@@ -594,7 +591,7 @@ class TestWindBarbs(TestCase):
         })
         
         plot = df.hvplot.barbs(x='lon', y='lat', angle='angle', mag='mag', geo=True)
-        assert isinstance(plot, gv.WindBarbs)
+        assert isinstance(plot, self.gv.WindBarbs)
         assert plot.kdims[0].name == 'lon'
         assert plot.kdims[1].name == 'lat'
         assert plot.vdims[0].name == 'angle'
@@ -602,8 +599,6 @@ class TestWindBarbs(TestCase):
 
     def test_barbs_without_geo(self):
         """Test wind barbs plot without geo=True"""
-        import geoviews as gv
-        
         df = pd.DataFrame({
             'x': np.linspace(0, 10, 10),
             'y': np.linspace(0, 10, 10),
@@ -612,12 +607,10 @@ class TestWindBarbs(TestCase):
         })
         
         plot = df.hvplot.barbs(x='x', y='y', u='u', v='v')
-        assert isinstance(plot, gv.WindBarbs)
+        assert isinstance(plot, self.gv.WindBarbs)
 
     def test_barbs_via_kind(self):
         """Test wind barbs using kind='barbs'"""
-        import geoviews as gv
-        
         df = pd.DataFrame({
             'lon': np.linspace(-10, 10, 10),
             'lat': np.linspace(-10, 10, 10),
@@ -626,7 +619,7 @@ class TestWindBarbs(TestCase):
         })
         
         plot = df.hvplot(x='lon', y='lat', u='u', v='v', kind='barbs', geo=True)
-        assert isinstance(plot, gv.WindBarbs)
+        assert isinstance(plot, self.gv.WindBarbs)
 
     def test_barbs_invalid_mixed_params(self):
         """Test that mixing u/v and angle/mag raises an error"""
