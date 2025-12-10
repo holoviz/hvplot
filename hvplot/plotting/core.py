@@ -241,6 +241,7 @@ class hvPlotTabular(hvPlotBase):
         'hexbin',
         'bivariate',
         'bar',
+        'barbs',
         'barh',
         'box',
         'violin',
@@ -1357,6 +1358,72 @@ class hvPlotTabular(hvPlotBase):
         - Wiki: https://simple.wikipedia.org/wiki/Vector_field
         """
         return self(x, y, angle=angle, mag=mag, kind='vectorfield', **kwds)
+
+    def barbs(self, x=None, y=None, angle=None, mag=None, u=None, v=None, **kwds):
+        """
+        Wind barbs plot for visualizing wind speed and direction, also known as
+        barb plots. Wind barbs use traditional meteorological symbols to show 
+        wind direction and speed.
+
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.barbs.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
+
+        Parameters
+        ----------
+        x : string
+            Field name to draw x-positions from
+        y : string
+            Field name to draw y-positions from
+        angle : string, optional
+            Angle in radians. Alternative to u and v components.
+        mag : string, optional
+            Magnitude. Alternative to u and v components.
+        u : string, optional
+            X-component of the wind vector. Alternative to angle and mag.
+        v : string, optional
+            Y-component of the wind vector. Alternative to angle and mag.
+        **kwds : optional
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('barbs')`` for the full method documentation.
+
+        Returns
+        -------
+        :class:`geoviews:geoviews.element.WindBarbs` / Panel object
+            You can `print` the object to study its composition and run:
+
+            .. code-block::
+
+                import holoviews as hv
+                hv.help(the_holoviews_object)
+
+            to learn more about its parameters and options.
+
+        References
+        ----------
+
+        - GeoViews: https://geoviews.org/gallery/index.html
+        - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.barbs.html
+        - Wiki: https://en.wikipedia.org/wiki/Station_model#Wind_speed_and_direction
+
+        Notes
+        -----
+        This plot type requires the `geoviews` package to be installed.
+        Wind barbs can be specified using either:
+        - Cartesian components (u, v)
+        - Polar components (angle, mag)
+        """
+        # Pass through u and v if provided, otherwise angle and mag
+        params = {}
+        if u is not None:
+            params['u'] = u
+        if v is not None:
+            params['v'] = v
+        if angle is not None:
+            params['angle'] = angle
+        if mag is not None:
+            params['mag'] = mag
+        return self(x, y, kind='barbs', **params, **kwds)
 
     def polygons(self, x=None, y=None, c=None, **kwds):
         """

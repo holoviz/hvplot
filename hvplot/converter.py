@@ -89,6 +89,14 @@ from .util import (
 )
 from .utilities import hvplot_extension
 
+# Import WindBarbs from geoviews if available, otherwise use VectorField as placeholder
+try:
+    from geoviews import WindBarbs
+except ImportError:
+    # WindBarbs is not available without geoviews, use VectorField as placeholder
+    # The actual element will be obtained from geoviews when geo=True via _get_element
+    WindBarbs = VectorField
+
 renderer = hv.renderer('bokeh')
 
 
@@ -744,6 +752,7 @@ class HoloViewsConverter:
         'area': ['x', 'y', 'y2', 'stacked'],
         'bar': ['x', 'y', 'stacked'],
         'barh': ['x', 'y', 'stacked'],
+        'barbs': ['x', 'y', 'angle', 'mag', 'u', 'v'],
         'box': ['x', 'y'],
         'errorbars': ['x', 'y', 'yerr1', 'yerr2'],
         'bivariate': ['x', 'y', 'bandwidth', 'cut', 'filled', 'levels'],
@@ -775,6 +784,7 @@ class HoloViewsConverter:
     _kind_mapping = {
         'area': Area,
         'bar': Bars,
+        'barbs': WindBarbs,
         'barh': Bars,
         'bivariate': Bivariate,
         'box': BoxWhisker,
