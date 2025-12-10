@@ -3301,11 +3301,18 @@ class HoloViewsConverter:
         if not (x and y):
             x, y = list(k for k, v in data.coords.items() if v.size > 1)
 
-        # Get angle/mag or u/v from kwds
-        angle = self.kwds.get('angle')
-        mag = self.kwds.get('mag')
-        u = self.kwds.get('u')
-        v = self.kwds.get('v')
+        # Get angle/mag or u/v from kwds, but method parameters take priority
+        angle = angle if angle is not None else self.kwds.get('angle')
+        mag = mag if mag is not None else self.kwds.get('mag')
+        u = u if u is not None else self.kwds.get('u')
+        v = v if v is not None else self.kwds.get('v')
+        
+        # Validate that only one parameter format is used
+        has_uv = u is not None or v is not None
+        has_angle_mag = angle is not None or mag is not None
+        
+        if has_uv and has_angle_mag:
+            raise ValueError("barbs cannot use both (u, v) and (angle, mag) parameters simultaneously")
         
         # Determine which dimensions to use
         if u is not None and v is not None:
@@ -3313,9 +3320,14 @@ class HoloViewsConverter:
         elif angle is not None and mag is not None:
             z = [angle, mag] + self.hover_cols
         else:
-            raise ValueError("barbs requires either (u, v) or (angle, mag) parameters")
+            raise ValueError("barbs requires either both (u, v) or both (angle, mag) parameters")
+        
+        # Only apply redim if z has enough elements
+        if len(z) > 1:
+            redim = self._merge_redim({z[1]: self._dim_ranges['c']})
+        else:
+            redim = {}
             
-        redim = self._merge_redim({z[1]: self._dim_ranges['c']})
         params = dict(self._relabel)
 
         element = self._get_element('barbs')

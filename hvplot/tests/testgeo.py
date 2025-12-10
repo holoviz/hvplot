@@ -628,3 +628,37 @@ class TestWindBarbs(TestCase):
         plot = df.hvplot(x='lon', y='lat', u='u', v='v', kind='barbs', geo=True)
         assert isinstance(plot, gv.WindBarbs)
 
+    def test_barbs_invalid_mixed_params(self):
+        """Test that mixing u/v and angle/mag raises an error"""
+        df = pd.DataFrame({
+            'lon': np.linspace(-10, 10, 10),
+            'lat': np.linspace(-10, 10, 10),
+            'u': np.random.randn(10),
+            'angle': np.random.uniform(0, 2*np.pi, 10),
+        })
+        
+        with pytest.raises(ValueError, match="cannot use both"):
+            df.hvplot.barbs(x='lon', y='lat', u='u', angle='angle')
+
+    def test_barbs_invalid_incomplete_uv(self):
+        """Test that providing only u or v raises an error"""
+        df = pd.DataFrame({
+            'lon': np.linspace(-10, 10, 10),
+            'lat': np.linspace(-10, 10, 10),
+            'u': np.random.randn(10),
+        })
+        
+        with pytest.raises(ValueError, match="requires either both"):
+            df.hvplot.barbs(x='lon', y='lat', u='u')
+
+    def test_barbs_invalid_incomplete_angle_mag(self):
+        """Test that providing only angle or mag raises an error"""
+        df = pd.DataFrame({
+            'lon': np.linspace(-10, 10, 10),
+            'lat': np.linspace(-10, 10, 10),
+            'angle': np.random.uniform(0, 2*np.pi, 10),
+        })
+        
+        with pytest.raises(ValueError, match="requires either both"):
+            df.hvplot.barbs(x='lon', y='lat', angle='angle')
+

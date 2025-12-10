@@ -1410,10 +1410,12 @@ class hvPlotTabular(hvPlotBase):
         -----
         This plot type requires the `geoviews` package to be installed.
         Wind barbs can be specified using either:
-        - Cartesian components (u, v)
-        - Polar components (angle, mag)
+        - Cartesian components (u, v) - both must be provided
+        - Polar components (angle, mag) - both must be provided
+        
+        Do not mix parameter formats (e.g., providing both u and angle will raise an error).
         """
-        # Pass through u and v if provided, otherwise angle and mag
+        # Pass through parameters - validation happens in converter
         params = {}
         if u is not None:
             params['u'] = u
