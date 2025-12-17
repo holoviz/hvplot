@@ -37,7 +37,9 @@ bokeh_version = Version(bokeh.__version__)
 
 _HV_VERSION = hv_version.release
 _HV_GE_1_21_0 = _HV_VERSION >= (1, 21, 0)
-_PD_GE_3_0_0 = Version(pd.__version__).release >= (3, 0, 0)
+_pd_version = Version(pd.__version__).release
+_PD_GE_2_1_0 = _pd_version >= (2, 1, 0)
+_PD_GE_3_0_0 = _pd_version >= (3, 0, 0)
 
 _fugue_ipython = None  # To be set to True in tests to mock ipython
 

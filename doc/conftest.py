@@ -83,6 +83,21 @@ if find_spec('selenium'):
     finally:
         webdriver_control.cleanup()
 
+pygraphviz = None
+
+try:
+    import pygraphviz  # noqa
+except ImportError:
+    pass
+
+pydot = None
+try:
+    import pydot  # noqa
+except ImportError:
+    pass
+
+if pygraphviz is None and pydot is None:
+    collect_ignore_glob += ['user_guide/NetworkX.ipynb']
 
 if Version(dask.__version__).release < (2025, 1, 0):
     # From Dask 2024.3.0 they now use `dask_expr` by default
