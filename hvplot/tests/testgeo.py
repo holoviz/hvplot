@@ -466,7 +466,7 @@ class TestGeoUtil(TestCase):
     def test_proj_to_cartopy(self):
         from ..util import proj_to_cartopy
 
-        crs = proj_to_cartopy('+init=epsg:26911')
+        crs = proj_to_cartopy('epsg:26911')
 
         assert isinstance(crs, self.ccrs.CRS)
 
