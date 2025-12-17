@@ -581,11 +581,13 @@ class TestChart1D(ComparisonTestCase):
         opts = Store.lookup_options('bokeh', plot, 'plot')
         self.assertEqual(opts.kwargs['hover_tooltips'], ['x'])
 
+    @pytest.mark.filterwarnings('ignore:hover_formatters')
     def test_hover_formatter(self):
         plot = self.df.hvplot('x', 'y', hover_formatters={'x': 'datetime'})
         opts = Store.lookup_options('bokeh', plot, 'plot')
         self.assertEqual(opts.kwargs['hover_formatters'], {'x': 'datetime'})
 
+    @pytest.mark.filterwarnings('ignore:hover_formatters')
     def test_hover_disabled(self):
         plot = self.df.hvplot(
             'x', 'y', hover_tooltips=['x'], hover_formatters={'x': 'datetime'}, hover=False

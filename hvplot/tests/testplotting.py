@@ -167,6 +167,7 @@ def test_pandas_plot_extension_loaded(plotting_backend):
         mock_hvplot_ext.assert_called_once_with('bokeh', logo=False)
 
 
+@pytest.mark.filterwarnings('ignore:allowing to pass duckdb data objects')
 def test_plot_supports_duckdb_relation():
     duckdb = pytest.importorskip('duckdb')
     connection = duckdb.connect(':memory:')
@@ -175,6 +176,7 @@ def test_plot_supports_duckdb_relation():
     assert isinstance(out, hv.NdOverlay)
 
 
+@pytest.mark.filterwarnings('ignore:allowing to pass duckdb data objects')
 def test_plot_supports_duckdb_connection():
     duckdb = pytest.importorskip('duckdb')
     connection = duckdb.connect(':memory:')
