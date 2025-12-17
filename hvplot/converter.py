@@ -1625,7 +1625,11 @@ class HoloViewsConverter:
                 # Broken, see https://github.com/holoviz/hvplot/issues/1364.
                 # Dask reset_index doesn't accept a level, so this would need to
                 # be adapted for Dask.
-                self.data = data.stack().reset_index(1).rename(columns={'level_1': group_label})
+                self.data = (
+                    data.stack(future_stack=True)
+                    .reset_index(1)
+                    .rename(columns={'level_1': group_label})
+                )
                 by = group_label
                 x = 'index'
 
