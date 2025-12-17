@@ -137,7 +137,7 @@ examples = [
     "xarray >=0.18.2",
     "xyzservices >=2022.9.0",
     "geodatasets >=2023.12.0",
-    "bokeh_sampledata; python_version >= '3.10'",
+    "bokeh_sampledata >=2025.0",
     "hvsampledata >=0.1.4a2",
 ]
 tests-nb = [
