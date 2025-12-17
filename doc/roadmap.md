@@ -1,27 +1,34 @@
 # Roadmap
 
-hvPlot was released in 2018 and has gained many features since then, becoming a super-charged version of Pandas `.plot()` API, with support for many data structures of the PyData ecosystem (Pandas, Dask, Xarray, GeoPandas, etc.), for multiple plotting backends, and for many powerful features (plotting large datasets with Datashader, geographic data with GeoViews, plotting streaming data, etc.). Yet, it hasn't been adopted as much as we hoped.
+hvPlot was released in 2018 and has gained many features since then, becoming a super-charged version of Pandas `.plot()` API, with support for many data structures of the PyData ecosystem (Pandas, Dask, Xarray, GeoPandas, etc.), for multiple plotting backends, and for many powerful features (plotting large datasets with Datashader, geographic data with GeoViews, plotting streaming data, etc.). Despite this, hvPlot isn't currently as widely known as some of the alternatives and has huge room to grow.
 
-Instead of focusing on new features, the strategy we propose to follow in this roadmap is based on stability and user-friendliness, we want hvPlot's features to shine!
+## hvPlot development principles
 
-- More bug fixes:
-    - hvPlot's development should favor bug fixes over new features or feature enhancements. Of course, we do not intend to prevent new features or enhancements; we are simply aiming to reduce the number of bugs rather than increase it.
-    - Bugs reported by hvPlot users regularly originate from one of its dependencies, typically HoloViews. It should be easy for hvPlot users to find these bugs on GitHub, and those issues should be fixed as well.
-- Better documentation:
-    - The documentation should continuously be improved (e.g. by extending the gallery) until it reaches a level that is at least as good as hvPlot's alternatives (e.g. Altair, Plotly Express, plotnine).
-    - The documentation should be kept up to date.
-- Higher test coverage:
-    - The test suite should catch more bugs.
-    - It should be easier for a contributor to add tests.
-- Improved user experience:
-    - Type hints should be added to the codebase to enhance the experience of users working from an IDE.
-    - Error messages should be improved to better guide users when things go wrong.
-- Increase hvPlot's presence within PyData
-    - Issues or discussions should be opened with the maintainers of these libraries to gauge how interested they would be in integrating or exposing more of hvPlot.
-    - For interested libraries, updates to their documentation should be made, with support provided to the maintainers over time.
-- Add missing features:
-    - HoloViews features that are stable enough and relevant for hvPlot's users (e.g. dual axis, native Polars support) should be exposed in hvPlot.
-    - Important features a plotting library like hvPlot is missing should be identified and added (e.g. pie charts)
+The following principles are derived from the goal of improving hvPlot's stability and user-friendliness.
+
+1. Reliability first
+
+Prioritize reducing bugs over introducing new features. New features and enhancements are welcome, but only when they do not compromise overall stability. Bugs originating in hvPlot's dependencies, particularly HoloViews, should be easy for users to discover, track, and see resolved through clear GitHub issues and coordinated fixes.
+
+2. Documentation as a core feature
+
+Treat documentation as a first-class part of the project. Continuously improve clarity, coverage, and examples, such as by expanding the gallery, until the documentation meets or exceeds the quality of comparable libraries (e.g. Altair, Plotly Express, plotnine). Ensure documentation remains accurate and up to date as the codebase evolves.
+
+3. Strong, accessible testing
+
+Maintain a test suite that meaningfully catches regressions and common user errors. Make writing and extending tests straightforward so that contributors can easily add coverage alongside bug fixes and new functionality.
+
+4. User-centered developer experience
+
+Improve the day-to-day experience of using hvPlot by adding type hints to support IDE tooling and by providing clearer, more actionable error messages when things go wrong.
+
+5. Deep integration with the PyData ecosystem
+
+Actively increase hvPlot’s visibility and adoption across the PyData ecosystem. Engage maintainers of related libraries through issues and discussions to explore deeper integration or exposure of hvPlot, and support those efforts with documentation updates and ongoing collaboration.
+
+6. Thoughtful feature completeness
+
+Expose stable, relevant HoloViews capabilities through hvPlot when they add clear user value (e.g. dual axes, native Polars support). Identify and implement essential plotting features expected of a general-purpose plotting library when they are missing (e.g. pie charts), while maintaining hvPlot's simplicity and reliability.
 
 Based on these principles, we aim to release 1.0 in early 2026, signaling to hvPlot's user base that it is a stable project already for a few years.
 
