@@ -3078,7 +3078,14 @@ class HoloViewsConverter:
         elif text not in data.columns:
             data = data.copy()
             template_str = text  # needed for dask lazy compute
-            data['label'] = data.apply(lambda row: template_str.format(**row), axis=1)
+            # Without meta, Dask runs the apply function on a small dataset to
+            # guess output types and might guess incorrectly.
+            apply_kwargs = {}
+            if is_dask(data):
+                apply_kwargs['meta'] = ('label', 'object')
+            data['label'] = data.apply(
+                lambda row: template_str.format(**row), axis=1, **apply_kwargs
+            )
             text = 'label'
 
         kdims, vdims = self._get_dimensions([x, y], [text])
