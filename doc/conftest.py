@@ -7,6 +7,7 @@ import dask
 
 from packaging.version import Version, parse
 from bokeh.io.webdriver import webdriver_control
+from hvplot.util import _PD_GE_3_0_0
 
 # Examples that are slow to run and/or download large files.
 SLOW_EXAMPLES = [
@@ -56,6 +57,9 @@ if not find_spec('streamz') or sys.version_info[:2] >= (3, 14):
         'ref/plotting_options/streaming.ipynb',
     ]
 
+if _PD_GE_3_0_0:
+    # Because of fugue
+    collect_ignore_glob += ['ref/data_libraries.ipynb']
 
 try:
     import ibis

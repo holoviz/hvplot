@@ -82,6 +82,10 @@ jobs:
               "environment": ["test-310", "test-313", "test-314"],
               "include": [
                 {
+                  "environment": "test-pandas3",
+                  "os": "ubuntu-latest"
+                },
+                {
                   "environment": "test-311",
                   "os": "ubuntu-latest"
                 },

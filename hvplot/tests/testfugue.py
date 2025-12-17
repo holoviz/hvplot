@@ -4,6 +4,8 @@ import hvplot
 import pandas as pd
 import pytest
 
+from hvplot.util import _PD_GE_3_0_0
+
 # Patch required before importing hvplot.fugue
 hvplot.util._fugue_ipython = True
 
@@ -27,6 +29,7 @@ def table():
     return df
 
 
+@pytest.mark.skipif(_PD_GE_3_0_0, reason='breaks with Pandas 3')
 def test_fugure_ipython_line(table, capsys):
     """hvplot works with Fugue"""
     fa.fugue_sql(
