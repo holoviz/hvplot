@@ -53,6 +53,7 @@ from pandas import DatetimeIndex, MultiIndex
 from .backend_transforms import _transfer_opts_cur_backend
 from .util import (
     _HV_GE_1_21_0,
+    _PD_GE_2_1_0,
     _Undefined,
     filter_opts,
     is_tabular,
@@ -1625,8 +1626,9 @@ class HoloViewsConverter:
                 # Broken, see https://github.com/holoviz/hvplot/issues/1364.
                 # Dask reset_index doesn't accept a level, so this would need to
                 # be adapted for Dask.
+                stack_kwargs = {'future_stack': True} if _PD_GE_2_1_0 else {}
                 self.data = (
-                    data.stack(future_stack=True)
+                    data.stack(**stack_kwargs)
                     .reset_index(1)
                     .rename(columns={'level_1': group_label})
                 )
