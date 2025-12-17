@@ -440,7 +440,7 @@ class TestGeoPandas(TestCase):
 
     def test_geometry_none(self):
         polygons = self.polygons.copy()
-        polygons.geometry[1] = None
+        polygons[1, 'geometry'] = None
         assert polygons.hvplot(geo=True)
 
     def test_tiles_without_gv(self):
