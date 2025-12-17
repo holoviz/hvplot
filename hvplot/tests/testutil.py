@@ -243,9 +243,10 @@ class TestDynamicArgs(TestCase):
         assert len(arg_deps) == 2
 
 
+@pytest.mark.geo
 def test_check_crs():
     pytest.importorskip('pyproj')
-    p = check_crs('epsg:26915 +units=m')
+    p = check_crs('epsg:26915')
     assert p.srs == '+proj=utm +zone=15 +datum=NAD83 +units=m +no_defs'
     p = check_crs('wrong')
     assert p is None
