@@ -2,6 +2,41 @@
 
 See [the HoloViz blog](https://blog.holoviz.org/#category=hvplot) for a visual summary of the major features added in a selection of releases.
 
+## Version 0.12.2 (2025-12-18)
+
+The 0.12.2 release is a patch release that brings a few bugfixes and enhancements. Many thanks to @ahuang11, @Azaya89, @hoxbro, @MarcSkovMadsen, @maximlt, and @MridulS for their contributions!
+
+Enhancements:
+
+- Automatically convert `xlim/ylim` to Web Mercator when `tiles=True` ([#1685](https://github.com/holoviz/hvplot/pull/1685))
+- Automatically use `y` as default `text` kwarg if only two columns ([#1681](https://github.com/holoviz/hvplot/pull/1681))
+
+Bug Fixes:
+
+- Fix handling of `hv.dim` expressions in `size` and `color` parameters ([#1691](https://github.com/holoviz/hvplot/pull/1691))
+- Exclude internal style columns (`_color` and `_size`) from tooltips ([#1690](https://github.com/holoviz/hvplot/pull/1690))
+
+Documentation:
+
+- Document `attr_labels` ([#1677](https://github.com/holoviz/hvplot/pull/1677))
+- Fix typo in the NetworkX user guide ([#1686](https://github.com/holoviz/hvplot/pull/1686))
+- Scale networkx layout and fix graphviz init in doc build ([#1672](https://github.com/holoviz/hvplot/pull/1672))
+- Roadmap updates ([#1694](https://github.com/holoviz/hvplot/pull/1694))
+
+Compatibility:
+
+- Ensure Python 3.14 support ([#1688](https://github.com/holoviz/hvplot/pull/1688), [#1703](https://github.com/holoviz/hvplot/pull/1703))
+- Compatibility with the latest versions of DuckDB ([#1682](https://github.com/holoviz/hvplot/pull/1682))
+- Compatibility with the upcoming Pandas 3.0 ([#1704](https://github.com/holoviz/hvplot/pull/1704))
+
+Infrastructure / Tests:
+
+- Address warnings emitted by the unit tests suite ([#1700](https://github.com/holoviz/hvplot/pull/1700))
+- Miscellaneous changes ([#1697](https://github.com/holoviz/hvplot/pull/1697), [#1698](https://github.com/holoviz/hvplot/pull/1698), [#1699](https://github.com/holoviz/hvplot/pull/1699), [#1701](https://github.com/holoviz/hvplot/pull/1701), [#1702](https://github.com/holoviz/hvplot/pull/1702), [#1706](https://github.com/holoviz/hvplot/pull/1706), [#1707](https://github.com/holoviz/hvplot/pull/1707))
+
+[Full Changelog](https://github.com/holoviz/hvplot/compare/v0.12.1...v0.12.2)
+
+
 ## Version 0.12.1 (2025-08-29)
 
 The 0.12.1 release is a patch release that brings a few bugfixes and enhancements, and most importantly adds a new extended [Gallery](https://hvplot.holoviz.org/en/docs/latest/gallery/index.html) top-level section with about 50 examples, replacing the previous and limited *Reference Gallery*. Many thanks to @kmnhan (first contribution!), @hoxbro, @Azaya89, and @maximlt for their contributions!
