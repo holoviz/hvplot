@@ -140,7 +140,7 @@ jobs:
           else
             pixi run -e ${{ matrix.environment }} test-example
           fi
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -171,10 +171,10 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.13'
       - name: install with geo
@@ -193,7 +193,7 @@ jobs:
         run: pytest -n logical --dist loadscope --nbval-lax -p no:python
       - name: Upload coverage reports to Codecov
         if: github.event_name == 'push' || github.event_name == 'pull_request'
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           fail_ci_if_error: false
           verbose: false
