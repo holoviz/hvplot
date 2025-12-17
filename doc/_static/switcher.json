@@ -1,7 +1,7 @@
 [
   {
     "name": "0.12 (latest)",
-    "version": "0.12.1",
+    "version": "0.12.2",
     "url": "https://hvplot.holoviz.org/en/docs/latest/",
     "preferred": true
   },
