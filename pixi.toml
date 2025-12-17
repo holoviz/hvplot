@@ -46,11 +46,11 @@ features = ["py314", "required", "test-core"]
 no-default-feature = true
 
 [environments.docs]
-features = ["py311", "required", "doc", "example", "geo", "graphviz"]
+features = ["py313", "required", "doc", "example", "geo", "graphviz"]
 no-default-feature = true
 
 [environments.build]
-features = ["py311", "required", "build"]
+features = ["py313", "required", "build"]
 no-default-feature = true
 
 [environments.lint]

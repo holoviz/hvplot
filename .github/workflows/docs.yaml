@@ -27,9 +27,6 @@ defaults:
   run:
     shell: bash -e {0}
 
-env:
-  PYTHON_VERSION: "3.11"
-
 jobs:
   pixi_lock:
     name: Pixi lock
@@ -89,7 +86,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-python@v6
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version: '3.13'
       - name: install
         run: pip install -v --prefer-binary -e ."[doc, examples, geo]"
       - name: pip list
