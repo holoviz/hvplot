@@ -1,4 +1,5 @@
 import os
+import sys
 
 from importlib.util import find_spec
 
@@ -50,7 +51,7 @@ if not find_spec('datashader'):
         'user_guide/Plotting_with_Plotly.ipynb',
     ]
 
-if not find_spec('streamz'):
+if not find_spec('streamz') or sys.version_info[:2] >= (3, 14):
     collect_ignore_glob += [
         'ref/plotting_options/streaming.ipynb',
     ]

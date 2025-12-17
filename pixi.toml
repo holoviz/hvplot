@@ -34,7 +34,7 @@ features = ["py313", "required", "test-core", "test", "example", "geo", "graphvi
 no-default-feature = true
 
 [environments.test-314]
-features = ["py314", "required", "test-core", "test-314", "example-314", "graphviz", "test-example"]  # geo
+features = ["py314", "required", "test-core", "test", "example", "geo", "graphviz", "test-example"]
 no-default-feature = true
 
 [environments.test-core]
@@ -149,40 +149,6 @@ xyzservices = ">=2022.9.0"
 geodatasets = ">=2023.12.0"
 hvsampledata = ">=0.1.4a2"
 
-[feature.example-314.dependencies]
-dask = "*"  # dask[dataframe]
-# datashader = ">=0.6.5"
-duckdb = "*"
-qpd = ">=0.4.4"
-fugue-sql-antlr = ">=0.2.0"
-sqlglot = "*"
-jinja2 = "*"
-fugue = "*"
-ibis-duckdb = ">=9.0.0"  # ibis-framework[duckdb]
-intake-parquet = ">=0.2.3"
-intake-xarray = ">=0.5.0,<2"
-intake  = ">=0.6.5,<2.0.0"
-ipywidgets = "*"
-networkx = ">=2.6.3"
-matplotlib = "*"
-notebook = ">=5.4"
-# numba = ">=0.51.0"
-pillow = ">=8.2.0"
-plotly = "*"
-polars = "*"
-pooch = ">=1.6.0"
-s3fs = ">=2022.1.0"
-scikit-image = ">=0.17.2"
-scikit-learn = ">=1.4.0"
-scipy = ">=1.5.3"
-selenium  = ">=3.141.0"
-# streamz = ">=0.3.0"
-xarray = ">=0.18.2"
-xyzservices = ">=2022.9.0"
-geodatasets = ">=2023.12.0"
-hvsampledata = ">=0.1.4a2"
-bokeh_sampledata = ">=2025.0"
-
 # =================== TESTS ===================
 
 [feature.test-core.dependencies]
@@ -228,18 +194,6 @@ dask = "*"
 spatialpandas = "*"
 duckdb = "*"
 
-[feature.test-314.dependencies]
-qpd = ">=0.4.4"
-fugue-sql-antlr = ">=0.2.0"
-sqlglot = "*"
-jinja2 = "*"
-fugue = "*"
-ibis-duckdb = ">=9.0.0"  # ibis-framework[duckdb]
-polars = "*"
-dask = "*"
-# spatialpandas = "*"
-duckdb = "*"
-
 [feature.geo.dependencies]
 # Geo dependencies are always a little special.
 cartopy = "*"
@@ -260,16 +214,11 @@ test-unit-geo = 'pytest -v hvplot --geo'
 test-unit-cov = 'pytest -v hvplot --cov=hvplot --cov-branch --cov-append'
 test-unit-geo-cov = 'pytest -v hvplot --geo --cov=hvplot --cov-branch --cov-append'
 
-[feature.test-314.tasks]
-test-unit-geo = 'pytest -v hvplot --geo'
-test-unit-cov = 'pytest -v hvplot --cov=hvplot --cov-branch --cov-append'
-test-unit-geo-cov = 'pytest -v hvplot --geo --cov=hvplot --cov-branch --cov-append'
-
 [feature.test-core.tasks]
 test-unit = 'pytest -v hvplot'
 
 [feature.test-example.tasks]
-test-example = 'pytest -n logical --dist loadscope --nbval-lax -p no:python'
+test-example = 'pytest -n logical --dist loadscope --nbval-lax -p no:python doc'
 
 # =================== DOCS ====================
 
