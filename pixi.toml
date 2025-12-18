@@ -152,6 +152,7 @@ xarray = ">=0.18.2"
 xyzservices = ">=2022.9.0"
 geodatasets = ">=2023.12.0"
 hvsampledata = ">=0.1.4a2"
+bokeh_sampledata = ">=2025.0"
 
 # =================== TESTS ===================
 
