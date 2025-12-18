@@ -30,9 +30,9 @@ exclude_patterns = ['governance']
 
 html_static_path += ['_static']  # noqa
 
-if pydata_sphinx_theme.__version__ == '0.16.1':
+# if pydata_sphinx_theme.__version__ == '0.16.1':
     # See https://github.com/pydata/pydata-sphinx-theme/issues/2088
-    templates_path.append('_static/patch_templates')  # noqa
+templates_path.append('_static/patch_templates')  # noqa
 
 html_css_files += ['custom.css']  # noqa
 
