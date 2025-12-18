@@ -117,7 +117,8 @@ jobs:
     steps:
       - uses: holoviz-dev/holoviz_tasks/pixi_lock@v0
         with:
-          cache: ${{ github.event.inputs.cache == 'true' || github.event.inputs.cache == '' }}
+          cache: false  # NOTE: REVERT
+          # cache: ${{ github.event.inputs.cache == 'true' || github.event.inputs.cache == '' }}
 
   unit_test_suite:
     name: unit:${{ matrix.environment }}:${{ matrix.os }}

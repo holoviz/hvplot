@@ -8,6 +8,7 @@ import holoviews as hv
 import pandas as pd
 import numpy as np
 import colorcet as cc
+import narwhals as nw
 
 from bokeh.models import HoverTool
 from holoviews.core.dimension import Dimension
@@ -56,6 +57,7 @@ from .util import (
     _PD_GE_2_1_0,
     _Undefined,
     filter_opts,
+    is_narwhals,
     is_tabular,
     is_series,
     is_dask,
@@ -74,7 +76,6 @@ from .util import (
     relabel_redim,
     redim_,
     support_index,
-    check_library,
     is_geodataframe,
     process_derived_datetime_xarray,
     process_derived_datetime_pandas,
@@ -1438,6 +1439,9 @@ class HoloViewsConverter:
         elif isinstance(data, pd.DataFrame):
             datatype = 'pandas'
             self.data = data
+        elif isinstance(data, (nw.LazyFrame, nw.DataFrame, nw.Series)):
+            datatype = 'narwhals'
+            self.data = data
         elif is_dask(data):
             datatype = 'dask'
             self.data = data.persist() if persist else data
@@ -2676,19 +2680,29 @@ class HoloViewsConverter:
 
         cur_opts, compat_opts = self._get_compat_opts(element.name, labelled=labelled)
 
-        id_vars = [x]
-        if any(v in self.indexes for v in id_vars):
-            # Calling reset_index() is required since id_vars from melt
-            # only accepts column names, not index names.
-            data = data.reset_index()
-        data = data[y + [x]]
+        # id_vars = [x]
+        # if any(v in self.indexes for v in id_vars):
+        #     # Calling reset_index() is required since id_vars from melt
+        #     # only accepts column names, not index names.
+        #     data = data.reset_index()
+        # if x is "index":
 
-        if check_library(data, 'dask'):
-            from dask.dataframe import melt
-        else:
-            melt = pd.melt
+        #
+        # if check_library(data, 'dask'):
+        #     from dask.dataframe import melt
+        # else:
+        #     melt = pd.melt
 
-        df = melt(data, id_vars=[x], var_name=self.group_label, value_name=self.value_label)
+        # df = melt(data, id_vars=[x], var_name=self.group_label, value_name=self.value_label)
+
+        data = nw.from_native(data)
+        data = data.select([*y, x])
+        df = data.unpivot(
+            index=x,
+            variable_name=self.group_label,
+            value_name=self.value_label,
+        ).to_native()
+
         kdims = [x, self.group_label]
         vdims = [self.value_label] + self.hover_cols
         if self.subplots:
@@ -2745,14 +2759,23 @@ class HoloViewsConverter:
         cur_opts['labelled'] = labelled
 
         kdims = [self.group_label]
-        data = data[list(y)]
-        if check_library(data, 'dask'):
-            from dask.dataframe import melt
-        else:
-            melt = pd.melt
-        df = melt(data, var_name=self.group_label, value_name=self.value_label)
-        if list(y) and df[self.value_label].dtype is not data[y[0]].dtype:
-            df[self.value_label] = df[self.value_label].astype(data[y[0]].dtype)
+        # if check_library(data, 'narwhals'):
+        #     data = data.lazy().collect().to_pandas()   # HACK: Should likely be handled more elegant
+        # data = data[list(y)]
+        # if check_library(data, 'dask'):
+        #     from dask.dataframe import melt
+        # else:
+        #     melt = pd.melt
+        # df = melt(data, var_name=self.group_label, value_name=self.value_label)
+        data = nw.from_native(data)
+        data = data.select(list(y))
+        df = data.unpivot(
+            index=x,
+            variable_name=self.group_label,
+            value_name=self.value_label,
+        ).to_native()
+        # if list(y) and df[self.value_label].dtype is not data[y[0]].dtype:
+        #     df[self.value_label] = df[self.value_label].astype(data[y[0]].dtype)
         redim = self._merge_redim({self.value_label: ylim})
         return relabel_redim(
             element(df, kdims, self.value_label),
@@ -2832,13 +2855,11 @@ class HoloViewsConverter:
 
         if hist_opts['bin_range'] is None and not self._norm_opts.get('axiswise'):
             ranges = []
+            nw_data = nw.from_native(data)
+
             for col in y:
-                ys = data[col]
-                ymin, ymax = (ys.min(), ys.max())
-                if is_dask(ys):
-                    ymin, ymax = ymin.compute(), ymax.compute()
-                elif is_ibis(ys):
-                    ymin, ymax = ymin.execute(), ymax.execute()
+                ymin = nw_data.select(nw.col(col).min()).lazy().collect().item()
+                ymax = nw_data.select(nw.col(col).max()).lazy().collect().item()
                 ranges.append((ymin, ymax))
             if ranges:
                 hist_opts['bin_range'] = max_range(ranges)
@@ -2893,10 +2914,17 @@ class HoloViewsConverter:
                 dists = Distribution(data, y, [])
         else:
             ranges = {self.value_label: xlim}
-            data = data[y]
-            df = data.melt(var_name=self.group_label, value_name=self.value_label)
+            data = nw.from_native(data)
+            data = data.select([x, *y])
+            df = data.unpivot(
+                index=x,
+                variable_name=self.group_label,
+                value_name=self.value_label,
+            ).to_native()
+            # data = data[y]
+            # df = data.melt(var_name=self.group_label, value_name=self.value_label)
             ds = Dataset(df)
-            if len(df):
+            if len(ds):
                 dists = ds.to(Distribution, self.value_label)
                 dists = dists.layout() if self.subplots else dists.overlay(sort=False)
             else:
@@ -2984,15 +3012,20 @@ class HoloViewsConverter:
         )
 
     def ohlc(self, x=None, y=None, data=None):
+        from holoviews.core.util import dtype_kind
+
         self._error_if_unavailable('ohlc', Rectangles)
         self._error_if_unavailable('ohlc', Segments)
         data = self.data if data is None else data
         if x is None:
             variables = [var for var in self.variables if var not in self.indexes]
-            if data[variables[0]].dtype.kind == 'M':
+            dtype = nw.from_native(data).schema[variables[0]]
+            if dtype_kind(dtype) == 'M':
                 x = variables[0]
-            else:
+            elif self.indexes:
                 x = self.indexes[0]
+            else:
+                x = 'index'
         width = self.kwds.get('bar_width', 0.5)
         if y is None:
             o, h, l, c = [col for col in data.columns if col != x][:4]  # noqa: E741
@@ -3005,7 +3038,7 @@ class HoloViewsConverter:
             self.hover_cols.remove(x)
         vdims = list(dict.fromkeys(ohlc_cols + self.hover_cols))
         ds = Dataset(data, [x], vdims)
-        if ds.dimension_values(x).dtype.kind in 'SUO':
+        if dtype_kind(ds.dimension_values(x)) in 'SUO':
             rects = Rectangles(ds, [x, o, x, c])
         else:
             if len(ds):
@@ -3021,8 +3054,9 @@ class HoloViewsConverter:
         seg_cur_opts, seg_compat_opts = self._get_compat_opts('Segments')
         tools = seg_cur_opts.pop('tools', [])
         if 'hover' in tools:
-            x_data = data[x] if x in data.columns else data.index
-            if pd.api.types.is_datetime64_any_dtype(x_data):
+            # x_data = data[x] if x in data.columns else data.index
+            dtype = nw.from_native(data).schema[x]
+            if dtype_kind(dtype) == 'M':
                 # %F %T: strftime code for %Y-%m-%d %H:%M:%S.
                 # See https://man7.org/linux/man-pages/man3/strftime.3.html
                 x_tooltip = f'@{x}{{%F %T}}'
@@ -3058,7 +3092,7 @@ class HoloViewsConverter:
     def table(self, x=None, y=None, data=None):
         self._error_if_unavailable('table')
         data = self.data if data is None else data
-        if isinstance(data.index, (DatetimeIndex, MultiIndex)):
+        if isinstance(getattr(data, 'index', None), (DatetimeIndex, MultiIndex)):
             # To get the index displayed in the table as Bokeh doesn't show it.
             data = data.reset_index()
 
@@ -3305,6 +3339,8 @@ class HoloViewsConverter:
         data, x, y, _ = self._process_gridded_args(data, x, y, z=None)
         params = dict(self._relabel)
 
+        if is_narwhals(self.data) and x == 'index':
+            x = None
         if not (x and y):
             if is_geodataframe(data):
                 x, y = ('Longitude', 'Latitude') if self.geo else ('x', 'y')
