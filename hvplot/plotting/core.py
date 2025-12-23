@@ -1354,6 +1354,12 @@ class hvPlotTabular(hvPlotBase):
         - HoloViews: https://holoviews.org/reference/elements/bokeh/Barbs.html
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.barbs.html
         """
+        try:
+            import geoviews as gv  # noqa: F401
+        except ImportError:
+            raise ImportError(
+                'geoviews is required for barbs plots. Please install geoviews to use this feature.'
+            )
         return self(x, y, angle=angle, mag=mag, kind='barbs', **kwds)
 
     def vectorfield(self, x=None, y=None, angle=None, mag=None, **kwds):
