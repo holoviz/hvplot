@@ -233,6 +233,7 @@ if os.getenv('HVPLOT_GALLERY') not in ('False', 'false', '0'):
             'reference/xarray/line': 'ref/api/manual/hvplot.hvPlot.line',
             'reference/xarray/quadmesh': 'ref/api/manual/hvplot.hvPlot.quadmesh',
             'reference/xarray/rgb': 'ref/api/manual/hvplot.hvPlot.rgb',
+            'reference/xarray/barbs': 'ref/api/manual/hvplot.hvPlot.barbs',
             'reference/xarray/vectorfield': 'ref/api/manual/hvplot.hvPlot.vectorfield',
             'reference/xarray/violin': 'ref/api/manual/hvplot.hvPlot.violin',
             # When the pandas section was renamed tabular:

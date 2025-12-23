@@ -554,3 +554,47 @@ class TestGeoUtil(TestCase):
 
         crs = proj_to_cartopy(proj4_string)
         assert isinstance(crs, self.ccrs.NearsidePerspective)
+
+
+class TestWindBarbs(TestCase):
+    def setUp(self):
+        if sys.platform == 'win32':
+            raise SkipTest('Skip geo tests on windows for now')
+        try:
+            import geoviews as gv  # noqa
+
+            self.gv = gv
+        except ImportError:
+            raise SkipTest('geoviews not available')
+        import hvplot.pandas  # noqa
+
+    def test_barbs_with_angle_mag(self):
+        """Test wind barbs plot with angle and magnitude"""
+        df = pd.DataFrame(
+            {
+                'lon': np.linspace(-10, 10, 20),
+                'lat': np.linspace(-10, 10, 20),
+                'angle': np.random.uniform(0, 2 * np.pi, 20),
+                'mag': np.random.uniform(0, 10, 20),
+            }
+        )
+
+        plot = df.hvplot.barbs(x='lon', y='lat', angle='angle', mag='mag', geo=True)
+        assert isinstance(plot, self.gv.WindBarbs)
+        assert plot.kdims[0].name == 'lon'
+        assert plot.kdims[1].name == 'lat'
+        assert plot.vdims[0].name == 'angle'
+        assert plot.vdims[1].name == 'mag'
+
+    def test_barbs_invalid_incomplete_angle_mag(self):
+        """Test that providing only angle or mag raises an error"""
+        df = pd.DataFrame(
+            {
+                'lon': np.linspace(-10, 10, 10),
+                'lat': np.linspace(-10, 10, 10),
+                'angle': np.random.uniform(0, 2 * np.pi, 10),
+            }
+        )
+
+        with pytest.raises(ValueError, match='requires either both'):
+            df.hvplot.barbs(x='lon', y='lat', angle='angle')

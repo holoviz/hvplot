@@ -90,6 +90,11 @@ from .util import (
 )
 from .utilities import hvplot_extension
 
+try:
+    from geoviews import WindBarbs
+except ImportError:
+    WindBarbs = None
+
 renderer = hv.renderer('bokeh')
 
 
@@ -574,7 +579,9 @@ class HoloViewsConverter:
     _geom_types = ['paths', 'polygons']
 
     _geo_types = sorted(
-        _gridded_types + _geom_types + ['points', 'vectorfield', 'labels', 'hexbin', 'bivariate']
+        _gridded_types
+        + _geom_types
+        + ['points', 'barbs', 'vectorfield', 'labels', 'hexbin', 'bivariate']
     )
 
     _stats_types = ['hist', 'kde', 'violin', 'box', 'density']
@@ -745,6 +752,7 @@ class HoloViewsConverter:
         'area': ['x', 'y', 'y2', 'stacked'],
         'bar': ['x', 'y', 'stacked'],
         'barh': ['x', 'y', 'stacked'],
+        'barbs': ['x', 'y', 'angle', 'mag'],
         'box': ['x', 'y'],
         'errorbars': ['x', 'y', 'yerr1', 'yerr2'],
         'bivariate': ['x', 'y', 'bandwidth', 'cut', 'filled', 'levels'],
@@ -777,6 +785,7 @@ class HoloViewsConverter:
         'area': Area,
         'bar': Bars,
         'barh': Bars,
+        'barbs': WindBarbs,
         'bivariate': Bivariate,
         'box': BoxWhisker,
         'contour': Contours,
@@ -3274,6 +3283,29 @@ class HoloViewsConverter:
             return contourf.redim.range(**redim)
         else:
             return contourf
+
+    def barbs(self, x=None, y=None, angle=None, mag=None, data=None):
+        self._error_if_unavailable('barbs')
+        data, x, y, _ = self._process_gridded_args(data, x, y, z=None)
+
+        if not (x and y):
+            x, y = list(k for k, v in data.coords.items() if v.size > 1)
+
+        angle = self.kwds.get('angle')
+        mag = self.kwds.get('mag')
+        z = [angle, mag] + self.hover_cols
+        redim = self._merge_redim({z[1]: self._dim_ranges['c']})
+        params = dict(self._relabel)
+
+        element = self._get_element('barbs')
+        cur_opts, compat_opts = self._get_compat_opts('Barbs')
+        if self.geo:
+            params['crs'] = self.crs
+
+        return redim_(
+            element(data, [x, y], z, **params),
+            **redim,
+        ).apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
 
     def vectorfield(self, x=None, y=None, angle=None, mag=None, data=None):
         self._error_if_unavailable('vectorfield')

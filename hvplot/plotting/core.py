@@ -250,6 +250,7 @@ class hvPlotTabular(hvPlotBase):
         'table',
         'dataset',
         'points',
+        'barbs',
         'vectorfield',
         'polygons',
         'paths',
@@ -1312,6 +1313,49 @@ class hvPlotTabular(hvPlotBase):
         """
         return self(x, y, kind='points', **kwds)
 
+    def barbs(self, x=None, y=None, angle=None, mag=None, **kwds):
+        """
+        A barbs plot visualizes wind barbs given by the (``x``, ``y``) starting point,
+        a magnitude (``mag``) and an `angle`.
+
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.barbs.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
+
+        Parameters
+        ----------
+        x : string
+            Field name to draw x-positions from
+        y : string
+            Field name to draw y-positions from
+        mag : string
+            Magnitude.
+        angle : string
+            Angle in radians.
+        **kwds : optional
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('vectorfield')`` for the full method documentation.
+
+        Returns
+        -------
+        :class:`holoviews:holoviews.element.VectorField` / Panel object
+            You can `print` the object to study its composition and run:
+
+            .. code-block::
+
+                import holoviews as hv
+                hv.help(the_holoviews_object)
+
+            to learn more about its parameters and options.
+
+        References
+        ----------
+
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Barbs.html
+        - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.barbs.html
+        """
+        return self(x, y, angle=angle, mag=mag, kind='barbs', **kwds)
+
     def vectorfield(self, x=None, y=None, angle=None, mag=None, **kwds):
         """
         vectorfield visualizes vectors given by the (``x``, ``y``) starting point,
@@ -1721,6 +1765,7 @@ class hvPlot(hvPlotTabular):
         'table',
         'dataset',
         'points',
+        'barbs',
         'vectorfield',
         'polygons',
         'paths',
