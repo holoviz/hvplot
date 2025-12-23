@@ -616,8 +616,6 @@ class HoloViewsConverter:
         'tiles_opts',
         'projection',
         'global_extent',
-        'xlim',
-        'ylim',
     ]
 
     _size_layout_options = [
