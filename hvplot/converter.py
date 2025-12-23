@@ -616,6 +616,8 @@ class HoloViewsConverter:
         'tiles_opts',
         'projection',
         'global_extent',
+        'xlim',
+        'ylim',
     ]
 
     _size_layout_options = [
@@ -752,7 +754,7 @@ class HoloViewsConverter:
         'area': ['x', 'y', 'y2', 'stacked'],
         'bar': ['x', 'y', 'stacked'],
         'barh': ['x', 'y', 'stacked'],
-        'barbs': ['x', 'y', 'angle', 'mag'],
+        'barbs': ['x', 'y', 'angle', 'mag', 'scale'],
         'box': ['x', 'y'],
         'errorbars': ['x', 'y', 'yerr1', 'yerr2'],
         'bivariate': ['x', 'y', 'bandwidth', 'cut', 'filled', 'levels'],
@@ -3298,7 +3300,7 @@ class HoloViewsConverter:
         params = dict(self._relabel)
 
         element = self._get_element('barbs')
-        cur_opts, compat_opts = self._get_compat_opts('Barbs')
+        cur_opts, compat_opts = self._get_compat_opts('WindBarbs')
         if self.geo:
             params['crs'] = self.crs
 
