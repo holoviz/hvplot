@@ -579,7 +579,7 @@ class TestWindBarbs(TestCase):
             }
         )
 
-        plot = df.hvplot.barbs(x='lon', y='lat', angle='angle', mag='mag', geo=True)
+        plot = df.hvplot.windbarbs(x='lon', y='lat', angle='angle', mag='mag', geo=True)
         assert isinstance(plot, self.gv.WindBarbs)
         assert plot.kdims[0].name == 'lon'
         assert plot.kdims[1].name == 'lat'
@@ -597,4 +597,4 @@ class TestWindBarbs(TestCase):
         )
 
         with pytest.raises(ValueError, match='requires either both'):
-            df.hvplot.barbs(x='lon', y='lat', angle='angle')
+            df.hvplot.windbarbs(x='lon', y='lat', angle='angle')

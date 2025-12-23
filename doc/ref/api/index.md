@@ -64,7 +64,6 @@ This section documents all the plotting methods of the `hvPlot` class, which as 
 
    hvPlot.area
    hvPlot.bar
-   hvPlot.barbs
    hvPlot.barh
    hvPlot.box
    hvPlot.bivariate
@@ -95,6 +94,7 @@ This section documents all the plotting methods of the `hvPlot` class, which as 
 
 .. autosummary::
 
+   hvPlot.windbarbs
    hvPlot.contour
    hvPlot.contourf
    hvPlot.image
@@ -124,7 +124,7 @@ hvPlot's structure is based on Pandas' plotting API and as such provides special
 
 hvplot.hvPlot.area <manual/hvplot.hvPlot.area>
 hvplot.hvPlot.bar <manual/hvplot.hvPlot.bar>
-hvplot.hvPlot.barbs <manual/hvplot.hvPlot.barbs>
+hvplot.hvPlot.windbarbs <manual/hvplot.hvPlot.windbarbs>
 hvplot.hvPlot.barh <manual/hvplot.hvPlot.barh>
 hvplot.hvPlot.box <manual/hvplot.hvPlot.box>
 hvplot.hvPlot.bivariate <manual/hvplot.hvPlot.bivariate>

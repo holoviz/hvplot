@@ -90,11 +90,6 @@ from .util import (
 )
 from .utilities import hvplot_extension
 
-try:
-    from geoviews import WindBarbs
-except ImportError:
-    WindBarbs = None
-
 renderer = hv.renderer('bokeh')
 
 
@@ -581,7 +576,7 @@ class HoloViewsConverter:
     _geo_types = sorted(
         _gridded_types
         + _geom_types
-        + ['points', 'barbs', 'vectorfield', 'labels', 'hexbin', 'bivariate']
+        + ['points', 'windbarbs', 'vectorfield', 'labels', 'hexbin', 'bivariate']
     )
 
     _stats_types = ['hist', 'kde', 'violin', 'box', 'density']
@@ -654,6 +649,8 @@ class HoloViewsConverter:
         'yformatter',
         'xlabel',
         'ylabel',
+        'xlim',
+        'ylim',
         'xticks',
         'yticks',
         'cticks',
@@ -750,7 +747,7 @@ class HoloViewsConverter:
         'area': ['x', 'y', 'y2', 'stacked'],
         'bar': ['x', 'y', 'stacked'],
         'barh': ['x', 'y', 'stacked'],
-        'barbs': ['x', 'y', 'angle', 'mag', 'scale'],
+        'windbarbs': ['x', 'y', 'angle', 'mag', 'scale'],
         'box': ['x', 'y'],
         'errorbars': ['x', 'y', 'yerr1', 'yerr2'],
         'bivariate': ['x', 'y', 'bandwidth', 'cut', 'filled', 'levels'],
@@ -783,7 +780,6 @@ class HoloViewsConverter:
         'area': Area,
         'bar': Bars,
         'barh': Bars,
-        'barbs': WindBarbs,
         'bivariate': Bivariate,
         'box': BoxWhisker,
         'contour': Contours,
@@ -970,8 +966,9 @@ class HoloViewsConverter:
         self.dynamic = dynamic
         self.geo = any([geo, crs, global_extent, projection, project, coastline, features])
         # Try importing geoviews if geo-features requested
-        if self.geo or self.datatype == 'geopandas':
-            import_geoviews()
+        if self.geo or self.datatype == 'geopandas' or kind == 'windbarbs':
+            gv = import_geoviews()
+            self._kind_mapping['windbarbs'] = gv.WindBarbs
 
         self.crs = self._process_crs(data, crs) if self.geo else None
         self.output_projection = self.crs
@@ -3282,12 +3279,15 @@ class HoloViewsConverter:
         else:
             return contourf
 
-    def barbs(self, x=None, y=None, angle=None, mag=None, data=None):
-        self._error_if_unavailable('barbs')
+    def windbarbs(self, x=None, y=None, angle=None, mag=None, data=None):
+        self._error_if_unavailable('windbarbs')
         data, x, y, _ = self._process_gridded_args(data, x, y, z=None)
 
         if not (x and y):
-            x, y = list(k for k, v in data.coords.items() if v.size > 1)
+            if hasattr(data, 'coords'):
+                x, y = list(k for k, v in data.coords.items() if v.size > 1)
+            else:
+                x, y = data.columns[:2]
 
         angle = self.kwds.get('angle')
         mag = self.kwds.get('mag')
@@ -3295,7 +3295,7 @@ class HoloViewsConverter:
         redim = self._merge_redim({z[1]: self._dim_ranges['c']})
         params = dict(self._relabel)
 
-        element = self._get_element('barbs')
+        element = self._get_element('windbarbs')
         cur_opts, compat_opts = self._get_compat_opts('WindBarbs')
         if self.geo:
             params['crs'] = self.crs
@@ -3310,7 +3310,10 @@ class HoloViewsConverter:
         data, x, y, _ = self._process_gridded_args(data, x, y, z=None)
 
         if not (x and y):
-            x, y = list(k for k, v in data.coords.items() if v.size > 1)
+            if hasattr(data, 'coords'):
+                x, y = list(k for k, v in data.coords.items() if v.size > 1)
+            else:
+                x, y = data.columns[:2]
 
         angle = self.kwds.get('angle')
         mag = self.kwds.get('mag')

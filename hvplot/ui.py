@@ -26,7 +26,7 @@ KINDS = {
 }
 
 KINDS['2d'] = (
-    ['bivariate', 'heatmap', 'hexbin', 'labels', 'barbs', 'vectorfield', 'points', 'paths']
+    ['bivariate', 'heatmap', 'hexbin', 'labels', 'windbarbs', 'vectorfield', 'points', 'paths']
     + KINDS['gridded']
     + KINDS['geom']
 )

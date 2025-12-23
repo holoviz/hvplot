@@ -250,7 +250,7 @@ class hvPlotTabular(hvPlotBase):
         'table',
         'dataset',
         'points',
-        'barbs',
+        'windbarbs',
         'vectorfield',
         'polygons',
         'paths',
@@ -1313,12 +1313,14 @@ class hvPlotTabular(hvPlotBase):
         """
         return self(x, y, kind='points', **kwds)
 
-    def barbs(self, x=None, y=None, angle=None, mag=None, **kwds):
+    def windbarbs(self, x=None, y=None, angle=None, mag=None, **kwds):
         """
-        A barbs plot visualizes wind barbs given by the (``x``, ``y``) starting point,
-        a magnitude (``mag``) and an `angle`.
+        A windbarbs plot visualizes wind barbs given by the (``x``, ``y``) starting point,
+        a magnitude (``mag``) and an ``angle``.
 
-        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.barbs.html
+        .. versionadded:: 1.0.0
+
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.windbarbs.html
 
         Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
 
@@ -1334,38 +1336,38 @@ class hvPlotTabular(hvPlotBase):
             Angle in radians.
         **kwds : optional
             Additional keywords arguments are documented in :ref:`plot-options`.
-            Run ``hvplot.help('vectorfield')`` for the full method documentation.
+            Run ``hvplot.help('windbarbs')`` for the full method documentation.
 
         Returns
         -------
-        :class:`holoviews:holoviews.element.VectorField` / Panel object
+        :class:`geoviews:geoviews.element.Barbs` / Panel object
             You can `print` the object to study its composition and run:
 
             .. code-block::
 
-                import holoviews as hv
-                hv.help(the_holoviews_object)
+                import geoviews as gv
+                gv.help(the_geoviews_object)
 
             to learn more about its parameters and options.
 
         References
         ----------
 
-        - HoloViews: https://holoviews.org/reference/elements/bokeh/Barbs.html
+        - GeoViews: https://geoviews.org/gallery/bokeh/wind_barbs_example.html
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.barbs.html
         """
         try:
             import geoviews as gv  # noqa: F401
         except ImportError:
             raise ImportError(
-                'geoviews is required for barbs plots. Please install geoviews to use this feature.'
+                'geoviews>=1.15.0 is required for windbarbs plots. Please install geoviews to use this feature.'
             )
-        return self(x, y, angle=angle, mag=mag, kind='barbs', **kwds)
+        return self(x, y, angle=angle, mag=mag, kind='windbarbs', **kwds)
 
     def vectorfield(self, x=None, y=None, angle=None, mag=None, **kwds):
         """
         vectorfield visualizes vectors given by the (``x``, ``y``) starting point,
-        a magnitude (``mag``) and an `angle`. A ``vectorfield`` plot is also known
+        a magnitude (``mag``) and an ``angle``. A ``vectorfield`` plot is also known
         as a ``quiver`` plot.
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.vectorfield.html
@@ -1771,7 +1773,7 @@ class hvPlot(hvPlotTabular):
         'table',
         'dataset',
         'points',
-        'barbs',
+        'windbarbs',
         'vectorfield',
         'polygons',
         'paths',
