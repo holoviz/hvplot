@@ -135,11 +135,9 @@ import duckdb
 import hvplot.duckdb
 from bokeh.sampledata.autompg import autompg_clean as df
 
-# Create a DuckDB connection and register the DataFrame
 con = duckdb.connect(':memory:')
 con.register('autompg', df)
 
-# Query using DuckDB SQL to aggregate and filter data
 query = """
 SELECT origin, mfr, AVG(mpg) as mpg
 FROM autompg
