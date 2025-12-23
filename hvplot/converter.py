@@ -656,8 +656,6 @@ class HoloViewsConverter:
         'yformatter',
         'xlabel',
         'ylabel',
-        'xlim',
-        'ylim',
         'xticks',
         'yticks',
         'cticks',
