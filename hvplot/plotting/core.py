@@ -101,6 +101,13 @@ class hvPlotBase:
         x = x or params.pop('x', None)
         y = y or params.pop('y', None)
         kind = kind or params.pop('kind', None)
+
+        # Ensure windbarbs is registered in _kind_mapping (it's added dynamically
+        # when geoviews is available)
+        if kind == 'windbarbs' and 'windbarbs' not in HoloViewsConverter._kind_mapping:
+            gv = import_geoviews()
+            HoloViewsConverter._kind_mapping['windbarbs'] = gv.WindBarbs
+
         return HoloViewsConverter(self._data, x, y, kind=kind, **params)
 
     def __dir__(self):
