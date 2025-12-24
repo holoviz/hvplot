@@ -966,9 +966,8 @@ class HoloViewsConverter:
         self.dynamic = dynamic
         self.geo = any([geo, crs, global_extent, projection, project, coastline, features])
         # Try importing geoviews if geo-features requested
-        if self.geo or self.datatype == 'geopandas' or kind == 'windbarbs':
-            gv = import_geoviews()
-            self._kind_mapping['windbarbs'] = gv.WindBarbs
+        if self.geo or self.datatype == 'geopandas':
+            import_geoviews()
 
         self.crs = self._process_crs(data, crs) if self.geo else None
         self.output_projection = self.crs

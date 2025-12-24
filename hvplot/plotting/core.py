@@ -13,7 +13,7 @@ except ImportError:
     panel_available = False
 
 from ..converter import HoloViewsConverter
-from ..util import is_list_like, process_dynamic_args
+from ..util import is_list_like, process_dynamic_args, import_geoviews
 
 # Color palette for examples: https://www.color-hex.com/color-palette/1018056
 # light green: #55a194
@@ -1356,12 +1356,8 @@ class hvPlotTabular(hvPlotBase):
         - GeoViews: https://geoviews.org/gallery/bokeh/wind_barbs_example.html
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.barbs.html
         """
-        try:
-            import geoviews as gv  # noqa: F401
-        except ImportError:
-            raise ImportError(
-                'geoviews>=1.15.0 is required for windbarbs plots. Please install geoviews to use this feature.'
-            )
+        gv = import_geoviews()
+        HoloViewsConverter._kind_mapping['windbarbs'] = gv.WindBarbs
         return self(x, y, angle=angle, mag=mag, kind='windbarbs', **kwds)
 
     def vectorfield(self, x=None, y=None, angle=None, mag=None, **kwds):
