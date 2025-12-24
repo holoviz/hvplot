@@ -3290,6 +3290,12 @@ class HoloViewsConverter:
 
         angle = self.kwds.get('angle')
         mag = self.kwds.get('mag')
+
+        if (angle is None) != (mag is None):
+            raise ValueError("windbarbs requires either both 'angle' and 'mag' or neither")
+        if angle is None and mag is None:
+            raise ValueError("windbarbs requires 'angle' and 'mag' parameters")
+
         z = [angle, mag] + self.hover_cols
         redim = self._merge_redim({z[1]: self._dim_ranges['c']})
         params = dict(self._relabel)
@@ -3316,6 +3322,12 @@ class HoloViewsConverter:
 
         angle = self.kwds.get('angle')
         mag = self.kwds.get('mag')
+
+        if (angle is None) != (mag is None):
+            raise ValueError("vectorfield requires either both 'angle' and 'mag' or neither")
+        if angle is None and mag is None:
+            raise ValueError("vectorfield requires 'angle' and 'mag' parameters")
+
         z = [angle, mag] + self.hover_cols
         redim = self._merge_redim({z[1]: self._dim_ranges['c']})
         params = dict(self._relabel)
