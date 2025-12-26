@@ -1,4 +1,4 @@
-[project]
+[workspace]
 name = "hvplot"
 channels = ["pyviz/label/dev",  "conda-forge"]
 platforms = ["linux-64", "osx-arm64", "osx-64", "win-64"]
@@ -33,16 +33,24 @@ no-default-feature = true
 features = ["py313", "required", "test-core", "test", "example", "geo", "graphviz", "test-example"]
 no-default-feature = true
 
+[environments.test-314]
+features = ["py314", "required", "test-core", "test", "example", "geo", "graphviz", "test-example"]
+no-default-feature = true
+
+[environments.test-pandas3]
+features = ["py313", "required", "test-core", "test", "example", "geo", "graphviz", "test-example", "pandas3"]
+no-default-feature = true
+
 [environments.test-core]
-features = ["py313", "required", "test-core"]
+features = ["py314", "required", "test-core"]
 no-default-feature = true
 
 [environments.docs]
-features = ["py311", "required", "doc", "example", "geo", "graphviz"]
+features = ["py313", "required", "doc", "example", "geo", "graphviz"]
 no-default-feature = true
 
 [environments.build]
-features = ["py311", "required", "build"]
+features = ["py313", "required", "build"]
 no-default-feature = true
 
 [environments.lint]
@@ -73,24 +81,26 @@ PYTHONIOENCODING = "utf-8"
 
 [feature.py310.dependencies]
 python = "3.10.*"
-bokeh_sampledata = "*"
 
 [feature.py311.dependencies]
 python = "3.11.*"
-bokeh_sampledata = "*"
 
 [feature.py312.dependencies]
 python = "3.12.*"
-bokeh_sampledata = "*"
 
 [feature.py312.activation.env]
 COVERAGE_CORE = "sysmon"
 
 [feature.py313.dependencies]
 python = "3.13.*"
-bokeh_sampledata = "*"
 
 [feature.py313.activation.env]
+COVERAGE_CORE = "sysmon"
+
+[feature.py314.dependencies]
+python = "3.14.*"
+
+[feature.py314.activation.env]
 COVERAGE_CORE = "sysmon"
 
 # =================== DEV ===================
@@ -142,6 +152,7 @@ xarray = ">=0.18.2"
 xyzservices = ">=2022.9.0"
 geodatasets = ">=2023.12.0"
 hvsampledata = ">=0.1.4a2"
+bokeh_sampledata = ">=2025.0"
 
 # =================== TESTS ===================
 
@@ -159,7 +170,7 @@ pytest = "*"
 ruff = "*"
 scipy = "*"
 xarray = "*"
-# bokeh_sampledata = "*" (only available starting from Python 3.10)
+bokeh_sampledata = "*"
 psutil = "*"
 cftime = "*"
 numpydoc = "*"
@@ -212,7 +223,7 @@ test-unit-geo-cov = 'pytest -v hvplot --geo --cov=hvplot --cov-branch --cov-appe
 test-unit = 'pytest -v hvplot'
 
 [feature.test-example.tasks]
-test-example = 'pytest -n logical --dist loadscope --nbval-lax -p no:python'
+test-example = 'pytest -n logical --dist loadscope --nbval-lax -p no:python doc'
 
 # =================== DOCS ====================
 
@@ -264,3 +275,11 @@ pre-commit = "*"
 [feature.lint.tasks]
 lint = 'pre-commit run --all-files'
 lint-install = 'pre-commit install'
+
+# ================== SPECIAL ====================
+
+[feature.pandas3]
+channels = ["conda-forge/label/pandas_rc"]
+
+[feature.pandas3.dependencies]
+pandas = { version = ">=3.0.0rc0,<3.0.0", channel = "conda-forge/label/pandas_rc" }

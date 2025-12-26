@@ -8,11 +8,12 @@ import os
 import textwrap
 import sys
 
-from collections.abc import Hashable
+from collections.abc import Hashable, Sequence
 from contextlib import contextmanager
 from functools import lru_cache, wraps
 from importlib.util import find_spec
 from types import FunctionType
+import warnings
 
 from packaging.version import Version
 
@@ -21,6 +22,7 @@ import numpy as np
 import pandas as pd
 import param
 import holoviews as hv
+from holoviews.util.transform import lon_lat_to_easting_northing
 
 try:
     import panel as pn
@@ -35,6 +37,9 @@ bokeh_version = Version(bokeh.__version__)
 
 _HV_VERSION = hv_version.release
 _HV_GE_1_21_0 = _HV_VERSION >= (1, 21, 0)
+_pd_version = Version(pd.__version__).release
+_PD_GE_2_1_0 = _pd_version >= (2, 1, 0)
+_PD_GE_3_0_0 = _pd_version >= (3, 0, 0)
 
 _fugue_ipython = None  # To be set to True in tests to mock ipython
 
@@ -132,10 +137,7 @@ def check_crs(crs):
         try:
             out = pyproj.Proj(crs, preserve_units=True)
         except RuntimeError:
-            try:
-                out = pyproj.Proj(init=crs, preserve_units=True)
-            except RuntimeError:
-                out = None
+            out = None
     else:
         out = None
     return out
@@ -410,6 +412,97 @@ def process_crs(crs):
     ) from Exception(*errors)
 
 
+def _is_within_latlon_bounds(data, x: str, y: str) -> bool:
+    """
+    Return True when finite lat/lon bounds are detected.
+    If unexpected data is encountered, return False.
+    """
+    try:
+        min_x = np.nanmin(data[x])
+        max_x = np.nanmax(data[x])
+        x_ok = -180 <= min_x <= 360 and -180 <= max_x <= 360
+    except Exception as e:
+        warnings.warn(
+            f'Could not determine longitude bounds from variable {x!r}: {e}',
+            stacklevel=_find_stack_level(),
+        )
+        return False
+    try:
+        min_y = np.nanmin(data[y])
+        max_y = np.nanmax(data[y])
+        y_ok = -90 <= min_y <= 90 and -90 <= max_y <= 90
+    except Exception as e:
+        warnings.warn(
+            f'Could not determine latitude bounds from variable {y!r}: {e}',
+            stacklevel=_find_stack_level(),
+        )
+        return False
+    return x_ok and y_ok
+
+
+def _convert_latlon_to_mercator(lon: np.ndarray, lat: np.ndarray, use_lon_180: bool = True):
+    """Convert lon/lat values to Web Mercator easting/northing."""
+    if use_lon_180:
+        # ticks are better displayed with -180 to 180
+        lon = (lon + 180) % 360 - 180
+    else:
+        lon = lon % 360
+    return lon_lat_to_easting_northing(lon, lat)
+
+
+def _bounds_in_range(v0, v1, min_val, max_val):
+    """
+    Check if both bounds are valid and in range.
+    """
+    if np.isfinite(v0) and np.isfinite(v1):
+        return min_val <= v0 <= max_val and min_val <= v1 <= max_val
+    elif np.isfinite(v0) and not np.isfinite(v1):
+        return min_val <= v0 <= max_val
+    elif not np.isfinite(v0) and np.isfinite(v1):
+        return min_val <= v1 <= max_val
+    else:
+        # Both bounds are not finite so they can't be within range.
+        return False
+
+
+def _convert_limit_to_mercator(limit: tuple | None, is_x_axis=True) -> tuple | None:
+    """Convert axis limits to Web Mercator coordinates when possible."""
+    try:
+        import pandas as pd
+    except ModuleNotFoundError:
+        pd = None
+
+    if not limit:
+        return None
+
+    try:
+        v0, v1 = limit
+
+        v0 = np.nan if v0 is None or (pd and pd.isna(v0)) or not np.isfinite(v0) else v0
+        v1 = np.nan if v1 is None or (pd and pd.isna(v1)) or not np.isfinite(v1) else v1
+
+        if is_x_axis:
+            if not _bounds_in_range(v0, v1, -180, 360):
+                return limit
+            use_lon_180 = (
+                (np.isnan(v0) or np.isnan(v1))
+                or ((v0 <= 0 or v1 >= 0) and (v0 >= 180 or v1 <= 180))
+                or (v1 < v0 and v0 > 180)
+            )
+            (v0_merc, v1_merc), _ = _convert_latlon_to_mercator(
+                np.array([v0, v1]), (0, 0), use_lon_180
+            )
+        else:
+            if not _bounds_in_range(v0, v1, -90, 90):
+                return limit
+            _, (v0_merc, v1_merc) = _convert_latlon_to_mercator(np.array([0, 0]), (v0, v1))
+
+        return (v0_merc, v1_merc)
+    except Exception as e:
+        warnings.warn(f'Could not convert limits to Web Mercator: {e}')
+        return limit
+
+
 def is_list_like(obj):
     """
     Adapted from pandas' is_list_like cython function.
@@ -480,7 +573,7 @@ def is_dask(data):
 
 
 def is_duckdb(data):
-    if not check_library(data, 'duckdb'):
+    if not any((check_library(data, 'duckdb'), check_library(data, '_duckdb'))):
         return False
     import duckdb
 
@@ -1148,3 +1241,9 @@ def _find_stack_level() -> int:
         # https://docs.python.org/3/library/inspect.html#inspect.Traceback
         del frame
     return n
+
+
+def _generate_unique_name(name: str, names: Sequence[str], suffix: str = '_') -> str:
+    while name in names:
+        name += suffix
+    return name

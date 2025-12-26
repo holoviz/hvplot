@@ -25,6 +25,7 @@ classifiers = [
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
         "Operating System :: OS Independent",
         "Intended Audience :: Science/Research",
         "Intended Audience :: Developers",
@@ -54,7 +55,7 @@ HoloViz = "https://holoviz.org/"
 
 [project.optional-dependencies]
 tests-core = [
-    "dask[dataframe] <2025.1.0",
+    "dask[dataframe]",
     "ipywidgets",
     "matplotlib",
     "parameterized",
@@ -66,7 +67,7 @@ tests-core = [
     "ruff",
     "scipy",
     "xarray",
-    "bokeh_sampledata; python_version >= '3.10'",
+    "bokeh_sampledata",
     "psutil",
     "cftime",
     "numpydoc",
@@ -109,7 +110,7 @@ graphviz = [
 ]
 # Dependencies required to run the notebooks
 examples = [
-    "dask[dataframe] >=2021.3.0,<2025.1.0",
+    "dask[dataframe] >=2021.3.0",
     "datashader >=0.6.5",
     "duckdb",
     "fugue[sql]",
@@ -136,7 +137,7 @@ examples = [
     "xarray >=0.18.2",
     "xyzservices >=2022.9.0",
     "geodatasets >=2023.12.0",
-    "bokeh_sampledata; python_version >= '3.10'",
+    "bokeh_sampledata >=2025.0",
     "hvsampledata >=0.1.4a2",
 ]
 tests-nb = [
@@ -204,6 +205,12 @@ filterwarnings = [
     "ignore: 'xdrlib' is deprecated and slated for removal in Python 3.13:DeprecationWarning:metpy.io.nexrad",
     # 2023-09: See https://github.com/python-streamz/streamz/issues/460
     "ignore: pkg_resources is deprecated as an API:DeprecationWarning:streamz.plugins",
+    # 2025-10
+    "ignore:'_UnionGenericAlias' is deprecated and slated for removal in Python 3.17", # OK
+    # 2025-12
+    "ignore:pkg_resources is deprecated as an API:UserWarning:fugue_sql_antlr.parser",
+    # 2025-12
+    "ignore:The 'shapely.geos' module is deprecated:DeprecationWarning:geopandas._compat",
 ]
 
 [tool.codespell]

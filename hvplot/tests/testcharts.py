@@ -161,6 +161,12 @@ class TestChart1D(ComparisonTestCase):
         )
         self.df_hist = pd.DataFrame({'z': [1, 1, 4, 4]})
 
+    def color_series(self):
+        return self.cat_df['category'].map({'A': 'red', 'B': 'blue'})
+
+    def size_series(self):
+        return self.cat_df['y'] / 10
+
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
     def test_wide_chart(self, kind, element):
         plot = self.df.hvplot(kind=kind)
@@ -304,6 +310,86 @@ class TestChart1D(ComparisonTestCase):
         altered_df = self.df.assign(_color=y)
         expected = altered_df.hvplot.scatter('x', 'y', c='_color')
         self.assertEqual(actual, expected)
+
+    def test_color_series_excluded_from_default_hover(self):
+        color_series = self.color_series()
+        plot = self.cat_df.hvplot.scatter(x='x', y='y', color=color_series)
+
+        assert '_color' in plot.data.columns
+        assert '_color' in plot.vdims
+
+        # Check hover_tooltips option
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        hover_tooltips = opts.kwargs.get('hover_tooltips')
+
+        # hover_tooltips should be set and not include _color
+        assert hover_tooltips is not None
+        tooltip_dims = [tt[0] if isinstance(tt, tuple) else tt for tt in hover_tooltips]
+        assert '_color' not in tooltip_dims
+        assert 'x' in tooltip_dims
+        assert 'y' in tooltip_dims
+
+    def test_size_series_excluded_from_default_hover(self):
+        size_series = self.size_series()
+        plot = self.cat_df.hvplot.scatter(x='x', y='y', s=size_series)
+
+        assert '_size' in plot.data.columns
+        assert '_size' in plot.vdims
+
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        hover_tooltips = opts.kwargs.get('hover_tooltips')
+
+        # hover_tooltips should be set and not include _size
+        assert hover_tooltips is not None
+        tooltip_dims = [tt[0] if isinstance(tt, tuple) else tt for tt in hover_tooltips]
+        assert '_size' not in tooltip_dims
+        assert 'x' in tooltip_dims
+        assert 'y' in tooltip_dims
+
+    def test_explicit_hover_tooltips_respected_with_internal_columns(self):
+        color_series = self.color_series()
+        expected_htt = [('x', '@x'), ('color', '@_color')]
+        plot = self.cat_df.hvplot.scatter(
+            x='x', y='y', color=color_series, hover_tooltips=expected_htt
+        )
+
+        # Explicit hover_tooltips should be used
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        hover_tooltips = opts.kwargs.get('hover_tooltips')
+        assert hover_tooltips == expected_htt
+
+    def test_color_column_name_shown_in_hover(self):
+        plot = self.cat_df.hvplot.scatter(x='x', y='y', color='category')
+
+        assert 'category' in [d.name for d in plot.vdims]
+        assert '_color' not in plot.data.columns
+
+    def test_color_with_cmap_dict_shown_in_hover(self):
+        plot = self.cat_df.hvplot.scatter(
+            x='x', y='y', color='category', cmap={'A': 'red', 'B': 'blue'}
+        )
+
+        assert 'category' in [d.name for d in plot.vdims]
+        assert '_color' not in plot.data.columns
+
+    def test_both_color_and_size_series_excluded_from_hover(self):
+        color_series = self.color_series()
+        size_series = self.size_series()
+        plot = self.cat_df.hvplot.scatter(x='x', y='y', color=color_series, s=size_series)
+
+        # Both should be in data
+        assert '_color' in plot.data.columns
+        assert '_size' in plot.data.columns
+
+        opts = Store.lookup_options('bokeh', plot, 'plot')
+        hover_tooltips = opts.kwargs.get('hover_tooltips')
+
+        assert hover_tooltips is not None
+        tooltip_dims = [tt[0] if isinstance(tt, tuple) else tt for tt in hover_tooltips]
+        assert '_color' not in tooltip_dims
+        assert '_size' not in tooltip_dims
+        assert 'x' in tooltip_dims
+        assert 'y' in tooltip_dims
 
     def test_scatter_size_set_to_series(self):
         if is_dask(self.df['y']):
@@ -495,11 +581,13 @@ class TestChart1D(ComparisonTestCase):
         opts = Store.lookup_options('bokeh', plot, 'plot')
         self.assertEqual(opts.kwargs['hover_tooltips'], ['x'])
 
+    @pytest.mark.filterwarnings('ignore:hover_formatters')
     def test_hover_formatter(self):
         plot = self.df.hvplot('x', 'y', hover_formatters={'x': 'datetime'})
         opts = Store.lookup_options('bokeh', plot, 'plot')
         self.assertEqual(opts.kwargs['hover_formatters'], {'x': 'datetime'})
 
+    @pytest.mark.filterwarnings('ignore:hover_formatters')
     def test_hover_disabled(self):
         plot = self.df.hvplot(
             'x', 'y', hover_tooltips=['x'], hover_formatters={'x': 'datetime'}, hover=False
@@ -534,6 +622,17 @@ class TestChart1D(ComparisonTestCase):
             Dimension('label'),
         ]
         assert list(plot.data['label']) == ['-58.7E -34.58N', '-47.9E -15.78N', '-70.7E -33.45N']
+
+    def test_labels_default_y(self):
+        edge_df = self.edge_df.copy().drop(columns=['Volume {m3}'])
+        plot = edge_df.hvplot.labels('Longitude', 'Latitude')
+        assert list(plot.dimensions()) == [
+            Dimension('Longitude'),
+            Dimension('Latitude'),
+            Dimension('Latitude'),
+        ]
+        assert plot.kdims == ['Longitude', 'Latitude']
+        assert plot.vdims == ['Latitude']
 
     def test_labels_by(self):
         plot = self.edge_df.hvplot.labels(
@@ -610,6 +709,14 @@ class TestChart1DDask(TestChart1D):
         self.cat_df_index_y = dd.from_pandas(self.cat_df_index_y, npartitions=3)
         self.cat_only_df = dd.from_pandas(self.cat_only_df, npartitions=1)
         self.df_hist = dd.from_pandas(self.df_hist, npartitions=1)
+
+    def color_series(self):
+        # Passing lazy series not yet supported
+        return self.cat_df['category'].map({'A': 'red', 'B': 'blue'}, meta='object').compute()
+
+    def size_series(self):
+        # Passing lazy series not yet supported
+        return (self.cat_df['y'] / 10).compute()
 
     def test_by_datetime_accessor(self):
         raise SkipTest("Can't expand dt accessor columns when using dask")

@@ -47,12 +47,13 @@ from holoviews.plotting.bokeh import OverlayPlot, colormap_generator
 from holoviews.plotting.util import process_cmap
 from holoviews.operation import histogram, apply_when
 from holoviews.streams import Buffer, Pipe
-from holoviews.util.transform import dim, lon_lat_to_easting_northing
+from holoviews.util.transform import dim
 from pandas import DatetimeIndex, MultiIndex
 
 from .backend_transforms import _transfer_opts_cur_backend
 from .util import (
     _HV_GE_1_21_0,
+    _PD_GE_2_1_0,
     _Undefined,
     filter_opts,
     is_tabular,
@@ -82,6 +83,10 @@ from .util import (
     import_geoviews,
     is_mpl_cmap,
     _find_stack_level,
+    _is_within_latlon_bounds,
+    _convert_latlon_to_mercator,
+    _convert_limit_to_mercator,
+    _generate_unique_name,
 )
 from .utilities import hvplot_extension
 
@@ -1008,6 +1013,17 @@ class HoloViewsConverter:
         elif projection is False:
             # to disable automatic projection of tiles
             self.output_projection = projection
+        elif tiles and not self.geo and (xlim or ylim):
+            should_convert = (
+                not is_geodataframe(data)
+                and x is not None
+                and y is not None
+                and _is_within_latlon_bounds(data, x, y)
+            )
+
+            if should_convert:
+                xlim = _convert_limit_to_mercator(xlim, is_x_axis=True)
+                ylim = _convert_limit_to_mercator(ylim, is_x_axis=False)
 
         # Operations
         if resample_when is not None and not any([rasterize, datashade, downsample]):
@@ -1636,7 +1652,12 @@ class HoloViewsConverter:
                 # Broken, see https://github.com/holoviz/hvplot/issues/1364.
                 # Dask reset_index doesn't accept a level, so this would need to
                 # be adapted for Dask.
-                self.data = data.stack().reset_index(1).rename(columns={'level_1': group_label})
+                stack_kwargs = {'future_stack': True} if _PD_GE_2_1_0 else {}
+                self.data = (
+                    data.stack(**stack_kwargs)
+                    .reset_index(1)
+                    .rename(columns={'level_1': group_label})
+                )
                 by = group_label
                 x = 'index'
 
@@ -1774,6 +1795,11 @@ class HoloViewsConverter:
         else:
             valid_opts = []
 
+        if 's' in kwds and 'size' not in kwds:
+            kwds['size'] = kwds.pop('s')
+        if 'c' in kwds and 'color' not in kwds:
+            kwds['color'] = kwds.pop('c')
+
         cmap_opts = ('cmap', 'colormap', 'color_key')
         categorical_cmaps = [
             'accent',
@@ -1810,7 +1836,11 @@ class HoloViewsConverter:
         color = kwds.pop('color', kwds.pop('c', None))
 
         if color is not None:
-            if (self.datashade or self.rasterize) and color in [self.x, self.y]:
+            if (
+                (self.datashade or self.rasterize)
+                and isinstance(color, str)
+                and color in [self.x, self.y]
+            ):
                 self.data = self.data.assign(_color=self.data[color])
                 style_opts['color'] = color = '_color'
                 self.variables.append('_color')
@@ -1821,12 +1851,12 @@ class HoloViewsConverter:
             else:
                 style_opts['color'] = color
 
-            if (
-                not isinstance(color, list)
-                and color in self.variables
-                and 'c' in self._kind_options.get(kind, [])
-            ):
-                if self.data[color].dtype.kind in 'OSU':
+            color_dim = self._validate_dim(color)
+            if color_dim is None and isinstance(color, str) and color in self.variables:
+                color_dim = color
+
+            if color_dim is not None and 'c' in self._kind_options.get(kind, []):
+                if self.data[color_dim].dtype.kind in 'OSU':
                     cmap = cmap or self._default_cmaps['categorical']
                 else:
                     plot_opts['colorbar'] = plot_opts.get('colorbar', True)
@@ -1853,9 +1883,10 @@ class HoloViewsConverter:
         else:
             color = style_opts.get('color')
 
+        color_is_dim = isinstance(color, dim)
         for k, v in style.items():
             if isinstance(v, Cycle) and isinstance(v, str):
-                if color == cmap:
+                if not color_is_dim and color == cmap:
                     if color not in Palette.colormaps and color.title() in Palette.colormaps:
                         color = color.title()
                     else:
@@ -1867,7 +1898,10 @@ class HoloViewsConverter:
                     style_opts[k] = color
 
         # Size
-        size = kwds.pop('size', kwds.pop('s', None))
+        size = kwds.pop('size', None)
+        # Determine the correct option name based on backend
+        # Bokeh uses 'size', matplotlib uses 's'
+        size_opt_name = 's' if self._backend_compat == 'matplotlib' else 'size'
         if size is not None:
             scale = kwds.get('scale', 1)
             if self.datashade or self.rasterize:
@@ -1879,14 +1913,16 @@ class HoloViewsConverter:
             if isinstance(size, (np.ndarray, pd.Series)):
                 size = np.sqrt(size) * scale
                 self.data = self.data.assign(_size=size)
-                style_opts['size'] = '_size'
+                style_opts[size_opt_name] = '_size'
                 self.variables.append('_size')
             elif isinstance(size, str):
-                style_opts['size'] = np.sqrt(dim(size)) * scale
-            elif not isinstance(size, dim):
-                style_opts['size'] = np.sqrt(size) * scale
-        elif 'size' in valid_opts:
-            style_opts['size'] = np.sqrt(30)
+                style_opts[size_opt_name] = np.sqrt(dim(size)) * scale
+            elif isinstance(size, dim):
+                style_opts[size_opt_name] = size * scale if scale != 1 else size
+            else:
+                style_opts[size_opt_name] = np.sqrt(size) * scale
+        elif 'size' in valid_opts or 's' in valid_opts:
+            style_opts[size_opt_name] = np.sqrt(30)
 
         # Marker
         if 'marker' in kwds and 'marker' in self._kind_options[self.kind]:
@@ -2342,6 +2378,9 @@ class HoloViewsConverter:
     def _get_dimensions(self, kdims, vdims):
         for style in ('color', 'size', 'marker', 'alpha'):
             dimension = self._style_opts.get(style)
+            # For matplotlib backend, 'size' is stored as 's'
+            if dimension is None and style == 'size':
+                dimension = self._style_opts.get('s')
             dimensions = (kdims if kdims else []) + vdims
             dimension = self._validate_dim(dimension)
             if dimension is None:
@@ -2436,6 +2475,14 @@ class HoloViewsConverter:
         elif element is ErrorBars and self.kwds.get('yerr1'):
             ys += [self.kwds['yerr1']]
         kdims, vdims = self._get_dimensions([x], ys)
+
+        # Automatically exclude internal style columns from hover tooltips
+        # if hover_tooltips was not explicitly set by the user
+        internal_cols = {'_color', '_size'}
+        if 'hover_tooltips' not in self._plot_opts and any(v in internal_cols for v in vdims):
+            hover_dims = [d for d in kdims + vdims if d not in internal_cols]
+            if hover_dims:
+                cur_opts[element.name]['hover_tooltips'] = [(d, f'@{{{d}}}') for d in hover_dims]
 
         if self.by:
             if element is Bars and not self.subplots:
@@ -2555,26 +2602,17 @@ class HoloViewsConverter:
         elif is_geodataframe(data):
             if getattr(data, 'crs', None) is not None:
                 data = data.to_crs(epsg=3857)
-        else:
-            min_x = np.min(data[x])
-            max_x = np.max(data[x])
-            min_y = np.min(data[y])
-            max_y = np.max(data[y])
-
-            x_within_bounds = -180 <= min_x <= 360 and -180 <= max_x <= 360
-            y_within_bounds = -90 <= min_y <= 90 and -90 <= max_y <= 90
-            if x_within_bounds and y_within_bounds:
-                data = data.copy()
-                lons_180 = (data[x] + 180) % 360 - 180  # ticks are better with -180 to 180
-                easting, northing = lon_lat_to_easting_northing(lons_180, data[y])
-                new_x = 'x' if 'x' not in data else 'x_'  # quick existing var check
-                new_y = 'y' if 'y' not in data else 'y_'
-                data[new_x] = easting
-                data[new_y] = northing
-                if is_xarray(data):
-                    data = data.swap_dims({x: new_x, y: new_y})
-                x = new_x
-                y = new_y
+        elif _is_within_latlon_bounds(data, x, y):
+            data = data.copy()
+            easting, northing = _convert_latlon_to_mercator(data[x], data[y])
+            names = list(data)
+            new_x = _generate_unique_name('x', names)
+            new_y = _generate_unique_name('y', names)
+            data[new_x] = easting
+            data[new_y] = northing
+            if is_xarray(data):
+                data = data.swap_dims({x: new_x, y: new_y})
+            x, y = new_x, new_y
         return data, x, y
 
     def chart(self, element, x, y, data=None):
@@ -3064,11 +3102,18 @@ class HoloViewsConverter:
 
         text = self.kwds.get('text')
         if not text:
-            text = [c for c in data.columns if c not in (x, y)][0]
+            text = next((c for c in data.columns if c not in (x, y)), y)
         elif text not in data.columns:
             data = data.copy()
             template_str = text  # needed for dask lazy compute
-            data['label'] = data.apply(lambda row: template_str.format(**row), axis=1)
+            # Without meta, Dask runs the apply function on a small dataset to
+            # guess output types and might guess incorrectly.
+            apply_kwargs = {}
+            if is_dask(data):
+                apply_kwargs['meta'] = ('label', 'object')
+            data['label'] = data.apply(
+                lambda row: template_str.format(**row), axis=1, **apply_kwargs
+            )
             text = 'label'
 
         kdims, vdims = self._get_dimensions([x, y], [text])

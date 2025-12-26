@@ -25,6 +25,11 @@ from hvplot.util import (
     _convert_col_names_to_str,
     instantiate_crs_str,
     is_geodataframe,
+    _is_within_latlon_bounds,
+    _convert_latlon_to_mercator,
+    _bounds_in_range,
+    _convert_limit_to_mercator,
+    _generate_unique_name,
 )
 
 
@@ -238,9 +243,10 @@ class TestDynamicArgs(TestCase):
         assert len(arg_deps) == 2
 
 
+@pytest.mark.geo
 def test_check_crs():
     pytest.importorskip('pyproj')
-    p = check_crs('epsg:26915 +units=m')
+    p = check_crs('epsg:26915')
     assert p.srs == '+proj=utm +zone=15 +datum=NAD83 +units=m +no_defs'
     p = check_crs('wrong')
     assert p is None
@@ -346,6 +352,11 @@ def test_is_list_like():
     assert is_list_like(np.array(['a', 'b']))
 
 
+@pytest.mark.parametrize('name,uname', [('a', 'a'), ('b', 'b_'), ('c_', 'c__')])
+def test_generate_unique_name(name, uname):
+    assert _generate_unique_name(name, ['b', 'c_']) == uname
+
+
 def test_convert_col_names_to_str():
     df = pd.DataFrame(np.random.random((10, 2)))
     assert all(not isinstance(col, str) for col in df.columns)
@@ -389,3 +400,231 @@ def test_is_geodataframe_classic_dataframe():
 @pytest.mark.geo
 def test_geoviews_is_available():
     assert import_geoviews()
+
+
+class TestIsWithinLatlonBounds:
+    """Test is_within_latlon_bounds function."""
+
+    def test_valid_bounds_dataframe(self):
+        """Return True for valid lat/lon bounds in DataFrame."""
+        df = pd.DataFrame({'lon': [-180, 0, 180], 'lat': [-90, 0, 90]})
+        assert _is_within_latlon_bounds(df, 'lon', 'lat')
+
+    def test_valid_bounds_dict(self):
+        """Return True for valid lat/lon bounds in dict."""
+        data = {'lon': np.array([0, 90]), 'lat': np.array([45, 60])}
+        assert _is_within_latlon_bounds(data, 'lon', 'lat')
+
+    def test_lon_extended_range(self):
+        """Return True when lon within -180 to 360 range."""
+        df = pd.DataFrame({'lon': [0, 180, 360], 'lat': [0, 45, 90]})
+        assert _is_within_latlon_bounds(df, 'lon', 'lat')
+
+    def test_lon_boundary_values(self):
+        """Return True at exact boundary values."""
+        df = pd.DataFrame({'lon': [-180, 360], 'lat': [-90, 90]})
+        assert _is_within_latlon_bounds(df, 'lon', 'lat')
+
+    def test_lon_below_min_bound(self):
+        """Return False when lon min is below -180."""
+        df = pd.DataFrame({'lon': [-181, 0, 90], 'lat': [0, 45, 90]})
+        assert not _is_within_latlon_bounds(df, 'lon', 'lat')
+
+    def test_lon_above_max_bound(self):
+        """Return False when lon max exceeds 360."""
+        df = pd.DataFrame({'lon': [-180, 0, 361], 'lat': [0, 45, 90]})
+        assert not _is_within_latlon_bounds(df, 'lon', 'lat')
+
+    def test_lat_below_min_bound(self):
+        """Return False when lat min is below -90."""
+        df = pd.DataFrame({'lon': [-180, 0, 90], 'lat': [-91, 0, 45]})
+        assert not _is_within_latlon_bounds(df, 'lon', 'lat')
+
+    def test_lat_above_max_bound(self):
+        """Return False when lat max exceeds 90."""
+        df = pd.DataFrame({'lon': [-180, 0, 90], 'lat': [-45, 0, 91]})
+        assert not _is_within_latlon_bounds(df, 'lon', 'lat')
+
+    def test_missing_column(self):
+        """Return False and warn when column doesn't exist."""
+        df = pd.DataFrame({'x': [1, 2, 3], 'y': [4, 5, 6]})
+        with pytest.warns(
+            UserWarning, match="Could not determine longitude bounds from variable 'lon'"
+        ):
+            result = _is_within_latlon_bounds(df, 'lon', 'lat')
+        assert not result
+
+    def test_non_numeric_values(self):
+        """Return False and warn for non-numeric data."""
+        df = pd.DataFrame({'lon': ['a', 'b', 'c'], 'lat': [45, 60, 75]})
+        with pytest.warns(
+            UserWarning, match="Could not determine longitude bounds from variable 'lon'"
+        ):
+            result = _is_within_latlon_bounds(df, 'lon', 'lat')
+        assert not result
+
+
+class TestBoundsInRange:
+    """Test _bounds_in_range helper function."""
+
+    def test_valid_bounds_in_range(self):
+        """Return True when both bounds are valid and in range."""
+        assert _bounds_in_range(-90, 90, -90, 90)
+        assert _bounds_in_range(-180, 360, -180, 360)
+        assert _bounds_in_range(0, 45, -180, 360)
+
+    def test_first_bound_out_of_range(self):
+        """Return False when first bound exceeds range."""
+        assert not _bounds_in_range(-181, 0, -180, 360)
+
+    def test_second_bound_out_of_range(self):
+        """Return False when second bound exceeds range."""
+        assert not _bounds_in_range(0, 361, -180, 360)
+
+    def test_both_bounds_out_of_range(self):
+        """Return False when both bounds exceed range."""
+        assert not _bounds_in_range(-200, 400, -180, 360)
+
+    def test_first_bound_nan(self):
+        """Return True when first bound is NaN."""
+        assert _bounds_in_range(np.nan, 0, -180, 360)
+
+    def test_second_bound_nan(self):
+        """Return True when second bound is NaN."""
+        assert _bounds_in_range(0, np.nan, -180, 360)
+
+
+class TestConvertLatlonToMercator:
+    """Test convert_latlon_to_mercator function."""
+
+    def test_prime_meridian(self):
+        """Convert coordinates at prime meridian and equator."""
+        lon = np.array([0])
+        lat = np.array([0])
+        easting, northing = _convert_latlon_to_mercator(lon, lat)
+        np.testing.assert_almost_equal(easting[0], 0, decimal=5)
+        np.testing.assert_almost_equal(northing[0], 0, decimal=5)
+
+    def test_multiple_points(self):
+        """Convert multiple lat/lon points."""
+        lon = np.array([-180, 0, 180])
+        lat = np.array([-45, 0, 45])
+        easting, northing = _convert_latlon_to_mercator(lon, lat)
+        assert len(easting) == 3 and len(northing) == 3
+
+    def test_lon_normalization_180(self):
+        """Normalize 180 and -180 to same value."""
+        lon1 = np.array([180])
+        lon2 = np.array([-180])
+        e1, _ = _convert_latlon_to_mercator(lon1, np.array([0]))
+        e2, _ = _convert_latlon_to_mercator(lon2, np.array([0]))
+        np.testing.assert_almost_equal(e1[0], e2[0], decimal=5)
+
+    def test_lon_normalization_270(self):
+        """Normalize 270 to -90."""
+        lon1 = np.array([270])
+        lon2 = np.array([-90])
+        e1, _ = _convert_latlon_to_mercator(lon1, np.array([0]))
+        e2, _ = _convert_latlon_to_mercator(lon2, np.array([0]))
+        np.testing.assert_almost_equal(e1[0], e2[0], decimal=5)
+
+    def test_returns_tuple(self):
+        """Return tuple of easting and northing arrays."""
+        result = _convert_latlon_to_mercator(np.array([0, 45, 90]), np.array([0, 30, 60]))
+        assert isinstance(result, tuple) and len(result) == 2
+
+
+class TestConvertLimitToMercator:
+    """Test convert_limit_to_mercator function."""
+
+    def test_none_and_empty_limits(self):
+        """Return None for None or empty limits."""
+        assert _convert_limit_to_mercator(None, is_x_axis=True) is None
+        assert _convert_limit_to_mercator((), is_x_axis=True) is None
+
+    def test_valid_x_limits(self):
+        """Convert valid x-axis (longitude) limits."""
+        result = _convert_limit_to_mercator((-90, 90), is_x_axis=True)
+        assert result is not None and isinstance(result, tuple) and len(result) == 2
+
+    def test_valid_y_limits(self):
+        """Convert valid y-axis (latitude) limits."""
+        result = _convert_limit_to_mercator((-45, 45), is_x_axis=False)
+        assert result is not None and isinstance(result, tuple) and len(result) == 2
+
+    def test_out_of_range_x_limits(self):
+        """Return original limits when x bounds out of range."""
+        limits = (-200, 0)
+        result = _convert_limit_to_mercator(limits, is_x_axis=True)
+        assert result == limits
+
+    def test_out_of_range_y_limits(self):
+        """Return original limits when y bounds out of range."""
+        limits = (0, 100)
+        result = _convert_limit_to_mercator(limits, is_x_axis=False)
+        assert result == limits
+
+    def test_x_limits_with_none(self):
+        """Return np.nan limit when x bound is None."""
+        limits = (0, None)
+        result = _convert_limit_to_mercator(limits, is_x_axis=True)
+        assert result[0] == limits[0]
+        assert np.isnan(result[1])
+
+    def test_y_limits_with_none(self):
+        """Return np.nan limit when y bound is None."""
+        limits = (None, 0)
+        result = _convert_limit_to_mercator(limits, is_x_axis=False)
+        np.testing.assert_almost_equal(result[1], limits[1])
+        assert np.isnan(result[0])
+
+    def test_x_limits_with_nan(self):
+        """Return original limits when x bound is NaN."""
+        limits = (0, np.nan)
+        result = _convert_limit_to_mercator(limits, is_x_axis=True)
+        assert result[0] == limits[0]
+        assert np.isnan(result[1])
+
+    def test_y_limits_with_nan(self):
+        """Return original limits when y bound is NaN."""
+        limits = (np.nan, 0)
+        result = _convert_limit_to_mercator(limits, is_x_axis=False)
+        np.testing.assert_almost_equal(result[1], limits[1])
+        assert np.isnan(result[0])
+
+    def test_unpacking_error_too_many_values(self):
+        """Return original and warn when unpacking too many values."""
+        limits = (1, 2, 3)
+        with pytest.warns(UserWarning, match='Could not convert limits'):
+            result = _convert_limit_to_mercator(limits, is_x_axis=True)
+        assert result == limits
+
+    def test_unpacking_error_single_value(self):
+        """Return original and warn when unpacking single value."""
+        limits = (45,)
+        with pytest.warns(UserWarning, match='Could not convert limits'):
+            result = _convert_limit_to_mercator(limits, is_x_axis=False)
+        assert result == limits
+
+    def test_mercator_y_conversion_changes_values(self):
+        """Ensure Mercator conversion changes y-axis limit values."""
+        original = (-45, 45)
+        result = _convert_limit_to_mercator(original, is_x_axis=False)
+        assert result != original and result[0] != original[0]
+
+    def test_mercator_x_conversion_changes_values(self):
+        """Ensure Mercator conversion changes x-axis limit values."""
+        original = (-90, 90)
+        result = _convert_limit_to_mercator(original, is_x_axis=True)
+        assert result != original and result[0] != original[0]
+
+    @pytest.mark.parametrize('bounds', [(0, 90), (190, 250), (170, -170), (350, 10)])
+    def test_converted_x_limits_ordered(self, bounds):
+        """Ensure converted x-axis limits maintain order."""
+        result = _convert_limit_to_mercator(bounds, is_x_axis=True)
+        assert result[0] < result[1]
+
+    def test_converted_y_limits_ordered(self):
+        """Ensure converted y-axis limits maintain order."""
+        result = _convert_limit_to_mercator((-45, -10), is_x_axis=False)
+        assert result[0] < result[1]

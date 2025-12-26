@@ -27,9 +27,6 @@ defaults:
   run:
     shell: bash -e {0}
 
-env:
-  PYTHON_VERSION: "3.11"
-
 jobs:
   pixi_lock:
     name: Pixi lock
@@ -59,7 +56,7 @@ jobs:
       - name: Build documentation
         run: pixi run -e docs docs-build
       - name: Upload docs artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: hvplot-docs
           path: ./builtdocs/
@@ -84,12 +81,12 @@ jobs:
       MOZ_HEADLESS: 1
       DISPLAY: ":99.0"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version: '3.13'
       - name: install
         run: pip install -v --prefer-binary -e ."[doc, examples, geo]"
       - name: pip list

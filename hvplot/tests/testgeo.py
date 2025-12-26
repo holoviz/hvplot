@@ -13,7 +13,6 @@ import pandas as pd
 import pytest
 
 from hvplot.util import proj_to_cartopy
-from packaging.version import Version
 
 pytestmark = pytest.mark.geo
 
@@ -46,15 +45,16 @@ class TestGeo(TestCase):
         self.da = rxr.open_rasterio(
             pathlib.Path(__file__).parent / 'data' / 'RGB-red.byte.tif'
         ).isel(band=0)
+        # UTM zone 18N
         self.crs = proj_to_cartopy(self.da.spatial_ref.attrs['crs_wkt'])
 
-    def assertCRS(self, plot, proj='utm'):
+    def assertCRS(self, plot, proj=None):
         import cartopy
 
-        if Version(cartopy.__version__) < Version('0.20'):
-            assert plot.crs.proj4_params['proj'] == proj
-        else:
-            assert plot.crs.to_dict()['proj'] == proj
+        if proj is None:
+            proj = cartopy.crs.UTM(zone=18)
+
+        assert plot.crs == proj
 
     def assert_projection(self, plot, proj):
         opts = hv.Store.lookup_options('bokeh', plot, 'plot')
@@ -110,11 +110,13 @@ class TestProjections(TestGeo):
             da.hvplot.image('x', 'y', crs='name_of_some_invalid_projection')
 
     def test_plot_with_geo_as_true_crs_no_crs_on_data_returns_default(self):
+        import cartopy.crs as ccrs
+
         da = self.da.copy()
         da.rio._crs = False  # To not treat it as a rioxarray
         da.attrs = {'bar': self.crs}
         plot = da.hvplot.image('x', 'y', geo=True)
-        self.assertCRS(plot, 'eqc')
+        self.assertCRS(plot, ccrs.PlateCarree())
 
     def test_plot_with_projection_as_string(self):
         da = self.da.copy()
@@ -440,7 +442,7 @@ class TestGeoPandas(TestCase):
 
     def test_geometry_none(self):
         polygons = self.polygons.copy()
-        polygons.geometry[1] = None
+        polygons[1, 'geometry'] = None
         assert polygons.hvplot(geo=True)
 
     def test_tiles_without_gv(self):
@@ -466,7 +468,7 @@ class TestGeoUtil(TestCase):
     def test_proj_to_cartopy(self):
         from ..util import proj_to_cartopy
 
-        crs = proj_to_cartopy('+init=epsg:26911')
+        crs = proj_to_cartopy('epsg:26911')
 
         assert isinstance(crs, self.ccrs.CRS)
 
