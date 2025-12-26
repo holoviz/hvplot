@@ -145,7 +145,7 @@ GROUP BY origin, mfr
 ORDER BY mpg DESC
 LIMIT 5
 """
-table = con.query(query)
+table = con.query(query).sort("mpg")
 table.hvplot.barh('mfr', 'mpg', by='origin', stacked=True)
 ```
 ```{image} ./_static/home/pandas.gif
