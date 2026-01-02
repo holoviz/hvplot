@@ -1,3 +1,8 @@
+import warnings
+
+from .util import _find_stack_level
+
+
 def patch(name='hvplot', extension='bokeh', logo=False):
     from . import hvPlotTabular, post_patch, _module_extensions
 
@@ -7,6 +12,13 @@ def patch(name='hvplot', extension='bokeh', logo=False):
         raise ImportError(
             'Could not patch plotting API onto streamz. Streamz could not be imported.'
         )
+
+    warnings.warn(
+        'streamz support has been deprecated and will be removed in a future version.',
+        DeprecationWarning,
+        stacklevel=_find_stack_level(),
+    )
+
     if 'hvplot.streamz' not in _module_extensions:
         _patch_plot = lambda self: hvPlotTabular(self)  # noqa: E731
         _patch_plot.__doc__ = hvPlotTabular.__call__.__doc__
