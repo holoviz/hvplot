@@ -31,6 +31,7 @@ def test_converter_argument_hover_formatters():
 
 
 def test_streamz_patch():
+    pytest.importorskip('streamz')
     with pytest.warns(
         DeprecationWarning,
         match='streamz support has been deprecated',
