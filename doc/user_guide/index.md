@@ -51,7 +51,7 @@ pandas.plotting module.
 - [Subplots](Subplots)
   How to generate subplots and grids.
 - [Streaming](Streaming)
-  How to use hvPlot for streaming plots with the streamz library.
+  How to use hvPlot for streaming plots with the streamz library (**Streamz support is deprecated**).
 - [Gridded Data](Gridded_Data)
   How to use hvPlot for plotting XArray-based gridded data.
 - [Network Graphs](NetworkX)
