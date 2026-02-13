@@ -2069,8 +2069,15 @@ class hvPlotXugrid(hvPlot):
             kwds['groupby'] = groupby
 
         # Convert xugrid data to xarray Dataset for the converter.
+        # Only include proper 1D dimension coordinates (where the coord's
+        # single dimension matches its name). 2D coords like FVCOM's
+        # siglay(siglay, node) break the groupby machinery.
+        coords = {}
+        for k in data.coords:
+            coord = data.coords[k]
+            if hasattr(coord, 'dims') and len(coord.dims) == 1 and coord.dims[0] == k:
+                coords[k] = coord
         # Ensure all extra dims have coordinates so groupby widgets work.
-        coords = {k: data.coords[k] for k in data.coords}
         for dim in extra_dims:
             if dim not in coords:
                 coords[dim] = np.arange(data.sizes[dim])
