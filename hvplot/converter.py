@@ -571,7 +571,16 @@ class HoloViewsConverter:
         A stream object for streaming plots, allowing data updates without re-rendering the entire plot.
     """
 
-    _gridded_types = ['image', 'contour', 'contourf', 'quadmesh', 'rgb', 'points', 'dataset']
+    _gridded_types = [
+        'image',
+        'contour',
+        'contourf',
+        'quadmesh',
+        'rgb',
+        'points',
+        'dataset',
+        'trimesh',
+    ]
 
     _geom_types = ['paths', 'polygons']
 
@@ -3242,8 +3251,23 @@ class HoloViewsConverter:
         ).apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
 
     def trimesh(self, x=None, y=None, z=None, data=None):
-        tris = self.kwds.pop('_xugrid_tris')
-        nodes = self.kwds.pop('_xugrid_nodes')
+        import xarray as xr
+
+        tris = self.kwds.get('_xugrid_tris')
+        node_x = self.kwds.get('_xugrid_node_x')
+        node_y = self.kwds.get('_xugrid_node_y')
+
+        # Get z values from data (grouped/sliced) or self.data (non-grouped)
+        source = data if data is not None else self.data
+        if isinstance(source, xr.Dataset):
+            z_name = z or self.z or list(source.data_vars)[0]
+            values = np.asarray(source[z_name].values).ravel()
+        elif isinstance(source, xr.DataArray):
+            values = np.asarray(source.values).ravel()
+        else:
+            values = np.asarray(source).ravel()
+
+        nodes_df = pd.DataFrame({'x': node_x, 'y': node_y, 'z': values})
 
         element = self._get_element('trimesh')
         params = dict(self._relabel)
@@ -3253,9 +3277,9 @@ class HoloViewsConverter:
             import geoviews as gv
 
             params['crs'] = self.crs
-            points_element = gv.Points(nodes, vdims=['z'])
+            points_element = gv.Points(nodes_df, vdims=['z'])
         else:
-            points_element = Points(nodes, vdims=['z'])
+            points_element = Points(nodes_df, vdims=['z'])
 
         tri = element((tris, points_element), **params)
 

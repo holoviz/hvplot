@@ -728,11 +728,11 @@ def process_xarray(
                     x = c
                 elif axis.lower() == 'y':
                     y = c
-        if not (x or y):
+        if not (x or y) and kind != 'trimesh':
             x, y = index_dims[:2] if len(index_dims) > 1 else dims[:2]
-        elif x and not y:
+        elif x and not y and kind != 'trimesh':
             y = [d for d in dims if d != x][0]
-        elif y and not x:
+        elif y and not x and kind != 'trimesh':
             x = [d for d in dims if d != y][0]
         if len(dims) > 2 and kind not in ('table', 'dataset') and not groupby:
             dims = list(data.coords[x].dims) + list(data.coords[y].dims)

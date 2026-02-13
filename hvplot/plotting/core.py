@@ -1996,6 +1996,7 @@ class hvPlotXugrid(hvPlot):
     def _get_converter(self, x=None, y=None, kind=None, **kwds):
         import numpy as np
         import pandas as pd
+        import xarray as xr
         import xugrid as xu
 
         data = self._data
@@ -2015,9 +2016,12 @@ class hvPlotXugrid(hvPlot):
             y = y or params.pop('y', None)
             return HoloViewsConverter(data, x, y, kind=kind, **params)
 
-        # Reduce extra dimensions (time, level, etc.)
         face_dim = grid.face_dimension
         node_dim = grid.node_dimension
+
+        # Reduce only explicitly specified extra dimensions;
+        # unspecified extra dims become groupby widgets (sliders)
+        extra_dims = []
         for dim in list(data.dims):
             if dim not in (face_dim, node_dim):
                 if dim in kwds:
@@ -2026,31 +2030,14 @@ class hvPlotXugrid(hvPlot):
                         data = data.isel({dim: val})
                     else:
                         data = data.sel({dim: val}, method='nearest')
-                elif 'time' in dim.lower():
-                    data = data.isel({dim: -1})
                 else:
-                    data = data.isel({dim: 0})
+                    extra_dims.append(dim)
 
-        # Determine if data is on faces or nodes
+        # If face data, convert to node (lazy if dask-backed)
         if face_dim in data.dims:
-            # Data on faces -> average to nodes for TriMesh compatibility
-            node_data = data.ugrid.to_node().mean(dim='nmax', skipna=True)
-        else:
-            node_data = data
+            data = data.ugrid.to_node().mean(dim='nmax', skipna=True)
 
-        # Ensure data is computed (not dask)
-        values = np.asarray(node_data.values).ravel()
-
-        # Build nodes DataFrame
-        nodes_df = pd.DataFrame(
-            {
-                'x': np.asarray(grid.node_x),
-                'y': np.asarray(grid.node_y),
-                'z': values,
-            }
-        )
-
-        # Build simplices (triangles)
+        # Build tris DataFrame (constant - mesh topology doesn't change)
         connectivity = grid.face_node_connectivity
         fill_value = grid.fill_value if hasattr(grid, 'fill_value') else -1
         if connectivity.shape[1] == 3:
@@ -2065,12 +2052,41 @@ class hvPlotXugrid(hvPlot):
             tris_df = pd.DataFrame(triangles, columns=['v0', 'v1', 'v2'])
 
         kwds['_xugrid_tris'] = tris_df
-        kwds['_xugrid_nodes'] = nodes_df
+        kwds['_xugrid_node_x'] = np.asarray(grid.node_x)
+        kwds['_xugrid_node_y'] = np.asarray(grid.node_y)
+
+        if extra_dims:
+            # Add unspecified extra dims as groupby so the converter
+            # creates slider widgets for them
+            groupby = kwds.get('groupby', [])
+            if isinstance(groupby, str):
+                groupby = [groupby]
+            else:
+                groupby = list(groupby)
+            for dim in extra_dims:
+                if dim not in groupby:
+                    groupby.append(dim)
+            kwds['groupby'] = groupby
+
+        # Convert xugrid data to xarray Dataset for the converter.
+        # Ensure all extra dims have coordinates so groupby widgets work.
+        coords = {k: data.coords[k] for k in data.coords}
+        for dim in extra_dims:
+            if dim not in coords:
+                coords[dim] = np.arange(data.sizes[dim])
+        xr_da = xr.DataArray(
+            data.data,  # keeps dask arrays lazy
+            dims=data.dims,
+            coords=coords,
+            name='z',
+        )
+        xr_ds = xr.Dataset({'z': xr_da})
+        kwds['z'] = 'z'
 
         params = dict(self._metadata, **kwds)
         x = x or params.pop('x', None)
         y = y or params.pop('y', None)
-        return HoloViewsConverter(nodes_df, x, y, kind=kind, **params)
+        return HoloViewsConverter(xr_ds, x, y, kind=kind, **params)
 
     def trimesh(self, x=None, y=None, z=None, colorbar=True, **kwds):
         """
