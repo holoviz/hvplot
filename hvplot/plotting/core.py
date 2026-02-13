@@ -2022,7 +2022,10 @@ class hvPlotXugrid(hvPlot):
             if dim not in (face_dim, node_dim):
                 if dim in kwds:
                     val = kwds.pop(dim)
-                    data = data.sel({dim: val}, method='nearest')
+                    if isinstance(val, (int, np.integer)):
+                        data = data.isel({dim: val})
+                    else:
+                        data = data.sel({dim: val}, method='nearest')
                 elif 'time' in dim.lower():
                     data = data.isel({dim: -1})
                 else:
