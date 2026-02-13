@@ -620,6 +620,14 @@ def is_xarray(data):
     return isinstance(data, (DataArray, Dataset))
 
 
+def is_xugrid(data):
+    if not check_library(data, 'xugrid'):
+        return False
+    import xugrid as xu
+
+    return isinstance(data, (xu.UgridDataArray, xu.UgridDataset))
+
+
 def is_lazy_data(data):
     """Check if data is lazy
 

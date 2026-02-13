@@ -1986,3 +1986,111 @@ class hvPlot(hvPlotTabular):
         return self(
             x, y, z=z, kind='contourf', colorbar=colorbar, levels=levels, logz=logz, **kwds
         )
+
+
+class hvPlotXugrid(hvPlot):
+    """hvPlot interface for xugrid UgridDataArray and UgridDataset objects."""
+
+    __all__ = hvPlot.__all__ + ['trimesh']
+
+    def _get_converter(self, x=None, y=None, kind=None, **kwds):
+        import numpy as np
+        import pandas as pd
+        import xugrid as xu
+
+        data = self._data
+        kind = kind or kwds.pop('kind', None) or 'trimesh'
+
+        # Handle UgridDataset: select the variable
+        if isinstance(data, xu.UgridDataset):
+            z = kwds.get('z') or list(data.data_vars)[0]
+            data = data[z]
+
+        grid = data.grid
+
+        # For non-trimesh kinds, fall back to the parent converter
+        if kind != 'trimesh':
+            params = dict(self._metadata, **kwds)
+            x = x or params.pop('x', None)
+            y = y or params.pop('y', None)
+            return HoloViewsConverter(data, x, y, kind=kind, **params)
+
+        # Reduce extra dimensions (time, level, etc.)
+        face_dim = grid.face_dimension
+        node_dim = grid.node_dimension
+        for dim in list(data.dims):
+            if dim not in (face_dim, node_dim):
+                if dim in kwds:
+                    val = kwds.pop(dim)
+                    data = data.sel({dim: val}, method='nearest')
+                elif 'time' in dim.lower():
+                    data = data.isel({dim: -1})
+                else:
+                    data = data.isel({dim: 0})
+
+        # Determine if data is on faces or nodes
+        if face_dim in data.dims:
+            # Data on faces -> average to nodes for TriMesh compatibility
+            node_data = data.ugrid.to_node().mean(dim='nmax', skipna=True)
+        else:
+            node_data = data
+
+        # Ensure data is computed (not dask)
+        values = np.asarray(node_data.values).ravel()
+
+        # Build nodes DataFrame
+        nodes_df = pd.DataFrame(
+            {
+                'x': np.asarray(grid.node_x),
+                'y': np.asarray(grid.node_y),
+                'z': values,
+            }
+        )
+
+        # Build simplices (triangles)
+        connectivity = grid.face_node_connectivity
+        fill_value = grid.fill_value if hasattr(grid, 'fill_value') else -1
+        if connectivity.shape[1] == 3:
+            tris_df = pd.DataFrame(np.asarray(connectivity), columns=['v0', 'v1', 'v2'])
+        else:
+            # Triangulate polygons with more than 3 nodes (fan triangulation)
+            triangles = []
+            for face in connectivity:
+                valid = face[face != fill_value]
+                for i in range(1, len(valid) - 1):
+                    triangles.append([valid[0], valid[i], valid[i + 1]])
+            tris_df = pd.DataFrame(triangles, columns=['v0', 'v1', 'v2'])
+
+        kwds['_xugrid_tris'] = tris_df
+        kwds['_xugrid_nodes'] = nodes_df
+
+        params = dict(self._metadata, **kwds)
+        x = x or params.pop('x', None)
+        y = y or params.pop('y', None)
+        return HoloViewsConverter(nodes_df, x, y, kind=kind, **params)
+
+    def trimesh(self, x=None, y=None, z=None, colorbar=True, **kwds):
+        """
+        TriMesh plot for unstructured grid data.
+
+        Creates a triangular mesh plot from xugrid UgridDataArray or
+        UgridDataset objects. Supports rasterization for large meshes.
+
+        Parameters
+        ----------
+        x : string, optional
+            The coordinate variable along the x-axis
+        y : string, optional
+            The coordinate variable along the y-axis
+        z : string, optional
+            The data variable to plot
+        colorbar : boolean
+            Whether to display a colorbar
+        **kwds : optional
+            Additional keywords arguments are documented in :ref:`plot-options`.
+
+        Returns
+        -------
+        :class:`holoviews:holoviews.element.TriMesh` / Panel object
+        """
+        return self(x, y, z=z, kind='trimesh', colorbar=colorbar, **kwds)

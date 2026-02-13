@@ -42,6 +42,7 @@ from holoviews.element import (
     VectorField,
     Rectangles,
     Segments,
+    TriMesh,
 )
 from holoviews.plotting.bokeh import OverlayPlot, colormap_generator
 from holoviews.plotting.util import process_cmap
@@ -67,6 +68,7 @@ from .util import (
     is_lazy_data,
     is_xarray,
     is_xarray_dataarray,
+    is_xugrid,
     process_crs,
     process_intake,
     process_xarray,
@@ -574,7 +576,9 @@ class HoloViewsConverter:
     _geom_types = ['paths', 'polygons']
 
     _geo_types = sorted(
-        _gridded_types + _geom_types + ['points', 'vectorfield', 'labels', 'hexbin', 'bivariate']
+        _gridded_types
+        + _geom_types
+        + ['points', 'vectorfield', 'labels', 'hexbin', 'bivariate', 'trimesh']
     )
 
     _stats_types = ['hist', 'kde', 'violin', 'box', 'density']
@@ -768,6 +772,7 @@ class HoloViewsConverter:
         'step': ['x', 'y', 'where'],
         'table': ['columns'],
         'quadmesh': ['x', 'y', 'z', 'logz'],
+        'trimesh': ['x', 'y', 'z'],
         'vectorfield': ['x', 'y', 'angle', 'mag'],
         'violine': ['y'],
     }
@@ -800,6 +805,7 @@ class HoloViewsConverter:
         'scatter': Scatter,
         'step': Curve,
         'table': Table,
+        'trimesh': TriMesh,
         'vectorfield': VectorField,
         'violin': Violin,
     }
@@ -814,6 +820,7 @@ class HoloViewsConverter:
         'hexbin',
         'quadmesh',
         'polygons',
+        'trimesh',
     ]
 
     _legend_positions = (
@@ -1463,6 +1470,13 @@ class HoloViewsConverter:
             else:
                 self.stream = Buffer(data=self.data, length=backlog, index=False)
             data.stream.gather().sink(self.stream.send)
+        elif is_xugrid(data):
+            # xugrid data is handled in hvPlotXugrid._get_converter
+            # which pre-processes mesh data and passes a pandas DataFrame
+            # to the converter. This branch handles the case where the
+            # converter is called directly with xugrid data.
+            datatype = 'pandas'
+            self.data = data
         elif is_xarray(data):
             import xarray as xr
 
@@ -1913,7 +1927,10 @@ class HoloViewsConverter:
         else:
             valid_opts = []
         ds_opts = ['max_px', 'threshold']
-        mismatches = sorted(k for k in kwds if k not in kind_opts + ds_opts + valid_opts)
+        # Skip internal keys (prefixed with _) used by extensions like xugrid
+        mismatches = sorted(
+            k for k in kwds if k not in kind_opts + ds_opts + valid_opts and not k.startswith('_')
+        )
         if not mismatches:
             return
 
@@ -3223,6 +3240,29 @@ class HoloViewsConverter:
             element(data, [x, y], z, **params),
             **redim,
         ).apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
+
+    def trimesh(self, x=None, y=None, z=None, data=None):
+        tris = self.kwds.pop('_xugrid_tris')
+        nodes = self.kwds.pop('_xugrid_nodes')
+
+        element = self._get_element('trimesh')
+        params = dict(self._relabel)
+        cur_opts, compat_opts = self._get_compat_opts('TriMesh')
+
+        if self.geo:
+            import geoviews as gv
+
+            params['crs'] = self.crs
+            points_element = gv.Points(nodes, vdims=['z'])
+        else:
+            points_element = Points(nodes, vdims=['z'])
+
+        tri = element((tris, points_element), **params)
+
+        redim = self._merge_redim({'z': self._dim_ranges['c']})
+        return redim_(tri, **redim).apply(
+            self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts
+        )
 
     def contour(self, x=None, y=None, z=None, data=None, filled=False):
         self._error_if_unavailable('contour')
