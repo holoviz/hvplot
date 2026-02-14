@@ -2033,9 +2033,12 @@ class hvPlotXugrid(hvPlot):
                 else:
                     extra_dims.append(dim)
 
-        # If face data, convert to node (lazy if dask-backed)
-        if face_dim in data.dims:
-            data = data.ugrid.to_node().mean(dim='nmax', skipna=True)
+        # If face data, defer the to_node() conversion to the trimesh()
+        # method so it runs on already-sliced data (single time/level)
+        # instead of the full multi-dimensional array.
+        is_face_data = face_dim in data.dims
+        if is_face_data:
+            kwds['_xugrid_grid'] = grid
 
         # Build tris DataFrame (constant - mesh topology doesn't change)
         connectivity = grid.face_node_connectivity

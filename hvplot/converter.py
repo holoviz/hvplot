@@ -3256,6 +3256,7 @@ class HoloViewsConverter:
         tris = self.kwds.get('_xugrid_tris')
         node_x = self.kwds.get('_xugrid_node_x')
         node_y = self.kwds.get('_xugrid_node_y')
+        xugrid_grid = self.kwds.get('_xugrid_grid')
 
         # Get z values from data (grouped/sliced) or self.data (non-grouped)
         source = data if data is not None else self.data
@@ -3266,6 +3267,16 @@ class HoloViewsConverter:
             values = np.asarray(source.values).ravel()
         else:
             values = np.asarray(source).ravel()
+
+        # If data was on faces, convert to nodes now (after groupby slicing).
+        # This avoids running the expensive interpolation on the full
+        # multi-dimensional array.
+        if xugrid_grid is not None:
+            import xugrid as xu
+
+            face_da = xr.DataArray(values, dims=[xugrid_grid.face_dimension])
+            face_uda = xu.UgridDataArray(face_da, xugrid_grid)
+            values = np.asarray(face_uda.ugrid.to_node().mean(dim='nmax').values)
 
         nodes_df = pd.DataFrame({'x': node_x, 'y': node_y, 'z': values})
 
