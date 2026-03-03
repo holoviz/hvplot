@@ -83,6 +83,29 @@ from .plotting import (
 )
 from . import sampledata  # noqa
 
+__all__ = [
+    "andrews_curves",
+    "bind",
+    "explorer",
+    "extension",
+    "help",
+    "HoloViewsConverter",
+    "hvPlot",
+    "hvplot_extension",
+    "hvPlotTabular",
+    "Interactive",
+    "lag_plot",
+    "output",
+    "parallel_coordinates",
+    "plot",
+    "post_patch",
+    "render",
+    "sampledata",
+    "save",
+    "scatter_matrix",
+    "show",
+]
+
 # Define '__version__'
 try:
     # For performance reasons on imports, avoid importing setuptools_scm
