@@ -74,8 +74,6 @@ class TestPatchXArray(TestCase):
 
 class TestPatchStreamz(TestCase):
     def setUp(self):
-        if sys.version_info[:2] >= (3, 14):
-            raise SkipTest('streamz not compatible')
         try:
             import streamz  # noqa
         except ImportError:

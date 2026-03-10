@@ -185,21 +185,6 @@ align: center
 ---
 :::
 
-:::{tab-item} Streamz
-```python
-import hvplot.streamz
-from streamz.dataframe import Random
-
-df_streamz = Random(interval='200ms', freq='50ms')
-df_streamz.hvplot()
-```
-```{image} ./assets/streamz_demo.gif
----
-alt: Works with Streamz
-align: center
----
-:::
-
 ::::
 
 `.hvplot()` can generate plots with [Bokeh](https://bokeh.org/) (default), [Matplotlib](https://matplotlib.org/) or [Plotly](https://plotly.com/).
