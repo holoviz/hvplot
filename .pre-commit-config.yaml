@@ -1,7 +1,7 @@
 default_stages: [pre-commit]
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c # frozen: v6.0.0
     hooks:
       - id: check-builtin-literals
       - id: check-case-conflict
@@ -14,18 +14,17 @@ repos:
         exclude: (\.min\.js$|\.svg$)
       - id: trailing-whitespace
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.9
+    rev: b969e2851312ca2b24bbec879ba4954341d1bd12 # frozen: v0.15.5
     hooks:
-      - id: ruff
+      - id: ruff-check
       - id: ruff-format
-        exclude: \.ipynb$
   - repo: https://github.com/hoxbro/clean_notebook
-    rev: v0.1.17
+    rev: 2e6f506fab3cdfbe16bc18fd0d24e828db773b74 # frozen: v0.2.1
     hooks:
       - id: clean-notebook
         args: [-i, tags]
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.1
+    rev: 2ccb47ff45ad361a21071a7eedda4c37e6ae8c5a # frozen: v2.4.2
     hooks:
       - id: codespell
         exclude: (\.min\.js$|\.svg$|\.html$)
