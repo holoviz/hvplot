@@ -13,7 +13,7 @@ except ImportError:
     panel_available = False
 
 from ..converter import HoloViewsConverter
-from ..util import is_list_like, process_dynamic_args
+from ..util import is_list_like, process_dynamic_args, import_geoviews
 
 # Color palette for examples: https://www.color-hex.com/color-palette/1018056
 # light green: #55a194
@@ -101,6 +101,13 @@ class hvPlotBase:
         x = x or params.pop('x', None)
         y = y or params.pop('y', None)
         kind = kind or params.pop('kind', None)
+
+        # Ensure windbarbs is registered in _kind_mapping (it's added dynamically
+        # when geoviews is available)
+        if kind == 'windbarbs' and 'windbarbs' not in HoloViewsConverter._kind_mapping:
+            gv = import_geoviews()
+            HoloViewsConverter._kind_mapping['windbarbs'] = gv.WindBarbs
+
         return HoloViewsConverter(self._data, x, y, kind=kind, **params)
 
     def __dir__(self):
@@ -250,6 +257,7 @@ class hvPlotTabular(hvPlotBase):
         'table',
         'dataset',
         'points',
+        'windbarbs',
         'vectorfield',
         'polygons',
         'paths',
@@ -1312,10 +1320,57 @@ class hvPlotTabular(hvPlotBase):
         """
         return self(x, y, kind='points', **kwds)
 
+    def windbarbs(self, x=None, y=None, angle=None, mag=None, **kwds):
+        """
+        A windbarbs plot visualizes wind barbs given by the (``x``, ``y``) starting point,
+        a magnitude (``mag``) and an ``angle``.
+
+        .. versionadded:: 1.0.0
+
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.windbarbs.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
+
+        Parameters
+        ----------
+        x : string
+            Field name to draw x-positions from
+        y : string
+            Field name to draw y-positions from
+        mag : string
+            Magnitude.
+        angle : string
+            Angle in radians.
+        **kwds : optional
+            Additional keywords arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('windbarbs')`` for the full method documentation.
+
+        Returns
+        -------
+        :class:`geoviews:geoviews.element.Barbs` / Panel object
+            You can `print` the object to study its composition and run:
+
+            .. code-block::
+
+                import geoviews as gv
+                gv.help(the_geoviews_object)
+
+            to learn more about its parameters and options.
+
+        References
+        ----------
+
+        - GeoViews: https://geoviews.org/gallery/bokeh/wind_barbs_example.html
+        - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.barbs.html
+        """
+        gv = import_geoviews()
+        HoloViewsConverter._kind_mapping['windbarbs'] = gv.WindBarbs
+        return self(x, y, angle=angle, mag=mag, kind='windbarbs', **kwds)
+
     def vectorfield(self, x=None, y=None, angle=None, mag=None, **kwds):
         """
         vectorfield visualizes vectors given by the (``x``, ``y``) starting point,
-        a magnitude (``mag``) and an `angle`. A ``vectorfield`` plot is also known
+        a magnitude (``mag``) and an ``angle``. A ``vectorfield`` plot is also known
         as a ``quiver`` plot.
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.vectorfield.html
@@ -1721,6 +1776,7 @@ class hvPlot(hvPlotTabular):
         'table',
         'dataset',
         'points',
+        'windbarbs',
         'vectorfield',
         'polygons',
         'paths',
