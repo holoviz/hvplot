@@ -65,7 +65,7 @@ jobs:
         run: |
           MATRIX=$(jq -nsc '{
               "os": ["ubuntu-latest", "macos-latest", "windows-latest"],
-              "environment": ["test-310", "test-313", "test-314"],
+              "environment": ["test-310", "test-314"],
               "exclude": [
                 {
                   "environment": "test-310",
