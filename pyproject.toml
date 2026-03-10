@@ -222,12 +222,8 @@ write-changes = true
 line-length = 99
 
 [tool.ruff.lint]
-extend-select = [
-    "UP",
-]
-ignore = [
-    "UP038",  # Use `X | Y` in `isinstance` call instead of `(X, Y)`
-]
+extend-select = ["UP"]
 
 [tool.ruff.format]
 quote-style = "single"
+exclude = ["*.ipynb", "*.md"]
