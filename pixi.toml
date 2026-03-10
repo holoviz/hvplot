@@ -122,8 +122,7 @@ datashader = ">=0.6.5"
 duckdb = "*"
 # In 0.9 fugue added the sql extra but didn't add a fugue-sql conda package,
 # removing the sql deps from core fugue. Adding them manually here.
-qpd = ">=0.4.4"
-fugue-sql-antlr = ">=0.2.0"
+fugue-sql-antlr = ">=0.2.4"
 sqlglot = "*"
 jinja2 = "*"
 # fugue[sql] = "*"
@@ -186,8 +185,7 @@ nbval = "*"
 
 # In 0.9 fugue added the sql extra but didn't add a fugue-sql conda package,
 # removing the sql deps from core fugue. Adding them manually here.
-qpd = ">=0.4.4"
-fugue-sql-antlr = ">=0.2.0"
+fugue-sql-antlr = ">=0.2.4"
 sqlglot = "*"
 jinja2 = "*"
 # fugue[sql] = "*"
