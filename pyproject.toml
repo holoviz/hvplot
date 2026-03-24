@@ -89,8 +89,7 @@ tests = [
 # In 0.9 fugue added the sql extra but didn't add a fugue-sql package, removing the sql deps from fugue
 # Adding them manually here
 fugue-sql = [
-    "qpd >=0.4.4",
-    "fugue-sql-antlr >=0.2.0",
+    "fugue-sql-antlr >=0.2.4",
     "sqlglot",
     "jinja2",
 ]
