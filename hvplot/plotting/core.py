@@ -440,6 +440,10 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
+        See Also
+        --------
+        :meth:`points` : Points plot for 2D coordinate visualization.
+
         References
         ----------
         - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/basic/scatters/color_scatter.html
@@ -660,6 +664,11 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
+        See Also
+        --------
+        :meth:`hexbin` : Hexbin plot for dense data visualization.
+        :meth:`bivariate` : 2D KDE plot.
+
         References
         ----------
         - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/topics/categorical/heatmap_unemployment.html
@@ -730,6 +739,11 @@ class hvPlotTabular(hvPlotBase):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
+
+        See Also
+        --------
+        :meth:`heatmap` : Heatmap from tabular data.
+        :meth:`scatter` : Scatter plot for 2D data points.
 
         References
         ----------
@@ -880,6 +894,10 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
+        See Also
+        --------
+        :meth:`barh` : Horizontal bar plot.
+
         References
         ----------
         - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/vbar.html
@@ -932,6 +950,10 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
+        See Also
+        --------
+        :meth:`bar` : Vertical bar plot.
+
         References
         ----------
         - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/hbar.html
@@ -980,6 +1002,12 @@ class hvPlotTabular(hvPlotBase):
 
             to learn more about its parameters and options.
 
+        See Also
+        --------
+        :meth:`violin` : Violin plot showing data distribution.
+        :meth:`hist` : Histogram plot.
+        :meth:`kde` : Kernel Density Estimate plot.
+
         References
         ----------
         - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/topics/stats/boxplot.html
@@ -1027,6 +1055,12 @@ class hvPlotTabular(hvPlotBase):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
+
+        See Also
+        --------
+        :meth:`box` : Box plot showing data distribution.
+        :meth:`hist` : Histogram plot.
+        :meth:`kde` : Kernel Density Estimate plot.
 
         References
         ----------
@@ -1098,9 +1132,9 @@ class hvPlotTabular(hvPlotBase):
 
         See Also
         --------
-        kde : Kernel Density Estimate plot.
-        bivariate : 2D KDE plot.
-        contour : Isolines plot for gridded data.
+        :meth:`kde` : Kernel Density Estimate plot.
+        :meth:`bivariate` : 2D KDE plot.
+        :meth:`contour` : Isolines plot for gridded data.
 
         References
         ----------
@@ -1177,9 +1211,9 @@ class hvPlotTabular(hvPlotBase):
 
         See Also
         --------
-        hist : Histogram plot.
-        bivariate : 2D KDE plot.
-        contour : Isolines plot for gridded data.
+        :meth:`hist` : Histogram plot.
+        :meth:`bivariate` : 2D KDE plot.
+        :meth:`contour` : Isolines plot for gridded data.
 
         References
         ----------
@@ -1331,6 +1365,10 @@ class hvPlotTabular(hvPlotBase):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
+
+        See Also
+        --------
+        :meth:`scatter` : Scatter plot for 2D data points.
 
         References
         ----------
@@ -1818,6 +1856,11 @@ class hvPlot(hvPlotTabular):
 
             to learn more about its parameters and options.
 
+        See Also
+        --------
+        :meth:`quadmesh` : Quadrilateral mesh plot.
+        :meth:`rgb` : RGB image plot from multi-band data.
+
         References
         ----------
         - Bokeh: https://docs.bokeh.org/en/latest/docs/examples/topics/images/image.html
@@ -1866,6 +1909,10 @@ class hvPlot(hvPlotTabular):
                 hv.help(the_holoviews_object)
 
             to learn more about its parameters and options.
+
+        See Also
+        --------
+        image : Image plot from gridded data.
 
         References
         ----------
@@ -1919,6 +1966,10 @@ class hvPlot(hvPlotTabular):
 
             to learn more about its parameters and options.
 
+        See Also
+        --------
+        :meth:`image` : Image plot from gridded data.
+
         References
         ----------
         - HoloViews: https://holoviews.org/reference/elements/bokeh/QuadMesh.html
@@ -1969,7 +2020,7 @@ class hvPlot(hvPlotTabular):
 
         See Also
         --------
-        contourf : Filled contour plot.
+        :meth:`contourf` : Filled contour plot.
 
         References
         ----------
@@ -2013,7 +2064,7 @@ class hvPlot(hvPlotTabular):
 
         See Also
         --------
-        contour : Line contour plot.
+        :meth:`contour` : Line contour plot.
 
         Returns
         -------
