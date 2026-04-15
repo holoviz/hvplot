@@ -181,7 +181,7 @@ class hvPlotTabular(hvPlotBase):
     -------
     A Holoviews object. You can `print` the object to study its composition and run
 
-    .. code-block::
+    .. code-block:: python
 
         import holoviews as hv
         hv.help(the_holoviews_object)
@@ -191,7 +191,7 @@ class hvPlotTabular(hvPlotBase):
     Examples
     --------
 
-    .. code-block::
+    .. code-block:: python
 
         import pandas as pd
         import hvplot.pandas
@@ -219,7 +219,7 @@ class hvPlotTabular(hvPlotBase):
 
     You can can add *markers* to a `line` plot by overlaying with a `scatter` plot.
 
-    .. code-block::
+    .. code-block:: python
 
         markers = df.hvplot.scatter(
             x="numerical", y=["actual", "forecast"], color=["#f16a6f", "#1e85f7"], size=50
@@ -509,8 +509,10 @@ class hvPlotTabular(hvPlotBase):
 
     def errorbars(self, x=None, y=None, yerr1=None, yerr2=None, **kwds):
         """
-        `errorbars` provide a visual indicator for the variability of the plotted data on a graph.
-        They are usually overlaid with other plots such as `scatter` , `line` or `bar` plots to
+        Create error bars showing data variability.
+
+        Error bars provide a visual indicator for the variability of the plotted data on a graph.
+        They are usually overlaid with other plots such as ``scatter``, ``line``, or ``bar`` plots to
         indicate the variability.
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.errorbars.html
@@ -558,7 +560,9 @@ class hvPlotTabular(hvPlotBase):
 
     def ohlc(self, x=None, y=None, **kwds):
         """
-        The `ohlc` plot visualizes the open, high, low and close prices of stocks and other assets.
+        Create an OHLC plot for financial data visualization.
+
+        The OHLC plot visualizes the open, high, low, and close prices of stocks and other assets.
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.ohlc.html
 
@@ -606,7 +610,9 @@ class hvPlotTabular(hvPlotBase):
 
     def heatmap(self, x=None, y=None, C=None, colorbar=True, logz=False, **kwds):
         """
-        `heatmap` visualises tabular data indexed by two key dimensions as a grid of colored values.
+        Create a heatmap from tabular data.
+
+        A heatmap visualizes tabular data indexed by two key dimensions as a grid of colored values.
         This allows spotting correlations in multivariate data and provides a high-level overview
         of how the two variables are plotted. The data can either be shaped as a 2-D array
         (in which case no aggregate will be computed) or as a set of two axis variables and one
@@ -630,10 +636,10 @@ class hvPlotTabular(hvPlotBase):
             to the index name. Can refer to continuous and categorical data.
         C : str, optional
             Field to draw heatmap color from. If not specified a simple count will be used.
-        colorbar : bool, optional
-            Whether to display a colorbar. Default is True.
-        logz : bool, optional
-            Whether to apply log scaling to the z-axis. Default is False.
+        colorbar : bool, default True
+            Whether to display a colorbar.
+        logz : bool, default False
+            Whether to apply log scaling to the z-axis.
         reduce_function : function, optional
             Function to compute statistics for heatmap, for example ``np.mean``.
             If omitted, no aggregation is applied and duplicate values are dropped.
@@ -676,10 +682,10 @@ class hvPlotTabular(hvPlotBase):
         **kwds,
     ):
         """
-        The `hexbin` plot uses hexagons to split the area into several parts and attribute a color
-        to it.
+        Create a hexbin plot for dense data visualization.
 
-        `hexbin` offers a straightforward method for plotting dense data.
+        The hexbin plot uses hexagons to split the area into several parts and attribute a color
+        to it, offering a straightforward method for plotting dense data.
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.hexbin.html
 
@@ -693,18 +699,18 @@ class hvPlotTabular(hvPlotBase):
             Field name to draw y-positions from.
         C : str, optional
             Field to draw hexbin color from. If not specified a simple count will be used.
-        colorbar : bool, optional
-            Whether to display a colorbar. Default is True.
+        colorbar : bool, default True
+            Whether to display a colorbar.
         reduce_function : function, optional
             Function to compute statistics for hexbins, for example ``np.mean``.
             Default aggregation is a count of the values in the area.
-        gridsize : int or tuple, optional
+        gridsize : int or tuple, default 50
             Number of hexagonal bins along x- and y-axes. Defaults to uniform
             sampling along both axes when setting an integer but independent
             bin sampling can be specified a tuple of integers corresponding to
-            the number of bins along each axis. Default is 50.
-        logz : bool, optional
-            Whether to apply log scaling to the z-axis. Default is False.
+            the number of bins along each axis.
+        logz : bool, default False
+            Whether to apply log scaling to the z-axis.
         min_count : int, optional
             The display threshold before a bin is shown, by default bins with
             a count of less than 1 are hidden.
@@ -774,19 +780,19 @@ class hvPlotTabular(hvPlotBase):
             Field name to draw x-positions from. If not specified, the index is used.
         y : str, optional
             Field name to draw y-positions from.
-        colorbar : bool, optional
-            Whether to display a colorbar. Default is True.
+        colorbar : bool, default True
+            Whether to display a colorbar.
         bandwidth : float, optional
             Allows supplying explicit bandwidth value of the kernel for the
             density estimate, rather than relying on Scott. Higher value
             yields smoother contours. Default is None.
-        cut : float, optional
-            Draw the estimate to cut * bw from the extreme data points. Default is 3.
-        filled : bool, optional
-            If True the contours will be filled. Default is False.
-        levels : int or list, optional
+        cut : float, default 3
+            Draw the estimate to cut * bw from the extreme data points.
+        filled : bool, default False
+            If True the contours will be filled.
+        levels : int or list, default 10
             The number of contour lines to draw or a list of scalar values used
-            to specify the contour levels. Default is 10.
+            to specify the contour levels.
         **kwds : optional
             Additional keyword arguments are documented in :ref:`plot-options`.
             Run ``hvplot.help('bivariate')`` for the full method documentation.
@@ -815,7 +821,7 @@ class hvPlotTabular(hvPlotBase):
 
         Notes
         -----
-        This function requires `scipy` to be installed.
+        This function requires ``scipy`` to be installed.
         """
         return self(
             x,
@@ -887,9 +893,9 @@ class hvPlotTabular(hvPlotBase):
 
     def barh(self, x=None, y=None, stacked=False, **kwds):
         """
-        A horizontal bar plot
+        Create a horizontal bar plot.
 
-        A `barh` plot represents categorical data with rectangular bars
+        A horizontal bar plot represents categorical data with rectangular bars
         with heights proportional to the values that they represent. The y-axis of the chart
         plots categories and the x-axis represents the value scale.
         The bars are of equal width which allows for instant comparison of data.
@@ -907,8 +913,8 @@ class hvPlotTabular(hvPlotBase):
         y : str, optional
             Field name to draw categories from. If not specified, all numerical
             columns are used.
-        stacked : bool, optional
-            If True, creates a stacked horizontal bar plot. Default is False.
+        stacked : bool, default False
+            If True, creates a stacked horizontal bar plot.
         **kwds : optional
             Additional keyword arguments are documented in :ref:`plot-options`.
             Run ``hvplot.help('barh')`` for the full method documentation.
@@ -939,10 +945,12 @@ class hvPlotTabular(hvPlotBase):
 
     def box(self, y=None, by=None, **kwds):
         """
-        The `box` plot gives you a visual idea about the *locality*, *spread* and *skewness* of
-        numerical data through their quartiles. It is also known as *box and whiskers plot*.
+        Create a box plot showing data distribution.
 
-        `box` plots are most useful when grouped by additional dimensions.
+        The box plot gives you a visual idea about the *locality*, *spread*, and *skewness* of
+        numerical data through their quartiles. It is also known as a *box and whiskers plot*.
+
+        Box plots are most useful when grouped by additional dimensions.
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.box.html
 
@@ -985,10 +993,12 @@ class hvPlotTabular(hvPlotBase):
 
     def violin(self, y=None, by=None, **kwds):
         """
-        `violin`  plots are similar to `box` plots, but they provide a better sense of the
+        Create a violin plot showing data distribution.
+
+        Violin plots are similar to box plots, but they provide a better sense of the
         distribution of data.
 
-        Note that `violin` plots depend on the `scipy` library.
+        Note that violin plots depend on the ``scipy`` library.
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.violin.html
 
@@ -1194,7 +1204,7 @@ class hvPlotTabular(hvPlotBase):
 
     def table(self, columns=None, **kwds):
         """
-        Displays a 'table'.
+        Display data as a table.
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.table.html
 
@@ -1231,8 +1241,10 @@ class hvPlotTabular(hvPlotBase):
 
     def dataset(self, columns=None, **kwds):
         """
+        Wrap data in a HoloViews Dataset object.
+
         Wraps the dataset in a :class:`holoviews:holoviews.element.Dataset`
-        object, for further processing with HoloViews.
+        object for further processing with HoloViews.
 
         Parameters
         ----------
@@ -1264,7 +1276,9 @@ class hvPlotTabular(hvPlotBase):
 
     def points(self, x=None, y=None, **kwds):
         """
-        A `points` plot visualizes positions in a 2D space. This is useful for example for
+        Create a points plot for 2D coordinate visualization.
+
+        A points plot visualizes positions in a 2D space. This is useful for example for
         geographic plots.
 
         Although the :meth:`hvplot.hvPlot.scatter` plot is superficially
@@ -1420,7 +1434,7 @@ class hvPlotTabular(hvPlotBase):
 
     def paths(self, x=None, y=None, c=None, **kwds):
         """
-        Plot one or more collection of lines.
+        Create a paths plot from line collections.
 
         Each path is a collection of independent x and y coordinates,
         represented from:
@@ -1428,7 +1442,7 @@ class hvPlotTabular(hvPlotBase):
         - tabular data: 1 path
         - gridded data: 1 path
         - GeoPandas GeoDataFrame: as many paths as LineString/MultiLineString
-          as geometries contained in the dtaset
+          as geometries contained in the dataset
 
         Options like ``color`` or ``line_width`` are vectorized, i.e. each
         sub-line of a path can be displayed separately based on another dimension.
@@ -1468,9 +1482,9 @@ class hvPlotTabular(hvPlotBase):
 
     def labels(self, x=None, y=None, text=None, **kwds):
         """
-        Labels plot.
+        Create a labels plot for text annotations.
 
-        `labels` are mostly useful when overlaid on top of other plots using the `*`
+        Labels are mostly useful when overlaid on top of other plots using the ``*``
         operator.
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.labels.html
@@ -1697,7 +1711,7 @@ class hvPlot(hvPlotTabular):
     Examples
     --------
 
-    .. code-block::
+    .. code-block:: python
 
         import hvplot.pandas
         import pandas as pd
@@ -1725,7 +1739,7 @@ class hvPlot(hvPlotTabular):
 
     You can can add *markers* to a `line` plot by overlaying with a `scatter` plot.
 
-    .. code-block::
+    .. code-block:: python
 
         markers = df.hvplot.scatter(
             x="numerical", y=["actual", "forecast"], color=["#f16a6f", "#1e85f7"], size=50
@@ -1769,10 +1783,10 @@ class hvPlot(hvPlotTabular):
 
     def image(self, x=None, y=None, z=None, colorbar=True, **kwds):
         """
-        Image plot
+        Create an image plot from gridded data.
 
-        You can use `image` to display for example geographic data with independent `latitude` and
-        `longitude` fields and a third dependent field.
+        You can use image plots to display for example geographic data with independent ``latitude`` and
+        ``longitude`` fields and a third dependent field.
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.image.html
 
@@ -1786,7 +1800,7 @@ class hvPlot(hvPlotTabular):
             The coordinate variable along the y-axis
         z : str, optional
             The data variable to plot
-        colorbar: bool
+        colorbar : bool, default True
             Whether to display a colorbar
         **kwds : optional
             Additional keywords arguments are documented in :ref:`plot-options`.
@@ -1797,7 +1811,7 @@ class hvPlot(hvPlotTabular):
         :class:`holoviews:holoviews.element.Image` or Panel object
             You can `print` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -1815,9 +1829,9 @@ class hvPlot(hvPlotTabular):
 
     def rgb(self, x=None, y=None, z=None, bands=None, **kwds):
         """
-        RGB plot
+        Create an RGB image plot from multi-band data.
 
-        `rgb`  can be used to display images that are distributed as three separate "channels" or
+        RGB plots can be used to display images that are distributed as three separate "channels" or
         "bands".
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.rgb.html
@@ -1846,7 +1860,7 @@ class hvPlot(hvPlotTabular):
         :class:`holoviews:holoviews.element.RGB` or Panel object
             You can `print` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -1866,9 +1880,9 @@ class hvPlot(hvPlotTabular):
 
     def quadmesh(self, x=None, y=None, z=None, colorbar=True, **kwds):
         """
-        QuadMesh plot
+        Create a quadrilateral mesh plot.
 
-        ``quadmesh`` allows you to plot values on an irregular grid by representing each value as a
+        QuadMesh allows you to plot values on an irregular grid by representing each value as a
         polygon. It is often useful for displaying projected geographic datasets.
         Note that this method can be slower than ``image``. To reduce the render
         time or the size of the saved plot, set ``rasterize=True`` to aggregate
@@ -1887,7 +1901,7 @@ class hvPlot(hvPlotTabular):
             The coordinate variable along the y-axis
         z : str, optional
             The data variable to plot
-        colorbar: bool
+        colorbar : bool, default True
             Whether to display a colorbar
         **kwds : optional
             Additional keywords arguments are documented in :ref:`plot-options`.
@@ -1898,7 +1912,7 @@ class hvPlot(hvPlotTabular):
         :class:`holoviews:holoviews.element.QuadMesh` or Panel object
             You can `print` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
@@ -1913,7 +1927,7 @@ class hvPlot(hvPlotTabular):
 
     def contour(self, x=None, y=None, z=None, colorbar=True, levels=5, logz=False, **kwds):
         """
-        Line contour plot.
+        Create a line contour plot.
 
         A contour plot displays isolines representing constant values in a 2D
         scalar field over gridded data.
@@ -1930,13 +1944,13 @@ class hvPlot(hvPlotTabular):
             The coordinate variable along the y-axis
         z : str, optional
             The data variable to plot
-        colorbar: bool, optional
-            Whether to display a colorbar. Default is True.
-        levels: int or list, optional
+        colorbar : bool, default True
+            Whether to display a colorbar.
+        levels : int or list, default 5
             The number of contour lines to draw or a list of scalar values used
-            to specify the contour levels. Default is 5.
-        logz: bool, optional
-            Whether to apply log scaling to the z-axis. Default is False.
+            to specify the contour levels.
+        logz : bool, default False
+            Whether to apply log scaling to the z-axis.
         **kwds : optional
             Additional keywords arguments are documented in :ref:`plot-options`.
             Run ``hvplot.help('contour')`` for the full method documentation.
@@ -1946,7 +1960,7 @@ class hvPlot(hvPlotTabular):
         :class:`holoviews:holoviews.element.Contours` or Panel object
             You can `print` the object to study its composition and run:
 
-            .. code-block::
+            .. code-block:: python
 
                 import holoviews as hv
                 hv.help(the_holoviews_object)
