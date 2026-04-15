@@ -35,7 +35,7 @@ pandas.plotting module.
 - [Plotting with Bokeh](Plotting)
   Overview of plotting your data with hvPlot and Bokeh.
 - [Plotting with Matplotlib](Plotting_with_Matplotlib)
-  Overview of plotting your data with hvPlot and Matplotib.
+  Overview of plotting your data with hvPlot and Matplotlib.
 - [Plotting with Plotly](Plotting_with_Plotly)
   Overview of plotting your data with hvPlot and Plotly.
 - [Interactive](Interactive)
@@ -53,7 +53,7 @@ pandas.plotting module.
 - [Streaming](Streaming)
   How to use hvPlot for streaming plots with the streamz library.
 - [Gridded Data](Gridded_Data)
-  How to use hvPlot for plotting XArray-based gridded data.
+  How to use hvPlot for plotting Xarray-based gridded data.
 - [Network Graphs](NetworkX)
   How to use hvPlot for plotting NetworkX graphs.
 - [Geographic Data](Geographic_Data)

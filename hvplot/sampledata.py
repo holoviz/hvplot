@@ -20,5 +20,5 @@ def __getattr__(name):
             "Install the package 'hvsampledata' to access datasets from the "
             "'sampledata' module of hvPlot."
         )
-        raise ImportError(msg)
+        raise AttributeError(msg)
     raise AttributeError(f'module {__name__!r} has no attribute {name!r}')
