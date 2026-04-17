@@ -135,8 +135,17 @@ import duckdb
 import hvplot.duckdb
 from bokeh.sampledata.autompg import autompg_clean as df
 
-df_duckdb = duckdb.from_df(df)
-table = df_duckdb.groupby(['origin', 'mfr'])['mpg'].mean().sort_values().tail(5)
+con = duckdb.connect(':memory:')
+con.register('autompg', df)
+
+query = """
+SELECT origin, mfr, AVG(mpg) as mpg
+FROM autompg
+GROUP BY origin, mfr
+ORDER BY mpg DESC
+LIMIT 5
+"""
+table = con.query(query).sort("mpg")
 table.hvplot.barh('mfr', 'mpg', by='origin', stacked=True)
 ```
 ```{image} ./_static/home/pandas.gif
@@ -435,7 +444,7 @@ align: center
 Tutorials <tutorials/index>
 User Guide <user_guide/index>
 How-To Guides <how_to/index>
-Gallery <reference/index>
+Gallery <gallery/index>
 Reference <ref/index>
 Explanation <explanation/index>
 Developer Guide <developer_guide>

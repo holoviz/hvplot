@@ -3,6 +3,8 @@ from collections import defaultdict
 
 import param
 
+from packaging.version import Version
+
 try:
     import panel as pn
 
@@ -1096,6 +1098,7 @@ class hvPlotTabular(hvPlotBase):
             y=y,
             by=by,
             bins=bins,
+            bin_range=bin_range,
             normed=normed,
             cumulative=cumulative,
             **kwds,
@@ -1480,19 +1483,35 @@ class hvPlotTabular(hvPlotBase):
 class hvPlotTabularDuckDB(hvPlotTabular):
     def _get_converter(self, x=None, y=None, kind=None, **kwds):
         import duckdb
-        from duckdb.typing import (
-            BIGINT,
-            FLOAT,
-            DOUBLE,
-            INTEGER,
-            SMALLINT,
-            TINYINT,
-            UBIGINT,
-            UINTEGER,
-            USMALLINT,
-            UTINYINT,
-            HUGEINT,
-        )
+
+        if Version(duckdb.__version__).release < (1, 4, 1):
+            from duckdb.typing import (
+                BIGINT,
+                FLOAT,
+                DOUBLE,
+                INTEGER,
+                SMALLINT,
+                TINYINT,
+                UBIGINT,
+                UINTEGER,
+                USMALLINT,
+                UTINYINT,
+                HUGEINT,
+            )
+        else:
+            from duckdb.sqltypes import (
+                BIGINT,
+                FLOAT,
+                DOUBLE,
+                INTEGER,
+                SMALLINT,
+                TINYINT,
+                UBIGINT,
+                UINTEGER,
+                USMALLINT,
+                UTINYINT,
+                HUGEINT,
+            )
 
         params = dict(self._metadata, **kwds)
         x = x or params.pop('x', None)
