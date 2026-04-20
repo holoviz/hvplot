@@ -156,13 +156,13 @@ def test_interactive_pandas_function(df):
 
     dfi = Interactive(bind(sel_col, select))
     assert type(dfi) is Interactive
-    assert dfi._obj is df.A
+    pd.testing.assert_series_equal(dfi._obj, df.A)
     assert isinstance(dfi._fn, pn.param.ParamFunction)
     assert dfi._transform == dim('*')
     assert dfi._method is None
 
     select.value = 'B'
-    assert dfi._obj is df.B
+    pd.testing.assert_series_equal(dfi._obj, df.B)
 
 
 def test_interactive_xarray_function(dataset):

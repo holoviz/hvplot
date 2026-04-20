@@ -16,11 +16,11 @@ jobs:
         run: |
           # Get current labels and issue type - if any exist, the issue has been looked at
           label_count=$(gh issue view "$NUMBER" --json labels --jq '.labels | length')
-          issue_type=$(gh api repos/$GH_REPO/issues/$NUMBER --jq '.type')
+          issue_type=$(gh api repos/$GH_REPO/issues/$NUMBER --jq '.type // empty')
           echo "Number of existing labels: $label_count"
           echo "Issue type: $issue_type"
 
-          if [ "$label_count" -eq 0 ] && [ "$issue_type" = "null" ]; then
+          if [ "$label_count" -eq 0 ] && [ -z "$issue_type" ]; then
             needs_triage=true
           else
             needs_triage=false

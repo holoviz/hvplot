@@ -280,7 +280,7 @@ autosummary_generate = True
 # autosummary_generate_overwrite = False
 
 intersphinx_mapping = {
-    'cartopy': ('https://scitools.org.uk/cartopy/docs/latest/', None),
+    'cartopy': ('https://cartopy.readthedocs.io/stable/', None),
     'holoviews': ('https://holoviews.org/', None),
     'pandas': (
         'https://pandas.pydata.org/pandas-docs/stable/',
