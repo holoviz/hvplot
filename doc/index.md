@@ -263,10 +263,11 @@ align: center
 :::{tab-item} Layout
 ```python
 import hvplot.pandas
-from hvplot.sample_data import us_crime as df
+from hvplot.sampledata import stocks
 
-plot1 = df.hvplot(x='Year', y='Violent Crime rate', width=400)
-plot2 = df.hvplot(x='Year', y='Burglary rate', width=400)
+df = stocks('pandas')
+plot1 = df.hvplot(x='date', y='Apple', width=400)
+plot2 = df.hvplot(x='date', y='Google', width=400)
 plot1 + plot2
 ```
 ```{image} ./_static/home/layout.gif
@@ -312,10 +313,10 @@ align: center
 :::{tab-item} Large Data
 ```python
 import hvplot.pandas
-from hvplot.sample_data import catalogue as cat
+from hvplot.sampledata import nyc_taxi_remote
 
-df = cat.airline_flights.read()
-df.hvplot.scatter(x='distance', y='airtime', rasterize=True, cnorm='eq_hist', width=500)
+df = nyc_taxi_remote('pandas')
+df.hvplot.scatter(x='trip_distance', y='passenger_count', rasterize=True, cnorm='eq_hist', width=500)
 ```
 ```{image} ./_static/home/large_data.gif
 ---
