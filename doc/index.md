@@ -298,10 +298,10 @@ align: center
 :::{tab-item} Large Data
 ```python
 import hvplot.pandas
-from hvplot.sampledata import nyc_taxi_remote
+from hvplot.sampledata import synthetic_clusters
 
-df = nyc_taxi_remote('pandas')
-df.hvplot.scatter(x='trip_distance', y='passenger_count', rasterize=True, cnorm='eq_hist', width=500)
+df = synthetic_clusters('pandas')
+df.hvplot.points(datashade=True, by='cat', width=500)
 ```
 ```{image} ./_static/home/large_data.gif
 ---
