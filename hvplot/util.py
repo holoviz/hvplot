@@ -519,7 +519,7 @@ def is_list_like(obj):
 
 
 def is_tabular(data):
-    if check_library(data, ['dask', 'streamz', 'pandas', 'geopandas', 'cudf']):
+    if check_library(data, ['dask', 'streamz', 'pandas', 'geopandas', 'cudf', 'narwhals']):
         return True
     elif check_library(data, 'intake'):
         from intake.source.base import DataSource
@@ -531,7 +531,7 @@ def is_tabular(data):
 
 
 def is_series(data):
-    if not check_library(data, ['dask', 'streamz', 'pandas', 'cudf']):
+    if not check_library(data, ['dask', 'streamz', 'pandas', 'cudf', 'narwhals']):
         return False
     elif isinstance(data, pd.Series):
         return True
@@ -547,6 +547,10 @@ def is_series(data):
         import cudf
 
         return isinstance(data, cudf.Series)
+    elif check_library(data, 'narwhals'):
+        import narwhals as nw
+
+        return isinstance(data, nw.Series)
     else:
         return False
 
@@ -578,6 +582,14 @@ def is_duckdb(data):
     import duckdb
 
     return isinstance(data, (duckdb.DuckDBPyRelation, duckdb.DuckDBPyConnection))
+
+
+def is_narwhals(data):
+    if not check_library(data, 'narwhals'):
+        return False
+    import narwhals as nw
+
+    return isinstance(data, (nw.DataFrame, nw.Series, nw.LazyFrame))
 
 
 def is_polars(data):
@@ -623,7 +635,7 @@ def is_xarray(data):
 def is_lazy_data(data):
     """Check if data is lazy
 
-    This checks if the datatype is Dask, Ibis, or Polars' LazyFrame.
+    This checks if the datatype is Dask, Ibis, Polars' LazyFrame, or Narwhals' LazyFrame.
     It is useful to avoid eager evaluation of the data.
     """
     if is_dask(data) or is_ibis(data):
@@ -632,6 +644,10 @@ def is_lazy_data(data):
         import polars as pl
 
         return isinstance(data, pl.LazyFrame)
+    elif is_narwhals(data):
+        import narwhals as nw
+
+        return isinstance(data, nw.LazyFrame)
     return False
 
 
