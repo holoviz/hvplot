@@ -480,8 +480,13 @@ class HoloViewsConverter:
     fontsize : number or dict or None, default=None
         Set title, label and legend text to the same fontsize. Finer control
         by using a dict: ``{'title': '15pt', 'ylabel': '5px', 'ticks': 20}``.
-    grid : bool or None, default=None
-        Whether to show a grid.
+    grid : bool, str, dict, or None, default=None
+        Whether to show a grid. If True, shows grid on both axes.
+        If ``'x'`` or ``'y'``, shows grid only on the specified axis.
+        Suffix with ``'dashed'``, ``'dotted'``, or ``'dashdot'``
+        to change the grid line style, e.g. ``'x-dashed'``.
+        A dictionary of grid style options may also be supplied, e.g. for bokeh,
+        ``{'grid_line_color': 'red', 'grid_line_alpha': 0.5}``.
 
     Resampling Options
     ------------------
@@ -1075,7 +1080,28 @@ class HoloViewsConverter:
             plot_opts['logy'] = logy
 
         if grid is not None:
-            plot_opts['show_grid'] = grid
+            if isinstance(grid, str):
+                gridstyle = {}
+                axis = grid[0]
+                other_axis = 'x' if axis == 'y' else 'y'
+                if len(grid) > 1:
+                    line_dash = grid[1:].lstrip('-').lstrip('.').lstrip('_')
+                    line_dash_key = (
+                        f'{axis}grid_line_dash'
+                        if self._backend_compat == 'bokeh'
+                        else f'{axis}grid_linestyle'
+                    )
+                    gridstyle[line_dash_key] = line_dash
+                line_alpha_key = (
+                    f'{other_axis}grid_line_alpha'
+                    if self._backend_compat == 'bokeh'
+                    else f'{other_axis}grid_alpha'
+                )
+                gridstyle[line_alpha_key] = 0
+                plot_opts['gridstyle'] = gridstyle
+            elif isinstance(grid, dict):
+                plot_opts['gridstyle'] = grid
+            plot_opts['show_grid'] = bool(grid)
 
         if legend is not None:
             plot_opts['show_legend'] = bool(legend)
