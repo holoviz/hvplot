@@ -23,6 +23,12 @@ on:
   schedule:
     - cron: '0 15 * * SUN'
 
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 defaults:
   run:
     shell: bash -e {0}
@@ -84,6 +90,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          persist-credentials: false
       - uses: actions/setup-python@v6
         with:
           python-version: '3.13'
