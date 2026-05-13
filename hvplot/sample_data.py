@@ -1,30 +1,30 @@
 """
-Loads hvPlot sample data using intake catalogue.
+Deprecated. Use ``hvplot.sampledata`` instead.
+
+This module previously loaded hvPlot sample data using an intake catalogue.
+It has been replaced by ``hvplot.sampledata``, which uses the ``hvsampledata``
+package and does not require intake.
 """
 
-import os
+import warnings
 
-try:
-    from intake import open_catalog
-    import intake_parquet  # noqa
-    import intake_xarray  # noqa
-    import s3fs  # noqa
-except ImportError:
-    raise ImportError(
-        """Loading hvPlot sample data requires:
-                * intake
-                * intake-parquet
-                * intake-xarray
-                * s3fs
-             Install these using conda or pip before loading data."""
-    )
+from .util import _find_stack_level
+from . import sampledata as _sampledata
 
-_file_path = os.path.dirname(__file__)
-_cat_path = os.path.join(_file_path, 'datasets.yaml')
+warnings.warn(
+    "The 'hvplot.sample_data' module is deprecated and will be removed in a "
+    "future version. Use 'hvplot.sampledata' instead.",
+    FutureWarning,
+    stacklevel=_find_stack_level(),
+)
 
-# Load catalogue
-catalogue = open_catalog(_cat_path)
+from .sampledata import *  # noqa: F401, F403, E402
 
-# Add catalogue entries to namespace
-for _c in catalogue:
-    globals()[_c] = catalogue[_c]
+
+def __getattr__(name):
+    if not _sampledata._hvsampledata_available:
+        raise AttributeError(
+            "Install the package 'hvsampledata' to access datasets from "
+            "'hvplot.sample_data' (deprecated; use 'hvplot.sampledata' instead)."
+        )
+    raise AttributeError(f"module 'hvplot.sample_data' has no attribute {name!r}")

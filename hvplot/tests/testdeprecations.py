@@ -2,6 +2,8 @@
 Tests for deprecation warnings.
 """
 
+import sys
+import importlib
 import pandas as pd
 import pytest
 
@@ -28,3 +30,9 @@ def test_converter_argument_hover_formatters():
     df = pd.DataFrame({'x': [0, 1], 'y': [0, 1]})
     with pytest.warns(DeprecationWarning):
         HoloViewsConverter(df, 'x', 'y', hover_formatters={'@{y}': 'printf'})
+
+
+def test_sample_data_deprecation():
+    with pytest.warns(FutureWarning):
+        importlib.import_module('hvplot.sample_data')
+    sys.modules.pop('hvplot.sample_data', None)
