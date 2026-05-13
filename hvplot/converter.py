@@ -574,7 +574,9 @@ class HoloViewsConverter:
     _geom_types = ['paths', 'polygons']
 
     _geo_types = sorted(
-        _gridded_types + _geom_types + ['points', 'vectorfield', 'labels', 'hexbin', 'bivariate']
+        _gridded_types
+        + _geom_types
+        + ['points', 'windbarbs', 'vectorfield', 'labels', 'hexbin', 'bivariate']
     )
 
     _stats_types = ['hist', 'kde', 'violin', 'box', 'density']
@@ -745,6 +747,7 @@ class HoloViewsConverter:
         'area': ['x', 'y', 'y2', 'stacked'],
         'bar': ['x', 'y', 'stacked'],
         'barh': ['x', 'y', 'stacked'],
+        'windbarbs': ['x', 'y', 'angle', 'mag', 'scale'],
         'box': ['x', 'y'],
         'errorbars': ['x', 'y', 'yerr1', 'yerr2'],
         'bivariate': ['x', 'y', 'bandwidth', 'cut', 'filled', 'levels'],
@@ -3275,15 +3278,56 @@ class HoloViewsConverter:
         else:
             return contourf
 
+    def windbarbs(self, x=None, y=None, angle=None, mag=None, data=None):
+        self._error_if_unavailable('windbarbs')
+        data, x, y, _ = self._process_gridded_args(data, x, y, z=None)
+
+        if not (x and y):
+            if hasattr(data, 'coords'):
+                x, y = list(k for k, v in data.coords.items() if v.size > 1)
+            else:
+                x, y = data.columns[:2]
+
+        angle = self.kwds.get('angle')
+        mag = self.kwds.get('mag')
+
+        if (angle is None) != (mag is None):
+            raise ValueError("windbarbs requires either both 'angle' and 'mag' or neither")
+        if angle is None and mag is None:
+            raise ValueError("windbarbs requires 'angle' and 'mag' parameters")
+
+        z = [angle, mag] + self.hover_cols
+        redim = self._merge_redim({z[1]: self._dim_ranges['c']})
+        params = dict(self._relabel)
+
+        element = self._get_element('windbarbs')
+        cur_opts, compat_opts = self._get_compat_opts('WindBarbs')
+        if self.geo:
+            params['crs'] = self.crs
+
+        return redim_(
+            element(data, [x, y], z, **params),
+            **redim,
+        ).apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
+
     def vectorfield(self, x=None, y=None, angle=None, mag=None, data=None):
         self._error_if_unavailable('vectorfield')
         data, x, y, _ = self._process_gridded_args(data, x, y, z=None)
 
         if not (x and y):
-            x, y = list(k for k, v in data.coords.items() if v.size > 1)
+            if hasattr(data, 'coords'):
+                x, y = list(k for k, v in data.coords.items() if v.size > 1)
+            else:
+                x, y = data.columns[:2]
 
         angle = self.kwds.get('angle')
         mag = self.kwds.get('mag')
+
+        if (angle is None) != (mag is None):
+            raise ValueError("vectorfield requires either both 'angle' and 'mag' or neither")
+        if angle is None and mag is None:
+            raise ValueError("vectorfield requires 'angle' and 'mag' parameters")
+
         z = [angle, mag] + self.hover_cols
         redim = self._merge_redim({z[1]: self._dim_ranges['c']})
         params = dict(self._relabel)
