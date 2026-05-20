@@ -1451,6 +1451,11 @@ class HoloViewsConverter:
             datatype = 'ibis'
             self.data = data
         elif is_streamz(data):
+            warnings.warn(
+                'streamz support has been deprecated and will be removed in a future version.',
+                DeprecationWarning,
+                stacklevel=_find_stack_level(),
+            )
             datatype = 'streamz'
             self.data = data.example
             if isinstance(self.data, pd.DataFrame):
