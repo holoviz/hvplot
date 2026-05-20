@@ -15,6 +15,7 @@ SLOW_EXAMPLES = [
 
 collect_ignore_glob = [
     'user_guide/Streaming.ipynb',
+    'ref/plotting_options/streaming.ipynb',
 ]
 
 # Slow examples are excluded by default.
@@ -49,11 +50,6 @@ if not find_spec('datashader'):
         'user_guide/Plotting.ipynb',
         'user_guide/Plotting_with_Matplotlib.ipynb',
         'user_guide/Plotting_with_Plotly.ipynb',
-    ]
-
-if not find_spec('streamz'):
-    collect_ignore_glob += [
-        'ref/plotting_options/streaming.ipynb',
     ]
 
 if _PD_GE_3_0_0:
