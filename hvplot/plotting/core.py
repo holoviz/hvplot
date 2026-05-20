@@ -1986,3 +1986,133 @@ class hvPlot(hvPlotTabular):
         return self(
             x, y, z=z, kind='contourf', colorbar=colorbar, levels=levels, logz=logz, **kwds
         )
+
+
+class hvPlotXugrid(hvPlot):
+    """hvPlot interface for xugrid UgridDataArray and UgridDataset objects."""
+
+    __all__ = hvPlot.__all__ + ['trimesh']
+
+    def _get_converter(self, x=None, y=None, kind=None, **kwds):
+        import numpy as np
+        import pandas as pd
+        import xarray as xr
+        import xugrid as xu
+
+        data = self._data
+        kind = kind or kwds.pop('kind', None) or 'trimesh'
+
+        if isinstance(data, xu.UgridDataset):
+            z = kwds.get('z') or list(data.data_vars)[0]
+            data = data[z]
+
+        grid = data.grid
+
+        if kind != 'trimesh':
+            params = dict(self._metadata, **kwds)
+            x = x or params.pop('x', None)
+            y = y or params.pop('y', None)
+            return HoloViewsConverter(data, x, y, kind=kind, **params)
+
+        face_dim = grid.face_dimension
+        node_dim = grid.node_dimension
+
+        # Unspecified extra dims become groupby sliders; only pop explicitly-named ones.
+        extra_dims = []
+        for dim in list(data.dims):
+            if dim not in (face_dim, node_dim):
+                if dim in kwds:
+                    val = kwds.pop(dim)
+                    if isinstance(val, (int, np.integer)):
+                        data = data.isel({dim: val})
+                    else:
+                        data = data.sel({dim: val}, method='nearest')
+                else:
+                    extra_dims.append(dim)
+
+        # If face data, defer the to_node() conversion to the trimesh()
+        # method so it runs on already-sliced data (single time/level)
+        # instead of the full multi-dimensional array.
+        is_face_data = face_dim in data.dims
+        if is_face_data:
+            kwds['_xugrid_grid'] = grid
+
+        connectivity = grid.face_node_connectivity
+        fill_value = grid.fill_value if hasattr(grid, 'fill_value') else -1
+        if connectivity.shape[1] == 3:
+            tris_df = pd.DataFrame(np.asarray(connectivity), columns=['v0', 'v1', 'v2'])
+        else:
+            # Triangulate polygons with more than 3 nodes (fan triangulation)
+            triangles = []
+            for face in connectivity:
+                valid = face[face != fill_value]
+                for i in range(1, len(valid) - 1):
+                    triangles.append([valid[0], valid[i], valid[i + 1]])
+            tris_df = pd.DataFrame(triangles, columns=['v0', 'v1', 'v2'])
+
+        kwds['_xugrid_tris'] = tris_df
+        kwds['_xugrid_node_x'] = np.asarray(grid.node_x)
+        kwds['_xugrid_node_y'] = np.asarray(grid.node_y)
+
+        if extra_dims:
+            groupby = kwds.get('groupby', [])
+            if isinstance(groupby, str):
+                groupby = [groupby]
+            else:
+                groupby = list(groupby)
+            for dim in extra_dims:
+                if dim not in groupby:
+                    groupby.append(dim)
+            kwds['groupby'] = groupby
+
+        # Only include proper 1D dimension coordinates (where the coord's
+        # single dimension matches its name). 2D coords like FVCOM's
+        # siglay(siglay, node) break the groupby machinery.
+        coords = {}
+        for k in data.coords:
+            coord = data.coords[k]
+            if hasattr(coord, 'dims') and len(coord.dims) == 1 and coord.dims[0] == k:
+                coords[k] = coord
+        # Ensure all extra dims have coordinates so groupby widgets work.
+        for dim in extra_dims:
+            if dim not in coords:
+                coords[dim] = np.arange(data.sizes[dim])
+        xr_da = xr.DataArray(
+            data.data,  # keeps dask arrays lazy
+            dims=data.dims,
+            coords=coords,
+            name='z',
+        )
+        xr_ds = xr.Dataset({'z': xr_da})
+        kwds['z'] = 'z'
+
+        params = dict(self._metadata, **kwds)
+        x = x or params.pop('x', None)
+        y = y or params.pop('y', None)
+        return HoloViewsConverter(xr_ds, x, y, kind=kind, **params)
+
+    def trimesh(self, x=None, y=None, z=None, colorbar=True, **kwds):
+        """
+        TriMesh plot for unstructured grid data.
+
+        Creates a triangular mesh plot from xugrid UgridDataArray or
+        UgridDataset objects. Supports rasterization for large meshes.
+
+        Parameters
+        ----------
+        x : string, optional
+            The coordinate variable along the x-axis
+        y : string, optional
+            The coordinate variable along the y-axis
+        z : string, optional
+            The data variable to plot
+        colorbar : boolean
+            Whether to display a colorbar
+        **kwds : optional
+            Additional keywords arguments are documented in :ref:`plot-options`.
+
+        Returns
+        -------
+        :class:`holoviews:holoviews.element.TriMesh` / Panel object
+        """
+        return self(x, y, z=z, kind='trimesh', colorbar=colorbar, **kwds)
