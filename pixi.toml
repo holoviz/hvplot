@@ -1,7 +1,7 @@
 [workspace]
 name = "hvplot"
 channels = ["pyviz/label/dev",  "conda-forge"]
-platforms = ["linux-64", "osx-arm64", "osx-64", "win-64"]
+platforms = ["linux-64", "osx-arm64", "win-64"]
 
 [environments]
 default = [
@@ -35,10 +35,6 @@ no-default-feature = true
 
 [environments.test-314]
 features = ["py314", "required", "test-core", "test", "example", "geo", "graphviz", "test-example"]
-no-default-feature = true
-
-[environments.test-pandas3]
-features = ["py313", "required", "test-core", "test", "example", "geo", "graphviz", "test-example", "pandas3"]
 no-default-feature = true
 
 [environments.test-core]
@@ -122,8 +118,7 @@ datashader = ">=0.6.5"
 duckdb = "*"
 # In 0.9 fugue added the sql extra but didn't add a fugue-sql conda package,
 # removing the sql deps from core fugue. Adding them manually here.
-qpd = ">=0.4.4"
-fugue-sql-antlr = ">=0.2.0"
+fugue-sql-antlr = ">=0.2.4"
 sqlglot = "*"
 jinja2 = "*"
 # fugue[sql] = "*"
@@ -186,8 +181,7 @@ nbval = "*"
 
 # In 0.9 fugue added the sql extra but didn't add a fugue-sql conda package,
 # removing the sql deps from core fugue. Adding them manually here.
-qpd = ">=0.4.4"
-fugue-sql-antlr = ">=0.2.0"
+fugue-sql-antlr = ">=0.2.4"
 sqlglot = "*"
 jinja2 = "*"
 # fugue[sql] = "*"
@@ -275,11 +269,3 @@ pre-commit = "*"
 [feature.lint.tasks]
 lint = 'pre-commit run --all-files'
 lint-install = 'pre-commit install'
-
-# ================== SPECIAL ====================
-
-[feature.pandas3]
-channels = ["conda-forge/label/pandas_rc"]
-
-[feature.pandas3.dependencies]
-pandas = { version = ">=3.0.0rc0,<3.0.0", channel = "conda-forge/label/pandas_rc" }
