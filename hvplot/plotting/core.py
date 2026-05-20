@@ -2002,14 +2002,12 @@ class hvPlotXugrid(hvPlot):
         data = self._data
         kind = kind or kwds.pop('kind', None) or 'trimesh'
 
-        # Handle UgridDataset: select the variable
         if isinstance(data, xu.UgridDataset):
             z = kwds.get('z') or list(data.data_vars)[0]
             data = data[z]
 
         grid = data.grid
 
-        # For non-trimesh kinds, fall back to the parent converter
         if kind != 'trimesh':
             params = dict(self._metadata, **kwds)
             x = x or params.pop('x', None)
@@ -2019,8 +2017,7 @@ class hvPlotXugrid(hvPlot):
         face_dim = grid.face_dimension
         node_dim = grid.node_dimension
 
-        # Reduce only explicitly specified extra dimensions;
-        # unspecified extra dims become groupby widgets (sliders)
+        # Unspecified extra dims become groupby sliders; only pop explicitly-named ones.
         extra_dims = []
         for dim in list(data.dims):
             if dim not in (face_dim, node_dim):
@@ -2040,7 +2037,6 @@ class hvPlotXugrid(hvPlot):
         if is_face_data:
             kwds['_xugrid_grid'] = grid
 
-        # Build tris DataFrame (constant - mesh topology doesn't change)
         connectivity = grid.face_node_connectivity
         fill_value = grid.fill_value if hasattr(grid, 'fill_value') else -1
         if connectivity.shape[1] == 3:
@@ -2059,8 +2055,6 @@ class hvPlotXugrid(hvPlot):
         kwds['_xugrid_node_y'] = np.asarray(grid.node_y)
 
         if extra_dims:
-            # Add unspecified extra dims as groupby so the converter
-            # creates slider widgets for them
             groupby = kwds.get('groupby', [])
             if isinstance(groupby, str):
                 groupby = [groupby]
@@ -2071,7 +2065,6 @@ class hvPlotXugrid(hvPlot):
                     groupby.append(dim)
             kwds['groupby'] = groupby
 
-        # Convert xugrid data to xarray Dataset for the converter.
         # Only include proper 1D dimension coordinates (where the coord's
         # single dimension matches its name). 2D coords like FVCOM's
         # siglay(siglay, node) break the groupby machinery.

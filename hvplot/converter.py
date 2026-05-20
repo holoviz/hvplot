@@ -1480,10 +1480,6 @@ class HoloViewsConverter:
                 self.stream = Buffer(data=self.data, length=backlog, index=False)
             data.stream.gather().sink(self.stream.send)
         elif is_xugrid(data):
-            # xugrid data is handled in hvPlotXugrid._get_converter
-            # which pre-processes mesh data and passes a pandas DataFrame
-            # to the converter. This branch handles the case where the
-            # converter is called directly with xugrid data.
             datatype = 'pandas'
             self.data = data
         elif is_xarray(data):
