@@ -76,7 +76,7 @@ class TestPatchXArray(TestCase):
 class TestPatchStreamz(TestCase):
     def setUp(self):
         if _HV_VERSION >= (1, 23, 0):
-            raise SkipTest('streamz support removed in HoloViews >= 1.23')
+            raise SkipTest('streamz support has been removed in HoloViews >= 1.23.0')
         try:
             import streamz  # noqa
         except ImportError:

@@ -34,7 +34,7 @@ def test_converter_argument_hover_formatters():
 def test_streamz_patch():
     pytest.importorskip('streamz')
     if _HV_VERSION >= (1, 23, 0):
-        pytest.skip('streamz support removed in HoloViews >= 1.23')
+        pytest.skip('streamz support has been removed in HoloViews >= 1.23.0')
     with pytest.warns(
         DeprecationWarning,
         match='streamz support has been deprecated',
