@@ -50,8 +50,6 @@ pandas.plotting module.
   Displaying and saving plots in the notebook, at the command prompt, or in scripts.
 - [Subplots](Subplots)
   How to generate subplots and grids.
-- [Streaming](Streaming)
-  How to use hvPlot for streaming plots with the streamz library (**Streamz support is deprecated**).
 - [Gridded Data](Gridded_Data)
   How to use hvPlot for plotting Xarray-based gridded data.
 - [Network Graphs](NetworkX)
