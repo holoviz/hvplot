@@ -1,6 +1,16 @@
+import warnings
+
 from packaging.version import Version
 
 from . import hvPlot, post_patch, _module_extensions
+from .util import _find_stack_level
+
+warnings.warn(
+    'hvplot.intake is deprecated and will be removed in a future version. '
+    'Use pandas, xarray, or other supported libraries to read your data directly.',
+    FutureWarning,
+    stacklevel=_find_stack_level(),
+)
 
 
 def patch(name='hvplot', extension='bokeh', logo=False):

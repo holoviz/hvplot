@@ -654,6 +654,15 @@ def support_index(data):
 
 
 def process_intake(data, use_dask):
+    import warnings
+
+    warnings.warn(
+        'Passing an intake DataSource to hvplot is deprecated and will be removed in a '
+        'future version. '
+        'Use pandas, xarray, or other supported libraries to read your data first before passing to hvplot.',
+        FutureWarning,
+        stacklevel=_find_stack_level(),
+    )
     if data.container not in ('dataframe', 'xarray'):
         raise NotImplementedError(
             'Plotting interface currently only '
