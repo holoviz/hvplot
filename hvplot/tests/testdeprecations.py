@@ -54,3 +54,10 @@ def test_sample_data_deprecation():
     with pytest.warns(FutureWarning):
         importlib.import_module('hvplot.sample_data')
     sys.modules.pop('hvplot.sample_data', None)
+
+
+def test_intake_deprecation():
+    pytest.importorskip('intake')
+    with pytest.warns(FutureWarning):
+        importlib.import_module('hvplot.intake')
+    sys.modules.pop('hvplot.intake', None)
