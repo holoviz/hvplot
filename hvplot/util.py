@@ -654,8 +654,6 @@ def support_index(data):
 
 
 def process_intake(data, use_dask):
-    import warnings
-
     warnings.warn(
         'Passing an intake DataSource to hvplot is deprecated and will be removed in a '
         'future version. '

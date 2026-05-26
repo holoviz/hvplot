@@ -167,6 +167,7 @@ bokeh_sampledata = "*"
 psutil = "*"
 cftime = "*"
 numpydoc = "*"
+intake  = ">=0.6.5,<2.0.0" # Kept only for deprecation tests.
 
 [feature.test-example.dependencies]
 # Dependencies required to run the examples notebooks.
