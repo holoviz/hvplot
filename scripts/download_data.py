@@ -4,8 +4,6 @@ import time
 import bokeh
 from packaging.version import Version
 
-from hvplot.sampledata import download as _hvs_download
-
 
 def download(label, func, *args, **kwargs):
     for i in range(5):
@@ -35,4 +33,9 @@ try:
 except ModuleNotFoundError as e:
     print(f'ModuleNotFoundError when attempting to download xarray datasets : {e}')
 
-download('nyc_taxi', _hvs_download, 'nyc_taxi_remote')
+try:
+    from hvplot.sampledata import download as _hvs_download
+
+    download('nyc_taxi', _hvs_download, 'nyc_taxi_remote')
+except ImportError:
+    print('hvsampledata is not available in this environment, skipping nyc_taxi download.')
