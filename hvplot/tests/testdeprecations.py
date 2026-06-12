@@ -36,7 +36,7 @@ def test_streamz_patch():
     if _HV_VERSION >= (1, 23, 0):
         pytest.skip('streamz support has been removed in HoloViews >= 1.23.0')
     with pytest.warns(
-        DeprecationWarning,
+        FutureWarning,
         match='streamz support has been deprecated',
     ):
         from hvplot.streamz import patch

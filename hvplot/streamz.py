@@ -1,15 +1,10 @@
 import warnings
 
-from .util import _find_stack_level, _HV_VERSION
+from .util import _find_stack_level
 
 
 def patch(name='hvplot', extension='bokeh', logo=False):
     from . import hvPlotTabular, post_patch, _module_extensions
-
-    if _HV_VERSION >= (1, 23, 0):
-        raise RuntimeError(
-            'streamz support has been removed. HoloViews >= 1.23.0 no longer supports streamz.'
-        )
 
     try:
         import streamz.dataframe as sdf
@@ -19,8 +14,9 @@ def patch(name='hvplot', extension='bokeh', logo=False):
         )
 
     warnings.warn(
-        'streamz support has been deprecated and will be removed in a future version.',
-        DeprecationWarning,
+        'streamz support has been deprecated and will be removed in a future version '
+        '(HoloViews removed support in version 1.23.0)',
+        FutureWarning,
         stacklevel=_find_stack_level(),
     )
 

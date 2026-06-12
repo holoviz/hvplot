@@ -1454,11 +1454,14 @@ class HoloViewsConverter:
         elif is_streamz(data):
             if _HV_VERSION >= (1, 23, 0):
                 raise RuntimeError(
-                    'streamz support has been removed. HoloViews >= 1.23.0 no longer supports streamz.'
+                    'streamz support has been deprecated and will be removed in a '
+                    'future version. In HoloViews, streamz support was removed '
+                    'in version 1.23.0.'
                 )
             warnings.warn(
-                'streamz support has been deprecated and will be removed in a future version.',
-                DeprecationWarning,
+                'streamz support has been deprecated and will be removed in a future version '
+                '(HoloViews removed support in version 1.23.0).',
+                FutureWarning,
                 stacklevel=_find_stack_level(),
             )
             datatype = 'streamz'
