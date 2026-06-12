@@ -4,6 +4,7 @@ List of currently deprecated APIs:
 
 | Warning | Description |
 |-|-|
+| `FutureWarning` since `0.12.1` | `sample_data` module that required the `intake` package, use `sampledata` instead that requires `hvsampledata`. |
 | `DeprecationWarning` since `0.12.0` | `hover_formatters` argument, use `hover_tooltips` instead. |
 | `FutureWarning` since `0.12.0` | Passing DuckDB objects to `hvplot.plotting.plot`, use `import hvplot.duckdb` instead. |
 | `FutureWarning` since `0.12.0` | `debug` argument |
