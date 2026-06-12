@@ -1,9 +1,7 @@
 """
 Deprecated. Use ``hvplot.sampledata`` instead.
 
-This module previously loaded hvPlot sample data using an intake catalogue.
-It has been replaced by ``hvplot.sampledata``, which uses the ``hvsampledata``
-package and does not require intake.
+Loads hvPlot sample data using intake catalogue.
 """
 
 import os
