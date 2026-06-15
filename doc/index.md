@@ -270,7 +270,7 @@ plot1 = df.hvplot(x='date', y='Apple', width=400)
 plot2 = df.hvplot(x='date', y='Google', width=400)
 plot1 + plot2
 ```
-```{image} ./_static/home/layout.gif
+```{image} ./_static/home/layout.png
 ---
 alt: laying out plots
 align: center
