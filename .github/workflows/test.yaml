@@ -26,6 +26,8 @@ on:
   schedule:
     - cron: '0 15 * * SUN'
 
+permissions: {}
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -39,7 +41,7 @@ jobs:
     name: Run pre-commit
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: holoviz-dev/holoviz_tasks/pre-commit@v0
+      - uses: holoviz-dev/holoviz_tasks/pre-commit@ffddda04b2894fea39b407f64d3622d2f19e5a9f # v1
 
   setup:
     name: Setup workflow
@@ -49,12 +51,14 @@ jobs:
       matrix_option: ${{ env.MATRIX_OPTION }}
     steps:
       - name: Set matrix option
+        env:
+          GITHUB_EVENT_INPUTS_TARGET: ${{ github.event.inputs.target }}
         run: |
-          if [[ '${{ github.event_name }}' == 'workflow_dispatch' ]]; then
-            OPTION=${{ github.event.inputs.target }}
-          elif [[ '${{ github.event_name }}' == 'schedule' ]]; then
+          if [[ "${GITHUB_EVENT_NAME}" == 'workflow_dispatch' ]]; then
+            OPTION=${GITHUB_EVENT_INPUTS_TARGET}
+          elif [[ "${GITHUB_EVENT_NAME}" == 'schedule' ]]; then
             OPTION="full"
-          elif [[ '${{ github.event_name }}' == 'push' && '${{ github.ref_type }}' == 'tag' ]]; then
+          elif [[ "${GITHUB_EVENT_NAME}" == 'push' && "${GITHUB_REF_TYPE}" == 'tag' ]]; then
             OPTION="full"
           else
             OPTION="default"
@@ -111,7 +115,7 @@ jobs:
     name: Pixi lock
     runs-on: ubuntu-latest
     steps:
-      - uses: holoviz-dev/holoviz_tasks/pixi_lock@v0
+      - uses: holoviz-dev/holoviz_tasks/pixi-lock@ffddda04b2894fea39b407f64d3622d2f19e5a9f # v1
         with:
           cache: ${{ github.event.inputs.cache == 'true' || github.event.inputs.cache == '' }}
 
@@ -123,24 +127,25 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
     timeout-minutes: 90
-
+    env:
+      ENV: ${{ matrix.environment }}
     steps:
-      - uses: holoviz-dev/holoviz_tasks/pixi_install@v0
+      - uses: holoviz-dev/holoviz_tasks/pixi-install@ffddda04b2894fea39b407f64d3622d2f19e5a9f # v1
         with:
           environments: ${{ matrix.environment }}
       - name: Test Unit
-        run: pixi run -e ${{ matrix.environment }} test-unit-cov
+        run: pixi run -e "${ENV}" test-unit-cov
       - name: Test Geo
         if: ${{ matrix.environment != 'test-314' }}
-        run: pixi run -e ${{ matrix.environment }} test-unit-geo-cov
+        run: pixi run -e "${ENV}" test-unit-geo-cov
       - name: Test Examples
         run: |
           if [[ "${{ github.event_name }}" == "schedule" ]]; then
-            HVPLOT_INCLUDE_SLOW_EXAMPLES=1 pixi run -e ${{ matrix.environment }} test-example
+            HVPLOT_INCLUDE_SLOW_EXAMPLES=1 pixi run -e "${ENV}" test-example
           else
-            pixi run -e ${{ matrix.environment }} test-example
+            pixi run -e "${ENV}" test-example
           fi
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -154,12 +159,14 @@ jobs:
         os: ["ubuntu-latest"]
         environment: ["test-core"]
     timeout-minutes: 120
+    env:
+      ENV: ${{ matrix.environment }}
     steps:
-      - uses: holoviz-dev/holoviz_tasks/pixi_install@v0
+      - uses: holoviz-dev/holoviz_tasks/pixi-install@ffddda04b2894fea39b407f64d3622d2f19e5a9f # v1
         with:
           environments: ${{ matrix.environment }}
       - name: Test Unit
-        run: pixi run -e ${{ matrix.environment }} test-unit
+        run: pixi run -e "${ENV}" test-unit
 
   pip_test:
     name: pip tests:${{ matrix.os }}:${{ matrix.environment }}
@@ -171,10 +178,11 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v6
+          persist-credentials: false
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
         with:
           python-version: '3.13'
       - name: install with geo
@@ -193,7 +201,7 @@ jobs:
         run: pytest -n logical --dist loadscope --nbval-lax -p no:python
       - name: Upload coverage reports to Codecov
         if: github.event_name == 'push' || github.event_name == 'pull_request'
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6
         with:
           fail_ci_if_error: false
           verbose: false
