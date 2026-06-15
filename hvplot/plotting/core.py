@@ -357,8 +357,6 @@ class hvPlotTabular(hvPlotBase):
 
             - A single color string (name, RGB, or RGBA code), e.g., 'red' or '#a98d19'
             - A sequence of color strings used recursively for each series
-
-            For multiple series, colors are applied cyclically.
         **kwds : optional
             Additional keyword arguments documented in :ref:`plot-options`.
             Run ``hvplot.help('step')`` for the full method documentation.
@@ -851,9 +849,9 @@ class hvPlotTabular(hvPlotBase):
 
     def bar(self, x=None, y=None, stacked=False, **kwds):
         """
-        Create a vertical bar chart for categorical data comparison.
+        Create a vertical bar chart.
 
-        A bar chart displays categorical data using rectangular bars with heights
+        A bar chart displays data using rectangular bars with heights
         proportional to the values they represent. It is ideal for comparing
         quantities across different categories and showing rankings or differences.
 
@@ -864,7 +862,7 @@ class hvPlotTabular(hvPlotBase):
         Parameters
         ----------
         x : str, optional
-            Field name for categorical x-axis positions. If not specified, the index is used.
+            Field name for x-axis positions. If not specified, the index is used.
         y : str or list of str, optional
             Field name(s) for bar heights. If not specified, all numerical
             fields are used.
@@ -913,7 +911,7 @@ class hvPlotTabular(hvPlotBase):
         """
         Create a horizontal bar plot.
 
-        A horizontal bar plot represents categorical data with rectangular bars
+        A horizontal bar plot represents data with rectangular bars
         with heights proportional to the values that they represent. The y-axis of the chart
         plots categories and the x-axis represents the value scale.
         The bars are of equal width which allows for instant comparison of data.
@@ -1098,9 +1096,9 @@ class hvPlotTabular(hvPlotBase):
 
             - int: Number of equal-width bins
             - str: Method for automatic bin selection ('auto', 'fd', 'scott', etc.)
-            - array-like: Explicit bin edges
+            - array-like: Explicit bin edges or a list of tuples
 
-            See :func:`numpy.histogram_bin_edges` for automatic methods.
+            See :func:`numpy.histogram_bin_edges` for more options for automatic bin selection.
         bin_range : tuple, optional
             Lower and upper range of bins as (min, max). If not specified,
             uses the data range.
@@ -1823,8 +1821,8 @@ class hvPlot(hvPlotTabular):
         """
         Create an image plot from gridded data.
 
-        You can use image plots to display for example geographic data with independent ``latitude`` and
-        ``longitude`` fields and a third dependent field.
+        You can use image plots to display for example geographic data with independent latitude and
+        longitude fields and a third dependent field.
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.image.html
 
