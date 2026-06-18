@@ -1096,7 +1096,7 @@ class hvPlotTabular(hvPlotBase):
 
             - int: Number of equal-width bins
             - str: Method for automatic bin selection ('auto', 'fd', 'scott', etc.)
-            - array-like: Explicit bin edges or a list of tuples
+            - array-like: Explicit bin edges or list or tuples
 
             See :func:`numpy.histogram_bin_edges` for more options for automatic bin selection.
         bin_range : tuple, optional
@@ -1388,14 +1388,14 @@ class hvPlotTabular(hvPlotBase):
 
         Parameters
         ----------
-        x : str, required
+        x : str,
             Field name for x-coordinates of vector origins.
-        y : str, required
+        y : str,
             Field name for y-coordinates of vector origins.
-        angle : str, required
+        angle : str,
             Field name containing vector angles in radians. The angle is measured
             counterclockwise from the positive x-axis.
-        mag : str, required
+        mag : str,
             Field name containing vector magnitudes (lengths).
         **kwds : optional
             Additional keyword arguments documented in :ref:`plot-options`.
