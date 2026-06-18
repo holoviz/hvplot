@@ -83,6 +83,7 @@ from .util import (
     import_geoviews,
     is_mpl_cmap,
     _find_stack_level,
+    _HV_VERSION,
     _is_within_latlon_bounds,
     _convert_latlon_to_mercator,
     _convert_limit_to_mercator,
@@ -1451,6 +1452,18 @@ class HoloViewsConverter:
             datatype = 'ibis'
             self.data = data
         elif is_streamz(data):
+            if _HV_VERSION >= (1, 23, 0):
+                raise RuntimeError(
+                    'streamz support has been deprecated and will be removed in a '
+                    'future version. In HoloViews, streamz support was removed '
+                    'in version 1.23.0.'
+                )
+            warnings.warn(
+                'streamz support has been deprecated and will be removed in a future version '
+                '(HoloViews removed support in version 1.23.0).',
+                FutureWarning,
+                stacklevel=_find_stack_level(),
+            )
             datatype = 'streamz'
             self.data = data.example
             if isinstance(self.data, pd.DataFrame):
