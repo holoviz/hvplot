@@ -1121,6 +1121,12 @@ class _PatchHvplotDocstrings:
         for cls in [hvPlot, hvPlotTabular]:
             for _kind in HoloViewsConverter._kind_mapping:
                 if hasattr(cls, _kind):
+                    # Handle dynamically added kinds (e.g., 'windbarbs' is added
+                    # to _kind_mapping at runtime when first called)
+                    if (cls, _kind) not in self.orig:
+                        method = getattr(cls, _kind)
+                        sig = inspect.signature(method)
+                        self.orig[(cls, _kind)] = (sig, method.__doc__)
                     signature = self.orig[(cls, _kind)][0]
                     _patch_doc(cls, _kind, signature=signature)
 
