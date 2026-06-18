@@ -48,26 +48,12 @@ def symmetric_df():
 
 @pytest.mark.usefixtures('load_pandas_accessor')
 class TestOptions:
-    @pytest.mark.parametrize(
-        'backend',
-        [
-            'bokeh',
-            pytest.param(
-                'matplotlib',
-                marks=pytest.mark.xfail(
-                    reason='legend_position not supported w/ matplotlib for scatter'
-                ),
-            ),
-            pytest.param(
-                'plotly',
-                marks=pytest.mark.xfail(
-                    reason='legend_position not supported w/ plotly for scatter'
-                ),
-            ),
-        ],
-        indirect=True,
-    )
     def test_scatter_legend_position(self, df, backend):
+        if backend == 'matplotlib':
+            pytest.xfail('legend_position not supported w/ matplotlib for scatter')
+        if backend == 'plotly':
+            pytest.xfail('legend_position not supported w/ plotly for scatter')
+
         plot = df.hvplot.scatter('x', 'y', c='category', legend='left')
         opts = Store.lookup_options(backend, plot, 'plot')
         assert opts.kwargs['legend_position'] == 'left'
