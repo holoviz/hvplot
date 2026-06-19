@@ -125,13 +125,11 @@ jinja2 = "*"
 fugue = "*"
 # end fugue
 ibis-duckdb = ">=9.0.0"  # ibis-framework[duckdb]
-intake-parquet = ">=0.2.3"
-intake-xarray = ">=0.5.0,<2"
-intake  = ">=0.6.5,<2.0.0"
 ipywidgets = "*"
 networkx = ">=2.6.3"
 matplotlib = "*"
 notebook = ">=5.4"
+netcdf4 = "*"
 numba = ">=0.51.0"
 pillow = ">=8.2.0"
 plotly = "*"
@@ -169,6 +167,7 @@ bokeh_sampledata = "*"
 psutil = "*"
 cftime = "*"
 numpydoc = "*"
+intake  = ">=0.6.5,<2.0.0" # Kept only for deprecation tests.
 
 [feature.test-example.dependencies]
 # Dependencies required to run the examples notebooks.
