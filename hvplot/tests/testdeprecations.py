@@ -2,6 +2,8 @@
 Tests for deprecation warnings.
 """
 
+import sys
+import importlib
 import pandas as pd
 import pytest
 
@@ -42,3 +44,13 @@ def test_streamz_patch():
         from hvplot.streamz import patch
 
         patch()
+
+
+def test_sample_data_deprecation():
+    pytest.importorskip('intake')
+    pytest.importorskip('intake_parquet')
+    pytest.importorskip('intake_xarray')
+    pytest.importorskip('s3fs')
+    with pytest.warns(FutureWarning):
+        importlib.import_module('hvplot.sample_data')
+    sys.modules.pop('hvplot.sample_data', None)
