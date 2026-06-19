@@ -42,6 +42,7 @@ from holoviews.element import (
     VectorField,
     Rectangles,
     Segments,
+    TriMesh,
 )
 from holoviews.plotting.bokeh import OverlayPlot, colormap_generator
 from holoviews.plotting.util import process_cmap
@@ -67,6 +68,7 @@ from .util import (
     is_lazy_data,
     is_xarray,
     is_xarray_dataarray,
+    is_xugrid,
     process_crs,
     process_intake,
     process_xarray,
@@ -570,12 +572,23 @@ class HoloViewsConverter:
         A stream object for streaming plots, allowing data updates without re-rendering the entire plot.
     """
 
-    _gridded_types = ['image', 'contour', 'contourf', 'quadmesh', 'rgb', 'points', 'dataset']
+    _gridded_types = [
+        'image',
+        'contour',
+        'contourf',
+        'quadmesh',
+        'rgb',
+        'points',
+        'dataset',
+        'trimesh',
+    ]
 
     _geom_types = ['paths', 'polygons']
 
     _geo_types = sorted(
-        _gridded_types + _geom_types + ['points', 'vectorfield', 'labels', 'hexbin', 'bivariate']
+        _gridded_types
+        + _geom_types
+        + ['points', 'vectorfield', 'labels', 'hexbin', 'bivariate', 'trimesh']
     )
 
     _stats_types = ['hist', 'kde', 'violin', 'box', 'density']
@@ -769,6 +782,7 @@ class HoloViewsConverter:
         'step': ['x', 'y', 'where'],
         'table': ['columns'],
         'quadmesh': ['x', 'y', 'z', 'logz'],
+        'trimesh': ['x', 'y', 'z'],
         'vectorfield': ['x', 'y', 'angle', 'mag'],
         'violine': ['y'],
     }
@@ -801,6 +815,7 @@ class HoloViewsConverter:
         'scatter': Scatter,
         'step': Curve,
         'table': Table,
+        'trimesh': TriMesh,
         'vectorfield': VectorField,
         'violin': Violin,
     }
@@ -815,6 +830,7 @@ class HoloViewsConverter:
         'hexbin',
         'quadmesh',
         'polygons',
+        'trimesh',
     ]
 
     _legend_positions = (
@@ -1476,6 +1492,9 @@ class HoloViewsConverter:
             else:
                 self.stream = Buffer(data=self.data, length=backlog, index=False)
             data.stream.gather().sink(self.stream.send)
+        elif is_xugrid(data):
+            datatype = 'pandas'
+            self.data = data
         elif is_xarray(data):
             import xarray as xr
 
@@ -1926,7 +1945,10 @@ class HoloViewsConverter:
         else:
             valid_opts = []
         ds_opts = ['max_px', 'threshold']
-        mismatches = sorted(k for k in kwds if k not in kind_opts + ds_opts + valid_opts)
+        # Skip internal keys (prefixed with _) used by extensions like xugrid
+        mismatches = sorted(
+            k for k in kwds if k not in kind_opts + ds_opts + valid_opts and not k.startswith('_')
+        )
         if not mismatches:
             return
 
@@ -3236,6 +3258,55 @@ class HoloViewsConverter:
             element(data, [x, y], z, **params),
             **redim,
         ).apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
+
+    def trimesh(self, x=None, y=None, z=None, data=None):
+        import xarray as xr
+
+        tris = self.kwds.get('_xugrid_tris')
+        node_x = self.kwds.get('_xugrid_node_x')
+        node_y = self.kwds.get('_xugrid_node_y')
+        xugrid_grid = self.kwds.get('_xugrid_grid')
+
+        # Get z values from data (grouped/sliced) or self.data (non-grouped)
+        source = data if data is not None else self.data
+        if isinstance(source, xr.Dataset):
+            z_name = z or self.z or list(source.data_vars)[0]
+            values = np.asarray(source[z_name].values).ravel()
+        elif isinstance(source, xr.DataArray):
+            values = np.asarray(source.values).ravel()
+        else:
+            values = np.asarray(source).ravel()
+
+        # If data was on faces, convert to nodes now (after groupby slicing).
+        # This avoids running the expensive interpolation on the full
+        # multi-dimensional array.
+        if xugrid_grid is not None:
+            import xugrid as xu
+
+            face_da = xr.DataArray(values, dims=[xugrid_grid.face_dimension])
+            face_uda = xu.UgridDataArray(face_da, xugrid_grid)
+            values = np.asarray(face_uda.ugrid.to_node().mean(dim='nmax').values)
+
+        nodes_df = pd.DataFrame({'x': node_x, 'y': node_y, 'z': values})
+
+        element = self._get_element('trimesh')
+        params = dict(self._relabel)
+        cur_opts, compat_opts = self._get_compat_opts('TriMesh')
+
+        if self.geo:
+            import geoviews as gv
+
+            params['crs'] = self.crs
+            points_element = gv.Points(nodes_df, vdims=['z'])
+        else:
+            points_element = Points(nodes_df, vdims=['z'])
+
+        tri = element((tris, points_element), **params)
+
+        redim = self._merge_redim({'z': self._dim_ranges['c']})
+        return redim_(tri, **redim).apply(
+            self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts
+        )
 
     def contour(self, x=None, y=None, z=None, data=None, filled=False):
         self._error_if_unavailable('contour')
