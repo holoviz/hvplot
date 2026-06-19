@@ -145,7 +145,7 @@ MATPLOTLIB_TRANSFORMS = {
     'style': {
         'bar_width': UNSET,
         'size': lambda k, v: ('s', v),
-        'fill_color': lambda k, v: ('facecolor', v),
+        'fill_color': lambda k, v: ('facecolors', v),
         'fill_alpha': UNSET,
         'line_alpha': UNSET,
         'line_cap': lambda k, v: ('capstyle', _line_cap_bk_mpl_mapping.get(v, UNSET)),
