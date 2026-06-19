@@ -132,3 +132,6 @@ hvplot/_version.py
 # pixi
 .pixi
 pixi.lock
+
+# Sphinx doctree cache
+.sphinx-doctrees/
