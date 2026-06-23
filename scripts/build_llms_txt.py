@@ -8,6 +8,7 @@ Run as part of the docs build pipeline:
 import shutil
 import subprocess
 import sys
+from collections.abc import Callable
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
@@ -102,9 +103,34 @@ def build_markdown_docs() -> list[Path]:
     return generated
 
 
-def _build_links(paths: list[Path]) -> list[str]:
+def _default_label(path: Path) -> str:
+    return path.stem.replace('_', ' ')
+
+
+def _api_manual_label(path: Path) -> str:
+    name = path.stem
+    for prefix in ('hvplot.hvPlot.', 'hvplot.plotting.'):
+        if name.startswith(prefix):
+            name = name.removeprefix(prefix)
+            break
+    return name.replace('_', ' ')
+
+
+def _reference_label(path: Path) -> str:
+    if path.stem != 'index':
+        return _default_label(path)
+
+    if path.parent == Path('ref'):
+        return 'reference'
+
+    return path.parent.name.replace('_', ' ')
+
+
+def _build_links(
+    paths: list[Path], label_builder: Callable[[Path], str] = _default_label
+) -> list[str]:
     return [
-        f'- [{path.stem.replace("_", " ")}]({MARKDOWN_BASE_URL}/{path.as_posix()})'
+        f'- [{label_builder(path)}]({MARKDOWN_BASE_URL}/{path.as_posix()})'
         for path in sorted(paths)
     ]
 
@@ -130,17 +156,27 @@ def generate_llms_txt(generated_paths: list[Path]) -> None:
 
     if tutorial_paths:
         lines.extend(['## Tutorials', ''])
+        lines.extend(
+            [
+                'Step-by-step guides to help you master hvPlot and explore the full HoloViz ecosystem.',
+                '',
+            ]
+        )
         lines.extend(_build_links(tutorial_paths))
         lines.append('')
 
     if ref_paths:
         lines.extend(['## Reference', ''])
-        lines.extend(_build_links(ref_paths))
+        lines.extend(
+            ['API reference and pages that provide detailed information about hvPlot’s usage.', '']
+        )
+        lines.extend(_build_links(ref_paths, _reference_label))
         lines.append('')
 
     if api_manual_paths:
-        lines.extend(['## API Manual', ''])
-        lines.extend(_build_links(api_manual_paths))
+        lines.extend(['## API', ''])
+        lines.extend(['hvPlot plotting APIs', ''])
+        lines.extend(_build_links(api_manual_paths, _api_manual_label))
         lines.append('')
 
     llms_txt = BUILTDOCS_DIR / 'llms.txt'
