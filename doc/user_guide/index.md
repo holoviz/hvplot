@@ -11,7 +11,7 @@ commandline, and from a script. Another section will introduce you to
 generating [subplots](Subplots.ipynb) from your data.
 
 Once the basics are covered you can learn how to use the plotting API
-for specific types of data including [streaming data](Streaming.ipynb), [gridded data](Gridded_Data.ipynb)
+for specific types of data including [gridded data](Gridded_Data.ipynb),
 [network graphs](NetworkX.ipynb), [geographic data](Geographic_Data.ipynb),
 and [timeseries data](Timeseries_Data.ipynb). These sections are not meant
 to be read in a particular order; you should take a look at any that seem
@@ -78,7 +78,6 @@ Plotting Extensions <Plotting_Extensions>
 Exploring data <Explorer>
 Viewing <Viewing>
 Subplots <Subplots>
-Streaming <Streaming>
 Gridded Data <Gridded_Data>
 Network Graphs <NetworkX>
 Geographic Data <Geographic_Data>
