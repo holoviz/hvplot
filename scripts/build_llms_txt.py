@@ -17,23 +17,7 @@ BUILTDOCS_DIR = ROOT / 'builtdocs'
 OUTPUT_DIR = BUILTDOCS_DIR / 'markdown'
 MARKDOWN_BASE_URL = '/markdown'
 
-INCLUDED_REFERENCE_FILES = {
-    Path('ref/index.md'),
-    Path('ref/installation.md'),
-    Path('ref/data_libraries.ipynb'),
-    Path('ref/plotting_extensions.ipynb'),
-    Path('ref/deprecations.md'),
-    Path('ref/api/index.md'),
-}
-
-INCLUDED_DIR_PREFIXES = (
-    Path('tutorials'),
-    Path('ref/plotting_options'),
-    Path('ref/api/manual'),
-    Path('ref/api_compatibility'),
-)
-
-EXCLUDED_DIR_NAMES = {'gallery', 'user_guide', '.ipynb_checkpoints'}
+EXCLUDED_DIR_NAMES = {'user_guide', '.ipynb_checkpoints'}
 
 
 def _is_included(rel_path: Path) -> bool:
@@ -43,10 +27,7 @@ def _is_included(rel_path: Path) -> bool:
     if rel_path.suffix not in {'.md', '.ipynb'}:
         return False
 
-    if rel_path in INCLUDED_REFERENCE_FILES:
-        return True
-
-    return any(rel_path.is_relative_to(prefix) for prefix in INCLUDED_DIR_PREFIXES)
+    return True
 
 
 def _iter_source_docs() -> list[Path]:
@@ -107,6 +88,14 @@ def _default_label(path: Path) -> str:
     return path.stem.replace('_', ' ')
 
 
+def _section_label(path: Path) -> str:
+    if path == Path('index.md'):
+        return 'home'
+    if path.parent == Path('.'):
+        return path.stem.replace('_', ' ')
+    return path.parent.as_posix().replace('-', ' ')
+
+
 def _api_manual_label(path: Path) -> str:
     name = path.stem
     for prefix in ('hvplot.hvPlot.', 'hvplot.plotting.'):
@@ -135,24 +124,39 @@ def _build_links(
     ]
 
 
+def _top_level_paths(generated_paths: list[Path]) -> list[Path]:
+    return [p for p in generated_paths if len(p.parts) == 1]
+
+
+def _section_paths(generated_paths: list[Path], section: str) -> list[Path]:
+    return [p for p in generated_paths if p.is_relative_to(Path(section))]
+
+
 def generate_llms_txt(generated_paths: list[Path]) -> None:
-    tutorial_paths = [p for p in generated_paths if p.is_relative_to(Path('tutorials'))]
+    top_level_paths = _top_level_paths(generated_paths)
+    tutorial_paths = _section_paths(generated_paths, 'tutorials')
+    gallery_paths = _section_paths(generated_paths, 'gallery')
     ref_paths = [
         p
-        for p in generated_paths
-        if p.is_relative_to(Path('ref')) and not p.is_relative_to(Path('ref/api/manual'))
+        for p in _section_paths(generated_paths, 'ref')
+        if not p.is_relative_to(Path('ref/api/manual'))
     ]
-    api_manual_paths = [p for p in generated_paths if p.is_relative_to(Path('ref/api/manual'))]
+    api_manual_paths = _section_paths(generated_paths, 'ref/api/manual')
 
     lines = [
         '# hvPlot',
         '',
         'hvPlot is a high-level plotting API for the HoloViz ecosystem built on HoloViews.',
-        'This file points to markdown documentation selected for code-writing utility.',
+        'This file points to the generated markdown documentation selected for code-writing utility.',
         '',
         f'All links resolve under {MARKDOWN_BASE_URL}/.',
         '',
     ]
+
+    if top_level_paths:
+        lines.extend(['## Home', ''])
+        lines.extend(_build_links(top_level_paths, _section_label))
+        lines.append('')
 
     if tutorial_paths:
         lines.extend(['## Tutorials', ''])
@@ -163,6 +167,14 @@ def generate_llms_txt(generated_paths: list[Path]) -> None:
             ]
         )
         lines.extend(_build_links(tutorial_paths))
+        lines.append('')
+
+    if gallery_paths:
+        lines.extend(['## Gallery', ''])
+        lines.extend(
+            ['Example visualizations using hvPlot with different backends and datasets.', '']
+        )
+        lines.extend(_build_links(gallery_paths))
         lines.append('')
 
     if ref_paths:
