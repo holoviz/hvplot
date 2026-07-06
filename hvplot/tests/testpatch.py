@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 
 from hvplot.plotting import hvPlotTabular, hvPlot
+from hvplot.util import _HV_VERSION
 
 
 class TestPatchPandas(TestCase):
@@ -74,8 +75,8 @@ class TestPatchXArray(TestCase):
 
 class TestPatchStreamz(TestCase):
     def setUp(self):
-        if sys.version_info[:2] >= (3, 14):
-            raise SkipTest('streamz not compatible')
+        if _HV_VERSION >= (1, 23, 0):
+            raise SkipTest('streamz support has been removed in HoloViews >= 1.23.0')
         try:
             import streamz  # noqa
         except ImportError:
