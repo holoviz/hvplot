@@ -4,7 +4,6 @@ from unittest import TestCase, SkipTest
 
 import numpy as np
 import pandas as pd
-import pytest
 
 try:
     import xarray as xr
@@ -168,19 +167,6 @@ class TestTrimeshTimeDimension(TestCase):
     def test_dynamic_map_face_data(self):
         plot = self.uda_face.hvplot.trimesh()
         assert isinstance(plot, hv.DynamicMap)
-
-    def test_explicit_time_selection_node(self):
-        """Passing time= as a scalar should collapse the time dimension."""
-        t0 = pd.Timestamp('2000-01-01')
-        plot = self.uda_node.hvplot.trimesh(time=t0)
-        tm = plot.last if hasattr(plot, 'last') else plot
-        assert isinstance(tm, TriMesh)
-
-    def test_explicit_time_selection_face(self):
-        t0 = pd.Timestamp('2000-01-01')
-        plot = self.uda_face.hvplot.trimesh(time=t0)
-        tm = plot.last if hasattr(plot, 'last') else plot
-        assert isinstance(tm, TriMesh)
 
 
 class TestTrimeshUgridDataset(TestCase):

@@ -2117,18 +2117,8 @@ class hvPlotXugrid(hvPlot):
         face_dim = grid.face_dimension
         node_dim = grid.node_dimension
 
-        # Unspecified extra dims become groupby sliders; only pop explicitly-named ones.
-        extra_dims = []
-        for dim in list(data.dims):
-            if dim not in (face_dim, node_dim):
-                if dim in kwds:
-                    val = kwds.pop(dim)
-                    if isinstance(val, (int, np.integer)):
-                        data = data.isel({dim: val})
-                    else:
-                        data = data.sel({dim: val}, method='nearest')
-                else:
-                    extra_dims.append(dim)
+        # Unspecified extra dims become groupby sliders.
+        extra_dims = [dim for dim in list(data.dims) if dim not in (face_dim, node_dim)]
 
         # If face data, defer the to_node() conversion to the trimesh()
         # method so it runs on already-sliced data (single time/level)
