@@ -3297,7 +3297,7 @@ class HoloViewsConverter:
             import geoviews as gv
 
             params['crs'] = self.crs
-            points_element = gv.Points(nodes_df, vdims=['z'])
+            points_element = gv.Points(nodes_df, vdims=[self.z], crs=self.crs)
         else:
             points_element = Points(nodes_df, vdims=['z'])
 
