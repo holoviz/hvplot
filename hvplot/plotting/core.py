@@ -2144,6 +2144,8 @@ class hvPlotXugrid(hvPlot):
         kwds['_xugrid_node_x'] = np.asarray(grid.node_x)
         kwds['_xugrid_node_y'] = np.asarray(grid.node_y)
 
+        # process_xarray's groupby detection relies on x/y being set, which
+        # doesn't apply to trimesh
         if extra_dims:
             groupby = kwds.get('groupby', [])
             if isinstance(groupby, str):
