@@ -2164,6 +2164,7 @@ class hvPlotXugrid(hvPlot):
             if hasattr(coord, 'dims') and len(coord.dims) == 1 and coord.dims[0] == k:
                 coords[k] = coord
         # Ensure all extra dims have coordinates so groupby widgets work.
+        # The xarray backend doesn't handle this case (see holoviz/hvplot#603).
         for dim in extra_dims:
             if dim not in coords:
                 coords[dim] = np.arange(data.sizes[dim])
