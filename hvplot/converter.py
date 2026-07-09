@@ -3270,8 +3270,7 @@ class HoloViewsConverter:
         # Get z values from data (grouped/sliced) or self.data (non-grouped)
         source = data if data is not None else self.data
         if isinstance(source, xr.Dataset):
-            z_name = z or self.z or list(source.data_vars)[0]
-            values = np.asarray(source[z_name].values).ravel()
+            values = np.asarray(source[self.z].values).ravel()
         elif isinstance(source, xr.DataArray):
             values = np.asarray(source.values).ravel()
         else:
@@ -3287,7 +3286,7 @@ class HoloViewsConverter:
             face_uda = xu.UgridDataArray(face_da, xugrid_grid)
             values = np.asarray(face_uda.ugrid.to_node().mean(dim='nmax').values)
 
-        nodes_df = pd.DataFrame({'x': node_x, 'y': node_y, 'z': values})
+        nodes_df = pd.DataFrame({'x': node_x, 'y': node_y, self.z: values})
 
         element = self._get_element('trimesh')
         params = dict(self._relabel)
@@ -3299,7 +3298,7 @@ class HoloViewsConverter:
             params['crs'] = self.crs
             points_element = gv.Points(nodes_df, vdims=[self.z], crs=self.crs)
         else:
-            points_element = Points(nodes_df, vdims=['z'])
+            points_element = Points(nodes_df, vdims=[self.z])
 
         tri = element((tris, points_element), **params)
 
