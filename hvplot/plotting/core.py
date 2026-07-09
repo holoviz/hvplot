@@ -2109,10 +2109,10 @@ class hvPlotXugrid(hvPlot):
         grid = data.grid
 
         if kind != 'trimesh':
-            params = dict(self._metadata, **kwds)
-            x = x or params.pop('x', None)
-            y = y or params.pop('y', None)
-            return HoloViewsConverter(data, x, y, kind=kind, **params)
+            raise NotImplementedError(
+                f"kind='{kind}' is not yet supported for xugrid data. "
+                'Use .hvplot.trimesh() or convert to xarray/pandas first.'
+            )
 
         face_dim = grid.face_dimension
         node_dim = grid.node_dimension
