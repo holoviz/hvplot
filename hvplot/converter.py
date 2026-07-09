@@ -3302,7 +3302,7 @@ class HoloViewsConverter:
 
         tri = element((tris, points_element), **params)
 
-        redim = self._merge_redim({'z': self._dim_ranges['c']})
+        redim = self._merge_redim({self.z: self._dim_ranges['c']})
         return redim_(tri, **redim).apply(
             self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts
         )
