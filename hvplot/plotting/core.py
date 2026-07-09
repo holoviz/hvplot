@@ -2167,14 +2167,15 @@ class hvPlotXugrid(hvPlot):
         for dim in extra_dims:
             if dim not in coords:
                 coords[dim] = np.arange(data.sizes[dim])
+        name = data.name or 'z'
         xr_da = xr.DataArray(
             data.data,  # keeps dask arrays lazy
             dims=data.dims,
             coords=coords,
-            name='z',
+            name=name,
         )
-        xr_ds = xr.Dataset({'z': xr_da})
-        kwds['z'] = 'z'
+        xr_ds = xr.Dataset({name: xr_da})
+        kwds['z'] = name
 
         params = dict(self._metadata, **kwds)
         x = x or params.pop('x', None)
