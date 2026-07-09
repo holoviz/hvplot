@@ -2128,16 +2128,10 @@ class hvPlotXugrid(hvPlot):
             kwds['_xugrid_grid'] = grid
 
         connectivity = grid.face_node_connectivity
-        fill_value = grid.fill_value if hasattr(grid, 'fill_value') else -1
         if connectivity.shape[1] == 3:
             tris_df = pd.DataFrame(np.asarray(connectivity), columns=['v0', 'v1', 'v2'])
         else:
-            # Triangulate polygons with more than 3 nodes (fan triangulation)
-            triangles = []
-            for face in connectivity:
-                valid = face[face != fill_value]
-                for i in range(1, len(valid) - 1):
-                    triangles.append([valid[0], valid[i], valid[i + 1]])
+            (_, _, triangles), _ = grid.triangulation
             tris_df = pd.DataFrame(triangles, columns=['v0', 'v1', 'v2'])
 
         kwds['_xugrid_tris'] = tris_df
