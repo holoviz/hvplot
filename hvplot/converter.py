@@ -3286,8 +3286,7 @@ class HoloViewsConverter:
             face_uda = xu.UgridDataArray(face_da, xugrid_grid)
             values = np.asarray(face_uda.ugrid.to_node().mean(dim='nmax').values)
 
-        nodes_df = pd.DataFrame({'x': node_x, 'y': node_y, self.z: values})
-
+        nodes = np.column_stack([node_x, node_y, values])
         element = self._get_element('trimesh')
         params = dict(self._relabel)
         cur_opts, compat_opts = self._get_compat_opts('TriMesh')
@@ -3296,9 +3295,9 @@ class HoloViewsConverter:
             import geoviews as gv
 
             params['crs'] = self.crs
-            points_element = gv.Points(nodes_df, vdims=[self.z], crs=self.crs)
+            points_element = gv.Points(nodes, vdims=[self.z], crs=self.crs)
         else:
-            points_element = Points(nodes_df, vdims=[self.z])
+            points_element = Points(nodes, vdims=[self.z])
 
         tri = element((tris, points_element), **params)
 

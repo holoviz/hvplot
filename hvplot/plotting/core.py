@@ -2095,7 +2095,6 @@ class hvPlotXugrid(hvPlot):
 
     def _get_converter(self, x=None, y=None, kind=None, **kwds):
         import numpy as np
-        import pandas as pd
         import xarray as xr
         import xugrid as xu
 
@@ -2129,12 +2128,11 @@ class hvPlotXugrid(hvPlot):
 
         connectivity = grid.face_node_connectivity
         if connectivity.shape[1] == 3:
-            tris_df = pd.DataFrame(np.asarray(connectivity), columns=['v0', 'v1', 'v2'])
+            tris = np.asarray(connectivity)
         else:
-            (_, _, triangles), _ = grid.triangulation
-            tris_df = pd.DataFrame(triangles, columns=['v0', 'v1', 'v2'])
+            (_, _, tris), _ = grid.triangulation
 
-        kwds['_xugrid_tris'] = tris_df
+        kwds['_xugrid_tris'] = tris
         kwds['_xugrid_node_x'] = np.asarray(grid.node_x)
         kwds['_xugrid_node_y'] = np.asarray(grid.node_y)
 
