@@ -533,13 +533,13 @@ class hvPlotExplorer(Viewer):
     @classmethod
     def from_data(cls, data, **params):
         if is_geodataframe(data):
-            # cls = hvGeomExplorer
+            # kls = hvGeomExplorer
             raise TypeError('GeoDataFrame objects not yet supported.')
         elif is_xarray(data):
-            cls = hvGridExplorer
+            kls = hvGridExplorer
         else:
-            cls = hvDataFrameExplorer
-        return cls(data, **params)
+            kls = hvDataFrameExplorer
+        return kls(data, **params)
 
     def __panel__(self):
         return self._layout

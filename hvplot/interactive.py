@@ -152,7 +152,7 @@ def _find_widgets(op):
     return widgets
 
 
-class Interactive:
+class Interactive:  # noqa: PLW1641
     """
     The `.interactive` API enhances the API of data analysis libraries
     like Pandas, Dask, and Xarray, by allowing to replace in a pipeline

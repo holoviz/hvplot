@@ -13,6 +13,7 @@ def run_script(script, env_vars=None):
         text=True,
         capture_output=True,
         env=os.environ | env_vars,
+        check=False,
     )
     if process.returncode != 0:
         raise RuntimeError(f'Subprocess failed: {process.stderr}')
