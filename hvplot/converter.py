@@ -782,7 +782,7 @@ class HoloViewsConverter:
         'step': ['x', 'y', 'where'],
         'table': ['columns'],
         'quadmesh': ['x', 'y', 'z', 'logz'],
-        'trimesh': ['x', 'y', 'z'],
+        'trimesh': ['x', 'y', 'z', 'filled'],
         'vectorfield': ['x', 'y', 'angle', 'mag'],
         'violine': ['y'],
     }
@@ -3306,6 +3306,9 @@ class HoloViewsConverter:
             points_element = Points(nodes, vdims=['z'])
 
         tri = element((tris, points_element), **params)
+
+        if 'filled' in self.kwds:
+            cur_opts['filled'] = self.kwds['filled']
 
         redim = self._merge_redim({'z': self._dim_ranges['c']})
         if self.z != 'z':

@@ -129,6 +129,18 @@ class TestTrimeshNodeData(TestCase):
         opts = plot.opts.get()
         assert opts.kwargs.get('colorbar', True) is False
 
+    def test_filled_default_false(self):
+        plot = self.uda.hvplot.trimesh()
+        tm = plot.last if hasattr(plot, 'last') else plot
+        plot_opts = hv.Store.lookup_options('bokeh', tm, 'plot').kwargs
+        assert plot_opts.get('filled') is False
+
+    def test_filled_true(self):
+        plot = self.uda.hvplot.trimesh(filled=True)
+        tm = plot.last if hasattr(plot, 'last') else plot
+        plot_opts = hv.Store.lookup_options('bokeh', tm, 'plot').kwargs
+        assert plot_opts.get('filled') is True
+
 
 class TestTrimeshFaceData(TestCase):
     """Tests for trimesh plots when data lives on mesh faces."""

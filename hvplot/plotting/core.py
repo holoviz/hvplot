@@ -2177,7 +2177,7 @@ class hvPlotXugrid(hvPlot):
         y = y or params.pop('y', None)
         return HoloViewsConverter(xr_ds, x, y, kind=kind, **params)
 
-    def trimesh(self, x=None, y=None, z=None, colorbar=True, **kwds):
+    def trimesh(self, x=None, y=None, z=None, colorbar=True, filled=False, **kwds):
         """
         TriMesh plot for unstructured grid data.
 
@@ -2194,6 +2194,8 @@ class hvPlotXugrid(hvPlot):
             The data variable to plot
         colorbar : boolean
             Whether to display a colorbar
+        filled : boolean, default False
+            Whether the triangles should be drawn as filled
         **kwds : optional
             Additional keywords arguments are documented in :ref:`plot-options`.
 
@@ -2201,4 +2203,4 @@ class hvPlotXugrid(hvPlot):
         -------
         :class:`holoviews:holoviews.element.TriMesh` / Panel object
         """
-        return self(x, y, z=z, kind='trimesh', colorbar=colorbar, **kwds)
+        return self(x, y, z=z, kind='trimesh', colorbar=colorbar, filled=filled, **kwds)
