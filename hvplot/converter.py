@@ -1385,8 +1385,21 @@ class HoloViewsConverter:
         self.is_series = is_series(data)
         if self.is_series:
             data = data.to_frame()
-        if is_intake(data):
-            data = process_intake(data, use_dask or persist)
+        _is_intake = False
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            if is_intake(data):
+                _is_intake = True
+                data = process_intake(data, use_dask or persist)
+        if _is_intake:
+            warnings.warn(
+                'Passing an intake DataSource to hvplot is deprecated and will '
+                'be removed in a future version. '
+                'Use pandas, xarray, or other supported libraries to read your'
+                'data first before passing to hvplot.',
+                FutureWarning,
+                stacklevel=_find_stack_level(),
+            )
         # Pandas interface in HoloViews doesn't accept non-string columns.
         # The converter stores a reference to the source data to
         # update the `_dataset` property (of the hv object its __call__ method

@@ -589,6 +589,15 @@ def is_polars(data):
 
 
 def is_intake(data):
+    """Is Intake
+
+    .. deprecated:: 0.13
+    """
+    warnings.warn(
+        'is_intake is deprecated and will be removed in a future version.',
+        FutureWarning,
+        stacklevel=_find_stack_level(),
+    )
     if 'intake' not in sys.modules:
         return False
     from intake.source.base import DataSource
@@ -654,10 +663,12 @@ def support_index(data):
 
 
 def process_intake(data, use_dask):
+    """Process intake
+
+    .. deprecated:: 0.13
+    """
     warnings.warn(
-        'Passing an intake DataSource to hvplot is deprecated and will be removed in a '
-        'future version. '
-        'Use pandas, xarray, or other supported libraries to read your data first before passing to hvplot.',
+        'process_intake is deprecated and will be removed in a future version.',
         FutureWarning,
         stacklevel=_find_stack_level(),
     )
