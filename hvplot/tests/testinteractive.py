@@ -99,7 +99,7 @@ def test_spy(clone_spy, series):
 
     assert clone_spy.count == 2
     assert not clone_spy.calls[1].is_empty()
-    assert clone_spy.calls[1].kwargs == dict(x='X')
+    assert clone_spy.calls[1].kwargs == {'x': 'X'}
 
 
 def test_interactive_pandas_dataframe(df):

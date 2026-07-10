@@ -77,7 +77,7 @@ def andrews_curves(
 
     labelled = ['x']
     options = {
-        'Overlay': dict(legend_limit=5000),
+        'Overlay': {'legend_limit': 5000},
         'Curve': dict(kwds, labelled=labelled, alpha=alpha, width=width, height=height, **kwds),
     }
     dataset = hv.Dataset(df)

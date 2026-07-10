@@ -554,7 +554,7 @@ def is_series(data):
 def check_library(obj, library):
     if not isinstance(library, list):
         library = [library]
-    return any([obj.__module__.split('.')[0].startswith(lib) for lib in library])
+    return any(obj.__module__.split('.')[0].startswith(lib) for lib in library)
 
 
 def is_cudf(data):

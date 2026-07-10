@@ -481,12 +481,12 @@ def da2():
 
 @pytest.fixture(scope='module')
 def ds1(da):
-    return xr.Dataset(dict(foo=da))
+    return xr.Dataset({'foo': da})
 
 
 @pytest.fixture(scope='module')
 def ds2(da, da2):
-    return xr.Dataset(dict(foo=da, bar=da2))
+    return xr.Dataset({'foo': da, 'bar': da2})
 
 
 @pytest.mark.usefixtures('load_xarray_accessor')

@@ -38,12 +38,12 @@ def test_explorer_settings():
 
     settings = explorer.settings()
 
-    assert settings == dict(
-        by=['species'],
-        kind='scatter',
-        x='bill_length_mm',
-        y=['bill_depth_mm'],
-    )
+    assert settings == {
+        'by': ['species'],
+        'kind': 'scatter',
+        'x': 'bill_length_mm',
+        'y': ['bill_depth_mm'],
+    }
 
 
 def test_explorer_plot_code():

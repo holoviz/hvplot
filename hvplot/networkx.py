@@ -71,7 +71,7 @@ def _from_networkx(G, positions, nodes=None, cls=Graph, **kwargs):
         node_columns = nodes.columns()
         idx_dim = nodes.kdims[0].name
         info_cols, values = zip(*((k, v) for k, v in node_columns.items() if k != idx_dim))
-        node_info = {i: vals for i, vals in zip(node_columns[idx_dim], zip(*values))}
+        node_info = dict(zip(node_columns[idx_dim], zip(*values)))
     else:
         info_cols = []
         node_info = None
@@ -247,18 +247,18 @@ def draw(G, pos=None, **kwargs):
 
     # Compute options
     inspection_policy = kwargs.pop('inspection_policy', 'nodes')
-    opts = dict(
-        axiswise=True,
-        arrowhead_length=kwargs.get('arrowhead_length', 0.025),
-        directed=kwargs.pop('arrows', isinstance(G, nx.DiGraph)),
-        colorbar=kwargs.pop('colorbar', False),
-        padding=kwargs.get('padding', 0.1),
-        width=kwargs.pop('width', 400),
-        height=kwargs.pop('height', 400),
-        selection_policy=kwargs.pop('selection_policy', 'nodes'),
-        inspection_policy=inspection_policy,
-        node_fill_color='red',
-    )
+    opts = {
+        'axiswise': True,
+        'arrowhead_length': kwargs.get('arrowhead_length', 0.025),
+        'directed': kwargs.pop('arrows', isinstance(G, nx.DiGraph)),
+        'colorbar': kwargs.pop('colorbar', False),
+        'padding': kwargs.get('padding', 0.1),
+        'width': kwargs.pop('width', 400),
+        'height': kwargs.pop('height', 400),
+        'selection_policy': kwargs.pop('selection_policy', 'nodes'),
+        'inspection_policy': inspection_policy,
+        'node_fill_color': 'red',
+    }
 
     if '_axis_defaults':
         opts.update(xaxis=None, yaxis=None, show_frame=False)

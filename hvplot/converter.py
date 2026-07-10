@@ -1278,14 +1278,14 @@ class HoloViewsConverter:
         # High-level options
         self._validate_kwds(kwds)
         if debug:
-            kwds = dict(
-                x=self.x,
-                y=self.y,
-                by=self.by,
-                kind=self.kind,
-                groupby=self.groupby,
-                grid=self.grid,
-            )
+            kwds = {
+                'x': self.x,
+                'y': self.y,
+                'by': self.by,
+                'kind': self.kind,
+                'groupby': self.groupby,
+                'grid': self.grid,
+            }
             param.main.param.warning(
                 'Plotting {kind} plot with parameters x: {x}, '
                 'y: {y}, by: {by}, groupby: {groupby}, row/col: {grid}'.format(**kwds)
@@ -2166,7 +2166,7 @@ class HoloViewsConverter:
             layers = _transfer_opts_cur_backend(layers)
             return layers
 
-        opts = dict(dynamic=self.dynamic)
+        opts = {'dynamic': self.dynamic}
         if self._plot_opts.get('width') is not None:
             opts['width'] = self._plot_opts['width']
         if self._plot_opts.get('height') is not None:
@@ -3260,7 +3260,7 @@ class HoloViewsConverter:
         data, x, y, z = self._process_gridded_args(data, x, y, z)
 
         if not (x and y):
-            x, y = list(k for k, v in data.coords.items() if v.size > 1)
+            x, y = [k for k, v in data.coords.items() if v.size > 1]
         if not z:
             z = next(iter(data.data_vars))
         z = [z, *self.hover_cols]
@@ -3393,7 +3393,7 @@ class HoloViewsConverter:
         data, x, y, _ = self._process_gridded_args(data, x, y, z=None)
 
         if not (x and y):
-            x, y = list(k for k, v in data.coords.items() if v.size > 1)
+            x, y = [k for k, v in data.coords.items() if v.size > 1]
 
         angle = self.kwds.get('angle')
         mag = self.kwds.get('mag')

@@ -216,7 +216,7 @@ class TestGeoAnnotation(TestCase):
         self.assertIn('openstreetmap', plot.get(0).data)
 
     def test_plot_with_tiles_with_tiles_opts(self):
-        plot = self.df.hvplot.points('x', 'y', geo=False, tiles=True, tiles_opts=dict(alpha=0.5))
+        plot = self.df.hvplot.points('x', 'y', geo=False, tiles=True, tiles_opts={'alpha': 0.5})
         assert len(plot) == 2
         tiles = plot.get(0)
         assert isinstance(tiles, hv.Tiles)
@@ -234,7 +234,7 @@ class TestGeoAnnotation(TestCase):
     def test_plot_with_tiles_with_tiles_opts_with_geo(self):
         import geoviews as gv
 
-        plot = self.df.hvplot.points('x', 'y', geo=True, tiles=True, tiles_opts=dict(alpha=0.5))
+        plot = self.df.hvplot.points('x', 'y', geo=True, tiles=True, tiles_opts={'alpha': 0.5})
         assert len(plot) == 2
         tiles = plot.get(0)
         assert isinstance(tiles, gv.element.WMTS)
@@ -366,14 +366,14 @@ class TestGeoPandas(TestCase):
             crs='EPSG:4326',
         )
         p_names = ['Vatican City', 'San Marino', 'Vaduz', 'Luxembourg', 'Palikir']
-        self.cities = gpd.GeoDataFrame(dict(name=p_names), geometry=p_geometry)
+        self.cities = gpd.GeoDataFrame({'name': p_names}, geometry=p_geometry)
 
         pg_geometry = [
             Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0))),
             Polygon(((2, 2), (2, 3), (3, 3), (3, 2), (2, 2))),
         ]
         pg_names = ['A', 'B']
-        self.polygons = gpd.GeoDataFrame(dict(name=pg_names), geometry=pg_geometry)
+        self.polygons = gpd.GeoDataFrame({'name': pg_names}, geometry=pg_geometry)
 
     def test_points_hover_cols_is_empty_by_default(self):
         points = self.cities.hvplot()

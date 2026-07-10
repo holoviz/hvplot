@@ -18,9 +18,9 @@ KINDS = {
         set(_hvConverter._kind_mapping)
         - set(_hvConverter._gridded_types)
         - set(_hvConverter._geom_types)
-        | set(['points', 'paths'])
+        | {'points', 'paths'}
     ),
-    'gridded': sorted(set(_hvConverter._gridded_types) - set(['dataset'])),
+    'gridded': sorted(set(_hvConverter._gridded_types) - {'dataset'}),
     'geom': _hvConverter._geom_types,
 }
 
@@ -672,7 +672,7 @@ class hvPlotExplorer(Viewer):
                 crs_kwargs = kwargs.pop(f'{key}_kwargs', {})
                 kwargs[key] = instantiate_crs_str(kwargs.pop(key), **crs_kwargs)
             feature_scale = kwargs.pop('feature_scale', None)
-            kwargs['features'] = {feature: feature_scale for feature in kwargs.pop('features', [])}
+            kwargs['features'] = dict.fromkeys(kwargs.pop('features', []), feature_scale)
 
         kwargs['min_height'] = 400
         df = self._data
@@ -874,7 +874,7 @@ class hvPlotExplorer(Viewer):
         if 'y_multi' in settings:
             settings['y'] = settings.pop('y_multi')
         settings.pop('opts', None)
-        settings = {k: v for k, v in sorted(list(settings.items()))}
+        settings = dict(sorted(settings.items()))
         return settings
 
 

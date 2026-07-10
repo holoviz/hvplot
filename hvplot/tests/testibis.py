@@ -23,6 +23,6 @@ def test_ibis_hist():
     ) >= version.parse('1.4'):
         pytest.skip('Ibis <= 10.8.0 is incompatible with DuckDB >= 1.4')
 
-    df = pd.DataFrame(dict(x=np.arange(10)))
+    df = pd.DataFrame({'x': np.arange(10)})
     table = ibis.memtable(df)
     table.hvplot.hist('x')

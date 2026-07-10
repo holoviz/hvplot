@@ -54,14 +54,14 @@ class TestScatterMatrix(TestCase):
 
     def test_diagonal_kwargs_mutually_exclusive(self):
         with self.assertRaises(TypeError):
-            scatter_matrix(self.df, diagonal_kwds=dict(a=1), hist_kwds=dict(a=1))
+            scatter_matrix(self.df, diagonal_kwds={'a': 1}, hist_kwds={'a': 1})
         with self.assertRaises(TypeError):
-            scatter_matrix(self.df, diagonal_kwds=dict(a=1), density_kwds=dict(a=1))
+            scatter_matrix(self.df, diagonal_kwds={'a': 1}, density_kwds={'a': 1})
         with self.assertRaises(TypeError):
-            scatter_matrix(self.df, density_kwds=dict(a=1), hist_kwds=dict(a=1))
+            scatter_matrix(self.df, density_kwds={'a': 1}, hist_kwds={'a': 1})
 
     def test_diagonal_kwargs(self):
-        sm = scatter_matrix(self.df, diagonal_kwds=dict(line_color='red'))
+        sm = scatter_matrix(self.df, diagonal_kwds={'line_color': 'red'})
         self.assertEqual(sm['a', 'a'].opts.get().kwargs['line_color'], 'red')
 
     def test_c(self):

@@ -64,7 +64,7 @@ def parallel_coordinates(
         labelled.append('y')
     options = {
         'Curve': dict(kwds, labelled=labelled, alpha=alpha, width=width, height=height),
-        'Overlay': dict(legend_limit=5000),
+        'Overlay': {'legend_limit': 5000},
     }
 
     dataset = hv.Dataset(df)
