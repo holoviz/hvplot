@@ -2184,6 +2184,10 @@ class hvPlotXugrid(hvPlot):
         Creates a triangular mesh plot from xugrid UgridDataArray or
         UgridDataset objects. Supports rasterization for large meshes.
 
+        .. versionadded:: 0.13.0
+
+            Experimental support for xugrid.
+
         Parameters
         ----------
         x : string, optional
