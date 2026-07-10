@@ -2,11 +2,14 @@
 Tests for deprecation warnings.
 """
 
+import os
 import sys
 import importlib
+import tempfile
 import pandas as pd
 import pytest
 
+from hvplot import hvPlot
 from hvplot.converter import HoloViewsConverter
 from hvplot.plotting import plot
 from hvplot.tests.util import makeDataFrame
@@ -54,3 +57,33 @@ def test_sample_data_deprecation():
     with pytest.warns(FutureWarning):
         importlib.import_module('hvplot.sample_data')
     sys.modules.pop('hvplot.sample_data', None)
+
+
+def test_intake_deprecation():
+    pytest.importorskip('intake')
+    with pytest.warns(FutureWarning):
+        importlib.import_module('hvplot.intake')
+    sys.modules.pop('hvplot.intake', None)
+
+
+def test_intake_datasource_hvplot_deprecation(disable_param_warnings_as_exceptions):
+    intake = pytest.importorskip('intake')
+
+    from intake.source.base import DataSource
+
+    # Patch .hvplot onto DataSource manually to avoid importing hvplot.intake,
+    # which fires its own separate FutureWarning and would pollute this test.
+    if not hasattr(DataSource, 'hvplot'):
+        DataSource.hvplot = property(lambda self: hvPlot(self))
+
+    df = pd.DataFrame({'x': [1, 2, 3], 'y': [4, 5, 6]})
+    with tempfile.NamedTemporaryFile(suffix='.csv', delete=False, mode='w') as f:
+        df.to_csv(f, index=False)
+        tmppath = f.name
+
+    try:
+        src = intake.open_csv(tmppath)
+        with pytest.warns(FutureWarning, match='intake DataSource'):
+            src.hvplot.line(x='x', y='y')
+    finally:
+        os.unlink(tmppath)

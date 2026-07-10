@@ -156,20 +156,6 @@ align: center
 ```
 
 :::
-:::{tab-item} Intake
-```python
-import hvplot.intake
-from hvplot.sample_data import catalogue as cat
-
-cat.us_crime.hvplot.line(x='Year', y='Violent Crime rate')
-```
-```{image} ./_static/home/intake.gif
----
-alt: Works with Intake
-align: center
----
-:::
-
 :::{tab-item} NetworkX
 ```python
 import hvplot.networkx as hvnx
