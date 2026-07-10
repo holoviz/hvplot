@@ -3293,17 +3293,27 @@ class HoloViewsConverter:
         params = dict(self._relabel)
         cur_opts, compat_opts = self._get_compat_opts('TriMesh')
 
+        # Use 'z' internally to avoid column name collisions in HoloViews'
+        # connect_tri_edges_pd merge.
+        # See https://github.com/holoviz/holoviews/issues/6951
+        # The display label is set via redim below.
         if self.geo:
             import geoviews as gv
 
             params['crs'] = self.crs
-            points_element = gv.Points(nodes, vdims=[self.z], crs=self.crs)
+            points_element = gv.Points(nodes, vdims=['z'], crs=self.crs)
         else:
-            points_element = Points(nodes, vdims=[self.z])
+            points_element = Points(nodes, vdims=['z'])
 
         tri = element((tris, points_element), **params)
 
-        redim = self._merge_redim({self.z: self._dim_ranges['c']})
+        redim = self._merge_redim({'z': self._dim_ranges['c']})
+        if self.z != 'z':
+            redim['z'] = redim.get('z', {})
+            if isinstance(redim['z'], dict):
+                redim['z']['label'] = self.z
+            else:
+                redim['z'] = {'label': self.z, 'range': redim['z']}
         return redim_(tri, **redim).apply(
             self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts
         )

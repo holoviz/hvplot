@@ -265,8 +265,8 @@ class TestTrimeshQuadMesh(TestCase):
 class TestTrimeshVariableName(TestCase):
     """Tests for variable name propagation."""
 
-    def test_named_variable_in_vdims(self):
-        """The data variable name should propagate to the TriMesh nodes vdims."""
+    def test_named_variable_in_vdim_label(self):
+        """The data variable name should propagate to the TriMesh vdim label."""
         node_x = np.array([0.0, 1.0, 1.0, 0.0])
         node_y = np.array([0.0, 0.0, 1.0, 1.0])
         faces = np.array([[0, 1, 2], [0, 2, 3]])
@@ -277,8 +277,8 @@ class TestTrimeshVariableName(TestCase):
         uda = xu.UgridDataArray(da, grid)
         plot = uda.hvplot.trimesh()
         tm = plot.last if hasattr(plot, 'last') else plot
-        vdim_names = [d.name for d in tm.nodes.vdims]
-        assert 'temperature' in vdim_names
+        z_dim = tm.nodes.get_dimension('z')
+        assert z_dim.label == 'temperature'
 
     def test_unnamed_variable_falls_back_to_z(self):
         """Without a name, the vdim should fall back to 'z'."""
