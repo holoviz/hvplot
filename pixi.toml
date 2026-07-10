@@ -192,6 +192,7 @@ polars = "*"
 dask = "*"
 spatialpandas = "*"
 duckdb = "*"
+xugrid = "*"
 
 [feature.geo.dependencies]
 # Geo dependencies are always a little special.
