@@ -220,10 +220,6 @@ class Axes(Controls):
 
     ylim = param.Range()
 
-    logx = param.Boolean(default=False)
-
-    logy = param.Boolean(default=False)
-
     def __init__(self, data, **params):
         super().__init__(data, **params)
         self._update_ranges()
