@@ -83,8 +83,8 @@ class hvPlotBase:
                     fn_args = defaultdict(list)
                     for name, arg in zip(arg_names, args):
                         fn_args[(name, kwds[name])].append(arg)
-                    for (name, fn), args in fn_args.items():
-                        combined_kwds[name] = fn(*args)
+                    for (name, fn), fargs in fn_args.items():
+                        combined_kwds[name] = fn(*fargs)
                     plot = self._get_converter(xd, yd, kindd, **combined_kwds)(kindd, xd, yd)
                     return pn.panel(plot, **panel_dict)
 

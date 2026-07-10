@@ -643,7 +643,7 @@ class hvPlotExplorer(Viewer):
                     p.objects = variables_no_index
 
                 # Setting the default value if not set
-                if (pname == 'x' or pname == 'y') and getattr(self, pname, None) is None:
+                if pname in ('x', 'y') and getattr(self, pname, None) is None:
                     setattr(self, pname, p.objects[0])
 
     def _plot(self):

@@ -2124,37 +2124,36 @@ class HoloViewsConverter:
                 obj = obj.grid(self.grid).opts(
                     shared_xaxis=True, shared_yaxis=True, backend='bokeh'
                 )
-        else:
-            if self.streaming:
-                cb = partial(method, x, y)
-                if self.cb is None:
-                    cbcallable = cb
-                else:
-                    cbcallable = StreamingCallable(cb, periodic=self.cb)
-                obj = DynamicMap(cbcallable, streams=[self.stream])
+        elif self.streaming:
+            cb = partial(method, x, y)
+            if self.cb is None:
+                cbcallable = cb
             else:
-                data = self.source_data
-                if self.datatype in ('geopandas', 'spatialpandas'):
-                    columns = [c for c in data.columns if c != 'geometry']
-                    shape_dims = ['Longitude', 'Latitude'] if self.geo else ['x', 'y']
-                    dataset = Dataset(data, kdims=shape_dims + columns)
-                elif self.datatype == 'xarray':
-                    import xarray as xr
+                cbcallable = StreamingCallable(cb, periodic=self.cb)
+            obj = DynamicMap(cbcallable, streams=[self.stream])
+        else:
+            data = self.source_data
+            if self.datatype in ('geopandas', 'spatialpandas'):
+                columns = [c for c in data.columns if c != 'geometry']
+                shape_dims = ['Longitude', 'Latitude'] if self.geo else ['x', 'y']
+                dataset = Dataset(data, kdims=shape_dims + columns)
+            elif self.datatype == 'xarray':
+                import xarray as xr
 
-                    if isinstance(data, xr.Dataset):
-                        dataset = Dataset(data, self.indexes)
-                    else:
-                        name = data.name or self.label or self.value_label
-                        dataset = Dataset(data, self.indexes, name)
+                if isinstance(data, xr.Dataset):
+                    dataset = Dataset(data, self.indexes)
                 else:
-                    try:
-                        dataset = Dataset(data, self.indexes)
-                    except Exception:
-                        dataset = Dataset(data)
-                    dataset = redim_(dataset, **self._redim)
+                    name = data.name or self.label or self.value_label
+                    dataset = Dataset(data, self.indexes, name)
+            else:
+                try:
+                    dataset = Dataset(data, self.indexes)
+                except Exception:
+                    dataset = Dataset(data)
+                dataset = redim_(dataset, **self._redim)
 
-                obj = method(x, y)
-                obj._dataset = dataset
+            obj = method(x, y)
+            obj._dataset = dataset
 
         if self.crs and self.project:
             # Apply projection before rasterizing

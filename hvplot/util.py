@@ -994,7 +994,7 @@ def _parse_docstring_sections(docstring: str) -> dict[str, str]:
 
     sections = {}
     for i, section_header in enumerate(section_headers):
-        start_line = section_headers[i][0]
+        start_line = section_header[0]
         if i == len(section_headers) - 1:
             section_text = '\n'.join(lines[start_line:])
         else:
