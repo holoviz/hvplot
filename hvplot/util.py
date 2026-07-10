@@ -629,6 +629,14 @@ def is_xarray(data):
     return isinstance(data, (DataArray, Dataset))
 
 
+def is_xugrid(data):
+    if not check_library(data, 'xugrid'):
+        return False
+    import xugrid as xu
+
+    return isinstance(data, (xu.UgridDataArray, xu.UgridDataset))
+
+
 def is_lazy_data(data):
     """Check if data is lazy
 
@@ -700,6 +708,10 @@ def process_xarray(
     data, x, y, by, groupby, use_dask, persist, gridded, label, value_label, other_dims, kind=None
 ):
     import xarray as xr
+
+    if kind == 'trimesh':
+        data = data.to_dataset(name=data.name)
+        return data, x, y, by, groupby
 
     if isinstance(data, xr.Dataset):
         dataset = data
