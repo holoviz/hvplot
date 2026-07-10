@@ -120,7 +120,7 @@ class StreamingCallable(Callable):
         if not self.periodic._running:
             self.periodic.start()
         else:
-            raise Exception('PeriodicCallback already running.')
+            raise RuntimeError('PeriodicCallback already running.')
 
     def stop(self):
         """
@@ -129,7 +129,7 @@ class StreamingCallable(Callable):
         if self.periodic._running:
             self.periodic.stop()
         else:
-            raise Exception('PeriodicCallback not running.')
+            raise RuntimeError('PeriodicCallback not running.')
 
 
 class HoloViewsConverter:
