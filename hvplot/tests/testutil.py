@@ -300,7 +300,7 @@ def test_process_crs_platecarree(input):
     pytest.importorskip('pyproj')
     ccrs = pytest.importorskip('cartopy.crs')
     crs = process_crs(input)
-    assert isinstance(crs, ccrs.PlateCarree)  # noqa: E
+    assert isinstance(crs, ccrs.PlateCarree)
 
 
 @pytest.mark.parametrize(
