@@ -67,7 +67,7 @@ html_theme_options.update(  # noqa
             },
         ],
         'pygments_dark_style': 'material',
-        'announcement': "hvPlot 0.12 has just been released! Checkout the <a href='https://blog.holoviz.org/posts/hvplot_release_0.12/'>blog post</a> and support hvPlot by giving it a 🌟 on <a href='https://github.com/holoviz/hvplot'>Github</a>.",
+        'announcement': "hvPlot 0.12 has just been released! Checkout the <a href='https://blog.holoviz.org/posts/hvplot_release_0.12/'>blog post</a> and support hvPlot by giving it a 🌟 on <a href='https://github.com/holoviz/hvplot'>Github</a>.",  # noqa: E501
         'switcher': {
             'json_url': 'https://hvplot.holoviz.org/switcher.json',
             'version_match': switcher_version,
@@ -216,7 +216,7 @@ if os.getenv('HVPLOT_GALLERY') not in ('False', 'false', '0'):
             'reference/tabular/lagplot': 'ref/api/manual/hvplot.plotting.lag_plot',
             'reference/tabular/line': 'ref/api/manual/hvplot.hvPlot.line',
             'reference/tabular/ohlc': 'ref/api/manual/hvplot.hvPlot.ohlc',
-            'reference/tabular/parallelcoordinates': 'ref/api/manual/hvplot.plotting.parallel_coordinates',
+            'reference/tabular/parallelcoordinates': 'ref/api/manual/hvplot.plotting.parallel_coordinates',  # noqa: E501
             'reference/tabular/scatter': 'ref/api/manual/hvplot.hvPlot.scatter',
             'reference/tabular/scattermatrix': 'ref/api/manual/hvplot.plotting.scatter_matrix',
             'reference/tabular/step': 'ref/api/manual/hvplot.hvPlot.step',
@@ -294,7 +294,7 @@ intersphinx_mapping = {
 }
 
 # To avoid this warning
-# hvplot/ui.py:docstring of hvplot.ui.hvPlotExplorer:43: WARNING: autosummary: stub file not found 'hvplot.ui.hvPlotExplorer.hvplot'. Check your autosummary_generate setting.
+# hvplot/ui.py:docstring of hvplot.ui.hvPlotExplorer:43: WARNING: autosummary: stub file not found 'hvplot.ui.hvPlotExplorer.hvplot'. Check your autosummary_generate setting.  # noqa: E501
 # See https://stackoverflow.com/a/73294408
 numpydoc_class_members_toctree = False
 

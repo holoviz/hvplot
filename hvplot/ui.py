@@ -686,8 +686,8 @@ class hvPlotExplorer(Viewer):
             self.kind in KINDS['stats'] or kwargs.get('rasterize') or kwargs.get('datashade')
         ):
             warn_message = (
-                f'plotted {MAX_ROWS} rows out of {len(df)} rows '
-                f'to avoid performance issues; use rasterize=True or datashade=True to visualize more.'
+                f'plotted {MAX_ROWS} rows out of {len(df)} rows to avoid performance issues; '
+                'use rasterize=True or datashade=True to visualize more.'
             )
             if self.kind == 'line':
                 warn_message = f'Selected the first {MAX_ROWS} rows and {warn_message}'

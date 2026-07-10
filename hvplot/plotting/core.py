@@ -378,7 +378,8 @@ class hvPlotTabular(hvPlotBase):
         ----------
         - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/step.html
         - HoloViews: https://holoviews.org/gallery/demos/bokeh/step_chart.html
-        - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.line.html (use `draw_style='step'`)
+        - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.line.html
+          (use `draw_style='step'`)
         - Plotly: https://plotly.com/python/line-charts/ (See the Interpolation Section)
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.step.html
         """
@@ -514,8 +515,8 @@ class hvPlotTabular(hvPlotBase):
         Create error bars showing data variability.
 
         Error bars provide a visual indicator for the variability of the plotted data on a graph.
-        They are usually overlaid with other plots such as ``scatter``, ``line``, or ``bar`` plots to
-        indicate the variability.
+        They are usually overlaid with other plots such as ``scatter``, ``line``, or ``bar`` plots
+        to indicate the variability.
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.errorbars.html
 
@@ -614,9 +615,9 @@ class hvPlotTabular(hvPlotBase):
         """
         Create a heatmap from tabular data.
 
-        A heatmap visualizes tabular data indexed by two key dimensions as a grid of colored values.
-        This allows spotting correlations in multivariate data and provides a high-level overview
-        of how the two variables are plotted. The data can either be shaped as a 2-D array
+        A heatmap visualizes tabular data indexed by two key dimensions as a grid of colored
+        values. This allows spotting correlations in multivariate data and provides a high-level
+        overview of how the two variables are plotted. The data can either be shaped as a 2-D array
         (in which case no aggregate will be computed) or as a set of two axis variables and one
         aggregation variable (on which an aggregation is computed).
 
@@ -1821,8 +1822,8 @@ class hvPlot(hvPlotTabular):
         """
         Create an image plot from gridded data.
 
-        You can use image plots to display for example geographic data with independent latitude and
-        longitude fields and a third dependent field.
+        You can use image plots to display for example geographic data with independent latitude
+        and longitude fields and a third dependent field.
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.image.html
 
@@ -1872,8 +1873,8 @@ class hvPlot(hvPlotTabular):
         """
         Create an RGB image plot from multi-band data.
 
-        RGB plots can be used to display images that are distributed as three separate "channels" or
-        "bands".
+        RGB plots can be used to display images that are distributed as three separate "channels"
+        or "bands".
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.rgb.html
 

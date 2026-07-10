@@ -14,8 +14,9 @@ import glob
 
 import pytest
 
-# Note: The regex will find urls from code cells in notebooks ending with '\\' because the are really inside \"some_url\"
-URL_REGEX = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"  # pylint: disable=line-too-long
+# Note: The regex will find urls from code cells in notebooks ending with '\\' because they
+# are really inside \"some_url\"
+URL_REGEX = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"  # noqa: E501
 ROOT = pathlib.Path(__file__).parent
 PACKAGE_ROOT = ROOT.parent
 MAX_WORKERS = 10

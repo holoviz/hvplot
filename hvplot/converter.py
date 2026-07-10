@@ -162,13 +162,14 @@ class HoloViewsConverter:
         for more information.
     group_label : str or None, default=None
         Sets a custom label for the dimension created when plotting multiple columns.
-        When multiple columns are plotted (e.g., multiple y values), hvPlot automatically reshapes the data from wide to long format.
-        It creates a new grouping dimension that holds the original column names.
-        By default, this grouping dimension is labeled ``'Variable'``.
+        When multiple columns are plotted (e.g., multiple y values), hvPlot automatically reshapes
+        the data from wide to long format. It creates a new grouping dimension that holds the
+        original column names. By default, this grouping dimension is labeled ``'Variable'``.
         Setting ``group_label`` overrides this default label.
 
         .. note::
-           ``group_label`` only applies when plotting multiple columns and does not control grouping with ``by``.
+           ``group_label`` only applies when plotting multiple columns and does not control
+           grouping with ``by``.
     kind : str, default='line'
         The type of plot to generate. Should only be set when calling
         ``hvplot()`` directly.
@@ -193,7 +194,8 @@ class HoloViewsConverter:
     use_index : bool, default=True
         Whether to use the data's index for the x-axis by default.
     value_label : str, default='value'
-        Sets a custom label for the values when the data is reshaped from wide to long format (e.g., when plotting multiple columns).
+        Sets a custom label for the values when the data is reshaped from wide to long
+        format (e.g., when plotting multiple columns).
         This label is typically used for the y-axis, colorbar, or in hover tooltips.
 
     Geographic Options
@@ -225,7 +227,8 @@ class HoloViewsConverter:
         or integer EPSG code, a CRS or Proj pyproj object, a Cartopy
         CRS object or class name, a WKT string, or a proj.4 string.
         Defaults to PlateCarree.
-    tiles : bool or str or xyzservices.TileProvider or holoviews.Tiles or geoviews.WMTS or None, default=False
+    tiles : bool or str or xyzservices.TileProvider or holoviews.Tiles
+            or geoviews.WMTS or None, default=False
         Whether to overlay the plot on a tile source. If coordinate values fall within
         lat/lon bounds, auto-projects to EPSG:3857, unless ``projection=False``:
 
@@ -525,8 +528,8 @@ class HoloViewsConverter:
         automatically increase the point size when the data is sparse
         so that individual points become more visible.
     max_px : int, default=3
-        The maximum size in pixels for dynamically spreading elements in sparse data using ``dynspread``.
-        This helps to increase the visibility of sparse data points.
+        The maximum size in pixels for dynamically spreading elements in sparse data
+        using ``dynspread``. This helps to increase the visibility of sparse data points.
     pixel_ratio : number or None, default=None
        Pixel ratio applied to the height and width, used when rasterizing or
        datashading. When not set explicitly, the ratio is automatically
@@ -569,7 +572,8 @@ class HoloViewsConverter:
     backlog : int, default=1000
         Maximum number of rows to keep in the stream buffer when using a streaming data source.
     stream : holoviews.streams.Stream or None, default=None
-        A stream object for streaming plots, allowing data updates without re-rendering the entire plot.
+        A stream object for streaming plots, allowing data updates without re-rendering the
+        entire plot.
     """
 
     _gridded_types = [
@@ -1890,8 +1894,9 @@ class HoloViewsConverter:
             color = style_opts['color']
         elif not isinstance(cmap, dict):
             # Checks if any of the categorical cmaps matches cmap;
-            # uses any() instead of `cmap in categorical_cmaps` to handle reversed colormaps (suffixed with `_r`).
-            # If cmap is LinearSegmentedColormap, get the name attr, else return the str typed cmap.
+            # uses any() instead of `cmap in categorical_cmaps` to handle reversed colormaps
+            # (suffixed with `_r`). If cmap is LinearSegmentedColormap, get the name attr, else
+            # return the str typed cmap.
             if (isinstance(cmap, str) or is_mpl_cmap(cmap)) and any(
                 categorical_cmap in getattr(cmap, 'name', cmap)
                 for categorical_cmap in categorical_cmaps
