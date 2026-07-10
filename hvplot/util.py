@@ -77,7 +77,7 @@ def with_hv_extension(func, extension='bokeh', logo=False):
 
 def get_ipy():
     try:
-        ip = get_ipython()  # noqa: F821
+        ip = get_ipython()
     except NameError:
         ip = None
     return ip
@@ -85,7 +85,7 @@ def get_ipy():
 
 def _in_ipython():
     try:
-        get_ipython  # noqa: F821
+        get_ipython
         return True
     except NameError:
         return False
@@ -369,9 +369,11 @@ def process_crs(crs):
         all_crs = [
             proj
             for proj in dir(ccrs)
-            if callable(getattr(ccrs, proj))
-            and proj not in ['ABCMeta', 'CRS']
-            and proj[0].isupper()
+            if (
+                callable(getattr(ccrs, proj))
+                and proj not in ['ABCMeta', 'CRS']
+                and proj[0].isupper()
+            )
             or proj == 'GOOGLE_MERCATOR'
         ]
         if crs in all_crs and crs != 'GOOGLE_MERCATOR':
@@ -751,9 +753,9 @@ def process_xarray(
         if not (x or y):
             x, y = index_dims[:2] if len(index_dims) > 1 else dims[:2]
         elif x and not y:
-            y = [d for d in dims if d != x][0]
+            y = next(d for d in dims if d != x)
         elif y and not x:
-            x = [d for d in dims if d != y][0]
+            x = next(d for d in dims if d != y)
         if len(dims) > 2 and kind not in ('table', 'dataset') and not groupby:
             dims = list(data.coords[x].dims) + list(data.coords[y].dims)
             groupby = [
@@ -842,7 +844,7 @@ def process_dynamic_args(x, y, kind, **kwds):
     arg_deps = []
     arg_names = []
 
-    for k, v in list(kwds.items()) + [('x', x), ('y', y), ('kind', kind)]:
+    for k, v in [*kwds.items(), ('x', x), ('y', y), ('kind', kind)]:
         if isinstance(v, param.Parameter):
             dynamic[k] = v
         elif panel_available and isinstance(v, pn.widgets.Widget):
@@ -1200,8 +1202,12 @@ def _parse_numpydoc_patch(self):
                 self._error_location(f'The section {section} appears twice in {doc_str}')
 
         # Patch is here, extending the sections with these other options
-        if section in ('Parameters', 'Other Parameters', 'Attributes', 'Methods') + tuple(
-            _numpydoc_extra_sections()
+        if section in (
+            'Parameters',
+            'Other Parameters',
+            'Attributes',
+            'Methods',
+            *_numpydoc_extra_sections(),
         ):
             self[section] = self._parse_param_list(content)
         elif section in ('Returns', 'Yields', 'Raises', 'Warns', 'Receives'):

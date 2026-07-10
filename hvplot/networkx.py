@@ -63,7 +63,7 @@ def _from_networkx(G, positions, nodes=None, cls=Graph, **kwargs):
         k for k in edges if k not in ('start', 'end') and len(edges[k]) == len(edges['start'])
     )
     edge_vdims = [str(col) if isinstance(col, int) else col for col in edge_cols]
-    edge_data = tuple(edges[col] for col in ['start', 'end'] + edge_cols)
+    edge_data = tuple(edges[col] for col in ['start', 'end', *edge_cols])
 
     # Unpack user node info
     xdim, ydim, idim = cls.node_type.kdims[:3]
@@ -99,7 +99,7 @@ def _from_networkx(G, positions, nodes=None, cls=Graph, **kwargs):
         for k in node_columns
         if k not in cls.node_type.kdims and len(node_columns[k]) == len(node_columns[xdim.name])
     )
-    columns = [xdim.name, ydim.name, idim.name] + node_cols + list(info_cols)
+    columns = [xdim.name, ydim.name, idim.name, *node_cols, *info_cols]
     node_data = tuple(node_columns[col] for col in columns)
 
     # Construct nodes

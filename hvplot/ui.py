@@ -35,7 +35,7 @@ KINDS['all'] = sorted(set(KINDS['dataframe'] + KINDS['gridded'] + KINDS['geom'])
 CMAPS = [cm for cm in list_cmaps() if not cm.endswith('_r_r')]
 DEFAULT_CMAPS = _hvConverter._default_cmaps
 GEO_FEATURES = ['borders', 'coastline', 'land', 'lakes', 'ocean', 'rivers', 'states', 'grid']
-GEO_TILES = [None] + sorted(tile_sources)
+GEO_TILES = [None, *sorted(tile_sources)]
 GEO_KEYS = [
     'crs',
     'crs_kwargs',
@@ -361,7 +361,7 @@ class Geographic(Controls):
     _widgets_kwargs = {'geo': {'type': pn.widgets.Toggle}}
 
     def __init__(self, data, **params):
-        geo_params = GEO_KEYS + ['geo']
+        geo_params = [*GEO_KEYS, 'geo']
         gv_available = None
         if any(params.get(p) for p in geo_params):
             gv_available = import_geoviews()

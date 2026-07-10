@@ -288,7 +288,7 @@ class hvPlotTabular(hvPlotBase):
             '#a98d19.
 
             A sequence of color strings referred to by name, RGB or RGBA code, which will be used
-            for each series recursively. For instance ['green','yellow'] each field’s line will be
+            for each series recursively. For instance ['green','yellow'] each field's line will be
             filled in green or yellow, alternatively. If there is only a single series to be
             plotted, then only the first color from the color list will be used.
         **kwds : optional
@@ -2091,7 +2091,7 @@ class hvPlot(hvPlotTabular):
 class hvPlotXugrid(hvPlot):
     """hvPlot interface for xugrid UgridDataArray and UgridDataset objects."""
 
-    __all__ = hvPlot.__all__ + ['trimesh']
+    __all__ = [*hvPlot.__all__, 'trimesh']
 
     def _get_converter(self, x=None, y=None, kind=None, **kwds):
         import numpy as np
@@ -2102,7 +2102,7 @@ class hvPlotXugrid(hvPlot):
         kind = kind or kwds.pop('kind', None) or 'trimesh'
 
         if isinstance(data, xu.UgridDataset):
-            z = kwds.get('z') or list(data.data_vars)[0]
+            z = kwds.get('z') or next(iter(data.data_vars))
             data = data[z]
 
         grid = data.grid

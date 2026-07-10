@@ -52,7 +52,7 @@ def parallel_coordinates(
     """
     # Transform the dataframe to be used in Vega-Lite
     if cols is not None:
-        data = data[list(cols) + [class_column]]
+        data = data[[*list(cols), class_column]]
     cols = data.columns
     df = data.reset_index()
     index = (set(df.columns) - set(cols)).pop()

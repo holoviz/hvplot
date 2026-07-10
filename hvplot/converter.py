@@ -1457,7 +1457,7 @@ class HoloViewsConverter:
                         'The GeopandasInterface can only read dataframes which '
                         'share a common geometry type'
                     )
-                geom_type = list(geom_types)[0]
+                geom_type = next(iter(geom_types))
                 if geom_type == 'Point':
                     kind = 'points'
                 elif geom_type == 'Polygon':
@@ -1520,7 +1520,7 @@ class HoloViewsConverter:
                     raise ValueError('Cannot plot an empty xarray.Dataset object.')
             if z is None:
                 if isinstance(data, xr.Dataset):
-                    z = list(data.data_vars)[0]
+                    z = next(iter(data.data_vars))
                 else:
                     z = data.name or label or value_label
             if gridded and isinstance(data, xr.Dataset) and not isinstance(z, list):
@@ -1551,7 +1551,7 @@ class HoloViewsConverter:
                 if 'bands' in kwds:
                     other_dims = [kwds['bands']]
                 else:
-                    other_dims = [d for d in data.coords if d not in (groupby or [])][0]
+                    other_dims = next(d for d in data.coords if d not in (groupby or []))
             else:
                 other_dims = []
             da = data
@@ -1765,7 +1765,7 @@ class HoloViewsConverter:
         if self.datatype in ('geopandas', 'spatialpandas'):
             self.hover_cols = [c for c in self.hover_cols if c != 'geometry']
 
-        if da is not None and attr_labels is True or attr_labels is None:
+        if (da is not None and attr_labels is True) or attr_labels is None:
             try:
                 var_tuples = [(var, da[var].attrs) for var in da.coords]
                 if isinstance(da, xr.Dataset):
@@ -2065,7 +2065,7 @@ class HoloViewsConverter:
             if groups:
                 datasets = dataset.groupby(groups, dynamic=self.dynamic)
                 if len(zs) > 1:
-                    dimensions = [Dimension(self.group_label, values=zs)] + datasets.kdims
+                    dimensions = [Dimension(self.group_label, values=zs), *datasets.kdims]
                     if self.dynamic:
 
                         def z_wrapper(**kwargs):
@@ -2088,7 +2088,7 @@ class HoloViewsConverter:
                     else:
                         obj = HoloMap(
                             {
-                                (z,) + k: method(x, y, z, dataset[k])
+                                (z, *k): method(x, y, z, dataset[k])
                                 for k, v in datasets.data.items()
                                 for z in zs
                             },
@@ -2557,7 +2557,7 @@ class HoloViewsConverter:
         """This should happen after _process_chart_x"""
         y = y or self.y
         if y is None:
-            ys = [c for c in data.columns if c not in [x] + self.by + self.groupby + self.grid]
+            ys = [c for c in data.columns if c not in [x, *self.by, *self.groupby, *self.grid]]
             if len(ys) > 1:
                 # if columns have different dtypes, only include numeric columns
                 from pandas.api.types import is_numeric_dtype as isnum
@@ -2734,7 +2734,7 @@ class HoloViewsConverter:
             # Calling reset_index() is required since id_vars from melt
             # only accepts column names, not index names.
             data = data.reset_index()
-        data = data[y + [x]]
+        data = data[[*y, x]]
 
         if check_library(data, 'dask'):
             from dask.dataframe import melt
@@ -2743,7 +2743,7 @@ class HoloViewsConverter:
 
         df = melt(data, id_vars=[x], var_name=self.group_label, value_name=self.value_label)
         kdims = [x, self.group_label]
-        vdims = [self.value_label] + self.hover_cols
+        vdims = [self.value_label, *self.hover_cols]
         if self.subplots:
             obj = Dataset(df, kdims, vdims).to(element, x).layout()
         else:
@@ -2771,7 +2771,7 @@ class HoloViewsConverter:
         """
         Helper method to generate element from indexed dataframe.
         """
-        data, x, y = self._process_chart_args(data, False, y)
+        data, _x, y = self._process_chart_args(data, False, y)
 
         custom = {}
         if 'color' in self._style_opts:
@@ -2827,7 +2827,7 @@ class HoloViewsConverter:
 
     def hist(self, x=None, y=None, data=None):
         self._error_if_unavailable('hist')
-        data, x, y = self._process_chart_args(data, False, y)
+        data, _x, y = self._process_chart_args(data, False, y)
 
         labelled = ['y'] if self.invert else ['x']
 
@@ -2988,8 +2988,8 @@ class HoloViewsConverter:
             data = (data.columns, data.index, data.values)
             z = ['value']
         else:
-            z = self.kwds.get('C', [c for c in data.columns if c not in (x, y)][0])
-            z = [z] + self.hover_cols
+            z = self.kwds.get('C', next(c for c in data.columns if c not in (x, y)))
+            z = [z, *self.hover_cols]
             self.use_index = False
             data, x, y = self._process_chart_args(data, x, y, single_y=True)
 
@@ -3204,8 +3204,8 @@ class HoloViewsConverter:
         if not (x and y):
             x, y = list(data.dims)[::-1]
         if not z:
-            z = list(data.data_vars)[0]
-        z = [z] + self.hover_cols
+            z = next(iter(data.data_vars))
+        z = [z, *self.hover_cols]
 
         params = dict(self._relabel)
         cur_opts, compat_opts = self._get_compat_opts('Image')
@@ -3229,7 +3229,7 @@ class HoloViewsConverter:
         y = y or coords[1]
         bands = self.kwds.get('bands', coords[0])
         if z is None:
-            z = list(data.data_vars)[0]
+            z = next(iter(data.data_vars))
         data = data[z]
         nbands = len(data.coords[bands])
         if nbands < 3:
@@ -3262,8 +3262,8 @@ class HoloViewsConverter:
         if not (x and y):
             x, y = list(k for k, v in data.coords.items() if v.size > 1)
         if not z:
-            z = list(data.data_vars)[0]
-        z = [z] + self.hover_cols
+            z = next(iter(data.data_vars))
+        z = [z, *self.hover_cols]
 
         params = dict(self._relabel)
         redim = self._merge_redim({z[0]: self._dim_ranges['c']})
@@ -3397,7 +3397,7 @@ class HoloViewsConverter:
 
         angle = self.kwds.get('angle')
         mag = self.kwds.get('mag')
-        z = [angle, mag] + self.hover_cols
+        z = [angle, mag, *self.hover_cols]
         redim = self._merge_redim({z[1]: self._dim_ranges['c']})
         params = dict(self._relabel)
 

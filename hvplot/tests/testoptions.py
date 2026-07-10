@@ -527,7 +527,7 @@ class TestXarrayTitle:
         assert opts.kwargs['title'] == 'time = 0'
 
     def test_dataset_empty_raises(self, ds1, backend):
-        with pytest.raises(ValueError, match='empty xarray.Dataset'):
+        with pytest.raises(ValueError, match=r'empty xarray.Dataset'):
             ds1.drop_vars('foo').hvplot()
 
     def test_dataset_one_var_behaves_like_dataarray(self, ds1, backend):

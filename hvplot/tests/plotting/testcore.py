@@ -2,14 +2,14 @@ import numpy as np
 import pandas as pd
 import pytest
 
-import hvplot.pandas  # noqa: F401
+import hvplot.pandas
 from hvplot import hvPlotTabular
 from hvplot.tests.util import makeDataFrame
 
 try:
     import polars as pl
 
-    import hvplot.polars  # noqa: F401
+    import hvplot.polars
 
     skip_polar = False
 except ImportError:

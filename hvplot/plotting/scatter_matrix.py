@@ -174,7 +174,7 @@ def scatter_matrix(
         # change colors for scatter matrix
         chart_opts['color'] = c
         # Add color vdim to each plot.
-        grid = grid.map(lambda x: x.clone(vdims=x.vdims + [c]), 'Scatter')
+        grid = grid.map(lambda x: x.clone(vdims=[*x.vdims, c]), 'Scatter')
         # create a new scatter matrix with groups for each catetory, so now the histogram will
         # show separate colors for each group.
         groups = _hv.operation.gridmatrix(

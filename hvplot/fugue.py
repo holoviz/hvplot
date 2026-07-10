@@ -46,7 +46,7 @@ def patch(name='hvplot', extension='bokeh', logo=False):
             col = _pn.Column(*charts)
             try:
                 if not _fugue_ipython:
-                    get_ipython()  # noqa: F821
+                    get_ipython()
             except NameError:
                 col.show()  # in script
             else:

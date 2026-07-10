@@ -33,7 +33,7 @@ def help(kind=None, docstring=True, generic=True, style=True):
     """
     from .plotting.core import hvPlot
 
-    doc, sig = _get_doc_and_signature(
+    doc, _sig = _get_doc_and_signature(
         cls=hvPlot, kind=kind, docstring=docstring, generic=generic, style=style
     )
     print(doc)

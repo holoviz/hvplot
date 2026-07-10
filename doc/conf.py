@@ -14,7 +14,7 @@ param.parameterized.docstring_describe_params = False
 
 from nbsite.shared_conf import *  # noqa: E402, F403
 
-import hvplot  # noqa: E402, F401
+import hvplot  # noqa: E402
 
 project = 'hvPlot'
 authors = 'HoloViz developers'

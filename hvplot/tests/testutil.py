@@ -206,7 +206,7 @@ class TestDynamicArgs(TestCase):
         )
         kind = pn.widgets.Select(name='kind', value='scatter', options=['bivariate', 'scatter'])
 
-        dynamic, arg_deps, arg_names = process_dynamic_args(x, y, kind)
+        dynamic, arg_deps, _arg_names = process_dynamic_args(x, y, kind)
         assert 'x' not in dynamic
         assert 'y' in dynamic
         assert arg_deps == []
@@ -219,7 +219,7 @@ class TestDynamicArgs(TestCase):
         kind = 'scatter'
         color = pn.widgets.ColorPicker(value='#ff0000')
 
-        dynamic, arg_deps, arg_names = process_dynamic_args(x, y, kind, c=color)
+        dynamic, arg_deps, _arg_names = process_dynamic_args(x, y, kind, c=color)
         assert 'x' not in dynamic
         assert 'c' in dynamic
         assert arg_deps == []

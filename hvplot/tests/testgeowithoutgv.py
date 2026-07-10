@@ -8,7 +8,7 @@ import pandas as pd
 import pytest
 from holoviews.util.transform import lon_lat_to_easting_northing
 
-import hvplot.pandas  # noqa: F401
+import hvplot.pandas
 from hvplot.util import is_geodataframe
 
 try:
