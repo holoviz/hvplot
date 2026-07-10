@@ -2548,7 +2548,7 @@ class HoloViewsConverter:
             else:
                 xs = list(data.columns)
             xs = [c for c in xs if c not in self.by + self.groupby + self.grid + [y]]
-            x = xs[0] if len(xs) else None
+            x = xs[0] if xs else None
 
         if not x and not categories:
             raise ValueError('Could not determine what to plot. Set x explicitly')

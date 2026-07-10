@@ -239,7 +239,7 @@ def draw(G, pos=None, **kwargs):
         comparisons = []
         for edge in kwargs['edgelist']:
             comparisons.append(edges == edge)
-        if len(comparisons):
+        if comparisons:
             selector = np.logical_and(*np.logical_or.reduce(comparisons).T)
             g = g.iloc[selector]
         else:
