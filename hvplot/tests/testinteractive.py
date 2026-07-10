@@ -7,8 +7,8 @@ import pytest
 import xarray as xr
 from holoviews.util.transform import dim
 
-import hvplot.pandas  # noqa
-import hvplot.xarray  # noqa
+import hvplot.pandas  # noqa: F401
+import hvplot.xarray  # noqa: F401
 from hvplot import bind
 from hvplot.interactive import Interactive
 from hvplot.tests.util import makeDataFrame, makeMixedDataFrame

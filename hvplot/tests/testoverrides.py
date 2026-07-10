@@ -12,7 +12,7 @@ from hvplot.plotting import hvPlot, hvPlotTabular
 
 class TestOverrides(ComparisonTestCase):
     def setUp(self):
-        import hvplot.pandas  # noqa
+        import hvplot.pandas  # noqa: F401
 
         self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
 

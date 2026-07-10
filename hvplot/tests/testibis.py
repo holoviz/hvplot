@@ -6,11 +6,11 @@ import pytest
 from packaging import version
 
 try:
-    import hvplot.ibis  # noqa
+    # Used as default in-memory backend by ibis
+    import duckdb  # noqa: F401
     import ibis
 
-    # Used as default in-memory backend by ibis
-    import duckdb  # noqa
+    import hvplot.ibis  # noqa: F401
 except ImportError:
     pytest.skip(allow_module_level=True)
 

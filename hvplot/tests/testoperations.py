@@ -13,7 +13,7 @@ from holoviews.element.comparison import ComparisonTestCase
 from holoviews.element.raster import ImageStack
 from parameterized import parameterized
 
-import hvplot.pandas  # noqa
+import hvplot.pandas  # noqa: F401
 from hvplot.converter import HoloViewsConverter
 from hvplot.tests.util import makeTimeDataFrame
 
@@ -21,12 +21,11 @@ from hvplot.tests.util import makeTimeDataFrame
 class TestDatashader(ComparisonTestCase):
     def setUp(self):
         try:
-            import datashader  # noqa
+            import datashader  # noqa: F401
         except ImportError:
             raise SkipTest('Datashader not available')
         if sys.maxsize < 2**32:
             raise SkipTest('Datashader does not support 32-bit systems')
-        import hvplot.pandas  # noqa
 
         self.df = pd.DataFrame(
             [[1, 2, 'A', 0.1], [3, 4, 'B', 0.2], [5, 6, 'C', 0.3]],
@@ -371,13 +370,13 @@ class TestDatashader(ComparisonTestCase):
 class TestChart2D(ComparisonTestCase):
     def setUp(self):
         try:
-            import datashader as ds  # noqa
+            import datashader  # noqa: F401
             import xarray as xr
         except ImportError:
             raise SkipTest('xarray or datashader not available')
         if sys.maxsize < 2**32:
             raise SkipTest('Datashader does not support 32-bit systems')
-        import hvplot.xarray  # noqa
+        import hvplot.xarray  # noqa: F401
 
         data = np.arange(0, 60).reshape(6, 10)
         x = np.arange(10)
@@ -399,7 +398,6 @@ class TestChart2D(ComparisonTestCase):
 
 class TestDownsample(ComparisonTestCase):
     def setUp(self):
-        import hvplot.pandas  # noqa
 
         self.df = pd.DataFrame(np.random.random(100))
 

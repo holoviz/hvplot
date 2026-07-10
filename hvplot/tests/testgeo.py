@@ -28,18 +28,18 @@ class TestGeo(TestCase):
         if sys.platform == 'win32':
             raise SkipTest('Skip geo tests on windows for now')
         try:
-            import xarray as xr  # noqa
-            import rasterio  # noqa
-            import geoviews  # noqa
-            import cartopy.crs as ccrs  # noqa
-            import pyproj  # noqa
+            import cartopy.crs as ccrs  # noqa: F401
+            import geoviews  # noqa: F401
+            import pyproj  # noqa: F401
+            import rasterio  # noqa: F401
             import rioxarray as rxr
+            import xarray as xr  # noqa: F401
         except ImportError:
             raise SkipTest(
                 'xarray, rasterio, geoviews, cartopy, pyproj or rioxarray not available'
             )
-        import hvplot.xarray  # noqa
-        import hvplot.pandas  # noqa
+        import hvplot.pandas  # noqa: F401
+        import hvplot.xarray  # noqa: F401
 
         self.da = rxr.open_rasterio(
             pathlib.Path(__file__).parent / 'data' / 'RGB-red.byte.tif'
@@ -179,11 +179,11 @@ class TestProjections(TestGeo):
 class TestGeoAnnotation(TestCase):
     def setUp(self):
         try:
-            import geoviews  # noqa
-            import cartopy.crs as ccrs  # noqa
+            import cartopy.crs as ccrs  # noqa: F401
+            import geoviews  # noqa: F401
         except ImportError:
             raise SkipTest('geoviews or cartopy not available')
-        import hvplot.pandas  # noqa
+        import hvplot.pandas  # noqa: F401
 
         self.crs = ccrs.PlateCarree()
         self.df = pd.DataFrame(np.random.rand(10, 2), columns=['x', 'y'])
@@ -309,11 +309,11 @@ class TestGeoAnnotation(TestCase):
 class TestGeoElements(TestCase):
     def setUp(self):
         try:
-            import geoviews  # noqa
-            import cartopy.crs as ccrs  # noqa
+            import cartopy.crs as ccrs  # noqa: F401
+            import geoviews  # noqa: F401
         except ImportError:
             raise SkipTest('geoviews or cartopy not available')
-        import hvplot.pandas  # noqa
+        import hvplot.pandas  # noqa: F401
 
         self.crs = ccrs.PlateCarree()
         self.df = pd.DataFrame(np.random.rand(10, 2), columns=['x', 'y'])
@@ -350,15 +350,15 @@ class TestGeoElements(TestCase):
 class TestGeoPandas(TestCase):
     def setUp(self):
         try:
-            import geopandas as gpd  # noqa
-            import geoviews  # noqa
-            import cartopy.crs as ccrs  # noqa
-            import shapely  # noqa
+            import cartopy.crs as ccrs  # noqa: F401
+            import geopandas as gpd  # noqa: F401
+            import geoviews  # noqa: F401
+            import shapely  # noqa: F401
         except ImportError:
             raise SkipTest('geopandas, geoviews, shapely or cartopy not available')
-        import hvplot.pandas  # noqa
-
         from shapely.geometry import Polygon
+
+        import hvplot.pandas  # noqa: F401
 
         p_geometry = gpd.points_from_xy(
             x=[12.45339, 12.44177, 9.51667, 6.13000, 158.14997],

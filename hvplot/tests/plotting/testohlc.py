@@ -1,6 +1,6 @@
 import pandas as pd
 
-import hvplot.pandas  # noqa
+import hvplot.pandas  # noqa: F401
 
 df = pd.DataFrame(
     {

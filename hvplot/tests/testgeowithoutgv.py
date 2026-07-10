@@ -8,13 +8,13 @@ import pandas as pd
 import pytest
 from holoviews.util.transform import lon_lat_to_easting_northing
 
-import hvplot.pandas  # noqa
+import hvplot.pandas  # noqa: F401
 from hvplot.util import is_geodataframe
 
 try:
     import dask.dataframe as dd
 
-    import hvplot.dask  # noqa
+    import hvplot.dask  # noqa: F401
 except ImportError:
     dd = None
 

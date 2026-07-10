@@ -63,23 +63,23 @@ import sys
 
 import holoviews as _hv
 import panel as _pn
-from holoviews import render  # noqa
+from holoviews import render  # noqa: F401
 
-from . import sampledata  # noqa
-from .converter import HoloViewsConverter  # noqa
+from . import sampledata  # noqa: F401
+from .converter import HoloViewsConverter  # noqa: F401
 from .interactive import Interactive
 from .plotting import (
-    andrews_curves,  # noqa
-    hvPlot,  # noqa
-    hvPlotTabular,  # noqa
-    lag_plot,  # noqa
-    parallel_coordinates,  # noqa
-    plot,  # noqa
-    scatter_matrix,  # noqa
+    andrews_curves,  # noqa: F401
+    hvPlot,  # noqa: F401
+    hvPlotTabular,  # noqa: F401
+    lag_plot,  # noqa: F401
+    parallel_coordinates,  # noqa: F401
+    plot,  # noqa: F401
+    scatter_matrix,  # noqa: F401
 )
-from .ui import explorer  # noqa
+from .ui import explorer  # noqa: F401
 from .util import _in_ipython, _PatchHvplotDocstrings
-from .utilities import help, hvplot_extension, output, save, show  # noqa
+from .utilities import help, hvplot_extension, output, save, show  # noqa: F401
 
 # Define '__version__'
 try:
@@ -132,7 +132,7 @@ _PATCH_PLOT_SIGNATURES = _in_ipython() or (
 _module_extensions = set()
 
 try:
-    ip = get_ipython()  # noqa
+    ip = get_ipython()  # noqa: F821
 
     def pre_run_cell(info):
         for ext in _module_extensions:

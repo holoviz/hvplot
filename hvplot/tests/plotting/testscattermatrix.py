@@ -82,7 +82,7 @@ class TestScatterMatrix(TestCase):
 class TestDatashader(TestCase):
     def setUp(self):
         try:
-            import datashader  # noqa
+            import datashader  # noqa: F401
         except ImportError:
             raise SkipTest('Datashader not available')
         if sys.maxsize < 2**32:

@@ -11,12 +11,12 @@ import hvplot
 
 @pytest.fixture(scope='class')
 def load_pandas_accessor():
-    import hvplot.pandas  # noqa
+    import hvplot.pandas  # noqa: F401
 
 
 @pytest.fixture(scope='class')
 def load_xarray_accessor():
-    import hvplot.xarray  # noqa
+    import hvplot.xarray  # noqa: F401
 
 
 @pytest.fixture(params=['bokeh', 'matplotlib', 'plotly'], scope='class')

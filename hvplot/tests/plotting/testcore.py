@@ -2,14 +2,14 @@ import numpy as np
 import pandas as pd
 import pytest
 
-import hvplot.pandas  # noqa
+import hvplot.pandas  # noqa: F401
 from hvplot import hvPlotTabular
 from hvplot.tests.util import makeDataFrame
 
 try:
     import polars as pl
 
-    import hvplot.polars  # noqa
+    import hvplot.polars  # noqa: F401
 
     skip_polar = False
 except ImportError:
@@ -24,7 +24,7 @@ except ImportError:
 try:
     import dask.dataframe as dd
 
-    import hvplot.dask  # noqa
+    import hvplot.dask  # noqa: F401
 except ImportError:
     dd = None
 

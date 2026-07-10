@@ -80,13 +80,13 @@ if find_spec('selenium'):
 pygraphviz = None
 
 try:
-    import pygraphviz  # noqa
+    import pygraphviz  # noqa: F401
 except ImportError:
     pass
 
 pydot = None
 try:
-    import pydot  # noqa
+    import pydot  # noqa: F401
 except ImportError:
     pass
 

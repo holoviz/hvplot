@@ -33,7 +33,7 @@ def patch(name='hvplot', extension='bokeh', logo=False):
 
 
 try:
-    import intake.plotting  # noqa
+    import intake.plotting  # noqa: F401
 
     patch()
 except Exception:

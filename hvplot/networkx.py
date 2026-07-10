@@ -12,7 +12,7 @@ from holoviews.plotting.bokeh.styles import markers
 
 from .backend_transforms import _transfer_opts_cur_backend
 from .util import process_crs
-from .utilities import save, show  # noqa
+from .utilities import save, show  # noqa: F401
 
 if _hv.extension and not getattr(_hv.extension, '_loaded', False):
     _hv.extension('bokeh', logo=False)

@@ -13,7 +13,7 @@ try:
 except ImportError:
     raise SkipTest('XArray not available')
 else:
-    import hvplot.xarray  # noqa
+    import hvplot.xarray  # noqa: F401
 
 
 class TestGridPlots(ComparisonTestCase):

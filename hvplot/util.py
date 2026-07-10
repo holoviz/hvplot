@@ -77,7 +77,7 @@ def with_hv_extension(func, extension='bokeh', logo=False):
 
 def get_ipy():
     try:
-        ip = get_ipython()  # noqa
+        ip = get_ipython()  # noqa: F821
     except NameError:
         ip = None
     return ip
@@ -85,7 +85,7 @@ def get_ipy():
 
 def _in_ipython():
     try:
-        get_ipython  # noqa
+        get_ipython  # noqa: F821
         return True
     except NameError:
         return False
@@ -351,7 +351,7 @@ def process_crs(crs):
     except ImportError:
         missing.append('cartopy')
     try:
-        import geoviews as gv  # noqa
+        import geoviews  # noqa: F401
     except ImportError:
         missing.append('geoviews')
     try:
@@ -1196,10 +1196,8 @@ def _parse_numpydoc_patch(self):
             section = (s.capitalize() for s in section.split(' '))
             section = ' '.join(section)
             if self.get(section):
-                self._error_location(
-                    'The section %s appears twice in  %s'  # noqa
-                    % (section, '\n'.join(self._doc._str))  # noqa
-                )
+                doc_str = '\n'.join(self._doc._str)
+                self._error_location(f'The section {section} appears twice in {doc_str}')
 
         # Patch is here, extending the sections with these other options
         if section in ('Parameters', 'Other Parameters', 'Attributes', 'Methods') + tuple(

@@ -17,9 +17,9 @@ warnings.warn(
 )
 
 try:
-    import intake_parquet  # noqa
-    import intake_xarray  # noqa
-    import s3fs  # noqa
+    import intake_parquet  # noqa: F401
+    import intake_xarray  # noqa: F401
+    import s3fs  # noqa: F401
     from intake import open_catalog
 except ImportError:
     raise ImportError(

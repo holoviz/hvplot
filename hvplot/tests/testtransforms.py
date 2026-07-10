@@ -8,7 +8,7 @@ from holoviews.element.comparison import ComparisonTestCase
 
 class TestPandasTransforms(ComparisonTestCase):
     def setUp(self):
-        import hvplot.pandas  # noqa
+        import hvplot.pandas  # noqa: F401
 
     def test_pandas_transform(self):
         demo_df = pd.DataFrame({'value': np.random.randn(50), 'probability': np.random.rand(50)})
@@ -54,10 +54,10 @@ class TestPandasTransforms(ComparisonTestCase):
 class TestXArrayTransforms(ComparisonTestCase):
     def setUp(self):
         try:
-            import xarray as xr  # noqa
+            import xarray  # noqa: F401
         except ImportError:
             raise SkipTest('xarray not available')
-        import hvplot.xarray  # noqa
+        import hvplot.xarray  # noqa: F401
 
     def test_xarray_transform(self):
         import xarray as xr
