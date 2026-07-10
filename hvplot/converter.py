@@ -1945,10 +1945,12 @@ class HoloViewsConverter:
         else:
             valid_opts = []
         ds_opts = ['max_px', 'threshold']
-        # Skip internal keys (prefixed with _) used by extensions like xugrid
-        mismatches = sorted(
-            k for k in kwds if k not in kind_opts + ds_opts + valid_opts and not k.startswith('_')
-        )
+        allowed = [
+            *kind_opts,
+            *ds_opts,
+            *valid_opts,
+        ]
+        mismatches = sorted(k for k in kwds if k not in allowed and not k.startswith('_xugrid'))
         if not mismatches:
             return
 
