@@ -1,8 +1,9 @@
-from unittest import TestCase, SkipTest
+from unittest import SkipTest, TestCase
 
 try:
-    import numpy as np
     import networkx as nx
+    import numpy as np
+
     import hvplot.networkx as hvnx
 except ImportError:
     raise SkipTest('NetworkX not available')

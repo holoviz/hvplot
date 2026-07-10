@@ -2,12 +2,11 @@ from functools import partial
 
 import holoviews as _hv
 import numpy as _np
-
 from packaging.version import Version
 
 from ..backend_transforms import _transfer_opts_cur_backend
 from ..converter import HoloViewsConverter
-from ..util import with_hv_extension, _convert_col_names_to_str
+from ..util import _convert_col_names_to_str, with_hv_extension
 
 
 @with_hv_extension

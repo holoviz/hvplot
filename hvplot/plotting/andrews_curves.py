@@ -1,8 +1,7 @@
+import colorcet as cc
+import holoviews as hv
 import numpy as np
 import pandas as pd
-
-import holoviews as hv
-import colorcet as cc
 
 from ..backend_transforms import _transfer_opts_cur_backend
 from ..util import with_hv_extension

@@ -4,7 +4,7 @@ Experimental support for ibis.
 
 
 def patch(name='hvplot', extension='bokeh', logo=False):
-    from . import hvPlotTabular, post_patch, _module_extensions
+    from . import _module_extensions, hvPlotTabular, post_patch
 
     try:
         import ibis

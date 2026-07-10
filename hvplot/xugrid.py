@@ -2,7 +2,7 @@
 
 
 def patch(name='hvplot', extension='bokeh', logo=False):
-    from . import post_patch, _module_extensions
+    from . import _module_extensions, post_patch
     from .plotting.core import hvPlotXugrid
 
     try:

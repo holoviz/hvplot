@@ -61,27 +61,25 @@ To report issues go to https://github.com/holoviz/holoviews.
 import os
 import sys
 
-import panel as _pn
 import holoviews as _hv
-
+import panel as _pn
 from holoviews import render  # noqa
 
-
+from . import sampledata  # noqa
 from .converter import HoloViewsConverter  # noqa
 from .interactive import Interactive
-from .ui import explorer  # noqa
-from .util import _PatchHvplotDocstrings, _in_ipython
-from .utilities import help, hvplot_extension, output, save, show  # noqa
 from .plotting import (
+    andrews_curves,  # noqa
     hvPlot,  # noqa
     hvPlotTabular,  # noqa
-    andrews_curves,  # noqa
     lag_plot,  # noqa
     parallel_coordinates,  # noqa
-    scatter_matrix,  # noqa
     plot,  # noqa
+    scatter_matrix,  # noqa
 )
-from . import sampledata  # noqa
+from .ui import explorer  # noqa
+from .util import _in_ipython, _PatchHvplotDocstrings
+from .utilities import help, hvplot_extension, output, save, show  # noqa
 
 # Define '__version__'
 try:
@@ -109,7 +107,7 @@ except (ImportError, LookupError, FileNotFoundError):
         # ImportError, let's be explicit anyway.
 
         # Try something else:
-        from importlib.metadata import version as mversion, PackageNotFoundError
+        from importlib.metadata import PackageNotFoundError, version as mversion
 
         try:
             __version__ = mversion('hvplot')

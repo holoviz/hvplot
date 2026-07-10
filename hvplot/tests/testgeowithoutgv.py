@@ -3,16 +3,17 @@ Geo tests **without** importing GeoViews.
 """
 
 import holoviews as hv
-import hvplot.pandas  # noqa
 import numpy as np
 import pandas as pd
 import pytest
-
-from hvplot.util import is_geodataframe
 from holoviews.util.transform import lon_lat_to_easting_northing
+
+import hvplot.pandas  # noqa
+from hvplot.util import is_geodataframe
 
 try:
     import dask.dataframe as dd
+
     import hvplot.dask  # noqa
 except ImportError:
     dd = None

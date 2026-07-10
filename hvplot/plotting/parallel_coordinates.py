@@ -1,5 +1,5 @@
-import holoviews as hv
 import colorcet as cc
+import holoviews as hv
 
 from ..backend_transforms import _transfer_opts_cur_backend
 from ..util import with_hv_extension

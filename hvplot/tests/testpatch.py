@@ -3,13 +3,12 @@ Tests patching of supported libraries
 """
 
 import sys
-
-from unittest import TestCase, SkipTest
+from unittest import SkipTest, TestCase
 
 import numpy as np
 import pandas as pd
 
-from hvplot.plotting import hvPlotTabular, hvPlot
+from hvplot.plotting import hvPlot, hvPlotTabular
 from hvplot.util import _HV_VERSION
 
 

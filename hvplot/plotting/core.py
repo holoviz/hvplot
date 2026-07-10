@@ -2,7 +2,6 @@ import itertools
 from collections import defaultdict
 
 import param
-
 from packaging.version import Version
 
 try:
@@ -1572,8 +1571,9 @@ class hvPlotTabularDuckDB(hvPlotTabular):
         if Version(duckdb.__version__).release < (1, 4, 1):
             from duckdb.typing import (
                 BIGINT,
-                FLOAT,
                 DOUBLE,
+                FLOAT,
+                HUGEINT,
                 INTEGER,
                 SMALLINT,
                 TINYINT,
@@ -1581,13 +1581,13 @@ class hvPlotTabularDuckDB(hvPlotTabular):
                 UINTEGER,
                 USMALLINT,
                 UTINYINT,
-                HUGEINT,
             )
         else:
             from duckdb.sqltypes import (
                 BIGINT,
-                FLOAT,
                 DOUBLE,
+                FLOAT,
+                HUGEINT,
                 INTEGER,
                 SMALLINT,
                 TINYINT,
@@ -1595,7 +1595,6 @@ class hvPlotTabularDuckDB(hvPlotTabular):
                 UINTEGER,
                 USMALLINT,
                 UTINYINT,
-                HUGEINT,
             )
 
         params = dict(self._metadata, **kwds)

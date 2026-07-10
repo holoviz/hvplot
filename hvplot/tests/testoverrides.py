@@ -4,10 +4,10 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+from holoviews import Scatter, Store
+from holoviews.element.comparison import ComparisonTestCase
 
 from hvplot.plotting import hvPlot, hvPlotTabular
-from holoviews import Store, Scatter
-from holoviews.element.comparison import ComparisonTestCase
 
 
 class TestOverrides(ComparisonTestCase):

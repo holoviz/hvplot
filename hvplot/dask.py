@@ -18,7 +18,7 @@ class DaskInteractive(Interactive):
 
 
 def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=False):
-    from . import hvPlotTabular, post_patch, _module_extensions
+    from . import _module_extensions, hvPlotTabular, post_patch
 
     try:
         import dask.dataframe as dd

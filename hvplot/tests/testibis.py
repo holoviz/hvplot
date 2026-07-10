@@ -3,9 +3,7 @@
 import numpy as np
 import pandas as pd
 import pytest
-
 from packaging import version
-
 
 try:
     import hvplot.ibis  # noqa

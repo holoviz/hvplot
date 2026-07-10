@@ -1,13 +1,12 @@
 import warnings
 
 import holoviews as hv
-from ..util import with_hv_extension, is_duckdb, is_polars, _find_stack_level
 
-from .core import hvPlot, hvPlotTabular  # noqa
-
+from ..util import _find_stack_level, is_duckdb, is_polars, with_hv_extension
 from .andrews_curves import andrews_curves  # noqa
-from .parallel_coordinates import parallel_coordinates  # noqa
+from .core import hvPlot, hvPlotTabular  # noqa
 from .lag_plot import lag_plot  # noqa
+from .parallel_coordinates import parallel_coordinates  # noqa
 from .scatter_matrix import scatter_matrix  # noqa
 
 

@@ -2,17 +2,16 @@ import re
 from textwrap import dedent
 from unittest.mock import patch
 
-import numpy as np
 import holoviews as hv
+import numpy as np
 import pandas as pd
+import pytest
+import xarray as xr
+from bokeh.sampledata import penguins
+
 import hvplot.pandas
 import hvplot.xarray
-import xarray as xr
-
-import pytest
-
-from bokeh.sampledata import penguins
-from hvplot.ui import hvDataFrameExplorer, hvGridExplorer, MAX_ROWS
+from hvplot.ui import MAX_ROWS, hvDataFrameExplorer, hvGridExplorer
 
 df = penguins.data
 ds_air_temperature = xr.tutorial.open_dataset('air_temperature')

@@ -5,24 +5,22 @@ Provides utilities to convert data and projections
 import inspect
 import itertools
 import os
-import textwrap
 import sys
-
+import textwrap
+import warnings
 from collections.abc import Hashable, Sequence
 from contextlib import contextmanager
 from functools import lru_cache, wraps
 from importlib.util import find_spec
 from types import FunctionType
-import warnings
-
-from packaging.version import Version
 
 import bokeh
+import holoviews as hv
 import numpy as np
 import pandas as pd
 import param
-import holoviews as hv
 from holoviews.util.transform import lon_lat_to_easting_northing
+from packaging.version import Version
 
 try:
     import panel as pn
@@ -1130,8 +1128,8 @@ def _get_doc_and_signature(
 
 class _PatchHvplotDocstrings:
     def __init__(self):
-        from .plotting.core import hvPlot, hvPlotTabular
         from .converter import HoloViewsConverter
+        from .plotting.core import hvPlot, hvPlotTabular
 
         # Store the original signatures because the method signatures
         # are going to be patched every time an extension is changed.
@@ -1145,8 +1143,8 @@ class _PatchHvplotDocstrings:
         self.orig = orig
 
     def __call__(self):
-        from .plotting.core import hvPlot, hvPlotTabular
         from .converter import HoloViewsConverter
+        from .plotting.core import hvPlot, hvPlotTabular
 
         for cls in [hvPlot, hvPlotTabular]:
             for _kind in HoloViewsConverter._kind_mapping:
@@ -1237,6 +1235,7 @@ def _patch_numpy_docstring():
 
 def _get_docstring_group_parameters(option_group: str) -> list:
     from numpydoc.docscrape import NumpyDocString
+
     from .converter import HoloViewsConverter
 
     with _patch_numpy_docstring():

@@ -4,8 +4,7 @@ These tests depends on GeoViews.
 
 import pathlib
 import sys
-
-from unittest import TestCase, SkipTest
+from unittest import SkipTest, TestCase
 
 import holoviews as hv
 import numpy as np
@@ -149,9 +148,9 @@ class TestProjections(TestGeo):
         hv.renderer('bokeh').get_plot(plot)
 
     def test_geo_with_rasterize(self):
-        import xarray as xr
         import cartopy.crs as ccrs
         import geoviews as gv
+        import xarray as xr
 
         try:
             from holoviews.operation.datashader import rasterize

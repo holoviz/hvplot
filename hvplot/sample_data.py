@@ -17,10 +17,10 @@ warnings.warn(
 )
 
 try:
-    from intake import open_catalog
     import intake_parquet  # noqa
     import intake_xarray  # noqa
     import s3fs  # noqa
+    from intake import open_catalog
 except ImportError:
     raise ImportError(
         """Loading hvPlot sample data requires:

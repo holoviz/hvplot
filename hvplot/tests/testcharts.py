@@ -1,15 +1,14 @@
 from unittest import SkipTest, expectedFailure
-from parameterized import parameterized
 
 import numpy as np
 import pandas as pd
 import pytest
-
-from holoviews.core.dimension import Dimension
 from holoviews import NdLayout, NdOverlay, Store, dim, render
-from holoviews.element import Curve, Area, Scatter, Points, Path, HeatMap
+from holoviews.core.dimension import Dimension
+from holoviews.element import Area, Curve, HeatMap, Path, Points, Scatter
 from holoviews.element.comparison import ComparisonTestCase
 from packaging.version import Version
+from parameterized import parameterized
 
 from ..util import is_dask
 
@@ -78,6 +77,7 @@ class TestChart2D(ComparisonTestCase):
     def test_xarray_dataset_with_attrs(self):
         try:
             import xarray as xr
+
             import hvplot.xarray  # noqa
         except ImportError:
             raise SkipTest('xarray not available')

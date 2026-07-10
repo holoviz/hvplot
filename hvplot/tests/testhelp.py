@@ -1,9 +1,8 @@
-import hvplot.pandas
 import pytest
-
 from holoviews.core import Store
 from holoviews.element import Curve
 
+import hvplot.pandas
 from hvplot.util import _get_doc_and_signature
 
 

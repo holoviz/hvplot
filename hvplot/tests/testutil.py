@@ -14,22 +14,22 @@ except ImportError:
     spd = None
     dd = None
 
-from unittest import TestCase, SkipTest
+from unittest import SkipTest, TestCase
 
 from hvplot.util import (
+    _bounds_in_range,
+    _convert_col_names_to_str,
+    _convert_latlon_to_mercator,
+    _convert_limit_to_mercator,
+    _generate_unique_name,
+    _is_within_latlon_bounds,
     check_crs,
     import_geoviews,
+    instantiate_crs_str,
+    is_geodataframe,
     is_list_like,
     process_crs,
     process_xarray,
-    _convert_col_names_to_str,
-    instantiate_crs_str,
-    is_geodataframe,
-    _is_within_latlon_bounds,
-    _convert_latlon_to_mercator,
-    _bounds_in_range,
-    _convert_limit_to_mercator,
-    _generate_unique_name,
 )
 
 

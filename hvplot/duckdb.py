@@ -3,7 +3,8 @@
 
 def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=False):
     from hvplot.plotting.core import hvPlotTabularDuckDB
-    from . import post_patch, _module_extensions
+
+    from . import _module_extensions, post_patch
 
     if 'hvplot.duckdb' not in _module_extensions:
         try:

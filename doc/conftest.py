@@ -1,11 +1,10 @@
 import os
-
 from importlib.util import find_spec
 
 import dask
-
-from packaging.version import Version, parse
 from bokeh.io.webdriver import webdriver_control
+from packaging.version import Version, parse
+
 from hvplot.util import _PD_GE_3_0_0
 
 # Examples that are slow to run and/or download large files.
@@ -57,8 +56,8 @@ if _PD_GE_3_0_0:
     collect_ignore_glob += ['ref/data_libraries.ipynb']
 
 try:
-    import ibis
     import duckdb
+    import ibis
 
     # 'Ibis <= 10.8.0 is incompatible with DuckDB >= 1.4')
     if parse(ibis.__version__) <= parse('10.8.0') and parse(duckdb.__version__) >= parse('1.4'):

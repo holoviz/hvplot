@@ -6,11 +6,11 @@
     - https:// cannot be used. For example in SVGs.
 """
 
+import glob
 import pathlib
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from urllib.request import urlopen
-import glob
 
 import pytest
 

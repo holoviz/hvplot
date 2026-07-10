@@ -1,20 +1,19 @@
 import sys
-
 from unittest import SkipTest
-from parameterized import parameterized
 
-import hvplot.pandas  # noqa
 import numpy as np
 import pandas as pd
 import pytest
-
 from holoviews import Store, render
-from holoviews.element import Image, QuadMesh, Points
-from holoviews.core.spaces import DynamicMap
 from holoviews.core.overlay import Overlay
+from holoviews.core.spaces import DynamicMap
+from holoviews.element import Image, Points, QuadMesh
 from holoviews.element.chart import Scatter
 from holoviews.element.comparison import ComparisonTestCase
 from holoviews.element.raster import ImageStack
+from parameterized import parameterized
+
+import hvplot.pandas  # noqa
 from hvplot.converter import HoloViewsConverter
 from hvplot.tests.util import makeTimeDataFrame
 
@@ -372,8 +371,8 @@ class TestDatashader(ComparisonTestCase):
 class TestChart2D(ComparisonTestCase):
     def setUp(self):
         try:
-            import xarray as xr
             import datashader as ds  # noqa
+            import xarray as xr
         except ImportError:
             raise SkipTest('xarray or datashader not available')
         if sys.maxsize < 2**32:

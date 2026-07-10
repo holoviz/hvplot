@@ -6,7 +6,7 @@ from typing import Any
 
 import panel as _pn
 
-from . import hvPlotTabular, post_patch, _module_extensions
+from . import _module_extensions, hvPlotTabular, post_patch
 from .util import _fugue_ipython
 
 

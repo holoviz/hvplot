@@ -1,7 +1,6 @@
 import dask
 import param
 import pytest
-
 from packaging.version import Version
 
 param.parameterized.warnings_as_exceptions = True

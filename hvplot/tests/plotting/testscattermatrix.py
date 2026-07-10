@@ -1,10 +1,8 @@
-from unittest import TestCase, SkipTest
 import sys
+from unittest import SkipTest, TestCase
 
-from parameterized import parameterized
 import numpy as np
 import pandas as pd
-
 from holoviews.core import GridMatrix, NdOverlay
 from holoviews.element import (
     Bivariate,
@@ -13,6 +11,8 @@ from holoviews.element import (
     Histogram,
     Scatter,
 )
+from parameterized import parameterized
+
 from hvplot import scatter_matrix
 
 

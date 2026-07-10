@@ -4,9 +4,9 @@ from holoviews.core import Store
 from holoviews.element import Area, Curve
 
 from hvplot.backend_transforms import (
+    _is_interactive_opt,
     _transfer_opts,
     _transform_size_to_mpl,
-    _is_interactive_opt,
 )
 
 

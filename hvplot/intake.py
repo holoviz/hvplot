@@ -2,7 +2,7 @@ import warnings
 
 from packaging.version import Version
 
-from . import hvPlot, post_patch, _module_extensions
+from . import _module_extensions, hvPlot, post_patch
 from .util import _find_stack_level
 
 warnings.warn(

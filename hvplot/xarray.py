@@ -1,5 +1,4 @@
 import xarray as xr
-
 from panel.widgets import Widget
 
 from .interactive import Interactive
@@ -39,7 +38,7 @@ class XArrayInteractive(Interactive):
 
 
 def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=False):
-    from . import hvPlot, post_patch, _module_extensions
+    from . import _module_extensions, hvPlot, post_patch
 
     try:
         import xarray as xr

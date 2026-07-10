@@ -1,13 +1,12 @@
 from collections import defaultdict
 
-import numpy as np
-import networkx as nx
 import holoviews as _hv
-
+import networkx as nx
+import numpy as np
 from bokeh.models import HoverTool
 from holoviews import Graph, Labels, dim
-from holoviews.core.util import dimension_sanitizer
 from holoviews.core.options import Store
+from holoviews.core.util import dimension_sanitizer
 from holoviews.plotting.bokeh import GraphPlot, LabelsPlot
 from holoviews.plotting.bokeh.styles import markers
 

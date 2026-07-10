@@ -8,11 +8,11 @@ Usage:
 """
 
 import sys
-
 from textwrap import indent
 
-from hvplot.util import _get_docstring_group_parameters
 from sphinx.util.docutils import SphinxDirective
+
+from hvplot.util import _get_docstring_group_parameters
 
 
 class PlottingOptionsTableDirective(SphinxDirective):

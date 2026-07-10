@@ -96,7 +96,6 @@ display its repr.
 import abc
 import operator
 import sys
-
 from functools import partial
 from types import FunctionType, MethodType
 
@@ -104,18 +103,17 @@ import holoviews as hv
 import pandas as pd
 import panel as pn
 import param
-
-from panel.layout import Column, Row, HSpacer
-from panel.util import get_method_owner, full_groupby
+from panel.layout import Column, HSpacer, Row
+from panel.util import full_groupby, get_method_owner
 from panel.widgets.base import Widget
 
 from .converter import HoloViewsConverter
 from .util import (
+    _convert_col_names_to_str,
     _flatten,
     is_tabular,
     is_xarray,
     is_xarray_dataarray,
-    _convert_col_names_to_str,
 )
 
 

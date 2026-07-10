@@ -1,6 +1,6 @@
+import holoviews as _hv
 import panel as _pn
 import param
-import holoviews as _hv
 
 from .util import _get_doc_and_signature
 

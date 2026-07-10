@@ -1,6 +1,6 @@
 """Adds the `.hvplot` method to pl.DataFrame, pl.LazyFrame and pl.Series"""
 
-from hvplot import post_patch, _module_extensions
+from hvplot import _module_extensions, post_patch
 from hvplot.plotting.core import hvPlotTabularPolars
 
 

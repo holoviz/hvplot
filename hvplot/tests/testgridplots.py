@@ -1,8 +1,7 @@
 import os
 import tempfile
-
-from unittest import SkipTest
 from collections import OrderedDict
+from unittest import SkipTest
 
 import numpy as np
 from holoviews import Store

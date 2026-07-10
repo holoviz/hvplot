@@ -2,10 +2,11 @@
 Tests for deprecation warnings.
 """
 
+import importlib
 import os
 import sys
-import importlib
 import tempfile
+
 import pandas as pd
 import pytest
 

@@ -3,50 +3,49 @@ import sys
 import warnings
 from functools import partial
 
-import param
-import holoviews as hv
-import pandas as pd
-import numpy as np
 import colorcet as cc
-
+import holoviews as hv
+import numpy as np
+import pandas as pd
+import param
 from bokeh.models import HoverTool
 from holoviews.core.dimension import Dimension
-from holoviews.core.spaces import DynamicMap, HoloMap, Callable
-from holoviews.core.overlay import NdOverlay
-from holoviews.core.options import Store, Cycle, Palette
 from holoviews.core.layout import NdLayout
+from holoviews.core.options import Cycle, Palette, Store
+from holoviews.core.overlay import NdOverlay
+from holoviews.core.spaces import Callable, DynamicMap, HoloMap
 from holoviews.core.util import max_range
 from holoviews.element import (
-    Curve,
-    Scatter,
+    RGB,
     Area,
     Bars,
+    Bivariate,
     BoxWhisker,
+    Contours,
+    Curve,
     Dataset,
     Distribution,
-    Table,
-    HeatMap,
-    Image,
-    HexTiles,
-    QuadMesh,
-    Bivariate,
-    Histogram,
-    Violin,
-    Contours,
-    Polygons,
-    Points,
-    Path,
-    Labels,
-    RGB,
     ErrorBars,
-    VectorField,
+    HeatMap,
+    HexTiles,
+    Histogram,
+    Image,
+    Labels,
+    Path,
+    Points,
+    Polygons,
+    QuadMesh,
     Rectangles,
+    Scatter,
     Segments,
+    Table,
     TriMesh,
+    VectorField,
+    Violin,
 )
+from holoviews.operation import apply_when, histogram
 from holoviews.plotting.bokeh import OverlayPlot, colormap_generator
 from holoviews.plotting.util import process_cmap
-from holoviews.operation import histogram, apply_when
 from holoviews.streams import Buffer, Pipe
 from holoviews.util.transform import dim
 from pandas import DatetimeIndex, MultiIndex
@@ -54,42 +53,42 @@ from pandas import DatetimeIndex, MultiIndex
 from .backend_transforms import _transfer_opts_cur_backend
 from .util import (
     _HV_GE_1_21_0,
+    _HV_VERSION,
     _PD_GE_2_1_0,
+    _convert_col_names_to_str,
+    _convert_latlon_to_mercator,
+    _convert_limit_to_mercator,
+    _find_stack_level,
+    _generate_unique_name,
+    _is_within_latlon_bounds,
     _Undefined,
+    check_library,
     filter_opts,
-    is_tabular,
-    is_series,
+    import_datashader,
+    import_geoviews,
+    is_cudf,
     is_dask,
     is_duckdb,
-    is_intake,
-    is_cudf,
-    is_streamz,
+    is_geodataframe,
     is_ibis,
+    is_intake,
     is_lazy_data,
+    is_mpl_cmap,
+    is_series,
+    is_streamz,
+    is_tabular,
     is_xarray,
     is_xarray_dataarray,
     is_xugrid,
     process_crs,
+    process_derived_datetime_pandas,
+    process_derived_datetime_xarray,
     process_intake,
     process_xarray,
+    redim_,
     relabel,
     relabel_redim,
-    redim_,
     support_index,
-    check_library,
-    is_geodataframe,
-    process_derived_datetime_xarray,
-    process_derived_datetime_pandas,
-    _convert_col_names_to_str,
-    import_datashader,
-    import_geoviews,
-    is_mpl_cmap,
-    _find_stack_level,
-    _HV_VERSION,
-    _is_within_latlon_bounds,
-    _convert_latlon_to_mercator,
-    _convert_limit_to_mercator,
-    _generate_unique_name,
 )
 from .utilities import hvplot_extension
 
@@ -2194,7 +2193,7 @@ class HoloViewsConverter:
             return layers
 
         ds = import_datashader()
-        from holoviews.operation.datashader import datashade, rasterize, dynspread
+        from holoviews.operation.datashader import datashade, dynspread, rasterize
 
         categorical, agg = self._process_categorical_datashader()
         if agg:
