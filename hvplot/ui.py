@@ -1,3 +1,5 @@
+"""Panel-based interactive UI to explore data and build hvPlot plots."""
+
 import holoviews as _hv
 import numpy as np
 import panel as pn
@@ -115,6 +117,8 @@ def _create_param_pane(inst, widgets_kwargs=None, parameters=None):
 
 
 class Controls(Viewer):
+    """Base class for a group of explorer control widgets."""
+
     explorer = param.ClassSelector(class_=Viewer, precedence=-1)
 
     _widgets_kwargs = {}
@@ -126,10 +130,12 @@ class Controls(Viewer):
         super().__init__(**params)
 
     def __panel__(self):
+        """Return the Panel representation of the controls."""
         return _create_param_pane(self, widgets_kwargs=self._widgets_kwargs)
 
     @property
     def kwargs(self):
+        """Return the set control values as plot keyword arguments."""
         return {
             k: v
             for k, v in self.param.values().items()
@@ -138,6 +144,8 @@ class Controls(Viewer):
 
 
 class Colormapping(Controls):
+    """Controls for colormapping options."""
+
     clim = param.Range(
         label='Colorbar Limits (clim)',
         doc="""
@@ -173,6 +181,7 @@ class Colormapping(Controls):
 
     @property
     def colormapped(self):
+        """Return whether the current plot uses colormapping."""
         if self.explorer.kind in _hvConverter._colorbar_types:
             return True
         return self.color is not None and self.color in self._data
@@ -198,10 +207,14 @@ class Colormapping(Controls):
 
 
 class Style(Controls):
+    """Controls for style options."""
+
     alpha = param.Magnitude(default=1)
 
 
 class Axes(Controls):
+    """Controls for axes options."""
+
     legend = param.Selector(default='bottom_right', objects=_hvConverter._legend_positions)
 
     logx = param.Boolean(default=False)
@@ -249,7 +262,6 @@ class Axes(Controls):
         This function is a workaround and should be removed when a better solution is found.
 
         """
-
         if isinstance(val[0], datetime_types) and isinstance(val[1], datetime_types):
             val = (dt_to_int(val[0], 'ms'), dt_to_int(val[1], 'ms'))
 
@@ -257,6 +269,8 @@ class Axes(Controls):
 
 
 class Labels(Controls):
+    """Controls for title and axis label options."""
+
     title = param.String(doc='Title for the plot')
 
     xlabel = param.String(doc='Axis labels for the x-axis.')
@@ -287,6 +301,8 @@ class Labels(Controls):
 
 
 class Geographic(Controls):
+    """Controls for geographic options."""
+
     tiles = param.ObjectSelector(
         default=None,
         objects=GEO_TILES,
@@ -416,6 +432,8 @@ class Geographic(Controls):
 
 
 class Operations(Controls):
+    """Controls for data operations such as datashading."""
+
     datashade = param.Boolean(
         default=False,
         doc="""
@@ -476,6 +494,8 @@ class Operations(Controls):
 
 
 class Advanced(Controls):
+    """Controls for advanced options passed to HoloViews .opts()."""
+
     opts = param.Dict(
         label='HoloViews .opts()',
         doc="""
@@ -490,6 +510,8 @@ class Advanced(Controls):
 
 
 class StatusBar(param.Parameterized):
+    """Status bar controls for the explorer."""
+
     live_update = param.Boolean(
         default=True,
         doc="""
@@ -498,6 +520,8 @@ class StatusBar(param.Parameterized):
 
 
 class hvPlotExplorer(Viewer):
+    """Interactive UI to explore data and build hvPlot plots."""
+
     kind = param.Selector()
 
     x = param.Selector()
@@ -532,6 +556,7 @@ class hvPlotExplorer(Viewer):
 
     @classmethod
     def from_data(cls, data, **params):
+        """Create the appropriate explorer subclass for the given data."""
         if is_geodataframe(data):
             # kls = hvGeomExplorer
             raise TypeError('GeoDataFrame objects not yet supported.')
@@ -542,6 +567,7 @@ class hvPlotExplorer(Viewer):
         return kls(data, **params)
 
     def __panel__(self):
+        """Return the Panel representation of the explorer."""
         return self._layout
 
     def __init__(self, df, **params):
@@ -626,9 +652,7 @@ class hvPlotExplorer(Viewer):
         self.param.trigger('kind')
 
     def _populate(self):
-        """
-        Populates the options of the controls based on the data type.
-        """
+        """Populate the options of the controls based on the data type."""
         variables = self._converter.variables
         indexes = getattr(self._converter, 'indexes', [])
         variables_no_index = [v for v in variables if v not in indexes]
@@ -879,6 +903,8 @@ class hvPlotExplorer(Viewer):
 
 
 class hvGeomExplorer(hvPlotExplorer):
+    """Explorer for geometry (GeoDataFrame) data."""
+
     kind = param.Selector(default=None, objects=KINDS['all'])
 
     @property
@@ -899,11 +925,11 @@ class hvGeomExplorer(hvPlotExplorer):
 
     @param.depends('x')
     def xlim(self):
-        pass
+        """Return the x-axis limits."""
 
     @param.depends('y')
     def ylim(self):
-        pass
+        """Return the y-axis limits."""
 
     @property
     def _groups(self):
@@ -911,6 +937,8 @@ class hvGeomExplorer(hvPlotExplorer):
 
 
 class hvGridExplorer(hvPlotExplorer):
+    """Explorer for gridded (xarray) data."""
+
     kind = param.Selector(default='image', objects=KINDS['all'])
 
     def __init__(self, ds, **params):
@@ -952,6 +980,7 @@ class hvGridExplorer(hvPlotExplorer):
 
     @param.depends('x')
     def xlim(self):
+        """Return the x-axis limits."""
         try:
             values = self._data[self._x]
         except Exception:
@@ -962,6 +991,7 @@ class hvGridExplorer(hvPlotExplorer):
 
     @param.depends('y', 'y_multi')
     def ylim(self):
+        """Return the y-axis limits."""
         y = self._y
         if not isinstance(y, list):
             y = [y]
@@ -1000,6 +1030,8 @@ class hvGridExplorer(hvPlotExplorer):
 
 
 class hvDataFrameExplorer(hvPlotExplorer):
+    """Explorer for tabular (DataFrame) data."""
+
     z = param.Selector()
 
     kind = param.Selector(default='scatter', objects=KINDS['all'])
@@ -1010,6 +1042,7 @@ class hvDataFrameExplorer(hvPlotExplorer):
 
     @property
     def xcat(self):
+        """Return whether the x dimension is categorical."""
         if self.kind in ('bar', 'box', 'violin'):
             return False
         values = self._data[self.x]
@@ -1037,6 +1070,7 @@ class hvDataFrameExplorer(hvPlotExplorer):
 
     @param.depends('x')
     def xlim(self):
+        """Return the x-axis limits."""
         if self._x == 'index':
             values = self._data.index.values
         else:
@@ -1055,6 +1089,7 @@ class hvDataFrameExplorer(hvPlotExplorer):
 
     @param.depends('y', 'y_multi')
     def ylim(self):
+        """Return the y-axis limits."""
         y = self._y
         if not isinstance(y, list):
             y = [y]

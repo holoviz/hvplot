@@ -1,7 +1,8 @@
-"""Adds the `.hvplot` method to duckdb.DuckDBPyRelation and duckdb.DuckDBPyConnection"""
+"""Adds the `.hvplot` method to duckdb.DuckDBPyRelation and duckdb.DuckDBPyConnection."""
 
 
 def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=False):
+    """Patch the hvPlot plotting API onto DuckDB relations and connections."""
     from hvplot.plotting.core import hvPlotTabularDuckDB
 
     from . import _module_extensions, post_patch

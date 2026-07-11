@@ -1,6 +1,4 @@
-"""
-Set of transforms to go from a Bokeh option to another backend's option.
-"""
+"""Set of transforms to go from a Bokeh option to another backend's option."""
 
 from holoviews.core.options import Store
 from holoviews.core.overlay import CompositeOverlay

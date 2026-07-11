@@ -32,7 +32,7 @@ def table():
 
 @pytest.mark.skipif(_PD_GE_3_0_0, reason='breaks with Pandas 3')
 def test_fugure_ipython_line(table, capsys):
-    """hvplot works with Fugue"""
+    """hvPlot works with Fugue"""
     fa.fugue_sql(
         """
         OUTPUT table USING hvplot:line(

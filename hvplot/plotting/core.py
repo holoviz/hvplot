@@ -1,3 +1,5 @@
+"""hvPlot and hvPlotTabular, the main entrypoints to the hvPlot API."""
+
 import itertools
 from collections import defaultdict
 
@@ -55,6 +57,7 @@ class hvPlotBase:
         self._metadata = metadata
 
     def __call__(self, x=None, y=None, kind=None, **kwds):
+        """Create a plot of the given kind."""
         # Convert an array-like to a list
         x = list(x) if is_list_like(x) else x
         y = list(y) if is_list_like(y) else y
@@ -104,16 +107,12 @@ class hvPlotBase:
         return HoloViewsConverter(self._data, x, y, kind=kind, **params)
 
     def __dir__(self):
-        """
-        List default attributes and custom defined plots.
-        """
+        """List default attributes and custom defined plots."""
         dirs = super().__dir__()
         return sorted(list(dirs) + list(self._plots))
 
     def __getattribute__(self, name):
-        """
-        Custom getattribute to expose user defined subplots.
-        """
+        """Expose user defined subplots as attributes."""
         plots = object.__getattribute__(self, '_plots')
         if name in plots:
             plot_opts = plots[name]
@@ -1226,13 +1225,10 @@ class hvPlotTabular(hvPlotBase):
         -----
         This function requires ``scipy`` to be installed.
         """
-
         return self(kind='kde', x=None, y=y, by=by, **kwds)
 
     def density(self, y=None, by=None, **kwds):
-        """
-        Alias of :meth:`hvplot.hvPlot.kde`.
-        """
+        """Alias of :meth:`hvplot.hvPlot.kde`."""
         return self(kind='kde', x=None, y=y, by=by, **kwds)
 
     def table(self, columns=None, **kwds):
@@ -1566,6 +1562,8 @@ class hvPlotTabular(hvPlotBase):
 
 
 class hvPlotTabularDuckDB(hvPlotTabular):
+    """hvPlot accessor for DuckDB relations and connections."""
+
     def _get_converter(self, x=None, y=None, kind=None, **kwds):
         import duckdb
 
@@ -1665,6 +1663,8 @@ class hvPlotTabularDuckDB(hvPlotTabular):
 
 
 class hvPlotTabularPolars(hvPlotTabular):
+    """hvPlot accessor for polars DataFrame, LazyFrame and Series."""
+
     def _get_converter(self, x=None, y=None, kind=None, **kwds):
         import polars as pl
 

@@ -1,3 +1,5 @@
+"""hvPlot-based drawing functions mirroring the NetworkX drawing API."""
+
 from collections import defaultdict
 
 import holoviews as _hv
@@ -43,7 +45,6 @@ def _from_networkx(G, positions, nodes=None, cls=Graph, **kwargs):
     graph : holoviews.Graph
        Graph element
     """
-
     # Unpack edges
     edges = defaultdict(list)
     for start, end in G.edges():

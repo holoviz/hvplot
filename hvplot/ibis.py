@@ -1,9 +1,8 @@
-"""
-Experimental support for ibis.
-"""
+"""Experimental support for ibis."""
 
 
 def patch(name='hvplot', extension='bokeh', logo=False):
+    """Patch the hvPlot plotting API onto ibis expressions."""
     from . import _module_extensions, hvPlotTabular, post_patch
 
     try:

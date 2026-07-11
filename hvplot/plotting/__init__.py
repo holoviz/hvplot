@@ -1,3 +1,5 @@
+"""Pandas-style plotting functions built on hvPlot."""
+
 import warnings
 
 import holoviews as hv
@@ -12,6 +14,7 @@ from .scatter_matrix import scatter_matrix  # noqa: F401
 
 @with_hv_extension
 def plot(data, kind, **kwargs):
+    """Plot data of the given kind, the pandas plotting backend entrypoint."""
     # drop reuse_plot
     kwargs.pop('reuse_plot', None)
 
@@ -51,14 +54,17 @@ def plot(data, kind, **kwargs):
 
 
 def boxplot_series(*args, **kwargs):
+    """Box plot for a Series."""
     return plot(*args, kind='box', **kwargs)
 
 
 def boxplot_frame(*args, **kwargs):
+    """Box plot for a DataFrame."""
     return plot(*args, kind='box', **kwargs)
 
 
 def boxplot_frame_groupby(grouped, **kwargs):
+    """Box plot for a grouped DataFrame."""
     width = kwargs.pop('width', 300)
     subplots = kwargs.pop('subplots', True)
     layout = hv.Layout if subplots else hv.Overlay
@@ -69,8 +75,10 @@ def boxplot_frame_groupby(grouped, **kwargs):
 
 
 def hist_series(*args, **kwargs):
+    """Histogram for a Series."""
     return plot(*args, kind='hist', **kwargs)
 
 
 def hist_frame(*args, **kwargs):
+    """Histogram for a DataFrame."""
     return plot(*args, kind='hist', **kwargs)

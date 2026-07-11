@@ -1,5 +1,5 @@
 """
-interactive API
+interactive API.
 
 How Interactive works
 ---------------------
@@ -212,6 +212,7 @@ class Interactive:  # noqa: PLW1641
     _fig = None
 
     def __new__(cls, obj, **kwargs):
+        """Create an Interactive instance, supporting functions as input."""
         # __new__ implemented to support functions as input, e.g.
         # hvplot.find(foo, widget).interactive().max()
         if 'fn' in kwargs:
@@ -540,7 +541,6 @@ class Interactive:  # noqa: PLW1641
         >>> dfi = df.interactive(width=200)
         >>> dfi.head(widget)
         """
-
         if self._method is None:
             if self._depth == 0:
                 # This code path is entered when initializing an interactive
@@ -847,9 +847,7 @@ class Interactive:  # noqa: PLW1641
         return self.holoviews() if self._dmap else self.panel(**self._kwargs)
 
     def panel(self, **kwargs):
-        """
-        Wraps the output in a Panel component.
-        """
+        """Wrap the output in a Panel component."""
         return pn.panel(self._callback, **kwargs)
 
     def widgets(self):

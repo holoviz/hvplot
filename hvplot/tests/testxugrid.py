@@ -182,7 +182,8 @@ class TestTrimeshExtraDimCoords(TestCase):
 
     def test_2d_coord_produces_dynamic_map(self):
         """A 2D coordinate (like FVCOM's siglay) should be filtered out
-        and replaced with integer indices for the groupby slider."""
+        and replaced with integer indices for the groupby slider.
+        """
         grid = self._make_grid()
         node_dim = grid.node_dimension
         da = xr.DataArray(
@@ -196,7 +197,8 @@ class TestTrimeshExtraDimCoords(TestCase):
 
     def test_dim_without_coord_produces_dynamic_map(self):
         """A dimension with no coordinate at all should get integer indices
-        and still produce a working groupby slider."""
+        and still produce a working groupby slider.
+        """
         grid = self._make_grid()
         node_dim = grid.node_dimension
         da = xr.DataArray(

@@ -1,3 +1,5 @@
+"""Andrews curves plot for visualizing multivariate data."""
+
 import colorcet as cc
 import holoviews as hv
 import numpy as np
@@ -19,7 +21,7 @@ def andrews_curves(
     colormap=None,
     **kwds,
 ):
-    """
+    r"""
     Generate a plot of Andrews curves, for visualising clusters of
     multivariate data.
 

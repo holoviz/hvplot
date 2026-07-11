@@ -1,9 +1,10 @@
-"""Adds the `.hvplot` method to pd.DataFrame and pd.Series"""
+"""Adds the `.hvplot` method to pd.DataFrame and pd.Series."""
 
 from .interactive import Interactive
 
 
 def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=False):
+    """Patch the hvPlot plotting API onto pandas DataFrame and Series."""
     from . import _module_extensions, hvPlotTabular, post_patch
 
     try:

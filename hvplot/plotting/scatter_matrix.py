@@ -1,3 +1,5 @@
+"""Scatter matrix plot for visualizing pairwise variable relationships."""
+
 from functools import partial
 
 import holoviews as _hv
@@ -93,7 +95,6 @@ def scatter_matrix(
     --------
         :func:`pandas.plotting.scatter_matrix` : Equivalent pandas function.
     """
-
     data = _hv.Dataset(_convert_col_names_to_str(data))
     supported = list(HoloViewsConverter._kind_mapping)
     if diagonal not in supported:

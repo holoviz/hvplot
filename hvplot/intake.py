@@ -1,3 +1,8 @@
+"""Patch the hvPlot plotting API onto Intake catalog entries (deprecated).
+
+.. deprecated:: 0.13
+"""
+
 import warnings
 
 from packaging.version import Version
@@ -14,6 +19,7 @@ warnings.warn(
 
 
 def patch(name='hvplot', extension='bokeh', logo=False):
+    """Patch the hvPlot plotting API onto Intake catalog entries."""
     try:
         import intake
     except ImportError as e:

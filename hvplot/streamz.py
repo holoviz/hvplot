@@ -1,9 +1,15 @@
+"""Patch the hvPlot plotting API onto streamz objects (deprecated).
+
+.. deprecated:: 0.13
+"""
+
 import warnings
 
 from .util import _find_stack_level
 
 
 def patch(name='hvplot', extension='bokeh', logo=False):
+    """Patch the hvPlot plotting API onto streamz DataFrame and Series."""
     from . import _module_extensions, hvPlotTabular, post_patch
 
     try:

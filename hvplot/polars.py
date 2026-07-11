@@ -1,10 +1,11 @@
-"""Adds the `.hvplot` method to pl.DataFrame, pl.LazyFrame and pl.Series"""
+"""Adds the `.hvplot` method to pl.DataFrame, pl.LazyFrame and pl.Series."""
 
 from hvplot import _module_extensions, post_patch
 from hvplot.plotting.core import hvPlotTabularPolars
 
 
 def patch(name='hvplot', extension='bokeh', logo=False):
+    """Patch the hvPlot plotting API onto polars DataFrame, LazyFrame and Series."""
     try:
         import polars as pl
     except ImportError as e:

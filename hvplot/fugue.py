@@ -1,6 +1,4 @@
-"""
-Experimental support for fugue.
-"""
+"""Experimental support for fugue."""
 
 from typing import Any
 
@@ -11,6 +9,7 @@ from .util import _fugue_ipython
 
 
 def patch(name='hvplot', extension='bokeh', logo=False):
+    """Register the hvPlot output extension with the fugue SQL API."""
     try:
         from fugue import DataFrames, Outputter
         from fugue.extensions import namespace_candidate, parse_outputter
@@ -33,8 +32,8 @@ def patch(name='hvplot', extension='bokeh', logo=False):
             Process the dataframes and output the result as
             a pn.Column.
 
-            Parameters:
-            -----------
+            Parameters
+            ----------
             dfs: fugue.DataFrames
             """
             charts = []

@@ -1,7 +1,8 @@
-"""Adds the `.hvplot` method to xu.UgridDataArray and xu.UgridDataset"""
+"""Adds the `.hvplot` method to xu.UgridDataArray and xu.UgridDataset."""
 
 
 def patch(name='hvplot', extension='bokeh', logo=False):
+    """Patch xugrid objects with the hvplot accessors."""
     from . import _module_extensions, post_patch
     from .plotting.core import hvPlotXugrid
 

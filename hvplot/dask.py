@@ -1,11 +1,16 @@
+"""Patch the hvPlot plotting API onto Dask objects."""
+
 import sys
 
 from .interactive import Interactive
 
 
 class DaskInteractive(Interactive):
+    """Interactive pipeline wrapper for Dask objects."""
+
     @classmethod
     def applies(cls, obj):
+        """Return whether the object is a Dask Series or DataFrame."""
         if 'dask.dataframe' in sys.modules:
             import dask.dataframe as dd
 
@@ -13,11 +18,13 @@ class DaskInteractive(Interactive):
         return False
 
     def compute(self):
+        """Trigger computation of the underlying Dask object."""
         self._method = 'compute'
         return self.__call__()
 
 
 def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=False):
+    """Patch the hvPlot plotting API onto Dask DataFrame and Series."""
     from . import _module_extensions, hvPlotTabular, post_patch
 
     try:

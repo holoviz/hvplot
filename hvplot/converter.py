@@ -1,3 +1,5 @@
+"""Conversion of tabular and gridded data into HoloViews elements."""
+
 import difflib
 import sys
 import warnings
@@ -114,18 +116,14 @@ class StreamingCallable(Callable):
         return self.__class__(callable, **params)
 
     def start(self):
-        """
-        Start the periodic callback
-        """
+        """Start the periodic callback."""
         if not self.periodic._running:
             self.periodic.start()
         else:
             raise RuntimeError('PeriodicCallback already running.')
 
     def stop(self):
-        """
-        Stop the periodic callback
-        """
+        """Stop the periodic callback."""
         if self.periodic._running:
             self.periodic.stop()
         else:
@@ -133,7 +131,8 @@ class StreamingCallable(Callable):
 
 
 class HoloViewsConverter:
-    """
+    """Convert data and plotting options into HoloViews elements.
+
     Data Options
     ------------
     attr_labels : bool or None, default=None
@@ -1352,7 +1351,7 @@ class HoloViewsConverter:
         return bool(cmin < 0 and cmax > 0)
 
     def _process_crs(self, data, crs):
-        """Given crs as proj4 string, data.attr, or cartopy.crs return cartopy.crs"""
+        """Given crs as proj4 string, data.attr, or cartopy.crs return cartopy.crs."""
         if hasattr(data, 'rio') and data.rio.crs is not None:
             # if data is a rioxarray
             _crs = data.rio.crs.to_wkt()
@@ -2018,6 +2017,7 @@ class HoloViewsConverter:
             )
 
     def __call__(self, kind, x, y):
+        """Dispatch to the plotting method matching the requested kind."""
         kind = self.kind or kind
         method = getattr(self, kind)
 
@@ -2448,9 +2448,7 @@ class HoloViewsConverter:
         return cur_opts, compat_opts
 
     def _error_if_unavailable(self, kind, element=None):
-        """
-        Raise an error if the element is not available with the current backend.
-        """
+        """Raise an error if the element is not available with the current backend."""
         if not element:
             element = self._kind_mapping[kind]
         if element not in Store.registry[self._backend]:
@@ -2463,6 +2461,7 @@ class HoloViewsConverter:
     ##########################
 
     def single_chart(self, element, x, y, data=None):
+        """Build a single chart element from x and y."""
         labelled = ['y' if self.invert else 'x'] if x != 'index' else []
         if not self.is_series:
             labelled.append('x' if self.invert else 'y')
@@ -2536,7 +2535,7 @@ class HoloViewsConverter:
         )
 
     def _process_chart_x(self, data, x, y, single_y, categories=None):
-        """This should happen before _process_chart_y"""
+        """Determine the x dimension; should run before _process_chart_y."""
         if x is False:
             return None
 
@@ -2554,7 +2553,7 @@ class HoloViewsConverter:
         return x
 
     def _process_chart_y(self, data, x, y, single_y):
-        """This should happen after _process_chart_x"""
+        """Determine the y dimension; should run after _process_chart_x."""
         y = y or self.y
         if y is None:
             ys = [c for c in data.columns if c not in [x, *self.by, *self.groupby, *self.grid]]
@@ -2615,9 +2614,7 @@ class HoloViewsConverter:
         return data, x, y
 
     def _process_tiles_without_geo(self, data, x, y):
-        """
-        Tiles without requiring geoviews/cartopy.
-        """
+        """Tiles without requiring geoviews/cartopy."""
         if self.geo or not self.tiles or self.output_projection is False:
             return data, x, y
         elif not is_geodataframe(data) and (x is None or y is None):
@@ -2643,7 +2640,7 @@ class HoloViewsConverter:
         return data, x, y
 
     def chart(self, element, x, y, data=None):
-        "Helper method for simple x vs. y charts"
+        """Generate a simple x vs. y chart."""
         data, x, y = self._process_chart_args(data, x, y)
         if x and y and not isinstance(y, (list, tuple)):
             return self.single_chart(element, x, y, data)
@@ -2688,18 +2685,22 @@ class HoloViewsConverter:
         )
 
     def line(self, x=None, y=None, data=None):
+        """Line plot."""
         self._error_if_unavailable('line')
         return self.chart(Curve, x, y, data)
 
     def step(self, x=None, y=None, data=None):
+        """Step plot."""
         where = self.kwds.get('where', 'mid')
         return self.line(x, y, data).options('Curve', interpolation='steps-' + where)
 
     def scatter(self, x=None, y=None, data=None):
+        """Scatter plot."""
         self._error_if_unavailable('scatter')
         return self.chart(Scatter, x, y, data)
 
     def area(self, x=None, y=None, data=None):
+        """Area plot."""
         self._error_if_unavailable('area')
         areas = self.chart(Area, x, y, data)
         if self.stacked:
@@ -2707,6 +2708,7 @@ class HoloViewsConverter:
         return areas
 
     def errorbars(self, x=None, y=None, data=None):
+        """Errorbars plot."""
         self._error_if_unavailable('errorbars')
         return self.chart(ErrorBars, x, y, data)
 
@@ -2715,9 +2717,7 @@ class HoloViewsConverter:
     ##########################
 
     def _category_plot(self, element, x: str, y: list[str], data):
-        """
-        Helper method to generate element from indexed dataframe.
-        """
+        """Generate element from indexed dataframe."""
         labelled = ['y' if self.invert else 'x'] if x != 'index' else []
         if self.value_label != 'value':
             labelled.append('x' if self.invert else 'y')
@@ -2753,6 +2753,7 @@ class HoloViewsConverter:
         )
 
     def bar(self, x=None, y=None, data=None):
+        """Bar plot."""
         self._error_if_unavailable('bar')
         data, x, y = self._process_chart_args(data, x, y, categories=self.by)
         if (x or self.by) and y and (self.by or not isinstance(y, (list, tuple) or len(y) == 1)):
@@ -2761,6 +2762,7 @@ class HoloViewsConverter:
         return self._category_plot(Bars, x, list(y), data)
 
     def barh(self, x=None, y=None, data=None):
+        """Horizontal bar plot."""
         return self.bar(x, y, data).opts('Bars', invert_axes=True)
 
     ##########################
@@ -2768,9 +2770,7 @@ class HoloViewsConverter:
     ##########################
 
     def _stats_plot(self, element, y, data=None):
-        """
-        Helper method to generate element from indexed dataframe.
-        """
+        """Generate element from indexed dataframe."""
         data, _x, y = self._process_chart_args(data, False, y)
 
         custom = {}
@@ -2814,10 +2814,12 @@ class HoloViewsConverter:
         ).apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
 
     def box(self, x=None, y=None, data=None):
+        """Box-whisker plot."""
         self._error_if_unavailable('box')
         return redim_(self._stats_plot(BoxWhisker, y, data), **self._redim)
 
     def violin(self, x=None, y=None, data=None):
+        """Violin plot."""
         self._error_if_unavailable('violin')
         try:
             from holoviews.element import Violin
@@ -2826,6 +2828,7 @@ class HoloViewsConverter:
         return redim_(self._stats_plot(Violin, y, data), **self._redim)
 
     def hist(self, x=None, y=None, data=None):
+        """Histogram."""
         self._error_if_unavailable('hist')
         data, _x, y = self._process_chart_args(data, False, y)
 
@@ -2911,6 +2914,7 @@ class HoloViewsConverter:
         )
 
     def kde(self, x=None, y=None, data=None):
+        """Kernel density estimate plot."""
         self._error_if_unavailable('kde')
         bw_method = self.kwds.pop('bw_method', None)
         ind = self.kwds.pop('ind', None)
@@ -2963,6 +2967,7 @@ class HoloViewsConverter:
         )
 
     def density(self, x=None, y=None, data=None):
+        """Kernel density estimate plot; alias of kde."""
         return self.kde(x, y, data)
 
     ##########################
@@ -2970,6 +2975,7 @@ class HoloViewsConverter:
     ##########################
 
     def dataset(self, x=None, y=None, data=None):
+        """Wrap the data in a HoloViews Dataset."""
         data = self.data if data is None else data
         if self.gridded:
             kdims = [self.x, self.y] if len(self.indexes) == 2 else None
@@ -2978,6 +2984,7 @@ class HoloViewsConverter:
             return redim_(Dataset(data, self.kwds.get('columns')), **self._redim)
 
     def heatmap(self, x=None, y=None, data=None):
+        """Heatmap."""
         self._error_if_unavailable('heatmap')
         data = self.data if data is None else data
         cur_opts, compat_opts = self._get_compat_opts('HeatMap')
@@ -3002,6 +3009,7 @@ class HoloViewsConverter:
         )
 
     def hexbin(self, x=None, y=None, data=None):
+        """Hexagonal binning plot."""
         self._error_if_unavailable('hexbin')
         self.use_index = False
         data, x, y = self._process_chart_args(data, x, y, single_y=True)
@@ -3026,6 +3034,7 @@ class HoloViewsConverter:
         )
 
     def bivariate(self, x=None, y=None, data=None):
+        """Bivariate density plot."""
         self._error_if_unavailable('bivariate')
         self.use_index = False
         data, x, y = self._process_chart_args(data, x, y, single_y=True)
@@ -3037,6 +3046,7 @@ class HoloViewsConverter:
         )
 
     def ohlc(self, x=None, y=None, data=None):
+        """Open-high-low-close plot."""
         self._error_if_unavailable('ohlc', Rectangles)
         self._error_if_unavailable('ohlc', Segments)
         data = self.data if data is None else data
@@ -3109,6 +3119,7 @@ class HoloViewsConverter:
         return segments * rects
 
     def table(self, x=None, y=None, data=None):
+        """Table."""
         self._error_if_unavailable('table')
         data = self.data if data is None else data
         if isinstance(data.index, (DatetimeIndex, MultiIndex)):
@@ -3123,6 +3134,7 @@ class HoloViewsConverter:
         ).apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
 
     def labels(self, x=None, y=None, data=None):
+        """Text labels plot."""
         self._error_if_unavailable('labels')
         self.use_index = False
         data, x, y = self._process_chart_args(data, x, y, single_y=True)
@@ -3199,6 +3211,7 @@ class HoloViewsConverter:
         return element
 
     def image(self, x=None, y=None, z=None, data=None):
+        """Image plot."""
         self._error_if_unavailable('image')
         data, x, y, z = self._process_gridded_args(data, x, y, z)
         if not (x and y):
@@ -3219,6 +3232,7 @@ class HoloViewsConverter:
         )
 
     def rgb(self, x=None, y=None, z=None, data=None):
+        """RGB(A) image plot."""
         self._error_if_unavailable('rgb')
         data, x, y, z = self._process_gridded_args(data, x, y, z)
 
@@ -3256,6 +3270,7 @@ class HoloViewsConverter:
         )
 
     def quadmesh(self, x=None, y=None, z=None, data=None):
+        """Quadmesh plot."""
         self._error_if_unavailable('quadmesh')
         data, x, y, z = self._process_gridded_args(data, x, y, z)
 
@@ -3278,6 +3293,7 @@ class HoloViewsConverter:
         ).apply(self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts)
 
     def trimesh(self, x=None, y=None, z=None, data=None):
+        """Trimesh plot."""
         import xarray as xr
 
         tris = self.kwds.get('_xugrid_tris')
@@ -3338,6 +3354,7 @@ class HoloViewsConverter:
         )
 
     def contour(self, x=None, y=None, z=None, data=None, filled=False):
+        """Contour plot."""
         self._error_if_unavailable('contour')
         from holoviews.operation import contours
 
@@ -3375,6 +3392,7 @@ class HoloViewsConverter:
         )
 
     def contourf(self, x=None, y=None, z=None, data=None):
+        """Filled contour plot."""
         self._error_if_unavailable('contourf')
         contourf = self.contour(x, y, z, data, filled=True)
         # The holoviews contours operation used in self.contour adapts
@@ -3389,6 +3407,7 @@ class HoloViewsConverter:
             return contourf
 
     def vectorfield(self, x=None, y=None, angle=None, mag=None, data=None):
+        """Vector field plot."""
         self._error_if_unavailable('vectorfield')
         data, x, y, _ = self._process_gridded_args(data, x, y, z=None)
 
@@ -3460,13 +3479,16 @@ class HoloViewsConverter:
         )
 
     def polygons(self, x=None, y=None, data=None):
+        """Polygons plot."""
         self._error_if_unavailable('polygons')
         return self._geom_plot(x, y, data, kind='polygons')
 
     def paths(self, x=None, y=None, data=None):
+        """Paths plot."""
         self._error_if_unavailable('paths')
         return self._geom_plot(x, y, data, kind='paths')
 
     def points(self, x=None, y=None, data=None):
+        """Points plot."""
         self._error_if_unavailable('points')
         return self._geom_plot(x, y, data, kind='points')

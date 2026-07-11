@@ -1,7 +1,10 @@
+"""Patch the hvPlot plotting API onto cuDF objects."""
+
 from .interactive import Interactive
 
 
 def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=False):
+    """Patch the hvPlot plotting API onto cuDF DataFrame and Series."""
     from . import _module_extensions, hvPlotTabular, post_patch
 
     try:

@@ -1,6 +1,6 @@
 """
-hvPlot makes data analysis and visualization simple
-===================================================
+hvPlot makes data analysis and visualization simple.
+====================================================
 
 hvPlot provides a familiar, high-level API for interactive data exploration and visualization,
 based on the Pandas `.plot` API and the innovative `.interactive` API.
@@ -135,6 +135,7 @@ try:
     ip = get_ipython()  # noqa: F821
 
     def pre_run_cell(info):
+        """Drop patched extension modules before each cell runs."""
         for ext in _module_extensions:
             sys.modules.pop(ext, None)
 
@@ -144,6 +145,7 @@ except Exception:
 
 
 def post_patch(extension='bokeh', logo=False, check_loaded=False):
+    """Load the HoloViews extension after patching a plotting API."""
     if not check_loaded:
         hvplot_extension(extension, logo=logo)
     elif not getattr(_hv.extension, '_loaded', False):
@@ -194,7 +196,6 @@ def bind(function, *args, **kwargs):
 
     Examples
     --------
-
     Develop your **algorithm** or data extraction method with the tools you know and love.
 
     >>> import pandas as pd

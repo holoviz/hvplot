@@ -1,3 +1,5 @@
+"""Parallel coordinates plot for visualizing multivariate data."""
+
 import colorcet as cc
 import holoviews as hv
 
