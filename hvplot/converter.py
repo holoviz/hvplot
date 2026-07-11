@@ -878,7 +878,7 @@ class HoloViewsConverter:
         persist=False,
         use_dask=False,
         crs=None,
-        fields={},
+        fields={},  # noqa: B006
         groupby=None,
         dynamic=True,
         grid=None,
@@ -896,7 +896,7 @@ class HoloViewsConverter:
         logy=None,
         loglog=None,
         hover=None,
-        hover_cols=[],
+        hover_cols=[],  # noqa: B006
         hover_formatters=None,
         hover_tooltips=None,
         subplots=False,
@@ -928,14 +928,14 @@ class HoloViewsConverter:
         project=False,
         toolbar=_Undefined,
         autohide_toolbar=False,
-        tools=[],
+        tools=[],  # noqa: B006
         attr_labels=None,
         coastline=False,
         tiles=False,
         tiles_opts=None,
         sort_date=True,
         check_symmetric_max=1000000,
-        transforms={},
+        transforms={},  # noqa: B006
         stream=None,
         cnorm=None,
         features=None,
@@ -1370,7 +1370,7 @@ class HoloViewsConverter:
                 raise ValueError(
                     f"'{crs}' must be either a valid crs or an reference to "
                     f'a `data.attr` containing a valid crs: {e}'
-                )
+                ) from None
 
     def _process_data(
         self,
@@ -2175,8 +2175,8 @@ class HoloViewsConverter:
         if self.downsample:
             try:
                 from holoviews.operation.downsample import downsample1d
-            except ImportError:
-                raise ImportError('Downsampling requires HoloViews >=1.16')
+            except ImportError as e:
+                raise ImportError('Downsampling requires HoloViews >=1.16') from e
 
             # Let HoloViews choose the default algo if 'downsample' is True.
             # Otherwise, user-specified algorithm
@@ -2821,8 +2821,8 @@ class HoloViewsConverter:
         self._error_if_unavailable('violin')
         try:
             from holoviews.element import Violin
-        except ImportError:
-            raise ImportError('Violin plot requires HoloViews version >=1.10')
+        except ImportError as e:
+            raise ImportError('Violin plot requires HoloViews version >=1.10') from e
         return redim_(self._stats_plot(Violin, y, data), **self._redim)
 
     def hist(self, x=None, y=None, data=None):

@@ -8,10 +8,10 @@ def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=Fals
 
     try:
         import pandas as pd
-    except ImportError:
+    except ImportError as e:
         raise ImportError(
             'Could not patch plotting API onto pandas. Pandas could not be imported.'
-        )
+        ) from e
 
     if 'hvplot.pandas' not in _module_extensions:
         _patch_plot = lambda self: hvPlotTabular(self)  # noqa: E731

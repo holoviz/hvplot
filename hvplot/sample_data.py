@@ -21,7 +21,7 @@ try:
     import intake_xarray  # noqa: F401
     import s3fs  # noqa: F401
     from intake import open_catalog
-except ImportError:
+except ImportError as e:
     raise ImportError(
         """Loading hvPlot sample data requires:
                 * intake
@@ -29,7 +29,7 @@ except ImportError:
                 * intake-xarray
                 * s3fs
              Install these using conda or pip before loading data."""
-    )
+    ) from e
 
 _file_path = os.path.dirname(__file__)
 _cat_path = os.path.join(_file_path, 'datasets.yaml')

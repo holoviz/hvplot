@@ -42,7 +42,8 @@ class hvPlotBase:
 
     __all__ = []
 
-    def __init__(self, data, custom_plots={}, **metadata):
+    def __init__(self, data, custom_plots=None, **metadata):
+        custom_plots = custom_plots or {}
         if 'query' in metadata:
             data = data.query(metadata.pop('query'))
         if 'sel' in metadata:
@@ -81,7 +82,7 @@ class hvPlotBase:
 
                     combined_kwds = dict(kwds, **dyn_kwds)
                     fn_args = defaultdict(list)
-                    for name, arg in zip(arg_names, args):
+                    for name, arg in zip(arg_names, args, strict=True):
                         fn_args[(name, kwds[name])].append(arg)
                     for (name, fn), fargs in fn_args.items():
                         combined_kwds[name] = fn(*fargs)

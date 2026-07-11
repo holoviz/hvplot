@@ -8,10 +8,10 @@ def patch(name='hvplot', extension='bokeh', logo=False):
 
     try:
         import streamz.dataframe as sdf
-    except ImportError:
+    except ImportError as e:
         raise ImportError(
             'Could not patch plotting API onto streamz. Streamz could not be imported.'
-        )
+        ) from e
 
     warnings.warn(
         'streamz support has been deprecated and will be removed in a future version '

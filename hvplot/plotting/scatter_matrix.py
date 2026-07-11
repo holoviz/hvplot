@@ -106,8 +106,8 @@ def scatter_matrix(
     if rasterize or datashade:
         try:
             import datashader  # noqa: F401
-        except ImportError:
-            raise ImportError('rasterize and datashade require datashader to be installed.')
+        except ImportError as e:
+            raise ImportError('rasterize and datashade require datashader to be installed.') from e
 
     if rasterize and datashade:
         raise ValueError('Choose to either rasterize or datashade the scatter matrix, not both.')

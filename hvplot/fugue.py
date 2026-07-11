@@ -14,11 +14,11 @@ def patch(name='hvplot', extension='bokeh', logo=False):
     try:
         from fugue import DataFrames, Outputter
         from fugue.extensions import namespace_candidate, parse_outputter
-    except ImportError:
+    except ImportError as e:
         raise ImportError(
             'Could not add fugue support as it could not be imported. '
             'Please make sure you have installed fugue in your environment.'
-        )
+        ) from e
 
     import hvplot.pandas  # noqa: F401
 

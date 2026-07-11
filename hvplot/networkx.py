@@ -70,8 +70,10 @@ def _from_networkx(G, positions, nodes=None, cls=Graph, **kwargs):
     if nodes:
         node_columns = nodes.columns()
         idx_dim = nodes.kdims[0].name
-        info_cols, values = zip(*((k, v) for k, v in node_columns.items() if k != idx_dim))
-        node_info = dict(zip(node_columns[idx_dim], zip(*values)))
+        info_cols, values = zip(
+            *((k, v) for k, v in node_columns.items() if k != idx_dim), strict=True
+        )
+        node_info = dict(zip(node_columns[idx_dim], zip(*values, strict=True), strict=True))
     else:
         info_cols = []
         node_info = None
@@ -216,12 +218,12 @@ def draw(G, pos=None, **kwargs):
     if kwargs.get('geo', False) or 'crs' in kwargs:
         try:
             import geoviews
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
                 'In order to use geo-related features '
                 'the geoviews library must be available. '
                 'It can be installed with pip or conda.'
-            )
+            ) from e
         crs = process_crs(kwargs.get('crs'))
         label_element = geoviews.Labels
         params['cls'] = geoviews.Graph

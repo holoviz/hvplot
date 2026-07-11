@@ -248,7 +248,7 @@ class Interactive:  # noqa: PLW1641
         loc='top_left',
         center=False,
         dmap=False,
-        inherit_kwargs={},
+        inherit_kwargs=None,
         max_rows=100,
         method=None,
         _shared_obj=None,
@@ -283,7 +283,7 @@ class Interactive:  # noqa: PLW1641
         self._dmap = dmap
         # TODO: What's the real use of inherit_kwargs? So far I've only seen
         # it containing 'ax'
-        self._inherit_kwargs = inherit_kwargs
+        self._inherit_kwargs = inherit_kwargs or {}
         self._max_rows = max_rows
         self._kwargs = kwargs
         ds = hv.Dataset(_convert_col_names_to_str(self._obj))
@@ -429,7 +429,9 @@ class Interactive:  # noqa: PLW1641
             **kwargs,
         )
 
-    def _repr_mimebundle_(self, include=[], exclude=[]):
+    def _repr_mimebundle_(self, include=None, exclude=None):
+        include = include or []
+        exclude = exclude or []
         return self.layout()._repr_mimebundle_()
 
     def __dir__(self):

@@ -672,7 +672,7 @@ class TestChart1D(ComparisonTestCase):
             ['bar', 'bar', 'baz', 'baz', 'foo', 'foo', 'qux', 'qux'],
             ['one', 'two', 'one', 'two', 'one', 'two', 'one', 'two'],
         ]
-        tuples = list(zip(*arrays))
+        tuples = list(zip(*arrays, strict=True))
         index = pd.MultiIndex.from_tuples(tuples)
         df = pd.DataFrame(np.random.randn(3, 8), index=['A', 'B', 'C'], columns=index)
         df.hvplot.scatter()

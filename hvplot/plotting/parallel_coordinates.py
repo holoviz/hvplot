@@ -78,7 +78,7 @@ def parallel_coordinates(
     el = hv.Overlay(
         [
             curve.relabel(k).options('Curve', color=c, backend='bokeh')
-            for c, (k, v) in zip(colors, groups)
+            for c, (k, v) in zip(colors, groups, strict=True)
             for curve in v
         ]
     ).options(options, backend='bokeh')

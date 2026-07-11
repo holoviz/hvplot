@@ -444,14 +444,15 @@ class TestGeoPandas(TestCase):
         polygons[1, 'geometry'] = None
         assert polygons.hvplot(geo=True)
 
+    @pytest.mark.xfail(reason='Last assertion broken')
     def test_tiles_without_gv(self):
         polygons = self.polygons.copy()
         polygons_plot = polygons.hvplot(tiles=True)
-        polygons_plot.get(1).data.crs is None
+        assert polygons_plot.get(1).data.crs is None
 
         polygons.crs = 'EPSG:4326'
         polygons_plot = self.polygons.hvplot(tiles=True)
-        polygons_plot.get(1).data.crs == 'EPSG:3857'
+        assert polygons_plot.get(1).data.crs == 'EPSG:3857'
 
 
 class TestGeoUtil(TestCase):

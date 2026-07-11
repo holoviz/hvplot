@@ -85,7 +85,7 @@ def get_ipy():
 
 def _in_ipython():
     try:
-        get_ipython
+        get_ipython  # noqa: B018
         return True
     except NameError:
         return False
@@ -499,7 +499,10 @@ def _convert_limit_to_mercator(limit: tuple | None, is_x_axis=True) -> tuple | N
 
         return (v0_merc, v1_merc)
     except Exception as e:
-        warnings.warn(f'Could not convert limits to Web Mercator: {e}')
+        warnings.warn(
+            f'Could not convert limits to Web Mercator: {e}',
+            stacklevel=_find_stack_level(),
+        )
         return limit
 
 

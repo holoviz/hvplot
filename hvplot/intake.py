@@ -16,10 +16,10 @@ warnings.warn(
 def patch(name='hvplot', extension='bokeh', logo=False):
     try:
         import intake
-    except ImportError:
+    except ImportError as e:
         raise ImportError(
             'Could not patch plotting API onto intake. intake could not be imported.'
-        )
+        ) from e
 
     if 'hvplot.intake' not in _module_extensions:
         _patch_plot = lambda self: hvPlot(self)  # noqa: E731

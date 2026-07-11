@@ -7,10 +7,10 @@ def patch(name='hvplot', extension='bokeh', logo=False):
 
     try:
         import xugrid as xu
-    except ImportError:
+    except ImportError as e:
         raise ImportError(
             'Could not patch plotting API onto xugrid. xugrid could not be imported.'
-        )
+        ) from e
 
     if 'hvplot.xugrid' not in _module_extensions:
         _patch_plot = lambda self: hvPlotXugrid(self)  # noqa: E731
