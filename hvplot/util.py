@@ -312,7 +312,7 @@ def proj_to_cartopy(proj):
         cl, (ccrs.Robinson, ccrs.Mollweide, ccrs.Sinusoidal, ccrs.EckertIV, ccrs.Miller)
     ):
         # Global projections - remove most parameters except central longitude
-        kw_proj = {k: v for k, v in kw_proj.items() if k in ['central_longitude']}
+        kw_proj = {k: v for k, v in kw_proj.items() if k == 'central_longitude'}
     elif issubclass(cl, ccrs.Geostationary):
         kw_proj.pop('false_easting', None)
         kw_proj.pop('false_northing', None)

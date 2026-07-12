@@ -1443,8 +1443,7 @@ class HoloViewsConverter:
             if kind is None:
                 if datatype == 'geopandas':
                     geom_types = {gt[5:] if gt and 'Multi' in gt else gt for gt in data.geom_type}
-                    if None in geom_types:
-                        geom_types.remove(None)
+                    geom_types.discard(None)
                 else:
                     geom_types = [
                         type(data.geometry.dtype)
@@ -2408,7 +2407,7 @@ class HoloViewsConverter:
             # For matplotlib backend, 'size' is stored as 's'
             if dimension is None and style == 'size':
                 dimension = self._style_opts.get('s')
-            dimensions = (kdims if kdims else []) + vdims
+            dimensions = (kdims or []) + vdims
             dimension = self._validate_dim(dimension)
             if dimension is None:
                 continue
