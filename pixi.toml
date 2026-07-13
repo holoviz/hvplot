@@ -146,6 +146,7 @@ xyzservices = ">=2022.9.0"
 geodatasets = ">=2023.12.0"
 hvsampledata = ">=0.1.4a2"
 bokeh_sampledata = ">=2025.0"
+xugrid = ">=0.15.0"
 
 # =================== TESTS ===================
 
@@ -191,7 +192,7 @@ polars = "*"
 dask = "*"
 spatialpandas = "*"
 duckdb = "*"
-xugrid = "*"
+xugrid = ">=0.15.0"
 
 [feature.geo.dependencies]
 # Geo dependencies are always a little special.
