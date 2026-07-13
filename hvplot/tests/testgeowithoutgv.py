@@ -3,17 +3,18 @@ Geo tests **without** importing GeoViews.
 """
 
 import holoviews as hv
-import hvplot.pandas  # noqa
 import numpy as np
 import pandas as pd
 import pytest
-
-from hvplot.util import is_geodataframe
 from holoviews.util.transform import lon_lat_to_easting_northing
+
+import hvplot.pandas
+from hvplot.util import is_geodataframe
 
 try:
     import dask.dataframe as dd
-    import hvplot.dask  # noqa
+
+    import hvplot.dask  # noqa: F401
 except ImportError:
     dd = None
 
@@ -156,8 +157,7 @@ class TestAnnotationNotGeo:
         assert y_range_end == ylim_expected_1
 
     def test_xlim_only_conversion_with_tiles(self, lat_lon_df):
-        """xlim should convert even when ylim is not provided."""
-
+        """Opt xlim should convert even when ylim is not provided."""
         plot = lat_lon_df.hvplot.points('lon', 'lat', tiles=True, xlim=(-130, -70))
         bk_plot = bk_renderer.get_plot(plot)
 
@@ -169,7 +169,7 @@ class TestAnnotationNotGeo:
         assert x_start < x_end
 
     def test_ylim_only_conversion_with_tiles(self, lat_lon_df):
-        """ylim should convert even when xlim is not provided."""
+        """Opt ylim should convert even when xlim is not provided."""
         plot = lat_lon_df.hvplot.points('lon', 'lat', tiles=True, ylim=(25, 45))
         bk_plot = bk_renderer.get_plot(plot)
 

@@ -1,18 +1,20 @@
+"""Pandas-style plotting functions built on hvPlot."""
+
 import warnings
 
 import holoviews as hv
-from ..util import with_hv_extension, is_duckdb, is_polars, _find_stack_level
 
-from .core import hvPlot, hvPlotTabular  # noqa
-
-from .andrews_curves import andrews_curves  # noqa
-from .parallel_coordinates import parallel_coordinates  # noqa
-from .lag_plot import lag_plot  # noqa
-from .scatter_matrix import scatter_matrix  # noqa
+from ..util import _find_stack_level, is_duckdb, is_polars, with_hv_extension
+from .andrews_curves import andrews_curves  # noqa: F401
+from .core import hvPlot, hvPlotTabular  # noqa: F401
+from .lag_plot import lag_plot  # noqa: F401
+from .parallel_coordinates import parallel_coordinates  # noqa: F401
+from .scatter_matrix import scatter_matrix  # noqa: F401
 
 
 @with_hv_extension
 def plot(data, kind, **kwargs):
+    """Plot data of the given kind, the pandas plotting backend entrypoint."""
     # drop reuse_plot
     kwargs.pop('reuse_plot', None)
 
@@ -52,14 +54,17 @@ def plot(data, kind, **kwargs):
 
 
 def boxplot_series(*args, **kwargs):
+    """Box plot for a Series."""
     return plot(*args, kind='box', **kwargs)
 
 
 def boxplot_frame(*args, **kwargs):
+    """Box plot for a DataFrame."""
     return plot(*args, kind='box', **kwargs)
 
 
 def boxplot_frame_groupby(grouped, **kwargs):
+    """Box plot for a grouped DataFrame."""
     width = kwargs.pop('width', 300)
     subplots = kwargs.pop('subplots', True)
     layout = hv.Layout if subplots else hv.Overlay
@@ -70,8 +75,10 @@ def boxplot_frame_groupby(grouped, **kwargs):
 
 
 def hist_series(*args, **kwargs):
+    """Histogram for a Series."""
     return plot(*args, kind='hist', **kwargs)
 
 
 def hist_frame(*args, **kwargs):
+    """Histogram for a DataFrame."""
     return plot(*args, kind='hist', **kwargs)

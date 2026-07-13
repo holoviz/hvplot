@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import xarray as xr
-
 from holoviews import Store
 
 import hvplot.xarray  # noqa: F401

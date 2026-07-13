@@ -6,7 +6,7 @@ from unittest import TestCase
 
 import panel as pn
 
-from hvplot.util import process_xarray  # noqa
+from hvplot.util import process_xarray  # noqa: F401
 
 
 def look_for_class(panel, classname, items=None):
@@ -25,8 +25,9 @@ def look_for_class(panel, classname, items=None):
 
 class TestPanelObjects(TestCase):
     def setUp(self):
-        import hvplot.pandas  # noqa
         from bokeh.sampledata.iris import flowers
+
+        import hvplot.pandas  # noqa: F401
 
         self.flowers = flowers
         self.cols = list(self.flowers.columns[:-1])

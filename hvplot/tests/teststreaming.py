@@ -1,13 +1,12 @@
 from unittest import TestCase
 
 import pandas as pd
-
 from holoviews.streams import Buffer, Pipe
 
 
 class TestExplicitStreamPlotting(TestCase):
     def setUp(self):
-        import hvplot.pandas  # noqa
+        import hvplot.pandas  # noqa: F401
 
         self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
 

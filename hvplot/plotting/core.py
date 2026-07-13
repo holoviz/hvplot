@@ -1,8 +1,9 @@
+"""hvPlot and hvPlotTabular, the main entrypoints to the hvPlot API."""
+
 import itertools
 from collections import defaultdict
 
 import param
-
 from packaging.version import Version
 
 try:
@@ -43,7 +44,8 @@ class hvPlotBase:
 
     __all__ = []
 
-    def __init__(self, data, custom_plots={}, **metadata):
+    def __init__(self, data, custom_plots=None, **metadata):
+        custom_plots = custom_plots or {}
         if 'query' in metadata:
             data = data.query(metadata.pop('query'))
         if 'sel' in metadata:
@@ -55,6 +57,7 @@ class hvPlotBase:
         self._metadata = metadata
 
     def __call__(self, x=None, y=None, kind=None, **kwds):
+        """Create a plot of the given kind."""
         # Convert an array-like to a list
         x = list(x) if is_list_like(x) else x
         y = list(y) if is_list_like(y) else y
@@ -82,10 +85,10 @@ class hvPlotBase:
 
                     combined_kwds = dict(kwds, **dyn_kwds)
                     fn_args = defaultdict(list)
-                    for name, arg in zip(arg_names, args):
+                    for name, arg in zip(arg_names, args, strict=True):
                         fn_args[(name, kwds[name])].append(arg)
-                    for (name, fn), args in fn_args.items():
-                        combined_kwds[name] = fn(*args)
+                    for (name, fn), fargs in fn_args.items():
+                        combined_kwds[name] = fn(*fargs)
                     plot = self._get_converter(xd, yd, kindd, **combined_kwds)(kindd, xd, yd)
                     return pn.panel(plot, **panel_dict)
 
@@ -104,16 +107,12 @@ class hvPlotBase:
         return HoloViewsConverter(self._data, x, y, kind=kind, **params)
 
     def __dir__(self):
-        """
-        List default attributes and custom defined plots.
-        """
+        """List default attributes and custom defined plots."""
         dirs = super().__dir__()
         return sorted(list(dirs) + list(self._plots))
 
     def __getattribute__(self, name):
-        """
-        Custom getattribute to expose user defined subplots.
-        """
+        """Expose user defined subplots as attributes."""
         plots = object.__getattribute__(self, '_plots')
         if name in plots:
             plot_opts = plots[name]
@@ -289,7 +288,7 @@ class hvPlotTabular(hvPlotBase):
             '#a98d19.
 
             A sequence of color strings referred to by name, RGB or RGBA code, which will be used
-            for each series recursively. For instance ['green','yellow'] each field’s line will be
+            for each series recursively. For instance ['green','yellow'] each field's line will be
             filled in green or yellow, alternatively. If there is only a single series to be
             plotted, then only the first color from the color list will be used.
         **kwds : optional
@@ -378,7 +377,8 @@ class hvPlotTabular(hvPlotBase):
         ----------
         - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/step.html
         - HoloViews: https://holoviews.org/gallery/demos/bokeh/step_chart.html
-        - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.line.html (use `draw_style='step'`)
+        - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.line.html
+          (use `draw_style='step'`)
         - Plotly: https://plotly.com/python/line-charts/ (See the Interpolation Section)
         - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.step.html
         """
@@ -514,8 +514,8 @@ class hvPlotTabular(hvPlotBase):
         Create error bars showing data variability.
 
         Error bars provide a visual indicator for the variability of the plotted data on a graph.
-        They are usually overlaid with other plots such as ``scatter``, ``line``, or ``bar`` plots to
-        indicate the variability.
+        They are usually overlaid with other plots such as ``scatter``, ``line``, or ``bar`` plots
+        to indicate the variability.
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.errorbars.html
 
@@ -614,9 +614,9 @@ class hvPlotTabular(hvPlotBase):
         """
         Create a heatmap from tabular data.
 
-        A heatmap visualizes tabular data indexed by two key dimensions as a grid of colored values.
-        This allows spotting correlations in multivariate data and provides a high-level overview
-        of how the two variables are plotted. The data can either be shaped as a 2-D array
+        A heatmap visualizes tabular data indexed by two key dimensions as a grid of colored
+        values. This allows spotting correlations in multivariate data and provides a high-level
+        overview of how the two variables are plotted. The data can either be shaped as a 2-D array
         (in which case no aggregate will be computed) or as a set of two axis variables and one
         aggregation variable (on which an aggregation is computed).
 
@@ -1225,13 +1225,10 @@ class hvPlotTabular(hvPlotBase):
         -----
         This function requires ``scipy`` to be installed.
         """
-
         return self(kind='kde', x=None, y=y, by=by, **kwds)
 
     def density(self, y=None, by=None, **kwds):
-        """
-        Alias of :meth:`hvplot.hvPlot.kde`.
-        """
+        """Alias of :meth:`hvplot.hvPlot.kde`."""
         return self(kind='kde', x=None, y=y, by=by, **kwds)
 
     def table(self, columns=None, **kwds):
@@ -1565,14 +1562,17 @@ class hvPlotTabular(hvPlotBase):
 
 
 class hvPlotTabularDuckDB(hvPlotTabular):
+    """hvPlot accessor for DuckDB relations and connections."""
+
     def _get_converter(self, x=None, y=None, kind=None, **kwds):
         import duckdb
 
         if Version(duckdb.__version__).release < (1, 4, 1):
             from duckdb.typing import (
                 BIGINT,
-                FLOAT,
                 DOUBLE,
+                FLOAT,
+                HUGEINT,
                 INTEGER,
                 SMALLINT,
                 TINYINT,
@@ -1580,13 +1580,13 @@ class hvPlotTabularDuckDB(hvPlotTabular):
                 UINTEGER,
                 USMALLINT,
                 UTINYINT,
-                HUGEINT,
             )
         else:
             from duckdb.sqltypes import (
                 BIGINT,
-                FLOAT,
                 DOUBLE,
+                FLOAT,
+                HUGEINT,
                 INTEGER,
                 SMALLINT,
                 TINYINT,
@@ -1594,7 +1594,6 @@ class hvPlotTabularDuckDB(hvPlotTabular):
                 UINTEGER,
                 USMALLINT,
                 UTINYINT,
-                HUGEINT,
             )
 
         params = dict(self._metadata, **kwds)
@@ -1664,6 +1663,8 @@ class hvPlotTabularDuckDB(hvPlotTabular):
 
 
 class hvPlotTabularPolars(hvPlotTabular):
+    """hvPlot accessor for polars DataFrame, LazyFrame and Series."""
+
     def _get_converter(self, x=None, y=None, kind=None, **kwds):
         import polars as pl
 
@@ -1821,8 +1822,8 @@ class hvPlot(hvPlotTabular):
         """
         Create an image plot from gridded data.
 
-        You can use image plots to display for example geographic data with independent latitude and
-        longitude fields and a third dependent field.
+        You can use image plots to display for example geographic data with independent latitude
+        and longitude fields and a third dependent field.
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.image.html
 
@@ -1872,8 +1873,8 @@ class hvPlot(hvPlotTabular):
         """
         Create an RGB image plot from multi-band data.
 
-        RGB plots can be used to display images that are distributed as three separate "channels" or
-        "bands".
+        RGB plots can be used to display images that are distributed as three separate "channels"
+        or "bands".
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.rgb.html
 
@@ -2091,7 +2092,7 @@ class hvPlot(hvPlotTabular):
 class hvPlotXugrid(hvPlot):
     """hvPlot interface for xugrid UgridDataArray and UgridDataset objects."""
 
-    __all__ = hvPlot.__all__ + ['trimesh']
+    __all__ = [*hvPlot.__all__, 'trimesh']
 
     def _get_converter(self, x=None, y=None, kind=None, **kwds):
         import numpy as np
@@ -2102,7 +2103,7 @@ class hvPlotXugrid(hvPlot):
         kind = kind or kwds.pop('kind', None) or 'trimesh'
 
         if isinstance(data, xu.UgridDataset):
-            z = kwds.get('z') or list(data.data_vars)[0]
+            z = kwds.get('z') or next(iter(data.data_vars))
             data = data[z]
 
         grid = data.grid

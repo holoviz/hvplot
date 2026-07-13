@@ -5,22 +5,24 @@ import sys
 sys.path.insert(0, os.path.abspath('_ext'))
 
 import os
+
 import param
 import pydata_sphinx_theme
 
 param.parameterized.docstring_signature = False
 param.parameterized.docstring_describe_params = False
 
-import hvplot  # noqa
-from nbsite.shared_conf import *  # noqa
+from nbsite.shared_conf import *  # noqa: E402, F403
+
+import hvplot  # noqa: E402
 
 project = 'hvPlot'
 authors = 'HoloViz developers'
-copyright_years['start_year'] = '2016'  # noqa
-copyright = copyright_fmt.format(**copyright_years)  # noqa
+copyright_years['start_year'] = '2016'  # noqa: F405
+copyright = copyright_fmt.format(**copyright_years)  # noqa: F405
 description = 'A high-level plotting API for the PyData ecosystem built on HoloViews'
 
-version = release = base_version(hvplot.__version__)  # noqa
+version = release = base_version(hvplot.__version__)  # noqa: F405
 nbbuild_cell_timeout = 600
 
 # Useful for SEO on a versioned site
@@ -28,13 +30,13 @@ html_baseurl = 'https://hvplot.holoviz.org/en/docs/latest/'
 
 exclude_patterns = ['governance']
 
-html_static_path += ['_static']  # noqa
+html_static_path += ['_static']  # noqa: F405
 
 if pydata_sphinx_theme.__version__ == '0.16.1':
     # See https://github.com/pydata/pydata-sphinx-theme/issues/2088
-    templates_path.append('_static/patch_templates')  # noqa
+    templates_path.append('_static/patch_templates')  # noqa: F405
 
-html_css_files += ['custom.css']  # noqa
+html_css_files += ['custom.css']  # noqa: F405
 
 html_js_files = [
     'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js',
@@ -44,7 +46,7 @@ switcher_version = (
     if any(pr in hvplot.__version__ for pr in ('a', 'b', 'rc', 'dev'))
     else version
 )
-html_theme_options.update(  # noqa
+html_theme_options.update(  # noqa: F405
     {
         'navbar_start': ['navbar-logo', 'version-switcher'],
         'use_edit_page_button': True,
@@ -67,7 +69,7 @@ html_theme_options.update(  # noqa
             },
         ],
         'pygments_dark_style': 'material',
-        'announcement': "hvPlot 0.12 has just been released! Checkout the <a href='https://blog.holoviz.org/posts/hvplot_release_0.12/'>blog post</a> and support hvPlot by giving it a 🌟 on <a href='https://github.com/holoviz/hvplot'>Github</a>.",
+        'announcement': "hvPlot 0.12 has just been released! Checkout the <a href='https://blog.holoviz.org/posts/hvplot_release_0.12/'>blog post</a> and support hvPlot by giving it a 🌟 on <a href='https://github.com/holoviz/hvplot'>Github</a>.",  # noqa: E501
         'switcher': {
             'json_url': 'https://hvplot.holoviz.org/switcher.json',
             'version_match': switcher_version,
@@ -83,7 +85,7 @@ html_theme = 'pydata_sphinx_theme'
 html_logo = '_static/logo_horizontal.svg'
 html_favicon = '_static/favicon.ico'
 
-extensions += [  # noqa
+extensions += [  # noqa: F405
     'sphinx.ext.autosummary',
     'nbsite.gallery',
     'nbsite.analytics',
@@ -175,7 +177,7 @@ rediraffe_redirects = {
 
 html_extra_path = ['topics.html']
 
-html_context.update(  # noqa
+html_context.update(  # noqa: F405
     {
         'last_release': f'v{release}',
         'default_mode': 'light',
@@ -216,7 +218,7 @@ if os.getenv('HVPLOT_GALLERY') not in ('False', 'false', '0'):
             'reference/tabular/lagplot': 'ref/api/manual/hvplot.plotting.lag_plot',
             'reference/tabular/line': 'ref/api/manual/hvplot.hvPlot.line',
             'reference/tabular/ohlc': 'ref/api/manual/hvplot.hvPlot.ohlc',
-            'reference/tabular/parallelcoordinates': 'ref/api/manual/hvplot.plotting.parallel_coordinates',
+            'reference/tabular/parallelcoordinates': 'ref/api/manual/hvplot.plotting.parallel_coordinates',  # noqa: E501
             'reference/tabular/scatter': 'ref/api/manual/hvplot.hvPlot.scatter',
             'reference/tabular/scattermatrix': 'ref/api/manual/hvplot.plotting.scatter_matrix',
             'reference/tabular/step': 'ref/api/manual/hvplot.hvPlot.step',
@@ -294,7 +296,7 @@ intersphinx_mapping = {
 }
 
 # To avoid this warning
-# hvplot/ui.py:docstring of hvplot.ui.hvPlotExplorer:43: WARNING: autosummary: stub file not found 'hvplot.ui.hvPlotExplorer.hvplot'. Check your autosummary_generate setting.
+# hvplot/ui.py:docstring of hvplot.ui.hvPlotExplorer:43: WARNING: autosummary: stub file not found 'hvplot.ui.hvPlotExplorer.hvplot'. Check your autosummary_generate setting.  # noqa: E501
 # See https://stackoverflow.com/a/73294408
 numpydoc_class_members_toctree = False
 

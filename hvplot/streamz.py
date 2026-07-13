@@ -1,17 +1,23 @@
+"""Patch the hvPlot plotting API onto streamz objects (deprecated).
+
+.. deprecated:: 0.13
+"""
+
 import warnings
 
 from .util import _find_stack_level
 
 
 def patch(name='hvplot', extension='bokeh', logo=False):
-    from . import hvPlotTabular, post_patch, _module_extensions
+    """Patch the hvPlot plotting API onto streamz DataFrame and Series."""
+    from . import _module_extensions, hvPlotTabular, post_patch
 
     try:
         import streamz.dataframe as sdf
-    except ImportError:
+    except ImportError as e:
         raise ImportError(
             'Could not patch plotting API onto streamz. Streamz could not be imported.'
-        )
+        ) from e
 
     warnings.warn(
         'streamz support has been deprecated and will be removed in a future version '

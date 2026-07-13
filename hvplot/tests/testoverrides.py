@@ -4,15 +4,15 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+from holoviews import Scatter, Store
+from holoviews.element.comparison import ComparisonTestCase
 
 from hvplot.plotting import hvPlot, hvPlotTabular
-from holoviews import Store, Scatter
-from holoviews.element.comparison import ComparisonTestCase
 
 
 class TestOverrides(ComparisonTestCase):
     def setUp(self):
-        import hvplot.pandas  # noqa
+        import hvplot.pandas  # noqa: F401
 
         self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
 

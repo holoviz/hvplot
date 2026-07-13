@@ -1,19 +1,20 @@
+"""hvPlot-based drawing functions mirroring the NetworkX drawing API."""
+
 from collections import defaultdict
 
-import numpy as np
-import networkx as nx
 import holoviews as _hv
-
+import networkx as nx
+import numpy as np
 from bokeh.models import HoverTool
 from holoviews import Graph, Labels, dim
-from holoviews.core.util import dimension_sanitizer
 from holoviews.core.options import Store
+from holoviews.core.util import dimension_sanitizer
 from holoviews.plotting.bokeh import GraphPlot, LabelsPlot
 from holoviews.plotting.bokeh.styles import markers
 
 from .backend_transforms import _transfer_opts_cur_backend
 from .util import process_crs
-from .utilities import save, show  # noqa
+from .utilities import save, show  # noqa: F401
 
 if _hv.extension and not getattr(_hv.extension, '_loaded', False):
     _hv.extension('bokeh', logo=False)
@@ -44,7 +45,6 @@ def _from_networkx(G, positions, nodes=None, cls=Graph, **kwargs):
     graph : holoviews.Graph
        Graph element
     """
-
     # Unpack edges
     edges = defaultdict(list)
     for start, end in G.edges():
@@ -64,15 +64,17 @@ def _from_networkx(G, positions, nodes=None, cls=Graph, **kwargs):
         k for k in edges if k not in ('start', 'end') and len(edges[k]) == len(edges['start'])
     )
     edge_vdims = [str(col) if isinstance(col, int) else col for col in edge_cols]
-    edge_data = tuple(edges[col] for col in ['start', 'end'] + edge_cols)
+    edge_data = tuple(edges[col] for col in ['start', 'end', *edge_cols])
 
     # Unpack user node info
     xdim, ydim, idim = cls.node_type.kdims[:3]
     if nodes:
         node_columns = nodes.columns()
         idx_dim = nodes.kdims[0].name
-        info_cols, values = zip(*((k, v) for k, v in node_columns.items() if k != idx_dim))
-        node_info = {i: vals for i, vals in zip(node_columns[idx_dim], zip(*values))}
+        info_cols, values = zip(
+            *((k, v) for k, v in node_columns.items() if k != idx_dim), strict=True
+        )
+        node_info = dict(zip(node_columns[idx_dim], zip(*values, strict=True), strict=True))
     else:
         info_cols = []
         node_info = None
@@ -100,7 +102,7 @@ def _from_networkx(G, positions, nodes=None, cls=Graph, **kwargs):
         for k in node_columns
         if k not in cls.node_type.kdims and len(node_columns[k]) == len(node_columns[xdim.name])
     )
-    columns = [xdim.name, ydim.name, idim.name] + node_cols + list(info_cols)
+    columns = [xdim.name, ydim.name, idim.name, *node_cols, *info_cols]
     node_data = tuple(node_columns[col] for col in columns)
 
     # Construct nodes
@@ -217,12 +219,12 @@ def draw(G, pos=None, **kwargs):
     if kwargs.get('geo', False) or 'crs' in kwargs:
         try:
             import geoviews
-        except ImportError:
+        except ImportError as e:
             raise ImportError(
                 'In order to use geo-related features '
                 'the geoviews library must be available. '
                 'It can be installed with pip or conda.'
-            )
+            ) from e
         crs = process_crs(kwargs.get('crs'))
         label_element = geoviews.Labels
         params['cls'] = geoviews.Graph
@@ -240,7 +242,7 @@ def draw(G, pos=None, **kwargs):
         comparisons = []
         for edge in kwargs['edgelist']:
             comparisons.append(edges == edge)
-        if len(comparisons):
+        if comparisons:
             selector = np.logical_and(*np.logical_or.reduce(comparisons).T)
             g = g.iloc[selector]
         else:
@@ -248,18 +250,18 @@ def draw(G, pos=None, **kwargs):
 
     # Compute options
     inspection_policy = kwargs.pop('inspection_policy', 'nodes')
-    opts = dict(
-        axiswise=True,
-        arrowhead_length=kwargs.get('arrowhead_length', 0.025),
-        directed=kwargs.pop('arrows', isinstance(G, nx.DiGraph)),
-        colorbar=kwargs.pop('colorbar', False),
-        padding=kwargs.get('padding', 0.1),
-        width=kwargs.pop('width', 400),
-        height=kwargs.pop('height', 400),
-        selection_policy=kwargs.pop('selection_policy', 'nodes'),
-        inspection_policy=inspection_policy,
-        node_fill_color='red',
-    )
+    opts = {
+        'axiswise': True,
+        'arrowhead_length': kwargs.get('arrowhead_length', 0.025),
+        'directed': kwargs.pop('arrows', isinstance(G, nx.DiGraph)),
+        'colorbar': kwargs.pop('colorbar', False),
+        'padding': kwargs.get('padding', 0.1),
+        'width': kwargs.pop('width', 400),
+        'height': kwargs.pop('height', 400),
+        'selection_policy': kwargs.pop('selection_policy', 'nodes'),
+        'inspection_policy': inspection_policy,
+        'node_fill_color': 'red',
+    }
 
     if '_axis_defaults':
         opts.update(xaxis=None, yaxis=None, show_frame=False)

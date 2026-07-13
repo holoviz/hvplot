@@ -1,6 +1,6 @@
 """
-hvPlot makes data analysis and visualization simple
-===================================================
+hvPlot makes data analysis and visualization simple.
+====================================================
 
 hvPlot provides a familiar, high-level API for interactive data exploration and visualization,
 based on the Pandas `.plot` API and the innovative `.interactive` API.
@@ -61,27 +61,25 @@ To report issues go to https://github.com/holoviz/holoviews.
 import os
 import sys
 
-import panel as _pn
 import holoviews as _hv
+import panel as _pn
+from holoviews import render  # noqa: F401
 
-from holoviews import render  # noqa
-
-
-from .converter import HoloViewsConverter  # noqa
+from . import sampledata  # noqa: F401
+from .converter import HoloViewsConverter  # noqa: F401
 from .interactive import Interactive
-from .ui import explorer  # noqa
-from .util import _PatchHvplotDocstrings, _in_ipython
-from .utilities import help, hvplot_extension, output, save, show  # noqa
 from .plotting import (
-    hvPlot,  # noqa
-    hvPlotTabular,  # noqa
-    andrews_curves,  # noqa
-    lag_plot,  # noqa
-    parallel_coordinates,  # noqa
-    scatter_matrix,  # noqa
-    plot,  # noqa
+    andrews_curves,  # noqa: F401
+    hvPlot,  # noqa: F401
+    hvPlotTabular,  # noqa: F401
+    lag_plot,  # noqa: F401
+    parallel_coordinates,  # noqa: F401
+    plot,  # noqa: F401
+    scatter_matrix,  # noqa: F401
 )
-from . import sampledata  # noqa
+from .ui import explorer  # noqa: F401
+from .util import _in_ipython, _PatchHvplotDocstrings
+from .utilities import help, hvplot_extension, output, save, show  # noqa: F401
 
 # Define '__version__'
 try:
@@ -109,7 +107,7 @@ except (ImportError, LookupError, FileNotFoundError):
         # ImportError, let's be explicit anyway.
 
         # Try something else:
-        from importlib.metadata import version as mversion, PackageNotFoundError
+        from importlib.metadata import PackageNotFoundError, version as mversion
 
         try:
             __version__ = mversion('hvplot')
@@ -134,9 +132,10 @@ _PATCH_PLOT_SIGNATURES = _in_ipython() or (
 _module_extensions = set()
 
 try:
-    ip = get_ipython()  # noqa
+    ip = get_ipython()  # noqa: F821
 
     def pre_run_cell(info):
+        """Drop patched extension modules before each cell runs."""
         for ext in _module_extensions:
             sys.modules.pop(ext, None)
 
@@ -146,6 +145,7 @@ except Exception:
 
 
 def post_patch(extension='bokeh', logo=False, check_loaded=False):
+    """Load the HoloViews extension after patching a plotting API."""
     if not check_loaded:
         hvplot_extension(extension, logo=logo)
     elif not getattr(_hv.extension, '_loaded', False):
@@ -196,7 +196,6 @@ def bind(function, *args, **kwargs):
 
     Examples
     --------
-
     Develop your **algorithm** or data extraction method with the tools you know and love.
 
     >>> import pandas as pd

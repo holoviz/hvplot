@@ -1,22 +1,21 @@
 from unittest import SkipTest, expectedFailure
-from parameterized import parameterized
 
 import numpy as np
 import pandas as pd
 import pytest
-
-from holoviews.core.dimension import Dimension
 from holoviews import NdLayout, NdOverlay, Store, dim, render
-from holoviews.element import Curve, Area, Scatter, Points, Path, HeatMap
+from holoviews.core.dimension import Dimension
+from holoviews.element import Area, Curve, HeatMap, Path, Points, Scatter
 from holoviews.element.comparison import ComparisonTestCase
 from packaging.version import Version
+from parameterized import parameterized
 
 from ..util import is_dask
 
 
 class TestChart2D(ComparisonTestCase):
     def setUp(self):
-        import hvplot.pandas  # noqa
+        import hvplot.pandas  # noqa: F401
 
         self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
         self.cat_df = pd.DataFrame(
@@ -78,7 +77,8 @@ class TestChart2D(ComparisonTestCase):
     def test_xarray_dataset_with_attrs(self):
         try:
             import xarray as xr
-            import hvplot.xarray  # noqa
+
+            import hvplot.xarray  # noqa: F401
         except ImportError:
             raise SkipTest('xarray not available')
 
@@ -98,7 +98,7 @@ class TestChart2DDask(TestChart2D):
             import dask.dataframe as dd
         except ImportError:
             raise SkipTest('Dask not available')
-        import hvplot.dask  # noqa
+        import hvplot.dask  # noqa: F401
 
         self.df = dd.from_pandas(self.df, npartitions=2)
         self.cat_df = dd.from_pandas(self.cat_df, npartitions=3)
@@ -126,7 +126,7 @@ class TestChart2DDask(TestChart2D):
 
 class TestChart1D(ComparisonTestCase):
     def setUp(self):
-        import hvplot.pandas  # noqa
+        import hvplot.pandas  # noqa: F401
 
         self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
         self.df_desc = self.df.describe().transpose().sort_values('mean')
@@ -672,7 +672,7 @@ class TestChart1D(ComparisonTestCase):
             ['bar', 'bar', 'baz', 'baz', 'foo', 'foo', 'qux', 'qux'],
             ['one', 'two', 'one', 'two', 'one', 'two', 'one', 'two'],
         ]
-        tuples = list(zip(*arrays))
+        tuples = list(zip(*arrays, strict=True))
         index = pd.MultiIndex.from_tuples(tuples)
         df = pd.DataFrame(np.random.randn(3, 8), index=['A', 'B', 'C'], columns=index)
         df.hvplot.scatter()
@@ -700,7 +700,7 @@ class TestChart1DDask(TestChart1D):
             import dask.dataframe as dd
         except ImportError:
             raise SkipTest('Dask not available')
-        import hvplot.dask  # noqa
+        import hvplot.dask  # noqa: F401
 
         self.df = dd.from_pandas(self.df, npartitions=2)
         self.dt_df = dd.from_pandas(self.dt_df, npartitions=3)
@@ -735,7 +735,7 @@ def test_cmap_LinearSegmentedColormap():
     # test for https://github.com/holoviz/hvplot/pull/1461
     xr = pytest.importorskip('xarray')
     mpl = pytest.importorskip('matplotlib')
-    import hvplot.xarray  # noqa
+    import hvplot.xarray  # noqa: F401
 
     data = np.arange(25).reshape(5, 5)
     xr_da = xr.DataArray(data)

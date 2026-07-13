@@ -1,8 +1,9 @@
+"""Andrews curves plot for visualizing multivariate data."""
+
+import colorcet as cc
+import holoviews as hv
 import numpy as np
 import pandas as pd
-
-import holoviews as hv
-import colorcet as cc
 
 from ..backend_transforms import _transfer_opts_cur_backend
 from ..util import with_hv_extension
@@ -20,7 +21,7 @@ def andrews_curves(
     colormap=None,
     **kwds,
 ):
-    """
+    r"""
     Generate a plot of Andrews curves, for visualising clusters of
     multivariate data.
 
@@ -78,7 +79,7 @@ def andrews_curves(
 
     labelled = ['x']
     options = {
-        'Overlay': dict(legend_limit=5000),
+        'Overlay': {'legend_limit': 5000},
         'Curve': dict(kwds, labelled=labelled, alpha=alpha, width=width, height=height, **kwds),
     }
     dataset = hv.Dataset(df)
@@ -92,7 +93,7 @@ def andrews_curves(
     el = hv.Overlay(
         [
             curve.relabel(k).options('Curve', color=c, backend='bokeh')
-            for c, (k, v) in zip(colors, groups)
+            for c, (k, v) in zip(colors, groups, strict=True)
             for curve in v
         ]
     ).options(options, backend='bokeh')

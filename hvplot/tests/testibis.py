@@ -3,16 +3,14 @@
 import numpy as np
 import pandas as pd
 import pytest
-
 from packaging import version
 
-
 try:
-    import hvplot.ibis  # noqa
+    # Used as default in-memory backend by ibis
+    import duckdb  # noqa: F401
     import ibis
 
-    # Used as default in-memory backend by ibis
-    import duckdb  # noqa
+    import hvplot.ibis  # noqa: F401
 except ImportError:
     pytest.skip(allow_module_level=True)
 
@@ -25,6 +23,6 @@ def test_ibis_hist():
     ) >= version.parse('1.4'):
         pytest.skip('Ibis <= 10.8.0 is incompatible with DuckDB >= 1.4')
 
-    df = pd.DataFrame(dict(x=np.arange(10)))
+    df = pd.DataFrame({'x': np.arange(10)})
     table = ibis.memtable(df)
     table.hvplot.hist('x')

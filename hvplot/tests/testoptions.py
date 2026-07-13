@@ -1,22 +1,22 @@
-import hvplot
 import holoviews as hv
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
-
 from holoviews import Store
 from holoviews.core.options import Options, OptionTree
+
+import hvplot
 
 
 @pytest.fixture(scope='class')
 def load_pandas_accessor():
-    import hvplot.pandas  # noqa
+    import hvplot.pandas  # noqa: F401
 
 
 @pytest.fixture(scope='class')
 def load_xarray_accessor():
-    import hvplot.xarray  # noqa
+    import hvplot.xarray  # noqa: F401
 
 
 @pytest.fixture(params=['bokeh', 'matplotlib', 'plotly'], scope='class')
@@ -481,12 +481,12 @@ def da2():
 
 @pytest.fixture(scope='module')
 def ds1(da):
-    return xr.Dataset(dict(foo=da))
+    return xr.Dataset({'foo': da})
 
 
 @pytest.fixture(scope='module')
 def ds2(da, da2):
-    return xr.Dataset(dict(foo=da, bar=da2))
+    return xr.Dataset({'foo': da, 'bar': da2})
 
 
 @pytest.mark.usefixtures('load_xarray_accessor')
@@ -527,7 +527,7 @@ class TestXarrayTitle:
         assert opts.kwargs['title'] == 'time = 0'
 
     def test_dataset_empty_raises(self, ds1, backend):
-        with pytest.raises(ValueError, match='empty xarray.Dataset'):
+        with pytest.raises(ValueError, match=r'empty xarray.Dataset'):
             ds1.drop_vars('foo').hvplot()
 
     def test_dataset_one_var_behaves_like_dataarray(self, ds1, backend):

@@ -1,14 +1,15 @@
 """Tests for hvplot.xugrid trimesh support."""
 
-from unittest import TestCase, SkipTest
+from unittest import SkipTest, TestCase
 
 import numpy as np
 import pandas as pd
 
 try:
+    import holoviews as hv
     import xarray as xr
     import xugrid as xu
-    import holoviews as hv
+
     import hvplot.xugrid  # noqa: F401 - patches .hvplot onto xu types
 except ImportError as e:
     raise SkipTest(f'xugrid or required dependency not available: {e}')
@@ -181,7 +182,8 @@ class TestTrimeshExtraDimCoords(TestCase):
 
     def test_2d_coord_produces_dynamic_map(self):
         """A 2D coordinate (like FVCOM's siglay) should be filtered out
-        and replaced with integer indices for the groupby slider."""
+        and replaced with integer indices for the groupby slider.
+        """
         grid = self._make_grid()
         node_dim = grid.node_dimension
         da = xr.DataArray(
@@ -195,7 +197,8 @@ class TestTrimeshExtraDimCoords(TestCase):
 
     def test_dim_without_coord_produces_dynamic_map(self):
         """A dimension with no coordinate at all should get integer indices
-        and still produce a working groupby slider."""
+        and still produce a working groupby slider.
+        """
         grid = self._make_grid()
         node_dim = grid.node_dimension
         da = xr.DataArray(
@@ -334,8 +337,8 @@ class TestTrimeshGeo(TestCase):
 
     def test_geo_non_platecarree_crs(self):
         try:
-            import geoviews  # noqa: F401
             import cartopy.crs as ccrs
+            import geoviews  # noqa: F401
         except ImportError:
             raise SkipTest('geoviews or cartopy not available')
 

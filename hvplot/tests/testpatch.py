@@ -3,19 +3,18 @@ Tests patching of supported libraries
 """
 
 import sys
-
-from unittest import TestCase, SkipTest
+from unittest import SkipTest, TestCase
 
 import numpy as np
 import pandas as pd
 
-from hvplot.plotting import hvPlotTabular, hvPlot
+from hvplot.plotting import hvPlot, hvPlotTabular
 from hvplot.util import _HV_VERSION
 
 
 class TestPatchPandas(TestCase):
     def setUp(self):
-        import hvplot.pandas  # noqa
+        import hvplot.pandas  # noqa: F401
 
     def test_pandas_series_patched(self):
         series = pd.Series([0, 1, 2])
@@ -29,10 +28,10 @@ class TestPatchPandas(TestCase):
 class TestPatchDask(TestCase):
     def setUp(self):
         try:
-            import dask.dataframe as dd  # noqa
+            import dask.dataframe  # noqa: F401
         except ImportError:
             raise SkipTest('Dask not available')
-        import hvplot.dask  # noqa
+        import hvplot.dask  # noqa: F401
 
     def test_dask_series_patched(self):
         import dask.dataframe as dd
@@ -52,10 +51,10 @@ class TestPatchDask(TestCase):
 class TestPatchXArray(TestCase):
     def setUp(self):
         try:
-            import xarray as xr  # noqa
+            import xarray  # noqa: F401
         except ImportError:
             raise SkipTest('XArray not available')
-        import hvplot.xarray  # noqa
+        import hvplot.xarray  # noqa: F401
 
     def test_xarray_dataarray_patched(self):
         import xarray as xr
@@ -78,10 +77,10 @@ class TestPatchStreamz(TestCase):
         if _HV_VERSION >= (1, 23, 0):
             raise SkipTest('streamz support has been removed in HoloViews >= 1.23.0')
         try:
-            import streamz  # noqa
+            import streamz  # noqa: F401
         except ImportError:
             raise SkipTest('streamz not available')
-        import hvplot.streamz  # noqa
+        import hvplot.streamz  # noqa: F401
 
     def test_streamz_dataframe_patched(self):
         from streamz.dataframe import Random
@@ -113,10 +112,10 @@ class TestPatchPolars(TestCase):
         if sys.platform == 'win32' and sys.version_info[:2] == (3, 9):
             raise SkipTest('stack overflow error')
         try:
-            import polars as pl  # noqa
+            import polars  # noqa: F401
         except ImportError:
             raise SkipTest('Polars not available')
-        import hvplot.polars  # noqa
+        import hvplot.polars  # noqa: F401
 
     def test_polars_series_patched(self):
         import polars as pl
@@ -140,10 +139,10 @@ class TestPatchPolars(TestCase):
 class TestPatchDuckDB(TestCase):
     def setUp(self):
         try:
-            import duckdb  # noqa
+            import duckdb  # noqa: F401
         except ImportError:
             raise SkipTest('DuckDB not available')
-        import hvplot.duckdb  # noqa
+        import hvplot.duckdb  # noqa: F401
 
     def test_duckdb_relation_patched(self):
         import duckdb

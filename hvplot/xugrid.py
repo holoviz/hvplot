@@ -1,16 +1,17 @@
-"""Adds the `.hvplot` method to xu.UgridDataArray and xu.UgridDataset"""
+"""Adds the `.hvplot` method to xu.UgridDataArray and xu.UgridDataset."""
 
 
 def patch(name='hvplot', extension='bokeh', logo=False):
-    from . import post_patch, _module_extensions
+    """Patch xugrid objects with the hvplot accessors."""
+    from . import _module_extensions, post_patch
     from .plotting.core import hvPlotXugrid
 
     try:
         import xugrid as xu
-    except ImportError:
+    except ImportError as e:
         raise ImportError(
             'Could not patch plotting API onto xugrid. xugrid could not be imported.'
-        )
+        ) from e
 
     if 'hvplot.xugrid' not in _module_extensions:
         _patch_plot = lambda self: hvPlotXugrid(self)  # noqa: E731

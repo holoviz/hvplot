@@ -1,13 +1,14 @@
+"""Scatter matrix plot for visualizing pairwise variable relationships."""
+
 from functools import partial
 
 import holoviews as _hv
 import numpy as _np
-
 from packaging.version import Version
 
 from ..backend_transforms import _transfer_opts_cur_backend
 from ..converter import HoloViewsConverter
-from ..util import with_hv_extension, _convert_col_names_to_str
+from ..util import _convert_col_names_to_str, with_hv_extension
 
 
 @with_hv_extension
@@ -94,7 +95,6 @@ def scatter_matrix(
     --------
         :func:`pandas.plotting.scatter_matrix` : Equivalent pandas function.
     """
-
     data = _hv.Dataset(_convert_col_names_to_str(data))
     supported = list(HoloViewsConverter._kind_mapping)
     if diagonal not in supported:
@@ -106,9 +106,9 @@ def scatter_matrix(
 
     if rasterize or datashade:
         try:
-            import datashader  # noqa
-        except ImportError:
-            raise ImportError('rasterize and datashade require datashader to be installed.')
+            import datashader  # noqa: F401
+        except ImportError as e:
+            raise ImportError('rasterize and datashade require datashader to be installed.') from e
 
     if rasterize and datashade:
         raise ValueError('Choose to either rasterize or datashade the scatter matrix, not both.')
@@ -175,7 +175,7 @@ def scatter_matrix(
         # change colors for scatter matrix
         chart_opts['color'] = c
         # Add color vdim to each plot.
-        grid = grid.map(lambda x: x.clone(vdims=x.vdims + [c]), 'Scatter')
+        grid = grid.map(lambda x: x.clone(vdims=[*x.vdims, c]), 'Scatter')
         # create a new scatter matrix with groups for each catetory, so now the histogram will
         # show separate colors for each group.
         groups = _hv.operation.gridmatrix(
