@@ -202,9 +202,9 @@ class TestDynamicArgs(TestCase):
 
         x = 'sepal_width'
         y = pn.widgets.Select(
-            name='y', value='sepal_length', options=['sepal_length', 'petal_length']
+            label='y', value='sepal_length', options=['sepal_length', 'petal_length']
         )
-        kind = pn.widgets.Select(name='kind', value='scatter', options=['bivariate', 'scatter'])
+        kind = pn.widgets.Select(label='kind', value='scatter', options=['bivariate', 'scatter'])
 
         dynamic, arg_deps, _arg_names = process_dynamic_args(x, y, kind)
         assert 'x' not in dynamic
@@ -230,7 +230,7 @@ class TestDynamicArgs(TestCase):
         x = 'sepal_length'
         y = 'sepal_width'
         kind = 'scatter'
-        by_species = pn.widgets.Checkbox(name='By species')
+        by_species = pn.widgets.Checkbox(label='By species')
         color = pn.widgets.ColorPicker(value='#ff0000')
 
         @pn.depends(by_species.param.value, color.param.value)

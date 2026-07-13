@@ -33,10 +33,10 @@ class TestPanelObjects(TestCase):
         self.cols = list(self.flowers.columns[:-1])
 
     def test_using_explicit_widgets_works(self):
-        x = pn.widgets.Select(name='x', value='sepal_length', options=self.cols)
-        y = pn.widgets.Select(name='y', value='sepal_width', options=self.cols)
-        kind = pn.widgets.Select(name='kind', value='scatter', options=['bivariate', 'scatter'])
-        by_species = pn.widgets.Checkbox(name='By species')
+        x = pn.widgets.Select(label='x', value='sepal_length', options=self.cols)
+        y = pn.widgets.Select(label='y', value='sepal_width', options=self.cols)
+        kind = pn.widgets.Select(label='kind', value='scatter', options=['bivariate', 'scatter'])
+        by_species = pn.widgets.Checkbox(label='By species')
         color = pn.widgets.ColorPicker(value='#ff0000')
 
         @pn.depends(by_species.param.value, color.param.value)
@@ -53,8 +53,8 @@ class TestPanelObjects(TestCase):
         assert len(look_for_class(pane, pn.widgets.DiscreteSlider)) == 1
 
     def test_using_explicit_widgets_with_groupby_does_not_raise_error(self):
-        x = pn.widgets.Select(name='x', value='sepal_length', options=self.cols)
-        y = pn.widgets.Select(name='y', value='sepal_width', options=self.cols)
+        x = pn.widgets.Select(label='x', value='sepal_length', options=self.cols)
+        y = pn.widgets.Select(label='y', value='sepal_width', options=self.cols)
 
         pane = self.flowers.hvplot(x, y, groupby='species')
         assert isinstance(pane, pn.param.ParamFunction)

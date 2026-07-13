@@ -332,8 +332,8 @@ import hvplot.pandas
 import panel as pn
 from bokeh.sampledata.penguins import data as df
 
-w_sex = pn.widgets.MultiSelect(name='Sex', value=['MALE'], options=['MALE', 'FEMALE'])
-w_body_mass = pn.widgets.FloatSlider(name='Min body mass', start=2700, end=6300, step=50)
+w_sex = pn.widgets.MultiSelect(label='Sex', value=['MALE'], options=['MALE', 'FEMALE'])
+w_body_mass = pn.widgets.FloatSlider(label='Min body mass', start=2700, end=6300, step=50)
 
 dfi = df.interactive(loc='left')
 dfi.loc[(dfi['sex'].isin(w_sex)) & (dfi['body_mass_g'] > w_body_mass)]['bill_length_mm'].describe()
@@ -352,7 +352,7 @@ import hvplot.xarray
 import panel as pn
 import xarray as xr
 
-w_time = pn.widgets.IntSlider(name='time', start=0, end=10)
+w_time = pn.widgets.IntSlider(label='time', start=0, end=10)
 
 da = xr.tutorial.open_dataset('air_temperature').air
 da.interactive.isel(time=w_time).mean().item() - da.mean().item()
@@ -375,8 +375,8 @@ import panel as pn
 import xarray as xr
 
 da = xr.tutorial.open_dataset('air_temperature').air
-w_quantile = pn.widgets.FloatSlider(name='quantile', start=0, end=1)
-w_time = pn.widgets.IntSlider(name='time', start=0, end=10)
+w_quantile = pn.widgets.FloatSlider(label='quantile', start=0, end=1)
+w_time = pn.widgets.IntSlider(label='time', start=0, end=10)
 
 da.interactive(loc='left') \
 .isel(time=w_time) \
