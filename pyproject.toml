@@ -118,6 +118,7 @@ examples = [
     "ipywidgets",
     "networkx >=2.6.3",
     "matplotlib",
+    "netcdf4",
     "notebook >=5.4",
     "numba >=0.51.0",
     "pillow >=8.2.0",
