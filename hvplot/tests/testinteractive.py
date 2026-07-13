@@ -260,8 +260,8 @@ def test_interactive_pandas_dataframe_hvplot_accessor_dmap_kind_widget(df):
 def test_interactive_with_bound_function_calls():
     df = pd.DataFrame({'species': [1, 1, 1, 2, 2, 2], 'sex': 3 * ['MALE', 'FEMALE']})
 
-    w_species = pn.widgets.Select(name='Species', options=[1, 2])
-    w_sex = pn.widgets.MultiSelect(name='Sex', value=['MALE'], options=['MALE', 'FEMALE'])
+    w_species = pn.widgets.Select(label='Species', options=[1, 2])
+    w_sex = pn.widgets.MultiSelect(label='Sex', value=['MALE'], options=['MALE', 'FEMALE'])
 
     def load_data(species, watch=True):
         if watch:

@@ -210,8 +210,8 @@ def bind(function, *args, **kwargs):
     >>> import hvplot
     >>> import panel as pn
 
-    >>> alpha = pn.widgets.FloatSlider(value=0.5, start=0, end=1.0, step=0.1, name="Alpha")
-    >>> top = pn.widgets.RadioButtonGroup(value=10, options=[5, 10, 25], name="Top")
+    >>> alpha = pn.widgets.FloatSlider(value=0.5, start=0, end=1.0, step=0.1, label="Alpha")
+    >>> top = pn.widgets.RadioButtonGroup(value=10, options=[5, 10, 25], label="Top")
     >>> interactive_table = (
     ...     hvplot
     ...     .bind(algorithm, alpha=alpha)
