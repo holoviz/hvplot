@@ -33,7 +33,7 @@ def _api_label(path: Path) -> str:
 CONFIG = LlmsBuildConfig(
     project_title='hvPlot',
     project_description=(
-        'hvPlot is a high-level plotting API for the HoloViz ecosystem built on HoloViews. '
+        'hvPlot is a high-level plotting API for the HoloViz ecosystem built on HoloViews. \n'
         'This file points to the selected markdown documentation for code-writing utility.'
     ),
     markdown_root=OUTPUT_DIR,
