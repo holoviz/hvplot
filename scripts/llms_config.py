@@ -12,6 +12,7 @@ ROOT = Path(__file__).parent.parent
 DOC_DIR = ROOT / 'doc'
 BUILTDOCS_DIR = ROOT / 'builtdocs'
 OUTPUT_DIR = BUILTDOCS_DIR / 'markdown'
+REPO_EXCLUDES = ('.ipynb_checkpoints', 'user_guide')
 MARKDOWN_BASE_URL = '/markdown'
 
 
@@ -39,7 +40,13 @@ CONFIG = LlmsBuildConfig(
     markdown_root=OUTPUT_DIR,
     llms_output_path=BUILTDOCS_DIR / 'llms.txt',
     markdown_base_url=MARKDOWN_BASE_URL,
-    sources=(MarkdownSource(source_dir=DOC_DIR, output_dir=OUTPUT_DIR),),
+    sources=(
+        MarkdownSource(
+            source_dir=DOC_DIR,
+            output_dir=OUTPUT_DIR,
+            exclude_dir_names=REPO_EXCLUDES,
+        ),
+    ),
     sections=(
         LlmsSection(
             title='Home',
