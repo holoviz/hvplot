@@ -3,7 +3,6 @@
   "extends": ["config:recommended", ":enablePreCommit"],
   "schedule": ["* 0-4 1 * *"],  // 12am-5am on the first day of the month
   "enabledManagers": ["github-actions", "pre-commit"],
-  "commitMessagePrefix": "chore(bot):",
   "automerge": true,
   "minimumReleaseAge": "7 days",
   "packageRules": [
