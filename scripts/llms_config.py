@@ -112,12 +112,5 @@ CONFIG = LlmsBuildConfig(
             path_filter=lambda path: path in PAGES,
             label_builder=_api_label,
         ),
-        LlmsSection(
-            title='API Compatibility',
-            description='Compatibility notes for external plotting backends.',
-            path_prefix=Path('ref/api_compatibility'),
-            path_filter=lambda path: path in PAGES,
-            label_builder=_label,
-        ),
     ),
 )
