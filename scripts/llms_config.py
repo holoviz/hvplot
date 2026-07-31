@@ -49,13 +49,19 @@ ROOT_PAGES = {
 }
 
 
+def _index_label(path: Path) -> str:
+    return 'home' if path.parent == Path('.') else path.parent.as_posix().replace('-', ' ')
+
+
 def _label(path: Path) -> str:
     if path.stem == 'index':
-        return 'home' if path.parent == Path('.') else path.parent.as_posix().replace('-', ' ')
+        return _index_label(path)
     return path.stem.replace('_', ' ')
 
 
 def _api_label(path: Path) -> str:
+    if path.stem == 'index':
+        return _index_label(path)
     name = path.stem
     for prefix in ('hvplot.hvPlot.', 'hvplot.plotting.', 'hvplot.ui.', 'hvplot.networkx.'):
         if name.startswith(prefix):
