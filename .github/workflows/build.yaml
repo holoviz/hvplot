@@ -44,12 +44,12 @@ jobs:
         run: |
           echo "TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
           echo "CONDA_FILE=$(ls dist/*.tar.bz2)" >> $GITHUB_ENV
-      - name: conda dev upload
-        if: github.event_name == 'push' && (contains(env.TAG, 'a') || contains(env.TAG, 'b') || contains(env.TAG, 'rc'))
-        run: pixi run -e build publish-conda --token ${{ secrets.CONDA_UPLOAD_TOKEN }} upload --user pyviz --label=dev $CONDA_FILE
-      - name: conda main upload
-        if: github.event_name == 'push' && (!(contains(env.TAG, 'a') || contains(env.TAG, 'b') || contains(env.TAG, 'rc')))
-        run: pixi run -e build publish-conda --token ${{ secrets.CONDA_UPLOAD_TOKEN }} upload --user pyviz --label=dev --label=main $CONDA_FILE
+      - uses: anaconda/actions/upload-package@a6f488910b4a1e4f3fe01736241ca1b92b4b355a # v0.3.1
+        with:
+          token: ${{ secrets.CONDA_UPLOAD_TOKEN }}
+          channel: pyviz
+          packages: dist/*.tar.bz2
+          labels: ${{ (contains(github.ref_name, 'a') || contains(github.ref_name, 'b') || contains(github.ref_name, 'rc')) && 'dev' || 'main,dev' }}
 
   pip_build:
     name: Build PyPI
