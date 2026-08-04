@@ -20,18 +20,20 @@ from nbsite.scripts import LlmsBuildConfig  # noqa: E402
 SOURCE_SUFFIXES = ('.md', '.ipynb', '.rst')
 
 
-def _test_paths() -> set[Path]:
-    return llms_config.PAGES | llms_config.ROOT_PAGES
-
-
-def _resolve_doc_path(path: Path) -> Path | None:
-    """Return the source file in ``doc/`` a configured page maps to, if any."""
-    stem = path.with_suffix('')
-    for suffix in SOURCE_SUFFIXES:
-        candidate = llms_config.DOC_DIR / f'{stem}{suffix}'
-        if candidate.exists():
-            return candidate
-    return None
+def _all_doc_paths() -> set[Path]:
+    """Every markdown path the sources produce, relative to the markdown root."""
+    paths: set[Path] = set()
+    for source in llms_config.CONFIG.sources:
+        for path in source.source_dir.rglob('*'):
+            if not path.is_file():
+                continue
+            rel_path = path.relative_to(source.source_dir)
+            if any(part in source.exclude_dir_names for part in rel_path.parts):
+                continue
+            if rel_path.suffix not in source.include_suffixes:
+                continue
+            paths.add(rel_path.with_suffix('.md'))
+    return paths
 
 
 def _matches(section, path: Path) -> bool:
@@ -40,23 +42,30 @@ def _matches(section, path: Path) -> bool:
     return matches_prefix and section.path_filter(path)
 
 
+def _section_paths(section) -> list[Path]:
+    return [path for path in sorted(_all_doc_paths()) if _matches(section, path)]
+
+
 def test_config_is_valid() -> None:
     assert isinstance(llms_config.CONFIG, LlmsBuildConfig)
 
 
-@pytest.mark.parametrize('path', sorted(_test_paths()))
-def test_referenced_pages_exist(path: Path) -> None:
-    assert _resolve_doc_path(path) is not None
-
-
-def test_sections_match_at_least_one_page() -> None:
+def test_every_section_matches_at_least_one_page() -> None:
     for section in llms_config.CONFIG.sections:
-        assert any(_matches(section, path) for path in _test_paths())
+        assert _section_paths(section)
 
 
 @pytest.mark.parametrize('section', llms_config.CONFIG.sections, ids=lambda s: s.title)
 def test_section_labels_are_unique_and_non_empty(section) -> None:
-    paths = [path for path in _test_paths() if _matches(section, path)]
+    paths = _section_paths(section)
     labels = [section.label_builder(path) for path in paths]
     assert all(labels)
     assert len(labels) == len(set(labels))
+
+
+@pytest.mark.parametrize('section', llms_config.CONFIG.sections, ids=lambda s: s.title)
+def test_section_descriptions_are_non_empty(section) -> None:
+    assert section.description.strip()
+    if section.description_builder is not None:
+        for path in _section_paths(section):
+            assert section.description_builder(path).strip()
