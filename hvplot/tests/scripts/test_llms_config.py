@@ -17,8 +17,6 @@ sys.path.insert(0, str(REPO_ROOT / 'scripts'))
 import llms_config  # noqa: E402
 from nbsite.scripts import LlmsBuildConfig  # noqa: E402
 
-SOURCE_SUFFIXES = ('.md', '.ipynb', '.rst')
-
 
 def _all_doc_paths() -> set[Path]:
     """Every markdown path the sources produce, relative to the markdown root."""
@@ -29,6 +27,8 @@ def _all_doc_paths() -> set[Path]:
                 continue
             rel_path = path.relative_to(source.source_dir)
             if any(part in source.exclude_dir_names for part in rel_path.parts):
+                continue
+            if rel_path in source.exclude_files:
                 continue
             if rel_path.suffix not in source.include_suffixes:
                 continue
