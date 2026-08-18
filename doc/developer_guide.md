@@ -223,6 +223,28 @@ As hvPlot uses notebooks for much of the documentation, this takes a little whil
 
 A development version of hvPlot can be found [here](https://holoviz-dev.github.io/hvplot/). You can ask a maintainer if they want to make a dev release for your PR, but there is no guarantee they will say yes.
 
+### Markdown docs and `llms.txt`
+
+As part of `docs-build`, hvPlot also generates clean Markdown versions of its documentation together with an `llms.txt` index file that points AI assistants at the most relevant pages.
+
+The build produces:
+
+- `builtdocs/markdown/` - a Markdown rendering of the documentation
+- `builtdocs/llms.txt` - an index of the most useful documentation pages for LLM-assisted development
+
+#### Using hvPlot with an AI assistant
+
+The generated `llms.txt` and Markdown docs are designed to be consumed by AI assistants so they can produce correct, idiomatic hvPlot code instead of guessing from stale training data. There are two ways to make use of them:
+
+- **Point your own assistant at the docs.** Once the site is deployed, `llms.txt` is available at `https://hvplot.holoviz.org/en/docs/latest/llms.txt` and the Markdown pages it links to under `https://hvplot.holoviz.org/en/docs/latest/markdown/`. You can fetch these and give them to your assistant as context.
+
+- **Use the HoloViz skills.** The [holoviz-skills](https://holoviz-dev.github.io/holoviz-skills/) repository provides a curated collection of [Agent Skills](https://www.anthropic.com/news/skills) for the HoloViz ecosystem, including hvPlot. Install them with:
+
+```bash
+pip install holoviz-skills
+holoviz-skills install
+```
+
 ### Link to hvPlot objects
 
 ```md
