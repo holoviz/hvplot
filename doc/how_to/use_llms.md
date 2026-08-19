@@ -12,23 +12,7 @@ By the end of this guide you'll be able to:
 ## Prerequisites
 
 - An AI assistant that can read web content or local files (for example Claude, GitHub Copilot, or OpenAI Codex)
-- [Python](https://www.python.org/) 3.12+ and `pip` if you want to install the skills
-
-## Point your assistant at the docs
-
-hvPlot publishes a machine-friendly index of its documentation that your assistant can fetch directly.
-
-1. Tell your assistant to fetch the index:
-
-   `https://hvplot.holoviz.org/en/docs/latest/llms.txt`
-
-2. The index lists the most relevant pages and links to their Markdown versions under:
-
-   `https://hvplot.holoviz.org/en/docs/latest/markdown/`
-
-3. Ask your assistant to read the pages relevant to your task before writing code. For example, to create a plot you might have it read `tutorials/getting_started.md` and the API reference page for the method you need.
-
-The Markdown pages are intentionally free of the navigation chrome, CSS, and JavaScript of the full HTML site, so they consume far fewer tokens and are easier for an assistant to parse.
+- A python package installer like `pip` or `uvx` if you want to install the skills
 
 ## Install the HoloViz skills
 
@@ -38,6 +22,12 @@ The [holoviz-skills](https://holoviz-dev.github.io/holoviz-skills/) repository p
 
    ```bash
    pip install holoviz-skills
+   ```
+
+   OR
+
+   ```bash
+   uvx install holoviz-skills
    ```
 
 2. Install the skills for your tool:
@@ -55,12 +45,23 @@ The [holoviz-skills](https://holoviz-dev.github.io/holoviz-skills/) repository p
 
 3. Restart your assistant so it picks up the newly installed skills.
 
+## Point your assistant at the docs
+
+hvPlot publishes a machine-friendly index of its documentation that your assistant can fetch directly.
+
+1. Tell your assistant to fetch the index:
+
+   `https://hvplot.holoviz.org/en/docs/latest/llms.txt`
+
+2. The index lists the most relevant pages and links to their Markdown versions under:
+
+   `https://hvplot.holoviz.org/en/docs/latest/markdown/`
+
+3. Ask your assistant to read the pages relevant to your task before writing code. For example, to create a plot you might have it read `tutorials/getting_started.md` and the API reference page for the method you need.
+
+The Markdown pages are intentionally free of the navigation chrome, CSS, and JavaScript of the full HTML site, so they consume far fewer tokens and are easier for an assistant to parse.
+
 ## Which approach should I use?
 
 - **Point your assistant at the docs** is a good fit for a one-off task or when you can't install packages, and it always reflects the latest published docs.
 - **Install the HoloViz skills** gives your assistant packaged, opinionated guidance that works offline, but you need to update it as hvPlot evolves.
-
-## What to do next
-
-- Browse the full list of skills and usage instructions at [holoviz-dev.github.io/holoviz-skills](https://holoviz-dev.github.io/holoviz-skills/).
-- If you're contributing to hvPlot, see the [Developer Guide](../developer_guide.md) for how the Markdown docs and `llms.txt` are built.
