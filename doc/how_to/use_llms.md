@@ -31,15 +31,12 @@ uvx holoviz-skills@latest install
 :::{tab-item} pip
 ```bash
 pip install holoviz-skills
+holoviz-skills install
 ```
 
 :::
 
 ::::
-
-```bash
-holoviz-skills install
-```
 
 The `install` command auto-detects the AI tools on your machine. You can also target a specific tool, for example:
 
