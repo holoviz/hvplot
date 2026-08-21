@@ -637,14 +637,17 @@ class hvPlotTabular(hvPlotBase):
             which can be explicitly declared by setting y to ``'index'`` or
             to the index name. Can refer to continuous and categorical data.
         C : str, optional
-            Field to draw heatmap color from. If not specified a simple count will be used.
+            Field to draw heatmap color from. If not specified, the number of rows
+            falling in each ``(x, y)`` cell is counted and shown as ``'Count'``.
         colorbar : bool, default True
             Whether to display a colorbar.
         logz : bool, default False
             Whether to apply log scaling to the z-axis.
         reduce_function : function, optional
             Function to compute statistics for heatmap, for example ``np.mean``.
-            If omitted, no aggregation is applied and duplicate values are dropped.
+            If omitted, no aggregation is applied to ``C`` and duplicate values are
+            dropped. Ignored when ``C`` is not set, since each cell then holds a row
+            count rather than the values behind it.
         **kwds : optional
             Additional keyword arguments are documented in :ref:`plot-options`.
             Run ``hvplot.help('heatmap')`` for the full method documentation.
