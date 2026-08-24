@@ -1,11 +1,8 @@
-"""
-Set of transforms to go from a Bokeh option to another backend's option.
-"""
+"""Set of transforms to go from a Bokeh option to another backend's option."""
 
-from holoviews.core.overlay import CompositeOverlay
 from holoviews.core.options import Store
+from holoviews.core.overlay import CompositeOverlay
 from holoviews.plotting.util import COLOR_ALIASES
-
 
 UNSET = type('UNSET', (), {})
 
@@ -323,7 +320,7 @@ PLOTLY_TRANSFORMS = {
 }
 
 
-BACKEND_TRANSFORMS = dict(
-    matplotlib=MATPLOTLIB_TRANSFORMS,
-    plotly=PLOTLY_TRANSFORMS,
-)
+BACKEND_TRANSFORMS = {
+    'matplotlib': MATPLOTLIB_TRANSFORMS,
+    'plotly': PLOTLY_TRANSFORMS,
+}

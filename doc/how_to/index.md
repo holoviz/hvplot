@@ -8,4 +8,6 @@ How-to guides are practical, problem-oriented instructions that help you accompl
 :maxdepth: 2
 
 Explore Multidimensional datasets <explore_with_widgets>
+use_llms
+
 ```

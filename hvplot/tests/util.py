@@ -1,10 +1,8 @@
 import string
-
 from datetime import datetime
 
 import numpy as np
 import pandas as pd
-
 
 # Pandas removed its make<> test utilities in version 2.2.0.
 

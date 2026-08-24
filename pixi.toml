@@ -125,13 +125,11 @@ jinja2 = "*"
 fugue = "*"
 # end fugue
 ibis-duckdb = ">=9.0.0"  # ibis-framework[duckdb]
-intake-parquet = ">=0.2.3"
-intake-xarray = ">=0.5.0,<2"
-intake  = ">=0.6.5,<2.0.0"
 ipywidgets = "*"
 networkx = ">=2.6.3"
 matplotlib = "*"
 notebook = ">=5.4"
+netcdf4 = "*"
 numba = ">=0.51.0"
 pillow = ">=8.2.0"
 plotly = "*"
@@ -148,6 +146,7 @@ xyzservices = ">=2022.9.0"
 geodatasets = ">=2023.12.0"
 hvsampledata = ">=0.1.4a2"
 bokeh_sampledata = ">=2025.0"
+xugrid = ">=0.15.0"
 
 # =================== TESTS ===================
 
@@ -169,6 +168,7 @@ bokeh_sampledata = "*"
 psutil = "*"
 cftime = "*"
 numpydoc = "*"
+intake  = ">=0.6.5,<2.0.0" # Kept only for deprecation tests.
 
 [feature.test-example.dependencies]
 # Dependencies required to run the examples notebooks.
@@ -192,6 +192,7 @@ polars = "*"
 dask = "*"
 spatialpandas = "*"
 duckdb = "*"
+xugrid = ">=0.15.0"
 
 [feature.geo.dependencies]
 # Geo dependencies are always a little special.
@@ -230,7 +231,7 @@ channels = [
     "conda-forge"
 ]
 [feature.doc.dependencies]
-nbsite = ">=0.9.0a12"
+nbsite = ">=0.10.0a0"
 sphinxext-rediraffe = "*"
 numpydoc = "*"
 sphinxcontrib-mermaid = "*"
@@ -244,9 +245,10 @@ HVPLOT_PATCH_PLOT_DOCSTRING_SIGNATURE = "false"
 [feature.doc.tasks]
 docs-build-sphinx = 'sphinx-build -j auto -b html doc builtdocs'
 _docs-install = 'python -m pip install --no-deps --disable-pip-version-check -e .'
+_docs_markdown = 'python -m nbsite build-llms --config scripts/llms_config.py'
 # Depends on _docs-install instead of install as install
 # in the default environment
-docs-build = { depends-on = ["_docs-install", "docs-build-sphinx"] }
+docs-build = { depends-on = ["_docs-install", "docs-build-sphinx", "_docs_markdown"] }
 docs-server = 'python -m http.server 5500 --directory ./builtdocs'
 
 # ================== BUILD ====================

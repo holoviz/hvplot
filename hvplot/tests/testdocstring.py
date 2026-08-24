@@ -4,8 +4,8 @@ import pytest
 
 pytest.importorskip('numpydoc')
 
-from hvplot.converter import HoloViewsConverter  # noqa: E402
-from hvplot.util import _get_docstring_group_parameters  # noqa: E402
+from hvplot.converter import HoloViewsConverter
+from hvplot.util import _get_docstring_group_parameters
 
 
 @pytest.mark.parametrize('section', HoloViewsConverter._docstring_sections.values())
