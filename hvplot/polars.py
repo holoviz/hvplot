@@ -1,16 +1,17 @@
-"""Adds the `.hvplot` method to pl.DataFrame, pl.LazyFrame and pl.Series"""
+"""Adds the `.hvplot` method to pl.DataFrame, pl.LazyFrame and pl.Series."""
 
-from hvplot import post_patch, _module_extensions
+from hvplot import _module_extensions, post_patch
 from hvplot.plotting.core import hvPlotTabularPolars
 
 
 def patch(name='hvplot', extension='bokeh', logo=False):
+    """Patch the hvPlot plotting API onto polars DataFrame, LazyFrame and Series."""
     try:
         import polars as pl
-    except ImportError:
+    except ImportError as e:
         raise ImportError(
             'Could not patch plotting API onto Polars. Polars could not be imported.'
-        )
+        ) from e
     if 'hvplot.polars' not in _module_extensions:
         pl.api.register_dataframe_namespace(name)(hvPlotTabularPolars)
         pl.api.register_series_namespace(name)(hvPlotTabularPolars)

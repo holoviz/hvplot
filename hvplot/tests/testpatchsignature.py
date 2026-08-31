@@ -3,7 +3,7 @@ import subprocess
 import sys
 
 from hvplot.converter import HoloViewsConverter
-from hvplot.util import _PatchHvplotDocstrings, _in_ipython, _parse_docstring_sections
+from hvplot.util import _in_ipython, _parse_docstring_sections, _PatchHvplotDocstrings
 
 
 def run_script(script, env_vars=None):
@@ -13,6 +13,7 @@ def run_script(script, env_vars=None):
         text=True,
         capture_output=True,
         env=os.environ | env_vars,
+        check=False,
     )
     if process.returncode != 0:
         raise RuntimeError(f'Subprocess failed: {process.stderr}')

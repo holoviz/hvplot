@@ -1,5 +1,5 @@
 """
-interactive API
+interactive API.
 
 How Interactive works
 ---------------------
@@ -96,7 +96,6 @@ display its repr.
 import abc
 import operator
 import sys
-
 from functools import partial
 from types import FunctionType, MethodType
 
@@ -104,18 +103,17 @@ import holoviews as hv
 import pandas as pd
 import panel as pn
 import param
-
-from panel.layout import Column, Row, HSpacer
-from panel.util import get_method_owner, full_groupby
+from panel.layout import Column, HSpacer, Row
+from panel.util import full_groupby, get_method_owner
 from panel.widgets.base import Widget
 
 from .converter import HoloViewsConverter
 from .util import (
+    _convert_col_names_to_str,
     _flatten,
     is_tabular,
     is_xarray,
     is_xarray_dataarray,
-    _convert_col_names_to_str,
 )
 
 
@@ -154,7 +152,7 @@ def _find_widgets(op):
     return widgets
 
 
-class Interactive:
+class Interactive:  # noqa: PLW1641
     """
     The `.interactive` API enhances the API of data analysis libraries
     like Pandas, Dask, and Xarray, by allowing to replace in a pipeline
@@ -214,6 +212,7 @@ class Interactive:
     _fig = None
 
     def __new__(cls, obj, **kwargs):
+        """Create an Interactive instance, supporting functions as input."""
         # __new__ implemented to support functions as input, e.g.
         # hvplot.find(foo, widget).interactive().max()
         if 'fn' in kwargs:
@@ -250,7 +249,7 @@ class Interactive:
         loc='top_left',
         center=False,
         dmap=False,
-        inherit_kwargs={},
+        inherit_kwargs=None,
         max_rows=100,
         method=None,
         _shared_obj=None,
@@ -285,7 +284,7 @@ class Interactive:
         self._dmap = dmap
         # TODO: What's the real use of inherit_kwargs? So far I've only seen
         # it containing 'ax'
-        self._inherit_kwargs = inherit_kwargs
+        self._inherit_kwargs = inherit_kwargs or {}
         self._max_rows = max_rows
         self._kwargs = kwargs
         ds = hv.Dataset(_convert_col_names_to_str(self._obj))
@@ -431,7 +430,9 @@ class Interactive:
             **kwargs,
         )
 
-    def _repr_mimebundle_(self, include=[], exclude=[]):
+    def _repr_mimebundle_(self, include=None, exclude=None):
+        include = include or []
+        exclude = exclude or []
         return self.layout()._repr_mimebundle_()
 
     def __dir__(self):
@@ -540,7 +541,6 @@ class Interactive:
         >>> dfi = df.interactive(width=200)
         >>> dfi.head(widget)
         """
-
         if self._method is None:
             if self._depth == 0:
                 # This code path is entered when initializing an interactive
@@ -847,9 +847,7 @@ class Interactive:
         return self.holoviews() if self._dmap else self.panel(**self._kwargs)
 
     def panel(self, **kwargs):
-        """
-        Wraps the output in a Panel component.
-        """
+        """Wrap the output in a Panel component."""
         return pn.panel(self._callback, **kwargs)
 
     def widgets(self):

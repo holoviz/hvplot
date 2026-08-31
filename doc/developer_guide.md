@@ -204,6 +204,8 @@ Example tests can be run with the following command:
 pixi run test-example
 ```
 
+Slow example tests are excluded by default. Set the environment variable `HVPLOT_INCLUDE_SLOW_EXAMPLES` (e.g. to `1`) to include them.
+
 ## Documentation
 
 The documentation can be built with the command:
@@ -215,11 +217,22 @@ pixi run docs-build
 As hvPlot uses notebooks for much of the documentation, this takes a little while. You can disable:
 
 - Executing all the notebooks by setting the environment variable `HVPLOT_EXECUTE_NBS` to `false`
-- Building the gallery with `HVPLOT_REFERENCE_GALLERY="false"`
+- Building the gallery with `HVPLOT_GALLERY="false"`
 - Running the user guide notebooks with `HVPLOT_EXECUTE_NBS_USER_GUIDE="false"`
 - Running the getting started notebooks with `HVPLOT_EXECUTE_NBS_TUTORIALS="false"`
 
 A development version of hvPlot can be found [here](https://holoviz-dev.github.io/hvplot/). You can ask a maintainer if they want to make a dev release for your PR, but there is no guarantee they will say yes.
+
+### Markdown docs and `llms.txt`
+
+As part of `docs-build`, hvPlot also generates clean Markdown versions of its documentation together with an `llms.txt` index file that points AI assistants at the most relevant pages.
+
+The build produces:
+
+- `builtdocs/markdown/` - a Markdown rendering of the documentation
+- `builtdocs/llms.txt` - an index of the most useful documentation pages for LLM-assisted development
+
+See [Using hvPlot with an AI assistant](how_to/use_llms.md) for how to consume these docs with an AI assistant.
 
 ### Link to hvPlot objects
 

@@ -1,9 +1,8 @@
-import hvplot.pandas
 import pytest
-
 from holoviews.core import Store
 from holoviews.element import Curve
 
+import hvplot.pandas
 from hvplot.util import _get_doc_and_signature
 
 
@@ -16,7 +15,7 @@ def reset_default_backend():
 
 def test_help_style_extension_output(reset_default_backend):
     # default, after e.g. import hvplot.pandas
-    docstring, signature = _get_doc_and_signature(
+    docstring, _signature = _get_doc_and_signature(
         cls=hvplot.hvPlot,
         kind='line',
         completions=False,
@@ -31,7 +30,7 @@ def test_help_style_extension_output(reset_default_backend):
 
     # The current backend becomes matplotlib
     hvplot.extension('matplotlib', 'plotly')
-    docstring, signature = _get_doc_and_signature(
+    docstring, _signature = _get_doc_and_signature(
         cls=hvplot.hvPlot,
         kind='line',
         completions=False,
@@ -46,7 +45,7 @@ def test_help_style_extension_output(reset_default_backend):
 
     # The current backend becomes plotly
     hvplot.output(backend='plotly')
-    docstring, signature = _get_doc_and_signature(
+    docstring, _signature = _get_doc_and_signature(
         cls=hvplot.hvPlot,
         kind='line',
         completions=False,
@@ -64,7 +63,7 @@ def test_help_style_extension_output(reset_default_backend):
 def test_help_style_compatibility(reset_default_backend):
     # The current backend is plotly but the style options are those of matplotlib
     hvplot.extension('plotly', 'matplotlib', compatibility='matplotlib')
-    docstring, signature = _get_doc_and_signature(
+    docstring, _signature = _get_doc_and_signature(
         cls=hvplot.hvPlot,
         kind='line',
         completions=False,

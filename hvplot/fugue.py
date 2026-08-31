@@ -1,24 +1,23 @@
-"""
-Experimental support for fugue.
-"""
+"""Experimental support for fugue."""
 
 from typing import Any
 
 import panel as _pn
 
-from . import hvPlotTabular, post_patch, _module_extensions
+from . import _module_extensions, hvPlotTabular, post_patch
 from .util import _fugue_ipython
 
 
 def patch(name='hvplot', extension='bokeh', logo=False):
+    """Register the hvPlot output extension with the fugue SQL API."""
     try:
         from fugue import DataFrames, Outputter
         from fugue.extensions import namespace_candidate, parse_outputter
-    except ImportError:
+    except ImportError as e:
         raise ImportError(
             'Could not add fugue support as it could not be imported. '
             'Please make sure you have installed fugue in your environment.'
-        )
+        ) from e
 
     import hvplot.pandas  # noqa: F401
 
@@ -33,8 +32,8 @@ def patch(name='hvplot', extension='bokeh', logo=False):
             Process the dataframes and output the result as
             a pn.Column.
 
-            Parameters:
-            -----------
+            Parameters
+            ----------
             dfs: fugue.DataFrames
             """
             charts = []

@@ -1,14 +1,14 @@
 import holoviews as hv
-import hvplot.pandas  # noqa
-import hvplot.xarray  # noqa
 import matplotlib
 import numpy as np
 import pandas as pd
 import panel as pn
 import pytest
 import xarray as xr
-
 from holoviews.util.transform import dim
+
+import hvplot.pandas
+import hvplot.xarray  # noqa: F401
 from hvplot import bind
 from hvplot.interactive import Interactive
 from hvplot.tests.util import makeDataFrame, makeMixedDataFrame
@@ -99,7 +99,7 @@ def test_spy(clone_spy, series):
 
     assert clone_spy.count == 2
     assert not clone_spy.calls[1].is_empty()
-    assert clone_spy.calls[1].kwargs == dict(x='X')
+    assert clone_spy.calls[1].kwargs == {'x': 'X'}
 
 
 def test_interactive_pandas_dataframe(df):
@@ -156,13 +156,13 @@ def test_interactive_pandas_function(df):
 
     dfi = Interactive(bind(sel_col, select))
     assert type(dfi) is Interactive
-    assert dfi._obj is df.A
+    pd.testing.assert_series_equal(dfi._obj, df.A)
     assert isinstance(dfi._fn, pn.param.ParamFunction)
     assert dfi._transform == dim('*')
     assert dfi._method is None
 
     select.value = 'B'
-    assert dfi._obj is df.B
+    pd.testing.assert_series_equal(dfi._obj, df.B)
 
 
 def test_interactive_xarray_function(dataset):
@@ -260,8 +260,8 @@ def test_interactive_pandas_dataframe_hvplot_accessor_dmap_kind_widget(df):
 def test_interactive_with_bound_function_calls():
     df = pd.DataFrame({'species': [1, 1, 1, 2, 2, 2], 'sex': 3 * ['MALE', 'FEMALE']})
 
-    w_species = pn.widgets.Select(name='Species', options=[1, 2])
-    w_sex = pn.widgets.MultiSelect(name='Sex', value=['MALE'], options=['MALE', 'FEMALE'])
+    w_species = pn.widgets.Select(label='Species', options=[1, 2])
+    w_sex = pn.widgets.MultiSelect(label='Sex', value=['MALE'], options=['MALE', 'FEMALE'])
 
     def load_data(species, watch=True):
         if watch:
@@ -565,7 +565,7 @@ def test_interactive_pandas_series_operator_and_method_widget(series):
     assert si._obj is series
     assert (
         repr(si._transform)
-        == "(dim('*').pd+FloatSlider(end=5.0, start=1.0, value=2.0)).head(IntSlider(end=5, start=1, value=2))"
+        == "(dim('*').pd+FloatSlider(end=5.0, start=1.0, value=2.0)).head(IntSlider(end=5, start=1, value=2))"  # noqa: E501
     )
     assert si._depth == 5
     assert si._method is None
@@ -726,7 +726,7 @@ def test_interactive_pandas_series_operator_and_method_widget_update(series):
 
     assert (
         repr(si._transform)
-        == "(dim('*').pd+FloatSlider(end=5.0, start=1.0, value=3.0)).head(IntSlider(end=5, start=1, value=3))"
+        == "(dim('*').pd+FloatSlider(end=5.0, start=1.0, value=3.0)).head(IntSlider(end=5, start=1, value=3))"  # noqa: E501
     )
 
     out = si._callback()
@@ -1149,7 +1149,7 @@ def test_interactive_pandas_series_plot_kind_attr(series, clone_spy):
     assert isinstance(si, Interactive)
     assert isinstance(si._current, matplotlib.axes.Axes)
     assert si._obj is series
-    # assert "dim('*').pd.plot).line(ax=<function Interactive._get_ax_fn.<locals>.get_ax" in repr(si._transform)
+    # assert "dim('*').pd.plot).line(ax=<function Interactive._get_ax_fn.<locals>.get_ax" in repr(si._transform)  # noqa: E501
     assert si._depth == 4
     assert si._method is None
 
@@ -1176,7 +1176,7 @@ def test_interactive_pandas_series_plot_kind_attr(series, clone_spy):
     # 2nd _clone in __call__
     assert clone_spy.calls[3].depth == 4
     assert len(clone_spy.calls[3].args) == 1
-    # assert "(dim('*').pd.plot()).line(ax=<function Interactive._get_ax_fn.<locals>.get_ax" in repr(clone_spy.calls[3].args[0])
+    # assert "(dim('*').pd.plot()).line(ax=<function Interactive._get_ax_fn.<locals>.get_ax" in repr(clone_spy.calls[3].args[0])  # noqa: E501
     # TODO: Looks like a bug, 'plot' should be True?
     assert clone_spy.calls[3].kwargs == {'plot': False}
 
@@ -1208,7 +1208,8 @@ def test_interactive_pandas_dir_with_type_change(df):
 
 
 @pytest.mark.xfail(
-    reason='hvplot.util.check_library expects the obj to have __module__, which is not true for a float'
+    reason='hvplot.util.check_library expects the obj to have __module__, '
+    'which is not true for a float'
 )
 def test_interactive_pandas_dir_with_type_change_to_float(df):
     dfi = Interactive(df)

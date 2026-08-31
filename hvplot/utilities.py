@@ -1,6 +1,8 @@
+"""Helper utilities for displaying, saving, and inspecting hvPlot output."""
+
+import holoviews as _hv
 import panel as _pn
 import param
-import holoviews as _hv
 
 from .util import _get_doc_and_signature
 
@@ -33,7 +35,7 @@ def help(kind=None, docstring=True, generic=True, style=True):
     """
     from .plotting.core import hvPlot
 
-    doc, sig = _get_doc_and_signature(
+    doc, _sig = _get_doc_and_signature(
         cls=hvPlot, kind=kind, docstring=docstring, generic=generic, style=style
     )
     print(doc)
@@ -130,8 +132,10 @@ def show(obj, title=None, port=0, **kwargs):
         return _pn.pane.HoloViews(obj).show(title, port, **kwargs)
     elif isinstance(obj, _pn.viewable.Viewable):
         return obj.show(title, port, **kwargs)
+    elif isinstance(obj, param.rx):
+        return _pn.panel(obj).show(title, port, **kwargs)
     else:
-        raise ValueError('{type(obj).__name__} type object not recognized and cannot be shown.')
+        raise ValueError(f'{type(obj).__name__} type object not recognized and cannot be shown.')
 
 
 class hvplot_extension(_hv.extension):
@@ -143,7 +147,6 @@ class hvplot_extension(_hv.extension):
 
     Notes
     -----
-
     - Installing a data source with e.g. `import hvplot.pandas` automatically
       calls this extension, enabling the Bokeh plotting backend.
     - Calling the extension in a notebook environment injects some CSS/HTML/JS
@@ -168,6 +171,7 @@ class hvplot_extension(_hv.extension):
     logo = param.Boolean(default=False)
 
     def __call__(self, *args, **params):
+        """Enable the extension."""
         from . import _PATCH_PLOT_SIGNATURES
 
         # importing e.g. hvplot.pandas always loads the bokeh extension.

@@ -4,13 +4,13 @@ Tests pandas.options.backend setting
 
 from unittest.mock import patch
 
-import pytest
-import pandas as pd
 import holoviews as hv
+import pandas as pd
+import pytest
+
 from hvplot.converter import HoloViewsConverter
 from hvplot.plotting import plot
 from hvplot.tests.util import makeDataFrame
-
 
 no_args = ['line', 'area', 'hist', 'box', 'kde', 'density', 'bar', 'barh']
 x_y = ['scatter', 'hexbin']
@@ -167,6 +167,7 @@ def test_pandas_plot_extension_loaded(plotting_backend):
         mock_hvplot_ext.assert_called_once_with('bokeh', logo=False)
 
 
+@pytest.mark.filterwarnings('ignore:allowing to pass duckdb data objects')
 def test_plot_supports_duckdb_relation():
     duckdb = pytest.importorskip('duckdb')
     connection = duckdb.connect(':memory:')
@@ -175,6 +176,7 @@ def test_plot_supports_duckdb_relation():
     assert isinstance(out, hv.NdOverlay)
 
 
+@pytest.mark.filterwarnings('ignore:allowing to pass duckdb data objects')
 def test_plot_supports_duckdb_connection():
     duckdb = pytest.importorskip('duckdb')
     connection = duckdb.connect(':memory:')

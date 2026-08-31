@@ -11,7 +11,7 @@ commandline, and from a script. Another section will introduce you to
 generating [subplots](Subplots.ipynb) from your data.
 
 Once the basics are covered you can learn how to use the plotting API
-for specific types of data including [streaming data](Streaming.ipynb), [gridded data](Gridded_Data.ipynb)
+for specific types of data including [gridded data](Gridded_Data.ipynb),
 [network graphs](NetworkX.ipynb), [geographic data](Geographic_Data.ipynb),
 and [timeseries data](Timeseries_Data.ipynb). These sections are not meant
 to be read in a particular order; you should take a look at any that seem
@@ -35,7 +35,7 @@ pandas.plotting module.
 - [Plotting with Bokeh](Plotting)
   Overview of plotting your data with hvPlot and Bokeh.
 - [Plotting with Matplotlib](Plotting_with_Matplotlib)
-  Overview of plotting your data with hvPlot and Matplotib.
+  Overview of plotting your data with hvPlot and Matplotlib.
 - [Plotting with Plotly](Plotting_with_Plotly)
   Overview of plotting your data with hvPlot and Plotly.
 - [Interactive](Interactive)
@@ -50,10 +50,8 @@ pandas.plotting module.
   Displaying and saving plots in the notebook, at the command prompt, or in scripts.
 - [Subplots](Subplots)
   How to generate subplots and grids.
-- [Streaming](Streaming)
-  How to use hvPlot for streaming plots with the streamz library.
 - [Gridded Data](Gridded_Data)
-  How to use hvPlot for plotting XArray-based gridded data.
+  How to use hvPlot for plotting Xarray-based gridded data.
 - [Network Graphs](NetworkX)
   How to use hvPlot for plotting NetworkX graphs.
 - [Geographic Data](Geographic_Data)
@@ -80,7 +78,6 @@ Plotting Extensions <Plotting_Extensions>
 Exploring data <Explorer>
 Viewing <Viewing>
 Subplots <Subplots>
-Streaming <Streaming>
 Gridded Data <Gridded_Data>
 Network Graphs <NetworkX>
 Geographic Data <Geographic_Data>

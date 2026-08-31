@@ -4,8 +4,7 @@ These tests depends on GeoViews.
 
 import pathlib
 import sys
-
-from unittest import TestCase, SkipTest
+from unittest import SkipTest, TestCase
 
 import holoviews as hv
 import numpy as np
@@ -13,7 +12,6 @@ import pandas as pd
 import pytest
 
 from hvplot.util import proj_to_cartopy
-from packaging.version import Version
 
 pytestmark = pytest.mark.geo
 
@@ -30,31 +28,32 @@ class TestGeo(TestCase):
         if sys.platform == 'win32':
             raise SkipTest('Skip geo tests on windows for now')
         try:
-            import xarray as xr  # noqa
-            import rasterio  # noqa
-            import geoviews  # noqa
-            import cartopy.crs as ccrs  # noqa
-            import pyproj  # noqa
+            import cartopy.crs as ccrs  # noqa: F401
+            import geoviews  # noqa: F401
+            import pyproj  # noqa: F401
+            import rasterio  # noqa: F401
             import rioxarray as rxr
+            import xarray as xr  # noqa: F401
         except ImportError:
             raise SkipTest(
                 'xarray, rasterio, geoviews, cartopy, pyproj or rioxarray not available'
             )
-        import hvplot.xarray  # noqa
-        import hvplot.pandas  # noqa
+        import hvplot.pandas
+        import hvplot.xarray  # noqa: F401
 
         self.da = rxr.open_rasterio(
             pathlib.Path(__file__).parent / 'data' / 'RGB-red.byte.tif'
         ).isel(band=0)
+        # UTM zone 18N
         self.crs = proj_to_cartopy(self.da.spatial_ref.attrs['crs_wkt'])
 
-    def assertCRS(self, plot, proj='utm'):
+    def assertCRS(self, plot, proj=None):
         import cartopy
 
-        if Version(cartopy.__version__) < Version('0.20'):
-            assert plot.crs.proj4_params['proj'] == proj
-        else:
-            assert plot.crs.to_dict()['proj'] == proj
+        if proj is None:
+            proj = cartopy.crs.UTM(zone=18)
+
+        assert plot.crs == proj
 
     def assert_projection(self, plot, proj):
         opts = hv.Store.lookup_options('bokeh', plot, 'plot')
@@ -110,11 +109,13 @@ class TestProjections(TestGeo):
             da.hvplot.image('x', 'y', crs='name_of_some_invalid_projection')
 
     def test_plot_with_geo_as_true_crs_no_crs_on_data_returns_default(self):
+        import cartopy.crs as ccrs
+
         da = self.da.copy()
         da.rio._crs = False  # To not treat it as a rioxarray
         da.attrs = {'bar': self.crs}
         plot = da.hvplot.image('x', 'y', geo=True)
-        self.assertCRS(plot, 'eqc')
+        self.assertCRS(plot, ccrs.PlateCarree())
 
     def test_plot_with_projection_as_string(self):
         da = self.da.copy()
@@ -147,9 +148,9 @@ class TestProjections(TestGeo):
         hv.renderer('bokeh').get_plot(plot)
 
     def test_geo_with_rasterize(self):
-        import xarray as xr
         import cartopy.crs as ccrs
         import geoviews as gv
+        import xarray as xr
 
         try:
             from holoviews.operation.datashader import rasterize
@@ -178,11 +179,11 @@ class TestProjections(TestGeo):
 class TestGeoAnnotation(TestCase):
     def setUp(self):
         try:
-            import geoviews  # noqa
-            import cartopy.crs as ccrs  # noqa
+            import cartopy.crs as ccrs
+            import geoviews  # noqa: F401
         except ImportError:
             raise SkipTest('geoviews or cartopy not available')
-        import hvplot.pandas  # noqa
+        import hvplot.pandas  # noqa: F401
 
         self.crs = ccrs.PlateCarree()
         self.df = pd.DataFrame(np.random.rand(10, 2), columns=['x', 'y'])
@@ -215,7 +216,7 @@ class TestGeoAnnotation(TestCase):
         self.assertIn('openstreetmap', plot.get(0).data)
 
     def test_plot_with_tiles_with_tiles_opts(self):
-        plot = self.df.hvplot.points('x', 'y', geo=False, tiles=True, tiles_opts=dict(alpha=0.5))
+        plot = self.df.hvplot.points('x', 'y', geo=False, tiles=True, tiles_opts={'alpha': 0.5})
         assert len(plot) == 2
         tiles = plot.get(0)
         assert isinstance(tiles, hv.Tiles)
@@ -233,7 +234,7 @@ class TestGeoAnnotation(TestCase):
     def test_plot_with_tiles_with_tiles_opts_with_geo(self):
         import geoviews as gv
 
-        plot = self.df.hvplot.points('x', 'y', geo=True, tiles=True, tiles_opts=dict(alpha=0.5))
+        plot = self.df.hvplot.points('x', 'y', geo=True, tiles=True, tiles_opts={'alpha': 0.5})
         assert len(plot) == 2
         tiles = plot.get(0)
         assert isinstance(tiles, gv.element.WMTS)
@@ -308,11 +309,11 @@ class TestGeoAnnotation(TestCase):
 class TestGeoElements(TestCase):
     def setUp(self):
         try:
-            import geoviews  # noqa
-            import cartopy.crs as ccrs  # noqa
+            import cartopy.crs as ccrs
+            import geoviews  # noqa: F401
         except ImportError:
             raise SkipTest('geoviews or cartopy not available')
-        import hvplot.pandas  # noqa
+        import hvplot.pandas  # noqa: F401
 
         self.crs = ccrs.PlateCarree()
         self.df = pd.DataFrame(np.random.rand(10, 2), columns=['x', 'y'])
@@ -349,15 +350,15 @@ class TestGeoElements(TestCase):
 class TestGeoPandas(TestCase):
     def setUp(self):
         try:
-            import geopandas as gpd  # noqa
-            import geoviews  # noqa
-            import cartopy.crs as ccrs  # noqa
-            import shapely  # noqa
+            import cartopy.crs as ccrs  # noqa: F401
+            import geopandas as gpd
+            import geoviews  # noqa: F401
+            import shapely  # noqa: F401
         except ImportError:
             raise SkipTest('geopandas, geoviews, shapely or cartopy not available')
-        import hvplot.pandas  # noqa
-
         from shapely.geometry import Polygon
+
+        import hvplot.pandas  # noqa: F401
 
         p_geometry = gpd.points_from_xy(
             x=[12.45339, 12.44177, 9.51667, 6.13000, 158.14997],
@@ -365,14 +366,14 @@ class TestGeoPandas(TestCase):
             crs='EPSG:4326',
         )
         p_names = ['Vatican City', 'San Marino', 'Vaduz', 'Luxembourg', 'Palikir']
-        self.cities = gpd.GeoDataFrame(dict(name=p_names), geometry=p_geometry)
+        self.cities = gpd.GeoDataFrame({'name': p_names}, geometry=p_geometry)
 
         pg_geometry = [
             Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0))),
             Polygon(((2, 2), (2, 3), (3, 3), (3, 2), (2, 2))),
         ]
         pg_names = ['A', 'B']
-        self.polygons = gpd.GeoDataFrame(dict(name=pg_names), geometry=pg_geometry)
+        self.polygons = gpd.GeoDataFrame({'name': pg_names}, geometry=pg_geometry)
 
     def test_points_hover_cols_is_empty_by_default(self):
         points = self.cities.hvplot()
@@ -440,17 +441,18 @@ class TestGeoPandas(TestCase):
 
     def test_geometry_none(self):
         polygons = self.polygons.copy()
-        polygons.geometry[1] = None
+        polygons[1, 'geometry'] = None
         assert polygons.hvplot(geo=True)
 
+    @pytest.mark.xfail(reason='Last assertion broken')
     def test_tiles_without_gv(self):
         polygons = self.polygons.copy()
         polygons_plot = polygons.hvplot(tiles=True)
-        polygons_plot.get(1).data.crs is None
+        assert polygons_plot.get(1).data.crs is None
 
         polygons.crs = 'EPSG:4326'
         polygons_plot = self.polygons.hvplot(tiles=True)
-        polygons_plot.get(1).data.crs == 'EPSG:3857'
+        assert polygons_plot.get(1).data.crs == 'EPSG:3857'
 
 
 class TestGeoUtil(TestCase):
@@ -466,7 +468,7 @@ class TestGeoUtil(TestCase):
     def test_proj_to_cartopy(self):
         from ..util import proj_to_cartopy
 
-        crs = proj_to_cartopy('+init=epsg:26911')
+        crs = proj_to_cartopy('epsg:26911')
 
         assert isinstance(crs, self.ccrs.CRS)
 
@@ -474,8 +476,8 @@ class TestGeoUtil(TestCase):
         from ..util import proj_to_cartopy
 
         crs = proj_to_cartopy(
-            'GEOGCRS["unnamed",BASEGEOGCRS["unknown",DATUM["unknown",ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1,ID["EPSG",9001]]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8901]]],DERIVINGCONVERSION["unknown",METHOD["PROJ ob_tran o_proj=latlon"],PARAMETER["o_lon_p",0,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],PARAMETER["o_lat_p",37.5,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],PARAMETER["lon_0",357.5,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]]],CS[ellipsoidal,2],AXIS["longitude",east,ORDER[1],ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],AXIS["latitude",north,ORDER[2],ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]]]'
-        )  # noqa: E501
+            'GEOGCRS["unnamed",BASEGEOGCRS["unknown",DATUM["unknown",ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1,ID["EPSG",9001]]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8901]]],DERIVINGCONVERSION["unknown",METHOD["PROJ ob_tran o_proj=latlon"],PARAMETER["o_lon_p",0,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],PARAMETER["o_lat_p",37.5,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],PARAMETER["lon_0",357.5,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]]],CS[ellipsoidal,2],AXIS["longitude",east,ORDER[1],ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],AXIS["latitude",north,ORDER[2],ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]]]'  # noqa: E501
+        )
 
         assert isinstance(crs, self.ccrs.RotatedPole)
         assert crs.proj4_params['lon_0'] == 357.5
@@ -485,7 +487,7 @@ class TestGeoUtil(TestCase):
         """Test Albers Equal Area projection from WKT string"""
         from ..util import proj_to_cartopy
 
-        albers_wkt = 'PROJCS["Projection = Albers Conical Equal Area",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Albers_Conic_Equal_Area"],PARAMETER["latitude_of_center",23],PARAMETER["longitude_of_center",-96],PARAMETER["standard_parallel_1",29.5],PARAMETER["standard_parallel_2",45.5],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH]]'
+        albers_wkt = 'PROJCS["Projection = Albers Conical Equal Area",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Albers_Conic_Equal_Area"],PARAMETER["latitude_of_center",23],PARAMETER["longitude_of_center",-96],PARAMETER["standard_parallel_1",29.5],PARAMETER["standard_parallel_2",45.5],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH]]'  # noqa: E501
 
         crs = proj_to_cartopy(albers_wkt)
 
@@ -500,7 +502,7 @@ class TestGeoUtil(TestCase):
         """Test Albers Equal Area projection from PROJ4 string"""
         from ..util import proj_to_cartopy
 
-        proj4_string = '+proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs'
+        proj4_string = '+proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs'  # noqa: E501
 
         crs = proj_to_cartopy(proj4_string)
 
