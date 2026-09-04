@@ -132,6 +132,38 @@ def test_pandas_frame_specials_plot_explicit_return_holoviews_object(backend, ki
     assert isinstance(plot, el)
 
 
+@pytest.mark.parametrize('kind,el', [('donut', hv.Donut), ('waterfall', hv.Waterfall)])
+def test_hvplot_direct_returns_type_and_contents(plotting_backend, kind, el):
+    """Test df.hvplot.<kind>() returns NdOverlay with correct contained elements."""
+    import hvplot.pandas  # noqa: F401 - registers hvPlot accessor on pandas
+
+    df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6]})
+    plot = df.hvplot.__getattribute__(kind)()
+    # Assert top-level is NdOverlay
+    assert isinstance(plot, hv.NdOverlay), f'Expected NdOverlay, got {type(plot).__name__}'
+    # Assert all contained elements are the expected type
+    for key, element in plot.data.items():
+        assert isinstance(element, el), (
+            f'Expected {el.__name__} for key {key}, got {type(element).__name__}'
+        )
+
+
+@pytest.mark.parametrize('kind,el', [('donut', hv.Donut), ('waterfall', hv.Waterfall)])
+def test_hvplot_kind_returns_type_and_contents(plotting_backend, kind, el):
+    """Test df.hvplot(kind='<kind>') returns NdOverlay with correct contained elements."""
+    import hvplot.pandas  # noqa: F401 - registers hvPlot accessor on pandas
+
+    df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6]})
+    plot = df.hvplot(kind=kind)
+    # Assert top-level is NdOverlay
+    assert isinstance(plot, hv.NdOverlay), f'Expected NdOverlay, got {type(plot).__name__}'
+    # Assert all contained elements are the expected type
+    for key, element in plot.data.items():
+        assert isinstance(element, el), (
+            f'Expected {el.__name__} for key {key}, got {type(element).__name__}'
+        )
+
+
 def test_pandas_plot_reuse_plot_dropped(plotting_backend):
     df = pd.DataFrame([0, 1, 2])
     with patch('hvplot.plotting.hvPlotTabular.__call__') as hvcall:

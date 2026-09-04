@@ -253,6 +253,8 @@ class hvPlotTabular(hvPlotBase):
         'polygons',
         'paths',
         'labels',
+        'donut',
+        'waterfall',
         'explorer',
     ]
 
@@ -1230,6 +1232,102 @@ class hvPlotTabular(hvPlotBase):
     def density(self, y=None, by=None, **kwds):
         """Alias of :meth:`hvplot.hvPlot.kde`."""
         return self(kind='kde', x=None, y=y, by=by, **kwds)
+
+    def donut(self, x=None, y=None, **kwds):
+        """
+        Create a donut plot.
+
+        A donut plot displays data as a circular chart with a hole in the center,
+        useful for showing proportions of a whole.
+
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.donut.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
+
+        Parameters
+        ----------
+        x : str, optional
+            Field name(s) to draw x-positions from. If not specified, the index is
+            used. Can refer to continuous and categorical data.
+        y : str or list of str, optional
+            Field name(s) to draw y-positions from. If not specified, all numerical
+            fields are used.
+        **kwds : optional
+            Additional keyword arguments documented in :ref:`plot-options`.
+            Run ``hvplot.help('donut')`` for the full method documentation.
+
+        Returns
+        -------
+        :class:`holoviews:holoviews.element.Donut` or Panel object
+            A HoloViews Donut element or Panel object if using Panel widgets.
+            You can ``print`` the object to study its composition and run:
+
+            .. code-block:: python
+
+                import holoviews as hv
+                hv.help(the_holoviews_object)
+
+            to learn more about its parameters and options.
+
+        See Also
+        --------
+        :meth:`waterfall` : Waterfall plot.
+
+        References
+        ----------
+        - HoloViews: https://holoviews.org/reference/elements/chart/Donut.html
+        - Plotly: https://plotly.com/python/donut-charts/
+        - Wiki: https://en.wikipedia.org/wiki/Donut_chart
+        """
+        return self(kind='donut', x=x, y=y, **kwds)
+
+    def waterfall(self, x=None, y=None, **kwds):
+        """
+        Create a waterfall plot.
+
+        A waterfall plot displays data as a series of columns that rise and fall,
+        commonly used to visualize running totals or contributions to a net change.
+
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.waterfall.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
+
+        Parameters
+        ----------
+        x : str, optional
+            Field name(s) to draw x-positions from. If not specified, the index is
+            used. Can refer to continuous and categorical data.
+        y : str or list of str, optional
+            Field name(s) to draw y-positions from. If not specified, all numerical
+            fields are used.
+        **kwds : optional
+            Additional keyword arguments documented in :ref:`plot-options`.
+            Run ``hvplot.help('waterfall')`` for the full method documentation.
+
+        Returns
+        -------
+        :class:`holoviews:holoviews.element.Waterfall` or Panel object
+            A HoloViews Waterfall element or Panel object if using Panel widgets.
+            You can ``print`` the object to study its composition and run:
+
+            .. code-block:: python
+
+                import holoviews as hv
+                hv.help(the_holoviews_object)
+
+            to learn more about its parameters and options.
+
+        See Also
+        --------
+        :meth:`donut` : Donut plot.
+
+        References
+        ----------
+        - HoloViews: https://holoviews.org/reference/elements/chart/Waterfall.html
+        - Plotly: https://plotly.com/python/waterfall-charts/
+        - Wiki: https://en.wikipedia.org/wiki/Waterfall_chart
+        """
+        return self(kind='waterfall', x=x, y=y, **kwds)
 
     def table(self, columns=None, **kwds):
         """

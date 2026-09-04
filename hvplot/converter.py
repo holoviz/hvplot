@@ -27,6 +27,7 @@ from holoviews.element import (
     Curve,
     Dataset,
     Distribution,
+    Donut,
     ErrorBars,
     HeatMap,
     HexTiles,
@@ -44,6 +45,7 @@ from holoviews.element import (
     TriMesh,
     VectorField,
     Violin,
+    Waterfall,
 )
 from holoviews.operation import apply_when, histogram
 from holoviews.plotting.bokeh import OverlayPlot, colormap_generator
@@ -800,6 +802,7 @@ class HoloViewsConverter:
         'contourf': Polygons,
         'dataset': Dataset,
         'density': Distribution,
+        'donut': Donut,
         'errorbars': ErrorBars,
         'heatmap': HeatMap,
         'hexbin': HexTiles,
@@ -820,6 +823,7 @@ class HoloViewsConverter:
         'trimesh': TriMesh,
         'vectorfield': VectorField,
         'violin': Violin,
+        'waterfall': Waterfall,
     }
 
     # Types which have a colorbar by default
@@ -2687,6 +2691,16 @@ class HoloViewsConverter:
         """Line plot."""
         self._error_if_unavailable('line')
         return self.chart(Curve, x, y, data)
+
+    def donut(self, x=None, y=None, data=None):
+        """Donut plot."""
+        self._error_if_unavailable('donut')
+        return self.chart(Donut, x, y, data)
+
+    def waterfall(self, x=None, y=None, data=None):
+        """Waterfall plot."""
+        self._error_if_unavailable('waterfall')
+        return self.chart(Waterfall, x, y, data)
 
     def step(self, x=None, y=None, data=None):
         """Step plot."""
