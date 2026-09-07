@@ -38,7 +38,7 @@ jobs:
     name: Pixi lock
     runs-on: ubuntu-latest
     steps:
-      - uses: holoviz-dev/holoviz_tasks/pixi-lock@ffddda04b2894fea39b407f64d3622d2f19e5a9f # v1
+      - uses: holoviz-dev/holoviz_tasks/pixi-lock@8fb2d0a3e4c70e218d487e0eed3b9c2488997212 # v1
 
   docs_build:
     name: Build Documentation
@@ -56,7 +56,7 @@ jobs:
             echo "❌ 'version' is required and must match format X.X.X (e.g. 0.11.1) when target is 'main'"
             exit 1
           fi
-      - uses: holoviz-dev/holoviz_tasks/pixi-install@ffddda04b2894fea39b407f64d3622d2f19e5a9f # v1
+      - uses: holoviz-dev/holoviz_tasks/pixi-install@8fb2d0a3e4c70e218d487e0eed3b9c2488997212 # v1
         with:
           environments: docs
       - name: Build documentation
@@ -69,7 +69,7 @@ jobs:
       - name: report failure
         if: failure()
         run: cat /tmp/sphinx-*.log | tail -n 100
-      - uses: holoviz-dev/holoviz_tasks/docs-publish@ffddda04b2894fea39b407f64d3622d2f19e5a9f # v1
+      - uses: holoviz-dev/holoviz_tasks/docs-publish@8fb2d0a3e4c70e218d487e0eed3b9c2488997212 # v1
         with:
           s3-url: s3://hvplot.holoviz.org
           s3-cloudfront-id: E13QSRL36ILGWH
@@ -87,11 +87,11 @@ jobs:
       MOZ_HEADLESS: 1
       DISPLAY: ":99.0"
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           fetch-depth: 0
           persist-credentials: false
-      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.13'
       - name: install
