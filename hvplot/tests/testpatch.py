@@ -3,13 +3,65 @@ Tests patching of supported libraries
 """
 
 import sys
+from importlib import import_module, reload
 from unittest import SkipTest, TestCase
 
+import holoviews as hv
 import numpy as np
 import pandas as pd
+import pytest
 
+import hvplot
 from hvplot.plotting import hvPlot, hvPlotTabular
 from hvplot.util import _HV_VERSION
+
+
+@pytest.mark.parametrize('module_name', ['pandas', 'xarray'])
+@pytest.mark.parametrize('backend', ['matplotlib', 'plotly'])
+def test_import_preserves_selected_backend(module_name, backend):
+    original_backend = hv.Store.current_backend
+    original_compatibility = hvplot.extension.compatibility
+    module = import_module(f'hvplot.{module_name}')
+    try:
+        hvplot.extension(backend, compatibility='bokeh')
+        reload(module)
+        assert hv.Store.current_backend == backend
+        assert hvplot.extension.compatibility == 'bokeh'
+    finally:
+        hvplot.extension(original_backend, compatibility=original_compatibility)
+
+
+@pytest.mark.parametrize('module_name', ['pandas', 'xarray'])
+def test_patch_loads_default_backend(module_name, monkeypatch):
+    original_backend = hv.Store.current_backend
+    original_compatibility = hvplot.extension.compatibility
+    module = import_module(f'hvplot.{module_name}')
+    monkeypatch.setattr(hv.extension, '_loaded', False)
+    try:
+        hv.Store.set_current_backend('bokeh')
+        module.patch()
+        assert hv.Store.current_backend == 'bokeh'
+        data = (
+            pd.Series([1, 2])
+            if module_name == 'pandas'
+            else module.xr.DataArray([1, 2], dims=['x'], name='value')
+        )
+        assert hv.render(data.hvplot.line()) is not None
+    finally:
+        hvplot.extension(original_backend, compatibility=original_compatibility)
+
+
+@pytest.mark.parametrize('module_name', ['pandas', 'xarray'])
+def test_patch_honors_explicit_backend(module_name):
+    original_backend = hv.Store.current_backend
+    original_compatibility = hvplot.extension.compatibility
+    module = import_module(f'hvplot.{module_name}')
+    try:
+        hvplot.extension('matplotlib')
+        module.patch(extension='plotly')
+        assert hv.Store.current_backend == 'plotly'
+    finally:
+        hvplot.extension(original_backend, compatibility=original_compatibility)
 
 
 class TestPatchPandas(TestCase):
