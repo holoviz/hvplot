@@ -322,6 +322,38 @@ class TestDatashader(ComparisonTestCase):
         assert isinstance(element, eltype)
         assert len(element) == 0
 
+    @parameterized.expand(
+        [(operation, limit) for operation in ('rasterize', 'datashade') for limit in (1, 10, None)]
+    )
+    def test_dynspread_resample_when(self, operation, limit):
+        df = pd.DataFrame({'x': [0, 1, 2], 'y': [0, 1, 2]})
+        dmap = df.hvplot.points(
+            'x',
+            'y',
+            width=40,
+            height=40,
+            xlim=(-1, 3),
+            ylim=(-1, 3),
+            resample_when=limit,
+            dynspread=True,
+            max_px=2,
+            threshold=1,
+            **{operation: True},
+        )
+
+        render(dmap)
+        result = dmap[()]
+        if limit is None:
+            image = result
+        else:
+            image, points = result.values()
+            assert isinstance(points, Points)
+            assert len(points) == (len(df) if limit >= len(df) else 0)
+        assert isinstance(image, Image)
+        if limit is None or limit < len(df):
+            array = image.dimension_values(image.vdims[-1], flat=False)
+            assert np.count_nonzero(np.nan_to_num(array)) > len(df)
+
     def test_selector_error_if_no_datashading_operation(self):
         with pytest.raises(
             ValueError, match='rasterize or datashade must be enabled when selector is set'
