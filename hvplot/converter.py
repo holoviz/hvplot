@@ -2253,13 +2253,18 @@ class HoloViewsConverter:
             if self.pixel_ratio:
                 opts['pixel_ratio'] = self.pixel_ratio
 
-        processed = self._resample_obj(operation, obj, opts)
         if self.dynspread:
-            processed = dynspread(
-                processed,
-                max_px=self.kwds.get('max_px', 3),
-                threshold=self.kwds.get('threshold', 0.5),
-            )
+            resample = partial(operation, **opts)
+
+            def spread_resampled(data, **spread_opts):
+                return dynspread(resample(data), **spread_opts)
+
+            operation = spread_resampled
+            opts = {
+                'max_px': self.kwds.get('max_px', 3),
+                'threshold': self.kwds.get('threshold', 0.5),
+            }
+        processed = self._resample_obj(operation, obj, opts)
 
         opts = filter_opts(eltype, dict(self._plot_opts, **style), backend='bokeh')
         layers = self._apply_layers(processed).opts(eltype, **opts, backend='bokeh')
