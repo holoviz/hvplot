@@ -7,6 +7,10 @@ How-to guides are practical, problem-oriented instructions that help you accompl
 :hidden:
 :maxdepth: 2
 
+display_plots
+save_bokeh_plots
+save_matplotlib_plots
+use_panel_for_display
 use_llms
 
 ```
