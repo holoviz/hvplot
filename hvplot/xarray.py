@@ -44,7 +44,7 @@ class XArrayInteractive(Interactive):
     isel.__doc__ = xr.DataArray.isel.__doc__
 
 
-def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=False):
+def patch(name='hvplot', interactive='interactive', extension=None, logo=False):
     """Patch xarray objects with the hvplot accessors."""
     from . import _module_extensions, hvPlot, post_patch
 

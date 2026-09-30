@@ -147,8 +147,9 @@ class hvplot_extension(_hv.extension):
 
     Notes
     -----
-    - Installing a data source with e.g. `import hvplot.pandas` automatically
-      calls this extension, enabling the Bokeh plotting backend.
+    - Installing a data source with e.g. `import hvplot.pandas` initializes
+      the plotting extension, preserving a previously selected backend.
+      Bokeh is used by default.
     - Calling the extension in a notebook environment injects some CSS/HTML/JS
       content in the cell output, content that is required for the plots to
       be rendered and interacted with.
@@ -174,9 +175,6 @@ class hvplot_extension(_hv.extension):
         """Enable the extension."""
         from . import _PATCH_PLOT_SIGNATURES
 
-        # importing e.g. hvplot.pandas always loads the bokeh extension.
-        # so hvplot.extension('matplotlib', compatibility='bokeh') doesn't
-        # require the user or the code to explicitly load bokeh.
         compatibility = params.pop('compatibility', None)
         super().__call__(*args, **params)
         backend = _hv.Store.current_backend
