@@ -740,3 +740,31 @@ def test_cmap_LinearSegmentedColormap():
     data = np.arange(25).reshape(5, 5)
     xr_da = xr.DataArray(data)
     xr_da.hvplot.image(cmap=mpl.colormaps['viridis'])
+
+
+def test_area_y2_with_by_not_stacked():
+    import hvplot.pandas  # noqa: F401
+
+    df = pd.DataFrame(
+        {
+            'x': [0, 1, 0, 1],
+            'lower': [0, 1, 10, 11],
+            'upper': [1, 2, 11, 12],
+            'cat': ['A', 'A', 'B', 'B'],
+        }
+    )
+    plot = df.hvplot.area(x='x', y='lower', y2='upper', by='cat')
+
+    for key in ('A', 'B'):
+        sub = df[df['cat'] == key]
+        assert plot[key].vdims == [Dimension('lower'), Dimension('upper')]
+        np.testing.assert_array_equal(plot[key].dimension_values('lower'), sub['lower'])
+        np.testing.assert_array_equal(plot[key].dimension_values('upper'), sub['upper'])
+
+
+def test_area_y2_with_stacked_errors():
+    import hvplot.pandas  # noqa: F401
+
+    df = pd.DataFrame({'x': [0, 1], 'lower': [0, 1], 'upper': [1, 2]})
+    with pytest.raises(ValueError, match="'stacked' cannot be combined with 'y2'"):
+        df.hvplot.area(x='x', y='lower', y2='upper', stacked=True)
