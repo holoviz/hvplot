@@ -11,7 +11,13 @@ from bokeh.sampledata import penguins
 
 import hvplot.pandas
 import hvplot.xarray
-from hvplot.ui import MAX_ROWS, hvDataFrameExplorer, hvGridExplorer
+from hvplot.ui import (
+    CATEGORICAL_CMAP,
+    DEFAULT_CMAPS,
+    MAX_ROWS,
+    hvDataFrameExplorer,
+    hvGridExplorer,
+)
 
 df = penguins.data
 ds_air_temperature = xr.tutorial.open_dataset('air_temperature')
@@ -425,3 +431,137 @@ def test_explorer_geo_no_import_error_when_false():
     da = ds_air_temperature['air'].isel(time=0)
     with patch('hvplot.util.import_geoviews', return_value=None):
         assert hvplot.explorer(da, x='lon', y='lat', geo=False)
+
+
+def test_explorer_color_key_accepts_mapping():
+    color_key = {'Adelie': '#e41a1c', 'Chinstrap': '#377eb8', 'Gentoo': '#4daf4a'}
+    explorer = hvplot.explorer(
+        df,
+        kind='points',
+        x='bill_length_mm',
+        y='bill_depth_mm',
+        by=['species'],
+        datashade=True,
+        color_key=color_key,
+    )
+
+    assert explorer.colormapping.color_key == color_key
+
+
+def test_explorer_color_key_replaces_cmap():
+    """cmap always has a value to emit, and the converter refuses both at once."""
+    explorer = hvplot.explorer(
+        df,
+        kind='points',
+        x='bill_length_mm',
+        y='bill_depth_mm',
+        by=['species'],
+        datashade=True,
+        color_key={'Adelie': '#e41a1c'},
+    )
+
+    kwargs = explorer.colormapping.kwargs
+
+    assert 'cmap' not in kwargs
+    assert kwargs['color_key'] == {'Adelie': '#e41a1c'}
+
+
+def test_explorer_datashade_by_uses_categorical_cmap():
+    explorer = hvplot.explorer(
+        df,
+        kind='points',
+        x='bill_length_mm',
+        y='bill_depth_mm',
+        by=['species'],
+        datashade=True,
+    )
+
+    assert explorer.colormapping.cmap == CATEGORICAL_CMAP
+
+
+def test_explorer_datashade_toggled_after_by_uses_categorical_cmap():
+    explorer = hvplot.explorer(
+        df, kind='points', x='bill_length_mm', y='bill_depth_mm', by=['species']
+    )
+    assert explorer.colormapping.cmap == DEFAULT_CMAPS['linear']
+
+    explorer.operations.datashade = True
+
+    assert explorer.colormapping.cmap == CATEGORICAL_CMAP
+
+
+def test_explorer_by_without_datashade_keeps_default_cmap():
+    """A plain by overlay takes its colors from a Cycle, so cmap is untouched."""
+    explorer = hvplot.explorer(
+        df, kind='scatter', x='bill_length_mm', y='bill_depth_mm', by=['species']
+    )
+
+    assert explorer.colormapping.cmap == DEFAULT_CMAPS['linear']
+    assert 'cmap' not in explorer.plot_code()
+
+
+def test_explorer_categorical_color_sets_valid_cmap():
+    """cmap is a Selector over names, so the categorical default cannot be a list."""
+    explorer = hvplot.explorer(df, kind='scatter', x='bill_length_mm', y='bill_depth_mm')
+
+    explorer.colormapping.color = 'species'
+
+    assert explorer.colormapping.cmap == CATEGORICAL_CMAP
+
+
+def test_explorer_dict_cmap_redirects_to_color_key():
+    """hvPlot takes explicit colors as cmap everywhere else, so a spec written
+    against that API must not be refused by the explorer."""
+    colors = {'Adelie': '#e41a1c', 'Chinstrap': '#377eb8', 'Gentoo': '#4daf4a'}
+    explorer = hvplot.explorer(
+        df,
+        kind='points',
+        x='bill_length_mm',
+        y='bill_depth_mm',
+        by=['species'],
+        datashade=True,
+        cmap=colors,
+    )
+
+    assert explorer.colormapping.color_key == colors
+    assert 'cmap' not in explorer.colormapping.kwargs
+
+
+def test_explorer_color_key_wins_over_dict_cmap():
+    explorer = hvplot.explorer(
+        df,
+        kind='points',
+        x='bill_length_mm',
+        y='bill_depth_mm',
+        by=['species'],
+        datashade=True,
+        cmap={'Adelie': '#111111'},
+        color_key={'Adelie': '#e41a1c'},
+    )
+
+    assert explorer.colormapping.color_key == {'Adelie': '#e41a1c'}
+
+
+def test_explorer_color_key_accepts_list():
+    colors = ['#e41a1c', '#377eb8', '#4daf4a']
+    explorer = hvplot.explorer(
+        df,
+        kind='points',
+        x='bill_length_mm',
+        y='bill_depth_mm',
+        by=['species'],
+        datashade=True,
+        color_key=colors,
+    )
+
+    assert explorer.colormapping.color_key == colors
+
+
+def test_explorer_named_cmap_still_selectable():
+    """Redirecting explicit colors must not disturb the dropdown."""
+    explorer = hvplot.explorer(
+        df, kind='scatter', x='bill_length_mm', y='bill_depth_mm', cmap='viridis'
+    )
+
+    assert explorer.colormapping.cmap == 'viridis'
+    assert explorer.colormapping.color_key is None

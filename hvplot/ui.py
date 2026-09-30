@@ -36,6 +36,11 @@ KINDS['all'] = sorted(set(KINDS['dataframe'] + KINDS['gridded'] + KINDS['geom'])
 
 CMAPS = [cm for cm in list_cmaps() if not cm.endswith('_r_r')]
 DEFAULT_CMAPS = _hvConverter._default_cmaps
+# ``DEFAULT_CMAPS['categorical']`` is a bare list of colors, which the ``cmap``
+# Selector below cannot hold. glasbey_hv is the named stand-in: like that
+# list it carries 256 distinct hues, where a Category palette repeats after
+# 10 or 20 and would give two categories the same color.
+CATEGORICAL_CMAP = 'glasbey_hv'
 GEO_FEATURES = ['borders', 'coastline', 'land', 'lakes', 'ocean', 'rivers', 'states', 'grid']
 GEO_TILES = [None, *sorted(tile_sources)]
 GEO_KEYS = [
@@ -160,6 +165,16 @@ class Colormapping(Controls):
 
     color = param.String(default=None)
 
+    color_key = param.ClassSelector(
+        default=None,
+        class_=(dict, list),
+        label='Color Key (color_key)',
+        doc="""
+        Explicit colors for the categories being datashaded, either a mapping
+        of category to color or a list of colors. Takes precedence over
+        ``cmap``.""",
+    )
+
     colorbar = param.Boolean(default=None)
 
     cmap = param.Selector(default=DEFAULT_CMAPS['linear'], label='Colormap', objects=CMAPS)
@@ -180,17 +195,48 @@ class Colormapping(Controls):
             self.symmetric = self.explorer._converter._plot_opts.get('symmetric', False)
 
     @property
+    def kwargs(self):
+        """Return the set control values as plot keyword arguments."""
+        kwargs = super().kwargs
+        if kwargs.get('color_key') is not None:
+            # The converter accepts at most one of cmap, colormap and color_key,
+            # and cmap always has a value to emit, so drop it in favor of the
+            # explicit key.
+            kwargs.pop('cmap', None)
+        return kwargs
+
+    @property
     def colormapped(self):
         """Return whether the current plot uses colormapping."""
         if self.explorer.kind in _hvConverter._colorbar_types:
             return True
         return self.color is not None and self.color in self._data
 
-    @param.depends('color', 'explorer.kind', 'symmetric', watch=True)
-    def _update_coloropts(self):
-        if not self.colormapped or self.cmap not in list(DEFAULT_CMAPS.values()):
+    @property
+    def _datashading_by(self):
+        """Whether the plot aggregates a categorical ``by`` column per pixel.
+
+        Only this combination colors the categories through ``cmap``; a plain
+        ``by`` overlay takes its colors from a Cycle instead.
+        """
+        if not self.explorer.by:
+            return False
+        operations = self.explorer.operations
+        return operations.datashade or operations.rasterize
+
+    @param.depends('color', 'explorer.kind', 'explorer.by', 'symmetric', watch=True)
+    def _update_coloropts(self, *events):
+        # Only keep steering the colormap while it is one this method chose; a
+        # value outside that set was picked by the user and is left alone.
+        if self.cmap not in [*DEFAULT_CMAPS.values(), CATEGORICAL_CMAP]:
             return
-        if self.explorer.kind in _hvConverter._colorbar_types:
+        if self._datashading_by:
+            # Aggregating categories per pixel against a linear ramp renders
+            # every category as a near-identical shade of one hue.
+            key = 'categorical'
+        elif not self.colormapped:
+            return
+        elif self.explorer.kind in _hvConverter._colorbar_types:
             key = 'diverging' if self.symmetric else 'linear'
             self.colorbar = True
         elif self.color in self._data:
@@ -203,7 +249,7 @@ class Colormapping(Controls):
                 key = 'linear'
         else:
             return
-        self.cmap = DEFAULT_CMAPS[key]
+        self.cmap = CATEGORICAL_CMAP if key == 'categorical' else DEFAULT_CMAPS[key]
 
 
 class Style(Controls):
@@ -571,6 +617,13 @@ class hvPlotExplorer(Viewer):
         return self._layout
 
     def __init__(self, df, **params):
+        # The cmap control is a dropdown of colormap names, but everywhere else
+        # in hvPlot cmap also accepts explicit colors. Redirect those to
+        # color_key here, before the converter is built, so it never sees both.
+        if isinstance(params.get('cmap'), (dict, list)):
+            # An explicit color_key wins if both were given.
+            params.setdefault('color_key', params.pop('cmap'))
+            params.pop('cmap', None)
         x, y = params.get('x'), params.get('y')
         if 'y' in params:
             params['y_multi'] = params.pop('y') if isinstance(params['y'], list) else [params['y']]
@@ -619,6 +672,12 @@ class hvPlotExplorer(Viewer):
         self.param.watch(self._refresh, list(self.param))
         for controller in self._controllers.values():
             controller.param.watch(self._refresh, list(controller.param))
+        # Wired here rather than declared on Colormapping: the controls are built
+        # before this assignment, so a nested param.depends on operations cannot
+        # resolve when its watcher is registered.
+        self.operations.param.watch(
+            self.colormapping._update_coloropts, ['datashade', 'rasterize']
+        )
         self.statusbar.param.watch(self._refresh, list(self.statusbar.param))
         self._alert = pn.pane.Alert(
             alert_type='danger', visible=False, sizing_mode='stretch_width'
