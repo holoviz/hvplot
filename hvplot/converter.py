@@ -2988,20 +2988,49 @@ class HoloViewsConverter:
         data = self.data if data is None else data
         cur_opts, compat_opts = self._get_compat_opts('HeatMap')
 
+        counted = False
         if not (x or y) or (x == 'columns' and y in ('index', data.index.name)):
             cur_opts['labelled'] = []
             x, y = 'columns', 'index'
             data = (data.columns, data.index, data.values)
             z = ['value']
         else:
-            z = self.kwds.get('C', next(c for c in data.columns if c not in (x, y)))
-            z = [z, *self.hover_cols]
+            C = self.kwds.get('C')
             self.use_index = False
+            # Derived dimensions such as 'time.hour' only become real columns here,
+            # so any aggregation has to happen afterwards.
             data, x, y = self._process_chart_args(data, x, y, single_y=True)
+            if C is None:
+                ignored = [
+                    name
+                    for name, given in (
+                        ('hover_cols', self.hover_cols),
+                        ('reduce_function', 'reduce_function' in self.kwds),
+                    )
+                    if given
+                ]
+                if ignored:
+                    warnings.warn(
+                        f'{" and ".join(ignored)} ignored because C is not set, as each '
+                        'cell holds a row count rather than the values behind it. '
+                        'Set C to use them.',
+                        stacklevel=_find_stack_level(),
+                    )
+                # observed=True keeps categorical x/y from expanding to the full
+                # product of categories, which is mostly empty cells and can dwarf
+                # the data. Passing it explicitly also avoids relying on the pandas
+                # default, which is due to change.
+                data = data.groupby([x, y], observed=True).size().to_frame('Count').reset_index()
+                z = ['Count']
+                counted = True
+            else:
+                z = [C, *self.hover_cols]
 
         redim = self._merge_redim({z[0]: self._dim_ranges['c']})
         hmap = HeatMap(data, [x, y], z, **self._relabel)
-        if 'reduce_function' in self.kwds:
+        # Counting already reduced each cell to one row, so reducing again would
+        # just measure that single row (np.size would flatten every count to 1).
+        if 'reduce_function' in self.kwds and not counted:
             hmap = hmap.aggregate(function=self.kwds['reduce_function'])
         return redim_(hmap, **redim).apply(
             self._set_backends_opts, cur_opts=cur_opts, compat_opts=compat_opts

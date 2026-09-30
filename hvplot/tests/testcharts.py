@@ -27,6 +27,14 @@ class TestChart2D(ComparisonTestCase):
                 'temp': np.sin(np.linspace(0, 5 * 2 * np.pi, 5 * 24)).cumsum(),
             }
         )
+        # Repeated (x, y) pairs with deliberately uneven counts per cell.
+        self.dup_df = pd.DataFrame(
+            {
+                'x': ['a', 'a', 'a', 'b', 'b', 'c'],
+                'y': ['p', 'p', 'q', 'q', 'q', 'p'],
+                'value': [1, 2, 3, 4, 5, 6],
+            }
+        )
 
     @parameterized.expand([('points', Points), ('paths', Path)])
     def test_2d_defaults(self, kind, element):
@@ -74,6 +82,42 @@ class TestChart2D(ComparisonTestCase):
         assert plot.kdims == ['time.hour', 'time.day']
         assert plot.vdims == ['temp']
 
+    def test_heatmap_counts_when_C_not_set(self):
+        plot = self.dup_df.hvplot.heatmap(x='x', y='y')
+        assert plot.vdims == ['Count']
+        counts = {(r['x'], r['y']): r['Count'] for r in plot.dframe().to_dict('records')}
+        assert counts == {('a', 'p'): 2, ('a', 'q'): 1, ('b', 'q'): 2, ('c', 'p'): 1}
+
+    def test_heatmap_counts_match_between_call_styles(self):
+        self.assertEqual(
+            self.dup_df.hvplot.heatmap(x='x', y='y'),
+            self.dup_df.hvplot(x='x', y='y', kind='heatmap'),
+        )
+
+    def test_heatmap_counts_categorical_x_and_y(self):
+        categorical_df = self.dup_df.astype({'x': 'category', 'y': 'category'})
+        plot = categorical_df.hvplot.heatmap(x='x', y='y')
+        counts = {(r['x'], r['y']): r['Count'] for r in plot.dframe().to_dict('records')}
+        # Only the pairs present in the data, not the full product of categories,
+        # which would be mostly empty cells for high cardinality columns.
+        assert counts == {('a', 'p'): 2, ('a', 'q'): 1, ('b', 'q'): 2, ('c', 'p'): 1}
+
+    def test_heatmap_warns_options_ignored_when_C_not_set(self):
+        with pytest.warns(UserWarning, match='hover_cols'):
+            self.dup_df.hvplot.heatmap(x='x', y='y', hover_cols=['value'])
+        with pytest.warns(UserWarning, match='reduce_function'):
+            self.dup_df.hvplot.heatmap(x='x', y='y', reduce_function=np.size)
+
+    def test_heatmap_counts_ignore_reduce_function(self):
+        # np.size would otherwise flatten every count to 1.
+        plot = self.dup_df.hvplot.heatmap(x='x', y='y', reduce_function=np.size)
+        counts = {(r['x'], r['y']): r['Count'] for r in plot.dframe().to_dict('records')}
+        assert counts == {('a', 'p'): 2, ('a', 'q'): 1, ('b', 'q'): 2, ('c', 'p'): 1}
+
+    def test_heatmap_C_field_still_takes_precedence(self):
+        plot = self.dup_df.hvplot.heatmap(x='x', y='y', C='value')
+        assert plot.vdims == ['value']
+
     def test_xarray_dataset_with_attrs(self):
         try:
             import xarray as xr
@@ -102,6 +146,7 @@ class TestChart2DDask(TestChart2D):
 
         self.df = dd.from_pandas(self.df, npartitions=2)
         self.cat_df = dd.from_pandas(self.cat_df, npartitions=3)
+        self.dup_df = dd.from_pandas(self.dup_df, npartitions=2)
 
     @expectedFailure
     def test_heatmap_2d_index_columns(self):
