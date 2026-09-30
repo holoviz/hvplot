@@ -454,7 +454,7 @@ class hvPlotTabular(hvPlotBase):
         """
         return self(x, y, kind='scatter', **kwds)
 
-    def area(self, x=None, y=None, y2=None, stacked=True, **kwds):
+    def area(self, x=None, y=None, y2=None, stacked=None, **kwds):
         """
         Create an area plot that fills the region between curves and axes.
 
@@ -476,9 +476,11 @@ class hvPlotTabular(hvPlotBase):
         y2 : str, optional
             Field name for secondary y-positions. When specified, the area is
             filled between ``y`` and ``y2`` curves.
-        stacked : bool, default True
+        stacked : bool, optional
             Whether to stack multiple areas on top of each other. When False,
-            areas are overlaid with transparency.
+            areas are overlaid with transparency. Defaults to True, or to False
+            when ``y2`` is specified; passing True together with ``y2`` is an
+            error.
         **kwds : optional
             Additional keyword arguments documented in :ref:`plot-options`.
             Run ``hvplot.help('area')`` for the full method documentation.
@@ -505,8 +507,10 @@ class hvPlotTabular(hvPlotBase):
         - Matplotlib:  https://matplotlib.org/stable/gallery/lines_bars_and_markers/fill_between_demo.html
         - Wiki: https://en.wikipedia.org/wiki/Area_chart
         """
-        if 'alpha' not in kwds and not stacked:
+        if 'alpha' not in kwds and stacked is False:
             kwds['alpha'] = 0.5
+        if stacked is None:
+            stacked = y2 is None
         return self(x, y, y2=y2, kind='area', stacked=stacked, **kwds)
 
     def errorbars(self, x=None, y=None, yerr1=None, yerr2=None, **kwds):
