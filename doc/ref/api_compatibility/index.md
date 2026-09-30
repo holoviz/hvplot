@@ -7,4 +7,5 @@ This section aims to provide more precise information about the compatibility of
 :maxdepth: 2
 
 Pandas <pandas/index>
+Panel Widgets <panel_widgets>
 ```
