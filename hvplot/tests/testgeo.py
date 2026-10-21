@@ -11,9 +11,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from hvplot.tests._data import air_temperature
 from hvplot.util import proj_to_cartopy
-
-pytestmark = pytest.mark.geo
 
 bk_renderer = hv.Store.renderers['bokeh']
 
@@ -157,7 +156,7 @@ class TestProjections(TestGeo):
         except ImportError:
             raise SkipTest('datashader not available')
 
-        ds = xr.tutorial.open_dataset('air_temperature')
+        ds = air_temperature()
         hvplot_output = ds.isel(time=0).hvplot.points(
             'lon',
             'lat',

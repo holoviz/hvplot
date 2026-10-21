@@ -210,8 +210,9 @@ class TestChart1D(ComparisonTestCase):
 
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
     def test_wide_chart_auto_group_label(self, kind, element):
-        self.df.columns.name = 'My Name'
-        self.assertEqual(self.df.hvplot().kdims, ['My Name'])
+        # Not set in place, dask would share the renamed columns with equal frames.
+        df = self.df.rename_axis(columns='My Name')
+        self.assertEqual(df.hvplot().kdims, ['My Name'])
 
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
     def test_tidy_chart(self, kind, element):

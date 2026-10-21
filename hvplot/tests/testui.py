@@ -9,12 +9,19 @@ import pytest
 import xarray as xr
 from bokeh.sampledata import penguins
 
-import hvplot.pandas
-import hvplot.xarray
+import hvplot
+from hvplot.tests._data import air_temperature
+from hvplot.tests._deps import requires
 from hvplot.ui import MAX_ROWS, hvDataFrameExplorer, hvGridExplorer
 
+pytestmark = pytest.mark.usefixtures('hvplot_pandas', 'hvplot_xarray')
+
 df = penguins.data
-ds_air_temperature = xr.tutorial.open_dataset('air_temperature')
+
+
+@pytest.fixture
+def ds_air_temperature():
+    return air_temperature()
 
 
 def test_explorer_basic():
@@ -133,7 +140,7 @@ def test_explorer_kwargs_controls_error_not_supported():
         hvplot.explorer(df, title='Dummy title', not_a_control_kwarg=None)
 
 
-def test_explorer_hvplot_gridded_basic():
+def test_explorer_hvplot_gridded_basic(ds_air_temperature):
     explorer = hvplot.explorer(ds_air_temperature)
 
     assert isinstance(explorer, hvGridExplorer)
@@ -145,7 +152,7 @@ def test_explorer_hvplot_gridded_basic():
     assert explorer.groupby == ['time']
 
 
-def test_explorer_hvplot_gridded_2d():
+def test_explorer_hvplot_gridded_2d(ds_air_temperature):
     ds = ds_air_temperature.isel(time=0)
     explorer = hvplot.explorer(ds)
 
@@ -158,7 +165,7 @@ def test_explorer_hvplot_gridded_2d():
     assert explorer.groupby == []
 
 
-def test_explorer_hvplot_gridded_two_variables():
+def test_explorer_hvplot_gridded_two_variables(ds_air_temperature):
     ds = ds_air_temperature.copy()
     ds['airx2'] = ds['air'] * 2
     explorer = hvplot.explorer(ds)
@@ -173,7 +180,7 @@ def test_explorer_hvplot_gridded_two_variables():
     assert explorer.groupby == ['time', 'variable']
 
 
-def test_explorer_hvplot_gridded_dataarray():
+def test_explorer_hvplot_gridded_dataarray(ds_air_temperature):
     da = ds_air_temperature['air']
     explorer = hvplot.explorer(da)
 
@@ -186,13 +193,13 @@ def test_explorer_hvplot_gridded_dataarray():
     assert explorer.groupby == ['time']
 
 
-def test_explorer_hvplot_gridded_options():
+def test_explorer_hvplot_gridded_options(ds_air_temperature):
     explorer = hvplot.explorer(ds_air_temperature)
     assert explorer._controls[0].groups.keys() == {'dataframe', 'gridded', 'geom'}
 
 
+@requires('geoviews', 'cartopy')
 def test_explorer_hvplot_geo():
-    pytest.importorskip('geoviews')
     df = pd.DataFrame({'x': [-9796115.18980811], 'y': [4838471.398061159]})
     explorer = hvplot.explorer(df, x='x', geo=True, kind='points')
     assert explorer.geographic.geo
@@ -236,7 +243,7 @@ def test_explorer_method_dataframe():
     assert explorer.y == 'species'
 
 
-def test_explorer_method_grid():
+def test_explorer_method_grid(ds_air_temperature):
     explorer = ds_air_temperature.hvplot.explorer()
 
     assert isinstance(explorer, hvGridExplorer)
@@ -295,7 +302,7 @@ def test_explorer_code_dataframe():
         ```""")
 
 
-def test_explorer_code_gridded():
+def test_explorer_code_gridded(ds_air_temperature):
     explorer = hvplot.explorer(ds_air_temperature, x='lon', y='lat', kind='image')
     code = explorer.code
     assert code == dedent("""\
@@ -323,7 +330,7 @@ def test_explorer_code_gridded():
         ```""")
 
 
-def test_explorer_code_gridded_dataarray():
+def test_explorer_code_gridded_dataarray(ds_air_temperature):
     da = ds_air_temperature['air']
     explorer = hvplot.explorer(da, x='lon', y='lat', kind='image')
     code = explorer.code
@@ -352,7 +359,7 @@ def test_explorer_code_gridded_dataarray():
         ```""")
 
 
-def test_explorer_code_opts():
+def test_explorer_code_opts(ds_air_temperature):
     da = ds_air_temperature['air']
     explorer = hvplot.explorer(da, x='lon', y='lat', kind='image', opts={'color_levels': 3})
     code = explorer.code
@@ -386,15 +393,15 @@ def test_explorer_code_opts():
 
 
 def test_explorer_xarray_multi_var_extra_dims_no_coord():
-    ds = xr.tutorial.open_dataset('air_temperature')
+    ds = air_temperature()
     ds['lat_bnds'] = (('bnds', 'lat'), np.vstack([ds['lat'], ds['lat']]))
     assert ds.hvplot.explorer()
 
 
 @pytest.mark.usefixtures('disable_param_warnings_as_exceptions')
 @pytest.mark.parametrize('kind_tuple', [('scatter', 'points'), ('line', 'paths')])
-@pytest.mark.geo
-def test_explorer_geo_revise_kind(kind_tuple):
+@requires('geoviews', 'cartopy')
+def test_explorer_geo_revise_kind(kind_tuple, ds_air_temperature):
     da = ds_air_temperature['air'].isel(time=0)
     explorer = hvplot.explorer(da, x='lon', y='lat', kind=kind_tuple[0], geo=True)
     assert explorer.kind == kind_tuple[1]
@@ -421,7 +428,7 @@ def test_max_rows_sample():
     assert not ui._data.equals(df.head(MAX_ROWS))
 
 
-def test_explorer_geo_no_import_error_when_false():
+def test_explorer_geo_no_import_error_when_false(ds_air_temperature):
     da = ds_air_temperature['air'].isel(time=0)
     with patch('hvplot.util.import_geoviews', return_value=None):
         assert hvplot.explorer(da, x='lon', y='lat', geo=False)

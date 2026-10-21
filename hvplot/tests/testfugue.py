@@ -3,17 +3,11 @@
 import pandas as pd
 import pytest
 
-import hvplot
 from hvplot.util import _PD_GE_3_0_0
-
-# Patch required before importing hvplot.fugue
-hvplot.util._fugue_ipython = True
 
 try:
     import fugue.api as fa
     import fugue_sql_antlr  # noqa: F401
-
-    import hvplot.fugue
 except ImportError:
     pytest.skip(allow_module_level=True)
 
@@ -31,8 +25,12 @@ def table():
 
 
 @pytest.mark.skipif(_PD_GE_3_0_0, reason='breaks with Pandas 3')
-def test_fugure_ipython_line(table, capsys):
+def test_fugure_ipython_line(table, capsys, monkeypatch, hvplot_pandas):
     """hvPlot works with Fugue"""
+    import hvplot.fugue
+
+    # Patched on hvplot.fugue as it copies the flag from hvplot.util when first imported.
+    monkeypatch.setattr(hvplot.fugue, '_fugue_ipython', True)
     fa.fugue_sql(
         """
         OUTPUT table USING hvplot:line(

@@ -99,8 +99,8 @@ def air_temperature():
                 {'long_name': '4xDaily Air temperature at sigma level 995', 'units': 'degK'},
             )
         },
+        # Same coords order as the original, the explorer picks its default x/y from it.
         coords={
-            'time': ('time', time, {'standard_name': 'time', 'long_name': 'Time'}),
             'lat': (
                 'lat',
                 lat,
@@ -121,6 +121,7 @@ def air_temperature():
                     'axis': 'X',
                 },
             ),
+            'time': ('time', time, {'standard_name': 'time', 'long_name': 'Time'}),
         },
         attrs={'Conventions': 'COARDS', 'title': '4x daily NMC reanalysis (1948)'},
     )

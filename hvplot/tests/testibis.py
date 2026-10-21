@@ -9,10 +9,13 @@ try:
     # Used as default in-memory backend by ibis
     import duckdb  # noqa: F401
     import ibis
-
-    import hvplot.ibis  # noqa: F401
 except ImportError:
     pytest.skip(allow_module_level=True)
+
+
+@pytest.fixture(autouse=True)
+def hvplot_ibis():
+    import hvplot.ibis  # noqa: F401
 
 
 def test_ibis_hist():

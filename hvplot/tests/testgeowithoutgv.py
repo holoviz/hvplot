@@ -6,15 +6,13 @@ import holoviews as hv
 import numpy as np
 import pandas as pd
 import pytest
+from holoviews.plotting.bokeh import OverlayPlot
 from holoviews.util.transform import lon_lat_to_easting_northing
 
-import hvplot.pandas
 from hvplot.util import is_geodataframe
 
 try:
     import dask.dataframe as dd
-
-    import hvplot.dask  # noqa: F401
 except ImportError:
     dd = None
 
@@ -25,6 +23,18 @@ except ModuleNotFoundError:
 
 
 bk_renderer = hv.Store.renderers['bokeh']
+
+
+@pytest.fixture(autouse=True)
+def _without_geoviews(block_import, monkeypatch, hvplot_pandas):
+    block_import('geoviews')
+    # conftest imports geoviews for the whole session, undo what it registered in HoloViews:
+    # the hooks that import geoviews on hv.extension() and its plot class for overlays.
+    for backend, hooks in hv.extension._backend_hooks.items():
+        hooks = [hook for hook in hooks if not hook.__module__.startswith('geoviews')]
+        monkeypatch.setitem(hv.extension._backend_hooks, backend, hooks)
+    for overlay in (hv.Overlay, hv.NdOverlay):
+        monkeypatch.setitem(hv.Store.registry['bokeh'], overlay, OverlayPlot)
 
 
 @pytest.fixture
@@ -107,6 +117,8 @@ class TestAnnotationNotGeo:
 
     @pytest.mark.skipif(dd is None, reason='dask not installed')
     def test_plot_with_dask(self, simple_df):
+        import hvplot.dask  # noqa: F401
+
         ddf = dd.from_pandas(simple_df, npartitions=2)
         plot = ddf.hvplot.points('x', 'y', tiles=True)
         assert 'x_' not in plot.get(1).data

@@ -2,6 +2,8 @@ import os
 import subprocess
 import sys
 
+import pytest
+
 from hvplot.converter import HoloViewsConverter
 from hvplot.util import _in_ipython, _parse_docstring_sections, _PatchHvplotDocstrings
 
@@ -20,6 +22,7 @@ def run_script(script, env_vars=None):
     return process.stdout.strip()
 
 
+@pytest.mark.slow
 def test_no_automatic_patching():
     script = """
 import inspect
@@ -32,6 +35,7 @@ print(inspect.signature(hvPlot.line))
     assert out == '(self, x=None, y=None, **kwds)'
 
 
+@pytest.mark.slow
 def test_no_automatic_patching_extension_import():
     script = """
 import inspect
@@ -44,6 +48,7 @@ print(inspect.signature(hvplot.hvPlot.line))
     assert out == '(self, x=None, y=None, **kwds)'
 
 
+@pytest.mark.slow
 def test_patching_env_var():
     script = """
 import inspect

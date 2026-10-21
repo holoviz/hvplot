@@ -13,9 +13,10 @@ from holoviews.element.comparison import ComparisonTestCase
 from holoviews.element.raster import ImageStack
 from parameterized import parameterized
 
-import hvplot.pandas  # noqa: F401
 from hvplot.converter import HoloViewsConverter
 from hvplot.tests._data import makeTimeDataFrame
+
+pytestmark = pytest.mark.usefixtures('hvplot_pandas')
 
 
 class TestDatashader(ComparisonTestCase):

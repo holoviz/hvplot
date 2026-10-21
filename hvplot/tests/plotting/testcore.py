@@ -2,14 +2,11 @@ import numpy as np
 import pandas as pd
 import pytest
 
-import hvplot.pandas
 from hvplot import hvPlotTabular
 from hvplot.tests._data import makeDataFrame
 
 try:
     import polars as pl
-
-    import hvplot.polars
 
     skip_polar = False
 except ImportError:
@@ -23,8 +20,6 @@ except ImportError:
 
 try:
     import dask.dataframe as dd
-
-    import hvplot.dask  # noqa: F401
 except ImportError:
     dd = None
 
@@ -48,6 +43,18 @@ y_combinations = pytest.mark.parametrize(
     ids=lambda x: type(x).__name__,
 )
 
+pytestmark = pytest.mark.usefixtures('hvplot_pandas')
+
+
+@pytest.fixture
+def hvplot_dask():
+    import hvplot.dask  # noqa: F401
+
+
+@pytest.fixture
+def hvplot_polars():
+    import hvplot.polars  # noqa: F401
+
 
 @frame_kinds
 @y_combinations
@@ -65,7 +72,7 @@ def test_series_pandas(kind):
 @pytest.mark.skipif(dd is None, reason='dask not installed')
 @frame_kinds
 @y_combinations
-def test_dataframe_dask(kind, y):
+def test_dataframe_dask(kind, y, hvplot_dask):
     df = dd.from_pandas(makeDataFrame(), npartitions=2)
     assert isinstance(df, dd.DataFrame)
     df.hvplot(y=y, kind=kind)
@@ -73,7 +80,7 @@ def test_dataframe_dask(kind, y):
 
 @pytest.mark.skipif(dd is None, reason='dask not installed')
 @series_kinds
-def test_series_dask(kind):
+def test_series_dask(kind, hvplot_dask):
     ser = dd.from_pandas(pd.Series(np.random.rand(10), name='A'), npartitions=2)
     assert isinstance(ser, dd.Series)
     ser.hvplot(kind=kind)
@@ -83,7 +90,7 @@ def test_series_dask(kind):
 @pytest.mark.parametrize('cast', (pl.DataFrame, pl.LazyFrame))
 @frame_kinds
 @y_combinations
-def test_dataframe_polars(kind, y, cast):
+def test_dataframe_polars(kind, y, cast, hvplot_polars):
     df = cast(makeDataFrame())
     assert isinstance(df, cast)
     df.hvplot(y=y, kind=kind)
@@ -91,7 +98,7 @@ def test_dataframe_polars(kind, y, cast):
 
 @pytest.mark.skipif(skip_polar, reason='polars not installed')
 @series_kinds
-def test_series_polars(kind):
+def test_series_polars(kind, hvplot_polars):
     ser = pl.Series(values=np.random.rand(10), name='A')
     assert isinstance(ser, pl.Series)
     ser.hvplot(kind=kind)

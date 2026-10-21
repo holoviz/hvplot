@@ -16,6 +16,8 @@ except ImportError:
 
 from unittest import SkipTest, TestCase
 
+from hvplot.tests._data import air_temperature
+from hvplot.tests._deps import requires
 from hvplot.util import (
     _bounds_in_range,
     _convert_col_names_to_str,
@@ -36,7 +38,7 @@ from hvplot.util import (
 class TestProcessXarray(TestCase):
     def setUp(self):
         try:
-            import xarray as xr
+            import xarray as xr  # noqa: F401
         except ImportError:
             raise SkipTest('xarray not available')
         self.default_kwargs = {
@@ -51,7 +53,7 @@ class TestProcessXarray(TestCase):
             'by': None,
             'other_dims': [],
         }
-        self.ds = xr.tutorial.open_dataset('air_temperature')
+        self.ds = air_temperature()
 
     def test_process_1d_xarray_dataarray_with_no_coords(self):
         import xarray as xr
@@ -243,9 +245,8 @@ class TestDynamicArgs(TestCase):
         assert len(arg_deps) == 2
 
 
-@pytest.mark.geo
+@requires('pyproj')
 def test_check_crs():
-    pytest.importorskip('pyproj')
     p = check_crs('epsg:26915')
     assert p.srs == '+proj=utm +zone=15 +datum=NAD83 +units=m +no_defs'
     p = check_crs('wrong')
@@ -397,7 +398,7 @@ def test_is_geodataframe_classic_dataframe():
     assert not is_geodataframe(df)
 
 
-@pytest.mark.geo
+@requires('geoviews')
 def test_geoviews_is_available():
     assert import_geoviews()
 

@@ -2,19 +2,12 @@ import pytest
 from holoviews.core import Store
 from holoviews.element import Curve
 
-import hvplot.pandas
+import hvplot
 from hvplot.util import _get_doc_and_signature
 
 
-@pytest.fixture
-def reset_default_backend():
-    yield
-    hvplot.extension('bokeh')
-    hvplot.extension.compatibility = None
-
-
-def test_help_style_extension_output(reset_default_backend):
-    # default, after e.g. import hvplot.pandas
+def test_help_style_extension_output():
+    # default, bokeh is the current backend
     docstring, _signature = _get_doc_and_signature(
         cls=hvplot.hvPlot,
         kind='line',
@@ -60,7 +53,7 @@ def test_help_style_extension_output(reset_default_backend):
 
 
 @pytest.mark.usefixtures('disable_param_warnings_as_exceptions')
-def test_help_style_compatibility(reset_default_backend):
+def test_help_style_compatibility():
     # The current backend is plotly but the style options are those of matplotlib
     hvplot.extension('plotly', 'matplotlib', compatibility='matplotlib')
     docstring, _signature = _get_doc_and_signature(

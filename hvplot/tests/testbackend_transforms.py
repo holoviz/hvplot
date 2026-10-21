@@ -1,4 +1,3 @@
-import holoviews
 import pytest
 from holoviews.core import Store
 from holoviews.element import Area, Curve
@@ -34,21 +33,15 @@ def test_transform_size_to_mpl(width, height, aspect, opts):
     ),
 )
 def test_transfer_opts(element, opt, val, backend, opt_kind, transf_opt, transf_val):
-    current_backend = Store.current_backend
-    if backend not in Store.registry:
-        holoviews.extension(backend)
     Store.set_current_backend(backend)
-    try:
-        element = element.opts(backend='bokeh', **{opt: val})
-        new_element = element.apply(_transfer_opts, backend=backend)
-        new_opts = new_element.opts.get(opt_kind).kwargs
-        if transf_opt is None:
-            assert val not in new_opts.values()
-        else:
-            assert transf_opt in new_opts
-            assert new_opts[transf_opt] == transf_val
-    finally:
-        Store.set_current_backend(current_backend)
+    element = element.opts(backend='bokeh', **{opt: val})
+    new_element = element.apply(_transfer_opts, backend=backend)
+    new_opts = new_element.opts.get(opt_kind).kwargs
+    if transf_opt is None:
+        assert val not in new_opts.values()
+    else:
+        assert transf_opt in new_opts
+        assert new_opts[transf_opt] == transf_val
 
 
 @pytest.mark.parametrize(
@@ -59,19 +52,13 @@ def test_transfer_opts(element, opt, val, backend, opt_kind, transf_opt, transf_
     ),
 )
 def test_transfer_opts_compositeoverlay(opt, val, backend, opt_kind, transf_opt, transf_val):
-    current_backend = Store.current_backend
-    if backend not in Store.registry:
-        holoviews.extension(backend)
     Store.set_current_backend(backend)
-    try:
-        element = Area([]) * Curve([]).opts(backend='bokeh', **{opt: val})
-        new_element = element.apply(_transfer_opts, backend=backend)
-        transformed_element = new_element.Curve.I
-        new_opts = transformed_element.opts.get(opt_kind).kwargs
-        assert transf_opt in new_opts
-        assert new_opts[transf_opt] == transf_val
-    finally:
-        Store.set_current_backend(current_backend)
+    element = Area([]) * Curve([]).opts(backend='bokeh', **{opt: val})
+    new_element = element.apply(_transfer_opts, backend=backend)
+    transformed_element = new_element.Curve.I
+    new_opts = transformed_element.opts.get(opt_kind).kwargs
+    assert transf_opt in new_opts
+    assert new_opts[transf_opt] == transf_val
 
 
 @pytest.mark.parametrize(

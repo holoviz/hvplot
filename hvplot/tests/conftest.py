@@ -120,7 +120,12 @@ def _isolate_hvplot():
         if ext == 'hvplot.fugue':
             continue
         # Popped so that the next `import hvplot.<ext>` patches again.
-        sys.modules.pop(ext)._unpatch()
+        module = sys.modules.pop(ext, None)
+        if module is None:
+            # Its import failed after patching: forget it rather than failing all the next tests.
+            hvplot._module_extensions.discard(ext)
+            continue
+        module._unpatch()
     for backend, tree in options.items():
         Store.options(backend=backend, val=tree)
     Store._custom_options = {backend: {} for backend in Store._custom_options}

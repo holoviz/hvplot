@@ -4,33 +4,6 @@ import pandas as pd
 import pytest
 import xarray as xr
 from holoviews import Store
-from holoviews.core.options import Options, OptionTree
-
-import hvplot
-
-
-@pytest.fixture(scope='class')
-def load_pandas_accessor():
-    import hvplot.pandas  # noqa: F401
-
-
-@pytest.fixture(scope='class')
-def load_xarray_accessor():
-    import hvplot.xarray  # noqa: F401
-
-
-@pytest.fixture(params=['bokeh', 'matplotlib', 'plotly'], scope='class')
-def backend(request):
-    backend = request.param
-    backend_copy = Store.current_backend
-    if backend not in Store.registry:
-        hvplot.extension(backend, compatibility='bokeh')
-    Store.set_current_backend(backend)
-    store_copy = OptionTree(sorted(Store.options().items()), groups=Options._option_groups)
-    yield backend
-    Store.options(val=store_copy)
-    Store._custom_options = {k: {} for k in Store._custom_options.keys()}
-    Store.set_current_backend(backend_copy)
 
 
 @pytest.fixture(scope='module')
@@ -46,7 +19,7 @@ def symmetric_df():
     return pd.DataFrame([[1, 2, -1], [3, 4, 0], [5, 6, 1]], columns=['x', 'y', 'number'])
 
 
-@pytest.mark.usefixtures('load_pandas_accessor')
+@pytest.mark.usefixtures('hvplot_pandas')
 class TestOptions:
     def test_scatter_legend_position(self, df, backend):
         if backend == 'matplotlib':
@@ -489,7 +462,7 @@ def ds2(da, da2):
     return xr.Dataset({'foo': da, 'bar': da2})
 
 
-@pytest.mark.usefixtures('load_xarray_accessor')
+@pytest.mark.usefixtures('hvplot_xarray')
 class TestXarrayTitle:
     def test_dataarray_2d_with_title(self, da, backend):
         da_sel = da.sel(time=0, band=0)
@@ -543,7 +516,7 @@ class TestXarrayTitle:
         assert opts.kwargs['title'] == 'time = 0, y = 0, x = 0, band = 0'
 
 
-@pytest.mark.usefixtures('load_xarray_accessor')
+@pytest.mark.usefixtures('hvplot_xarray')
 class TestXarrayCticks:
     def test_cticks(self, da2):
         plot = da2.isel(other=0).hvplot(cticks=[5, 10])
@@ -551,14 +524,14 @@ class TestXarrayCticks:
         assert handles['colorbar'].ticker.ticks == [5, 10]
 
 
-def test_subcoordinate_y_bool(load_pandas_accessor):
+def test_subcoordinate_y_bool(hvplot_pandas):
     df = pd.DataFrame(np.random.random((10, 3)), columns=list('ABC'))
     plot = df.hvplot.line(subcoordinate_y=True)
     opts = Store.lookup_options('bokeh', plot, 'plot')
     assert opts.kwargs['subcoordinate_y'] is True
 
 
-def test_subcoordinate_y_dict(load_pandas_accessor):
+def test_subcoordinate_y_dict(hvplot_pandas):
     df = pd.DataFrame(np.random.random((10, 3)), columns=list('ABC'))
     plot = df.hvplot.line(subcoordinate_y={'subcoordinate_scale': 2})
     opts = Store.lookup_options('bokeh', plot, 'plot')

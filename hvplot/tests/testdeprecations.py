@@ -64,18 +64,16 @@ def test_intake_deprecation():
     pytest.importorskip('intake')
     with pytest.warns(FutureWarning):
         importlib.import_module('hvplot.intake')
-    sys.modules.pop('hvplot.intake', None)
 
 
-def test_intake_datasource_hvplot_deprecation(disable_param_warnings_as_exceptions):
+def test_intake_datasource_hvplot_deprecation(disable_param_warnings_as_exceptions, monkeypatch):
     intake = pytest.importorskip('intake')
 
     from intake.source.base import DataSource
 
     # Patch .hvplot onto DataSource manually to avoid importing hvplot.intake,
     # which fires its own separate FutureWarning and would pollute this test.
-    if not hasattr(DataSource, 'hvplot'):
-        DataSource.hvplot = property(lambda self: hvPlot(self))
+    monkeypatch.setattr(DataSource, 'hvplot', property(lambda self: hvPlot(self)), raising=False)
 
     df = pd.DataFrame({'x': [1, 2, 3], 'y': [4, 5, 6]})
     with tempfile.NamedTemporaryFile(suffix='.csv', delete=False, mode='w') as f:

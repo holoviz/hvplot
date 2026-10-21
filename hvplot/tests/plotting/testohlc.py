@@ -1,6 +1,7 @@
 import pandas as pd
+import pytest
 
-import hvplot.pandas  # noqa: F401
+pytestmark = pytest.mark.usefixtures('hvplot_pandas')
 
 df = pd.DataFrame(
     {

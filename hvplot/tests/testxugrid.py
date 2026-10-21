@@ -4,17 +4,21 @@ from unittest import SkipTest, TestCase
 
 import numpy as np
 import pandas as pd
+import pytest
 
 try:
     import holoviews as hv
     import xarray as xr
     import xugrid as xu
-
-    import hvplot.xugrid  # noqa: F401 - patches .hvplot onto xu types
 except ImportError as e:
     raise SkipTest(f'xugrid or required dependency not available: {e}')
 
 from holoviews.element import TriMesh
+
+
+@pytest.fixture(autouse=True)
+def hvplot_xugrid():
+    import hvplot.xugrid  # noqa: F401 - patches .hvplot onto xu types
 
 
 def _make_simple_node_uda():

@@ -7,12 +7,11 @@ import pytest
 import xarray as xr
 from holoviews.util.transform import dim
 
-import hvplot.pandas
-import hvplot.xarray  # noqa: F401
 from hvplot import bind
 from hvplot.interactive import Interactive
-from hvplot.tests._data import makeDataFrame, makeMixedDataFrame
-from hvplot.xarray import XArrayInteractive
+from hvplot.tests._data import air_temperature, makeDataFrame, makeMixedDataFrame
+
+pytestmark = pytest.mark.usefixtures('hvplot_pandas', 'hvplot_xarray')
 
 
 @pytest.fixture(scope='module')
@@ -27,7 +26,7 @@ def df():
 
 @pytest.fixture(scope='module')
 def dataset():
-    return xr.tutorial.load_dataset('air_temperature')
+    return air_temperature()
 
 
 @pytest.fixture(scope='module')
@@ -123,6 +122,9 @@ def test_interactive_pandas_series(series):
 
 
 def test_interactive_xarray_dataarray(dataarray):
+    # Imported here, the class is recreated each time hvplot.xarray is imported.
+    from hvplot.xarray import XArrayInteractive
+
     dai = Interactive(dataarray)
 
     assert type(dai) is XArrayInteractive
@@ -139,6 +141,9 @@ def test_interactive_xarray_dataarray_no_name():
 
 
 def test_interactive_xarray_dataset(dataset):
+    # Imported here, the class is recreated each time hvplot.xarray is imported.
+    from hvplot.xarray import XArrayInteractive
+
     dsi = Interactive(dataset)
 
     assert type(dsi) is XArrayInteractive
@@ -166,6 +171,9 @@ def test_interactive_pandas_function(df):
 
 
 def test_interactive_xarray_function(dataset):
+    # Imported here, the class is recreated each time hvplot.xarray is imported.
+    from hvplot.xarray import XArrayInteractive
+
     ds = dataset.copy()
     ds['air2'] = ds.air * 2
 
@@ -1349,4 +1357,4 @@ def test_interactive_accept_non_str_columnar_data():
 
     w.value = 0.5
 
-    pytest.approx(dfi.eval().sum(), (df[1] + 0.5).sum())
+    assert dfi.eval().sum() == pytest.approx((df[1] + 0.5).sum())
