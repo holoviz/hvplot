@@ -4,12 +4,9 @@ Patch/unpatch round trips of the data-library extension modules.
 Temporary, to be dissolved into the data_libraries/ tests.
 """
 
-import sys
-
 import pytest
 
 import hvplot
-import hvplot.pandas
 
 
 def _patched(classes, attrs):
@@ -22,9 +19,8 @@ def _unpatched(classes, attrs):
 
 
 def _round_trip(ext, classes, attrs=('hvplot',)):
-    # Leave the state as found, other tests in the same process rely on it.
-    was_patched = ext.__name__ in hvplot._module_extensions
-
+    # Ends patched, so the _isolate_hvplot fixture unpatches the extension
+    # and removes its module from sys.modules after the test.
     ext.patch()
     assert _patched(classes, attrs)
     assert ext.__name__ in hvplot._module_extensions
@@ -37,12 +33,11 @@ def _round_trip(ext, classes, attrs=('hvplot',)):
     assert _patched(classes, attrs)
     assert ext.__name__ in hvplot._module_extensions
 
-    if not was_patched:
-        ext._unpatch()
-
 
 def test_unpatch_pandas():
     import pandas as pd
+
+    import hvplot.pandas
 
     _round_trip(hvplot.pandas, [pd.DataFrame, pd.Series], ['hvplot', 'interactive'])
 
@@ -94,8 +89,6 @@ def test_unpatch_intake():
     import hvplot.intake
 
     _round_trip(hvplot.intake, [intake.source.base.DataSource])
-    # testdeprecations.py expects the import-time warning.
-    sys.modules.pop('hvplot.intake', None)
 
 
 @pytest.mark.filterwarnings('ignore:streamz support has been deprecated:FutureWarning')

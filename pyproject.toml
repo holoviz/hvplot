@@ -63,6 +63,8 @@ tests-core = [
     "pooch",
     "pre-commit",
     "pytest-cov",
+    "pytest-randomly",
+    "pytest-xdist",
     "pytest",
     "ruff",
     "scipy",
@@ -184,8 +186,12 @@ include = ["hvplot", "scripts", "doc"]
 version-file = "hvplot/_version.py"
 
 [tool.pytest.ini_options]
-addopts = "-v --pyargs"
+addopts = "--pyargs --strict-markers --strict-config"
 norecursedirs = "*.egg dist build _build jupyter_execute .*"
+xfail_strict = true
+markers = [
+    "slow: slow tests, run with --slow (always run on CI)",
+]
 # The test suite used to be run with nosetests which collected
 # by default files like `testgeo.py` while pytest's default is
 # to collect files like `test_geo.py`. This setting allows

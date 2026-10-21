@@ -11,7 +11,7 @@ import hvplot.pandas
 import hvplot.xarray  # noqa: F401
 from hvplot import bind
 from hvplot.interactive import Interactive
-from hvplot.tests.util import makeDataFrame, makeMixedDataFrame
+from hvplot.tests._data import makeDataFrame, makeMixedDataFrame
 from hvplot.xarray import XArrayInteractive
 
 

@@ -171,6 +171,8 @@ Unit tests can be run with the `test-unit` task:
 pixi run test-unit
 ```
 
+The tests run in parallel and in a random order. Slow tests are skipped unless you pass `--slow`, e.g. `pixi run test-unit --slow`.
+
 :::{admonition} Advanced usage
 :class: tip
 

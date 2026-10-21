@@ -4,7 +4,7 @@ import pytest
 
 import hvplot.pandas
 from hvplot import hvPlotTabular
-from hvplot.tests.util import makeDataFrame
+from hvplot.tests._data import makeDataFrame
 
 try:
     import polars as pl

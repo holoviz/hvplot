@@ -13,7 +13,7 @@ import pytest
 from hvplot import hvPlot
 from hvplot.converter import HoloViewsConverter
 from hvplot.plotting import plot
-from hvplot.tests.util import makeDataFrame
+from hvplot.tests._data import makeDataFrame
 from hvplot.util import _HV_VERSION
 
 

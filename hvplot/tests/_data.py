@@ -3,6 +3,7 @@ from datetime import datetime
 
 import numpy as np
 import pandas as pd
+import xarray as xr
 
 # Pandas removed its make<> test utilities in version 2.2.0.
 
@@ -78,3 +79,48 @@ def getTimeSeriesData(nper=None, freq='B'):
 def makeTimeDataFrame(nper=None, freq='B'):
     data = getTimeSeriesData(nper, freq)
     return pd.DataFrame(data)
+
+
+def air_temperature():
+    """Small synthetic version of `xr.tutorial.open_dataset('air_temperature')`.
+
+    Same variable, coords, dtypes and main attrs, without the download.
+    """
+    lat = np.linspace(75, 15, 10, dtype='float32')  # descending, like the original
+    lon = np.linspace(200, 330, 12, dtype='float32')
+    # ns like the original, recent pandas versions default to us.
+    time = pd.date_range('2013-01-01', periods=6, freq='6h').astype('datetime64[ns]')
+    air = np.random.default_rng(1).uniform(240, 300, size=(len(time), len(lat), len(lon)))
+    return xr.Dataset(
+        {
+            'air': (
+                ('time', 'lat', 'lon'),
+                air,
+                {'long_name': '4xDaily Air temperature at sigma level 995', 'units': 'degK'},
+            )
+        },
+        coords={
+            'time': ('time', time, {'standard_name': 'time', 'long_name': 'Time'}),
+            'lat': (
+                'lat',
+                lat,
+                {
+                    'standard_name': 'latitude',
+                    'long_name': 'Latitude',
+                    'units': 'degrees_north',
+                    'axis': 'Y',
+                },
+            ),
+            'lon': (
+                'lon',
+                lon,
+                {
+                    'standard_name': 'longitude',
+                    'long_name': 'Longitude',
+                    'units': 'degrees_east',
+                    'axis': 'X',
+                },
+            ),
+        },
+        attrs={'Conventions': 'COARDS', 'title': '4x daily NMC reanalysis (1948)'},
+    )
