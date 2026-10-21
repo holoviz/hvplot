@@ -398,7 +398,7 @@ def test_is_geodataframe_classic_dataframe():
     assert not is_geodataframe(df)
 
 
-@requires('geoviews')
+@pytest.mark.geo
 def test_geoviews_is_available():
     assert import_geoviews()
 

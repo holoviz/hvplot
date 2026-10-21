@@ -12,6 +12,7 @@ import pandas as pd
 import pytest
 
 from hvplot.tests._data import air_temperature
+from hvplot.tests._deps import requires
 from hvplot.util import proj_to_cartopy
 
 bk_renderer = hv.Store.renderers['bokeh']
@@ -22,21 +23,14 @@ def simple_df():
     return pd.DataFrame(np.random.rand(10, 2), columns=['x', 'y'])
 
 
+@pytest.mark.geo
+@requires('pyproj', 'rasterio', 'rioxarray')
 class TestGeo(TestCase):
     def setUp(self):
         if sys.platform == 'win32':
             raise SkipTest('Skip geo tests on windows for now')
-        try:
-            import cartopy.crs as ccrs  # noqa: F401
-            import geoviews  # noqa: F401
-            import pyproj  # noqa: F401
-            import rasterio  # noqa: F401
-            import rioxarray as rxr
-            import xarray as xr  # noqa: F401
-        except ImportError:
-            raise SkipTest(
-                'xarray, rasterio, geoviews, cartopy, pyproj or rioxarray not available'
-            )
+        import rioxarray as rxr
+
         import hvplot.pandas
         import hvplot.xarray  # noqa: F401
 
@@ -175,13 +169,11 @@ class TestProjections(TestGeo):
         xr.testing.assert_allclose(hvplot_output.data, expected.data)
 
 
+@pytest.mark.geo
 class TestGeoAnnotation(TestCase):
     def setUp(self):
-        try:
-            import cartopy.crs as ccrs
-            import geoviews  # noqa: F401
-        except ImportError:
-            raise SkipTest('geoviews or cartopy not available')
+        import cartopy.crs as ccrs
+
         import hvplot.pandas  # noqa: F401
 
         self.crs = ccrs.PlateCarree()
@@ -305,13 +297,11 @@ class TestGeoAnnotation(TestCase):
         assert plot.get(2).group == 'Borders'
 
 
+@pytest.mark.geo
 class TestGeoElements(TestCase):
     def setUp(self):
-        try:
-            import cartopy.crs as ccrs
-            import geoviews  # noqa: F401
-        except ImportError:
-            raise SkipTest('geoviews or cartopy not available')
+        import cartopy.crs as ccrs
+
         import hvplot.pandas  # noqa: F401
 
         self.crs = ccrs.PlateCarree()
@@ -346,15 +336,11 @@ class TestGeoElements(TestCase):
         self.assertEqual(opts.get('height'), None)
 
 
+@pytest.mark.geo
+@requires('geopandas', 'shapely')
 class TestGeoPandas(TestCase):
     def setUp(self):
-        try:
-            import cartopy.crs as ccrs  # noqa: F401
-            import geopandas as gpd
-            import geoviews  # noqa: F401
-            import shapely  # noqa: F401
-        except ImportError:
-            raise SkipTest('geopandas, geoviews, shapely or cartopy not available')
+        import geopandas as gpd
         from shapely.geometry import Polygon
 
         import hvplot.pandas  # noqa: F401

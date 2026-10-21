@@ -323,6 +323,7 @@ class TestTrimeshNonTrimeshKind(TestCase):
         assert 'trimesh' in str(ctx.exception)
 
 
+@pytest.mark.geo
 class TestTrimeshGeo(TestCase):
     """Tests for trimesh with geo=True and CRS options."""
 
@@ -330,21 +331,12 @@ class TestTrimeshGeo(TestCase):
         self.uda = _make_simple_node_uda()
 
     def test_geo_default_crs(self):
-        try:
-            import geoviews  # noqa: F401
-        except ImportError:
-            raise SkipTest('geoviews not available')
-
         plot = self.uda.hvplot.trimesh(geo=True)
         tm = plot.last if hasattr(plot, 'last') else plot
         assert isinstance(tm, TriMesh)
 
     def test_geo_non_platecarree_crs(self):
-        try:
-            import cartopy.crs as ccrs
-            import geoviews  # noqa: F401
-        except ImportError:
-            raise SkipTest('geoviews or cartopy not available')
+        import cartopy.crs as ccrs
 
         plot = self.uda.hvplot.trimesh(geo=True, crs=ccrs.Mercator())
         tm = plot.last if hasattr(plot, 'last') else plot

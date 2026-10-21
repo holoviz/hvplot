@@ -3,9 +3,11 @@
 import importlib.util
 import socket
 
+import holoviews as hv
 import pandas as pd
 import pytest
 from holoviews import Store
+from holoviews.plotting.bokeh import OverlayPlot
 
 import hvplot
 from hvplot.tests._deps import requires
@@ -37,6 +39,25 @@ def test_block_import(block_import):
     with pytest.raises(ModuleNotFoundError):
         import geoviews  # noqa: F401
     assert importlib.util.find_spec('geoviews') is None
+
+
+def test_block_import_geoviews_then_extension(block_import):
+    block_import('geoviews')
+
+    hvplot.extension('bokeh')
+
+
+def test_without_geo_marker_holoviews_state():
+    assert Store.registry['bokeh'][hv.Overlay] is OverlayPlot
+    assert not hv.extension._backend_hooks['bokeh']
+
+
+@pytest.mark.geo
+def test_geo_marker_geoviews_state():
+    from geoviews.plotting.bokeh import GeoOverlayPlot
+
+    assert Store.registry['bokeh'][hv.Overlay] is GeoOverlayPlot
+    assert 'Feature' in Store.options(backend='bokeh')
 
 
 def test_network_guard_blocks_remote_connection():

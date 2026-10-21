@@ -191,6 +191,7 @@ norecursedirs = "*.egg dist build _build jupyter_execute .*"
 xfail_strict = true
 markers = [
     "slow: slow tests, run with --slow (always run on CI)",
+    "geo: tests using GeoViews, skipped when geoviews or cartopy are missing",
 ]
 # The test suite used to be run with nosetests which collected
 # by default files like `testgeo.py` while pytest's default is

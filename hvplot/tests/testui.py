@@ -11,7 +11,6 @@ from bokeh.sampledata import penguins
 
 import hvplot
 from hvplot.tests._data import air_temperature
-from hvplot.tests._deps import requires
 from hvplot.ui import MAX_ROWS, hvDataFrameExplorer, hvGridExplorer
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas', 'hvplot_xarray')
@@ -198,7 +197,7 @@ def test_explorer_hvplot_gridded_options(ds_air_temperature):
     assert explorer._controls[0].groups.keys() == {'dataframe', 'gridded', 'geom'}
 
 
-@requires('geoviews', 'cartopy')
+@pytest.mark.geo
 def test_explorer_hvplot_geo():
     df = pd.DataFrame({'x': [-9796115.18980811], 'y': [4838471.398061159]})
     explorer = hvplot.explorer(df, x='x', geo=True, kind='points')
@@ -400,7 +399,7 @@ def test_explorer_xarray_multi_var_extra_dims_no_coord():
 
 @pytest.mark.usefixtures('disable_param_warnings_as_exceptions')
 @pytest.mark.parametrize('kind_tuple', [('scatter', 'points'), ('line', 'paths')])
-@requires('geoviews', 'cartopy')
+@pytest.mark.geo
 def test_explorer_geo_revise_kind(kind_tuple, ds_air_temperature):
     da = ds_air_temperature['air'].isel(time=0)
     explorer = hvplot.explorer(da, x='lon', y='lat', kind=kind_tuple[0], geo=True)

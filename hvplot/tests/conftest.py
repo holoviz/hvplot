@@ -1,7 +1,7 @@
-import contextlib
 import ipaddress
 import socket
 import sys
+from importlib.util import find_spec
 
 import dask
 import holoviews as hv
@@ -11,7 +11,9 @@ import pandas as pd
 import param
 import pytest
 from holoviews import Store
-from holoviews.core.options import Options, OptionTree
+from holoviews.core.data import Dataset, Interface
+from holoviews.core.options import Compositor, Options, OptionTree
+from holoviews.element import Path
 from packaging.version import Version
 
 import hvplot
@@ -23,16 +25,70 @@ if Version(dask.__version__).release < (2025, 1, 0):
     # https://github.com/dask/dask/issues/10995
     dask.config.set({'dataframe.query-planning': False})
 
+
+def _copy_options(tree):
+    return OptionTree(sorted(tree.items()), groups=Options._option_groups)
+
+
+def _save_hv_state():
+    """Copy the HoloViews global state that tests and `import geoviews` modify."""
+    return {
+        'current_backend': Store.current_backend,
+        'renderers': Store.renderers.copy(),
+        'registry': {backend: plots.copy() for backend, plots in Store.registry.items()},
+        'options': {
+            backend: _copy_options(Store.options(backend=backend))
+            for backend in Store.loaded_backends()
+        },
+        'extension_hooks': {
+            backend: hooks.copy() for backend, hooks in hv.extension._backend_hooks.items()
+        },
+        'compositors': Compositor.definitions.copy(),
+        'interfaces': Interface.interfaces.copy(),
+        'datatypes': {cls: list(cls.datatype) for cls in (Dataset, Path)},
+    }
+
+
+def _restore_hv_state(state):
+    # Everything is copied again, as a saved state is restored many times and tests
+    # must not modify it. Containers are updated in place as HoloViews may hold them.
+    for backend, tree in state['options'].items():
+        Store.options(backend=backend, val=_copy_options(tree))
+    Store._custom_options = {backend: {} for backend in Store._custom_options}
+    Store.renderers = state['renderers'].copy()
+    for backend, plots in state['registry'].items():
+        Store.registry[backend].clear()
+        Store.registry[backend].update(plots)
+    hv.extension._backend_hooks.clear()
+    hv.extension._backend_hooks.update(
+        {backend: hooks.copy() for backend, hooks in state['extension_hooks'].items()}
+    )
+    Compositor.definitions[:] = state['compositors']
+    Interface.interfaces.clear()
+    Interface.interfaces.update(state['interfaces'])
+    for cls, datatype in state['datatypes'].items():
+        cls.datatype = list(datatype)
+    if Store.current_backend != state['current_backend']:
+        # Only when needed, it runs hooks that cost ~20-40ms.
+        Store.set_current_backend(state['current_backend'])
+
+
 # Baseline state, set once per process (each pytest-xdist worker loads this module).
 # All the backends are loaded up front so that the plotting state does not depend
 # on which test happens to load a backend first. The first backend listed becomes
 # the current one, and compatibility is left to None.
 matplotlib.use('agg')
 hvplot.extension('bokeh', 'matplotlib', 'plotly')
-# GeoViews registers its elements' options when imported. Imported here, before the
-# first snapshot of _isolate_hvplot, otherwise they would be lost after the first test.
-with contextlib.suppress(ImportError):
+# Importing GeoViews changes HoloViews for good (plot classes, options, extension hooks,
+# data interfaces). It is imported once to save that state, which only the tests marked
+# with `geo` get. All the other tests run as if GeoViews had never been imported.
+_PLAIN_HV_STATE = _save_hv_state()
+_GEO_HV_STATE = None
+if find_spec('geoviews') and find_spec('cartopy'):
     import geoviews  # noqa: F401
+
+    _GEO_HV_STATE = _save_hv_state()
+    _restore_hv_state(_PLAIN_HV_STATE)
 
 
 def pytest_addoption(parser):
@@ -40,12 +96,13 @@ def pytest_addoption(parser):
 
 
 def pytest_collection_modifyitems(config, items):
-    if config.getoption('--slow'):
-        return
     skip_slow = pytest.mark.skip(reason='Slow test, run it with --slow.')
+    skip_geo = pytest.mark.skip(reason='GeoViews test, requires geoviews and cartopy.')
     for item in items:
-        if 'slow' in item.keywords:
+        if 'slow' in item.keywords and not config.getoption('--slow'):
             item.add_marker(skip_slow)
+        if 'geo' in item.keywords and _GEO_HV_STATE is None:
+            item.add_marker(skip_geo)
 
 
 def pytest_collection_finish(session):
@@ -94,20 +151,15 @@ def _block_network():
 
 
 @pytest.fixture(autouse=True)
-def _isolate_hvplot():
+def _isolate_hvplot(request):
     """Restore after each test the global state that hvPlot and HoloViews tests modify.
 
     It unpatches the data libraries (e.g. removes `pd.DataFrame.hvplot`) so the next
     test can only use an accessor if it imports it, and so it can run in any order.
+    Tests marked with `geo` run with the HoloViews state set by importing GeoViews.
     """
-    current_backend = Store.current_backend
-    renderers = Store.renderers.copy()
-    options = {
-        backend: OptionTree(
-            sorted(Store.options(backend=backend).items()), groups=Options._option_groups
-        )
-        for backend in Store.loaded_backends()
-    }
+    if request.node.get_closest_marker('geo'):
+        _restore_hv_state(_GEO_HV_STATE)
     compatibility = hvplot.extension.compatibility
     extension_loaded = hv.extension._loaded
     plotting_backend = pd.options.plotting.backend
@@ -126,13 +178,8 @@ def _isolate_hvplot():
             hvplot._module_extensions.discard(ext)
             continue
         module._unpatch()
-    for backend, tree in options.items():
-        Store.options(backend=backend, val=tree)
-    Store._custom_options = {backend: {} for backend in Store._custom_options}
-    Store.renderers = renderers
-    if Store.current_backend != current_backend:
-        # Only when needed, it runs hooks that cost ~20-40ms.
-        Store.set_current_backend(current_backend)
+    # Each test starts from the plain state: restoring it costs one copy, saving it would add one.
+    _restore_hv_state(_PLAIN_HV_STATE)
     hvplot.extension.compatibility = compatibility
     hv.extension._loaded = extension_loaded
     pd.set_option('plotting.backend', plotting_backend)
