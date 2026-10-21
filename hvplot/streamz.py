@@ -40,4 +40,16 @@ def patch(name='hvplot', extension='bokeh', logo=False):
     post_patch(extension, logo)
 
 
+def _unpatch(name='hvplot'):
+    """Undo `patch()`. Private, used by the test suite."""
+    import streamz.dataframe as sdf
+
+    from . import _module_extensions
+
+    for cls in (sdf.DataFrame, sdf.DataFrames, sdf.Series, sdf.Seriess):
+        if name in vars(cls):
+            delattr(cls, name)
+    _module_extensions.discard('hvplot.streamz')
+
+
 patch()
