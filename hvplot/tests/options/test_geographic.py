@@ -35,7 +35,7 @@ class TestGeo(TestCase):
         import hvplot.xarray  # noqa: F401
 
         self.da = rxr.open_rasterio(
-            pathlib.Path(__file__).parent / 'data' / 'RGB-red.byte.tif'
+            pathlib.Path(__file__).parents[1] / 'data' / 'RGB-red.byte.tif'
         ).isel(band=0)
         # UTM zone 18N
         self.crs = proj_to_cartopy(self.da.spatial_ref.attrs['crs_wkt'])
@@ -451,14 +451,14 @@ class TestGeoUtil(TestCase):
         self.ccrs = ccrs
 
     def test_proj_to_cartopy(self):
-        from ..util import proj_to_cartopy
+        from hvplot.util import proj_to_cartopy
 
         crs = proj_to_cartopy('epsg:26911')
 
         assert isinstance(crs, self.ccrs.CRS)
 
     def test_proj_to_cartopy_wkt_string(self):
-        from ..util import proj_to_cartopy
+        from hvplot.util import proj_to_cartopy
 
         crs = proj_to_cartopy(
             'GEOGCRS["unnamed",BASEGEOGCRS["unknown",DATUM["unknown",ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1,ID["EPSG",9001]]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8901]]],DERIVINGCONVERSION["unknown",METHOD["PROJ ob_tran o_proj=latlon"],PARAMETER["o_lon_p",0,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],PARAMETER["o_lat_p",37.5,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],PARAMETER["lon_0",357.5,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]]],CS[ellipsoidal,2],AXIS["longitude",east,ORDER[1],ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],AXIS["latitude",north,ORDER[2],ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]]]'  # noqa: E501
@@ -470,7 +470,7 @@ class TestGeoUtil(TestCase):
 
     def test_proj_to_cartopy_albers_equal_area_wkt(self):
         """Test Albers Equal Area projection from WKT string"""
-        from ..util import proj_to_cartopy
+        from hvplot.util import proj_to_cartopy
 
         albers_wkt = 'PROJCS["Projection = Albers Conical Equal Area",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Albers_Conic_Equal_Area"],PARAMETER["latitude_of_center",23],PARAMETER["longitude_of_center",-96],PARAMETER["standard_parallel_1",29.5],PARAMETER["standard_parallel_2",45.5],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH]]'  # noqa: E501
 
@@ -485,7 +485,7 @@ class TestGeoUtil(TestCase):
 
     def test_proj_to_cartopy_albers_equal_area_proj4(self):
         """Test Albers Equal Area projection from PROJ4 string"""
-        from ..util import proj_to_cartopy
+        from hvplot.util import proj_to_cartopy
 
         proj4_string = '+proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs'  # noqa: E501
 
@@ -498,7 +498,7 @@ class TestGeoUtil(TestCase):
         Test that various PROJ.4 projection strings are correctly mapped to their
         expected Cartopy CRS classes by `proj_to_cartopy`.
         """
-        from ..util import proj_to_cartopy
+        from hvplot.util import proj_to_cartopy
 
         test_cases = [
             ('+proj=eqdc +lat_0=40 +lon_0=-96 +lat_1=33 +lat_2=45', self.ccrs.EquidistantConic),
@@ -523,7 +523,7 @@ class TestGeoUtil(TestCase):
 
     def test_proj_to_cartopy_geostationary_special_case(self):
         """Test Geostationary projection which requires special parameters"""
-        from ..util import proj_to_cartopy
+        from hvplot.util import proj_to_cartopy
 
         # Geostationary typically requires satellite height
         proj4_string = '+proj=geos +lon_0=0 +h=35786023 +x_0=0 +y_0=0'
@@ -533,7 +533,7 @@ class TestGeoUtil(TestCase):
 
     def test_proj_to_cartopy_nearsided_perspective(self):
         """Test Near-sided Perspective projection"""
-        from ..util import proj_to_cartopy
+        from hvplot.util import proj_to_cartopy
 
         proj4_string = '+proj=nsper +lat_0=40 +lon_0=-96 +h=10000000'
 
