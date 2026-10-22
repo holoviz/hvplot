@@ -38,6 +38,7 @@ series_kinds = pytest.mark.parametrize('kind', sorted(SERIES_TYPES))
 y_combinations = pytest.mark.parametrize(
     'y',
     (
+        None,
         ['A', 'B', 'C', 'D'],
         ('A', 'B', 'C', 'D'),
         {'A', 'B', 'C', 'D'},
