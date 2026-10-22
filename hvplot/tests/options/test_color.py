@@ -8,13 +8,12 @@ import xarray as xr
 from holoviews import Store
 from holoviews.testing import assert_element_equal
 
+from hvplot.tests._backends import plotly_without
 from hvplot.tests._deps import requires
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
 
 pandas_and_dask = pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
-
-plotly_unsupported = pytest.mark.xfail(reason='Not supported by the plotly backend')
 
 
 @pytest.fixture
@@ -446,7 +445,7 @@ def test_color_key_dict_datashade(df):
 
 @pytest.mark.parametrize(
     'backend',
-    ['bokeh', 'matplotlib', pytest.param('plotly', marks=plotly_unsupported)],
+    ['bokeh', 'matplotlib', plotly_without('cnorm')],
     indirect=True,
 )
 @pytest.mark.parametrize('cnorm', ['linear', 'log', 'eq_hist'])
@@ -495,7 +494,7 @@ def test_rescale_discrete_levels_datashade(df):
 
 @pytest.mark.parametrize(
     'backend',
-    ['bokeh', 'matplotlib', pytest.param('plotly', marks=plotly_unsupported)],
+    ['bokeh', 'matplotlib', plotly_without('rescale_discrete_levels')],
     indirect=True,
 )
 def test_rescale_discrete_levels(df, backend):

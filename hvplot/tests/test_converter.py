@@ -151,35 +151,32 @@ def test_hvplot_defaults(options_df, backend):
 
 
 # Default opts are only supported with bokeh.
-@pytest.mark.parametrize('backend', ['bokeh'], indirect=True)
-def test_holoviews_defined_default_opts(options_df, backend):
+def test_holoviews_defined_default_opts(options_df):
     hv.opts.defaults(hv.opts.Scatter(height=400, width=900, show_grid=True))
     plot = options_df.hvplot.scatter('x', 'y', c='category')
-    opts = Store.lookup_options(backend, plot, 'plot')
+    opts = Store.lookup_options('bokeh', plot, 'plot')
     assert opts.kwargs['legend_position'] == 'right'
     assert opts.kwargs['show_grid'] is True
     assert opts.kwargs['height'] == 400
     assert opts.kwargs['width'] == 900
 
 
-@pytest.mark.parametrize('backend', ['bokeh'], indirect=True)
-def test_holoviews_defined_default_opts_overwritten_in_call(options_df, backend):
+def test_holoviews_defined_default_opts_overwritten_in_call(options_df):
     hv.opts.defaults(hv.opts.Scatter(height=400, width=900, show_grid=True))
     plot = options_df.hvplot.scatter('x', 'y', c='category', width=300, legend='left')
-    opts = Store.lookup_options(backend, plot, 'plot')
+    opts = Store.lookup_options('bokeh', plot, 'plot')
     assert opts.kwargs['legend_position'] == 'left'
     assert opts.kwargs['show_grid'] is True
     assert opts.kwargs['height'] == 400
     assert opts.kwargs['width'] == 300
 
 
-@pytest.mark.parametrize('backend', ['bokeh'], indirect=True)
-def test_holoviews_defined_default_opts_are_not_mutable(options_df, backend):
+def test_holoviews_defined_default_opts_are_not_mutable(options_df):
     hv.opts.defaults(hv.opts.Scatter(tools=['tap']))
     plot = options_df.hvplot.scatter('x', 'y', c='category')
-    opts = Store.lookup_options(backend, plot, 'plot')
+    opts = Store.lookup_options('bokeh', plot, 'plot')
     assert opts.kwargs['tools'] == ['tap', 'hover']
-    default_opts = Store.options(backend=backend)['Scatter'].groups['plot'].options
+    default_opts = Store.options(backend='bokeh')['Scatter'].groups['plot'].options
     assert default_opts['tools'] == ['tap']
 
 

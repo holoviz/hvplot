@@ -241,11 +241,18 @@ def hvplot_xarray():
 def backend(request):
     """Make each plotting backend the current one, restored after the test.
 
+    It is set up as most users do, with `hvplot.extension(backend)`, so tests read the
+    options named by the backend (e.g. `linewidth` for matplotlib). To test the bokeh
+    option names on another backend, call `hvplot.extension(backend, compatibility='bokeh')`.
+
     Restrict it with `@pytest.mark.parametrize('backend', ['bokeh'], indirect=True)`.
-    Request it after the accessor fixtures: importing an accessor switches back to bokeh.
     """
-    hvplot.extension(request.param, compatibility='bokeh')
-    return request.param
+    hvplot.extension(request.param)
+    yield request.param
+    assert Store.current_backend == request.param, (
+        'The backend changed during the test, request `backend` after the accessor fixtures '
+        '(importing an accessor switches back to bokeh).'
+    )
 
 
 @pytest.fixture(params=['pandas', 'dask', 'polars', 'duckdb', 'ibis'])

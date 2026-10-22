@@ -3,11 +3,18 @@ import numpy as np
 import pandas as pd
 import pytest
 from holoviews import Store
+from holoviews.core.options import AbbreviatedException
 from holoviews.element import Points
 from holoviews.testing import assert_element_equal
 
+from hvplot.tests._backends import size_opt
+
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
 
+plotly_alpha_dropped = pytest.mark.xfail(
+    reason='BUG: alpha is renamed to opacity, which plotly ignores, so it is dropped',
+    raises=KeyError,
+)
 alpha_backends = pytest.mark.parametrize(
     'backend',
     [
@@ -15,11 +22,13 @@ alpha_backends = pytest.mark.parametrize(
         pytest.param(
             'matplotlib',
             marks=pytest.mark.xfail(
-                reason='BUG: a dim mapped to alpha is not supported by matplotlib, fails on render'
+                reason='HoloViews: matplotlib cannot map a dim to alpha',
+                raises=AbbreviatedException,
             ),
         ),
         pytest.param(
-            'plotly', marks=pytest.mark.xfail(reason='cannot map a dim to alpha with plotly')
+            'plotly',
+            marks=plotly_alpha_dropped,
         ),
     ],
     indirect=True,
@@ -31,10 +40,6 @@ def df():
     return pd.DataFrame(
         {'cat': ['a', 'b', 'c'], 'x': [1, 3, 5], 'y': [2, 4, 6], 'number': [0.1, 0.2, 0.3]}
     )
-
-
-def size_opt(backend):
-    return 's' if backend == 'matplotlib' else 'size'
 
 
 def test_x(df):
@@ -140,7 +145,8 @@ def test_marker(df, backend):
         pytest.param(
             'matplotlib',
             marks=pytest.mark.render_xfail(
-                reason='BUG: marker mapped to a column unsupported by matplotlib, not documented'
+                reason='HoloViews: matplotlib cannot map a dim to marker',
+                raises=AbbreviatedException,
             ),
         ),
         'plotly',
@@ -169,7 +175,8 @@ def test_alpha_dim(df, backend):
         'bokeh',
         'matplotlib',
         pytest.param(
-            'plotly', marks=pytest.mark.xfail(reason='cannot map a dim to alpha with plotly')
+            'plotly',
+            marks=plotly_alpha_dropped,
         ),
     ],
     indirect=True,

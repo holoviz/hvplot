@@ -5,6 +5,8 @@ import pytest
 from holoviews import Store
 from holoviews.element import Bivariate, Contours, Polygons
 
+from hvplot.tests._backends import plotly_bivariate_bug
+
 
 @pytest.fixture
 def df(rng):
@@ -13,16 +15,19 @@ def df(rng):
     return pd.DataFrame({'x': x, 'y': x + rng.normal(size=20)})
 
 
+# plotly has no Bivariate options either, so the options are not found (and the plot can't render).
+plotly_no_options = pytest.mark.xfail(
+    reason='BUG: bivariate on plotly is not rejected, it has no options and fails with a KeyError',
+    raises=KeyError,
+)
 backends = pytest.mark.parametrize(
     'backend',
-    [
-        'bokeh',
-        'matplotlib',
-        pytest.param(
-            'plotly',
-            marks=pytest.mark.xfail(reason='bandwidth, cut, levels not supported with plotly'),
-        ),
-    ],
+    ['bokeh', 'matplotlib', pytest.param('plotly', marks=plotly_no_options)],
+    indirect=True,
+)
+filled_backends = pytest.mark.parametrize(
+    'backend',
+    ['bokeh', 'matplotlib', pytest.param('plotly', marks=plotly_bivariate_bug)],
     indirect=True,
 )
 
@@ -60,20 +65,7 @@ def test_cut(df, hvplot_pandas, backend):
     assert Store.lookup_options(backend, plot, 'plot').kwargs['cut'] == 1
 
 
-@pytest.mark.parametrize(
-    'backend',
-    [
-        'bokeh',
-        'matplotlib',
-        pytest.param(
-            'plotly',
-            marks=pytest.mark.render_xfail(
-                reason='HoloViews: Bivariate fails to render with plotly'
-            ),
-        ),
-    ],
-    indirect=True,
-)
+@filled_backends
 def test_filled(df, hvplot_pandas, backend):
     plot = df.hvplot.bivariate('x', 'y', filled=True)
     assert Store.lookup_options(backend, plot, 'plot').kwargs['filled'] is True

@@ -13,6 +13,7 @@ from holoviews import Store
 from matplotlib.ticker import PercentFormatter
 
 import hvplot
+from hvplot.tests._backends import plotly_without
 from hvplot.tests._deps import requires
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
@@ -148,7 +149,7 @@ def test_loglog_wins_over_logx_false(df, backend):
 
 
 only_bokeh_defaults = pytest.mark.xfail(
-    reason='BUG: HoloViews defaults are only read for bokeh (converter.py)'
+    reason='BUG: HoloViews defaults are only read for bokeh (converter.py)', raises=AssertionError
 )
 
 
@@ -365,8 +366,8 @@ def test_cticks_number_of_ticks(df):
     assert handles['color_colorbar'].ticker.desired_num_ticks == 3
 
 
-def test_cticks_matplotlib_default_compatibility(hvplot_xarray, da2):
-    hvplot.extension('matplotlib')
+@pytest.mark.parametrize('backend', ['matplotlib'], indirect=True)
+def test_cticks_matplotlib_default_compatibility(hvplot_xarray, da2, backend):
     plot = da2.isel(other=0).hvplot(cticks=[5, 10])
     handles = hv.renderer('matplotlib').get_plot(plot).handles
     assert list(handles['cbar'].get_ticks()) == [5, 10]
@@ -376,9 +377,10 @@ def test_cticks_matplotlib_default_compatibility(hvplot_xarray, da2):
     strict=True,
     reason='BUG: cticks is dropped on matplotlib with compatibility="bokeh" (the style key'
     ' is chosen from _backend instead of _backend_compat, converter.py)',
+    raises=AssertionError,
 )
-@pytest.mark.parametrize('backend', ['matplotlib'], indirect=True)
-def test_cticks_matplotlib_bokeh_compatibility(hvplot_xarray, da2, backend):
+def test_cticks_matplotlib_bokeh_compatibility(hvplot_xarray, da2):
+    hvplot.extension('matplotlib', compatibility='bokeh')
     plot = da2.isel(other=0).hvplot(cticks=[5, 10])
     handles = hv.renderer('matplotlib').get_plot(plot).handles
     assert list(handles['cbar'].get_ticks()) == [5, 10]
@@ -403,12 +405,9 @@ def test_autorange_default_unset(df):
     assert 'autorange' not in opts.kwargs
 
 
-plotly_unsupported = pytest.mark.xfail(reason='Not supported by the plotly backend')
-
-
 @pytest.mark.parametrize(
     'backend',
-    ['bokeh', 'matplotlib', pytest.param('plotly', marks=plotly_unsupported)],
+    ['bokeh', 'matplotlib', plotly_without('clabel')],
     indirect=True,
 )
 def test_clabel(hvplot_xarray, da2, backend):
@@ -537,7 +536,7 @@ def test_rot_with_invert(df, backend):
 
 @pytest.mark.parametrize(
     'backend',
-    ['bokeh', 'matplotlib', pytest.param('plotly', marks=plotly_unsupported)],
+    ['bokeh', 'matplotlib', plotly_without('xformatter')],
     indirect=True,
 )
 def test_xformatter(df, backend):
@@ -548,7 +547,7 @@ def test_xformatter(df, backend):
 
 @pytest.mark.parametrize(
     'backend',
-    ['bokeh', 'matplotlib', pytest.param('plotly', marks=plotly_unsupported)],
+    ['bokeh', 'matplotlib', plotly_without('yformatter')],
     indirect=True,
 )
 def test_yformatter(df, backend):

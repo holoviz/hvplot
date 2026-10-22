@@ -215,9 +215,36 @@ Option tests are named `test_<option>` or `test_<option>_<detail>`, e.g. `test_x
 The fixtures shared by all the tests are defined in `hvplot/tests/conftest.py`:
 
 - `hvplot_pandas` and `hvplot_xarray` add the `.hvplot` accessor. Don't `import hvplot.pandas` at the top of a test module, this is reported as an error, the accessors are removed after each test so that tests don't depend on each other.
-- `backend` runs a test with each plotting backend (Bokeh, Matplotlib and Plotly). Restrict it with `@pytest.mark.parametrize('backend', ['bokeh', 'matplotlib'], indirect=True)`.
+- `backend` runs a test with each plotting backend (Bokeh, Matplotlib and Plotly), selected with `hvplot.extension(backend)` like most users do. Restrict it with `@pytest.mark.parametrize('backend', ['bokeh', 'matplotlib'], indirect=True)`. Request it after the accessor fixtures, as importing an accessor switches back to Bokeh (the fixture fails the test otherwise).
 - `tabular_lib` and `gridded_lib` run a test with each tabular (pandas, Dask, Polars, DuckDB, Ibis) or gridded (Xarray, Dask) data library, skipping those not installed.
 - `block_import` makes a module look not installed, to test the code paths without an optional dependency.
+
+A test of an option that depends on the plotting backend reads the options set by hvPlot with `Store.lookup_options(backend, plot, 'plot')` (or `'style'`). The plots returned by hvPlot are rendered with the current backend, so the test also fails if the plot can't be rendered. A backend that doesn't support the option is marked `xfail`, with `raises` set to the exception expected, and the reason starts with `BUG:` or with the name of the library at fault, e.g. `HoloViews:`. If the docs describe the limitation, the test is instead restricted to the backends supporting the option, with a comment pointing to the docs.
+
+```python
+@pytest.mark.parametrize(
+    'backend',
+    [
+        'bokeh',
+        'matplotlib',
+        pytest.param(
+            'plotly',
+            marks=pytest.mark.xfail(
+                reason='HoloViews: plotly has no legend_position option', raises=KeyError
+            ),
+        ),
+    ],
+    indirect=True,
+)
+def test_legend_position(hvplot_pandas, backend):  # `backend` after the accessor fixture
+    df = pd.DataFrame({'x': [1, 2], 'y': [3, 4], 'category': ['a', 'b']})
+    plot = df.hvplot.scatter('x', 'y', by='category', legend='left')
+    assert Store.lookup_options(backend, plot, 'plot').kwargs['legend_position'] == 'left'
+```
+
+When the option has a different name per backend (e.g. `size` and `s` for the size of the points), parametrize `('backend', 'option')` together with `indirect=['backend']`.
+
+To test the Bokeh option names translated for another backend, call `hvplot.extension(backend, compatibility='bokeh')` in the test, see `test_backend_transforms.py`.
 
 To test the code paths with an optional dependency, use the `requires` mark from `hvplot/tests/_deps.py`, e.g. `@requires('datashader')`, or `pytest.importorskip` inside a test or a fixture. Tests needing GeoViews are marked with `@pytest.mark.geo`. The `test-core` environment runs the test suite without most optional dependencies.
 

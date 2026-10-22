@@ -2,11 +2,11 @@ import pandas as pd
 import pytest
 from holoviews import Store
 
+from hvplot.tests._backends import plotly_without
+
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
 
 pandas_and_dask = pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
-
-no_legend_position = pytest.mark.xfail(reason='legend_position not supported w/ plotly')
 
 
 @pytest.fixture
@@ -25,7 +25,7 @@ def xy_df():
 @pandas_and_dask
 @pytest.mark.parametrize(
     'backend',
-    ['bokeh', 'matplotlib', pytest.param('plotly', marks=no_legend_position)],
+    ['bokeh', 'matplotlib', plotly_without('legend_position')],
     indirect=True,
 )
 def test_legend_scatter_c(tabular_lib, df, backend):
@@ -37,7 +37,7 @@ def test_legend_scatter_c(tabular_lib, df, backend):
 @pandas_and_dask
 @pytest.mark.parametrize(
     'backend',
-    ['bokeh', 'matplotlib', pytest.param('plotly', marks=no_legend_position)],
+    ['bokeh', 'matplotlib', plotly_without('legend_position')],
     indirect=True,
 )
 def test_legend_hist_by(tabular_lib, df, backend):
@@ -63,6 +63,7 @@ def test_legend_by_index(tabular_lib, xy_df, kind):
     assert opts.kwargs['legend_position'] == 'left'
 
 
+# The docs show it for bokeh and matplotlib only (doc/ref/plotting_options/legend.ipynb).
 @pytest.mark.parametrize('backend', ['bokeh', 'matplotlib'], indirect=True)
 def test_legend_cols(df, backend):
     plot = df.hvplot.scatter('x', 'y', by='category', legend_cols=2)
@@ -70,6 +71,7 @@ def test_legend_cols(df, backend):
     assert opts.kwargs['legend_cols'] == 2
 
 
+# The docs show it for bokeh and matplotlib only (doc/ref/plotting_options/legend.ipynb).
 @pytest.mark.parametrize(
     ('backend', 'legend_opts'),
     [('bokeh', {'spacing': 20}), ('matplotlib', {'labelspacing': 2})],
@@ -87,7 +89,7 @@ def test_legend_opts(df, backend, legend_opts):
 )
 @pytest.mark.parametrize(
     'backend',
-    ['bokeh', 'matplotlib', pytest.param('plotly', marks=no_legend_position)],
+    ['bokeh', 'matplotlib', plotly_without('legend_position')],
     indirect=True,
 )
 def test_legend_position(df, backend, position):

@@ -4,6 +4,8 @@ from holoviews import NdLayout, NdOverlay, Store
 from holoviews.core.dimension import Dimension
 from holoviews.element import Labels
 
+from hvplot.tests._backends import matplotlib_labels_bug
+
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
 
 
@@ -96,39 +98,41 @@ def test_yoffset(df):
     assert Store.lookup_options('bokeh', plot, 'plot').kwargs['yoffset'] == 0.5
 
 
+# The default compatibility takes the options of the backend (e.g. `family` for matplotlib).
 @pytest.mark.parametrize(
-    'backend',
+    ('backend', 'font_opt'),
     [
-        'bokeh',
-        pytest.param('matplotlib', marks=pytest.mark.xfail(reason='text_font not translated')),
-        pytest.param('plotly', marks=pytest.mark.xfail(reason='text_font not translated')),
+        ('bokeh', 'text_font'),
+        pytest.param('matplotlib', 'family', marks=matplotlib_labels_bug),
+        ('plotly', 'family'),
     ],
-    indirect=True,
+    indirect=['backend'],
 )
-def test_text_font(df, backend):
-    plot = df.hvplot.labels('x', 'y', text='name', text_font='times')
-    opts = Store.lookup_options(backend, plot, 'style').kwargs
-    assert opts['family' if backend == 'matplotlib' else 'text_font'] == 'times'
+def test_text_font(df, backend, font_opt):
+    plot = df.hvplot.labels('x', 'y', text='name', **{font_opt: 'times'})
+    assert Store.lookup_options(backend, plot, 'style').kwargs[font_opt] == 'times'
 
 
 @pytest.mark.parametrize(
-    'backend',
+    ('backend', 'size_opt', 'size'),
     [
-        'bokeh',
+        ('bokeh', 'text_font_size', '20pt'),
+        pytest.param('matplotlib', 'size', 20, marks=matplotlib_labels_bug),
         pytest.param(
-            'matplotlib',
-            marks=pytest.mark.render_xfail(
-                reason='BUG: text_font_size is not translated to matplotlib, which rejects 20pt'
+            'plotly',
+            'size',
+            20,
+            marks=pytest.mark.xfail(
+                reason='BUG: size is read as a marker size and square-rooted, not as a font size',
+                raises=AssertionError,
             ),
         ),
-        pytest.param('plotly', marks=pytest.mark.xfail(reason='text_font_size not translated')),
     ],
-    indirect=True,
+    indirect=['backend'],
 )
-def test_text_font_size(df, backend):
-    plot = df.hvplot.labels('x', 'y', text='name', text_font_size='20pt')
-    opts = Store.lookup_options(backend, plot, 'style').kwargs
-    assert opts['size' if backend == 'matplotlib' else 'text_font_size'] == '20pt'
+def test_text_font_size(df, backend, size_opt, size):
+    plot = df.hvplot.labels('x', 'y', text='name', **{size_opt: size})
+    assert Store.lookup_options(backend, plot, 'style').kwargs[size_opt] == size
 
 
 def test_by(edge_df):

@@ -464,9 +464,13 @@ def test_geo_xlim_reprojected_with_tiles(hvplot_pandas, lat_lon_df):
     np.testing.assert_allclose(xlim, (-14471533.8, -7792364.4))
 
 
+# GeoViews has no plotly backend.
+geoviews_backends = pytest.mark.parametrize('backend', ['bokeh', 'matplotlib'], indirect=True)
+
+
 @pytest.mark.geo
 @skip_windows
-@pytest.mark.parametrize('backend', ['bokeh', 'matplotlib'], indirect=True)
+@geoviews_backends
 def test_projection_backends(hvplot_pandas, backend, simple_df):
     plot = simple_df.hvplot.points('x', 'y', projection='Robinson')
     proj = hv.Store.lookup_options(backend, plot, 'plot').kwargs['projection']
@@ -474,21 +478,21 @@ def test_projection_backends(hvplot_pandas, backend, simple_df):
 
 
 @pytest.mark.geo
-@pytest.mark.parametrize('backend', ['bokeh', 'matplotlib'], indirect=True)
+@geoviews_backends
 def test_global_extent_backends(hvplot_pandas, backend, simple_df):
     plot = simple_df.hvplot.points('x', 'y', global_extent=True)
     assert hv.Store.lookup_options(backend, plot, 'plot').kwargs['global_extent'] is True
 
 
 @pytest.mark.geo
-@pytest.mark.parametrize('backend', ['bokeh', 'matplotlib'], indirect=True)
+@geoviews_backends
 def test_coastline_scale_backends(hvplot_pandas, backend, simple_df):
     plot = simple_df.hvplot.points('x', 'y', coastline='50m')
     assert hv.Store.lookup_options(backend, plot.get(1), 'plot').kwargs['scale'] == '50m'
 
 
 @pytest.mark.geo
-@pytest.mark.parametrize('backend', ['bokeh', 'matplotlib'], indirect=True)
+@geoviews_backends
 def test_tiles_backends(hvplot_pandas, backend, simple_df):
     import geoviews as gv
 

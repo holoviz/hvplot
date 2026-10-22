@@ -14,6 +14,7 @@ def df():
     )
 
 
+# The docs show it for bokeh and matplotlib only (doc/ref/plotting_options/styling.ipynb).
 @pytest.mark.parametrize(
     ('backend', 'backend_opts'),
     [
@@ -54,7 +55,9 @@ def test_fontscale(df, backend):
         'matplotlib',
         pytest.param(
             'plotly',
-            marks=pytest.mark.render_xfail(reason='HoloViews: plotly fails on a numeric fontsize'),
+            marks=pytest.mark.render_xfail(
+                reason='HoloViews: plotly fails on a numeric fontsize', raises=TypeError
+            ),
         ),
     ],
     indirect=True,
@@ -65,22 +68,17 @@ def test_fontsize_number(df, backend):
     assert opts.kwargs['fontsize'] == 12
 
 
+# Matplotlib only accepts numeric fontsizes, see doc/ref/plotting_options/styling.ipynb.
 @pytest.mark.parametrize(
-    'backend',
+    ('backend', 'fontsize'),
     [
-        'bokeh',
-        pytest.param(
-            'matplotlib',
-            marks=pytest.mark.render_xfail(
-                reason='BUG: the documented fontsize dict with 15pt or 5px fails on matplotlib'
-            ),
-        ),
-        'plotly',
+        ('bokeh', {'title': '15pt', 'ylabel': '5px', 'ticks': 20}),
+        ('matplotlib', {'title': 15, 'ylabel': 5, 'ticks': 20}),
+        ('plotly', {'title': '15pt', 'ylabel': '5px', 'ticks': 20}),
     ],
-    indirect=True,
+    indirect=['backend'],
 )
-def test_fontsize_dict(df, backend):
-    fontsize = {'title': '15pt', 'ylabel': '5px', 'ticks': 20}
+def test_fontsize_dict(df, backend, fontsize):
     plot = df.hvplot.scatter('x', 'y', fontsize=fontsize)
     opts = Store.lookup_options(backend, plot, 'plot')
     assert opts.kwargs['fontsize'] == fontsize

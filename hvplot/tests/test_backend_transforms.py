@@ -1,7 +1,9 @@
+import pandas as pd
 import pytest
 from holoviews.core import Store
 from holoviews.element import Area, Curve
 
+import hvplot
 from hvplot.backend_transforms import (
     _is_interactive_opt,
     _transfer_opts,
@@ -59,6 +61,38 @@ def test_transfer_opts_compositeoverlay(opt, val, backend, opt_kind, transf_opt,
     new_opts = transformed_element.opts.get(opt_kind).kwargs
     assert transf_opt in new_opts
     assert new_opts[transf_opt] == transf_val
+
+
+@pytest.mark.usefixtures('hvplot_pandas')
+@pytest.mark.parametrize(
+    ('backend_name', 'kind', 'kwargs', 'style_opt', 'expected'),
+    [
+        ('matplotlib', 'line', {'line_width': 3}, 'linewidth', 3),
+        ('matplotlib', 'line', {'line_dash': 'dashed'}, 'linestyle', 'dashed'),
+        ('matplotlib', 'area', {'fill_color': 'red'}, 'facecolor', 'red'),
+        ('matplotlib', 'area', {'line_color': 'red'}, 'edgecolor', 'red'),
+        ('matplotlib', 'scatter', {'alpha': 0.5}, 'alpha', 0.5),
+        ('plotly', 'line', {'line_width': 3}, 'line_width', 3),
+        ('plotly', 'line', {'line_dash': 'dashed'}, 'dash', 'dash'),
+        pytest.param(
+            'plotly',
+            'scatter',
+            {'alpha': 0.5},
+            'alpha',
+            0.5,
+            marks=pytest.mark.xfail(
+                reason='BUG: alpha is renamed to opacity, which plotly ignores, so it is dropped',
+                raises=KeyError,
+            ),
+        ),
+    ],
+)
+def test_bokeh_options_translated(backend_name, kind, kwargs, style_opt, expected):
+    hvplot.extension(backend_name, compatibility='bokeh')
+    df = pd.DataFrame({'x': [1, 3, 5], 'y': [2, 4, 6]})
+    plot = getattr(df.hvplot, kind)('x', 'y', **kwargs)
+    style = Store.lookup_options(backend_name, plot, 'style').kwargs
+    assert style[style_opt] == expected
 
 
 @pytest.mark.parametrize(

@@ -3,7 +3,10 @@ import numpy as np
 import pandas as pd
 import pytest
 from holoviews import Store
+from holoviews.core.options import AbbreviatedException
 from holoviews.element import Scatter
+
+from hvplot.tests._backends import size_opt
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
 
@@ -14,11 +17,16 @@ alpha_backends = pytest.mark.parametrize(
         pytest.param(
             'matplotlib',
             marks=pytest.mark.xfail(
-                reason='BUG: a dim mapped to alpha is not supported by matplotlib, fails on render'
+                reason='HoloViews: matplotlib cannot map a dim to alpha',
+                raises=AbbreviatedException,
             ),
         ),
         pytest.param(
-            'plotly', marks=pytest.mark.xfail(reason='cannot map a dim to alpha with plotly')
+            'plotly',
+            marks=pytest.mark.xfail(
+                reason='HoloViews: plotly cannot map a dim to alpha',
+                raises=ValueError,
+            ),
         ),
     ],
     indirect=True,
@@ -31,10 +39,6 @@ def df():
         [[1, 2, 'A', 0.1], [3, 4, 'B', 0.2], [5, 6, 'C', 0.3]],
         columns=['x', 'y', 'category', 'number'],
     )
-
-
-def size_opt(backend):
-    return 's' if backend == 'matplotlib' else 'size'
 
 
 def test_x(df):
@@ -133,7 +137,8 @@ def test_marker(df, backend):
         pytest.param(
             'matplotlib',
             marks=pytest.mark.render_xfail(
-                reason='BUG: marker mapped to a column unsupported by matplotlib, not documented'
+                reason='HoloViews: matplotlib cannot map a dim to marker',
+                raises=AbbreviatedException,
             ),
         ),
         'plotly',
@@ -156,18 +161,7 @@ def test_alpha_dim(df, backend):
     hv.render(plot, backend=backend)
 
 
-# Unlike without `by`, the alpha mapping renders with matplotlib.
-@pytest.mark.parametrize(
-    'backend',
-    [
-        'bokeh',
-        'matplotlib',
-        pytest.param(
-            'plotly', marks=pytest.mark.xfail(reason='cannot map a dim to alpha with plotly')
-        ),
-    ],
-    indirect=True,
-)
+# Unlike without `by`, the alpha mapping renders with matplotlib and plotly.
 def test_alpha_dim_overlay(df, backend):
     plot = df.hvplot.scatter('x', 'y', alpha='number', by='category')
     opts = Store.lookup_options(backend, plot.last, 'style')
