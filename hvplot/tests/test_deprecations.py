@@ -58,8 +58,10 @@ def test_sample_data_deprecation():
     sys.modules.pop('hvplot.sample_data', None)
 
 
-def test_intake_deprecation():
+def test_intake_deprecation(monkeypatch):
     pytest.importorskip('intake')
+    # The warning is only emitted on first import, other tests may have imported it.
+    monkeypatch.delitem(sys.modules, 'hvplot.intake', raising=False)
     with pytest.warns(FutureWarning):
         importlib.import_module('hvplot.intake')
 
