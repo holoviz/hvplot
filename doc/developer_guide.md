@@ -176,7 +176,7 @@ The tests run in parallel and in a random order. Slow tests are skipped unless y
 :::{admonition} Advanced usage
 :class: tip
 
-The task is available in the following environments: `test-310`, `test-311`, `test-312`, `test-313`, and `test-core`. Where the first ones have the same environments except for different Python versions, and `test-core` only has a core set of dependencies.
+The task is available in the following environments: `test-310`, `test-311`, `test-312`, `test-313`, `test-314`, and `test-core`. Where the first ones have the same environments except for different Python versions, and `test-core` only has a core set of dependencies.
 
 You can run the task in a specific environment with the `-e` flag. For example, to run the `test-unit` task in the `test-313` environment, you can run:
 
@@ -196,6 +196,35 @@ pixi run -e test-core install
 ```
 
 :::
+
+#### Writing unit tests
+
+Tests are written with plain pytest: test functions, fixtures and `pytest.mark.parametrize`, no `unittest.TestCase`. Where a test goes depends on what it is about:
+
+| I'm working on... | Add the test to |
+|---|---|
+| a plot option (e.g. `xlabel`) | `hvplot/tests/options/test_<group>.py`, where the group is the option's section in the docstring and the docs (e.g. `axis`). |
+| a kind or a kind-specific option (e.g. `bins` for `hist`) | `hvplot/tests/kinds/test_<kind>.py` |
+| a behavior specific to one data library (e.g. polars LazyFrame) | `hvplot/tests/data_libraries/test_<lib>.py` |
+| anything else | the module mirroring the source file, e.g. `hvplot/tests/test_util.py` for `hvplot/util.py` and `hvplot/tests/plotting/test_core.py` for `hvplot/plotting/core.py` |
+
+Option tests are named `test_<option>` or `test_<option>_<detail>`, e.g. `test_xlabel_from_attrs`. Meta tests (`test_options_inventory.py` and `test_kinds_inventory.py`) check that every option and every kind has a test named this way, and their failure message tells you which test to add where.
+
+The fixtures shared by all the tests are defined in `hvplot/tests/conftest.py`:
+
+- `hvplot_pandas` and `hvplot_xarray` add the `.hvplot` accessor. Don't `import hvplot.pandas` at the top of a test module, this is reported as an error, the accessors are removed after each test so that tests don't depend on each other.
+- `backend` runs a test with each plotting backend (Bokeh, Matplotlib and Plotly). Restrict it with `@pytest.mark.parametrize('backend', ['bokeh', 'matplotlib'], indirect=True)`.
+- `tabular_lib` and `gridded_lib` run a test with each tabular (pandas, Dask, Polars, DuckDB, Ibis) or gridded (Xarray, Dask) data library, skipping those not installed.
+- `block_import` makes a module look not installed, to test the code paths without an optional dependency.
+
+To test the code paths with an optional dependency, use the `requires` mark from `hvplot/tests/_deps.py`, e.g. `@requires('datashader')`, or `pytest.importorskip` inside a test or a fixture. Tests needing GeoViews are marked with `@pytest.mark.geo`. The `test-core` environment runs the test suite without most optional dependencies.
+
+Other rules:
+
+- The global state changed by a test, e.g. HoloViews options or the current plotting backend, is restored after it. Tests must still not depend on each other, they run in a random order and in parallel.
+- Tests can't access the internet. Use the small datasets of `hvplot/tests/_data.py` or build the data in the test.
+- Mark tests taking more than about a second with `@pytest.mark.slow`.
+- A test exposing a bug in hvPlot that isn't fixed yet is marked with `@pytest.mark.xfail(reason='BUG: <description>')`. xfail marks are strict, so the test fails once the bug is fixed, reminding to remove the mark.
 
 ### Example tests
 
