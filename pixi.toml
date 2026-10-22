@@ -80,6 +80,8 @@ python = "3.10.*"
 
 [feature.py311.dependencies]
 python = "3.11.*"
+# GeoViews 1.15, the last for Python 3.11, fails to render with cartopy 0.26.
+cartopy = "<0.26"
 
 [feature.py312.dependencies]
 python = "3.12.*"
