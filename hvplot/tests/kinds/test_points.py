@@ -8,6 +8,23 @@ from holoviews.testing import assert_element_equal
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
 
+alpha_backends = pytest.mark.parametrize(
+    'backend',
+    [
+        'bokeh',
+        pytest.param(
+            'matplotlib',
+            marks=pytest.mark.xfail(
+                reason='BUG: a dim mapped to alpha is not supported by matplotlib, fails on render'
+            ),
+        ),
+        pytest.param(
+            'plotly', marks=pytest.mark.xfail(reason='cannot map a dim to alpha with plotly')
+        ),
+    ],
+    indirect=True,
+)
+
 
 @pytest.fixture
 def df():
@@ -25,9 +42,11 @@ def test_x(df):
     assert_element_equal(plot, Points(df, ['number', 'y'], []))
 
 
-def test_x_default(df):
-    plot = df.drop(columns='cat').hvplot.points()
-    assert_element_equal(plot, Points(df, ['x', 'y'], []))
+@pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
+def test_x_default(df, tabular_lib):
+    data = df.drop(columns='cat')
+    plot = tabular_lib(data).hvplot.points()
+    assert_element_equal(plot, Points(data, ['x', 'y'], []))
 
 
 @pytest.mark.xfail(
@@ -38,17 +57,15 @@ def test_x_default_first_numeric(df):
     assert plot.kdims == ['x', 'y']
 
 
-def test_x_index(df):
-    plot = df.hvplot.points(x='index', y='y', c='x')
+@pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
+def test_x_index(df, tabular_lib):
+    plot = tabular_lib(df).hvplot.points(x='index', y='y', c='x')
     assert_element_equal(plot, Points(df.reset_index(), ['index', 'y'], ['x']))
 
 
 def test_y(df, tabular_lib):
-    plot = tabular_lib(df).hvplot.points(x='x', y='y')
-    assert isinstance(plot, Points)
-    assert plot.kdims == ['x', 'y']
-    assert plot.vdims == []
-    assert list(plot.dimension_values('y')) == [2, 4, 6]
+    plot = tabular_lib(df).hvplot.points(x='x', y='number')
+    assert_element_equal(plot, Points(df, ['x', 'number'], []))
 
 
 def test_c(df, backend):
@@ -77,6 +94,13 @@ def test_s_dim(df, backend):
     np.testing.assert_allclose(size.apply(plot), np.sqrt(df['number']))
 
 
+def test_s_dim_overlay(df, backend):
+    plot = df.hvplot.points('x', 'y', s='number', by='cat')
+    size = Store.lookup_options(backend, plot.last, 'style').kwargs[size_opt(backend)]
+    np.testing.assert_allclose(size.apply(plot.last), np.sqrt([0.3]))
+    assert 'number' in plot.last.vdims
+
+
 def test_scale(df, backend):
     plot = df.hvplot.points('x', 'y', s=16, scale=2)
     assert Store.lookup_options(backend, plot, 'style').kwargs[size_opt(backend)] == 8
@@ -87,7 +111,38 @@ def test_marker(df, backend):
     assert Store.lookup_options(backend, plot, 'style').kwargs['marker'] == '^'
 
 
+# Matplotlib and Plotly cannot render a marker mapped to a column.
+@pytest.mark.parametrize('backend', ['bokeh'], indirect=True)
 def test_marker_dim(df, backend):
     plot = df.hvplot.points('x', 'y', marker='cat')
     assert 'cat' in plot.vdims
     assert Store.lookup_options(backend, plot, 'style').kwargs['marker'] == 'cat'
+
+
+@alpha_backends
+def test_alpha_dim(df, backend):
+    plot = df.hvplot.points('x', 'y', alpha='number')
+    opts = Store.lookup_options(backend, plot, 'style')
+    assert opts.kwargs['alpha'] == 'number'
+    assert 'number' in plot.vdims
+    hv.render(plot, backend=backend)
+
+
+# Unlike without `by`, the alpha mapping renders with matplotlib.
+@pytest.mark.parametrize(
+    'backend',
+    [
+        'bokeh',
+        'matplotlib',
+        pytest.param(
+            'plotly', marks=pytest.mark.xfail(reason='cannot map a dim to alpha with plotly')
+        ),
+    ],
+    indirect=True,
+)
+def test_alpha_dim_overlay(df, backend):
+    plot = df.hvplot.points('x', 'y', alpha='number', by='cat')
+    opts = Store.lookup_options(backend, plot.last, 'style')
+    assert opts.kwargs['alpha'] == 'number'
+    assert 'number' in plot.last.vdims
+    hv.render(plot, backend=backend)

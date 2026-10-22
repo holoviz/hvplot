@@ -17,14 +17,14 @@ def ds():
 
 
 def test_x(ds, hvplot_xarray):
-    plot = ds.hvplot.contour(x='y', y='x', z='v1')
+    plot = ds.hvplot.contour(x='y', z='v1')
     assert isinstance(plot, Contours)
     assert plot.kdims == ['y', 'x']
 
 
 def test_y(ds, hvplot_xarray):
-    plot = ds.hvplot.contour(x='x', y='y', z='v1')
-    assert plot.kdims == ['x', 'y']
+    plot = ds.hvplot.contour(y='x', z='v1')
+    assert plot.kdims == ['y', 'x']
 
 
 def test_z(ds, gridded_lib):

@@ -23,14 +23,14 @@ def ds():
 
 
 def test_x(ds):
-    plot = ds.hvplot.image(x='y', y='x', z='v1')
+    plot = ds.hvplot.image(x='y', z='v1')
     assert isinstance(plot, Image)
     assert plot.kdims == ['y', 'x']
 
 
 def test_y(ds):
-    plot = ds.hvplot.image(x='x', y='y', z='v1')
-    assert plot.kdims == ['x', 'y']
+    plot = ds.hvplot.image(y='x', z='v1')
+    assert plot.kdims == ['y', 'x']
 
 
 def test_z(ds, gridded_lib):

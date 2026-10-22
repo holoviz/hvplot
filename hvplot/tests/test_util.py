@@ -395,324 +395,369 @@ def test_geoviews_is_available():
     assert import_geoviews()
 
 
-class TestIsWithinLatlonBounds:
-    """Test is_within_latlon_bounds function."""
-
-    def test_valid_bounds_dataframe(self):
-        """Return True for valid lat/lon bounds in DataFrame."""
-        df = pd.DataFrame({'lon': [-180, 0, 180], 'lat': [-90, 0, 90]})
-        assert _is_within_latlon_bounds(df, 'lon', 'lat')
-
-    def test_valid_bounds_dict(self):
-        """Return True for valid lat/lon bounds in dict."""
-        data = {'lon': np.array([0, 90]), 'lat': np.array([45, 60])}
-        assert _is_within_latlon_bounds(data, 'lon', 'lat')
-
-    def test_lon_extended_range(self):
-        """Return True when lon within -180 to 360 range."""
-        df = pd.DataFrame({'lon': [0, 180, 360], 'lat': [0, 45, 90]})
-        assert _is_within_latlon_bounds(df, 'lon', 'lat')
-
-    def test_lon_boundary_values(self):
-        """Return True at exact boundary values."""
-        df = pd.DataFrame({'lon': [-180, 360], 'lat': [-90, 90]})
-        assert _is_within_latlon_bounds(df, 'lon', 'lat')
-
-    def test_lon_below_min_bound(self):
-        """Return False when lon min is below -180."""
-        df = pd.DataFrame({'lon': [-181, 0, 90], 'lat': [0, 45, 90]})
-        assert not _is_within_latlon_bounds(df, 'lon', 'lat')
-
-    def test_lon_above_max_bound(self):
-        """Return False when lon max exceeds 360."""
-        df = pd.DataFrame({'lon': [-180, 0, 361], 'lat': [0, 45, 90]})
-        assert not _is_within_latlon_bounds(df, 'lon', 'lat')
-
-    def test_lat_below_min_bound(self):
-        """Return False when lat min is below -90."""
-        df = pd.DataFrame({'lon': [-180, 0, 90], 'lat': [-91, 0, 45]})
-        assert not _is_within_latlon_bounds(df, 'lon', 'lat')
-
-    def test_lat_above_max_bound(self):
-        """Return False when lat max exceeds 90."""
-        df = pd.DataFrame({'lon': [-180, 0, 90], 'lat': [-45, 0, 91]})
-        assert not _is_within_latlon_bounds(df, 'lon', 'lat')
-
-    def test_missing_column(self):
-        """Return False and warn when column doesn't exist."""
-        df = pd.DataFrame({'x': [1, 2, 3], 'y': [4, 5, 6]})
-        with pytest.warns(
-            UserWarning, match="Could not determine longitude bounds from variable 'lon'"
-        ):
-            result = _is_within_latlon_bounds(df, 'lon', 'lat')
-        assert not result
-
-    def test_non_numeric_values(self):
-        """Return False and warn for non-numeric data."""
-        df = pd.DataFrame({'lon': ['a', 'b', 'c'], 'lat': [45, 60, 75]})
-        with pytest.warns(
-            UserWarning, match="Could not determine longitude bounds from variable 'lon'"
-        ):
-            result = _is_within_latlon_bounds(df, 'lon', 'lat')
-        assert not result
+def test_is_within_latlon_bounds_valid_bounds_dataframe():
+    """Return True for valid lat/lon bounds in DataFrame."""
+    df = pd.DataFrame({'lon': [-180, 0, 180], 'lat': [-90, 0, 90]})
+    assert _is_within_latlon_bounds(df, 'lon', 'lat')
 
 
-class TestBoundsInRange:
-    """Test _bounds_in_range helper function."""
-
-    def test_valid_bounds_in_range(self):
-        """Return True when both bounds are valid and in range."""
-        assert _bounds_in_range(-90, 90, -90, 90)
-        assert _bounds_in_range(-180, 360, -180, 360)
-        assert _bounds_in_range(0, 45, -180, 360)
-
-    def test_first_bound_out_of_range(self):
-        """Return False when first bound exceeds range."""
-        assert not _bounds_in_range(-181, 0, -180, 360)
-
-    def test_second_bound_out_of_range(self):
-        """Return False when second bound exceeds range."""
-        assert not _bounds_in_range(0, 361, -180, 360)
-
-    def test_both_bounds_out_of_range(self):
-        """Return False when both bounds exceed range."""
-        assert not _bounds_in_range(-200, 400, -180, 360)
-
-    def test_first_bound_nan(self):
-        """Return True when first bound is NaN."""
-        assert _bounds_in_range(np.nan, 0, -180, 360)
-
-    def test_second_bound_nan(self):
-        """Return True when second bound is NaN."""
-        assert _bounds_in_range(0, np.nan, -180, 360)
+def test_is_within_latlon_bounds_valid_bounds_dict():
+    """Return True for valid lat/lon bounds in dict."""
+    data = {'lon': np.array([0, 90]), 'lat': np.array([45, 60])}
+    assert _is_within_latlon_bounds(data, 'lon', 'lat')
 
 
-class TestConvertLatlonToMercator:
-    """Test convert_latlon_to_mercator function."""
-
-    def test_prime_meridian(self):
-        """Convert coordinates at prime meridian and equator."""
-        lon = np.array([0])
-        lat = np.array([0])
-        easting, northing = _convert_latlon_to_mercator(lon, lat)
-        np.testing.assert_almost_equal(easting[0], 0, decimal=5)
-        np.testing.assert_almost_equal(northing[0], 0, decimal=5)
-
-    def test_multiple_points(self):
-        """Convert multiple lat/lon points."""
-        lon = np.array([-180, 0, 180])
-        lat = np.array([-45, 0, 45])
-        easting, northing = _convert_latlon_to_mercator(lon, lat)
-        assert len(easting) == 3 and len(northing) == 3
-
-    def test_lon_normalization_180(self):
-        """Normalize 180 and -180 to same value."""
-        lon1 = np.array([180])
-        lon2 = np.array([-180])
-        e1, _ = _convert_latlon_to_mercator(lon1, np.array([0]))
-        e2, _ = _convert_latlon_to_mercator(lon2, np.array([0]))
-        np.testing.assert_almost_equal(e1[0], e2[0], decimal=5)
-
-    def test_lon_normalization_270(self):
-        """Normalize 270 to -90."""
-        lon1 = np.array([270])
-        lon2 = np.array([-90])
-        e1, _ = _convert_latlon_to_mercator(lon1, np.array([0]))
-        e2, _ = _convert_latlon_to_mercator(lon2, np.array([0]))
-        np.testing.assert_almost_equal(e1[0], e2[0], decimal=5)
-
-    def test_returns_tuple(self):
-        """Return tuple of easting and northing arrays."""
-        result = _convert_latlon_to_mercator(np.array([0, 45, 90]), np.array([0, 30, 60]))
-        assert isinstance(result, tuple) and len(result) == 2
+def test_is_within_latlon_bounds_lon_extended_range():
+    """Return True when lon within -180 to 360 range."""
+    df = pd.DataFrame({'lon': [0, 180, 360], 'lat': [0, 45, 90]})
+    assert _is_within_latlon_bounds(df, 'lon', 'lat')
 
 
-class TestConvertLimitToMercator:
-    """Test convert_limit_to_mercator function."""
+def test_is_within_latlon_bounds_lon_boundary_values():
+    """Return True at exact boundary values."""
+    df = pd.DataFrame({'lon': [-180, 360], 'lat': [-90, 90]})
+    assert _is_within_latlon_bounds(df, 'lon', 'lat')
 
-    def test_none_and_empty_limits(self):
-        """Return None for None or empty limits."""
-        assert _convert_limit_to_mercator(None, is_x_axis=True) is None
-        assert _convert_limit_to_mercator((), is_x_axis=True) is None
 
-    def test_valid_x_limits(self):
-        """Convert valid x-axis (longitude) limits."""
-        result = _convert_limit_to_mercator((-90, 90), is_x_axis=True)
-        assert result is not None and isinstance(result, tuple) and len(result) == 2
+def test_is_within_latlon_bounds_lon_below_min_bound():
+    """Return False when lon min is below -180."""
+    df = pd.DataFrame({'lon': [-181, 0, 90], 'lat': [0, 45, 90]})
+    assert not _is_within_latlon_bounds(df, 'lon', 'lat')
 
-    def test_valid_y_limits(self):
-        """Convert valid y-axis (latitude) limits."""
-        result = _convert_limit_to_mercator((-45, 45), is_x_axis=False)
-        assert result is not None and isinstance(result, tuple) and len(result) == 2
 
-    def test_out_of_range_x_limits(self):
-        """Return original limits when x bounds out of range."""
-        limits = (-200, 0)
+def test_is_within_latlon_bounds_lon_above_max_bound():
+    """Return False when lon max exceeds 360."""
+    df = pd.DataFrame({'lon': [-180, 0, 361], 'lat': [0, 45, 90]})
+    assert not _is_within_latlon_bounds(df, 'lon', 'lat')
+
+
+def test_is_within_latlon_bounds_lat_below_min_bound():
+    """Return False when lat min is below -90."""
+    df = pd.DataFrame({'lon': [-180, 0, 90], 'lat': [-91, 0, 45]})
+    assert not _is_within_latlon_bounds(df, 'lon', 'lat')
+
+
+def test_is_within_latlon_bounds_lat_above_max_bound():
+    """Return False when lat max exceeds 90."""
+    df = pd.DataFrame({'lon': [-180, 0, 90], 'lat': [-45, 0, 91]})
+    assert not _is_within_latlon_bounds(df, 'lon', 'lat')
+
+
+def test_is_within_latlon_bounds_missing_column():
+    """Return False and warn when column doesn't exist."""
+    df = pd.DataFrame({'x': [1, 2, 3], 'y': [4, 5, 6]})
+    with pytest.warns(
+        UserWarning, match="Could not determine longitude bounds from variable 'lon'"
+    ):
+        result = _is_within_latlon_bounds(df, 'lon', 'lat')
+    assert not result
+
+
+def test_is_within_latlon_bounds_non_numeric_values():
+    """Return False and warn for non-numeric data."""
+    df = pd.DataFrame({'lon': ['a', 'b', 'c'], 'lat': [45, 60, 75]})
+    with pytest.warns(
+        UserWarning, match="Could not determine longitude bounds from variable 'lon'"
+    ):
+        result = _is_within_latlon_bounds(df, 'lon', 'lat')
+    assert not result
+
+
+def test_bounds_in_range_valid_bounds_in_range():
+    """Return True when both bounds are valid and in range."""
+    assert _bounds_in_range(-90, 90, -90, 90)
+    assert _bounds_in_range(-180, 360, -180, 360)
+    assert _bounds_in_range(0, 45, -180, 360)
+
+
+def test_bounds_in_range_first_bound_out_of_range():
+    """Return False when first bound exceeds range."""
+    assert not _bounds_in_range(-181, 0, -180, 360)
+
+
+def test_bounds_in_range_second_bound_out_of_range():
+    """Return False when second bound exceeds range."""
+    assert not _bounds_in_range(0, 361, -180, 360)
+
+
+def test_bounds_in_range_both_bounds_out_of_range():
+    """Return False when both bounds exceed range."""
+    assert not _bounds_in_range(-200, 400, -180, 360)
+
+
+def test_bounds_in_range_first_bound_nan():
+    """Return True when first bound is NaN."""
+    assert _bounds_in_range(np.nan, 0, -180, 360)
+
+
+def test_bounds_in_range_second_bound_nan():
+    """Return True when second bound is NaN."""
+    assert _bounds_in_range(0, np.nan, -180, 360)
+
+
+def test_convert_latlon_to_mercator_prime_meridian():
+    """Convert coordinates at prime meridian and equator."""
+    lon = np.array([0])
+    lat = np.array([0])
+    easting, northing = _convert_latlon_to_mercator(lon, lat)
+    np.testing.assert_almost_equal(easting[0], 0, decimal=5)
+    np.testing.assert_almost_equal(northing[0], 0, decimal=5)
+
+
+def test_convert_latlon_to_mercator_multiple_points():
+    """Convert multiple lat/lon points."""
+    lon = np.array([-180, 0, 180])
+    lat = np.array([-45, 0, 45])
+    easting, northing = _convert_latlon_to_mercator(lon, lat)
+    assert len(easting) == 3 and len(northing) == 3
+
+
+def test_convert_latlon_to_mercator_lon_normalization_180():
+    """Normalize 180 and -180 to same value."""
+    lon1 = np.array([180])
+    lon2 = np.array([-180])
+    e1, _ = _convert_latlon_to_mercator(lon1, np.array([0]))
+    e2, _ = _convert_latlon_to_mercator(lon2, np.array([0]))
+    np.testing.assert_almost_equal(e1[0], e2[0], decimal=5)
+
+
+def test_convert_latlon_to_mercator_lon_normalization_270():
+    """Normalize 270 to -90."""
+    lon1 = np.array([270])
+    lon2 = np.array([-90])
+    e1, _ = _convert_latlon_to_mercator(lon1, np.array([0]))
+    e2, _ = _convert_latlon_to_mercator(lon2, np.array([0]))
+    np.testing.assert_almost_equal(e1[0], e2[0], decimal=5)
+
+
+def test_convert_latlon_to_mercator_returns_tuple():
+    """Return tuple of easting and northing arrays."""
+    result = _convert_latlon_to_mercator(np.array([0, 45, 90]), np.array([0, 30, 60]))
+    assert isinstance(result, tuple) and len(result) == 2
+
+
+def test_convert_limit_to_mercator_none_and_empty_limits():
+    """Return None for None or empty limits."""
+    assert _convert_limit_to_mercator(None, is_x_axis=True) is None
+    assert _convert_limit_to_mercator((), is_x_axis=True) is None
+
+
+def test_convert_limit_to_mercator_valid_x_limits():
+    """Convert valid x-axis (longitude) limits."""
+    result = _convert_limit_to_mercator((-90, 90), is_x_axis=True)
+    assert result is not None and isinstance(result, tuple) and len(result) == 2
+
+
+def test_convert_limit_to_mercator_valid_y_limits():
+    """Convert valid y-axis (latitude) limits."""
+    result = _convert_limit_to_mercator((-45, 45), is_x_axis=False)
+    assert result is not None and isinstance(result, tuple) and len(result) == 2
+
+
+def test_convert_limit_to_mercator_out_of_range_x_limits():
+    """Return original limits when x bounds out of range."""
+    limits = (-200, 0)
+    result = _convert_limit_to_mercator(limits, is_x_axis=True)
+    assert result == limits
+
+
+def test_convert_limit_to_mercator_out_of_range_y_limits():
+    """Return original limits when y bounds out of range."""
+    limits = (0, 100)
+    result = _convert_limit_to_mercator(limits, is_x_axis=False)
+    assert result == limits
+
+
+def test_convert_limit_to_mercator_x_limits_with_none():
+    """Return np.nan limit when x bound is None."""
+    limits = (0, None)
+    result = _convert_limit_to_mercator(limits, is_x_axis=True)
+    assert result[0] == limits[0]
+    assert np.isnan(result[1])
+
+
+def test_convert_limit_to_mercator_y_limits_with_none():
+    """Return np.nan limit when y bound is None."""
+    limits = (None, 0)
+    result = _convert_limit_to_mercator(limits, is_x_axis=False)
+    np.testing.assert_almost_equal(result[1], limits[1])
+    assert np.isnan(result[0])
+
+
+def test_convert_limit_to_mercator_x_limits_with_nan():
+    """Return original limits when x bound is NaN."""
+    limits = (0, np.nan)
+    result = _convert_limit_to_mercator(limits, is_x_axis=True)
+    assert result[0] == limits[0]
+    assert np.isnan(result[1])
+
+
+def test_convert_limit_to_mercator_y_limits_with_nan():
+    """Return original limits when y bound is NaN."""
+    limits = (np.nan, 0)
+    result = _convert_limit_to_mercator(limits, is_x_axis=False)
+    np.testing.assert_almost_equal(result[1], limits[1])
+    assert np.isnan(result[0])
+
+
+def test_convert_limit_to_mercator_unpacking_error_too_many_values():
+    """Return original and warn when unpacking too many values."""
+    limits = (1, 2, 3)
+    with pytest.warns(UserWarning, match='Could not convert limits'):
         result = _convert_limit_to_mercator(limits, is_x_axis=True)
-        assert result == limits
+    assert result == limits
 
-    def test_out_of_range_y_limits(self):
-        """Return original limits when y bounds out of range."""
-        limits = (0, 100)
+
+def test_convert_limit_to_mercator_unpacking_error_single_value():
+    """Return original and warn when unpacking single value."""
+    limits = (45,)
+    with pytest.warns(UserWarning, match='Could not convert limits'):
         result = _convert_limit_to_mercator(limits, is_x_axis=False)
-        assert result == limits
-
-    def test_x_limits_with_none(self):
-        """Return np.nan limit when x bound is None."""
-        limits = (0, None)
-        result = _convert_limit_to_mercator(limits, is_x_axis=True)
-        assert result[0] == limits[0]
-        assert np.isnan(result[1])
-
-    def test_y_limits_with_none(self):
-        """Return np.nan limit when y bound is None."""
-        limits = (None, 0)
-        result = _convert_limit_to_mercator(limits, is_x_axis=False)
-        np.testing.assert_almost_equal(result[1], limits[1])
-        assert np.isnan(result[0])
-
-    def test_x_limits_with_nan(self):
-        """Return original limits when x bound is NaN."""
-        limits = (0, np.nan)
-        result = _convert_limit_to_mercator(limits, is_x_axis=True)
-        assert result[0] == limits[0]
-        assert np.isnan(result[1])
-
-    def test_y_limits_with_nan(self):
-        """Return original limits when y bound is NaN."""
-        limits = (np.nan, 0)
-        result = _convert_limit_to_mercator(limits, is_x_axis=False)
-        np.testing.assert_almost_equal(result[1], limits[1])
-        assert np.isnan(result[0])
-
-    def test_unpacking_error_too_many_values(self):
-        """Return original and warn when unpacking too many values."""
-        limits = (1, 2, 3)
-        with pytest.warns(UserWarning, match='Could not convert limits'):
-            result = _convert_limit_to_mercator(limits, is_x_axis=True)
-        assert result == limits
-
-    def test_unpacking_error_single_value(self):
-        """Return original and warn when unpacking single value."""
-        limits = (45,)
-        with pytest.warns(UserWarning, match='Could not convert limits'):
-            result = _convert_limit_to_mercator(limits, is_x_axis=False)
-        assert result == limits
-
-    def test_mercator_y_conversion_changes_values(self):
-        """Ensure Mercator conversion changes y-axis limit values."""
-        original = (-45, 45)
-        result = _convert_limit_to_mercator(original, is_x_axis=False)
-        assert result != original and result[0] != original[0]
-
-    def test_mercator_x_conversion_changes_values(self):
-        """Ensure Mercator conversion changes x-axis limit values."""
-        original = (-90, 90)
-        result = _convert_limit_to_mercator(original, is_x_axis=True)
-        assert result != original and result[0] != original[0]
-
-    @pytest.mark.parametrize('bounds', [(0, 90), (190, 250), (170, -170), (350, 10)])
-    def test_converted_x_limits_ordered(self, bounds):
-        """Ensure converted x-axis limits maintain order."""
-        result = _convert_limit_to_mercator(bounds, is_x_axis=True)
-        assert result[0] < result[1]
-
-    def test_converted_y_limits_ordered(self):
-        """Ensure converted y-axis limits maintain order."""
-        result = _convert_limit_to_mercator((-45, -10), is_x_axis=False)
-        assert result[0] < result[1]
+    assert result == limits
 
 
-@requires('cartopy', 'pyproj')
-@pytest.mark.skipif(sys.platform == 'win32', reason='Skip geo tests on windows for now')
-class TestProjToCartopy:
-    def test_proj_to_cartopy(self):
-        import cartopy.crs as ccrs
+def test_convert_limit_to_mercator_mercator_y_conversion_changes_values():
+    """Ensure Mercator conversion changes y-axis limit values."""
+    original = (-45, 45)
+    result = _convert_limit_to_mercator(original, is_x_axis=False)
+    assert result != original and result[0] != original[0]
 
-        crs = proj_to_cartopy('epsg:26911')
 
-        assert isinstance(crs, ccrs.CRS)
+def test_convert_limit_to_mercator_mercator_x_conversion_changes_values():
+    """Ensure Mercator conversion changes x-axis limit values."""
+    original = (-90, 90)
+    result = _convert_limit_to_mercator(original, is_x_axis=True)
+    assert result != original and result[0] != original[0]
 
-    def test_proj_to_cartopy_wkt_string(self):
-        import cartopy.crs as ccrs
 
-        crs = proj_to_cartopy(
-            'GEOGCRS["unnamed",BASEGEOGCRS["unknown",DATUM["unknown",ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1,ID["EPSG",9001]]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8901]]],DERIVINGCONVERSION["unknown",METHOD["PROJ ob_tran o_proj=latlon"],PARAMETER["o_lon_p",0,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],PARAMETER["o_lat_p",37.5,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],PARAMETER["lon_0",357.5,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]]],CS[ellipsoidal,2],AXIS["longitude",east,ORDER[1],ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],AXIS["latitude",north,ORDER[2],ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]]]'  # noqa: E501
-        )
+@pytest.mark.parametrize('bounds', [(0, 90), (190, 250), (170, -170), (350, 10)])
+def test_convert_limit_to_mercator_converted_x_limits_ordered(bounds):
+    """Ensure converted x-axis limits maintain order."""
+    result = _convert_limit_to_mercator(bounds, is_x_axis=True)
+    assert result[0] < result[1]
 
-        assert isinstance(crs, ccrs.RotatedPole)
-        assert crs.proj4_params['lon_0'] == 357.5
-        assert crs.proj4_params['o_lat_p'] == 37.5
 
-    def test_proj_to_cartopy_albers_equal_area_wkt(self):
-        """Test Albers Equal Area projection from WKT string"""
-        import cartopy.crs as ccrs
+def test_convert_limit_to_mercator_converted_y_limits_ordered():
+    """Ensure converted y-axis limits maintain order."""
+    result = _convert_limit_to_mercator((-45, -10), is_x_axis=False)
+    assert result[0] < result[1]
 
-        albers_wkt = 'PROJCS["Projection = Albers Conical Equal Area",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Albers_Conic_Equal_Area"],PARAMETER["latitude_of_center",23],PARAMETER["longitude_of_center",-96],PARAMETER["standard_parallel_1",29.5],PARAMETER["standard_parallel_2",45.5],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH]]'  # noqa: E501
 
-        crs = proj_to_cartopy(albers_wkt)
+requires_cartopy = requires('cartopy', 'pyproj')
+skip_windows = pytest.mark.skipif(
+    sys.platform == 'win32', reason='Skip geo tests on windows for now'
+)
 
-        assert isinstance(crs, ccrs.AlbersEqualArea)
-        assert crs.proj4_params['proj'] == 'aea'
-        assert crs.proj4_params['lat_0'] == 23.0
-        assert crs.proj4_params['lon_0'] == -96.0
-        assert crs.proj4_params['lat_1'] == 29.5
-        assert crs.proj4_params['lat_2'] == 45.5
 
-    def test_proj_to_cartopy_albers_equal_area_proj4(self):
-        """Test Albers Equal Area projection from PROJ4 string"""
-        import cartopy.crs as ccrs
+@requires_cartopy
+@skip_windows
+def test_proj_to_cartopy():
+    import cartopy.crs as ccrs
 
-        proj4_string = '+proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs'  # noqa: E501
+    crs = proj_to_cartopy('epsg:26911')
 
-        crs = proj_to_cartopy(proj4_string)
+    assert isinstance(crs, ccrs.CRS)
 
-        assert isinstance(crs, ccrs.AlbersEqualArea)
 
-    @pytest.mark.parametrize(
-        ('proj4_string', 'expected_class'),
-        [
-            ('+proj=eqdc +lat_0=40 +lon_0=-96 +lat_1=33 +lat_2=45', 'EquidistantConic'),
-            ('+proj=aeqd +lat_0=40 +lon_0=-96', 'AzimuthalEquidistant'),
-            ('+proj=gnom +lat_0=40 +lon_0=-96', 'Gnomonic'),
-            ('+proj=ortho +lat_0=40 +lon_0=-96', 'Orthographic'),
-            ('+proj=robin +lon_0=0', 'Robinson'),
-            ('+proj=moll +lon_0=0', 'Mollweide'),
-            ('+proj=sinu +lon_0=0', 'Sinusoidal'),
-            ('+proj=eck4 +lon_0=0', 'EckertIV'),
-            ('+proj=laea +lat_0=40 +lon_0=-96', 'LambertAzimuthalEqualArea'),
-            ('+proj=cea +lon_0=0', 'LambertCylindrical'),
-            ('+proj=mill +lon_0=0', 'Miller'),
-        ],
+@requires_cartopy
+@skip_windows
+def test_proj_to_cartopy_wkt_string():
+    import cartopy.crs as ccrs
+
+    crs = proj_to_cartopy(
+        'GEOGCRS["unnamed",BASEGEOGCRS["unknown",DATUM["unknown",ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1,ID["EPSG",9001]]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8901]]],DERIVINGCONVERSION["unknown",METHOD["PROJ ob_tran o_proj=latlon"],PARAMETER["o_lon_p",0,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],PARAMETER["o_lat_p",37.5,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],PARAMETER["lon_0",357.5,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]]],CS[ellipsoidal,2],AXIS["longitude",east,ORDER[1],ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],AXIS["latitude",north,ORDER[2],ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]]]'  # noqa: E501
     )
-    def test_proj_to_cartopy_additional_projections(self, proj4_string, expected_class):
-        """
-        Test that various PROJ.4 projection strings are correctly mapped to their
-        expected Cartopy CRS classes by `proj_to_cartopy`.
-        """
-        import cartopy.crs as ccrs
 
-        crs = proj_to_cartopy(proj4_string)
-        assert isinstance(crs, getattr(ccrs, expected_class))
+    assert isinstance(crs, ccrs.RotatedPole)
+    assert crs.proj4_params['lon_0'] == 357.5
+    assert crs.proj4_params['o_lat_p'] == 37.5
 
-    def test_proj_to_cartopy_geostationary_special_case(self):
-        """Test Geostationary projection which requires special parameters"""
-        import cartopy.crs as ccrs
 
-        # Geostationary typically requires satellite height
-        proj4_string = '+proj=geos +lon_0=0 +h=35786023 +x_0=0 +y_0=0'
+@requires_cartopy
+@skip_windows
+def test_proj_to_cartopy_albers_equal_area_wkt():
+    """Test Albers Equal Area projection from WKT string"""
+    import cartopy.crs as ccrs
 
-        crs = proj_to_cartopy(proj4_string)
-        assert isinstance(crs, ccrs.Geostationary)
+    albers_wkt = 'PROJCS["Projection = Albers Conical Equal Area",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Albers_Conic_Equal_Area"],PARAMETER["latitude_of_center",23],PARAMETER["longitude_of_center",-96],PARAMETER["standard_parallel_1",29.5],PARAMETER["standard_parallel_2",45.5],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH]]'  # noqa: E501
 
-    def test_proj_to_cartopy_nearsided_perspective(self):
-        """Test Near-sided Perspective projection"""
-        import cartopy.crs as ccrs
+    crs = proj_to_cartopy(albers_wkt)
 
-        proj4_string = '+proj=nsper +lat_0=40 +lon_0=-96 +h=10000000'
+    assert isinstance(crs, ccrs.AlbersEqualArea)
+    assert crs.proj4_params['proj'] == 'aea'
+    assert crs.proj4_params['lat_0'] == 23.0
+    assert crs.proj4_params['lon_0'] == -96.0
+    assert crs.proj4_params['lat_1'] == 29.5
+    assert crs.proj4_params['lat_2'] == 45.5
 
-        crs = proj_to_cartopy(proj4_string)
-        assert isinstance(crs, ccrs.NearsidePerspective)
+
+@requires_cartopy
+@skip_windows
+def test_proj_to_cartopy_albers_equal_area_proj4():
+    """Test Albers Equal Area projection from PROJ4 string"""
+    import cartopy.crs as ccrs
+
+    proj4_string = '+proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs'  # noqa: E501
+
+    crs = proj_to_cartopy(proj4_string)
+
+    assert isinstance(crs, ccrs.AlbersEqualArea)
+
+
+@requires_cartopy
+@skip_windows
+@pytest.mark.parametrize(
+    ('proj4_string', 'expected_class'),
+    [
+        ('+proj=eqdc +lat_0=40 +lon_0=-96 +lat_1=33 +lat_2=45', 'EquidistantConic'),
+        ('+proj=aeqd +lat_0=40 +lon_0=-96', 'AzimuthalEquidistant'),
+        ('+proj=gnom +lat_0=40 +lon_0=-96', 'Gnomonic'),
+        ('+proj=ortho +lat_0=40 +lon_0=-96', 'Orthographic'),
+        ('+proj=robin +lon_0=0', 'Robinson'),
+        ('+proj=moll +lon_0=0', 'Mollweide'),
+        ('+proj=sinu +lon_0=0', 'Sinusoidal'),
+        ('+proj=eck4 +lon_0=0', 'EckertIV'),
+        ('+proj=laea +lat_0=40 +lon_0=-96', 'LambertAzimuthalEqualArea'),
+        ('+proj=cea +lon_0=0', 'LambertCylindrical'),
+        ('+proj=mill +lon_0=0', 'Miller'),
+    ],
+)
+@requires_cartopy
+@skip_windows
+def test_proj_to_cartopy_additional_projections(proj4_string, expected_class):
+    """
+    Test that various PROJ.4 projection strings are correctly mapped to their
+    expected Cartopy CRS classes by `proj_to_cartopy`.
+    """
+    import cartopy.crs as ccrs
+
+    crs = proj_to_cartopy(proj4_string)
+    assert isinstance(crs, getattr(ccrs, expected_class))
+
+
+@requires_cartopy
+@skip_windows
+def test_proj_to_cartopy_geostationary_special_case():
+    """Test Geostationary projection which requires special parameters"""
+    import cartopy.crs as ccrs
+
+    # Geostationary typically requires satellite height
+    proj4_string = '+proj=geos +lon_0=0 +h=35786023 +x_0=0 +y_0=0'
+
+    crs = proj_to_cartopy(proj4_string)
+    assert isinstance(crs, ccrs.Geostationary)
+
+
+@requires_cartopy
+@skip_windows
+def test_proj_to_cartopy_nearsided_perspective():
+    """Test Near-sided Perspective projection"""
+    import cartopy.crs as ccrs
+
+    proj4_string = '+proj=nsper +lat_0=40 +lon_0=-96 +h=10000000'
+
+    crs = proj_to_cartopy(proj4_string)
+    assert isinstance(crs, ccrs.NearsidePerspective)
 
 
 def test_import_datashader_without_datashader(block_import):

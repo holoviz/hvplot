@@ -25,7 +25,8 @@ def test_lag_plot_dataframe_colored_by_column():
     plot = lag_plot(df)
     assert plot.vdims == ['y(t + 1)', 'variable']
     assert plot.array().tolist() == [[1, 2, 'a'], [2, 3, 'a'], [10, 20, 'b'], [20, 30, 'b']]
-    assert Store.lookup_options('bokeh', plot, 'style').kwargs['color'] == 'variable'
+    color = Store.lookup_options('bokeh', plot, 'style').kwargs['color']
+    assert repr(color) == repr(hv.dim('variable'))
 
 
 def test_lag_plot_kwds():

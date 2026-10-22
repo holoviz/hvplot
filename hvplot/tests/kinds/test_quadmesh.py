@@ -17,15 +17,15 @@ def ds():
 
 
 def test_x(ds, gridded_lib):
-    plot = gridded_lib(ds).hvplot.quadmesh(x='lon', y='lat')
+    plot = gridded_lib(ds).hvplot.quadmesh(x='lat')
     assert isinstance(plot, QuadMesh)
-    assert plot.kdims == ['lon', 'lat']
+    assert plot.kdims == ['lat', 'lon']
     assert plot.vdims == ['a']
     assert list(plot.dimension_values('lon', expanded=False)) == [0, 1, 2]
 
 
 def test_y(ds, hvplot_xarray):
-    plot = ds.hvplot.quadmesh(x='lat', y='lon')
+    plot = ds.hvplot.quadmesh(y='lon')
     assert plot.kdims == ['lat', 'lon']
     assert list(plot.dimension_values('lon', expanded=False)) == [0, 1, 2]
 

@@ -18,21 +18,21 @@ def test_x(df):
     assert_element_equal(plot, Path(df, ['z', 'y'], []))
 
 
-def test_x_default(df):
-    plot = df.hvplot.paths()
+@pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
+def test_x_default(df, tabular_lib):
+    plot = tabular_lib(df).hvplot.paths()
     assert_element_equal(plot, Path(df, ['x', 'y'], []))
 
 
-def test_x_index(df):
-    plot = df.hvplot.paths(x='index', y='y', c='x')
+@pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
+def test_x_index(df, tabular_lib):
+    plot = tabular_lib(df).hvplot.paths(x='index', y='y', c='x')
     assert_element_equal(plot, Path(df.reset_index(), ['index', 'y'], ['x']))
 
 
 def test_y(df, tabular_lib):
-    plot = tabular_lib(df).hvplot.paths(x='x', y='y')
-    assert isinstance(plot, Path)
-    assert plot.kdims == ['x', 'y']
-    assert list(plot.dimension_values('y')) == [2, 4, 6]
+    plot = tabular_lib(df).hvplot.paths(x='x', y='z')
+    assert_element_equal(plot, Path(df, ['x', 'z'], []))
 
 
 @pytest.mark.geo

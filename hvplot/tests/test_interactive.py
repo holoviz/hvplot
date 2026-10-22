@@ -109,7 +109,7 @@ def test_interactive_pandas_dataframe(df):
     assert type(dfi) is Interactive
     assert dfi._obj is df
     assert dfi._fn is None
-    assert dfi._transform == dim('*')
+    assert repr(dfi._transform) == repr(dim('*'))
     assert dfi._method is None
 
 
@@ -119,7 +119,7 @@ def test_interactive_pandas_series(series):
     assert type(si) is Interactive
     assert si._obj is series
     assert si._fn is None
-    assert si._transform == dim('*')
+    assert repr(si._transform) == repr(dim('*'))
     assert si._method is None
 
 
@@ -132,7 +132,7 @@ def test_interactive_xarray_dataarray(dataarray):
     assert type(dai) is XArrayInteractive
     assert (dai._obj == dataarray).all()
     assert dai._fn is None
-    assert dai._transform == dim('air')
+    assert repr(dai._transform) == repr(dim('air'))
     assert dai._method is None
 
 
@@ -151,7 +151,7 @@ def test_interactive_xarray_dataset(dataset):
     assert type(dsi) is XArrayInteractive
     assert dsi._obj is dataset
     assert dsi._fn is None
-    assert dsi._transform == dim('*')
+    assert repr(dsi._transform) == repr(dim('*'))
     assert dsi._method is None
 
 
@@ -165,7 +165,7 @@ def test_interactive_pandas_function(df):
     assert type(dfi) is Interactive
     pd.testing.assert_series_equal(dfi._obj, df.A)
     assert isinstance(dfi._fn, pn.param.ParamFunction)
-    assert dfi._transform == dim('*')
+    assert repr(dfi._transform) == repr(dim('*'))
     assert dfi._method is None
 
     select.value = 'B'
@@ -188,12 +188,13 @@ def test_interactive_xarray_function(dataset):
 
     assert type(dsi) is XArrayInteractive
     assert isinstance(dsi._fn, pn.param.ParamFunction)
-    assert dsi._transform == dim('air')
+    # Unlike for a DataArray given directly, the name of the array is not in the transform.
+    assert repr(dsi._transform) == repr(dim('*'))
     assert dsi._method is None
 
     select.value = 'air2'
     assert (dsi._obj == ds.air2).all()
-    assert dsi._transform == dim('air2')
+    assert repr(dsi._transform) == repr(dim('*'))
 
 
 def test_interactive_nested_widgets():
@@ -236,7 +237,7 @@ def test_interactive_slice():
 def test_interactive_pandas_dataframe_hvplot_accessor(df):
     dfi = df.interactive()
 
-    assert dfi.hvplot(kind='scatter')._transform == dfi.hvplot.scatter()._transform
+    assert repr(dfi.hvplot(kind='scatter')._transform) == repr(dfi.hvplot.scatter()._transform)
 
     with pytest.raises(TypeError):
         dfi.hvplot.scatter(kind='area')
@@ -245,7 +246,7 @@ def test_interactive_pandas_dataframe_hvplot_accessor(df):
 def test_interactive_xarray_dataset_hvplot_accessor(dataarray):
     dai = dataarray.interactive
 
-    assert dai.hvplot(kind='line')._transform == dai.hvplot.line()._transform
+    assert repr(dai.hvplot(kind='line')._transform) == repr(dai.hvplot.line()._transform)
 
     with pytest.raises(TypeError):
         dai.hvplot.line(kind='area')

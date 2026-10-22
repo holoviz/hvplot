@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import pytest
+from holoviews.element import Histogram
 from packaging.version import Version
 
 import hvplot
@@ -25,7 +26,8 @@ def test_ibis_hist():
         pytest.skip('Ibis <= 10.8.0 is incompatible with DuckDB >= 1.4')
 
     table = ibis.memtable(pd.DataFrame({'x': np.arange(10)}))
-    table.hvplot.hist('x')
+    plot = table.hvplot.hist('x')
+    assert isinstance(plot, Histogram)
 
 
 def test_unpatch_ibis():

@@ -1,3 +1,4 @@
+import holoviews as hv
 import pandas as pd
 import pytest
 from holoviews import Store
@@ -40,8 +41,15 @@ def test_fontsize(df, backend, fontsize):
     assert opts.kwargs['fontsize'] == fontsize
 
 
-@pytest.mark.parametrize('grid', [True, False])
-def test_grid(df, backend, grid):
-    plot = df.hvplot.scatter('x', 'y', grid=grid)
+def test_grid(df, backend):
+    plot = df.hvplot.scatter('x', 'y', grid=True)
     opts = Store.lookup_options(backend, plot, 'plot')
-    assert opts.kwargs['show_grid'] is grid
+    assert opts.kwargs['show_grid'] is True
+
+
+def test_grid_false_overrides_holoviews_defaults(df, backend):
+    # The grid is off by default, so the default has to be changed to see the option.
+    hv.opts.defaults(hv.opts.Scatter(show_grid=True))
+    plot = df.hvplot.scatter('x', 'y', grid=False)
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['show_grid'] is False

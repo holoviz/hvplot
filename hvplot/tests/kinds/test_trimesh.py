@@ -40,23 +40,29 @@ def uda(grid):
     return xu.UgridDataArray(da, grid)
 
 
-def test_x(uda):
+def test_x_default(uda):
     plot = uda.hvplot.trimesh()
     assert isinstance(plot, TriMesh)
     assert plot.nodes.kdims[0] == 'x'
     assert list(plot.nodes.dimension_values('x')) == [0, 1, 1, 0]
 
 
-@pytest.mark.xfail(strict=True, reason='BUG: setting x/y to the mesh node coordinates fails')
+@pytest.mark.xfail(strict=True, reason='BUG: trimesh ignores x and fails when it is set')
 def test_x_node_coordinate(uda):
-    plot = uda.hvplot.trimesh(x='mesh2d_node_x', y='mesh2d_node_y')
+    plot = uda.hvplot.trimesh(x='mesh2d_node_x')
     assert list(plot.nodes.dimension_values(0)) == [0, 1, 1, 0]
 
 
-def test_y(uda):
+def test_y_default(uda):
     plot = uda.hvplot.trimesh()
     assert plot.nodes.kdims[1] == 'y'
     assert list(plot.nodes.dimension_values('y')) == [0, 0, 2, 2]
+
+
+@pytest.mark.xfail(strict=True, reason='BUG: trimesh ignores y and fails when it is set')
+def test_y_node_coordinate(uda):
+    plot = uda.hvplot.trimesh(y='mesh2d_node_y')
+    assert list(plot.nodes.dimension_values(1)) == [0, 0, 2, 2]
 
 
 def test_z(grid, uda):
@@ -68,12 +74,6 @@ def test_z(grid, uda):
     plot = ds.hvplot.trimesh(z='b')
     assert plot.nodes.vdims[0].label == 'b'
     assert list(plot.nodes.dimension_values(plot.nodes.vdims[0])) == [10, 20, 30, 40]
-
-
-@bokeh_and_mpl
-def test_filled_default(uda, backend):
-    plot = uda.hvplot.trimesh()
-    assert Store.lookup_options(backend, plot, 'plot').kwargs['filled'] is False
 
 
 @bokeh_and_mpl

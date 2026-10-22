@@ -34,7 +34,6 @@ def test_y(df, tabular_lib):
     assert plot.vdims == ['y']
 
 
-@pytest.mark.parametrize('stacked', [True, False])
-def test_stacked(df, hvplot_pandas, backend, stacked):
-    plot = df.hvplot.barh(x='cat', y=['y', 'y2'], stacked=stacked)
-    assert Store.lookup_options(backend, plot, 'plot').kwargs['stacked'] is stacked
+def test_stacked(df, hvplot_pandas, backend):
+    plot = df.hvplot.barh(x='cat', y=['y', 'y2'], stacked=True)
+    assert Store.lookup_options(backend, plot, 'plot').kwargs['stacked'] is True

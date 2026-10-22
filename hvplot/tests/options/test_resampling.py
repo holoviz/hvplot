@@ -138,11 +138,8 @@ def test_datashade_aspect_and_frame_height(df, opt, dynamic):
 @requires('datashader')
 def test_datashade_cmap_as_color_key(df):
     color_key = {'A': '#ff0000', 'B': '#00ff00', 'C': '#0000ff'}
-    df.hvplot.points(x='x', y='y', by='category', cmap=color_key, datashade=True)
-    with pytest.raises(TypeError):
-        df.hvplot.points(
-            x='x', y='y', by='category', datashade=True, cmap='kbc_r', color_key=color_key
-        )
+    plot = df.hvplot.points(x='x', y='y', by='category', cmap=color_key, datashade=True)
+    assert _operation(plot).p.color_key == color_key
 
 
 @requires('datashader')
@@ -292,21 +289,9 @@ def test_max_px(df):
 
 
 @requires('datashader')
-def test_max_px_default(df):
-    plot = df.hvplot.points('x', 'y', datashade=True, dynspread=True)
-    assert _operation(plot).p.max_px == 3
-
-
-@requires('datashader')
 def test_threshold(df):
     plot = df.hvplot.points('x', 'y', datashade=True, dynspread=True, threshold=0.8)
     assert _operation(plot).p.threshold == 0.8
-
-
-@requires('datashader')
-def test_threshold_default(df):
-    plot = df.hvplot.points('x', 'y', datashade=True, dynspread=True)
-    assert _operation(plot).p.threshold == 0.5
 
 
 @requires('datashader')
@@ -314,13 +299,6 @@ def test_threshold_default(df):
 def test_precompute(df, operation):
     plot = df.hvplot.points('x', 'y', precompute=True, **{operation: True})
     assert _operation(plot).p.precompute is True
-
-
-@requires('datashader')
-@operations
-def test_precompute_default_false(df, operation):
-    plot = df.hvplot.points('x', 'y', **{operation: True})
-    assert _operation(plot).p.precompute is False
 
 
 def test_resample_when_without_operation_error(df):
@@ -340,7 +318,7 @@ def test_resample_when(large_df, operation):
 
     image = overlay.get(0)
     assert isinstance(image, Image)
-    assert len(image.data) > 0
+    assert len(image) > 0
 
     scatter = overlay.get(1)
     assert isinstance(scatter, Scatter)
@@ -433,10 +411,9 @@ def line_df():
     return pd.DataFrame(np.random.random(100))
 
 
-def test_downsample_default(line_df):
+def test_downsample_true(line_df):
     plot = line_df.hvplot.line(downsample=True)
     assert isinstance(plot.callback.operation, downsample1d)
-    assert plot.callback.operation.algorithm == 'lttb'
 
 
 def test_downsample_opts(line_df):

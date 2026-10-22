@@ -64,7 +64,11 @@ def test_transforms_xarray(hvplot_xarray):
     [
         'pandas',
         pytest.param(
-            'dask', marks=pytest.mark.skip(reason="Can't expand dt accessor columns with dask")
+            'dask',
+            marks=pytest.mark.xfail(
+                strict=True,
+                reason='BUG: dt accessor columns with dask fail on mismatched divisions',
+            ),
         ),
     ],
     indirect=True,
@@ -138,21 +142,9 @@ def test_groupby_index(tabular_lib, cat_df):
     assert hmap.last.vdims == ['y']
 
 
-@pytest.mark.parametrize(
-    'tabular_lib',
-    [
-        'pandas',
-        pytest.param(
-            'dask', marks=pytest.mark.skip(reason='Dask does not support MultiIndex DataFrames')
-        ),
-    ],
-    indirect=True,
-)
-def test_groupby_multiindex_level(tabular_lib):
+def test_groupby_multiindex_level():
     df = pd.DataFrame({'A': [1, 2, 3, 4], 'B': ['a', 'a', 'b', 'b'], 'C': [0, 1, 2, 1.5]})
-    hmap = tabular_lib(df.set_index(['A', 'B'])).hvplot.scatter(
-        x='A', y='C', groupby='B', dynamic=False
-    )
+    hmap = df.set_index(['A', 'B']).hvplot.scatter(x='A', y='C', groupby='B', dynamic=False)
     assert hmap.kdims == ['B']
     assert hmap.vdims == []
     assert list(hmap.keys()) == ['a', 'b']

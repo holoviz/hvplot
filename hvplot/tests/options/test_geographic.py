@@ -70,8 +70,8 @@ def test_crs_proj_string(plain_da):
 
 @pytest.mark.geo
 @skip_windows
-def test_crs_object(utm_da, utm_crs):
-    plot = utm_da.hvplot.image('x', 'y', crs=utm_crs)
+def test_crs_object(plain_da, utm_crs):
+    plot = plain_da.hvplot.image('x', 'y', crs=utm_crs)
     assert plot.crs == _utm()
 
 
@@ -149,7 +149,7 @@ def test_projection_with_tiles_error(utm_da, utm_crs):
 
 @pytest.mark.geo
 @skip_windows
-def test_projection_overlay(hvplot_pandas):
+def test_geo_overlay_tiles_renders(hvplot_pandas):
     # Regression test for https://github.com/holoviz/hvplot/issues/1090
     df = pd.DataFrame({'lon': [0, 10], 'lat': [40, 50], 'v': [0, 1]})
 
@@ -198,10 +198,13 @@ def test_coastline(hvplot_pandas, simple_df):
 
 @pytest.mark.geo
 def test_coastline_sets_geo_by_default(hvplot_pandas, simple_df):
+    import cartopy.crs as ccrs
     import geoviews as gv
 
     plot = simple_df.hvplot.points('x', 'y', coastline=True)
     assert len(plot) == 2
+    assert isinstance(plot.get(0), gv.Points)
+    assert plot.get(0).crs == ccrs.PlateCarree()
     assert isinstance(plot.get(1), gv.Feature)
 
 

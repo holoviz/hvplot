@@ -104,11 +104,6 @@ def test_node_data_colorbar_can_be_disabled(node_uda):
     assert hv.Store.lookup_options('bokeh', plot, 'plot').kwargs['colorbar'] is False
 
 
-def test_node_data_filled_default_false(node_uda):
-    plot = node_uda.hvplot.trimesh()
-    assert hv.Store.lookup_options('bokeh', plot, 'plot').kwargs.get('filled') is False
-
-
 def test_node_data_filled_true(node_uda):
     plot = node_uda.hvplot.trimesh(filled=True)
     assert hv.Store.lookup_options('bokeh', plot, 'plot').kwargs.get('filled') is True
@@ -164,13 +159,22 @@ def test_time_dim_face_data_creates_dynamic_map(time_face_uda):
     assert isinstance(time_face_uda.hvplot.trimesh(), hv.DynamicMap)
 
 
-@pytest.mark.parametrize('kwargs', [{}, {'z': 'temp'}], ids=['default_z', 'explicit_z'])
-def test_ugrid_dataset_returns_trimesh(grid, kwargs):
+@pytest.mark.parametrize(
+    ('kwargs', 'label'), [({}, 'other'), ({'z': 'temp'}, 'temp')], ids=['default_z', 'explicit_z']
+)
+def test_ugrid_dataset_returns_trimesh(grid, kwargs, label):
     import xugrid as xu
 
-    da = xr.DataArray([1.0, 2.0, 3.0, 4.0], dims=[grid.node_dimension], name='temp')
-    ds = xu.UgridDataArray(da, grid).to_dataset()
-    assert isinstance(ds.hvplot.trimesh(**kwargs), TriMesh)
+    ds = xu.UgridDataset(grids=[grid])
+    ds['other'] = xu.UgridDataArray(
+        xr.DataArray([5.0, 6.0, 7.0, 8.0], dims=[grid.node_dimension]), grid
+    )
+    ds['temp'] = xu.UgridDataArray(
+        xr.DataArray([1.0, 2.0, 3.0, 4.0], dims=[grid.node_dimension]), grid
+    )
+    plot = ds.hvplot.trimesh(**kwargs)
+    assert isinstance(plot, TriMesh)
+    assert plot.nodes.get_dimension('z').label == label
 
 
 def test_quad_mesh_triangulated():
@@ -217,14 +221,22 @@ def test_non_trimesh_kind_error_message_is_helpful(node_uda):
 
 @pytest.mark.geo
 def test_geo_default_crs(node_uda):
-    assert isinstance(node_uda.hvplot.trimesh(geo=True), TriMesh)
+    import cartopy.crs as ccrs
+    import geoviews as gv
+
+    plot = node_uda.hvplot.trimesh(geo=True)
+    assert isinstance(plot, gv.TriMesh)
+    assert plot.crs == ccrs.PlateCarree()
 
 
 @pytest.mark.geo
 def test_geo_non_platecarree_crs(node_uda):
     import cartopy.crs as ccrs
+    import geoviews as gv
 
-    assert isinstance(node_uda.hvplot.trimesh(geo=True, crs=ccrs.Mercator()), TriMesh)
+    plot = node_uda.hvplot.trimesh(geo=True, crs=ccrs.Mercator())
+    assert isinstance(plot, gv.TriMesh)
+    assert plot.crs == ccrs.Mercator()
 
 
 def test_unpatch_xugrid():

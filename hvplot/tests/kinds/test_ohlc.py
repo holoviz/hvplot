@@ -19,9 +19,12 @@ df = pd.DataFrame(
 
 ohlc_cols = ['Open', 'High', 'Low', 'Close']
 
+# Neither the Date column nor the OHLC order is what ohlc picks when x and y are not set.
+reordered_df = df.reset_index(names='Date')[['Volume', 'Close', 'Low', 'High', 'Open', 'Date']]
+
 
 def test_x():
-    plot = df.reset_index(names='Date').hvplot.ohlc(x='Date', y=ohlc_cols)
+    plot = reordered_df.hvplot.ohlc(x='Date', y=ohlc_cols)
     assert plot.Segments.I.kdims == ['Date', 'Low', 'Date', 'High']
     assert plot.Rectangles.I.kdims == ['lbound', 'Open', 'ubound', 'Close']
 
@@ -41,15 +44,15 @@ def test_x_default_index():
         pytest.param(
             'ibis',
             marks=pytest.mark.xfail(
-                strict=True, reason='BUG: ohlc reads the dtype of an ibis column'
+                strict=True,
+                reason='BUG: ohlc reads dimension_values(x).dtype.kind, missing on ibis',
             ),
         ),
     ],
     indirect=True,
 )
 def test_y(tabular_lib):
-    data = tabular_lib(df.reset_index(names='Date'))
-    plot = data.hvplot.ohlc(x='Date', y=ohlc_cols)
+    plot = tabular_lib(reordered_df).hvplot.ohlc(x='Date', y=ohlc_cols)
     rects, segments = plot.Rectangles.I, plot.Segments.I
     assert isinstance(rects, Rectangles)
     assert isinstance(segments, Segments)
@@ -139,7 +142,7 @@ def test_ohlc_non_datetime_x_axis():
     hover_tool = Store.lookup_options('bokeh', segments, 'plot').kwargs['tools'][0]
     tooltips = hover_tool.tooltips
     x_label, x_tooltip = tooltips[0]
-    assert '{%F}' not in x_tooltip
+    assert '%F' not in x_tooltip
     formatter_key = '@' + x_label
     assert formatter_key not in hover_tool.formatters
 

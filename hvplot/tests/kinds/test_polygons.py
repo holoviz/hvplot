@@ -27,10 +27,10 @@ def test_x(df):
 
 
 def test_y(df, tabular_lib):
-    plot = tabular_lib(df).hvplot.polygons(x='x', y='y')
+    plot = tabular_lib(df).hvplot.polygons(x='x', y='lon')
     assert isinstance(plot, Polygons)
-    assert plot.kdims == ['x', 'y']
-    assert list(plot.dimension_values('y')) == [0, 0, 1, 0]
+    assert plot.kdims == ['x', 'lon']
+    assert list(plot.dimension_values('lon')) == [5, 6, 6, 5]
 
 
 @pytest.mark.geo

@@ -27,11 +27,11 @@ def test_y_list(df, hvplot_pandas):
     assert list(plot.dimension_values('Variable')) == ['x', 'x', 'x', 'y', 'y', 'y']
 
 
-def test_violin_from_xarray_with_by_and_color(hvplot_xarray):
+def test_violin_from_xarray_with_by_and_color(hvplot_xarray, rng):
     latitudes = np.linspace(-90, 90, 3)
     longitudes = np.linspace(-180, 180, 4)
     times = pd.date_range('2023-01-01', periods=5, freq='D')
-    data = np.random.random((5, 3, 4))
+    data = rng.random((5, 3, 4))
     da = xr.DataArray(
         data,
         coords={'time': times, 'lat': latitudes, 'lon': longitudes},

@@ -1,23 +1,12 @@
-import numpy as np
 import pandas as pd
 import pytest
 from holoviews.element import Table
 
 
-@pytest.mark.parametrize(
-    'tabular_lib',
-    [
-        'pandas',
-        pytest.param(
-            'dask',
-            marks=pytest.mark.xfail(strict=True, reason='Only supported for pandas DatetimeIndex'),
-        ),
-    ],
-    indirect=True,
-)
-def test_table_datetime_index_displayed(tabular_lib):
-    dt_df = pd.DataFrame(np.random.rand(90), index=pd.date_range('2019-01-01', '2019-03-31'))
-    table = tabular_lib(dt_df).hvplot.table()
+# Only supported for a pandas DatetimeIndex.
+def test_table_datetime_index_displayed(hvplot_pandas, rng):
+    dt_df = pd.DataFrame(rng.random(90), index=pd.date_range('2019-01-01', '2019-03-31'))
+    table = dt_df.hvplot.table()
     assert table.kdims[0] == 'index'
 
 

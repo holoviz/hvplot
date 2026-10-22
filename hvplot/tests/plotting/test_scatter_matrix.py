@@ -94,52 +94,74 @@ def test_c(df, rng):
     assert 'e' in (d.name for d in offdiag_vdims)
 
 
+skip_32bit = pytest.mark.skipif(
+    sys.maxsize < 2**32, reason='Datashader does not support 32-bit systems'
+)
+
+
 @requires('datashader')
-@pytest.mark.skipif(sys.maxsize < 2**32, reason='Datashader does not support 32-bit systems')
-class TestDatashader:
-    def test_rasterize_datashade_mutually_exclusive(self, df):
-        with pytest.raises(ValueError):
-            scatter_matrix(df, rasterize=True, datashade=True)
+@skip_32bit
+def test_rasterize_datashade_mutually_exclusive(df):
+    with pytest.raises(ValueError):
+        scatter_matrix(df, rasterize=True, datashade=True)
 
-    @pytest.mark.parametrize(
-        'kwargs', [{'dynspread': True}, {'spread': True}, {'dynspread': True, 'spread': True}]
-    )
-    def test_spread_but_no_rasterize_or_datashade(self, df, kwargs):
-        with pytest.raises(ValueError):
-            scatter_matrix(df, **kwargs)
 
-    @pytest.mark.parametrize('operation', ['rasterize', 'datashade'])
-    def test_rasterization(self, df, operation):
-        sm = scatter_matrix(df, **{operation: True})
-        dm = sm['a', 'b']
-        assert dm.callback.operation.name == operation
-        dm[()]
-        assert len(dm.last.pipeline.operations) == 3
+@requires('datashader')
+@skip_32bit
+@pytest.mark.parametrize(
+    'kwargs', [{'dynspread': True}, {'spread': True}, {'dynspread': True, 'spread': True}]
+)
+def test_spread_but_no_rasterize_or_datashade(df, kwargs):
+    with pytest.raises(ValueError):
+        scatter_matrix(df, **kwargs)
 
-    @pytest.mark.parametrize('operation', ['rasterize', 'datashade'])
-    def test_datashade_aggregator(self, df, operation):
-        sm = scatter_matrix(df, aggregator='mean', **{operation: True})
-        dm = sm['a', 'b']
-        dm[()]
-        assert dm.last.pipeline.operations[-1].aggregator == 'mean'
 
-    @pytest.mark.parametrize('operation', ['spread', 'dynspread'])
-    def test_spread_rasterize(self, df, operation):
-        sm = scatter_matrix(df, rasterize=True, **{operation: True})
-        dm = sm['a', 'b']
-        dm[()]
-        assert len(dm.last.pipeline.operations) == 4
+@requires('datashader')
+@skip_32bit
+@pytest.mark.parametrize('operation', ['rasterize', 'datashade'])
+def test_rasterization(df, operation):
+    sm = scatter_matrix(df, **{operation: True})
+    dm = sm['a', 'b']
+    assert dm.callback.operation.name == operation
+    dm[()]
+    assert len(dm.last.pipeline.operations) == 3
 
-    @pytest.mark.parametrize('operation', ['spread', 'dynspread'])
-    def test_spread_datashade(self, df, operation):
-        sm = scatter_matrix(df, datashade=True, **{operation: True})
-        dm = sm['a', 'b']
-        dm[()]
-        assert len(dm.last.pipeline.operations) == 4
 
-    @pytest.mark.parametrize('operation', ['spread', 'dynspread'])
-    def test_spread_kwargs(self, df, operation):
-        sm = scatter_matrix(df, datashade=True, **{operation: True, 'shape': 'circle'})
-        dm = sm['a', 'b']
-        dm[()]
-        assert dm.last.pipeline.operations[-1].args[0].keywords['shape'] == 'circle'
+@requires('datashader')
+@skip_32bit
+@pytest.mark.parametrize('operation', ['rasterize', 'datashade'])
+def test_datashade_aggregator(df, operation):
+    sm = scatter_matrix(df, aggregator='mean', **{operation: True})
+    dm = sm['a', 'b']
+    dm[()]
+    assert dm.last.pipeline.operations[-1].aggregator == 'mean'
+
+
+@requires('datashader')
+@skip_32bit
+@pytest.mark.parametrize('operation', ['spread', 'dynspread'])
+def test_spread_rasterize(df, operation):
+    sm = scatter_matrix(df, rasterize=True, **{operation: True})
+    dm = sm['a', 'b']
+    dm[()]
+    assert len(dm.last.pipeline.operations) == 4
+
+
+@requires('datashader')
+@skip_32bit
+@pytest.mark.parametrize('operation', ['spread', 'dynspread'])
+def test_spread_datashade(df, operation):
+    sm = scatter_matrix(df, datashade=True, **{operation: True})
+    dm = sm['a', 'b']
+    dm[()]
+    assert len(dm.last.pipeline.operations) == 4
+
+
+@requires('datashader')
+@skip_32bit
+@pytest.mark.parametrize('operation', ['spread', 'dynspread'])
+def test_spread_kwargs(df, operation):
+    sm = scatter_matrix(df, datashade=True, **{operation: True, 'shape': 'circle'})
+    dm = sm['a', 'b']
+    dm[()]
+    assert dm.last.pipeline.operations[-1].args[0].keywords['shape'] == 'circle'

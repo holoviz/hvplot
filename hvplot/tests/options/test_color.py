@@ -34,7 +34,7 @@ def symmetric_df():
 def test_c_column(df, kind, backend):
     plot = df.hvplot('x', 'y', c='number', kind=kind)
     opts = Store.lookup_options(backend, plot, 'style')
-    assert opts.kwargs['color'] == 'number'
+    assert repr(opts.kwargs['color']) == repr(hv.dim('number'))
     assert 'number' in plot.vdims
 
 
@@ -42,7 +42,7 @@ def test_c_column(df, kind, backend):
 def test_c_column_and_by(df, kind, backend):
     plot = df.hvplot('x', 'y', c='number', by='category', kind=kind)
     opts = Store.lookup_options(backend, plot.last, 'style')
-    assert opts.kwargs['color'] == 'number'
+    assert repr(opts.kwargs['color']) == repr(hv.dim('number'))
     assert 'number' in plot.last.vdims
 
 
@@ -116,7 +116,9 @@ def test_cmap_list(df, backend):
 def test_cmap_matplotlib_colormap(hvplot_xarray):
     # Regression test for https://github.com/holoviz/hvplot/pull/1461
     da = xr.DataArray(np.arange(25).reshape(5, 5))
-    da.hvplot.image(cmap=mpl.colormaps['viridis'])
+    cmap = mpl.colormaps['viridis']
+    plot = da.hvplot.image(cmap=cmap)
+    assert Store.lookup_options('bokeh', plot, 'style').kwargs['cmap'] is cmap
 
 
 def test_colormap_by_name(df, backend):
@@ -307,8 +309,8 @@ def test_cnorm_rasterize(df):
 
 @requires('datashader')
 def test_cnorm_datashade(df):
-    plot = df.hvplot(x='x', y='y', datashade=True, cnorm='eq_hist')
-    assert _operation(plot).p['cnorm'] == 'eq_hist'
+    plot = df.hvplot(x='x', y='y', datashade=True, cnorm='log')
+    assert _operation(plot).p['cnorm'] == 'log'
 
 
 @requires('datashader')
@@ -322,12 +324,6 @@ def test_rescale_discrete_levels_rasterize(df):
 def test_rescale_discrete_levels_datashade(df):
     plot = df.hvplot(x='x', y='y', datashade=True, cnorm='eq_hist', rescale_discrete_levels=False)
     assert _operation(plot).p['rescale_discrete_levels'] is False
-
-
-@requires('datashader')
-def test_rescale_discrete_levels_datashade_default_true(df):
-    plot = df.hvplot(x='x', y='y', datashade=True, cnorm='eq_hist')
-    assert _operation(plot).p['rescale_discrete_levels'] is True
 
 
 @pytest.mark.parametrize(

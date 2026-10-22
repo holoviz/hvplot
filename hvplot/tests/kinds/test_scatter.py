@@ -7,13 +7,16 @@ from holoviews.element import Scatter
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
 
-kinds = pytest.mark.parametrize('kind', ['scatter', 'points'])
-
 alpha_backends = pytest.mark.parametrize(
     'backend',
     [
         'bokeh',
-        'matplotlib',
+        pytest.param(
+            'matplotlib',
+            marks=pytest.mark.xfail(
+                reason='BUG: a dim mapped to alpha is not supported by matplotlib, fails on render'
+            ),
+        ),
         pytest.param(
             'plotly', marks=pytest.mark.xfail(reason='cannot map a dim to alpha with plotly')
         ),
@@ -110,6 +113,8 @@ def test_marker(df, backend):
     assert Store.lookup_options(backend, plot, 'style').kwargs['marker'] == '^'
 
 
+# Matplotlib and Plotly cannot render a marker mapped to a column.
+@pytest.mark.parametrize('backend', ['bokeh'], indirect=True)
 def test_marker_dim(df, backend):
     plot = df.hvplot.scatter('x', 'y', marker='category')
     opts = Store.lookup_options(backend, plot, 'style')
@@ -118,18 +123,29 @@ def test_marker_dim(df, backend):
 
 
 @alpha_backends
-@kinds
-def test_alpha_dim(df, kind, backend):
-    plot = df.hvplot('x', 'y', alpha='number', kind=kind)
+def test_alpha_dim(df, backend):
+    plot = df.hvplot.scatter('x', 'y', alpha='number')
     opts = Store.lookup_options(backend, plot, 'style')
     assert opts.kwargs['alpha'] == 'number'
     assert 'number' in plot.vdims
+    hv.render(plot, backend=backend)
 
 
-@alpha_backends
-@kinds
-def test_alpha_dim_overlay(df, kind, backend):
-    plot = df.hvplot('x', 'y', alpha='number', by='category', kind=kind)
+# Unlike without `by`, the alpha mapping renders with matplotlib.
+@pytest.mark.parametrize(
+    'backend',
+    [
+        'bokeh',
+        'matplotlib',
+        pytest.param(
+            'plotly', marks=pytest.mark.xfail(reason='cannot map a dim to alpha with plotly')
+        ),
+    ],
+    indirect=True,
+)
+def test_alpha_dim_overlay(df, backend):
+    plot = df.hvplot.scatter('x', 'y', alpha='number', by='category')
     opts = Store.lookup_options(backend, plot.last, 'style')
     assert opts.kwargs['alpha'] == 'number'
     assert 'number' in plot.last.vdims
+    hv.render(plot, backend=backend)

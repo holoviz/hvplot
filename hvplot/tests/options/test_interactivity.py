@@ -188,11 +188,11 @@ def test_hover_shows_color_column(tabular_lib, cat_df):
 
 @pandas_and_dask
 def test_hover_shows_color_column_with_cmap_dict(tabular_lib, cat_df):
-    plot = tabular_lib(cat_df).hvplot.scatter(
-        x='x', y='y', color='category', cmap={'A': 'red', 'B': 'blue'}
-    )
+    cmap = {'A': 'red', 'B': 'blue'}
+    plot = tabular_lib(cat_df).hvplot.scatter(x='x', y='y', color='category', cmap=cmap)
     assert 'category' in [d.name for d in plot.vdims]
     assert '_color' not in plot.data.columns
+    assert Store.lookup_options('bokeh', plot, 'style').kwargs['cmap'] == cmap
 
 
 @pandas_and_dask

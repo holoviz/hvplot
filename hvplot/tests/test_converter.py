@@ -303,7 +303,7 @@ def test_time_df_as_index_with_x_as_derived_datetime_using_index(time_df):
     assert list(plot.dimensions()) == ['index.day', 'A']
 
 
-@pytest.mark.xfail(reason='See https://github.com/holoviz/hvplot/issues/1364')
+@pytest.mark.xfail(reason='BUG: hierarchical columns are not auto stacked, see issue 1364')
 def test_hierarchical_columns_auto_stack(rng):
     arrays = [
         ['bar', 'bar', 'baz', 'baz', 'foo', 'foo', 'qux', 'qux'],

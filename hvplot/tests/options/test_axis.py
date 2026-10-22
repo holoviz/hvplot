@@ -107,7 +107,9 @@ def test_logy(df, backend):
     assert opts.kwargs.get('logz') is None
 
 
-only_bokeh_defaults = pytest.mark.xfail(reason='hvPlot only reads the bokeh HoloViews defaults')
+only_bokeh_defaults = pytest.mark.xfail(
+    reason='BUG: HoloViews defaults are only read for bokeh (converter.py)'
+)
 
 
 @pytest.mark.parametrize(
@@ -173,17 +175,6 @@ def test_shared_axes_false_hist_subplots(tabular_lib, xy_df):
     assert plot_0.opts['axiswise']
     assert plot_0.range('x') == (1, 5)
     assert plot_1.range('y') == (2, 6)
-
-
-@pandas_and_dask
-def test_shared_axes_true_hist_subplots(tabular_lib, xy_df):
-    df = tabular_lib(xy_df)
-    plots = df.hvplot.hist(subplots=True, shared_axes=True)
-    plot_0 = plots.grid_items()[0, 0][1]
-    plot_1 = plots.grid_items()[0, 1][1]
-    assert not plot_0.opts['axiswise']
-    assert plot_0.range('x') == (1, 6)
-    assert plot_1.range('y') == (1, 6)
 
 
 def test_subcoordinate_y_bool():

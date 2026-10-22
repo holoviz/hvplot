@@ -71,8 +71,17 @@ DA_LATLON = xr.DataArray(
 EXPECTED_LATLON = RGB(([10, 20, 30], [0, 1], *DA_LATLON.values), ['lon', 'lat'])
 
 
+# The coords are ordered (band, lon, lat) but the data dims are (band, lat, lon), so that
+# the x and y rgb picks by default from the coords are not the right ones.
+DA_LATLON_COORDS_SWAPPED = xr.DataArray(
+    DA_LATLON.values,
+    coords={'band': [1, 2, 3], 'lon': [10, 20, 30], 'lat': [0, 1]},
+    dims=['band', 'lat', 'lon'],
+)
+
+
 def test_x(gridded_lib):
-    rgb = gridded_lib(DA_LATLON).hvplot.rgb(x='lon', y='lat')
+    rgb = gridded_lib(DA_LATLON_COORDS_SWAPPED).hvplot.rgb(x='lon', y='lat')
     assert_element_equal(rgb, EXPECTED_LATLON)
 
 
@@ -95,5 +104,11 @@ def test_z():
 
 
 def test_bands():
-    rgb = DA_LATLON.transpose('lat', 'lon', 'band').hvplot.rgb(x='lon', y='lat', bands='band')
+    # The first coord is not the bands one.
+    da = xr.DataArray(
+        np.moveaxis(DA_LATLON.values, 0, -1),
+        coords={'lat': [0, 1], 'lon': [10, 20, 30], 'channel': [1, 2, 3]},
+        dims=['lat', 'lon', 'channel'],
+    )
+    rgb = da.hvplot.rgb(x='lon', y='lat', bands='channel')
     assert_element_equal(rgb, EXPECTED_LATLON)

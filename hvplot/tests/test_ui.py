@@ -254,10 +254,10 @@ def test_explorer_method_grid(ds_air_temperature):
 
 
 def test_explorer_method_kind(df):
-    explorer = df.hvplot.explorer(kind='scatter')
+    explorer = df.hvplot.explorer(kind='line')
 
     assert isinstance(explorer, hvDataFrameExplorer)
-    assert explorer.kind == 'scatter'
+    assert explorer.kind == 'line'
     assert explorer.x == 'index'
     assert explorer.y == 'species'
 
@@ -396,7 +396,9 @@ def test_explorer_code_opts(ds_air_temperature):
 def test_explorer_xarray_multi_var_extra_dims_no_coord():
     ds = air_temperature()
     ds['lat_bnds'] = (('bnds', 'lat'), np.vstack([ds['lat'], ds['lat']]))
-    assert ds.hvplot.explorer()
+    explorer = ds.hvplot.explorer()
+    assert isinstance(explorer, hvGridExplorer)
+    assert explorer.kind == 'image'
 
 
 @pytest.mark.usefixtures('disable_param_warnings_as_exceptions')
@@ -432,7 +434,9 @@ def test_max_rows_sample():
 def test_explorer_geo_no_import_error_when_false(ds_air_temperature, block_import):
     block_import('geoviews')
     da = ds_air_temperature['air'].isel(time=0)
-    assert hvplot.explorer(da, x='lon', y='lat', geo=False)
+    explorer = hvplot.explorer(da, x='lon', y='lat', geo=False)
+    assert isinstance(explorer, hvGridExplorer)
+    assert explorer.geographic.geo is False
 
 
 def test_explorer_geo_without_geoviews(df, block_import):

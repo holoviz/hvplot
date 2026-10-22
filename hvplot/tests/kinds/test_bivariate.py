@@ -4,9 +4,11 @@ from holoviews import Store
 from holoviews.element import Bivariate
 
 
-@pytest.fixture(scope='module')
-def df():
-    return pd.DataFrame({'x': [1, 3, 5], 'y': [2, 4, 6], 'category': ['A', 'B', 'C']})
+@pytest.fixture
+def df(rng):
+    # Not collinear, as a density cannot be estimated otherwise.
+    x = rng.normal(size=20)
+    return pd.DataFrame({'x': x, 'y': x + rng.normal(size=20)})
 
 
 backends = pytest.mark.parametrize(

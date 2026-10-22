@@ -66,7 +66,7 @@ def test_points_hover_cols_positional_arg_sets_color(cities):
     assert points.kdims == ['x', 'y']
     assert points.vdims == ['name']
     opts = hv.Store.lookup_options('bokeh', points, 'style').kwargs
-    assert opts['color'] == 'name'
+    assert repr(opts['color']) == repr(hv.dim('name'))
 
 
 def test_points_hover_cols_with_c_set_to_name(cities):
@@ -74,7 +74,7 @@ def test_points_hover_cols_with_c_set_to_name(cities):
     assert points.kdims == ['x', 'y']
     assert points.vdims == ['name']
     opts = hv.Store.lookup_options('bokeh', points, 'style').kwargs
-    assert opts['color'] == 'name'
+    assert repr(opts['color']) == repr(hv.dim('name'))
 
 
 def test_points_hover_cols_with_by_set_to_name(cities):
