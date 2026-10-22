@@ -2,6 +2,8 @@ import pandas as pd
 import pytest
 from holoviews.element import Table
 
+from hvplot.tests._deps import POLARS_2
+
 
 # Only supported for a pandas DatetimeIndex.
 def test_table_datetime_index_displayed(hvplot_pandas, rng):
@@ -26,7 +28,7 @@ def test_table_multi_index_displayed(hvplot_pandas):
         pytest.param(
             'polars',
             marks=pytest.mark.xfail(
-                strict=True, reason='BUG: uses pl.NUMERIC_DTYPES, removed from polars'
+                POLARS_2, strict=True, reason='BUG: uses pl.NUMERIC_DTYPES, removed in polars 2.0'
             ),
         ),
         'duckdb',

@@ -4,6 +4,8 @@ import pytest
 import xarray as xr
 from holoviews import Dataset
 
+from hvplot.tests._deps import POLARS_2
+
 
 @pytest.fixture(scope='module')
 def df():
@@ -18,7 +20,7 @@ def df():
         pytest.param(
             'polars',
             marks=pytest.mark.xfail(
-                strict=True, reason='BUG: polars without y uses pl.NUMERIC_DTYPES, removed in 1.0'
+                POLARS_2, strict=True, reason='BUG: uses pl.NUMERIC_DTYPES, removed in polars 2.0'
             ),
         ),
         'duckdb',
