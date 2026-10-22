@@ -1,6 +1,8 @@
 import holoviews as hv
 import numpy as np
+import pandas as pd
 import pytest
+from packaging.version import Version
 
 from hvplot.tests._deps import requires
 
@@ -113,9 +115,10 @@ def test_polygons_turns_off_hover_when_there_are_no_fields_to_include(polygons):
 
 
 @pytest.mark.xfail(
+    Version(pd.__version__).major >= 3,
     strict=True,
     raises=TypeError,
-    reason='BUG: the geometry type of a missing geometry is NaN, not None, and is not discarded',
+    reason='BUG: with pandas 3 a missing geometry has geom type NaN, not None, and is kept',
 )
 def test_geometry_none(polygons):
     polygons.loc[1, 'geometry'] = None
