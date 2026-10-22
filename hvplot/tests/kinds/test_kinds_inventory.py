@@ -9,6 +9,11 @@ from hvplot.converter import HoloViewsConverter
 from hvplot.tests._inventory import collect_test_names, options_with_test
 
 
+def test_kind_options_keys_are_kinds():
+    # A key that is not a kind (e.g. a typo) would otherwise be silently ignored.
+    assert set(HoloViewsConverter._kind_options) <= set(HoloViewsConverter._kind_mapping)
+
+
 @pytest.mark.parametrize('kind', sorted(HoloViewsConverter._kind_mapping))
 def test_kind_has_module(kind):
     assert find_spec(f'hvplot.tests.kinds.test_{kind}'), (
