@@ -63,6 +63,7 @@ tests-core = [
     "pre-commit",
     "pytest-cov",
     "pytest-randomly",
+    "pytest-socket",
     "pytest-xdist",
     "pytest",
     "ruff",

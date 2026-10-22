@@ -1,5 +1,3 @@
-import ipaddress
-import socket
 import sys
 from importlib.util import find_spec
 
@@ -141,6 +139,9 @@ def pytest_collection_modifyitems(config, items):
     skip_geo = pytest.mark.skip(reason='GeoViews test, requires geoviews and cartopy.')
     render = not config.getoption('--no-render')
     for item in items:
+        # The test suite must never need internet: it would be slow, flaky and fail offline.
+        # pytest-socket blocks the creation of sockets, unless the test has `enable_socket`.
+        item.add_marker(pytest.mark.disable_socket)
         if 'slow' in item.keywords and not config.getoption('--slow'):
             item.add_marker(skip_slow)
         if 'geo' in item.keywords and _GEO_HV_STATE is None:
@@ -168,34 +169,6 @@ def pytest_collection_finish(session):
             result=[],
         )
         session.config.hook.pytest_collectreport(report=report)
-
-
-def _is_local(sock, address):
-    if sock.family == socket.AF_UNIX:
-        return True
-    host = address[0]
-    try:
-        return ipaddress.ip_address(host).is_loopback
-    except ValueError:  # a host name
-        return host == 'localhost'
-
-
-def _local_only(connect):
-    def guarded_connect(sock, address):
-        if not _is_local(sock, address):
-            raise RuntimeError(f'Tests must not access the network, tried to connect to {address}')
-        return connect(sock, address)
-
-    return guarded_connect
-
-
-@pytest.fixture(scope='session', autouse=True)
-def _block_network():
-    """The test suite must never need internet: it would be slow, flaky and fail offline."""
-    with pytest.MonkeyPatch.context() as mp:
-        mp.setattr(socket.socket, 'connect', _local_only(socket.socket.connect))
-        mp.setattr(socket.socket, 'connect_ex', _local_only(socket.socket.connect_ex))
-        yield
 
 
 @pytest.fixture(autouse=True)

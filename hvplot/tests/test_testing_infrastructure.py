@@ -8,6 +8,7 @@ import pandas as pd
 import pytest
 from holoviews import Store
 from holoviews.plotting.bokeh import OverlayPlot
+from pytest_socket import SocketBlockedError
 
 import hvplot
 from hvplot.tests._deps import pandas_and_dask, requires
@@ -60,13 +61,13 @@ def test_geo_marker_geoviews_state():
     assert 'Feature' in Store.options(backend='bokeh')
 
 
-def test_network_guard_blocks_remote_connection():
-    # 192.0.2.1 is reserved for documentation (TEST-NET-1), it is never reached.
-    with socket.socket() as sock, pytest.raises(RuntimeError, match='must not access the network'):
-        sock.connect(('192.0.2.1', 80))
+def test_sockets_blocked():
+    with pytest.raises(SocketBlockedError):
+        socket.socket()
 
 
-def test_network_guard_allows_loopback():
+@pytest.mark.enable_socket
+def test_sockets_enabled_by_marker():
     with socket.create_server(('127.0.0.1', 0)) as server, socket.socket() as client:
         client.connect(server.getsockname())
 
