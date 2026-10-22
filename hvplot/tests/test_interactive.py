@@ -1,3 +1,5 @@
+import sys
+
 import holoviews as hv
 import matplotlib
 import numpy as np
@@ -1358,3 +1360,36 @@ def test_interactive_accept_non_str_columnar_data():
     w.value = 0.5
 
     assert dfi.eval().sum() == pytest.approx((df[1] + 0.5).sum())
+
+
+def test_interactive_widgets_without_ipywidgets(series, monkeypatch):
+    # _find_widgets checks `sys.modules` to avoid importing ipywidgets, which is
+    # never imported when not installed (block_import would make it look imported).
+    monkeypatch.delitem(sys.modules, 'ipywidgets', raising=False)
+    w = pn.widgets.FloatSlider(value=2.0, start=1.0, end=5.0)
+    si = Interactive(series) + w
+
+    widgets = si.widgets()
+
+    assert len(widgets) == 1
+    assert widgets[0] is w
+    assert 'ipywidgets' not in sys.modules
+
+
+def test_dask_interactive_applies():
+    dd = pytest.importorskip('dask.dataframe')
+    from hvplot.dask import DaskInteractive
+
+    df = pd.DataFrame({'a': [1, 2]})
+    assert DaskInteractive.applies(dd.from_pandas(df, npartitions=1))
+    assert not DaskInteractive.applies(df)
+
+
+def test_dask_interactive_applies_without_dask_dataframe(monkeypatch):
+    pytest.importorskip('dask.dataframe')
+    from hvplot.dask import DaskInteractive
+
+    # Like _find_widgets, it checks `sys.modules` to avoid importing dask.dataframe.
+    monkeypatch.delitem(sys.modules, 'dask.dataframe')
+    assert not DaskInteractive.applies(pd.DataFrame({'a': [1, 2]}))
+    assert 'dask.dataframe' not in sys.modules

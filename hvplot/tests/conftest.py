@@ -275,6 +275,10 @@ def block_import(monkeypatch):
     `importlib.util.find_spec` returns None. Modules that import the blocked one
     at their own top level must be blocked too.
 
+    Code checking whether a module is already imported with `name in sys.modules`
+    sees a blocked module as imported. To test it, remove the module instead with
+    `monkeypatch.delitem(sys.modules, name, raising=False)`.
+
     Example::
 
         def test_tiles_without_geoviews(block_import):

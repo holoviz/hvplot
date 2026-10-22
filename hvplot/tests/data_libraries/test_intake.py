@@ -29,3 +29,9 @@ def test_unpatch_intake():
     hvplot.intake.patch()
     assert 'hvplot' in vars(cls)
     assert 'hvplot.intake' in hvplot._module_extensions
+
+
+def test_patch_without_intake(block_import):
+    block_import('intake')
+    with pytest.raises(ImportError, match='intake could not be imported'):
+        hvplot.intake.patch()

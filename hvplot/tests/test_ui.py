@@ -1,6 +1,5 @@
 import re
 from textwrap import dedent
-from unittest.mock import patch
 
 import holoviews as hv
 import numpy as np
@@ -430,7 +429,21 @@ def test_max_rows_sample():
     assert not ui._data.equals(df.head(MAX_ROWS))
 
 
-def test_explorer_geo_no_import_error_when_false(ds_air_temperature):
+def test_explorer_geo_no_import_error_when_false(ds_air_temperature, block_import):
+    block_import('geoviews')
     da = ds_air_temperature['air'].isel(time=0)
-    with patch('hvplot.util.import_geoviews', return_value=None):
-        assert hvplot.explorer(da, x='lon', y='lat', geo=False)
+    assert hvplot.explorer(da, x='lon', y='lat', geo=False)
+
+
+def test_explorer_geo_without_geoviews(df, block_import):
+    block_import('geoviews')
+    with pytest.raises(ModuleNotFoundError, match='`geoviews` package must be installed'):
+        hvplot.explorer(df, x='bill_length_mm', y='bill_depth_mm', geo=True)
+
+
+def test_explorer_geo_controls_disabled_when_geo_not_requested(df):
+    # GeoViews is only imported when a geo option is passed, else geo stays disabled.
+    explorer = hvplot.explorer(df, x='bill_length_mm', y='bill_depth_mm')
+    assert explorer.geographic.param['geo'].constant
+    assert explorer.geographic.param['crs'].constant
+    assert explorer.geographic.param['geo'].label == 'geo (require GeoViews)'

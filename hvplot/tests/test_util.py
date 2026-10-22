@@ -18,12 +18,15 @@ from hvplot.util import (
     _convert_latlon_to_mercator,
     _convert_limit_to_mercator,
     _generate_unique_name,
+    _get_doc_and_signature,
     _is_within_latlon_bounds,
     check_crs,
+    import_datashader,
     import_geoviews,
     instantiate_crs_str,
     is_geodataframe,
     is_list_like,
+    is_mpl_cmap,
     process_crs,
     process_dynamic_args,
     process_xarray,
@@ -710,3 +713,75 @@ class TestProjToCartopy:
 
         crs = proj_to_cartopy(proj4_string)
         assert isinstance(crs, ccrs.NearsidePerspective)
+
+
+def test_import_datashader_without_datashader(block_import):
+    block_import('datashader')
+    with pytest.raises(ModuleNotFoundError, match='`datashader` package must be installed'):
+        import_datashader()
+
+
+def test_import_geoviews_without_geoviews(block_import):
+    block_import('geoviews')
+    with pytest.raises(ModuleNotFoundError, match='`geoviews` package must be installed'):
+        import_geoviews()
+
+
+def test_process_crs_without_geo_dependencies(block_import):
+    block_import('cartopy', 'geoviews', 'pyproj')
+    with pytest.raises(
+        ImportError, match='Geographic projection support requires: cartopy, geoviews, pyproj'
+    ):
+        process_crs('EPSG:4326')
+
+
+# is_mpl_cmap, is_geodataframe and DaskInteractive.applies check `sys.modules` to avoid
+# importing the library: without it installed it's never imported, so the tests remove
+# it from `sys.modules` (block_import would make it look imported).
+
+
+def test_is_mpl_cmap():
+    from matplotlib.colors import LinearSegmentedColormap
+
+    cmap = LinearSegmentedColormap.from_list('test', ['red', 'blue'])
+    assert is_mpl_cmap(cmap)
+    assert not is_mpl_cmap('viridis')
+
+
+def test_is_mpl_cmap_without_matplotlib(monkeypatch):
+    monkeypatch.delitem(sys.modules, 'matplotlib', raising=False)
+    assert not is_mpl_cmap('viridis')
+    assert 'matplotlib' not in sys.modules
+
+
+@requires('geopandas')
+def test_is_geodataframe_without_spatialpandas(monkeypatch):
+    import geopandas as gpd
+    from shapely.geometry import Point
+
+    monkeypatch.delitem(sys.modules, 'spatialpandas', raising=False)
+    assert is_geodataframe(gpd.GeoDataFrame({'geometry': [Point(0, 0)]}))
+    assert not is_geodataframe(pd.DataFrame({'geometry': [None]}))
+    assert 'spatialpandas' not in sys.modules
+
+
+def test_get_doc_and_signature_without_datashader_and_geoviews(block_import):
+    from hvplot.plotting.core import hvPlot
+
+    block_import('datashader', 'geoviews')
+    doc, signature = _get_doc_and_signature(hvPlot, 'points')
+    assert 'rasterize' not in signature.parameters
+    assert 'geo' not in signature.parameters
+    assert 'Resampling Options' not in doc
+    assert 'Geographic Options' not in doc
+
+
+@requires('datashader', 'geoviews')
+def test_get_doc_and_signature_with_datashader_and_geoviews():
+    from hvplot.plotting.core import hvPlot
+
+    doc, signature = _get_doc_and_signature(hvPlot, 'points')
+    assert 'rasterize' in signature.parameters
+    assert 'geo' in signature.parameters
+    assert 'Resampling Options' in doc
+    assert 'Geographic Options' in doc
