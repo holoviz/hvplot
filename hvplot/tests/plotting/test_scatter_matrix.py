@@ -117,6 +117,7 @@ def test_spread_but_no_rasterize_or_datashade(df, kwargs):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @skip_32bit
 @pytest.mark.parametrize('operation', ['rasterize', 'datashade'])
 def test_rasterization(df, operation):
@@ -128,6 +129,7 @@ def test_rasterization(df, operation):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @skip_32bit
 @pytest.mark.parametrize('operation', ['rasterize', 'datashade'])
 def test_datashade_aggregator(df, operation):
@@ -138,6 +140,7 @@ def test_datashade_aggregator(df, operation):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @skip_32bit
 @pytest.mark.parametrize('operation', ['spread', 'dynspread'])
 def test_spread_rasterize(df, operation):
@@ -148,6 +151,7 @@ def test_spread_rasterize(df, operation):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @skip_32bit
 @pytest.mark.parametrize('operation', ['spread', 'dynspread'])
 def test_spread_datashade(df, operation):
@@ -158,6 +162,7 @@ def test_spread_datashade(df, operation):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @skip_32bit
 @pytest.mark.parametrize('operation', ['spread', 'dynspread'])
 def test_spread_kwargs(df, operation):

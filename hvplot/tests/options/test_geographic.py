@@ -169,6 +169,7 @@ def test_geo_overlay_tiles_renders(hvplot_pandas):
 @pytest.mark.geo
 @skip_windows
 @requires('datashader')
+@pytest.mark.slow
 def test_project_with_rasterize(hvplot_xarray):
     import cartopy.crs as ccrs
     import geoviews as gv

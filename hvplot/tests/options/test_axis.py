@@ -238,6 +238,7 @@ def test_xlim_kde_by(grouped_df):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @pytest.mark.parametrize('operation', ['rasterize', 'datashade'])
 def test_ylim_resampling(xy_df, operation):
     plot = xy_df.hvplot.scatter(

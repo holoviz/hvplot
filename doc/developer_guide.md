@@ -225,7 +225,7 @@ Other rules:
 
 - The global state changed by a test, e.g. HoloViews options or the current plotting backend, is restored after it. Tests must still not depend on each other, they run in a random order and in parallel.
 - Tests can't access the internet. Use the small datasets of `hvplot/tests/_data.py` or build the data in the test.
-- Mark tests taking more than about a second with `@pytest.mark.slow`.
+- Mark tests taking more than about a second with `@pytest.mark.slow`, and always the tests running Datashader (e.g. with `rasterize=True` or `datashade=True`), as numba compiling its kernels takes seconds.
 - A test exposing a bug in hvPlot that isn't fixed yet is marked with `@pytest.mark.xfail(reason='BUG: <description>')`. xfail marks are strict, so the test fails once the bug is fixed, reminding to remove the mark.
 - A test that only fails when its plot is rendered is marked with `@pytest.mark.render_xfail(reason=...)`, an xfail that doesn't apply with `--no-render`. The reason starts with `BUG:` for an hvPlot bug, or with the name of the library at fault, e.g. `HoloViews:`.
 

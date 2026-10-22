@@ -437,6 +437,7 @@ def test_color_key_with_other_cmap_option_error(df, other):
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_color_key_dict_datashade(df):
     color_key = {'A': '#ff0000', 'B': '#00ff00', 'C': '#0000ff'}
     plot = df.hvplot.points('x', 'y', by='category', color_key=color_key, datashade=True)
@@ -463,6 +464,7 @@ def test_cnorm_image(hvplot_xarray):
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_cnorm_rasterize(df):
     plot = df.hvplot(x='x', y='y', rasterize=True, cnorm='eq_hist')
     opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
@@ -470,12 +472,14 @@ def test_cnorm_rasterize(df):
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_cnorm_datashade(df):
     plot = df.hvplot(x='x', y='y', datashade=True, cnorm='log')
     assert _operation(plot).p['cnorm'] == 'log'
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_rescale_discrete_levels_rasterize(df):
     plot = df.hvplot(x='x', y='y', rasterize=True, cnorm='eq_hist', rescale_discrete_levels=False)
     opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
@@ -483,6 +487,7 @@ def test_rescale_discrete_levels_rasterize(df):
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_rescale_discrete_levels_datashade(df):
     plot = df.hvplot(x='x', y='y', datashade=True, cnorm='eq_hist', rescale_discrete_levels=False)
     assert _operation(plot).p['rescale_discrete_levels'] is False

@@ -44,6 +44,7 @@ def _operation(dmap):
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_rasterize_by_count_cat_aggregator(df):
     from datashader.reductions import count_cat
 
@@ -54,6 +55,7 @@ def test_rasterize_by_count_cat_aggregator(df):
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_rasterize_by_categorical_cmap(df):
     plot = df.hvplot.scatter('x', 'y', by='category', rasterize=True)
     opts = Store.lookup_options('bokeh', plot[()], 'style').kwargs
@@ -62,6 +64,7 @@ def test_rasterize_by_categorical_cmap(df):
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_rasterize_by_image_stack(df):
     plot = df.hvplot(x='x', y='y', by='category', rasterize=True, dynamic=False)
     assert isinstance(plot, ImageStack)
@@ -69,6 +72,7 @@ def test_rasterize_by_image_stack(df):
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_rasterize_c_also_an_axis_default_cmap(df):
     plot = df.hvplot.scatter('x', 'y', c='y', dynamic=False, rasterize=True)
     opts = Store.lookup_options('bokeh', plot, 'style').kwargs
@@ -76,6 +80,7 @@ def test_rasterize_c_also_an_axis_default_cmap(df):
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_rasterize_default_cmap(df):
     plot = df.hvplot.scatter('x', 'y', dynamic=False, rasterize=True)
     opts = Store.lookup_options('bokeh', plot, 'style').kwargs
@@ -83,6 +88,7 @@ def test_rasterize_default_cmap(df):
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_rasterize_single_y_in_list_default_cmap(df):
     # Regression test for https://github.com/holoviz/hvplot/issues/1210
     plot = df.hvplot.line(y=['y'], rasterize=True)
@@ -91,6 +97,7 @@ def test_rasterize_single_y_in_list_default_cmap(df):
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_rasterize_default_colorbar(df):
     plot = df.hvplot.scatter('x', 'y', dynamic=False, rasterize=True)
     opts = Store.lookup_options('bokeh', plot, 'plot').kwargs
@@ -98,6 +105,7 @@ def test_rasterize_default_colorbar(df):
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_rasterize_default_colorbar_with_cmap(df):
     plot = df.hvplot.scatter('x', 'y', dynamic=False, rasterize=True, cmap='Reds')
     opts = Store.lookup_options('bokeh', plot, 'style').kwargs
@@ -107,6 +115,7 @@ def test_rasterize_default_colorbar_with_cmap(df):
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_rasterize_clim(df):
     plot = df.hvplot.scatter('x', 'y', dynamic=False, rasterize=True, clim=(1, 4))
     opts = Store.lookup_options('bokeh', plot, 'plot').kwargs
@@ -114,6 +123,7 @@ def test_rasterize_clim(df):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @pytest.mark.parametrize('dynamic', [True, False])
 @pytest.mark.parametrize('opt', ['aspect', 'data_aspect'])
 def test_datashade_aspect(df, opt, dynamic):
@@ -125,6 +135,7 @@ def test_datashade_aspect(df, opt, dynamic):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @pytest.mark.parametrize('dynamic', [True, False])
 @pytest.mark.parametrize('opt', ['aspect', 'data_aspect'])
 def test_datashade_aspect_and_frame_height(df, opt, dynamic):
@@ -137,6 +148,7 @@ def test_datashade_aspect_and_frame_height(df, opt, dynamic):
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_datashade_cmap_as_color_key(df):
     color_key = {'A': '#ff0000', 'B': '#00ff00', 'C': '#0000ff'}
     plot = df.hvplot.points(x='x', y='y', by='category', cmap=color_key, datashade=True)
@@ -144,12 +156,14 @@ def test_datashade_cmap_as_color_key(df):
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_datashade_cmap_name(df):
     plot = df.hvplot.points(x='x', y='y', datashade=True, cmap='fire')
     assert _operation(plot).p.cmap == process_cmap('fire')
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_datashade_hover_disabled_by_default(df):
     plot = df.hvplot(x='x', y='y', datashade=True)
     opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
@@ -157,6 +171,7 @@ def test_datashade_hover_disabled_by_default(df):
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_datashade_with_hover_true(df):
     plot = df.hvplot(x='x', y='y', datashade=True, hover=True)
     opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
@@ -164,6 +179,7 @@ def test_datashade_with_hover_true(df):
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_datashade_xlim():
     data = pd.DataFrame(np.random.randn(100).cumsum())
     img = data.hvplot(xlim=(0, 20000), datashade=True, dynamic=False)
@@ -171,6 +187,7 @@ def test_datashade_xlim():
 
 
 @requires('datashader')
+@pytest.mark.slow
 @operations
 def test_xlim_ylim_ranges(df, operation):
     plot = df.hvplot.points('x', 'y', xlim=(1, 5), ylim=(0, 10), **{operation: True})
@@ -179,6 +196,7 @@ def test_xlim_ylim_ranges(df, operation):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @pytest.mark.parametrize('kind', ['scatter', 'line', 'area'])
 def test_datashade_wide_explicit_ys_categorical(kind):
     df = makeTimeDataFrame()
@@ -188,6 +206,7 @@ def test_datashade_wide_explicit_ys_categorical(kind):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @pytest.mark.parametrize('kind', ['scatter', 'line', 'area'])
 def test_datashade_wide_implicit_ys_categorical(kind):
     plot = makeTimeDataFrame().hvplot(datashade=True, kind=kind)
@@ -196,6 +215,7 @@ def test_datashade_wide_implicit_ys_categorical(kind):
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_datashade_by_categorical(df):
     plot = df.hvplot.scatter('x', 'y', by='category', datashade=True)
     assert _operation(plot).p.cmap == CATEGORICAL_CMAP
@@ -203,6 +223,7 @@ def test_datashade_by_categorical(df):
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_aggregator_count_cat(df):
     from datashader.reductions import count_cat
 
@@ -213,6 +234,7 @@ def test_aggregator_count_cat(df):
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_aggregator_count_cat_categorical_cmap(df):
     from datashader.reductions import count_cat
 
@@ -223,6 +245,7 @@ def test_aggregator_count_cat_categorical_cmap(df):
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_aggregator_count_cat_image_stack(df):
     from datashader.reductions import count_cat
 
@@ -235,6 +258,7 @@ def test_aggregator_count_cat_image_stack(df):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @operations
 def test_aggregator_string_without_c(df, operation):
     dmap = df.hvplot.scatter('x', 'y', aggregator='max', **{operation: True})
@@ -242,6 +266,7 @@ def test_aggregator_string_without_c(df, operation):
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_aggregator_count_cat_string(df):
     from datashader.reductions import count_cat
 
@@ -253,6 +278,7 @@ def test_aggregator_count_cat_string(df):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @operations
 def test_aggregator_default_with_c(df, operation):
     from datashader.reductions import mean
@@ -264,6 +290,7 @@ def test_aggregator_default_with_c(df, operation):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @operations
 def test_aggregator_string_with_c(df, operation):
     from datashader.reductions import sum
@@ -275,6 +302,7 @@ def test_aggregator_string_with_c(df, operation):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @operations
 def test_aggregator_default_with_c_also_an_axis(df, operation):
     from datashader.reductions import mean
@@ -288,6 +316,7 @@ def test_aggregator_default_with_c_also_an_axis(df, operation):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @operations
 def test_pixel_ratio(df, operation):
     plot = df.hvplot(x='x', y='y', pixel_ratio=0.5, **{operation: True})
@@ -295,6 +324,7 @@ def test_pixel_ratio(df, operation):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @operations
 def test_dynspread(df, operation):
     from holoviews.operation.datashader import dynspread
@@ -307,6 +337,7 @@ def test_dynspread(df, operation):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @operations
 def test_dynspread_default_disabled(df, operation):
     from holoviews.operation.datashader import dynspread
@@ -316,6 +347,7 @@ def test_dynspread_default_disabled(df, operation):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @operations
 def test_max_px(df, operation):
     plot = df.hvplot.points('x', 'y', dynspread=True, max_px=5, **{operation: True})
@@ -323,6 +355,7 @@ def test_max_px(df, operation):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @operations
 def test_threshold(df, operation):
     plot = df.hvplot.points('x', 'y', dynspread=True, threshold=0.8, **{operation: True})
@@ -330,6 +363,7 @@ def test_threshold(df, operation):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @operations
 def test_precompute(df, operation):
     plot = df.hvplot.points('x', 'y', precompute=True, **{operation: True})
@@ -342,6 +376,7 @@ def test_resample_when_without_operation_error(df):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @operations
 def test_resample_when(large_df, operation):
     dmap = large_df.hvplot.scatter('x', 'y', resample_when=1000, **{operation: True})
@@ -384,6 +419,7 @@ def small_df():
 
 
 @requires('datashader')
+@pytest.mark.slow
 @pytest.mark.parametrize(
     'resampling',
     [
@@ -421,6 +457,7 @@ def test_selector_invalid_value(df, selector):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @operations
 def test_selector(df, operation):
     from datashader.reductions import first, min
@@ -435,6 +472,7 @@ def test_selector(df, operation):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @pytest.mark.render_xfail(reason='datashader: first() of a pandas string column fails')
 @operations
 def test_selector_reduction_of_string_column(df, operation):
@@ -446,6 +484,7 @@ def test_selector_reduction_of_string_column(df, operation):
 
 
 @requires('datashader')
+@pytest.mark.slow
 def test_selector_datashade_enables_hover(df):
     plot = df.hvplot(x='x', y='y', datashade=True, selector='first')
     opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
@@ -466,6 +505,7 @@ def test_rasterize_false_keeps_resolution(hvplot_xarray, da, kind):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @pytest.mark.parametrize('kind', ['image', 'quadmesh'])
 def test_x_sampling(hvplot_xarray, da, kind):
     plot = da.hvplot(kind=kind, dynamic=False, rasterize=True, x_sampling=5)
@@ -473,6 +513,7 @@ def test_x_sampling(hvplot_xarray, da, kind):
 
 
 @requires('datashader')
+@pytest.mark.slow
 @pytest.mark.parametrize('kind', ['image', 'quadmesh'])
 def test_y_sampling(hvplot_xarray, da, kind):
     plot = da.hvplot(kind=kind, dynamic=False, rasterize=True, y_sampling=2)
@@ -513,6 +554,7 @@ def test_rasterize_datashade_without_datashader(block_import, hvplot_pandas, ope
 
 
 @requires('datashader')
+@pytest.mark.slow
 @pytest.mark.parametrize('backend', ['matplotlib', 'plotly'], indirect=True)
 def test_rasterize_cmap_clim_colorbar_other_backends(df, backend):
     plot = df.hvplot.points('x', 'y', c='number', rasterize=True, cmap='fire', clim=(0, 1))
