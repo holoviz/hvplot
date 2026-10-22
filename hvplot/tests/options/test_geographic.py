@@ -10,6 +10,9 @@ import holoviews as hv
 import numpy as np
 import pandas as pd
 import pytest
+import xarray as xr
+from holoviews.element import Image
+from holoviews.element.comparison import ComparisonTestCase
 from holoviews.util.transform import lon_lat_to_easting_northing
 
 from hvplot.tests._data import air_temperature
@@ -536,3 +539,22 @@ class TestAnnotationNotGeo:
         assert x_range_end == 3000
         assert y_range_start == 400
         assert y_range_end == 800
+
+
+@pytest.mark.usefixtures('hvplot_xarray')
+class TestGridPlots(ComparisonTestCase):
+    def setUp(self):
+        self.ds = xr.Dataset(
+            {
+                'temp': (('lon', 'lat'), 15 + 8 * np.random.randn(2, 2)),
+                'precip': (('lon', 'lat'), 10 * np.random.rand(2, 2)),
+            },
+            coords={'lon': [-99.83, -99.32], 'lat': [42.25, 42.21]},
+        )
+
+    def test_tiles_without_gv(self):
+        plot = self.ds.hvplot('lon', 'lat', tiles=True)
+        assert len(plot) == 2
+        assert isinstance(plot.get(1), Image)
+        assert 'x' in plot.get(1).data
+        assert 'y' in plot.get(1).data

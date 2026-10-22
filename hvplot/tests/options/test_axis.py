@@ -1,9 +1,14 @@
+from unittest import SkipTest
+
 import holoviews as hv
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
 from holoviews import Store
+from holoviews.element import Area, Curve, Scatter
+from holoviews.element.comparison import ComparisonTestCase
+from parameterized import parameterized
 
 
 @pytest.fixture(scope='module')
@@ -203,3 +208,52 @@ def test_subcoordinate_y_dict(hvplot_pandas):
     opts = Store.lookup_options('bokeh', plot, 'plot')
     assert opts.kwargs['subcoordinate_y'] is True
     assert opts.kwargs['subcoordinate_scale'] == 2
+
+
+class TestChart1D(ComparisonTestCase):
+    def setUp(self):
+        import hvplot.pandas  # noqa: F401
+
+        self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
+
+    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    def test_tidy_chart_ranges(self, kind, element):
+        plot = self.df.hvplot(x='x', y='y', kind=kind, xlim=(0, 3), ylim=(5, 10))
+        opts = Store.lookup_options('bokeh', plot, 'plot').options
+        self.assertEqual(opts['xlim'], (0, 3))
+        self.assertEqual(opts['ylim'], (5, 10))
+
+    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    def test_wide_chart_ranges(self, kind, element):
+        plot = self.df.hvplot(kind=kind, xlim=(0, 3), ylim=(5, 10))
+        opts = Store.lookup_options('bokeh', plot.last, 'plot').options
+        self.assertEqual(opts['xlim'], (0, 3))
+        self.assertEqual(opts['ylim'], (5, 10))
+
+    def test_histogram_subplots_no_shared_axes(self):
+        plots = self.df.hvplot.hist(subplots=True, shared_axes=False)
+        plot_0 = plots.grid_items()[0, 0][1]
+        plot_1 = plots.grid_items()[0, 1][1]
+        assert plot_0.opts['axiswise']
+        assert plot_0.range('x') == (1, 5)
+        assert plot_1.range('y') == (2, 6)
+
+    def test_histogram_subplots_shared_axes(self):
+        plots = self.df.hvplot.hist(subplots=True, shared_axes=True)
+        plot_0 = plots.grid_items()[0, 0][1]
+        plot_1 = plots.grid_items()[0, 1][1]
+        assert not plot_0.opts['axiswise']
+        assert plot_0.range('x') == (1, 6)
+        assert plot_1.range('y') == (1, 6)
+
+
+class TestChart1DDask(TestChart1D):
+    def setUp(self):
+        super().setUp()
+        try:
+            import dask.dataframe as dd
+        except ImportError:
+            raise SkipTest('Dask not available')
+        import hvplot.dask  # noqa: F401
+
+        self.df = dd.from_pandas(self.df, npartitions=2)

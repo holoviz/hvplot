@@ -193,11 +193,7 @@ markers = [
     "slow: slow tests, run with --slow (always run on CI)",
     "geo: tests using GeoViews, skipped when geoviews or cartopy are missing",
 ]
-# The test suite used to be run with nosetests which collected
-# by default files like `testgeo.py` while pytest's default is
-# to collect files like `test_geo.py`. This setting allows
-# to avoid renaming all the test files.
-python_files = "test*.py"
+python_files = "test_*.py"
 filterwarnings = [
     # 2023-09: See https://github.com/matplotlib/matplotlib/issues/25244
     "ignore:Deprecated call to `pkg_resources.+?'mpl_toolkits:DeprecationWarning",

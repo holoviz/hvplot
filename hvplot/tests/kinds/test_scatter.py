@@ -1,9 +1,13 @@
+from unittest import SkipTest
+
 import holoviews as hv
 import numpy as np
 import pandas as pd
 import pytest
 from holoviews import Store
 from holoviews.element.comparison import ComparisonTestCase
+
+from hvplot.util import is_dask
 
 
 @pytest.fixture(scope='module')
@@ -97,3 +101,32 @@ class TestPandasTransforms(ComparisonTestCase):
     #     plot_opts = scatter.opts.get().kwargs
     #     # Matplotlib uses 's' not 'size'
     #     assert 's' in plot_opts
+
+
+class TestChart1D(ComparisonTestCase):
+    def setUp(self):
+        import hvplot.pandas  # noqa: F401
+
+        self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
+
+    def test_scatter_size_set_to_series(self):
+        if is_dask(self.df['y']):
+            y = self.df['y'].compute()
+        else:
+            y = self.df['y']
+        plot = self.df.hvplot.scatter('x', 'y', s=y)
+        opts = Store.lookup_options('bokeh', plot, 'style')
+        assert '_size' in plot.data.columns
+        self.assertEqual(opts.kwargs['size'], '_size')
+
+
+class TestChart1DDask(TestChart1D):
+    def setUp(self):
+        super().setUp()
+        try:
+            import dask.dataframe as dd
+        except ImportError:
+            raise SkipTest('Dask not available')
+        import hvplot.dask  # noqa: F401
+
+        self.df = dd.from_pandas(self.df, npartitions=2)
