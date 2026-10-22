@@ -196,7 +196,7 @@ jobs:
       - name: unit tests
         run: pytest -v hvplot -n logical --slow --cov=hvplot --cov-branch
       - name: examples tests
-        run: pytest -n logical --dist loadscope --nbval-lax -p no:python
+        run: pytest -n logical --dist loadscope --nbval-lax -p no:python -p no:randomly
       - name: Upload coverage reports to Codecov
         if: github.event_name == 'push' || github.event_name == 'pull_request'
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6

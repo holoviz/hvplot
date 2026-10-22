@@ -185,7 +185,7 @@ include = ["hvplot", "scripts", "doc"]
 version-file = "hvplot/_version.py"
 
 [tool.pytest.ini_options]
-addopts = "--pyargs --strict-markers --strict-config"
+addopts = "--pyargs --strict-markers"
 norecursedirs = "*.egg dist build _build jupyter_execute .*"
 xfail_strict = true
 markers = [

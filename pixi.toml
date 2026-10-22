@@ -215,7 +215,7 @@ test-unit = 'pytest hvplot -n logical'
 test-unit-cov = 'pytest hvplot -n logical --slow --cov=hvplot --cov-branch'
 
 [feature.test-example.tasks]
-test-example = 'pytest -n logical --dist loadscope --nbval-lax -p no:python doc'
+test-example = 'pytest -n logical --dist loadscope --nbval-lax -p no:python -p no:randomly doc'
 
 # =================== DOCS ====================
 
