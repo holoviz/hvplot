@@ -9,11 +9,9 @@ from holoviews import Store
 from holoviews.testing import assert_element_equal
 
 from hvplot.tests._backends import plotly_without
-from hvplot.tests._deps import requires
+from hvplot.tests._deps import pandas_and_dask, requires
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
-
-pandas_and_dask = pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
 
 
 @pytest.fixture
@@ -228,15 +226,13 @@ def test_symmetric_deduced_use_dask_skipped(symmetric_df):
     assert style_opts.kwargs['cmap'] == 'kbc_r'
 
 
-dask_symmetric_bug = pytest.mark.xfail(
-    reason='BUG: _process_symmetric raises TypeError on a dask DataFrame, swallowed',
-    strict=True,
+dask_symmetric_bug = pytest.mark.lib_xfail(
+    'dask', reason='BUG: _process_symmetric raises TypeError on a dask DataFrame, swallowed'
 )
 
 
-@pytest.mark.parametrize(
-    'tabular_lib', ['pandas', pytest.param('dask', marks=dask_symmetric_bug)], indirect=True
-)
+@pandas_and_dask
+@dask_symmetric_bug
 def test_symmetric_deduced_tabular_lib(tabular_lib, symmetric_df):
     plot = tabular_lib(symmetric_df).hvplot.scatter('x', 'y', c='number')
     plot_opts = Store.lookup_options('bokeh', plot, 'plot')
@@ -245,9 +241,8 @@ def test_symmetric_deduced_tabular_lib(tabular_lib, symmetric_df):
     assert style_opts.kwargs['cmap'] == 'coolwarm'
 
 
-@pytest.mark.parametrize(
-    'tabular_lib', ['pandas', pytest.param('dask', marks=dask_symmetric_bug)], indirect=True
-)
+@pandas_and_dask
+@dask_symmetric_bug
 def test_robust_tabular_lib(tabular_lib, symmetric_df):
     plot = tabular_lib(symmetric_df).hvplot.scatter('x', 'y', c='number', robust=True)
     plot_opts = Store.lookup_options('bokeh', plot, 'plot')

@@ -20,25 +20,10 @@ def test_table_multi_index_displayed(hvplot_pandas):
     assert table.kdims[:2] == multii_df.index.names
 
 
-@pytest.mark.parametrize(
-    'tabular_lib',
-    [
-        'pandas',
-        'dask',
-        pytest.param(
-            'polars',
-            marks=pytest.mark.xfail(
-                POLARS_2, strict=True, reason='BUG: uses pl.NUMERIC_DTYPES, removed in polars 2.0'
-            ),
-        ),
-        'duckdb',
-        pytest.param(
-            'ibis',
-            marks=pytest.mark.xfail(strict=True, reason='BUG: reads the index of an ibis table'),
-        ),
-    ],
-    indirect=True,
+@pytest.mark.lib_xfail(
+    'polars', condition=POLARS_2, reason='BUG: uses pl.NUMERIC_DTYPES, removed in polars 2.0'
 )
+@pytest.mark.lib_xfail('ibis', reason='BUG: reads the index of an ibis table')
 def test_columns(tabular_lib):
     df = pd.DataFrame({'A': [1, 2], 'B': ['a', 'b'], 'C': [0.5, 1.5]})
     table = tabular_lib(df).hvplot.table(columns=['C', 'A'])

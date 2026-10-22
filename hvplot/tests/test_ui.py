@@ -107,17 +107,16 @@ def test_explorer_hvplot(df):
     assert plot.vdims[0].name == 'bill_depth_mm'
 
 
-EXPLORER_BUGS = {
-    'polars': 'BUG: the explorer does not convert a polars DataFrame to pandas',
-    'duckdb': 'BUG: the explorer reads the dtype of a duckdb column in xlim',
-    'ibis': 'BUG: the explorer reads the dtype of an ibis column in xlim',
-}
-
-
-def test_explorer_tabular_lib(request, tabular_lib):
-    library = request.node.callspec.params['tabular_lib']
-    if library in EXPLORER_BUGS:
-        request.applymarker(pytest.mark.xfail(strict=True, reason=EXPLORER_BUGS[library]))
+@pytest.mark.lib_xfail(
+    'polars', reason='BUG: the explorer does not convert a polars DataFrame to pandas'
+)
+@pytest.mark.lib_xfail(
+    'duckdb', reason='BUG: the explorer reads the dtype of a duckdb column in xlim'
+)
+@pytest.mark.lib_xfail(
+    'ibis', reason='BUG: the explorer reads the dtype of an ibis column in xlim'
+)
+def test_explorer_tabular_lib(tabular_lib):
     data = pd.DataFrame({'x': [1.0, 2.0, 3.0], 'y': [2.0, 4.0, 3.0], 'z': [0.1, 0.2, 0.3]})
 
     explorer = hvplot.explorer(tabular_lib(data), kind='scatter', x='x', y='y')

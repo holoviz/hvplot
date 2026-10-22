@@ -14,20 +14,7 @@ def df():
     )
 
 
-@pytest.mark.parametrize(
-    'tabular_lib',
-    [
-        'pandas',
-        'dask',
-        'polars',
-        'duckdb',
-        pytest.param(
-            'ibis',
-            marks=pytest.mark.xfail(strict=True, reason='BUG: kde on ibis requires x'),
-        ),
-    ],
-    indirect=True,
-)
+@pytest.mark.lib_xfail('ibis', reason='BUG: kde on ibis requires x')
 def test_y(df, tabular_lib):
     plot = tabular_lib(df).hvplot.kde(y='y')
     assert isinstance(plot, Distribution)

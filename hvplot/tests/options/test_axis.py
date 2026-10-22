@@ -14,11 +14,9 @@ from matplotlib.ticker import PercentFormatter
 
 import hvplot
 from hvplot.tests._backends import plotly_without
-from hvplot.tests._deps import requires
+from hvplot.tests._deps import pandas_and_dask, requires
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
-
-pandas_and_dask = pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
 
 
 @pytest.fixture

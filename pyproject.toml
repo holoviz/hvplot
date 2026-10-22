@@ -192,6 +192,9 @@ markers = [
     "slow: slow tests, run with --slow (always run on CI)",
     "geo: tests using GeoViews, skipped when geoviews or cartopy are missing",
     "render_xfail: xfail that only applies when the plots are rendered (i.e. without --no-render)",
+    "lib_xfail(*libs, **xfail_kwargs): xfail for the tests run with these data libraries (tabular_lib or gridded_lib)",
+    "lib_render_xfail(*libs, **xfail_kwargs): lib_xfail that only applies when the plots are rendered",
+    "lib_skip(*libs, reason): skip the tests run with these data libraries, which they don't apply to",
 ]
 python_files = "test_*.py"
 filterwarnings = [

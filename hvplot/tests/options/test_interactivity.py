@@ -7,9 +7,10 @@ from holoviews import Store
 from holoviews.element import Area, Curve, Path, Points, Scatter
 from holoviews.testing import assert_element_equal
 
+from hvplot.tests._deps import pandas_and_dask
+
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
 
-pandas_and_dask = pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
 
 charts_1d = pytest.mark.parametrize(
     ('kind', 'element'), [('line', Curve), ('area', Area), ('scatter', Scatter)]

@@ -10,7 +10,7 @@ from holoviews import Store
 from holoviews.plotting.bokeh import OverlayPlot
 
 import hvplot
-from hvplot.tests._deps import requires
+from hvplot.tests._deps import pandas_and_dask, requires
 
 
 @pytest.fixture
@@ -88,3 +88,24 @@ def test_plots_returned_by_hvplot_are_rendered(request, hvplot_pandas, backend, 
 @pytest.mark.render_xfail(reason='Checks that render_xfail is applied when rendering.')
 def test_render_xfail(request):
     assert request.config.getoption('--no-render')
+
+
+# The body fails with dask only, so the tests below pass only if the lib_* mark is applied to
+# the dask item, and not to the pandas item (xfail is strict).
+@pandas_and_dask
+@pytest.mark.lib_xfail('dask', reason='Checks that lib_xfail is applied to the library.')
+def test_lib_xfail(tabular_lib, request):
+    assert request.node.callspec.params['tabular_lib'] != 'dask'
+
+
+@pandas_and_dask
+@pytest.mark.lib_skip('dask', reason='Checks that lib_skip is applied to the library.')
+def test_lib_skip(tabular_lib, request):
+    assert request.node.callspec.params['tabular_lib'] != 'dask'
+
+
+@pytest.mark.lib_render_xfail('dask', reason='Checks that lib_render_xfail is applied (gridded).')
+def test_lib_render_xfail(gridded_lib, request):
+    # With dask, it only fails when the plots are rendered.
+    dask_item = request.node.callspec.params['gridded_lib'] == 'dask'
+    assert not dask_item or request.config.getoption('--no-render')

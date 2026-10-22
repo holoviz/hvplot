@@ -28,21 +28,8 @@ def test_x(df):
     assert list(plot.dimension_values('lon')) == [5, 6, 6, 5]
 
 
-@pytest.mark.parametrize(
-    'tabular_lib',
-    [
-        'pandas',
-        'dask',
-        'polars',
-        'duckdb',
-        pytest.param(
-            'ibis',
-            marks=pytest.mark.render_xfail(
-                reason='HoloViews: Polygons of an ibis table fails to render'
-            ),
-        ),
-    ],
-    indirect=True,
+@pytest.mark.lib_render_xfail(
+    'ibis', reason='HoloViews: Polygons of an ibis table fails to render'
 )
 def test_y(df, tabular_lib):
     plot = tabular_lib(df).hvplot.polygons(x='x', y='lon')

@@ -9,22 +9,8 @@ def df():
     return pd.DataFrame({'y': [1.0, 4.0, 2.0, 3.0], 'y2': [0.5, 1.0, 1.5, 2.0]})
 
 
-@pytest.mark.parametrize(
-    'tabular_lib',
-    [
-        'pandas',
-        'dask',
-        'polars',
-        'duckdb',
-        pytest.param(
-            'ibis',
-            marks=pytest.mark.xfail(
-                strict=True,
-                reason='BUG: density fails with ibis, cannot determine what to plot',
-            ),
-        ),
-    ],
-    indirect=True,
+@pytest.mark.lib_xfail(
+    'ibis', reason='BUG: density fails with ibis, cannot determine what to plot'
 )
 def test_y(df, tabular_lib):
     plot = tabular_lib(df).hvplot.density(y='y')

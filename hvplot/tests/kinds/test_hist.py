@@ -4,6 +4,8 @@ import pytest
 from holoviews import NdLayout, NdOverlay
 from holoviews.element import Histogram
 
+from hvplot.tests._deps import pandas_and_dask
+
 
 @pytest.fixture(scope='module')
 def df():
@@ -105,7 +107,7 @@ def test_cumulative(df, hvplot_pandas):
     np.testing.assert_array_equal(plot.dimension_values('v_count'), [3, 6])
 
 
-@pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
+@pandas_and_dask
 def test_histogram_log_bins(tabular_lib):
     df = tabular_lib(pd.DataFrame({'z': [1, 1, 4, 4]}))
     plot_logx = df.hvplot.hist(bins=2, logx=True)

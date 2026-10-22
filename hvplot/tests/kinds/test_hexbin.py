@@ -20,21 +20,8 @@ def test_x(df, hvplot_pandas):
     assert plot.kdims == ['y', 'x']
 
 
-@pytest.mark.parametrize(
-    'tabular_lib',
-    [
-        'pandas',
-        'dask',
-        'polars',
-        'duckdb',
-        pytest.param(
-            'ibis',
-            marks=pytest.mark.render_xfail(
-                reason='HoloViews: HexTiles of an ibis table fails to render'
-            ),
-        ),
-    ],
-    indirect=True,
+@pytest.mark.lib_render_xfail(
+    'ibis', reason='HoloViews: HexTiles of an ibis table fails to render'
 )
 def test_y(df, tabular_lib):
     plot = tabular_lib(df).hvplot.hexbin(x='x', y='y')

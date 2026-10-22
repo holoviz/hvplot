@@ -6,12 +6,12 @@ import pytest
 from hvplot import hvPlotTabular
 from hvplot.converter import HoloViewsConverter
 from hvplot.tests._data import makeDataFrame
+from hvplot.tests._deps import TABULAR_LIBS
 
 TYPES = {t for t in dir(hvPlotTabular) if not t.startswith('_') and t != 'explorer'}
 FRAME_TYPES = TYPES - {'bivariate', 'heatmap', 'hexbin', 'labels', 'vectorfield'}
 SERIES_TYPES = FRAME_TYPES - {'points', 'polygons', 'ohlc', 'paths'}
 
-TABULAR_LIBS = ['pandas', 'dask', 'polars', 'duckdb', 'ibis']
 # Ibis tables have no index, which these kinds use as the default x.
 IBIS_NEEDS_X_KINDS = {'area', 'bar', 'barh', 'errorbars', 'line', 'scatter', 'step'}
 TABULAR_BUGS = {
@@ -136,8 +136,7 @@ def test_ibis_requires_x(tabular_lib):
         df.hvplot.line(y=Y)
 
 
-# DuckDB and Ibis have no Series object.
-@pytest.mark.parametrize('tabular_lib', ['pandas', 'dask', 'polars'], indirect=True)
+@pytest.mark.lib_skip('duckdb', 'ibis', reason='DuckDB and Ibis have no Series object.')
 @pytest.mark.parametrize(
     'kind',
     [pytest.param(k, marks=render_marks(k, None, series=True)) for k in sorted(SERIES_TYPES)],

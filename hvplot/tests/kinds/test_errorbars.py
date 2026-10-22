@@ -3,6 +3,8 @@ import pytest
 from holoviews import Store
 from holoviews.element import ErrorBars
 
+from hvplot.tests._deps import pandas_and_dask
+
 
 @pytest.fixture(scope='module')
 def df():
@@ -43,7 +45,7 @@ def test_yerr2(df, hvplot_pandas):
     assert list(plot.dimension_values('pos')) == [0.3, 0.2, 0.1]
 
 
-@pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
+@pandas_and_dask
 def test_errorbars_no_hover(tabular_lib):
     df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
     df_desc = tabular_lib(df.describe().transpose().sort_values('mean'))

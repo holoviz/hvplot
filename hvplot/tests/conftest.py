@@ -18,6 +18,7 @@ from packaging.version import Version
 
 import hvplot
 from hvplot.plotting.core import hvPlotBase
+from hvplot.tests._deps import GRIDDED_LIBS, TABULAR_LIBS
 
 param.parameterized.warnings_as_exceptions = True
 
@@ -120,6 +121,21 @@ def pytest_configure(config):
         hvPlotBase.__call__ = _render_returned_plot(hvPlotBase.__call__)
 
 
+def _apply_lib_marks(item, render):
+    """Apply the `lib_*` marks naming the library (`tabular_lib` or `gridded_lib`) of the item."""
+    params = item.callspec.params if hasattr(item, 'callspec') else {}
+    lib = params.get('tabular_lib') or params.get('gridded_lib')
+    marks = {'lib_xfail': pytest.mark.xfail, 'lib_skip': pytest.mark.skip}
+    if render:
+        marks['lib_render_xfail'] = pytest.mark.xfail
+    for name, make_mark in marks.items():
+        for mark in item.iter_markers(name):
+            if not set(mark.args) <= {*TABULAR_LIBS, *GRIDDED_LIBS}:
+                raise pytest.UsageError(f'{item.nodeid}: unknown library in {name}{mark.args}')
+            if lib in mark.args:
+                item.add_marker(make_mark(**mark.kwargs))
+
+
 def pytest_collection_modifyitems(config, items):
     skip_slow = pytest.mark.skip(reason='Slow test, run it with --slow.')
     skip_geo = pytest.mark.skip(reason='GeoViews test, requires geoviews and cartopy.')
@@ -133,6 +149,8 @@ def pytest_collection_modifyitems(config, items):
         render_xfail = item.get_closest_marker('render_xfail')
         if render_xfail and render:
             item.add_marker(pytest.mark.xfail(*render_xfail.args, **render_xfail.kwargs))
+        # For tests that fail or don't apply with some of the data libraries.
+        _apply_lib_marks(item, render)
 
 
 def pytest_collection_finish(session):
@@ -255,7 +273,7 @@ def backend(request):
     )
 
 
-@pytest.fixture(params=['pandas', 'dask', 'polars', 'duckdb', 'ibis'])
+@pytest.fixture(params=TABULAR_LIBS)
 def tabular_lib(request):
     """Return a function converting a pandas DataFrame to the library's object.
 
@@ -288,7 +306,7 @@ def tabular_lib(request):
         return ibis.memtable
 
 
-@pytest.fixture(params=['xarray', 'dask'])
+@pytest.fixture(params=GRIDDED_LIBS)
 def gridded_lib(request):
     """Return a function converting an xarray object to one backed by the library.
 

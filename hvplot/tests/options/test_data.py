@@ -10,12 +10,11 @@ from holoviews.core.dimension import Dimension
 from holoviews.element import Area, Curve, Scatter
 from holoviews.testing import assert_data_equal, assert_element_equal
 
-from hvplot.tests._deps import requires
+from hvplot.tests._deps import pandas_and_dask, requires
 from hvplot.util import is_dask
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
 
-pandas_and_dask = pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
 
 charts = pytest.mark.parametrize(
     ('kind', 'element'), [('line', Curve), ('area', Area), ('scatter', Scatter)]
@@ -59,19 +58,9 @@ def test_transforms_xarray(hvplot_xarray):
     assert_data_equal(img.data.value.data, da.data * 10)
 
 
-@pytest.mark.parametrize(
-    'tabular_lib',
-    [
-        'pandas',
-        pytest.param(
-            'dask',
-            marks=pytest.mark.xfail(
-                strict=True,
-                reason='BUG: dt accessor columns with dask fail on mismatched divisions',
-            ),
-        ),
-    ],
-    indirect=True,
+@pandas_and_dask
+@pytest.mark.lib_xfail(
+    'dask', reason='BUG: dt accessor columns with dask fail on mismatched divisions'
 )
 def test_by_datetime_accessor(tabular_lib):
     dt_df = pd.DataFrame(np.random.rand(90), index=pd.date_range('2019-01-01', '2019-03-31'))
@@ -109,18 +98,9 @@ def test_value_label_and_group_label_wide(tabular_lib, xy_df, kind, element):
     assert_element_equal(plot, expected)
 
 
-@pytest.mark.parametrize(
-    'tabular_lib',
-    [
-        'pandas',
-        pytest.param(
-            'dask',
-            marks=pytest.mark.render_xfail(
-                reason='dask: projecting a column through rename_axis(columns=...) fails'
-            ),
-        ),
-    ],
-    indirect=True,
+@pandas_and_dask
+@pytest.mark.lib_render_xfail(
+    'dask', reason='dask: projecting a column through rename_axis(columns=...) fails'
 )
 @pytest.mark.parametrize('kind', ['line', 'area', 'scatter'])
 def test_group_label_from_columns_name(tabular_lib, xy_df, kind):

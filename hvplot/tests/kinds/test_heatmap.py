@@ -5,6 +5,8 @@ from holoviews import Store
 from holoviews.element import HeatMap
 from holoviews.testing import assert_element_equal
 
+from hvplot.tests._deps import pandas_and_dask
+
 
 @pytest.fixture(scope='module')
 def df():
@@ -17,22 +19,7 @@ def test_x(df, hvplot_pandas):
     assert plot.kdims == ['y', 'x']
 
 
-@pytest.mark.parametrize(
-    'tabular_lib',
-    [
-        'pandas',
-        'dask',
-        'polars',
-        'duckdb',
-        pytest.param(
-            'ibis',
-            marks=pytest.mark.render_xfail(
-                reason='HoloViews: HeatMap of an ibis table fails to render'
-            ),
-        ),
-    ],
-    indirect=True,
-)
+@pytest.mark.lib_render_xfail('ibis', reason='HoloViews: HeatMap of an ibis table fails to render')
 def test_y(df, tabular_lib):
     plot = tabular_lib(df).hvplot.heatmap(x='x', y='y', C='value')
     assert isinstance(plot, HeatMap)
@@ -40,19 +27,8 @@ def test_y(df, tabular_lib):
     assert plot.vdims == ['value']
 
 
-@pytest.mark.parametrize(
-    'tabular_lib',
-    [
-        'pandas',
-        pytest.param(
-            'dask',
-            marks=pytest.mark.xfail(
-                strict=True, reason='BUG: heatmap of the index and columns fails with dask'
-            ),
-        ),
-    ],
-    indirect=True,
-)
+@pandas_and_dask
+@pytest.mark.lib_xfail('dask', reason='BUG: heatmap of the index and columns fails with dask')
 def test_x_y_default_columns_and_index(tabular_lib):
     df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
     plot = tabular_lib(df).hvplot.heatmap()
@@ -61,7 +37,7 @@ def test_x_y_default_columns_and_index(tabular_lib):
     )
 
 
-@pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
+@pandas_and_dask
 def test_x_y_derived_datetime(tabular_lib):
     time_df = pd.DataFrame(
         {

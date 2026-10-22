@@ -5,7 +5,7 @@ import xarray as xr
 from holoviews.element import Path
 from holoviews.testing import assert_element_equal
 
-from hvplot.tests._deps import requires
+from hvplot.tests._deps import pandas_and_dask, requires
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
 
@@ -20,13 +20,13 @@ def test_x(df):
     assert_element_equal(plot, Path(df, ['z', 'y'], []))
 
 
-@pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
+@pandas_and_dask
 def test_x_default(df, tabular_lib):
     plot = tabular_lib(df).hvplot.paths()
     assert_element_equal(plot, Path(df, ['x', 'y'], []))
 
 
-@pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
+@pandas_and_dask
 def test_x_index(df, tabular_lib):
     plot = tabular_lib(df).hvplot.paths(x='index', y='y', c='x')
     assert_element_equal(plot, Path(df.reset_index(), ['index', 'y'], ['x']))

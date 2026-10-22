@@ -34,22 +34,8 @@ def test_x_default_index():
     assert plot.Segments.I.kdims == ['index', 'Low', 'index', 'High']
 
 
-@pytest.mark.parametrize(
-    'tabular_lib',
-    [
-        'pandas',
-        'dask',
-        'polars',
-        'duckdb',
-        pytest.param(
-            'ibis',
-            marks=pytest.mark.xfail(
-                strict=True,
-                reason='BUG: ohlc reads dimension_values(x).dtype.kind, missing on ibis',
-            ),
-        ),
-    ],
-    indirect=True,
+@pytest.mark.lib_xfail(
+    'ibis', reason='BUG: ohlc reads dimension_values(x).dtype.kind, missing on ibis'
 )
 def test_y(tabular_lib):
     plot = tabular_lib(reordered_df).hvplot.ohlc(x='Date', y=ohlc_cols)

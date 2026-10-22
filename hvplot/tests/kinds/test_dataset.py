@@ -12,21 +12,8 @@ def df():
     return pd.DataFrame({'x': [1, 2, 3], 'y': [1.0, 4.0, 2.0], 'z': [0.5, 1.0, 1.5]})
 
 
-@pytest.mark.parametrize(
-    'tabular_lib',
-    [
-        'pandas',
-        'dask',
-        pytest.param(
-            'polars',
-            marks=pytest.mark.xfail(
-                POLARS_2, strict=True, reason='BUG: uses pl.NUMERIC_DTYPES, removed in polars 2.0'
-            ),
-        ),
-        'duckdb',
-        'ibis',
-    ],
-    indirect=True,
+@pytest.mark.lib_xfail(
+    'polars', condition=POLARS_2, reason='BUG: uses pl.NUMERIC_DTYPES, removed in polars 2.0'
 )
 def test_dataset_tabular(df, tabular_lib):
     plot = tabular_lib(df).hvplot.dataset()

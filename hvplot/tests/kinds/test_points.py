@@ -8,6 +8,7 @@ from holoviews.element import Points
 from holoviews.testing import assert_element_equal
 
 from hvplot.tests._backends import size_opt
+from hvplot.tests._deps import pandas_and_dask
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
 
@@ -47,7 +48,7 @@ def test_x(df):
     assert_element_equal(plot, Points(df, ['number', 'y'], []))
 
 
-@pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
+@pandas_and_dask
 def test_x_default(df, tabular_lib):
     data = df.drop(columns='cat')
     plot = tabular_lib(data).hvplot.points()
@@ -71,7 +72,7 @@ def test_x_or_y_only(df, kwargs):
     assert 'number' in plot.kdims
 
 
-@pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
+@pandas_and_dask
 def test_x_index(df, tabular_lib):
     plot = tabular_lib(df).hvplot.points(x='index', y='y', c='x')
     assert_element_equal(plot, Points(df.reset_index(), ['index', 'y'], ['x']))

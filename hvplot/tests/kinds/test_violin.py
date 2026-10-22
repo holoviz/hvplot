@@ -11,22 +11,7 @@ def df():
     return pd.DataFrame({'x': [1.0, 2.0, 3.0], 'y': [2.0, 4.0, 3.0]})
 
 
-@pytest.mark.parametrize(
-    'tabular_lib',
-    [
-        'pandas',
-        'dask',
-        'polars',
-        'duckdb',
-        pytest.param(
-            'ibis',
-            marks=pytest.mark.render_xfail(
-                reason='HoloViews: Violin of an ibis table fails to render'
-            ),
-        ),
-    ],
-    indirect=True,
-)
+@pytest.mark.lib_render_xfail('ibis', reason='HoloViews: Violin of an ibis table fails to render')
 def test_y(df, tabular_lib):
     plot = tabular_lib(df).hvplot.violin(y='y')
     assert isinstance(plot, Violin)

@@ -15,6 +15,8 @@ from holoviews.core.dimension import Dimension
 from holoviews.element import Area, Curve, Scatter
 from holoviews.testing import assert_element_equal
 
+from hvplot.tests._deps import pandas_and_dask
+
 pytestmark = pytest.mark.usefixtures('hvplot_pandas', 'hvplot_xarray')
 
 CHART_KINDS = [('line', Curve), ('area', Area), ('scatter', Scatter)]
@@ -190,7 +192,7 @@ def test_xarray_dataset_with_attrs():
     assert render(ndoverlay, 'bokeh').xaxis.axis_label == 'time (s)'
 
 
-@pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
+@pandas_and_dask
 @pytest.mark.parametrize(('kind', 'element'), CHART_KINDS)
 def test_wide_chart(df, tabular_lib, kind, element):
     data = tabular_lib(df)
@@ -205,7 +207,7 @@ def test_wide_chart(df, tabular_lib, kind, element):
     assert_element_equal(plot, obj)
 
 
-@pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
+@pandas_and_dask
 @pytest.mark.parametrize(('kind', 'element'), CHART_KINDS)
 def test_tidy_chart(df, tabular_lib, kind, element):
     data = tabular_lib(df)
@@ -213,7 +215,7 @@ def test_tidy_chart(df, tabular_lib, kind, element):
     assert_element_equal(plot, element(data, 'x', 'y'))
 
 
-@pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
+@pandas_and_dask
 @pytest.mark.parametrize(('kind', 'element'), CHART_KINDS)
 def test_tidy_chart_index(df, tabular_lib, kind, element):
     data = tabular_lib(df)
@@ -221,7 +223,7 @@ def test_tidy_chart_index(df, tabular_lib, kind, element):
     assert_element_equal(plot, element(data, 'index', 'y'))
 
 
-@pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
+@pandas_and_dask
 @pytest.mark.parametrize(('kind', 'element'), CHART_KINDS)
 def test_tidy_chart_index_by(df, tabular_lib, kind, element):
     data = tabular_lib(df)
@@ -240,7 +242,7 @@ def test_tidy_chart_index_by(df, tabular_lib, kind, element):
     assert_element_equal(plot, obj)
 
 
-@pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
+@pandas_and_dask
 @pytest.mark.parametrize(('kind', 'element'), CHART_KINDS)
 def test_only_includes_num_chart(cat_df, tabular_lib, kind, element):
     data = tabular_lib(cat_df)
@@ -255,7 +257,7 @@ def test_only_includes_num_chart(cat_df, tabular_lib, kind, element):
     assert_element_equal(plot, obj)
 
 
-@pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
+@pandas_and_dask
 @pytest.mark.parametrize(
     ('kind', 'element'),
     [

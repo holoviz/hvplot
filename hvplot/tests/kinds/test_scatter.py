@@ -7,6 +7,7 @@ from holoviews.core.options import AbbreviatedException
 from holoviews.element import Scatter
 
 from hvplot.tests._backends import size_opt
+from hvplot.tests._deps import pandas_and_dask
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
 
@@ -98,7 +99,7 @@ def test_s_dim_expression():
     assert repr(opts.kwargs['size']) == repr(dim_expr)
 
 
-@pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
+@pandas_and_dask
 def test_s_series(tabular_lib):
     df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
     plot = tabular_lib(df).hvplot.scatter('x', 'y', s=df['y'])

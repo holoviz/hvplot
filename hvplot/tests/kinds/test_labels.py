@@ -5,6 +5,7 @@ from holoviews.core.dimension import Dimension
 from holoviews.element import Labels
 
 from hvplot.tests._backends import matplotlib_labels_bug
+from hvplot.tests._deps import pandas_and_dask
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
 
@@ -61,7 +62,7 @@ def test_text_default_column(edge_df):
     assert list(plot.data['Volume {m3}']) == ['1', '2', '3']
 
 
-@pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
+@pandas_and_dask
 def test_text_template(tabular_lib):
     df = tabular_lib(pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y']))
     plot = df.hvplot('x', 'y', text='({x}, {y})', kind='labels')

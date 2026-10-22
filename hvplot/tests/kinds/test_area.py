@@ -5,6 +5,8 @@ from holoviews.core.dimension import Dimension
 from holoviews.element import Area
 from holoviews.testing import assert_element_equal
 
+from hvplot.tests._deps import pandas_and_dask
+
 
 @pytest.fixture(scope='module')
 def df():
@@ -36,7 +38,7 @@ def test_y2(df, hvplot_pandas):
     assert list(plot.dimension_values('y2')) == [0.5, 1.0, 1.5]
 
 
-@pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
+@pandas_and_dask
 def test_stacked(tabular_lib):
     df = tabular_lib(pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y']))
     plot = df.hvplot.area(stacked=True)
