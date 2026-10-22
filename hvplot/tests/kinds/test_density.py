@@ -1,6 +1,6 @@
 import pandas as pd
 import pytest
-from holoviews import Store
+from holoviews import NdOverlay, Store
 from holoviews.element import Distribution
 
 
@@ -37,6 +37,15 @@ def test_y_list(df, hvplot_pandas):
     plot = df.hvplot.density(y=['y', 'y2'])
     assert list(plot.keys()) == ['y', 'y2']
     assert all(isinstance(dist, Distribution) for dist in plot)
+
+
+def test_by(hvplot_pandas):
+    df = pd.DataFrame({'v': [1.0, 2.0, 3.0, 10.0, 11.0, 12.0], 'g': list('aaabbb')})
+    plot = df.hvplot.density(y='v', by='g')
+    assert isinstance(plot, NdOverlay)
+    assert list(plot.keys()) == ['a', 'b']
+    assert list(plot['a'].dimension_values('v')) == [1, 2, 3]
+    assert list(plot['b'].dimension_values('v')) == [10, 11, 12]
 
 
 def test_bw_method_not_supported(df, hvplot_pandas):

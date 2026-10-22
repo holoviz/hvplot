@@ -108,6 +108,18 @@ def test_scale(df, backend):
     assert Store.lookup_options(backend, plot, 'style').kwargs[size_opt(backend)] == 8
 
 
+def test_scale_dim(df, backend):
+    plot = df.hvplot.scatter('x', 'y', s='number', scale=2)
+    size = Store.lookup_options(backend, plot, 'style').kwargs[size_opt(backend)]
+    np.testing.assert_allclose(size.apply(plot), np.sqrt(df['number']) * 2)
+
+
+def test_scale_dim_expression(df, backend):
+    plot = df.hvplot.scatter('x', 'y', s=hv.dim('number') * 10, scale=2)
+    size = Store.lookup_options(backend, plot, 'style').kwargs[size_opt(backend)]
+    np.testing.assert_allclose(size.apply(plot), df['number'] * 20)
+
+
 def test_marker(df, backend):
     plot = df.hvplot.scatter('x', 'y', marker='^')
     assert Store.lookup_options(backend, plot, 'style').kwargs['marker'] == '^'

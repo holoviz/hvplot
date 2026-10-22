@@ -415,3 +415,124 @@ def test_use_dask(hvplot_xarray, labelled_da):
 def test_use_dask_default_false(hvplot_xarray, labelled_da):
     plot = labelled_da.to_dataset().hvplot.line('t', 'v')
     assert isinstance(plot.data, pd.DataFrame)
+
+
+@pytest.fixture
+def abc_df():
+    return pd.DataFrame(
+        {
+            'x': [1, 2, 3, 4],
+            'y': [5, 6, 7, 8],
+            'z': [9, 10, 11, 12],
+            'a': ['u', 'u', 'v', 'v'],
+            'b': ['p', 'q', 'p', 'q'],
+        }
+    )
+
+
+@pytest.fixture
+def cube_da():
+    """A (t, y, x) DataArray with 2 time steps."""
+    return xr.DataArray(
+        np.arange(18.0).reshape(2, 3, 3),
+        coords={'t': [0, 1], 'y': [0, 1, 2], 'x': [0, 1, 2]},
+        dims=('t', 'y', 'x'),
+        name='v',
+    )
+
+
+def test_label_tabular(abc_df):
+    assert abc_df.hvplot.scatter('x', 'y', label='foo').label == 'foo'
+
+
+def test_label_wide(abc_df):
+    plot = abc_df.hvplot.scatter('x', ['y', 'z'], label='foo')
+    assert [el.label for el in plot] == ['foo', 'foo']
+
+
+def test_label_by(abc_df):
+    plot = abc_df.hvplot.scatter('x', 'y', by='a', label='foo')
+    assert [el.label for el in plot] == ['foo', 'foo']
+
+
+def test_label_and_title(abc_df):
+    plot = abc_df.hvplot.scatter('x', 'y', label='foo', title='bar')
+    assert plot.label == 'foo'
+    assert hv.Store.lookup_options('bokeh', plot, 'plot').kwargs['title'] == 'bar'
+
+
+def test_by_multiple_columns(abc_df):
+    plot = abc_df.hvplot.scatter('x', 'y', by=['a', 'b'])
+    assert isinstance(plot, NdOverlay)
+    assert plot.kdims == ['a', 'b']
+    assert list(plot.keys()) == [('u', 'p'), ('u', 'q'), ('v', 'p'), ('v', 'q')]
+
+
+def test_groupby_multiple_columns(abc_df):
+    plot = abc_df.hvplot.scatter('x', 'y', groupby=['a', 'b'], dynamic=False)
+    assert type(plot) is HoloMap
+    assert plot.kdims == ['a', 'b']
+    assert list(plot.keys()) == [('u', 'p'), ('u', 'q'), ('v', 'p'), ('v', 'q')]
+
+
+def test_by_gridded(hvplot_xarray, cube_da):
+    plot = cube_da.hvplot.image('x', 'y', by='t')
+    assert isinstance(plot, NdOverlay)
+    assert plot.kdims == ['t']
+    assert list(plot.keys()) == [0, 1]
+
+
+def test_subplots_gridded(hvplot_xarray, cube_da):
+    plot = cube_da.hvplot.image('x', 'y', by='t', subplots=True)
+    assert isinstance(plot, NdLayout)
+    assert plot.kdims == ['t']
+    assert list(plot.keys()) == [0, 1]
+
+
+@pytest.mark.parametrize('facet', ['row', 'col'])
+def test_row_col_gridded(hvplot_xarray, cube_da, facet):
+    plot = cube_da.hvplot.image('x', 'y', **{facet: 't'})
+    assert isinstance(plot, GridSpace)
+    assert plot.kdims == ['t']
+    assert list(plot.keys()) == [0, 1]
+
+
+def test_groupby_not_found_error(abc_df):
+    with pytest.raises(ValueError, match='could not be found'):
+        abc_df.hvplot.scatter('x', 'y', groupby='nope')
+
+
+def test_groupby_not_found_error_gridded(hvplot_xarray, cube_da):
+    with pytest.raises(ValueError, match='could not be found'):
+        cube_da.hvplot.image('x', 'y', groupby='nope')
+
+
+def test_dynamic_multiple_z(hvplot_xarray, cube_da):
+    ds = xr.Dataset({'a': cube_da.isel(t=0, drop=True), 'b': cube_da.isel(t=1, drop=True)})
+    plot = ds.hvplot.image('x', 'y', z=['a', 'b'])
+    assert isinstance(plot, DynamicMap)
+    assert plot.kdims == ['Variable']
+
+
+def test_transforms_with_groupby(abc_df):
+    plot = abc_df.hvplot.scatter(
+        'x', 'y', groupby='a', dynamic=False, transforms={'y': hv.dim('y') * 2}
+    )
+    assert_data_equal(plot.last.data['y'].values, np.array([14, 16]))
+
+
+def test_fields_dict_with_label_and_unit(abc_df):
+    plot = abc_df.hvplot.scatter('x', 'y', fields={'y': {'label': 'Why', 'unit': 'm'}})
+    assert (plot.vdims[0].label, plot.vdims[0].unit) == ('Why', 'm')
+
+
+def test_fields_tuple(abc_df):
+    plot = abc_df.hvplot.scatter('x', 'y', fields={'y': ('Y', 'Why')})
+    assert plot.vdims[0].name == 'Y'
+    assert plot.vdims[0].label == 'Why'
+
+
+def test_fields_with_attr_labels(hvplot_xarray, labelled_da):
+    plot = labelled_da.hvplot.line(fields={'v': 'V'})
+    assert plot.vdims[0].name == 'V'
+    assert (plot.vdims[0].label, plot.vdims[0].unit) == ('Speed', 'm/s')

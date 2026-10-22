@@ -95,10 +95,19 @@ def test_cmap_default_numerical(df, backend):
     assert opts.kwargs['cmap'] == 'kbc_r'
 
 
-def test_cmap_by_type(df, backend):
-    plot = df.hvplot.scatter('x', 'y', c='number', cmap='diverging')
+@pytest.mark.parametrize(
+    ('alias', 'expected'),
+    [
+        ('linear', 'kbc_r'),
+        ('categorical', cc.palette['glasbey_category10']),
+        ('cyclic', 'colorwheel'),
+        ('diverging', 'coolwarm'),
+    ],
+)
+def test_cmap_by_type(df, backend, alias, expected):
+    plot = df.hvplot.scatter('x', 'y', c='number', cmap=alias)
     opts = Store.lookup_options(backend, plot, 'style')
-    assert opts.kwargs['cmap'] == 'coolwarm'
+    assert opts.kwargs['cmap'] == expected
 
 
 def test_cmap_by_name(df, backend):
@@ -113,12 +122,59 @@ def test_cmap_list(df, backend):
     assert opts.kwargs['cmap'] == ['red', 'blue', 'green']
 
 
+def test_cmap_dict(df, backend):
+    cmap = {'A': 'red', 'B': 'blue', 'C': 'green'}
+    plot = df.hvplot.scatter('x', 'y', c='category', cmap=cmap)
+    opts = Store.lookup_options(backend, plot, 'style')
+    assert opts.kwargs['cmap'] == cmap
+
+
+def test_cmap_ignored_with_by(df):
+    # Documented in doc/ref/plotting_options/color_colormap.ipynb: `by` cycles through
+    # a color list instead of honoring cmap.
+    default = df.hvplot.line('x', 'y', by='category')
+    plot = df.hvplot.line('x', 'y', by='category', cmap=['red', 'blue', 'green'])
+    default_color = Store.lookup_options('bokeh', default.last, 'style').kwargs['color']
+    color = Store.lookup_options('bokeh', plot.last, 'style').kwargs['color']
+    assert color.values == default_color.values
+    assert 'red' not in color.values
+
+
 def test_cmap_matplotlib_colormap(hvplot_xarray):
     # Regression test for https://github.com/holoviz/hvplot/pull/1461
     da = xr.DataArray(np.arange(25).reshape(5, 5))
     cmap = mpl.colormaps['viridis']
     plot = da.hvplot.image(cmap=cmap)
     assert Store.lookup_options('bokeh', plot, 'style').kwargs['cmap'] is cmap
+
+
+@pytest.mark.parametrize('kind', ['scatter', 'line', 'bar'])
+@pytest.mark.parametrize('color', ['red', '#ff5733'])
+def test_color_constant(df, backend, kind, color):
+    plot = df.hvplot(x='x', y='y', kind=kind, color=color)
+    style_opts = Store.lookup_options(backend, plot, 'style')
+    assert style_opts.kwargs['color'] == color
+    plot_opts = Store.lookup_options(backend, plot, 'plot')
+    assert 'colorbar' not in plot_opts.kwargs
+
+
+def test_color_list_by(df, backend):
+    colors = ['red', 'blue', 'green']
+    plot = df.hvplot.line('x', 'y', by='category', color=colors)
+    style_opts = Store.lookup_options(backend, plot.last, 'style')
+    assert style_opts.kwargs['color'].values == colors
+
+
+def test_color_over_c(df):
+    plot = df.hvplot.scatter('x', 'y', c='number', color='red')
+    style_opts = Store.lookup_options('bokeh', plot, 'style')
+    assert style_opts.kwargs['color'] == 'red'
+
+
+def test_c_ndarray(df):
+    plot = df.hvplot.scatter('x', 'y', c=df['number'].to_numpy())
+    expected = df.assign(_color=df['number']).hvplot.scatter('x', 'y', c='_color')
+    assert_element_equal(plot, expected)
 
 
 def test_colormap_by_name(df, backend):
@@ -157,6 +213,58 @@ def test_symmetric_not_deduced_when_clim_set(symmetric_df, backend):
     assert plot_opts.kwargs.get('symmetric') is None
     style_opts = Store.lookup_options(backend, plot, 'style')
     assert style_opts.kwargs['cmap'] == 'kbc_r'
+
+
+def test_colormap_and_cmap_error(df):
+    with pytest.raises(TypeError, match='Specify at most one of'):
+        df.hvplot.scatter('x', 'y', c='number', cmap='fire', colormap='fire')
+
+
+def test_symmetric_deduced_use_dask_skipped(symmetric_df):
+    # With use_dask=True the data is not checked, as it could be loaded lazily.
+    plot = symmetric_df.hvplot.scatter('x', 'y', c='number', use_dask=True)
+    plot_opts = Store.lookup_options('bokeh', plot, 'plot')
+    assert plot_opts.kwargs.get('symmetric') is None
+    style_opts = Store.lookup_options('bokeh', plot, 'style')
+    assert style_opts.kwargs['cmap'] == 'kbc_r'
+
+
+dask_symmetric_bug = pytest.mark.xfail(
+    reason='BUG: _process_symmetric raises TypeError on a dask DataFrame, swallowed',
+    strict=True,
+)
+
+
+@pytest.mark.parametrize(
+    'tabular_lib', ['pandas', pytest.param('dask', marks=dask_symmetric_bug)], indirect=True
+)
+def test_symmetric_deduced_tabular_lib(tabular_lib, symmetric_df):
+    plot = tabular_lib(symmetric_df).hvplot.scatter('x', 'y', c='number')
+    plot_opts = Store.lookup_options('bokeh', plot, 'plot')
+    assert plot_opts.kwargs['symmetric'] is True
+    style_opts = Store.lookup_options('bokeh', plot, 'style')
+    assert style_opts.kwargs['cmap'] == 'coolwarm'
+
+
+@pytest.mark.parametrize(
+    'tabular_lib', ['pandas', pytest.param('dask', marks=dask_symmetric_bug)], indirect=True
+)
+def test_robust_tabular_lib(tabular_lib, symmetric_df):
+    plot = tabular_lib(symmetric_df).hvplot.scatter('x', 'y', c='number', robust=True)
+    plot_opts = Store.lookup_options('bokeh', plot, 'plot')
+    assert plot_opts.kwargs['clim_percentile'] is True
+
+
+@pytest.mark.xfail(
+    reason='BUG: check_symmetric_max is ignored for tabular data, only used for xarray',
+    strict=True,
+)
+def test_check_symmetric_max_tabular():
+    df = pd.DataFrame({'x': np.arange(100.0), 'y': np.arange(100.0)})
+    df['number'] = np.linspace(-1, 1, len(df))
+    plot = df.hvplot.scatter('x', 'y', c='number', check_symmetric_max=10)
+    plot_opts = Store.lookup_options('bokeh', plot, 'plot')
+    assert not plot_opts.kwargs.get('symmetric')
 
 
 def test_bgcolor(df, backend):
@@ -240,6 +348,33 @@ def test_clim_one_bound_unset(hvplot_xarray, symmetric_da):
     assert plot.get_dimension('foo').range == (None, 5)
 
 
+def test_clim_points_c_column(df):
+    plot = df.hvplot.points('x', 'y', c='number', clim=(0, 1))
+    assert plot.get_dimension('number').range == (0, 1)
+
+
+@pytest.mark.xfail(reason='BUG: clim is ignored by scatter with c, points honors it', strict=True)
+def test_clim_scatter_c_column(df):
+    plot = df.hvplot.scatter('x', 'y', c='number', clim=(0, 1))
+    assert plot.get_dimension('number').range == (0, 1)
+
+
+@pytest.mark.parametrize('kind', ['image', 'quadmesh', 'contour', 'contourf'])
+def test_clim_gridded(hvplot_xarray, symmetric_da, kind):
+    plot = symmetric_da.hvplot(kind=kind, clim=(-5, 5))
+    assert plot.vdims[0].range == (-5, 5)
+
+
+def test_clim_heatmap(df):
+    plot = df.hvplot.heatmap('x', 'y', C='number', clim=(0, 1))
+    assert plot.get_dimension('number').range == (0, 1)
+
+
+def test_clim_hexbin(df):
+    plot = df.hvplot.hexbin('x', 'y', C='number', clim=(0, 1))
+    assert plot.get_dimension('number').range == (0, 1)
+
+
 def test_colorbar_default_line(df, backend):
     plot = df.hvplot.line('x', 'y')
     opts = Store.lookup_options(backend, plot, 'plot')
@@ -270,6 +405,25 @@ def test_colorbar_false_image(hvplot_xarray, symmetric_da, backend):
     assert opts.kwargs['colorbar'] is False
 
 
+def test_colorbar_true_without_c(df, backend):
+    plot = df.hvplot.scatter('x', 'y', colorbar=True)
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['colorbar'] is True
+
+
+def test_colorbar_default_categorical_c(df, backend):
+    plot = df.hvplot.scatter('x', 'y', c='category')
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert 'colorbar' not in opts.kwargs
+
+
+def test_colorbar_default_contour_hides_legend(hvplot_xarray, symmetric_da):
+    plot = symmetric_da.hvplot.contour()
+    opts = Store.lookup_options('bokeh', plot, 'plot')
+    assert opts.kwargs['colorbar'] is True
+    assert opts.kwargs['show_legend'] is False
+
+
 def test_color_key_by_name(df, backend):
     plot = df.hvplot.scatter('x', 'y', c='number', color_key='fire')
     opts = Store.lookup_options(backend, plot, 'style')
@@ -294,9 +448,17 @@ def test_color_key_dict_datashade(df):
     ['bokeh', 'matplotlib', pytest.param('plotly', marks=plotly_unsupported)],
     indirect=True,
 )
-def test_cnorm(df, backend):
-    plot = df.hvplot.scatter('x', 'y', c='number', cnorm='log')
+@pytest.mark.parametrize('cnorm', ['linear', 'log', 'eq_hist'])
+def test_cnorm(df, backend, cnorm):
+    plot = df.hvplot.scatter('x', 'y', c='number', cnorm=cnorm)
     opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['cnorm'] == cnorm
+
+
+def test_cnorm_image(hvplot_xarray):
+    da = xr.DataArray(np.arange(1, 5).reshape(2, 2), name='foo')
+    plot = da.hvplot.image(cnorm='log')
+    opts = Store.lookup_options('bokeh', plot, 'plot')
     assert opts.kwargs['cnorm'] == 'log'
 
 

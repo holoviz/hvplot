@@ -46,9 +46,8 @@ try:
     # Natural Earth features rendered by the geo unit tests, which can't access the network.
     for category, name, scale in [
         ('physical', 'coastline', '110m'),
-        ('physical', 'coastline', '10m'),
+        ('physical', 'coastline', '50m'),
         ('physical', 'land', '110m'),
-        ('physical', 'land', '50m'),
         ('cultural', 'admin_0_boundary_lines_land', '110m'),
     ]:
         download(

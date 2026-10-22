@@ -112,3 +112,17 @@ def test_bands():
     )
     rgb = da.hvplot.rgb(x='lon', y='lat', bands='channel')
     assert_element_equal(rgb, EXPECTED_LATLON)
+
+
+def test_not_3d_error():
+    da = xr.DataArray(
+        np.arange(6).reshape(2, 3), dims=['y', 'x'], coords={'y': [0, 1], 'x': [0, 1, 2]}
+    )
+    with pytest.raises(ValueError, match='Data must be 3D array to be converted to RGB'):
+        da.hvplot.rgb()
+
+
+def test_bands_fewer_than_3_error():
+    da = DA_RGB.isel(band=[0, 1])
+    with pytest.raises(ValueError, match='expected at least three channels'):
+        da.hvplot.rgb()

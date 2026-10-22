@@ -1,7 +1,9 @@
+import holoviews as hv
+import numpy as np
 import pandas as pd
 import pytest
 from holoviews import Store
-from holoviews.element import Bivariate
+from holoviews.element import Bivariate, Contours, Polygons
 
 
 @pytest.fixture
@@ -23,6 +25,14 @@ backends = pytest.mark.parametrize(
     ],
     indirect=True,
 )
+
+
+bokeh_and_mpl = pytest.mark.parametrize('backend', ['bokeh', 'matplotlib'], indirect=True)
+
+
+def density_contours(plot, backend):
+    """The contours that the backend draws, computed from the Bivariate element."""
+    return hv.renderer(backend).get_plot(plot).hmap.last
 
 
 def test_x(df, hvplot_pandas):
@@ -73,3 +83,34 @@ def test_filled(df, hvplot_pandas, backend):
 def test_levels(df, hvplot_pandas, backend):
     plot = df.hvplot.bivariate('x', 'y', levels=5)
     assert Store.lookup_options(backend, plot, 'plot').kwargs['levels'] == 5
+
+
+@bokeh_and_mpl
+def test_bandwidth_effect(df, hvplot_pandas, backend):
+    narrow = density_contours(df.hvplot.bivariate('x', 'y', bandwidth=0.2), backend)
+    wide = density_contours(df.hvplot.bivariate('x', 'y', bandwidth=2), backend)
+    # A narrow kernel gives a peaked density, a wide one gives a spread out density.
+    assert narrow.range('Density')[1] > 10 * wide.range('Density')[1]
+    assert np.ptp(narrow.range('x')) < np.ptp(wide.range('x'))
+
+
+@bokeh_and_mpl
+def test_cut_effect(df, hvplot_pandas, backend):
+    short = density_contours(df.hvplot.bivariate('x', 'y', cut=0.1), backend)
+    long = density_contours(df.hvplot.bivariate('x', 'y', cut=5), backend)
+    assert np.ptp(short.range('x')) < np.ptp(long.range('x'))
+
+
+@bokeh_and_mpl
+@pytest.mark.parametrize(('levels', 'n_contours'), [(3, 2), (7, 6)])
+def test_levels_effect(df, hvplot_pandas, backend, levels, n_contours):
+    contours = density_contours(df.hvplot.bivariate('x', 'y', levels=levels), backend)
+    assert type(contours) is Contours
+    assert len(contours.dimension_values('Density', expanded=False)) == n_contours
+
+
+@bokeh_and_mpl
+def test_filled_effect(df, hvplot_pandas, backend):
+    # Polygons subclass Contours.
+    assert type(density_contours(df.hvplot.bivariate('x', 'y', filled=True), backend)) is Polygons
+    assert type(density_contours(df.hvplot.bivariate('x', 'y'), backend)) is Contours

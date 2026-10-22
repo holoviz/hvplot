@@ -1,5 +1,7 @@
+import numpy as np
 import pandas as pd
 import pytest
+import xarray as xr
 from holoviews.element import Path
 from holoviews.testing import assert_element_equal
 
@@ -33,6 +35,39 @@ def test_x_index(df, tabular_lib):
 def test_y(df, tabular_lib):
     plot = tabular_lib(df).hvplot.paths(x='x', y='z')
     assert_element_equal(plot, Path(df, ['x', 'z'], []))
+
+
+@pytest.mark.xfail(
+    strict=True, reason='BUG: a lone x or y is ignored, the first two columns are plotted'
+)
+@pytest.mark.parametrize('kwargs', [{'x': 'z'}, {'y': 'z'}])
+def test_x_or_y_only(df, kwargs):
+    plot = df.hvplot.paths(**kwargs)
+    assert 'z' in plot.kdims
+
+
+@pytest.fixture
+def grid():
+    return xr.DataArray(
+        np.arange(6.0).reshape(2, 3), coords={'y': [0, 1], 'x': [10, 20, 30]}, name='v'
+    )
+
+
+def test_gridded(grid, gridded_lib):
+    plot = gridded_lib(grid).hvplot.paths(x='x', y='y')
+    assert isinstance(plot, Path)
+    assert plot.kdims == ['x', 'y']
+    # A single path through all the grid points.
+    assert len(plot.split()) == 1
+    assert list(plot.dimension_values('x')) == [10, 20, 30, 10, 20, 30]
+
+
+@pytest.mark.xfail(
+    strict=True, reason='BUG: gridded paths without x and y have only one key dimension'
+)
+def test_gridded_default(grid):
+    plot = grid.hvplot.paths()
+    assert plot.kdims == ['x', 'y']
 
 
 @pytest.mark.geo

@@ -1,6 +1,6 @@
 import pandas as pd
 import pytest
-from holoviews import NdOverlay, Store
+from holoviews import NdLayout, NdOverlay, Store
 from holoviews.element import Distribution
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
@@ -40,6 +40,37 @@ def test_y_list(df):
     assert isinstance(plot, NdOverlay)
     assert list(plot.keys()) == ['x', 'y']
     assert list(plot['y'].dimension_values(0)) == [2, 4, 6]
+
+
+@pytest.fixture
+def grouped():
+    return pd.DataFrame({'v': [1.0, 2.0, 3.0, 10.0, 11.0, 12.0], 'g': list('aaabbb')})
+
+
+def test_by(grouped):
+    plot = grouped.hvplot.kde(y='v', by='g')
+    assert isinstance(plot, NdOverlay)
+    assert list(plot.keys()) == ['a', 'b']
+    assert list(plot['a'].dimension_values('v')) == [1, 2, 3]
+    assert list(plot['b'].dimension_values('v')) == [10, 11, 12]
+
+
+def test_by_subplots(grouped):
+    plot = grouped.hvplot.kde(y='v', by='g', subplots=True)
+    assert isinstance(plot, NdLayout)
+    assert list(plot.keys()) == ['a', 'b']
+
+
+def test_by_list(df):
+    plot = df.hvplot.kde(y='x', by=['category', 'y'])
+    assert plot.kdims == ['category', 'y']
+    assert list(plot.keys()) == [('A', 2), ('B', 4), ('C', 6)]
+
+
+def test_y_empty(df):
+    plot = df.iloc[:0].hvplot.kde(y='y')
+    assert isinstance(plot, Distribution)
+    assert len(plot) == 0
 
 
 def test_bw_method_not_supported(df):

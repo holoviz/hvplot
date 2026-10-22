@@ -1,5 +1,8 @@
+import numpy as np
 import pandas as pd
 import pytest
+import xarray as xr
+from bokeh.models import HoverTool
 from holoviews import Store
 from holoviews.element import Area, Curve, Path, Points, Scatter
 from holoviews.testing import assert_element_equal
@@ -120,6 +123,44 @@ def test_hover_cols_all_and_use_index_false(tabular_lib, cat_df, kind, element):
     df = tabular_lib(cat_df)
     plot = df.hvplot(x='x', y='y', kind=kind, hover_cols='all', use_index=False)
     assert_element_equal(plot, element(df, 'x', ['y', 'category']))
+
+
+def test_hover_cols_string(cat_df):
+    plot = cat_df.hvplot.scatter('x', 'y', hover_cols='category')
+    assert plot.vdims == ['y', 'category']
+
+
+@pytest.mark.xfail(
+    reason='BUG: hover_cols raises on an xarray Dataset, the other data variables are dropped',
+    strict=True,
+)
+@pytest.mark.parametrize('hover_cols', [['w'], 'all'])
+@pytest.mark.parametrize('kind', ['image', 'quadmesh'])
+def test_hover_cols_gridded(hvplot_xarray, kind, hover_cols):
+    data = np.arange(6.0).reshape(2, 3)
+    ds = xr.Dataset(
+        {'v': (('y', 'x'), data), 'w': (('y', 'x'), data * 2)},
+        coords={'x': [0, 1, 2], 'y': [0, 1]},
+    )
+    plot = ds.hvplot(kind=kind, x='x', y='y', z='v', hover_cols=hover_cols)
+    assert plot.vdims == ['v', 'w']
+
+
+def test_tools_hover_instance_not_duplicated(cat_df):
+    hover = HoverTool()
+    plot = cat_df.hvplot.scatter('x', 'y', tools=[hover])
+    opts = Store.lookup_options('bokeh', plot, 'plot')
+    assert opts.kwargs['tools'] == [hover]
+
+
+@pytest.mark.xfail(
+    reason="BUG: hover_mode is dropped when 'hover' is also in tools",
+    strict=True,
+)
+def test_hover_line_mode_with_hover_tool(xy_df):
+    plot = xy_df.hvplot('x', 'y', hover='vline', tools=['hover'])
+    opts = Store.lookup_options('bokeh', plot, 'plot')
+    assert opts.kwargs['hover_mode'] == 'vline'
 
 
 def _tooltip_dims(plot):

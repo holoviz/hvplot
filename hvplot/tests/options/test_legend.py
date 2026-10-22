@@ -79,3 +79,30 @@ def test_legend_opts(df, backend, legend_opts):
     plot = df.hvplot.scatter('x', 'y', by='category', legend_opts=legend_opts)
     opts = Store.lookup_options(backend, plot, 'plot')
     assert opts.kwargs['legend_opts'] == legend_opts
+
+
+@pytest.mark.parametrize(
+    'position',
+    ['top_right', 'top_left', 'bottom_left', 'bottom_right', 'right', 'left', 'top', 'bottom'],
+)
+@pytest.mark.parametrize(
+    'backend',
+    ['bokeh', 'matplotlib', pytest.param('plotly', marks=no_legend_position)],
+    indirect=True,
+)
+def test_legend_position(df, backend, position):
+    plot = df.hvplot.scatter('x', 'y', by='category', legend=position)
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['legend_position'] == position
+    assert opts.kwargs['show_legend'] is True
+
+
+def test_legend_false(df, backend):
+    plot = df.hvplot.scatter('x', 'y', by='category', legend=False)
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['show_legend'] is False
+
+
+def test_legend_invalid_error(df):
+    with pytest.raises(ValueError, match='The legend option should be a boolean'):
+        df.hvplot.scatter('x', 'y', by='category', legend='middle')

@@ -40,7 +40,11 @@ def test_dataset_gridded(gridded_lib):
     assert plot.vdims == ['v']
 
 
-@pytest.mark.xfail(strict=True, reason='BUG: dataset keeps all the columns, not only `columns`')
+@pytest.mark.xfail(
+    strict=True,
+    reason='BUG: dataset keeps all the columns, `columns` is only used by a dead branch '
+    "('dataset' is always handled as gridded)",
+)
 def test_columns(df, hvplot_pandas):
     plot = df.hvplot.dataset(columns=['x', 'y'])
     assert plot.dimensions() == ['x', 'y']

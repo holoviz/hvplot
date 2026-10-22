@@ -43,6 +43,15 @@ def test_y_list(df, hvplot_pandas):
     assert list(plot.dimension_values('Variable')) == ['x', 'x', 'x', 'y', 'y', 'y']
 
 
+def test_y_with_by(hvplot_pandas):
+    df = pd.DataFrame({'y': [1.0, 4.0, 2.0, 3.0], 'cat': ['A', 'A', 'B', 'B']})
+    plot = df.hvplot.violin(y='y', by='cat')
+    assert plot.kdims == ['cat']
+    assert plot.vdims == ['y']
+    assert list(plot.dimension_values('cat')) == ['A', 'A', 'B', 'B']
+    assert list(plot.dimension_values('y')) == [1, 4, 2, 3]
+
+
 def test_violin_from_xarray_with_by_and_color(hvplot_xarray, rng):
     latitudes = np.linspace(-90, 90, 3)
     longitudes = np.linspace(-180, 180, 4)

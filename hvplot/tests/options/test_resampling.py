@@ -9,6 +9,7 @@ from holoviews.element import Image, Points
 from holoviews.element.chart import Scatter
 from holoviews.element.raster import ImageStack
 from holoviews.operation.downsample import downsample1d
+from holoviews.plotting.util import process_cmap
 
 from hvplot.converter import HoloViewsConverter
 from hvplot.tests._data import makeTimeDataFrame
@@ -143,6 +144,12 @@ def test_datashade_cmap_as_color_key(df):
 
 
 @requires('datashader')
+def test_datashade_cmap_name(df):
+    plot = df.hvplot.points(x='x', y='y', datashade=True, cmap='fire')
+    assert _operation(plot).p.cmap == process_cmap('fire')
+
+
+@requires('datashader')
 def test_datashade_hover_disabled_by_default(df):
     plot = df.hvplot(x='x', y='y', datashade=True)
     opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
@@ -161,6 +168,14 @@ def test_datashade_xlim():
     data = pd.DataFrame(np.random.randn(100).cumsum())
     img = data.hvplot(xlim=(0, 20000), datashade=True, dynamic=False)
     assert img.range(0) == (0, 20000)
+
+
+@requires('datashader')
+@operations
+def test_xlim_ylim_ranges(df, operation):
+    plot = df.hvplot.points('x', 'y', xlim=(1, 5), ylim=(0, 10), **{operation: True})
+    assert _operation(plot).p.x_range == (1, 5)
+    assert _operation(plot).p.y_range == (0, 10)
 
 
 @requires('datashader')
@@ -217,6 +232,24 @@ def test_aggregator_count_cat_image_stack(df):
     assert isinstance(plot, ImageStack)
     assert plot.opts['width'] == 999
     assert plot.opts['cmap'] == CATEGORICAL_CMAP
+
+
+@requires('datashader')
+@operations
+def test_aggregator_string_without_c(df, operation):
+    dmap = df.hvplot.scatter('x', 'y', aggregator='max', **{operation: True})
+    assert _operation(dmap).p.aggregator == 'max'
+
+
+@requires('datashader')
+def test_aggregator_count_cat_string(df):
+    from datashader.reductions import count_cat
+
+    plot = df.hvplot.scatter('x', 'y', c='category', aggregator='count_cat', rasterize=True)
+    agg = _operation(plot).p.aggregator
+    assert isinstance(agg, count_cat)
+    assert agg.column == 'category'
+    assert Store.lookup_options('bokeh', plot[()], 'style').kwargs['cmap'] == CATEGORICAL_CMAP
 
 
 @requires('datashader')
@@ -283,14 +316,16 @@ def test_dynspread_default_disabled(df, operation):
 
 
 @requires('datashader')
-def test_max_px(df):
-    plot = df.hvplot.points('x', 'y', datashade=True, dynspread=True, max_px=5)
+@operations
+def test_max_px(df, operation):
+    plot = df.hvplot.points('x', 'y', dynspread=True, max_px=5, **{operation: True})
     assert _operation(plot).p.max_px == 5
 
 
 @requires('datashader')
-def test_threshold(df):
-    plot = df.hvplot.points('x', 'y', datashade=True, dynspread=True, threshold=0.8)
+@operations
+def test_threshold(df, operation):
+    plot = df.hvplot.points('x', 'y', dynspread=True, threshold=0.8, **{operation: True})
     assert _operation(plot).p.threshold == 0.8
 
 
@@ -341,6 +376,34 @@ def test_resample_when_downsample(large_df, kind, eltype):
     element = overlay.get(1)
     assert isinstance(element, eltype)
     assert len(element) == 0
+
+
+@pytest.fixture
+def small_df():
+    return pd.DataFrame({'x': np.linspace(0, 1, 50), 'y': np.linspace(0, 1, 50)})
+
+
+@requires('datashader')
+@pytest.mark.parametrize(
+    'resampling',
+    [
+        pytest.param(
+            {'rasterize': True},
+            marks=pytest.mark.xfail(
+                reason='HoloViews: apply_when with rasterize empties the raw element', strict=True
+            ),
+        ),
+        {'datashade': True},
+        {'downsample': True},
+    ],
+)
+def test_resample_when_below_threshold(small_df, resampling):
+    dmap = small_df.hvplot.scatter('x', 'y', resample_when=1000, **resampling)
+
+    render(dmap)  # trigger dynamicmap
+    resampled, raw = dmap.items()[0][1]
+    assert len(resampled) == 0
+    assert len(raw) == len(small_df)
 
 
 def test_selector_without_operation_error(df):
@@ -434,10 +497,11 @@ def test_downsample_opts(line_df):
     assert plot.callback.operation.p.x_range == (0, 5)
 
 
-def test_downsample_minmax(line_df):
-    plot = line_df.hvplot.line(downsample='minmax')
+@pytest.mark.parametrize('algorithm', ['lttb', 'minmax', 'm4', 'minmax-lttb'])
+def test_downsample_algorithm(line_df, algorithm):
+    plot = line_df.hvplot.line(downsample=algorithm)
     assert isinstance(plot.callback.operation, downsample1d)
-    assert plot.callback.operation_kwargs['algorithm'] == 'minmax'
+    assert plot.callback.operation_kwargs['algorithm'] == algorithm
 
 
 @pytest.mark.parametrize('operation', ['rasterize', 'datashade'])
@@ -446,3 +510,14 @@ def test_rasterize_datashade_without_datashader(block_import, hvplot_pandas, ope
     df = pd.DataFrame({'x': [0, 1], 'y': [0, 1]})
     with pytest.raises(ModuleNotFoundError, match='`datashader` package must be installed'):
         df.hvplot.points('x', 'y', **{operation: True})
+
+
+@requires('datashader')
+@pytest.mark.parametrize('backend', ['matplotlib', 'plotly'], indirect=True)
+def test_rasterize_cmap_clim_colorbar_other_backends(df, backend):
+    plot = df.hvplot.points('x', 'y', c='number', rasterize=True, cmap='fire', clim=(0, 1))
+    style_opts = Store.lookup_options(backend, plot[()], 'style').kwargs
+    assert style_opts['cmap'] == 'fire'
+    plot_opts = Store.lookup_options(backend, plot[()], 'plot').kwargs
+    assert plot_opts['clim'] == (0, 1)
+    assert plot_opts['colorbar'] is True

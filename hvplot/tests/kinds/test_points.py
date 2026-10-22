@@ -57,6 +57,15 @@ def test_x_default_first_numeric(df):
     assert plot.kdims == ['x', 'y']
 
 
+@pytest.mark.xfail(
+    strict=True, reason='BUG: a lone x or y is ignored, the first two columns are plotted'
+)
+@pytest.mark.parametrize('kwargs', [{'x': 'number'}, {'y': 'number'}])
+def test_x_or_y_only(df, kwargs):
+    plot = df.hvplot.points(**kwargs)
+    assert 'number' in plot.kdims
+
+
 @pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
 def test_x_index(df, tabular_lib):
     plot = tabular_lib(df).hvplot.points(x='index', y='y', c='x')
@@ -104,6 +113,18 @@ def test_s_dim_overlay(df, backend):
 def test_scale(df, backend):
     plot = df.hvplot.points('x', 'y', s=16, scale=2)
     assert Store.lookup_options(backend, plot, 'style').kwargs[size_opt(backend)] == 8
+
+
+def test_scale_dim(df, backend):
+    plot = df.hvplot.points('x', 'y', s='number', scale=2)
+    size = Store.lookup_options(backend, plot, 'style').kwargs[size_opt(backend)]
+    np.testing.assert_allclose(size.apply(plot), np.sqrt(df['number']) * 2)
+
+
+def test_scale_dim_expression(df, backend):
+    plot = df.hvplot.points('x', 'y', s=hv.dim('number') * 10, scale=2)
+    size = Store.lookup_options(backend, plot, 'style').kwargs[size_opt(backend)]
+    np.testing.assert_allclose(size.apply(plot), df['number'] * 20)
 
 
 def test_marker(df, backend):

@@ -1,3 +1,4 @@
+import holoviews as hv
 import pandas as pd
 import pytest
 from holoviews.streams import Buffer, Pipe
@@ -47,3 +48,27 @@ def test_backlog(df):
     buffer = plot.streams[0]
     assert isinstance(buffer, Buffer)
     assert buffer.length == 2
+
+
+def test_stream_invalid_type_error(df):
+    with pytest.raises(ValueError, match='not recognized'):
+        df.hvplot('x', 'y', stream=hv.streams.Stream())
+
+
+def test_stream_with_groupby_error(df):
+    with pytest.raises(NotImplementedError, match='Streaming and groupby'):
+        df.hvplot('x', 'y', stream=Pipe(data=df), groupby='y')
+
+
+@requires('streamz')
+@pytest.mark.skipif(
+    _HV_VERSION < (1, 23, 0), reason='streamz is only an error in HoloViews >= 1.23.0'
+)
+@pytest.mark.filterwarnings('ignore:streamz support has been deprecated:FutureWarning')
+def test_backlog_streamz_removed_error(df):
+    from streamz.dataframe import DataFrame as StreamingDataFrame
+
+    import hvplot.streamz  # noqa: F401
+
+    with pytest.raises(RuntimeError, match='streamz support has been deprecated'):
+        StreamingDataFrame(example=df).hvplot('x', 'y', backlog=2)

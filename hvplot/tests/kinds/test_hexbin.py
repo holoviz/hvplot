@@ -1,3 +1,4 @@
+import holoviews as hv
 import numpy as np
 import pandas as pd
 import pytest
@@ -71,3 +72,41 @@ def test_logz(df, hvplot_pandas, backend):
 def test_min_count(df, hvplot_pandas, backend):
     plot = df.hvplot.hexbin(x='x', y='y', min_count=2)
     assert Store.lookup_options(backend, plot, 'plot').kwargs['min_count'] == 2
+
+
+# The binning happens when the plot is built, so these tests read the data of the Bokeh plot.
+@pytest.fixture
+def clustered():
+    # With 3 bins per axis, the points make 3 hexagons holding 3, 2 and 1 of them.
+    return pd.DataFrame(
+        {
+            'x': [0, 0.1, 0.2, 5, 5.1, 9],
+            'y': [0, 0.1, 0.1, 5, 5.1, 9],
+            'value': [1.0, 3.0, 5.0, 2.0, 4.0, 10.0],
+        }
+    )
+
+
+def tiles_data(plot):
+    return hv.renderer('bokeh').get_plot(plot).handles['cds'].data
+
+
+def test_gridsize_effect(clustered, hvplot_pandas):
+    plot = clustered.hvplot.hexbin(x='x', y='y', gridsize=3)
+    assert list(tiles_data(plot)['Count']) == [3, 2, 1]
+
+
+def test_min_count_effect(clustered, hvplot_pandas):
+    plot = clustered.hvplot.hexbin(x='x', y='y', gridsize=3, min_count=2)
+    assert list(tiles_data(plot)['Count']) == [3, 2]
+
+
+@pytest.mark.parametrize(
+    ('reduce_function', 'expected'),
+    [(np.sum, [9, 6, 10]), (np.mean, [3, 3, 10]), (np.max, [5, 4, 10])],
+)
+def test_reduce_function_effect(clustered, hvplot_pandas, reduce_function, expected):
+    plot = clustered.hvplot.hexbin(
+        x='x', y='y', C='value', gridsize=3, reduce_function=reduce_function
+    )
+    assert list(tiles_data(plot)['value']) == expected

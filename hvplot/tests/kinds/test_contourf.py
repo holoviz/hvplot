@@ -45,3 +45,9 @@ def test_logz(ds, hvplot_xarray, backend):
     # The default levels start at 0, which a log scale cannot render.
     plot = ds.hvplot.contourf(z='v1', levels=[2, 5, 8], logz=True)
     assert Store.lookup_options(backend, plot, 'plot').kwargs['logz'] is True
+
+
+def test_clim(ds, hvplot_xarray):
+    # Contouring adapts the value range to the levels, clim sets it back.
+    plot = ds.hvplot.contourf(z='v1', levels=[2, 5, 8], clim=(0, 20))
+    assert plot.vdims[0].range == (0, 20)

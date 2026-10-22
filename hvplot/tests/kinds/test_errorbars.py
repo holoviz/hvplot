@@ -32,12 +32,15 @@ def test_yerr1(df, hvplot_pandas):
     # Symmetric errors when yerr2 is not set.
     plot = df.hvplot.errorbars(x='x', y='y', yerr1='neg')
     assert plot.vdims == ['y', 'neg']
+    assert list(plot.dimension_values('neg')) == [0.1, 0.2, 0.3]
 
 
 def test_yerr2(df, hvplot_pandas):
     # yerr1 is then the negative error and yerr2 the positive one.
     plot = df.hvplot.errorbars(x='x', y='y', yerr1='neg', yerr2='pos')
     assert plot.vdims == ['y', 'neg', 'pos']
+    assert list(plot.dimension_values('neg')) == [0.1, 0.2, 0.3]
+    assert list(plot.dimension_values('pos')) == [0.3, 0.2, 0.1]
 
 
 @pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)

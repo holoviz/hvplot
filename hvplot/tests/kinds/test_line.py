@@ -35,3 +35,10 @@ def test_y_list(df, hvplot_pandas):
     assert list(plot.keys()) == ['y', 'z']
     assert plot['z'].kdims == ['x']
     assert plot['z'].vdims[0].name == 'z'
+
+
+def test_y_list_single(df, hvplot_pandas):
+    # A list of one column is plotted as a single curve, not as an overlay.
+    plot = df.hvplot.line(x='x', y=['y'])
+    assert isinstance(plot, Curve)
+    assert plot.vdims == ['y']

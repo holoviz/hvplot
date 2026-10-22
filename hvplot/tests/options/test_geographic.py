@@ -216,9 +216,9 @@ def test_coastline_sets_geo_by_default(hvplot_pandas, simple_df):
 
 @pytest.mark.geo
 def test_coastline_scale(hvplot_pandas, simple_df):
-    plot = simple_df.hvplot.points('x', 'y', geo=True, coastline='10m')
+    plot = simple_df.hvplot.points('x', 'y', geo=True, coastline='50m')
     opts = plot.get(1).opts.get('plot')
-    assert opts.kwargs['scale'] == '10m'
+    assert opts.kwargs['scale'] == '50m'
 
 
 @pytest.mark.geo
@@ -396,6 +396,105 @@ def test_geo_data_aspect_and_width(hvplot_pandas, simple_df):
     assert opts.get('height') is None
 
 
+@pytest.mark.geo
+@pytest.mark.usefixtures('disable_param_warnings_as_exceptions')
+def test_geo_unsupported_kind_warning(hvplot_pandas, simple_df, caplog):
+    plot = simple_df.hvplot.line('x', 'y', geo=True)
+    assert isinstance(plot, hv.Curve)
+    assert "geo option cannot be used with kind='line'" in caplog.text
+
+
+@pytest.mark.geo
+def test_features_dict_scale(hvplot_pandas, simple_df):
+    plot = simple_df.hvplot.points('x', 'y', features={'land': '110m', 'coastline': '50m'})
+    scales = [hv.Store.lookup_options('bokeh', el, 'plot').kwargs.get('scale') for el in plot]
+    # land is underlaid, coastline overlaid
+    assert scales == ['110m', None, '50m']
+
+
+@pytest.mark.geo
+@pytest.mark.usefixtures('disable_param_warnings_as_exceptions')
+def test_features_invalid_scale_warning(hvplot_pandas, simple_df, caplog):
+    plot = simple_df.hvplot.points('x', 'y', features={'land': '5m'})
+    assert len(plot) == 2
+    assert 'Feature scale of 5m not recognized' in caplog.text
+
+
+@pytest.mark.geo
+@pytest.mark.xfail(
+    strict=True, reason='BUG: invalid feature name raises AttributeError, not the ValueError'
+)
+def test_features_invalid_name_error(hvplot_pandas, simple_df):
+    with pytest.raises(ValueError, match='not recognized'):
+        simple_df.hvplot.points('x', 'y', features=['foo'])
+
+
+@pytest.mark.geo
+@pytest.mark.usefixtures('disable_param_warnings_as_exceptions')
+@pytest.mark.xfail(strict=True, reason='BUG: the coastline scale warning is missing its f prefix')
+def test_coastline_invalid_scale_warning(hvplot_pandas, simple_df, caplog):
+    simple_df.hvplot.points('x', 'y', coastline='5m')
+    assert 'coastline scale of 5m not recognized' in caplog.text
+
+
+@pytest.mark.geo
+def test_project_without_resampling(hvplot_pandas, lat_lon_df):
+    import cartopy.crs as ccrs
+
+    plot = lat_lon_df.hvplot.points('lon', 'lat', project=True, projection=ccrs.GOOGLE_MERCATOR)
+    lon, lat = lon_lat_to_easting_northing(lat_lon_df['lon'], lat_lon_df['lat'])
+    np.testing.assert_allclose(plot.data['lon'], lon, rtol=1e-6)
+    np.testing.assert_allclose(plot.data['lat'], lat, rtol=1e-6)
+
+
+@pytest.mark.geo
+def test_projection_without_project_keeps_data(hvplot_pandas, lat_lon_df):
+    import cartopy.crs as ccrs
+
+    plot = lat_lon_df.hvplot.points('lon', 'lat', geo=True, projection=ccrs.GOOGLE_MERCATOR)
+    pd.testing.assert_frame_equal(plot.data, lat_lon_df)
+
+
+@pytest.mark.geo
+@skip_windows
+def test_geo_xlim_reprojected_with_tiles(hvplot_pandas, lat_lon_df):
+    plot = lat_lon_df.hvplot.points('lon', 'lat', geo=True, tiles=True, xlim=(-130, -70))
+    xlim = hv.Store.lookup_options('bokeh', plot.get(1), 'plot').kwargs['xlim']
+    np.testing.assert_allclose(xlim, (-14471533.8, -7792364.4))
+
+
+@pytest.mark.geo
+@skip_windows
+@pytest.mark.parametrize('backend', ['bokeh', 'matplotlib'], indirect=True)
+def test_projection_backends(hvplot_pandas, backend, simple_df):
+    plot = simple_df.hvplot.points('x', 'y', projection='Robinson')
+    proj = hv.Store.lookup_options(backend, plot, 'plot').kwargs['projection']
+    assert proj.proj4_params['proj'] == 'robin'
+
+
+@pytest.mark.geo
+@pytest.mark.parametrize('backend', ['bokeh', 'matplotlib'], indirect=True)
+def test_global_extent_backends(hvplot_pandas, backend, simple_df):
+    plot = simple_df.hvplot.points('x', 'y', global_extent=True)
+    assert hv.Store.lookup_options(backend, plot, 'plot').kwargs['global_extent'] is True
+
+
+@pytest.mark.geo
+@pytest.mark.parametrize('backend', ['bokeh', 'matplotlib'], indirect=True)
+def test_coastline_scale_backends(hvplot_pandas, backend, simple_df):
+    plot = simple_df.hvplot.points('x', 'y', coastline='50m')
+    assert hv.Store.lookup_options(backend, plot.get(1), 'plot').kwargs['scale'] == '50m'
+
+
+@pytest.mark.geo
+@pytest.mark.parametrize('backend', ['bokeh', 'matplotlib'], indirect=True)
+def test_tiles_backends(hvplot_pandas, backend, simple_df):
+    import geoviews as gv
+
+    plot = simple_df.hvplot.points('x', 'y', geo=True, tiles=True)
+    assert isinstance(plot.get(0), gv.element.WMTS)
+
+
 # Without GeoViews
 
 
@@ -426,6 +525,11 @@ def test_tiles_without_geoviews(without_geoviews, simple_df):
     assert 'y_' in plot.get(1).data
     bk_plot = bk_renderer.get_plot(plot)
     assert bk_plot.projection == 'mercator'
+
+
+def test_projection_false_disables_tile_projection(without_geoviews, lat_lon_df):
+    plot = lat_lon_df.hvplot.points('lon', 'lat', tiles=True, projection=False)
+    assert list(plot.get(1).data.columns) == ['lon', 'lat']
 
 
 def test_tiles_name_without_geoviews(without_geoviews, simple_df):

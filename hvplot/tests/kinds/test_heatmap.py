@@ -81,6 +81,25 @@ def test_C(hvplot_pandas):
     assert list(plot.dimension_values('v2')) == [3.0, 4.0]
 
 
+def test_C_default_kind(hvplot_pandas):
+    # Without C, the remaining column is used.
+    df = pd.DataFrame({'x': [1, 2], 'y': ['A', 'B'], 'v': [3.0, 4.0]})
+    plot = df.hvplot(kind='heatmap', x='x', y='y')
+    assert plot.vdims == ['v']
+    assert list(plot.dimension_values('v')) == [3.0, 4.0]
+
+
+@pytest.mark.xfail(
+    strict=True, reason='BUG: the heatmap method always passes C=None, which raises'
+)
+def test_C_default(hvplot_pandas):
+    # The docstring says that a count is used without C.
+    df = pd.DataFrame({'x': [1, 2], 'y': ['A', 'B'], 'v': [3.0, 4.0]})
+    plot = df.hvplot.heatmap(x='x', y='y')
+    assert plot.kdims == ['x', 'y']
+    assert len(plot) == 2
+
+
 def test_reduce_function(hvplot_pandas):
     # Two values in the cell (1, A), reduced into one.
     df = pd.DataFrame({'x': [1, 1, 2], 'y': ['A', 'A', 'B'], 'value': [1.0, 3.0, 5.0]})

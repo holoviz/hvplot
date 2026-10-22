@@ -1,3 +1,4 @@
+import holoviews as hv
 import pandas as pd
 import panel as pn
 import pytest
@@ -23,6 +24,27 @@ def test_aspect(df, backend):
         assert opts.get('height') is None
     elif backend == 'matplotlib':
         assert opts.get('fig_size') is None
+
+
+@pytest.mark.parametrize('aspect', ['equal', 'square'])
+def test_aspect_string(df, aspect):
+    plot = df.hvplot(x='x', y='y', aspect=aspect)
+    opts = Store.lookup_options('bokeh', plot, 'plot').kwargs
+    assert opts['aspect'] == aspect
+    assert opts.get('width') is None
+    assert opts.get('height') is None
+
+
+def test_aspect_square_frame(df):
+    plot = df.hvplot(x='x', y='y', aspect='square')
+    state = hv.renderer('bokeh').get_plot(plot).state
+    assert state.frame_width == state.frame_height
+
+
+def test_aspect_and_frame_width(df):
+    plot = df.hvplot(x='x', y='y', aspect=2, frame_width=200)
+    state = hv.renderer('bokeh').get_plot(plot).state
+    assert (state.frame_width, state.frame_height) == (200, 100)
 
 
 # bokeh warns (expected) when aspect and width are both set.
@@ -143,6 +165,23 @@ def test_frame_height(df):
     assert opts.get('height') is None
 
 
+def test_frame_width_and_height(df):
+    plot = df.hvplot(x='x', y='y', frame_width=200, frame_height=100)
+    state = hv.renderer('bokeh').get_plot(plot).state
+    assert (state.frame_width, state.frame_height) == (200, 100)
+
+
+@pytest.mark.parametrize('backend', ['matplotlib', 'plotly'], indirect=True)
+def test_frame_width_and_height_ignored_outside_bokeh(df, backend):
+    plot = df.hvplot(x='x', y='y', frame_width=200, frame_height=100)
+    opts = Store.lookup_options(backend, plot, 'plot').kwargs
+    assert 'frame_width' not in opts
+    assert 'frame_height' not in opts
+    # They are not replaced by the default size either.
+    assert opts.get('width') is None
+    assert opts.get('height') is None
+
+
 def test_max_height(df):
     plot = df.hvplot(x='x', y='y', responsive=True, max_height=400)
     opts = Store.lookup_options('bokeh', plot, 'plot').kwargs
@@ -174,6 +213,25 @@ def test_padding(df, backend, padding):
     assert opts['padding'] == padding
 
 
+def test_padding_nested_tuple(df):
+    plot = df.hvplot(x='x', y='y', padding=((0, 0.5), 0.1))
+    opts = Store.lookup_options('bokeh', plot, 'plot').kwargs
+    assert opts['padding'] == ((0, 0.5), 0.1)
+    # No padding on the left of x (1), a large one on the right of x (5), the default is 0.1.
+    x_range = hv.renderer('bokeh').get_plot(plot).state.x_range
+    assert x_range.start == 1
+    assert x_range.end > 5.5
+
+
+@pytest.mark.parametrize('backend', ['bokeh', 'plotly'], indirect=True)
+def test_responsive_and_height(df, backend):
+    plot = df.hvplot(x='x', y='y', responsive=True, height=200)
+    opts = Store.lookup_options(backend, plot, 'plot').kwargs
+    assert opts['responsive'] is True
+    assert opts['height'] == 200
+    assert opts.get('width') is None
+
+
 @pytest.mark.parametrize('backend', ['bokeh', 'plotly'], indirect=True)
 def test_responsive(df, backend):
     plot = df.hvplot(x='x', y='y', responsive=True)
@@ -194,3 +252,16 @@ def test_widget_location(df, location, layout_type, widgets_index):
     assert isinstance(layout, layout_type)
     assert isinstance(layout[widgets_index], pn.WidgetBox)
     assert layout[1 - widgets_index].widget_location == location
+
+
+def test_widget_location_without_groupby(df):
+    pane = df.hvplot(x='x', y='y', widget_location='bottom')
+    assert isinstance(pane, pn.pane.HoloViews)
+    assert pane.widget_location == 'bottom'
+
+
+def test_widget_location_with_widget_argument(df):
+    slider = pn.widgets.IntSlider(start=100, end=300, value=200)
+    pane = df.hvplot(x='x', y='y', height=slider, widget_location='bottom')
+    assert isinstance(pane, pn.param.ParamFunction)
+    assert pane.object().widget_location == 'bottom'

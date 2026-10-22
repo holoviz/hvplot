@@ -48,3 +48,15 @@ def test_levels_list(ds, hvplot_xarray):
 def test_logz(ds, hvplot_xarray, backend):
     plot = ds.hvplot.contour(z='v1', logz=True)
     assert Store.lookup_options(backend, plot, 'plot').kwargs['logz'] is True
+
+
+@backends
+def test_colorbar_false(ds, hvplot_xarray, backend):
+    # The legend is replaced by the colorbar.
+    default = Store.lookup_options(backend, ds.hvplot.contour(z='v1'), 'plot').kwargs
+    assert default['colorbar'] is True
+    assert default['show_legend'] is False
+    plot = ds.hvplot.contour(z='v1', colorbar=False)
+    opts = Store.lookup_options(backend, plot, 'plot').kwargs
+    assert opts['colorbar'] is False
+    assert opts['show_legend'] is True

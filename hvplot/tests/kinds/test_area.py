@@ -33,6 +33,7 @@ def test_y2(df, hvplot_pandas):
     plot = df.hvplot.area(x='x', y='y', y2='y2')
     assert isinstance(plot, Area)
     assert plot.vdims == ['y', 'y2']
+    assert list(plot.dimension_values('y2')) == [0.5, 1.0, 1.5]
 
 
 @pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
@@ -55,3 +56,12 @@ def test_stacked_false(df, hvplot_pandas):
     assert list(plot['y2'].dimension_values('value')) == [0.5, 1.0, 1.5]
     # Overlaid areas are made transparent.
     assert Store.lookup_options('bokeh', plot['y'], 'style').kwargs['alpha'] == 0.5
+
+
+def test_stacked_default(df, hvplot_pandas):
+    # Unlike kind='area', the area method stacks by default.
+    plot = df.hvplot.area(x='x', y=['y', 'y2'])
+    assert list(plot['y2'].dimension_values('value')) == [1.5, 5.0, 3.5]
+    assert list(plot['y2'].dimension_values('Baseline')) == [1.0, 4.0, 2.0]
+    kind_plot = df.hvplot(kind='area', x='x', y=['y', 'y2'])
+    assert list(kind_plot['y2'].dimension_values('value')) == [0.5, 1.0, 1.5]

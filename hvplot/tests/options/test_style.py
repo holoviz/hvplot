@@ -28,6 +28,19 @@ def test_backend_opts(df, backend, backend_opts):
     assert opts.kwargs['backend_opts'] == backend_opts
 
 
+def test_backend_opts_bokeh_applied(df):
+    plot = df.hvplot.scatter('x', 'y', backend_opts={'plot.xgrid.grid_line_color': 'grey'})
+    state = hv.renderer('bokeh').get_plot(plot).state
+    assert state.xgrid[0].grid_line_color == 'grey'
+
+
+@pytest.mark.parametrize('backend', ['matplotlib'], indirect=True)
+def test_backend_opts_matplotlib_applied(df, backend):
+    plot = df.hvplot.scatter('x', 'y', backend_opts={'axes.frame_on': False})
+    axis = hv.renderer('matplotlib').get_plot(plot).handles['axis']
+    assert axis.get_frame_on() is False
+
+
 def test_fontscale(df, backend):
     plot = df.hvplot.scatter('x', 'y', fontscale=1.5)
     opts = Store.lookup_options(backend, plot, 'plot')

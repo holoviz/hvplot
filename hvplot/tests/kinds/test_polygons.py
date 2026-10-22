@@ -1,6 +1,8 @@
 import holoviews as hv
+import numpy as np
 import pandas as pd
 import pytest
+import xarray as xr
 from holoviews import Store
 from holoviews.element import Polygons
 
@@ -47,6 +49,37 @@ def test_y(df, tabular_lib):
     assert isinstance(plot, Polygons)
     assert plot.kdims == ['x', 'lon']
     assert list(plot.dimension_values('lon')) == [5, 6, 6, 5]
+
+
+@pytest.mark.xfail(
+    strict=True, reason='BUG: a lone x or y is ignored, the first two columns are plotted'
+)
+@pytest.mark.parametrize('kwargs', [{'x': 'lon'}, {'y': 'lon'}])
+def test_x_or_y_only(df, kwargs):
+    plot = df.hvplot.polygons(**kwargs)
+    assert 'lon' in plot.kdims
+
+
+@pytest.fixture
+def grid():
+    return xr.DataArray(
+        np.arange(6.0).reshape(2, 3), coords={'y': [0, 1], 'x': [10, 20, 30]}, name='v'
+    )
+
+
+def test_gridded(grid, gridded_lib):
+    plot = gridded_lib(grid).hvplot.polygons(x='x', y='y')
+    assert isinstance(plot, Polygons)
+    assert plot.kdims == ['x', 'y']
+    assert list(plot.dimension_values('x')) == [10, 20, 30, 10, 20, 30, 10]
+
+
+@pytest.mark.xfail(
+    strict=True, reason='BUG: gridded polygons without x and y have only one key dimension'
+)
+def test_gridded_default(grid):
+    plot = grid.hvplot.polygons()
+    assert plot.kdims == ['x', 'y']
 
 
 @pytest.mark.geo

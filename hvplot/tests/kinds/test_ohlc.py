@@ -114,6 +114,17 @@ def test_ohlc_hover_cols_all():
     assert tooltips[-1] == ('Volume', '@Volume')
 
 
+def test_ohlc_hover_false():
+    plot = df.hvplot.ohlc(y=ohlc_cols, hover=False)
+    assert Store.lookup_options('bokeh', plot.Segments.I, 'plot').kwargs['tools'] == []
+
+
+def test_ohlc_empty():
+    plot = df.iloc[:0].hvplot.ohlc(y=ohlc_cols)
+    assert len(plot.Segments.I) == 0
+    assert len(plot.Rectangles.I) == 0
+
+
 def test_ohlc_date_tooltip_format():
     plot = df.hvplot.ohlc(y=ohlc_cols)
     segments = plot.Segments.I
