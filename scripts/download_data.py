@@ -39,3 +39,24 @@ try:
     download('nyc_taxi', _hvs_download, 'nyc_taxi_remote')
 except ImportError:
     print('hvsampledata is not available in this environment, skipping nyc_taxi download.')
+
+try:
+    from cartopy.io import shapereader
+
+    # Natural Earth features rendered by the geo unit tests, which can't access the network.
+    for category, name, scale in [
+        ('physical', 'coastline', '110m'),
+        ('physical', 'coastline', '10m'),
+        ('physical', 'land', '110m'),
+        ('physical', 'land', '50m'),
+        ('cultural', 'admin_0_boundary_lines_land', '110m'),
+    ]:
+        download(
+            f'Natural Earth {name} {scale}',
+            shapereader.natural_earth,
+            resolution=scale,
+            category=category,
+            name=name,
+        )
+except ModuleNotFoundError as e:
+    print(f'ModuleNotFoundError when attempting to download Natural Earth data : {e}')
