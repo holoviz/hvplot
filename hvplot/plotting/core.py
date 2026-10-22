@@ -1665,6 +1665,13 @@ class hvPlotTabularDuckDB(hvPlotTabular):
 class hvPlotTabularPolars(hvPlotTabular):
     """hvPlot accessor for polars DataFrame, LazyFrame and Series."""
 
+    @staticmethod
+    def _get_polars_column_names(data) -> list[str]:
+        try:
+            return data.collect_schema().names()
+        except Exception:  # `collect_schema` was added in 1.0
+            return list(data.columns)
+
     def _get_converter(self, x=None, y=None, kind=None, **kwds):
         import polars as pl
 
@@ -1675,10 +1682,7 @@ class hvPlotTabularPolars(hvPlotTabular):
 
         # Find columns which should be converted for LazyDataFrame and DataFrame
         if isinstance(self._data, (pl.LazyFrame, pl.DataFrame)):
-            try:
-                column_names = self._data.collect_schema().names()
-            except Exception:  # Maybe not always supported, has been there since 1.7.1
-                column_names = list(self._data.columns)
+            column_names = self._get_polars_column_names(self._data)
 
             if params.get('hover_cols') == 'all':
                 columns = column_names
@@ -1699,7 +1703,7 @@ class hvPlotTabularPolars(hvPlotTabular):
                         num_dtypes = pl.selectors.numeric()
                     else:
                         num_dtypes = pl.col(pl.NUMERIC_DTYPES)
-                    columns |= set(self._data.select(num_dtypes).columns)
+                    columns |= set(self._get_polars_column_names(self._data.select(num_dtypes)))
                 xs = x if is_list_like(x) else (x,)
                 ys = y if is_list_like(y) else (y,)
                 columns |= {*xs, *ys}
