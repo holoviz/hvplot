@@ -5,9 +5,8 @@ import sys
 
 import pytest
 
-pytest.importorskip('numpydoc')
-
 from hvplot.converter import HoloViewsConverter
+from hvplot.tests._deps import requires
 from hvplot.util import (
     _get_docstring_group_parameters,
     _in_ipython,
@@ -16,11 +15,18 @@ from hvplot.util import (
 )
 
 
-@pytest.mark.parametrize('section', HoloViewsConverter._docstring_sections.values())
-def test_docstring_converter_sections_present(section):
-    assert section in HoloViewsConverter.__doc__
+def test_converter_docstrings_sections():
+    sections = _parse_docstring_sections(HoloViewsConverter.__doc__)
+    assert set(sections) == set(HoloViewsConverter._docstring_sections.values())
 
 
+def test_converter_options_docstrings():
+    assert (
+        HoloViewsConverter._docstring_sections.keys() == HoloViewsConverter._options_groups.keys()
+    )
+
+
+@requires('numpydoc')
 @pytest.mark.parametrize('section', HoloViewsConverter._docstring_sections.values())
 def test_docstring_converter_sections_include_parameters(section):
     assert _get_docstring_group_parameters(section)
@@ -35,6 +41,7 @@ def parse_docstring_for_param_names(section_title):
     return parameter_names
 
 
+@requires('numpydoc')
 @pytest.mark.parametrize(
     'section, options',
     [(k, v) for k, v in HoloViewsConverter._options_groups.items()],
@@ -45,6 +52,7 @@ def test_docstring_converter_options_match_per_section(section, options):
     assert set(options) == set(parameter_names)
 
 
+@requires('numpydoc')
 def test_docstring_converter_no_duplicate_and_match_options():
     all_doc_params = []
     for section_title in HoloViewsConverter._docstring_sections.values():
@@ -129,14 +137,3 @@ def test_patch_hvplot_docstrings():
         obj = getattr(cls, _kind)
         assert obj.__signature__ == osig
         assert obj.__doc__ == odoc
-
-
-def test_converter_docstrings_sections():
-    sections = _parse_docstring_sections(HoloViewsConverter.__doc__)
-    assert set(sections) == set(HoloViewsConverter._docstring_sections.values())
-
-
-def test_converter_options_docstrings():
-    assert (
-        HoloViewsConverter._docstring_sections.keys() == HoloViewsConverter._options_groups.keys()
-    )

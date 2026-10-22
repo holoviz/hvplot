@@ -8,15 +8,7 @@ import numpy as np
 import pandas as pd
 import panel as pn
 import pytest
-
-try:
-    import dask.dataframe as dd
-    import spatialpandas as spd
-except ImportError:
-    spd = None
-    dd = None
-
-from unittest import SkipTest, TestCase
+import xarray as xr
 
 from hvplot.tests._data import air_temperature
 from hvplot.tests._deps import requires
@@ -33,218 +25,196 @@ from hvplot.util import (
     is_geodataframe,
     is_list_like,
     process_crs,
+    process_dynamic_args,
     process_xarray,
+    proj_to_cartopy,
 )
 
-
-class TestProcessXarray(TestCase):
-    def setUp(self):
-        try:
-            import xarray as xr  # noqa: F401
-        except ImportError:
-            raise SkipTest('xarray not available')
-        self.default_kwargs = {
-            'value_label': 'value',
-            'label': None,
-            'gridded': False,
-            'persist': False,
-            'use_dask': False,
-            'groupby': None,
-            'y': None,
-            'x': None,
-            'by': None,
-            'other_dims': [],
-        }
-        self.ds = air_temperature()
-
-    def test_process_1d_xarray_dataarray_with_no_coords(self):
-        import xarray as xr
-
-        da = xr.DataArray(data=[1, 2, 3])
-
-        data, x, y, by, groupby = process_xarray(data=da, **self.default_kwargs)
-        assert isinstance(data, pd.DataFrame)
-        assert x == 'index'
-        assert y == ['value']
-        assert not by
-        assert not groupby
-
-    def test_process_1d_xarray_dataarray_with_coords(self):
-        import xarray as xr
-
-        da = xr.DataArray(data=[1, 2, 3], coords={'day': [5, 6, 7]}, dims=['day'])
-
-        data, x, y, by, groupby = process_xarray(data=da, **self.default_kwargs)
-        assert isinstance(data, pd.DataFrame)
-        assert x == 'day'
-        assert y == ['value']
-        assert not by
-        assert not groupby
-
-    def test_process_1d_xarray_dataarray_with_coords_and_name(self):
-        import xarray as xr
-
-        da = xr.DataArray(data=[1, 2, 3], coords={'day': [5, 6, 7]}, dims=['day'], name='temp')
-
-        data, x, y, by, groupby = process_xarray(data=da, **self.default_kwargs)
-        assert isinstance(data, pd.DataFrame)
-        assert x == 'day'
-        assert y == ['temp']
-        assert not by
-        assert not groupby
-
-    def test_process_2d_xarray_dataarray_with_no_coords(self):
-        import xarray as xr
-
-        da = xr.DataArray(np.random.randn(4, 5))
-
-        data, x, y, by, groupby = process_xarray(data=da, **self.default_kwargs)
-        assert isinstance(data, pd.DataFrame)
-        assert x == 'index'
-        assert y == ['value']
-        assert not by
-        assert not groupby
-
-    def test_process_2d_xarray_dataarray_with_no_coords_as_gridded(self):
-        import xarray as xr
-
-        da = xr.DataArray(np.random.randn(4, 5))
-
-        kwargs = self.default_kwargs
-        kwargs.update(gridded=True)
-
-        data, x, y, by, groupby = process_xarray(data=da, **kwargs)
-        assert isinstance(data, xr.Dataset)
-        assert list(data.data_vars.keys()) == ['value']
-        assert x == 'dim_1'
-        assert y == 'dim_0'
-        assert not by
-        assert not groupby
-
-    def test_process_2d_xarray_dataarray_with_coords_as_gridded(self):
-        import xarray as xr
-
-        da = xr.DataArray(
-            data=np.random.randn(4, 5), coords={'y': [3, 4, 5, 6, 7]}, dims=['x', 'y']
-        )
-
-        kwargs = self.default_kwargs
-        kwargs.update(gridded=True)
-
-        data, x, y, by, groupby = process_xarray(data=da, **kwargs)
-        assert isinstance(data, xr.Dataset)
-        assert list(data.data_vars.keys()) == ['value']
-        assert x == 'y'
-        assert y == 'x'
-        assert not by
-        assert not groupby
-
-    def test_process_3d_xarray_dataset_with_coords(self):
-        data, x, y, by, groupby = process_xarray(data=self.ds, **self.default_kwargs)
-        assert isinstance(data, pd.DataFrame)
-        assert x == 'time'
-        assert y == ['air']
-        assert not by
-        assert groupby == ['lon', 'lat']
-
-    def test_process_3d_xarray_dataset_with_coords_as_gridded(self):
-        import xarray as xr
-
-        kwargs = self.default_kwargs
-        kwargs.update(gridded=True, x='lon', y='lat')
-
-        data, x, y, by, groupby = process_xarray(data=self.ds, **kwargs)
-        assert isinstance(data, xr.Dataset)
-        assert list(data.data_vars.keys()) == ['air']
-        assert x == 'lon'
-        assert y == 'lat'
-        assert by is None
-        assert groupby == ['time']
-
-    def test_process_3d_xarray_dataset_with_coords_as_gridded_uses_axis_to_get_defaults(self):
-        import xarray as xr
-
-        kwargs = self.default_kwargs
-        kwargs.update(gridded=True)
-
-        data, x, y, by, groupby = process_xarray(data=self.ds, **kwargs)
-        assert isinstance(data, xr.Dataset)
-        assert list(data.data_vars.keys()) == ['air']
-        assert x == 'lon'
-        assert y == 'lat'
-        assert not by
-        assert groupby == ['time']
-
-    def test_process_xarray_dataset_with_by_as_derived_datetime(self):
-        data = self.ds.mean(dim=['lat', 'lon'])
-        kwargs = self.default_kwargs
-        kwargs.update(gridded=False, y='air', by=['time.hour'])
-
-        data, x, y, by, groupby = process_xarray(data=data, **kwargs)
-        assert isinstance(data, pd.DataFrame)
-        assert x == 'time'
-        assert y == 'air'
-        assert by == ['time.hour']
-        assert not groupby
-
-    def test_process_xarray_dataset_with_x_as_derived_datetime(self):
-        data = self.ds.mean(dim=['lat', 'lon'])
-        kwargs = self.default_kwargs
-        kwargs.update(gridded=False, y='air', x='time.dayofyear')
-
-        data, x, y, by, groupby = process_xarray(data=data, **kwargs)
-        assert isinstance(data, pd.DataFrame)
-        assert x == 'time.dayofyear'
-        assert y == 'air'
-        assert not by
-        assert not groupby
+PROCESS_XARRAY_KWARGS = {
+    'value_label': 'value',
+    'label': None,
+    'gridded': False,
+    'persist': False,
+    'use_dask': False,
+    'groupby': None,
+    'y': None,
+    'x': None,
+    'by': None,
+    'other_dims': [],
+}
 
 
-class TestDynamicArgs(TestCase):
-    def test_dynamic_and_static(self):
-        from hvplot.util import process_dynamic_args
+def test_process_1d_xarray_dataarray_with_no_coords():
+    da = xr.DataArray(data=[1, 2, 3])
 
-        x = 'sepal_width'
-        y = pn.widgets.Select(
-            label='y', value='sepal_length', options=['sepal_length', 'petal_length']
-        )
-        kind = pn.widgets.Select(label='kind', value='scatter', options=['bivariate', 'scatter'])
+    data, x, y, by, groupby = process_xarray(data=da, **PROCESS_XARRAY_KWARGS)
+    assert isinstance(data, pd.DataFrame)
+    assert x == 'index'
+    assert y == ['value']
+    assert not by
+    assert not groupby
 
-        dynamic, arg_deps, _arg_names = process_dynamic_args(x, y, kind)
-        assert 'x' not in dynamic
-        assert 'y' in dynamic
-        assert arg_deps == []
 
-    def test_dynamic_kwds(self):
-        from hvplot.util import process_dynamic_args
+def test_process_1d_xarray_dataarray_with_coords():
+    da = xr.DataArray(data=[1, 2, 3], coords={'day': [5, 6, 7]}, dims=['day'])
 
-        x = 'sepal_length'
-        y = 'sepal_width'
-        kind = 'scatter'
-        color = pn.widgets.ColorPicker(value='#ff0000')
+    data, x, y, by, groupby = process_xarray(data=da, **PROCESS_XARRAY_KWARGS)
+    assert isinstance(data, pd.DataFrame)
+    assert x == 'day'
+    assert y == ['value']
+    assert not by
+    assert not groupby
 
-        dynamic, arg_deps, _arg_names = process_dynamic_args(x, y, kind, c=color)
-        assert 'x' not in dynamic
-        assert 'c' in dynamic
-        assert arg_deps == []
 
-    def test_fn_kwds(self):
-        from hvplot.util import process_dynamic_args
+def test_process_1d_xarray_dataarray_with_coords_and_name():
+    da = xr.DataArray(data=[1, 2, 3], coords={'day': [5, 6, 7]}, dims=['day'], name='temp')
 
-        x = 'sepal_length'
-        y = 'sepal_width'
-        kind = 'scatter'
-        by_species = pn.widgets.Checkbox(label='By species')
-        color = pn.widgets.ColorPicker(value='#ff0000')
+    data, x, y, by, groupby = process_xarray(data=da, **PROCESS_XARRAY_KWARGS)
+    assert isinstance(data, pd.DataFrame)
+    assert x == 'day'
+    assert y == ['temp']
+    assert not by
+    assert not groupby
 
-        @pn.depends(by_species.param.value, color.param.value)
-        def by_species_fn(by_species, color):
-            return 'species' if by_species else color
 
-        dynamic, arg_deps, arg_names = process_dynamic_args(x, y, kind, c=by_species_fn)
-        assert dynamic == {}
-        assert arg_names == ['c', 'c']
-        assert len(arg_deps) == 2
+def test_process_2d_xarray_dataarray_with_no_coords(rng):
+    da = xr.DataArray(rng.standard_normal((4, 5)))
+
+    data, x, y, by, groupby = process_xarray(data=da, **PROCESS_XARRAY_KWARGS)
+    assert isinstance(data, pd.DataFrame)
+    assert x == 'index'
+    assert y == ['value']
+    assert not by
+    assert not groupby
+
+
+def test_process_2d_xarray_dataarray_with_no_coords_as_gridded(rng):
+    da = xr.DataArray(rng.standard_normal((4, 5)))
+
+    kwargs = dict(PROCESS_XARRAY_KWARGS, gridded=True)
+
+    data, x, y, by, groupby = process_xarray(data=da, **kwargs)
+    assert isinstance(data, xr.Dataset)
+    assert list(data.data_vars.keys()) == ['value']
+    assert x == 'dim_1'
+    assert y == 'dim_0'
+    assert not by
+    assert not groupby
+
+
+def test_process_2d_xarray_dataarray_with_coords_as_gridded(rng):
+    da = xr.DataArray(
+        data=rng.standard_normal((4, 5)), coords={'y': [3, 4, 5, 6, 7]}, dims=['x', 'y']
+    )
+
+    kwargs = dict(PROCESS_XARRAY_KWARGS, gridded=True)
+
+    data, x, y, by, groupby = process_xarray(data=da, **kwargs)
+    assert isinstance(data, xr.Dataset)
+    assert list(data.data_vars.keys()) == ['value']
+    assert x == 'y'
+    assert y == 'x'
+    assert not by
+    assert not groupby
+
+
+def test_process_3d_xarray_dataset_with_coords():
+    data, x, y, by, groupby = process_xarray(data=air_temperature(), **PROCESS_XARRAY_KWARGS)
+    assert isinstance(data, pd.DataFrame)
+    assert x == 'time'
+    assert y == ['air']
+    assert not by
+    assert groupby == ['lon', 'lat']
+
+
+def test_process_3d_xarray_dataset_with_coords_as_gridded():
+    kwargs = dict(PROCESS_XARRAY_KWARGS, gridded=True, x='lon', y='lat')
+
+    data, x, y, by, groupby = process_xarray(data=air_temperature(), **kwargs)
+    assert isinstance(data, xr.Dataset)
+    assert list(data.data_vars.keys()) == ['air']
+    assert x == 'lon'
+    assert y == 'lat'
+    assert by is None
+    assert groupby == ['time']
+
+
+def test_process_3d_xarray_dataset_with_coords_as_gridded_uses_axis_to_get_defaults():
+    kwargs = dict(PROCESS_XARRAY_KWARGS, gridded=True)
+
+    data, x, y, by, groupby = process_xarray(data=air_temperature(), **kwargs)
+    assert isinstance(data, xr.Dataset)
+    assert list(data.data_vars.keys()) == ['air']
+    assert x == 'lon'
+    assert y == 'lat'
+    assert not by
+    assert groupby == ['time']
+
+
+def test_process_xarray_dataset_with_by_as_derived_datetime():
+    data = air_temperature().mean(dim=['lat', 'lon'])
+    kwargs = dict(PROCESS_XARRAY_KWARGS, gridded=False, y='air', by=['time.hour'])
+
+    data, x, y, by, groupby = process_xarray(data=data, **kwargs)
+    assert isinstance(data, pd.DataFrame)
+    assert x == 'time'
+    assert y == 'air'
+    assert by == ['time.hour']
+    assert not groupby
+
+
+def test_process_xarray_dataset_with_x_as_derived_datetime():
+    data = air_temperature().mean(dim=['lat', 'lon'])
+    kwargs = dict(PROCESS_XARRAY_KWARGS, gridded=False, y='air', x='time.dayofyear')
+
+    data, x, y, by, groupby = process_xarray(data=data, **kwargs)
+    assert isinstance(data, pd.DataFrame)
+    assert x == 'time.dayofyear'
+    assert y == 'air'
+    assert not by
+    assert not groupby
+
+
+def test_process_dynamic_args_dynamic_and_static():
+    x = 'sepal_width'
+    y = pn.widgets.Select(
+        label='y', value='sepal_length', options=['sepal_length', 'petal_length']
+    )
+    kind = pn.widgets.Select(label='kind', value='scatter', options=['bivariate', 'scatter'])
+
+    dynamic, arg_deps, _arg_names = process_dynamic_args(x, y, kind)
+    assert 'x' not in dynamic
+    assert 'y' in dynamic
+    assert arg_deps == []
+
+
+def test_process_dynamic_args_dynamic_kwds():
+    x = 'sepal_length'
+    y = 'sepal_width'
+    kind = 'scatter'
+    color = pn.widgets.ColorPicker(value='#ff0000')
+
+    dynamic, arg_deps, _arg_names = process_dynamic_args(x, y, kind, c=color)
+    assert 'x' not in dynamic
+    assert 'c' in dynamic
+    assert arg_deps == []
+
+
+def test_process_dynamic_args_fn_kwds():
+    x = 'sepal_length'
+    y = 'sepal_width'
+    kind = 'scatter'
+    by_species = pn.widgets.Checkbox(label='By species')
+    color = pn.widgets.ColorPicker(value='#ff0000')
+
+    @pn.depends(by_species.param.value, color.param.value)
+    def by_species_fn(by_species, color):
+        return 'species' if by_species else color
+
+    dynamic, arg_deps, arg_names = process_dynamic_args(x, y, kind, c=by_species_fn)
+    assert dynamic == {}
+    assert arg_names == ['c', 'c']
+    assert len(arg_deps) == 2
 
 
 @requires('pyproj')
@@ -265,23 +235,28 @@ def test_check_crs():
         'EPSG: 6933',
     ],
 )
+@pytest.mark.geo
 def test_process_crs(input):
-    pytest.importorskip('pyproj')
-    ccrs = pytest.importorskip('cartopy.crs')
+    import cartopy.crs as ccrs
+
     crs = process_crs(input)
     assert isinstance(crs, ccrs.CRS)
 
 
+@pytest.mark.geo
 def test_process_crs_pyproj_crs():
-    pyproj = pytest.importorskip('pyproj')
-    ccrs = pytest.importorskip('cartopy.crs')
+    import cartopy.crs as ccrs
+    import pyproj
+
     crs = process_crs(pyproj.CRS.from_epsg(4326))
     assert isinstance(crs, ccrs.PlateCarree)
 
 
+@pytest.mark.geo
 def test_process_crs_pyproj_proj():
-    pyproj = pytest.importorskip('pyproj')
-    ccrs = pytest.importorskip('cartopy.crs')
+    import cartopy.crs as ccrs
+    import pyproj
+
     crs = process_crs(pyproj.Proj(init='epsg:4326'))
     assert isinstance(crs, ccrs.PlateCarree)
 
@@ -299,9 +274,10 @@ def test_process_crs_pyproj_proj():
     ],
     ids=lambda x: str(x)[:20],
 )
+@pytest.mark.geo
 def test_process_crs_platecarree(input):
-    pytest.importorskip('pyproj')
-    ccrs = pytest.importorskip('cartopy.crs')
+    import cartopy.crs as ccrs
+
     crs = process_crs(input)
     assert isinstance(crs, ccrs.PlateCarree)
 
@@ -320,25 +296,27 @@ def test_process_crs_platecarree(input):
     ],
     ids=lambda x: str(x)[:20],
 )
+@pytest.mark.geo
 def test_process_crs_mercator(input):
-    pytest.importorskip('pyproj')
-    ccrs = pytest.importorskip('cartopy.crs')
+    import cartopy.crs as ccrs
+
     crs = process_crs(input)
     assert isinstance(crs, ccrs.Mercator)
 
 
+@pytest.mark.geo
+@requires('rasterio')
 def test_process_crs_rasterio():
-    pytest.importorskip('pyproj')
-    rcrs = pytest.importorskip('rasterio.crs')
-    ccrs = pytest.importorskip('cartopy.crs')
+    import cartopy.crs as ccrs
+    import rasterio.crs as rcrs
+
     input = rcrs.CRS.from_epsg(4326).to_wkt()
     crs = process_crs(input)
     assert isinstance(crs, ccrs.CRS)
 
 
+@pytest.mark.geo
 def test_process_crs_raises_error():
-    pytest.importorskip('pyproj')
-    pytest.importorskip('cartopy.crs')
     with pytest.raises(ValueError, match='must be defined as a EPSG code, proj4 string'):
         process_crs(43823)
 
@@ -367,27 +345,36 @@ def test_convert_col_names_to_str():
     assert all(isinstance(col, str) for col in df.columns)
 
 
+@requires('cartopy')
 def test_instantiate_crs_str():
-    ccrs = pytest.importorskip('cartopy.crs')
+    import cartopy.crs as ccrs
+
     assert isinstance(instantiate_crs_str('PlateCarree'), ccrs.PlateCarree)
 
 
+@requires('cartopy')
 def test_instantiate_crs_google_mercator():
-    ccrs = pytest.importorskip('cartopy.crs')
+    import cartopy.crs as ccrs
+
     assert instantiate_crs_str('GOOGLE_MERCATOR') == ccrs.GOOGLE_MERCATOR
     assert instantiate_crs_str('google_mercator') == ccrs.GOOGLE_MERCATOR
 
 
+@requires('cartopy')
 def test_instantiate_crs_str_kwargs():
-    ccrs = pytest.importorskip('cartopy.crs')
+    import cartopy.crs as ccrs
+
     crs = instantiate_crs_str('PlateCarree', globe=ccrs.Globe(datum='WGS84'))
     assert isinstance(crs, ccrs.PlateCarree)
     assert isinstance(crs.globe, ccrs.Globe)
     assert crs.globe.datum == 'WGS84'
 
 
-@pytest.mark.skipif(spd is None or dd is None, reason='spatialpandas or dask is not available')
+@requires('spatialpandas', 'dask')
 def test_is_geodataframe_spatialpandas_dask():
+    import dask.dataframe as dd
+    import spatialpandas as spd
+
     square = spd.geometry.Polygon([(0.0, 0), (0, 1), (1, 1), (1, 0)])
     sdf = spd.GeoDataFrame({'geometry': spd.GeoSeries([square, square]), 'name': ['A', 'B']})
     sddf = dd.from_pandas(sdf, npartitions=2)
@@ -633,43 +620,36 @@ class TestConvertLimitToMercator:
         assert result[0] < result[1]
 
 
-class TestGeoUtil(TestCase):
-    def setUp(self):
-        if sys.platform == 'win32':
-            raise SkipTest('Skip geo tests on windows for now')
-        try:
-            import cartopy.crs as ccrs
-        except ImportError:
-            raise SkipTest('cartopy not available')
-        self.ccrs = ccrs
-
+@requires('cartopy', 'pyproj')
+@pytest.mark.skipif(sys.platform == 'win32', reason='Skip geo tests on windows for now')
+class TestProjToCartopy:
     def test_proj_to_cartopy(self):
-        from hvplot.util import proj_to_cartopy
+        import cartopy.crs as ccrs
 
         crs = proj_to_cartopy('epsg:26911')
 
-        assert isinstance(crs, self.ccrs.CRS)
+        assert isinstance(crs, ccrs.CRS)
 
     def test_proj_to_cartopy_wkt_string(self):
-        from hvplot.util import proj_to_cartopy
+        import cartopy.crs as ccrs
 
         crs = proj_to_cartopy(
             'GEOGCRS["unnamed",BASEGEOGCRS["unknown",DATUM["unknown",ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1,ID["EPSG",9001]]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8901]]],DERIVINGCONVERSION["unknown",METHOD["PROJ ob_tran o_proj=latlon"],PARAMETER["o_lon_p",0,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],PARAMETER["o_lat_p",37.5,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],PARAMETER["lon_0",357.5,ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]]],CS[ellipsoidal,2],AXIS["longitude",east,ORDER[1],ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],AXIS["latitude",north,ORDER[2],ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]]]'  # noqa: E501
         )
 
-        assert isinstance(crs, self.ccrs.RotatedPole)
+        assert isinstance(crs, ccrs.RotatedPole)
         assert crs.proj4_params['lon_0'] == 357.5
         assert crs.proj4_params['o_lat_p'] == 37.5
 
     def test_proj_to_cartopy_albers_equal_area_wkt(self):
         """Test Albers Equal Area projection from WKT string"""
-        from hvplot.util import proj_to_cartopy
+        import cartopy.crs as ccrs
 
         albers_wkt = 'PROJCS["Projection = Albers Conical Equal Area",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Albers_Conic_Equal_Area"],PARAMETER["latitude_of_center",23],PARAMETER["longitude_of_center",-96],PARAMETER["standard_parallel_1",29.5],PARAMETER["standard_parallel_2",45.5],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH]]'  # noqa: E501
 
         crs = proj_to_cartopy(albers_wkt)
 
-        assert isinstance(crs, self.ccrs.AlbersEqualArea)
+        assert isinstance(crs, ccrs.AlbersEqualArea)
         assert crs.proj4_params['proj'] == 'aea'
         assert crs.proj4_params['lat_0'] == 23.0
         assert crs.proj4_params['lon_0'] == -96.0
@@ -678,57 +658,55 @@ class TestGeoUtil(TestCase):
 
     def test_proj_to_cartopy_albers_equal_area_proj4(self):
         """Test Albers Equal Area projection from PROJ4 string"""
-        from hvplot.util import proj_to_cartopy
+        import cartopy.crs as ccrs
 
         proj4_string = '+proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs'  # noqa: E501
 
         crs = proj_to_cartopy(proj4_string)
 
-        assert isinstance(crs, self.ccrs.AlbersEqualArea)
+        assert isinstance(crs, ccrs.AlbersEqualArea)
 
-    def test_proj_to_cartopy_additional_projections(self):
+    @pytest.mark.parametrize(
+        ('proj4_string', 'expected_class'),
+        [
+            ('+proj=eqdc +lat_0=40 +lon_0=-96 +lat_1=33 +lat_2=45', 'EquidistantConic'),
+            ('+proj=aeqd +lat_0=40 +lon_0=-96', 'AzimuthalEquidistant'),
+            ('+proj=gnom +lat_0=40 +lon_0=-96', 'Gnomonic'),
+            ('+proj=ortho +lat_0=40 +lon_0=-96', 'Orthographic'),
+            ('+proj=robin +lon_0=0', 'Robinson'),
+            ('+proj=moll +lon_0=0', 'Mollweide'),
+            ('+proj=sinu +lon_0=0', 'Sinusoidal'),
+            ('+proj=eck4 +lon_0=0', 'EckertIV'),
+            ('+proj=laea +lat_0=40 +lon_0=-96', 'LambertAzimuthalEqualArea'),
+            ('+proj=cea +lon_0=0', 'LambertCylindrical'),
+            ('+proj=mill +lon_0=0', 'Miller'),
+        ],
+    )
+    def test_proj_to_cartopy_additional_projections(self, proj4_string, expected_class):
         """
         Test that various PROJ.4 projection strings are correctly mapped to their
         expected Cartopy CRS classes by `proj_to_cartopy`.
         """
-        from hvplot.util import proj_to_cartopy
+        import cartopy.crs as ccrs
 
-        test_cases = [
-            ('+proj=eqdc +lat_0=40 +lon_0=-96 +lat_1=33 +lat_2=45', self.ccrs.EquidistantConic),
-            ('+proj=aeqd +lat_0=40 +lon_0=-96', self.ccrs.AzimuthalEquidistant),
-            ('+proj=gnom +lat_0=40 +lon_0=-96', self.ccrs.Gnomonic),
-            ('+proj=ortho +lat_0=40 +lon_0=-96', self.ccrs.Orthographic),
-            ('+proj=robin +lon_0=0', self.ccrs.Robinson),
-            ('+proj=moll +lon_0=0', self.ccrs.Mollweide),
-            ('+proj=sinu +lon_0=0', self.ccrs.Sinusoidal),
-            ('+proj=eck4 +lon_0=0', self.ccrs.EckertIV),
-            ('+proj=laea +lat_0=40 +lon_0=-96', self.ccrs.LambertAzimuthalEqualArea),
-            ('+proj=cea +lon_0=0', self.ccrs.LambertCylindrical),
-            ('+proj=mill +lon_0=0', self.ccrs.Miller),
-        ]
-
-        for proj4_string, expected_class in test_cases:
-            with self.subTest(proj4=proj4_string):
-                crs = proj_to_cartopy(proj4_string)
-                assert isinstance(crs, expected_class), (
-                    f'Expected {expected_class} for {proj4_string}, got {type(crs)}'
-                )
+        crs = proj_to_cartopy(proj4_string)
+        assert isinstance(crs, getattr(ccrs, expected_class))
 
     def test_proj_to_cartopy_geostationary_special_case(self):
         """Test Geostationary projection which requires special parameters"""
-        from hvplot.util import proj_to_cartopy
+        import cartopy.crs as ccrs
 
         # Geostationary typically requires satellite height
         proj4_string = '+proj=geos +lon_0=0 +h=35786023 +x_0=0 +y_0=0'
 
         crs = proj_to_cartopy(proj4_string)
-        assert isinstance(crs, self.ccrs.Geostationary)
+        assert isinstance(crs, ccrs.Geostationary)
 
     def test_proj_to_cartopy_nearsided_perspective(self):
         """Test Near-sided Perspective projection"""
-        from hvplot.util import proj_to_cartopy
+        import cartopy.crs as ccrs
 
         proj4_string = '+proj=nsper +lat_0=40 +lon_0=-96 +h=10000000'
 
         crs = proj_to_cartopy(proj4_string)
-        assert isinstance(crs, self.ccrs.NearsidePerspective)
+        assert isinstance(crs, ccrs.NearsidePerspective)

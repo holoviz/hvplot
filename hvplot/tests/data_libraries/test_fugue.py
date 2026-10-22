@@ -1,15 +1,11 @@
-"""Fugue test suite"""
-
 import pandas as pd
 import pytest
 
+from hvplot.tests._deps import requires
 from hvplot.util import _PD_GE_3_0_0
 
-try:
-    import fugue.api as fa
-    import fugue_sql_antlr  # noqa: F401
-except ImportError:
-    pytest.skip(allow_module_level=True)
+# fugue is optional, it is imported in the tests.
+pytestmark = requires('fugue', 'fugue_sql_antlr')
 
 
 @pytest.fixture
@@ -25,8 +21,10 @@ def table():
 
 
 @pytest.mark.skipif(_PD_GE_3_0_0, reason='breaks with Pandas 3')
-def test_fugure_ipython_line(table, capsys, monkeypatch, hvplot_pandas):
+def test_fugue_ipython_line(table, capsys, monkeypatch, hvplot_pandas):
     """hvPlot works with Fugue"""
+    import fugue.api as fa
+
     import hvplot.fugue
 
     # Patched on hvplot.fugue as it copies the flag from hvplot.util when first imported.

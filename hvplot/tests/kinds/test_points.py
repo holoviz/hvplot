@@ -1,40 +1,33 @@
-from unittest import SkipTest
-
 import pandas as pd
+import pytest
 from holoviews.element import Path, Points
-from holoviews.element.comparison import ComparisonTestCase
-from parameterized import parameterized
+from holoviews.testing import assert_element_equal
+
+kinds = pytest.mark.parametrize(('kind', 'element'), [('points', Points), ('paths', Path)])
+tabular_libs = pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
 
 
-class TestChart2D(ComparisonTestCase):
-    def setUp(self):
-        import hvplot.pandas  # noqa: F401
-
-        self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
-
-    @parameterized.expand([('points', Points), ('paths', Path)])
-    def test_2d_defaults(self, kind, element):
-        plot = self.df.hvplot(kind=kind)
-        self.assertEqual(plot, element(self.df, ['x', 'y']))
-
-    @parameterized.expand([('points', Points), ('paths', Path)])
-    def test_2d_chart(self, kind, element):
-        plot = self.df.hvplot(x='x', y='y', kind=kind)
-        self.assertEqual(plot, element(self.df, ['x', 'y']))
-
-    @parameterized.expand([('points', Points), ('paths', Path)])
-    def test_2d_index_and_c(self, kind, element):
-        plot = self.df.hvplot(x='index', y='y', c='x', kind=kind)
-        self.assertEqual(plot, element(self.df, ['index', 'y'], ['x']))
+@pytest.fixture
+def df(tabular_lib):
+    return tabular_lib(pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y']))
 
 
-class TestChart2DDask(TestChart2D):
-    def setUp(self):
-        super().setUp()
-        try:
-            import dask.dataframe as dd
-        except ImportError:
-            raise SkipTest('Dask not available')
-        import hvplot.dask  # noqa: F401
+@tabular_libs
+@kinds
+def test_2d_defaults(df, kind, element):
+    plot = df.hvplot(kind=kind)
+    assert_element_equal(plot, element(df, ['x', 'y']))
 
-        self.df = dd.from_pandas(self.df, npartitions=2)
+
+@tabular_libs
+@kinds
+def test_2d_chart(df, kind, element):
+    plot = df.hvplot(x='x', y='y', kind=kind)
+    assert_element_equal(plot, element(df, ['x', 'y']))
+
+
+@tabular_libs
+@kinds
+def test_2d_index_and_c(df, kind, element):
+    plot = df.hvplot(x='index', y='y', c='x', kind=kind)
+    assert_element_equal(plot, element(df, ['index', 'y'], ['x']))

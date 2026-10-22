@@ -2,6 +2,8 @@ import pandas as pd
 import pytest
 from holoviews import Store
 
+pytestmark = pytest.mark.usefixtures('hvplot_pandas')
+
 
 @pytest.fixture(scope='module')
 def df():
@@ -11,11 +13,9 @@ def df():
     )
 
 
-@pytest.mark.usefixtures('hvplot_pandas')
-class TestOptions:
-    def test_kde_opts(self, df, backend):
-        plot = df.hvplot.kde('x', bandwidth=0.2, cut=1, filled=True)
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['bandwidth'] == 0.2
-        assert opts.kwargs['cut'] == 1
-        assert opts.kwargs['filled'] is True
+def test_kde_opts(df, backend):
+    plot = df.hvplot.kde('x', bandwidth=0.2, cut=1, filled=True)
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['bandwidth'] == 0.2
+    assert opts.kwargs['cut'] == 1
+    assert opts.kwargs['filled'] is True

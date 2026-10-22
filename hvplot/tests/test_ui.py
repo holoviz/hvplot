@@ -15,7 +15,10 @@ from hvplot.ui import MAX_ROWS, hvDataFrameExplorer, hvGridExplorer
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas', 'hvplot_xarray')
 
-df = penguins.data
+
+@pytest.fixture
+def df():
+    return penguins.data.copy()
 
 
 @pytest.fixture
@@ -23,7 +26,7 @@ def ds_air_temperature():
     return air_temperature()
 
 
-def test_explorer_basic():
+def test_explorer_basic(df):
     explorer = hvplot.explorer(df)
 
     assert isinstance(explorer, hvDataFrameExplorer)
@@ -32,7 +35,7 @@ def test_explorer_basic():
     assert explorer.y == 'species'
 
 
-def test_explorer_settings():
+def test_explorer_settings(df):
     explorer = hvplot.explorer(df)
 
     explorer.param.update(
@@ -52,7 +55,7 @@ def test_explorer_settings():
     }
 
 
-def test_explorer_plot_code():
+def test_explorer_plot_code(df):
     explorer = hvplot.explorer(df)
 
     explorer.param.update(
@@ -89,7 +92,7 @@ def test_explorer_plot_code():
     )
 
 
-def test_explorer_hvplot():
+def test_explorer_hvplot(df):
     explorer = hvplot.explorer(df)
 
     explorer.param.update(
@@ -105,7 +108,7 @@ def test_explorer_hvplot():
     assert plot.vdims[0].name == 'bill_depth_mm'
 
 
-def test_explorer_save(tmp_path):
+def test_explorer_save(tmp_path, df):
     explorer = hvplot.explorer(df)
 
     explorer.param.update(
@@ -121,7 +124,7 @@ def test_explorer_save(tmp_path):
     assert outfile.exists()
 
 
-def test_explorer_kwargs_controls():
+def test_explorer_kwargs_controls(df):
     explorer = hvplot.explorer(df, title='Dummy title', width=200)
 
     assert explorer.labels.title == 'Dummy title'
@@ -129,7 +132,7 @@ def test_explorer_kwargs_controls():
 
 
 @pytest.mark.usefixtures('disable_param_warnings_as_exceptions')
-def test_explorer_kwargs_controls_error_not_supported():
+def test_explorer_kwargs_controls_error_not_supported(df):
     with pytest.raises(
         TypeError,
         match=re.escape(
@@ -208,7 +211,7 @@ def test_explorer_hvplot_geo():
     assert explorer.geographic.projection == 'GOOGLE_MERCATOR'
 
 
-def test_explorer_live_update_init():
+def test_explorer_live_update_init(df):
     explorer = hvplot.explorer(df)
     assert explorer.statusbar.live_update is True
 
@@ -217,7 +220,7 @@ def test_explorer_live_update_init():
     assert 'live_update' not in explorer.settings()
 
 
-def test_explorer_live_update_after_init():
+def test_explorer_live_update_after_init(df):
     explorer = hvplot.explorer(df)
     assert explorer._hv_pane.object.type is hv.Scatter
     explorer.kind = 'line'
@@ -233,7 +236,7 @@ def test_explorer_live_update_after_init():
     assert 'scatter' in explorer.code
 
 
-def test_explorer_method_dataframe():
+def test_explorer_method_dataframe(df):
     explorer = df.hvplot.explorer()
 
     assert isinstance(explorer, hvDataFrameExplorer)
@@ -251,7 +254,7 @@ def test_explorer_method_grid(ds_air_temperature):
     assert explorer.y == 'lon'
 
 
-def test_explorer_method_kind():
+def test_explorer_method_kind(df):
     explorer = df.hvplot.explorer(kind='scatter')
 
     assert isinstance(explorer, hvDataFrameExplorer)
@@ -260,7 +263,7 @@ def test_explorer_method_kind():
     assert explorer.y == 'species'
 
 
-def test_explorer_method_as_kind():
+def test_explorer_method_as_kind(df):
     explorer = df.hvplot(kind='explorer')
 
     assert isinstance(explorer, hvDataFrameExplorer)
@@ -269,7 +272,7 @@ def test_explorer_method_as_kind():
     assert explorer.y == 'species'
 
 
-def test_explorer_method_propagates_kwargs():
+def test_explorer_method_propagates_kwargs(df):
     explorer = df.hvplot.explorer(title='Dummy title', x='bill_length_mm')
 
     assert isinstance(explorer, hvDataFrameExplorer)
@@ -279,7 +282,7 @@ def test_explorer_method_propagates_kwargs():
     assert explorer.labels.title == 'Dummy title'
 
 
-def test_explorer_code_dataframe():
+def test_explorer_code_dataframe(df):
     explorer = hvplot.explorer(df, x='bill_length_mm', kind='points')
     assert explorer.code == dedent("""\
         df.hvplot(

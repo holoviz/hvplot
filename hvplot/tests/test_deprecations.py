@@ -3,9 +3,7 @@ Tests for deprecation warnings.
 """
 
 import importlib
-import os
 import sys
-import tempfile
 
 import pandas as pd
 import pytest
@@ -66,7 +64,9 @@ def test_intake_deprecation():
         importlib.import_module('hvplot.intake')
 
 
-def test_intake_datasource_hvplot_deprecation(disable_param_warnings_as_exceptions, monkeypatch):
+def test_intake_datasource_hvplot_deprecation(
+    disable_param_warnings_as_exceptions, monkeypatch, tmp_path
+):
     intake = pytest.importorskip('intake')
 
     from intake.source.base import DataSource
@@ -75,14 +75,9 @@ def test_intake_datasource_hvplot_deprecation(disable_param_warnings_as_exceptio
     # which fires its own separate FutureWarning and would pollute this test.
     monkeypatch.setattr(DataSource, 'hvplot', property(lambda self: hvPlot(self)), raising=False)
 
-    df = pd.DataFrame({'x': [1, 2, 3], 'y': [4, 5, 6]})
-    with tempfile.NamedTemporaryFile(suffix='.csv', delete=False, mode='w') as f:
-        df.to_csv(f, index=False)
-        tmppath = f.name
+    path = tmp_path / 'data.csv'
+    pd.DataFrame({'x': [1, 2, 3], 'y': [4, 5, 6]}).to_csv(path, index=False)
 
-    try:
-        src = intake.open_csv(tmppath)
-        with pytest.warns(FutureWarning, match='intake DataSource'):
-            src.hvplot.line(x='x', y='y')
-    finally:
-        os.unlink(tmppath)
+    src = intake.open_csv(str(path))
+    with pytest.warns(FutureWarning, match='intake DataSource'):
+        src.hvplot.line(x='x', y='y')

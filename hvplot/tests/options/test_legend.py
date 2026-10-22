@@ -1,14 +1,15 @@
-from unittest import SkipTest
-
 import pandas as pd
 import pytest
 from holoviews import Store
-from holoviews.element import Area, Curve, Scatter
-from holoviews.element.comparison import ComparisonTestCase
-from parameterized import parameterized
+
+pytestmark = pytest.mark.usefixtures('hvplot_pandas')
+
+pandas_and_dask = pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
+
+no_legend_position = pytest.mark.xfail(reason='legend_position not supported w/ plotly')
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture
 def df():
     return pd.DataFrame(
         [[1, 2, 'A', 0.1], [3, 4, 'B', 0.2], [5, 6, 'C', 0.3]],
@@ -16,88 +17,65 @@ def df():
     )
 
 
-@pytest.mark.usefixtures('hvplot_pandas')
-class TestOptions:
-    def test_scatter_legend_position(self, df, backend):
-        if backend == 'matplotlib':
-            pytest.xfail('legend_position not supported w/ matplotlib for scatter')
-        if backend == 'plotly':
-            pytest.xfail('legend_position not supported w/ plotly for scatter')
-
-        plot = df.hvplot.scatter('x', 'y', c='category', legend='left')
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['legend_position'] == 'left'
-
-    def test_histogram_by_category_legend_position(self, df, backend):
-        if backend == 'plotly':
-            pytest.xfail('legend_position not supported w/ plotly for hist')
-
-        plot = df.hvplot.hist('y', by='category', legend='left')
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['legend_position'] == 'left'
-
-    def test_legend_cols(self, df, backend):
-        if backend == 'plotly':
-            pytest.skip('legend_cols not supported w/ plotly')
-
-        plot = df.hvplot.scatter('x', 'y', by='category', legend_cols=2)
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['legend_cols'] == 2
-
-    def test_legend_opts(self, df, backend):
-        if backend == 'plotly':
-            pytest.skip('legend_opts not supported w/ plotly')
-
-        if backend == 'bokeh':
-            lo = {'spacing': 20}
-        elif backend == 'matplotlib':
-            lo = {'labelspacing': 2}
-
-        plot = df.hvplot.scatter('x', 'y', by='category', legend_opts=lo)
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['legend_opts'] == lo
+@pytest.fixture
+def xy_df():
+    return pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
 
 
-class TestChart1D(ComparisonTestCase):
-    def setUp(self):
-        import hvplot.pandas  # noqa: F401
-
-        self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
-        self.cat_df = pd.DataFrame(
-            [[1, 2, 'A'], [3, 4, 'B'], [5, 6, 'C']], columns=['x', 'y', 'category']
-        )
-
-    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
-    def test_wide_chart_legend_position(self, kind, element):
-        plot = self.df.hvplot(kind=kind, value_label='Test', group_label='Category', legend='left')
-        opts = Store.lookup_options('bokeh', plot, 'plot')
-        self.assertEqual(opts.kwargs['legend_position'], 'left')
-
-    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
-    def test_tidy_chart_index_by_legend_position(self, kind, element):
-        plot = self.df.hvplot(x='index', y='y', by='x', kind=kind, legend='left')
-        opts = Store.lookup_options('bokeh', plot, 'plot')
-        self.assertEqual(opts.kwargs['legend_position'], 'left')
-
-    def test_scatter_color_by_legend_position(self):
-        plot = self.cat_df.hvplot.scatter('x', 'y', c='category', legend='left')
-        opts = Store.lookup_options('bokeh', plot, 'plot')
-        self.assertEqual(opts.kwargs['legend_position'], 'left')
-
-    def test_histogram_by_category_legend_position(self):
-        plot = self.cat_df.hvplot.hist('y', by='category', legend='left')
-        opts = Store.lookup_options('bokeh', plot, 'plot')
-        self.assertEqual(opts.kwargs['legend_position'], 'left')
+@pandas_and_dask
+@pytest.mark.parametrize(
+    'backend',
+    ['bokeh', 'matplotlib', pytest.param('plotly', marks=no_legend_position)],
+    indirect=True,
+)
+def test_legend_scatter_c(tabular_lib, df, backend):
+    plot = tabular_lib(df).hvplot.scatter('x', 'y', c='category', legend='left')
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['legend_position'] == 'left'
 
 
-class TestChart1DDask(TestChart1D):
-    def setUp(self):
-        super().setUp()
-        try:
-            import dask.dataframe as dd
-        except ImportError:
-            raise SkipTest('Dask not available')
-        import hvplot.dask  # noqa: F401
+@pandas_and_dask
+@pytest.mark.parametrize(
+    'backend',
+    ['bokeh', 'matplotlib', pytest.param('plotly', marks=no_legend_position)],
+    indirect=True,
+)
+def test_legend_hist_by(tabular_lib, df, backend):
+    plot = tabular_lib(df).hvplot.hist('y', by='category', legend='left')
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['legend_position'] == 'left'
 
-        self.df = dd.from_pandas(self.df, npartitions=2)
-        self.cat_df = dd.from_pandas(self.cat_df, npartitions=3)
+
+@pandas_and_dask
+@pytest.mark.parametrize('kind', ['line', 'area', 'scatter'])
+def test_legend_wide(tabular_lib, xy_df, kind):
+    df = tabular_lib(xy_df)
+    plot = df.hvplot(kind=kind, value_label='Test', group_label='Category', legend='left')
+    opts = Store.lookup_options('bokeh', plot, 'plot')
+    assert opts.kwargs['legend_position'] == 'left'
+
+
+@pandas_and_dask
+@pytest.mark.parametrize('kind', ['line', 'area', 'scatter'])
+def test_legend_by_index(tabular_lib, xy_df, kind):
+    plot = tabular_lib(xy_df).hvplot(x='index', y='y', by='x', kind=kind, legend='left')
+    opts = Store.lookup_options('bokeh', plot, 'plot')
+    assert opts.kwargs['legend_position'] == 'left'
+
+
+@pytest.mark.parametrize('backend', ['bokeh', 'matplotlib'], indirect=True)
+def test_legend_cols(df, backend):
+    plot = df.hvplot.scatter('x', 'y', by='category', legend_cols=2)
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['legend_cols'] == 2
+
+
+@pytest.mark.parametrize(
+    ('backend', 'legend_opts'),
+    [('bokeh', {'spacing': 20}), ('matplotlib', {'labelspacing': 2})],
+    indirect=['backend'],
+)
+def test_legend_opts(df, backend, legend_opts):
+    plot = df.hvplot.scatter('x', 'y', by='category', legend_opts=legend_opts)
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['legend_opts'] == legend_opts

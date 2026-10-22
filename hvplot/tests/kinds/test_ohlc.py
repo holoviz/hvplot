@@ -1,5 +1,6 @@
 import pandas as pd
 import pytest
+from holoviews import Store
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
 
@@ -21,7 +22,7 @@ def test_ohlc_hover_cols():
     plot = df.hvplot.ohlc(y=ohlc_cols, hover_cols=['Volume'])
     segments = plot.Segments.I
     assert 'Volume' in segments
-    tooltips = segments.opts.get('plot').kwargs['tools'][0].tooltips
+    tooltips = Store.lookup_options('bokeh', segments, 'plot').kwargs['tools'][0].tooltips
     assert len(tooltips) == len(df.columns) + 1
     assert tooltips[-1] == ('Volume', '@Volume')
 
@@ -30,7 +31,7 @@ def test_ohlc_hover_cols_all():
     plot = df.hvplot.ohlc(y=ohlc_cols, hover_cols='all')
     segments = plot.Segments.I
     assert 'Volume' in segments
-    tooltips = segments.opts.get('plot').kwargs['tools'][0].tooltips
+    tooltips = Store.lookup_options('bokeh', segments, 'plot').kwargs['tools'][0].tooltips
     assert len(tooltips) == len(df.columns) + 1
     assert tooltips[-1] == ('Volume', '@Volume')
 
@@ -38,7 +39,7 @@ def test_ohlc_hover_cols_all():
 def test_ohlc_date_tooltip_format():
     plot = df.hvplot.ohlc(y=ohlc_cols)
     segments = plot.Segments.I
-    hover_tool = segments.opts.get('plot').kwargs['tools'][0]
+    hover_tool = Store.lookup_options('bokeh', segments, 'plot').kwargs['tools'][0]
     tooltips = hover_tool.tooltips
     x_label, x_tooltip = tooltips[0]
     assert '{%F %T}' in x_tooltip
@@ -58,12 +59,9 @@ def test_ohlc_non_datetime_x_axis():
         },
         index=[1, 2, 3],
     )
-
-    ohlc_cols = ['Open', 'High', 'Low', 'Close']
-
     plot = df.hvplot.ohlc(y=ohlc_cols)
     segments = plot.Segments.I
-    hover_tool = segments.opts.get('plot').kwargs['tools'][0]
+    hover_tool = Store.lookup_options('bokeh', segments, 'plot').kwargs['tools'][0]
     tooltips = hover_tool.tooltips
     x_label, x_tooltip = tooltips[0]
     assert '{%F}' not in x_tooltip
@@ -88,7 +86,7 @@ def test_ohlc_non_index_date_col():
     )
     plot = df.hvplot.ohlc(hover_cols='all', use_index=False)
     segments = plot.Segments.I
-    hover_tool = segments.opts.get('plot').kwargs['tools'][0]
+    hover_tool = Store.lookup_options('bokeh', segments, 'plot').kwargs['tools'][0]
     tooltips = hover_tool.tooltips
     assert len(tooltips) == len(df.columns)
     assert tooltips[0] == ('Date', '@Date{%F %T}')

@@ -28,16 +28,14 @@ no_args_mapping = [
     (kind, el) for kind, el in HoloViewsConverter._kind_mapping.items() if kind in no_args
 ]
 x_y_mapping = [(kind, el) for kind, el in HoloViewsConverter._kind_mapping.items() if kind in x_y]
+explicit_backends = pytest.mark.parametrize('explicit_backend', ['holoviews', 'hvplot'])
 
 
 @pytest.fixture(params=['holoviews', 'hvplot'])
 def plotting_backend(request):
-    initial_backend = pd.options.plotting.backend
+    # Reset after the test by conftest.
     pd.options.plotting.backend = request.param
-    try:
-        yield request.param
-    finally:
-        pd.options.plotting.backend = initial_backend
+    return request.param
 
 
 @pytest.mark.parametrize('kind,el', no_args_mapping)
@@ -83,52 +81,52 @@ def test_pandas_frame_specials_plot_return_holoviews_object(plotting_backend, ki
     assert isinstance(plot, el)
 
 
-@pytest.mark.parametrize('backend', ['holoviews', 'hvplot'])
+@explicit_backends
 @pytest.mark.parametrize('kind,el', no_args_mapping)
-def test_pandas_series_plot_explicit_returns_holoviews_object(backend, kind, el):
+def test_pandas_series_plot_explicit_returns_holoviews_object(explicit_backend, kind, el):
     series = pd.Series([0, 1, 2])
-    plot = getattr(series.plot, kind)(backend=backend)
+    plot = getattr(series.plot, kind)(backend=explicit_backend)
     assert isinstance(plot, el)
 
 
-@pytest.mark.parametrize('backend', ['holoviews', 'hvplot'])
+@explicit_backends
 @pytest.mark.parametrize('kind,el', no_args_mapping)
-def test_pandas_dataframe_plot_explicit_returns_holoviews_object(backend, kind, el):
+def test_pandas_dataframe_plot_explicit_returns_holoviews_object(explicit_backend, kind, el):
     df = pd.DataFrame([0, 1, 2])
-    plot = getattr(df.plot, kind)(backend=backend)
+    plot = getattr(df.plot, kind)(backend=explicit_backend)
     assert isinstance(plot, el)
 
 
-@pytest.mark.parametrize('backend', ['holoviews', 'hvplot'])
+@explicit_backends
 @pytest.mark.parametrize('kind,el', x_y_mapping)
 def test_pandas_dataframe_plot_explicit_returns_holoviews_object_when_x_and_y_set(
-    backend, kind, el
+    explicit_backend, kind, el
 ):
     df = pd.DataFrame({'a': [0, 1, 2], 'b': [5, 7, 2]})
-    plot = getattr(df.plot, kind)(x='a', y='b', backend=backend)
+    plot = getattr(df.plot, kind)(x='a', y='b', backend=explicit_backend)
     assert isinstance(plot, el)
 
 
-@pytest.mark.parametrize('backend', ['holoviews', 'hvplot'])
-def test_pandas_dataframe_plot_explicit_does_not_implement_pie(backend):
+@explicit_backends
+def test_pandas_dataframe_plot_explicit_does_not_implement_pie(explicit_backend):
     df = pd.DataFrame({'a': [0, 1, 2], 'b': [5, 7, 2]})
     with pytest.raises(NotImplementedError, match='pie'):
-        df.plot.pie(y='a', backend=backend)
+        df.plot.pie(y='a', backend=explicit_backend)
 
 
-@pytest.mark.parametrize('backend', ['holoviews', 'hvplot'])
+@explicit_backends
 @pytest.mark.parametrize('kind,el', series_specials)
-def test_pandas_series_specials_plot_explicit_return_holoviews_object(backend, kind, el):
+def test_pandas_series_specials_plot_explicit_return_holoviews_object(explicit_backend, kind, el):
     series = pd.Series([0, 1, 2])
-    plot = getattr(series, kind)(backend=backend)
+    plot = getattr(series, kind)(backend=explicit_backend)
     assert isinstance(plot, el)
 
 
-@pytest.mark.parametrize('backend', ['holoviews', 'hvplot'])
+@explicit_backends
 @pytest.mark.parametrize('kind,el', frame_specials)
-def test_pandas_frame_specials_plot_explicit_return_holoviews_object(backend, kind, el):
+def test_pandas_frame_specials_plot_explicit_return_holoviews_object(explicit_backend, kind, el):
     df = pd.DataFrame([0, 1, 2])
-    plot = getattr(df, kind)(backend=backend)
+    plot = getattr(df, kind)(backend=explicit_backend)
     assert isinstance(plot, el)
 
 

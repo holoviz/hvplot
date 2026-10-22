@@ -1,65 +1,54 @@
-from unittest import SkipTest, TestCase
-
 import pandas as pd
 import pytest
 
 import hvplot
 from hvplot.plotting import hvPlotTabular
+from hvplot.tests._deps import requires
+
+# duckdb is optional, it is imported in the tests.
+pytestmark = requires('duckdb')
 
 
-class TestPatchDuckDB(TestCase):
-    def setUp(self):
-        try:
-            import duckdb  # noqa: F401
-        except ImportError:
-            raise SkipTest('DuckDB not available')
-        import hvplot.duckdb  # noqa: F401
-
-    def test_duckdb_relation_patched(self):
-        import duckdb
-
-        df = pd.DataFrame({'x': [1, 2, 3], 'y': [1, 2, 3]})
-        connection = duckdb.connect(':memory:')
-        relation = duckdb.from_df(df, connection=connection)
-        self.assertIsInstance(relation.hvplot, hvPlotTabular)
-
-    def test_duckdb_connection_patched(self):
-        import duckdb
-
-        df = pd.DataFrame({'x': [1, 2, 3], 'y': [1, 2, 3]})
-        connection = duckdb.connect(':memory:')
-        duckdb.from_df(df, connection=connection).to_view('test_connection')
-        self.assertIsInstance(
-            connection.execute('SELECT * FROM test_connection').hvplot, hvPlotTabular
-        )
+@pytest.fixture(autouse=True)
+def hvplot_duckdb():
+    import hvplot.duckdb  # noqa: F401
 
 
-def _patched(classes, attrs):
-    return all(attr in vars(cls) for cls in classes for attr in attrs)
+@pytest.fixture
+def connection():
+    import duckdb
+
+    connection = duckdb.connect(':memory:')
+    yield connection
+    connection.close()
 
 
-def _unpatched(classes, attrs):
-    return not any(attr in vars(cls) for cls in classes for attr in attrs)
+def test_duckdb_relation_patched(connection):
+    import duckdb
+
+    df = pd.DataFrame({'x': [1, 2, 3], 'y': [1, 2, 3]})
+    relation = duckdb.from_df(df, connection=connection)
+    assert isinstance(relation.hvplot, hvPlotTabular)
 
 
-def _round_trip(ext, classes, attrs=('hvplot',)):
-    # Ends patched, so the _isolate_hvplot fixture unpatches the extension
-    # and removes its module from sys.modules after the test.
-    ext.patch()
-    assert _patched(classes, attrs)
-    assert ext.__name__ in hvplot._module_extensions
+def test_duckdb_connection_patched(connection):
+    import duckdb
 
-    ext._unpatch()
-    assert _unpatched(classes, attrs)
-    assert ext.__name__ not in hvplot._module_extensions
-
-    ext.patch()
-    assert _patched(classes, attrs)
-    assert ext.__name__ in hvplot._module_extensions
+    df = pd.DataFrame({'x': [1, 2, 3], 'y': [1, 2, 3]})
+    duckdb.from_df(df, connection=connection).to_view('test_connection')
+    assert isinstance(connection.execute('SELECT * FROM test_connection').hvplot, hvPlotTabular)
 
 
 def test_unpatch_duckdb():
-    duckdb = pytest.importorskip('duckdb')
-    import hvplot.duckdb
+    import duckdb
 
-    _round_trip(hvplot.duckdb, [duckdb.DuckDBPyRelation, duckdb.DuckDBPyConnection])
+    classes = [duckdb.DuckDBPyRelation, duckdb.DuckDBPyConnection]
+
+    hvplot.duckdb._unpatch()
+    assert not any('hvplot' in vars(cls) for cls in classes)
+    assert 'hvplot.duckdb' not in hvplot._module_extensions
+
+    # Ends patched, the _isolate_hvplot fixture unpatches it after the test.
+    hvplot.duckdb.patch()
+    assert all('hvplot' in vars(cls) for cls in classes)
+    assert 'hvplot.duckdb' in hvplot._module_extensions

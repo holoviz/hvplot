@@ -1,36 +1,31 @@
 import pytest
 
 import hvplot
+from hvplot.tests._deps import requires
+
+# intake is optional, it is imported in the tests.
+pytestmark = [
+    requires('intake'),
+    pytest.mark.filterwarnings('ignore:hvplot.intake is deprecated:FutureWarning'),
+]
 
 
-def _patched(classes, attrs):
-    # vars() and not hasattr() as intake's DataSource inherits its own `hvplot` property.
-    return all(attr in vars(cls) for cls in classes for attr in attrs)
+@pytest.fixture(autouse=True)
+def hvplot_intake():
+    import hvplot.intake  # noqa: F401
 
 
-def _unpatched(classes, attrs):
-    return not any(attr in vars(cls) for cls in classes for attr in attrs)
-
-
-def _round_trip(ext, classes, attrs=('hvplot',)):
-    # Ends patched, so the _isolate_hvplot fixture unpatches the extension
-    # and removes its module from sys.modules after the test.
-    ext.patch()
-    assert _patched(classes, attrs)
-    assert ext.__name__ in hvplot._module_extensions
-
-    ext._unpatch()
-    assert _unpatched(classes, attrs)
-    assert ext.__name__ not in hvplot._module_extensions
-
-    ext.patch()
-    assert _patched(classes, attrs)
-    assert ext.__name__ in hvplot._module_extensions
-
-
-@pytest.mark.filterwarnings('ignore:hvplot.intake is deprecated:FutureWarning')
 def test_unpatch_intake():
-    intake = pytest.importorskip('intake')
-    import hvplot.intake
+    import intake
 
-    _round_trip(hvplot.intake, [intake.source.base.DataSource])
+    # vars() and not hasattr() as intake's DataSource inherits its own `hvplot` property.
+    cls = intake.source.base.DataSource
+
+    hvplot.intake._unpatch()
+    assert 'hvplot' not in vars(cls)
+    assert 'hvplot.intake' not in hvplot._module_extensions
+
+    # Ends patched, the _isolate_hvplot fixture unpatches it after the test.
+    hvplot.intake.patch()
+    assert 'hvplot' in vars(cls)
+    assert 'hvplot.intake' in hvplot._module_extensions

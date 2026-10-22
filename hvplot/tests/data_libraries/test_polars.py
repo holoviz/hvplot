@@ -1,73 +1,49 @@
-import sys
-from unittest import SkipTest, TestCase
-
 import pytest
 
 import hvplot
 from hvplot.plotting import hvPlotTabular
+from hvplot.tests._deps import requires
+
+# polars is optional, it is imported in the tests.
+pytestmark = requires('polars')
 
 
-class TestPatchPolars(TestCase):
-    def setUp(self):
-        if sys.platform == 'win32' and sys.version_info[:2] == (3, 9):
-            raise SkipTest('stack overflow error')
-        try:
-            import polars  # noqa: F401
-        except ImportError:
-            raise SkipTest('Polars not available')
-        import hvplot.polars  # noqa: F401
-
-    def test_polars_series_patched(self):
-        import polars as pl
-
-        pseries = pl.Series([0, 1, 2])
-        self.assertIsInstance(pseries.hvplot, hvPlotTabular)
-
-    def test_polars_dataframe_patched(self):
-        import polars as pl
-
-        pdf = pl.DataFrame({'x': [1, 3, 5], 'y': [2, 4, 6]})
-        self.assertIsInstance(pdf.hvplot, hvPlotTabular)
-
-    def test_polars_lazyframe_patched(self):
-        import polars as pl
-
-        pldf = pl.LazyFrame({'x': [1, 3, 5], 'y': [2, 4, 6]})
-        self.assertIsInstance(pldf.hvplot, hvPlotTabular)
+@pytest.fixture(autouse=True)
+def hvplot_polars():
+    import hvplot.polars  # noqa: F401
 
 
-def _patched(classes, attrs):
-    return all(attr in vars(cls) for cls in classes for attr in attrs)
+def test_polars_series_patched():
+    import polars as pl
+
+    pseries = pl.Series([0, 1, 2])
+    assert isinstance(pseries.hvplot, hvPlotTabular)
 
 
-def _unpatched(classes, attrs):
-    return not any(attr in vars(cls) for cls in classes for attr in attrs)
+def test_polars_dataframe_patched():
+    import polars as pl
+
+    pdf = pl.DataFrame({'x': [1, 3, 5], 'y': [2, 4, 6]})
+    assert isinstance(pdf.hvplot, hvPlotTabular)
 
 
-def _round_trip(ext, classes, attrs=('hvplot',)):
-    # Ends patched, so the _isolate_hvplot fixture unpatches the extension
-    # and removes its module from sys.modules after the test.
-    ext.patch()
-    assert _patched(classes, attrs)
-    assert ext.__name__ in hvplot._module_extensions
+def test_polars_lazyframe_patched():
+    import polars as pl
 
-    ext._unpatch()
-    assert _unpatched(classes, attrs)
-    assert ext.__name__ not in hvplot._module_extensions
-
-    ext.patch()
-    assert _patched(classes, attrs)
-    assert ext.__name__ in hvplot._module_extensions
+    pldf = pl.LazyFrame({'x': [1, 3, 5], 'y': [2, 4, 6]})
+    assert isinstance(pldf.hvplot, hvPlotTabular)
 
 
 def test_unpatch_polars():
-    pl = pytest.importorskip('polars')
-    import hvplot.polars
+    import polars as pl
 
     classes = [pl.DataFrame, pl.Series, pl.LazyFrame]
-    _round_trip(hvplot.polars, classes)
 
     hvplot.polars._unpatch()
-    assert not any('hvplot' in cls._accessors for cls in classes)
+    assert not any('hvplot' in vars(cls) or 'hvplot' in cls._accessors for cls in classes)
+    assert 'hvplot.polars' not in hvplot._module_extensions
+
+    # Ends patched, the _isolate_hvplot fixture unpatches it after the test.
     hvplot.polars.patch()
-    assert all('hvplot' in cls._accessors for cls in classes)
+    assert all('hvplot' in vars(cls) and 'hvplot' in cls._accessors for cls in classes)
+    assert 'hvplot.polars' in hvplot._module_extensions

@@ -155,7 +155,6 @@ xugrid = ">=0.15.0"
 dask = "*"  # dask[dataframe]
 ipywidgets = "*"
 matplotlib = "*"
-parameterized = "*"
 plotly = "*"
 pooch = "*"
 pre-commit = "*"

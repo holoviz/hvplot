@@ -1,49 +1,30 @@
-from unittest import TestCase
-
 import pandas as pd
+import pytest
 
 import hvplot
 from hvplot.plotting import hvPlotTabular
 
-
-class TestPatchPandas(TestCase):
-    def setUp(self):
-        import hvplot.pandas  # noqa: F401
-
-    def test_pandas_series_patched(self):
-        series = pd.Series([0, 1, 2])
-        self.assertIsInstance(series.hvplot, hvPlotTabular)
-
-    def test_pandas_dataframe_patched(self):
-        df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
-        self.assertIsInstance(df.hvplot, hvPlotTabular)
+pytestmark = pytest.mark.usefixtures('hvplot_pandas')
 
 
-def _patched(classes, attrs):
-    return all(attr in vars(cls) for cls in classes for attr in attrs)
+def test_pandas_series_patched():
+    series = pd.Series([0, 1, 2])
+    assert isinstance(series.hvplot, hvPlotTabular)
 
 
-def _unpatched(classes, attrs):
-    return not any(attr in vars(cls) for cls in classes for attr in attrs)
-
-
-def _round_trip(ext, classes, attrs=('hvplot',)):
-    # Ends patched, so the _isolate_hvplot fixture unpatches the extension
-    # and removes its module from sys.modules after the test.
-    ext.patch()
-    assert _patched(classes, attrs)
-    assert ext.__name__ in hvplot._module_extensions
-
-    ext._unpatch()
-    assert _unpatched(classes, attrs)
-    assert ext.__name__ not in hvplot._module_extensions
-
-    ext.patch()
-    assert _patched(classes, attrs)
-    assert ext.__name__ in hvplot._module_extensions
+def test_pandas_dataframe_patched():
+    df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
+    assert isinstance(df.hvplot, hvPlotTabular)
 
 
 def test_unpatch_pandas():
-    import hvplot.pandas
+    classes = [pd.DataFrame, pd.Series]
 
-    _round_trip(hvplot.pandas, [pd.DataFrame, pd.Series], ['hvplot', 'interactive'])
+    hvplot.pandas._unpatch()
+    assert not any('hvplot' in vars(cls) or 'interactive' in vars(cls) for cls in classes)
+    assert 'hvplot.pandas' not in hvplot._module_extensions
+
+    # Ends patched, the _isolate_hvplot fixture unpatches it after the test.
+    hvplot.pandas.patch()
+    assert all('hvplot' in vars(cls) and 'interactive' in vars(cls) for cls in classes)
+    assert 'hvplot.pandas' in hvplot._module_extensions

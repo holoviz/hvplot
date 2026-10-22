@@ -1216,7 +1216,7 @@ def test_interactive_pandas_dir_with_type_change(df):
 
 
 @pytest.mark.xfail(
-    reason='hvplot.util.check_library expects the obj to have __module__, '
+    reason='BUG: hvplot.util.check_library expects the obj to have __module__, '
     'which is not true for a float'
 )
 def test_interactive_pandas_dir_with_type_change_to_float(df):

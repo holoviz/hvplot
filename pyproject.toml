@@ -58,7 +58,6 @@ tests-core = [
     "dask[dataframe]",
     "ipywidgets",
     "matplotlib",
-    "parameterized",
     "plotly",
     "pooch",
     "pre-commit",

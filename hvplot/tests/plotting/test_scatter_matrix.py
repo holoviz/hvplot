@@ -1,8 +1,8 @@
 import sys
-from unittest import SkipTest, TestCase
 
-import numpy as np
 import pandas as pd
+import pytest
+from holoviews import Store
 from holoviews.core import GridMatrix, NdOverlay
 from holoviews.element import (
     Bivariate,
@@ -11,128 +11,135 @@ from holoviews.element import (
     Histogram,
     Scatter,
 )
-from parameterized import parameterized
 
 from hvplot import scatter_matrix
+from hvplot.tests._deps import requires
 
 
-class TestScatterMatrix(TestCase):
-    def setUp(self):
-        self.df = pd.DataFrame(np.random.randn(1000, 4), columns=['a', 'b', 'c', 'd'])
-
-    def test_returns_gridmatrix(self):
-        sm = scatter_matrix(self.df)
-        self.assertIsInstance(sm, GridMatrix)
-
-    def test_wrong_diagonal(self):
-        with self.assertRaises(ValueError):
-            scatter_matrix(self.df, diagonal='wrong')
-
-    def test_wrong_chart(self):
-        with self.assertRaises(ValueError):
-            scatter_matrix(self.df, chart='wrong')
-
-    def test_diagonal_default(self):
-        sm = scatter_matrix(self.df)
-        self.assertIsInstance(sm['a', 'a'], Histogram)
-
-    def test_offdiagonal_default(self):
-        sm = scatter_matrix(self.df)
-        self.assertIsInstance(sm['a', 'b'], Scatter)
-
-    def test_diagonal_kde(self):
-        sm = scatter_matrix(self.df, diagonal='kde')
-        self.assertIsInstance(sm['a', 'a'], Distribution)
-
-    def test_offdiagonal_bivariate(self):
-        sm = scatter_matrix(self.df, chart='bivariate')
-        self.assertIsInstance(sm['a', 'b'], Bivariate)
-
-    def test_offdiagonal_hexbin(self):
-        sm = scatter_matrix(self.df, chart='hexbin')
-        self.assertIsInstance(sm['a', 'b'], HexTiles)
-
-    def test_diagonal_kwargs_mutually_exclusive(self):
-        with self.assertRaises(TypeError):
-            scatter_matrix(self.df, diagonal_kwds={'a': 1}, hist_kwds={'a': 1})
-        with self.assertRaises(TypeError):
-            scatter_matrix(self.df, diagonal_kwds={'a': 1}, density_kwds={'a': 1})
-        with self.assertRaises(TypeError):
-            scatter_matrix(self.df, density_kwds={'a': 1}, hist_kwds={'a': 1})
-
-    def test_diagonal_kwargs(self):
-        sm = scatter_matrix(self.df, diagonal_kwds={'line_color': 'red'})
-        self.assertEqual(sm['a', 'a'].opts.get().kwargs['line_color'], 'red')
-
-    def test_c(self):
-        df = self.df.copy(deep=True)
-        df['e'] = np.random.choice(list('xyz'), size=len(df))
-        sm = scatter_matrix(df, c='e')
-
-        self.assertIsInstance(sm['a', 'a'], NdOverlay)
-        diag_kdims = sm['a', 'a'].kdims
-        self.assertEqual(len(diag_kdims), 1)
-        self.assertEqual(diag_kdims[0].name, 'e')
-
-        self.assertIsInstance(sm['a', 'b'], Scatter)
-        offdiag_vdims = sm['a', 'b'].vdims
-        self.assertTrue('e' in (d.name for d in offdiag_vdims))
+@pytest.fixture
+def df(rng):
+    return pd.DataFrame(rng.standard_normal((1000, 4)), columns=['a', 'b', 'c', 'd'])
 
 
-class TestDatashader(TestCase):
-    def setUp(self):
-        try:
-            import datashader  # noqa: F401
-        except ImportError:
-            raise SkipTest('Datashader not available')
-        if sys.maxsize < 2**32:
-            raise SkipTest('Datashader does not support 32-bit systems')
-        self.df = pd.DataFrame(np.random.randn(1000, 3), columns=['a', 'b', 'c'])
+def test_returns_gridmatrix(df):
+    sm = scatter_matrix(df)
+    assert isinstance(sm, GridMatrix)
 
-    def test_rasterize_datashade_mutually_exclusive(self):
-        with self.assertRaises(ValueError):
-            scatter_matrix(self.df, rasterize=True, datashade=True)
 
-    def test_spread_but_no_rasterize_or_datashade(self):
-        with self.assertRaises(ValueError):
-            scatter_matrix(self.df, dynspread=True)
-        with self.assertRaises(ValueError):
-            scatter_matrix(self.df, spread=True)
-        with self.assertRaises(ValueError):
-            scatter_matrix(self.df, dynspread=True, spread=True)
+def test_wrong_diagonal(df):
+    with pytest.raises(ValueError):
+        scatter_matrix(df, diagonal='wrong')
 
-    @parameterized.expand([('rasterize',), ('datashade',)])
-    def test_rasterization(self, operation):
-        sm = scatter_matrix(self.df, **{operation: True})
+
+def test_wrong_chart(df):
+    with pytest.raises(ValueError):
+        scatter_matrix(df, chart='wrong')
+
+
+def test_diagonal_default(df):
+    sm = scatter_matrix(df)
+    assert isinstance(sm['a', 'a'], Histogram)
+
+
+def test_offdiagonal_default(df):
+    sm = scatter_matrix(df)
+    assert isinstance(sm['a', 'b'], Scatter)
+
+
+def test_diagonal_kde(df):
+    sm = scatter_matrix(df, diagonal='kde')
+    assert isinstance(sm['a', 'a'], Distribution)
+
+
+def test_offdiagonal_bivariate(df):
+    sm = scatter_matrix(df, chart='bivariate')
+    assert isinstance(sm['a', 'b'], Bivariate)
+
+
+def test_offdiagonal_hexbin(df):
+    sm = scatter_matrix(df, chart='hexbin')
+    assert isinstance(sm['a', 'b'], HexTiles)
+
+
+@pytest.mark.parametrize(
+    'kwargs',
+    [
+        {'diagonal_kwds': {'a': 1}, 'hist_kwds': {'a': 1}},
+        {'diagonal_kwds': {'a': 1}, 'density_kwds': {'a': 1}},
+        {'density_kwds': {'a': 1}, 'hist_kwds': {'a': 1}},
+    ],
+)
+def test_diagonal_kwargs_mutually_exclusive(df, kwargs):
+    with pytest.raises(TypeError):
+        scatter_matrix(df, **kwargs)
+
+
+def test_diagonal_kwargs(df):
+    sm = scatter_matrix(df, diagonal_kwds={'line_color': 'red'})
+    opts = Store.lookup_options('bokeh', sm['a', 'a'], 'style')
+    assert opts.kwargs['line_color'] == 'red'
+
+
+def test_c(df, rng):
+    df['e'] = rng.choice(list('xyz'), size=len(df))
+    sm = scatter_matrix(df, c='e')
+
+    assert isinstance(sm['a', 'a'], NdOverlay)
+    diag_kdims = sm['a', 'a'].kdims
+    assert len(diag_kdims) == 1
+    assert diag_kdims[0].name == 'e'
+
+    assert isinstance(sm['a', 'b'], Scatter)
+    offdiag_vdims = sm['a', 'b'].vdims
+    assert 'e' in (d.name for d in offdiag_vdims)
+
+
+@requires('datashader')
+@pytest.mark.skipif(sys.maxsize < 2**32, reason='Datashader does not support 32-bit systems')
+class TestDatashader:
+    def test_rasterize_datashade_mutually_exclusive(self, df):
+        with pytest.raises(ValueError):
+            scatter_matrix(df, rasterize=True, datashade=True)
+
+    @pytest.mark.parametrize(
+        'kwargs', [{'dynspread': True}, {'spread': True}, {'dynspread': True, 'spread': True}]
+    )
+    def test_spread_but_no_rasterize_or_datashade(self, df, kwargs):
+        with pytest.raises(ValueError):
+            scatter_matrix(df, **kwargs)
+
+    @pytest.mark.parametrize('operation', ['rasterize', 'datashade'])
+    def test_rasterization(self, df, operation):
+        sm = scatter_matrix(df, **{operation: True})
         dm = sm['a', 'b']
-        self.assertEqual(dm.callback.operation.name, operation)
+        assert dm.callback.operation.name == operation
         dm[()]
-        self.assertEqual(len(dm.last.pipeline.operations), 3)
+        assert len(dm.last.pipeline.operations) == 3
 
-    @parameterized.expand([('rasterize',), ('datashade',)])
-    def test_datashade_aggregator(self, operation):
-        sm = scatter_matrix(self.df, aggregator='mean', **{operation: True})
-        dm = sm['a', 'b']
-        dm[()]
-        self.assertEqual(dm.last.pipeline.operations[-1].aggregator, 'mean')
-
-    @parameterized.expand([('spread',), ('dynspread',)])
-    def test_spread_rasterize(self, operation):
-        sm = scatter_matrix(self.df, rasterize=True, **{operation: True})
-        dm = sm['a', 'b']
-        dm[()]
-        self.assertEqual(len(dm.last.pipeline.operations), 4)
-
-    @parameterized.expand([('spread',), ('dynspread',)])
-    def test_spread_datashade(self, operation):
-        sm = scatter_matrix(self.df, datashade=True, **{operation: True})
+    @pytest.mark.parametrize('operation', ['rasterize', 'datashade'])
+    def test_datashade_aggregator(self, df, operation):
+        sm = scatter_matrix(df, aggregator='mean', **{operation: True})
         dm = sm['a', 'b']
         dm[()]
-        self.assertEqual(len(dm.last.pipeline.operations), 4)
+        assert dm.last.pipeline.operations[-1].aggregator == 'mean'
 
-    @parameterized.expand([('spread',), ('dynspread',)])
-    def test_spread_kwargs(self, operation):
-        sm = scatter_matrix(self.df, datashade=True, **{operation: True, 'shape': 'circle'})
+    @pytest.mark.parametrize('operation', ['spread', 'dynspread'])
+    def test_spread_rasterize(self, df, operation):
+        sm = scatter_matrix(df, rasterize=True, **{operation: True})
         dm = sm['a', 'b']
         dm[()]
-        self.assertEqual(dm.last.pipeline.operations[-1].args[0].keywords['shape'], 'circle')
+        assert len(dm.last.pipeline.operations) == 4
+
+    @pytest.mark.parametrize('operation', ['spread', 'dynspread'])
+    def test_spread_datashade(self, df, operation):
+        sm = scatter_matrix(df, datashade=True, **{operation: True})
+        dm = sm['a', 'b']
+        dm[()]
+        assert len(dm.last.pipeline.operations) == 4
+
+    @pytest.mark.parametrize('operation', ['spread', 'dynspread'])
+    def test_spread_kwargs(self, df, operation):
+        sm = scatter_matrix(df, datashade=True, **{operation: True, 'shape': 'circle'})
+        dm = sm['a', 'b']
+        dm[()]
+        assert dm.last.pipeline.operations[-1].args[0].keywords['shape'] == 'circle'

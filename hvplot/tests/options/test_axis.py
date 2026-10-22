@@ -1,17 +1,16 @@
-from unittest import SkipTest
-
 import holoviews as hv
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
 from holoviews import Store
-from holoviews.element import Area, Curve, Scatter
-from holoviews.element.comparison import ComparisonTestCase
-from parameterized import parameterized
+
+pytestmark = pytest.mark.usefixtures('hvplot_pandas')
+
+pandas_and_dask = pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture
 def df():
     return pd.DataFrame(
         [[1, 2, 'A', 0.1], [3, 4, 'B', 0.2], [5, 6, 'C', 0.3]],
@@ -19,95 +18,169 @@ def df():
     )
 
 
-@pytest.mark.usefixtures('hvplot_pandas')
-class TestOptions:
-    def test_axis_set_to_visible_by_default(self, df, backend):
-        plot = df.hvplot.scatter('x', 'y', c='category')
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert 'xaxis' not in opts.kwargs
-        assert 'yaxis' not in opts.kwargs
-
-    def test_axis_set_to_none(self, df, backend):
-        plot = df.hvplot.scatter('x', 'y', c='category', xaxis=None, yaxis=None)
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['xaxis'] is None
-        assert opts.kwargs['yaxis'] is None
-
-    def test_axis_set_to_false(self, df, backend):
-        plot = df.hvplot.scatter('x', 'y', c='category', xaxis=False, yaxis=False)
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['xaxis'] is None
-        assert opts.kwargs['yaxis'] is None
-
-    def test_axis_set_to_some_value(self, df, backend):
-        plot = df.hvplot.scatter('x', 'y', c='category', xaxis='top', yaxis='right')
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['xaxis'] == 'top'
-        assert opts.kwargs['yaxis'] == 'right'
-
-    def test_axis_set_to_none_in_holoviews_opts_default(self, df, backend):
-        hv.opts.defaults(hv.opts.Scatter(xaxis=None, yaxis=None))
-        plot = df.hvplot.scatter('x', 'y', c='category')
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['xaxis'] is None
-        assert opts.kwargs['yaxis'] is None
-
-    def test_axis_set_to_some_value_in_holoviews_opts_default(self, df, backend):
-        hv.opts.defaults(hv.opts.Scatter(xaxis='top', yaxis='right'))
-        plot = df.hvplot.scatter('x', 'y', c='category')
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['xaxis'] == 'top'
-        assert opts.kwargs['yaxis'] == 'right'
-
-    def test_axis_set_to_none_in_holoviews_opts_default_overwrite_in_call(self, df, backend):
-        hv.opts.defaults(hv.opts.Scatter(xaxis=None, yaxis=None))
-        plot = df.hvplot.scatter('x', 'y', c='category', xaxis=True, yaxis=True)
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['xaxis'] is True
-        assert opts.kwargs['yaxis'] is True
-
-    def test_axis_set_to_some_value_in_holoviews_opts_default_overwrite_in_call(self, df, backend):
-        hv.opts.defaults(hv.opts.Scatter(xaxis='top', yaxis='right'))
-        plot = df.hvplot.scatter('x', 'y', c='category', xaxis='top-bare', yaxis='right-bare')
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['xaxis'] == 'top-bare'
-        assert opts.kwargs['yaxis'] == 'right-bare'
-
-    def test_loglog_opts(self, df, backend):
-        plot = df.hvplot.scatter('x', 'y', c='category', loglog=True)
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['logx'] is True
-        assert opts.kwargs['logy'] is True
-        assert opts.kwargs.get('logz') is None
-
-    def test_logy_opts(self, df, backend):
-        plot = df.hvplot.scatter('x', 'y', c='category', logy=True)
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['logx'] is False
-        assert opts.kwargs['logy'] is True
-        assert opts.kwargs.get('logz') is None
-
-    def test_holoviews_defined_default_opts_logx(self, df, backend):
-        if backend != 'bokeh':
-            pytest.xfail(f'default opts not supported w/ {backend}')
-
-        hv.opts.defaults(hv.opts.Scatter(logx=True))
-        plot = df.hvplot.scatter('x', 'y', c='category')
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['logx'] is True
-        assert opts.kwargs['logy'] is False
-        assert opts.kwargs.get('logz') is None
-
-    def test_holoviews_defined_default_opts_logx_overwritten_in_call(self, df, backend):
-        hv.opts.defaults(hv.opts.Scatter(logx=True))
-        plot = df.hvplot.scatter('x', 'y', c='category', logx=False)
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['logx'] is False
-        assert opts.kwargs['logy'] is False
-        assert opts.kwargs.get('logz') is None
+@pytest.fixture
+def xy_df():
+    return pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
 
 
-@pytest.fixture(scope='module')
+def test_xaxis_yaxis_visible_by_default(df, backend):
+    plot = df.hvplot.scatter('x', 'y', c='category')
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert 'xaxis' not in opts.kwargs
+    assert 'yaxis' not in opts.kwargs
+
+
+@pytest.mark.parametrize('value', [None, False])
+def test_xaxis_yaxis_hidden(df, backend, value):
+    plot = df.hvplot.scatter('x', 'y', c='category', xaxis=value, yaxis=value)
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['xaxis'] is None
+    assert opts.kwargs['yaxis'] is None
+
+
+def test_xaxis_yaxis_position(df, backend):
+    plot = df.hvplot.scatter('x', 'y', c='category', xaxis='top', yaxis='right')
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['xaxis'] == 'top'
+    assert opts.kwargs['yaxis'] == 'right'
+
+
+def test_xaxis_yaxis_none_from_holoviews_defaults(df, backend):
+    hv.opts.defaults(hv.opts.Scatter(xaxis=None, yaxis=None))
+    plot = df.hvplot.scatter('x', 'y', c='category')
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['xaxis'] is None
+    assert opts.kwargs['yaxis'] is None
+
+
+def test_xaxis_yaxis_position_from_holoviews_defaults(df, backend):
+    hv.opts.defaults(hv.opts.Scatter(xaxis='top', yaxis='right'))
+    plot = df.hvplot.scatter('x', 'y', c='category')
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['xaxis'] == 'top'
+    assert opts.kwargs['yaxis'] == 'right'
+
+
+def test_xaxis_yaxis_override_holoviews_defaults_none(df, backend):
+    hv.opts.defaults(hv.opts.Scatter(xaxis=None, yaxis=None))
+    plot = df.hvplot.scatter('x', 'y', c='category', xaxis=True, yaxis=True)
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['xaxis'] is True
+    assert opts.kwargs['yaxis'] is True
+
+
+def test_xaxis_yaxis_override_holoviews_defaults_position(df, backend):
+    hv.opts.defaults(hv.opts.Scatter(xaxis='top', yaxis='right'))
+    plot = df.hvplot.scatter('x', 'y', c='category', xaxis='top-bare', yaxis='right-bare')
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['xaxis'] == 'top-bare'
+    assert opts.kwargs['yaxis'] == 'right-bare'
+
+
+def test_loglog(df, backend):
+    plot = df.hvplot.scatter('x', 'y', c='category', loglog=True)
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['logx'] is True
+    assert opts.kwargs['logy'] is True
+    assert opts.kwargs.get('logz') is None
+
+
+def test_logy(df, backend):
+    plot = df.hvplot.scatter('x', 'y', c='category', logy=True)
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['logx'] is False
+    assert opts.kwargs['logy'] is True
+    assert opts.kwargs.get('logz') is None
+
+
+only_bokeh_defaults = pytest.mark.xfail(reason='hvPlot only reads the bokeh HoloViews defaults')
+
+
+@pytest.mark.parametrize(
+    'backend',
+    [
+        'bokeh',
+        pytest.param('matplotlib', marks=only_bokeh_defaults),
+        pytest.param('plotly', marks=only_bokeh_defaults),
+    ],
+    indirect=True,
+)
+def test_logx_from_holoviews_defaults(df, backend):
+    hv.opts.defaults(hv.opts.Scatter(logx=True))
+    plot = df.hvplot.scatter('x', 'y', c='category')
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['logx'] is True
+    assert opts.kwargs['logy'] is False
+    assert opts.kwargs.get('logz') is None
+
+
+def test_logx_override_holoviews_defaults(df, backend):
+    hv.opts.defaults(hv.opts.Scatter(logx=True))
+    plot = df.hvplot.scatter('x', 'y', c='category', logx=False)
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['logx'] is False
+    assert opts.kwargs['logy'] is False
+    assert opts.kwargs.get('logz') is None
+
+
+@pandas_and_dask
+@pytest.mark.parametrize('kind', ['line', 'area', 'scatter'])
+def test_xlim_ylim_tidy(tabular_lib, xy_df, kind):
+    df = tabular_lib(xy_df)
+    plot = df.hvplot(x='x', y='y', kind=kind, xlim=(0, 3), ylim=(5, 10))
+    opts = Store.lookup_options('bokeh', plot, 'plot').options
+    assert opts['xlim'] == (0, 3)
+    assert opts['ylim'] == (5, 10)
+
+
+@pandas_and_dask
+@pytest.mark.parametrize('kind', ['line', 'area', 'scatter'])
+def test_xlim_ylim_wide(tabular_lib, xy_df, kind):
+    df = tabular_lib(xy_df)
+    plot = df.hvplot(kind=kind, xlim=(0, 3), ylim=(5, 10))
+    opts = Store.lookup_options('bokeh', plot.last, 'plot').options
+    assert opts['xlim'] == (0, 3)
+    assert opts['ylim'] == (5, 10)
+
+
+@pandas_and_dask
+def test_shared_axes_false_hist_subplots(tabular_lib, xy_df):
+    df = tabular_lib(xy_df)
+    plots = df.hvplot.hist(subplots=True, shared_axes=False)
+    plot_0 = plots.grid_items()[0, 0][1]
+    plot_1 = plots.grid_items()[0, 1][1]
+    assert plot_0.opts['axiswise']
+    assert plot_0.range('x') == (1, 5)
+    assert plot_1.range('y') == (2, 6)
+
+
+@pandas_and_dask
+def test_shared_axes_true_hist_subplots(tabular_lib, xy_df):
+    df = tabular_lib(xy_df)
+    plots = df.hvplot.hist(subplots=True, shared_axes=True)
+    plot_0 = plots.grid_items()[0, 0][1]
+    plot_1 = plots.grid_items()[0, 1][1]
+    assert not plot_0.opts['axiswise']
+    assert plot_0.range('x') == (1, 6)
+    assert plot_1.range('y') == (1, 6)
+
+
+def test_subcoordinate_y_bool():
+    df = pd.DataFrame(np.random.random((10, 3)), columns=list('ABC'))
+    plot = df.hvplot.line(subcoordinate_y=True)
+    opts = Store.lookup_options('bokeh', plot, 'plot')
+    assert opts.kwargs['subcoordinate_y'] is True
+
+
+def test_subcoordinate_y_dict():
+    df = pd.DataFrame(np.random.random((10, 3)), columns=list('ABC'))
+    plot = df.hvplot.line(subcoordinate_y={'subcoordinate_scale': 2})
+    opts = Store.lookup_options('bokeh', plot, 'plot')
+    assert opts.kwargs['subcoordinate_y'] is True
+    assert opts.kwargs['subcoordinate_scale'] == 2
+
+
+@pytest.fixture
 def da():
     return xr.DataArray(
         data=np.arange(16).reshape((2, 2, 2, 2)),
@@ -117,7 +190,7 @@ def da():
     )
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture
 def da2():
     return xr.DataArray(
         data=np.arange(27).reshape((3, 3, 3)),
@@ -127,133 +200,57 @@ def da2():
     )
 
 
-@pytest.fixture(scope='module')
-def ds1(da):
-    return xr.Dataset({'foo': da})
+def test_title_dataarray_2d(hvplot_xarray, da, backend):
+    plot = da.sel(time=0, band=0).hvplot()  # Image plot
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['title'] == 'time = 0, band = 0'
 
 
-@pytest.fixture(scope='module')
-def ds2(da, da2):
-    return xr.Dataset({'foo': da, 'bar': da2})
+def test_title_dataarray_1d(hvplot_xarray, da, backend):
+    plot = da.sel(time=0, band=0, x=0).hvplot()  # Line plot
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['title'] == 'time = 0, x = 0, band = 0'
 
 
-@pytest.mark.usefixtures('hvplot_xarray')
-class TestXarrayTitle:
-    def test_dataarray_2d_with_title(self, da, backend):
-        da_sel = da.sel(time=0, band=0)
-        plot = da_sel.hvplot()  # Image plot
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['title'] == 'time = 0, band = 0'
-
-    def test_dataarray_1d_with_title(self, da, backend):
-        da_sel = da.sel(time=0, band=0, x=0)
-        plot = da_sel.hvplot()  # Line plot
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['title'] == 'time = 0, x = 0, band = 0'
-
-    def test_dataarray_1d_and_by_with_title(self, da, backend):
-        da_sel = da.sel(time=0, band=0, x=[0, 1])
-        plot = da_sel.hvplot(by='x')  # Line plot with hue/by
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['title'] == 'time = 0, band = 0'
-
-    def test_override_title(self, da, backend):
-        da_sel = da.sel(time=0, band=0)
-        plot = da_sel.hvplot(title='title')  # Image plot
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['title'] == 'title'
-
-    def test_dataarray_4d_line_no_title(self, da, backend):
-        plot = da.hvplot.line(dynamic=False)  # Line plot with widgets
-        opts = Store.lookup_options(backend, plot.last, 'plot')
-        assert 'title' not in opts.kwargs
-
-    def test_dataarray_3d_histogram_with_title(self, da, backend):
-        da_sel = da.sel(time=0)
-        plot = da_sel.hvplot()  # Histogram and no widgets
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['title'] == 'time = 0'
-
-    def test_dataset_one_var_behaves_like_dataarray(self, ds1, backend):
-        ds_sel = ds1.sel(time=0, band=0)
-        plot = ds_sel.hvplot()  # Image plot
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['title'] == 'time = 0, band = 0'
-
-    def test_dataset_scatter_with_title(self, ds2, backend):
-        ds_sel = ds2.sel(time=0, band=0, x=0, y=0)
-        plot = ds_sel.hvplot.scatter(x='foo', y='bar')  # Image plot
-        opts = Store.lookup_options(backend, plot, 'plot')
-        assert opts.kwargs['title'] == 'time = 0, y = 0, x = 0, band = 0'
+def test_title_dataarray_1d_and_by(hvplot_xarray, da, backend):
+    plot = da.sel(time=0, band=0, x=[0, 1]).hvplot(by='x')  # Line plot with hue/by
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['title'] == 'time = 0, band = 0'
 
 
-@pytest.mark.usefixtures('hvplot_xarray')
-class TestXarrayCticks:
-    def test_cticks(self, da2):
-        plot = da2.isel(other=0).hvplot(cticks=[5, 10])
-        handles = hv.renderer('bokeh').get_plot(plot).handles
-        assert handles['colorbar'].ticker.ticks == [5, 10]
+def test_title_override(hvplot_xarray, da, backend):
+    plot = da.sel(time=0, band=0).hvplot(title='title')  # Image plot
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['title'] == 'title'
 
 
-def test_subcoordinate_y_bool(hvplot_pandas):
-    df = pd.DataFrame(np.random.random((10, 3)), columns=list('ABC'))
-    plot = df.hvplot.line(subcoordinate_y=True)
-    opts = Store.lookup_options('bokeh', plot, 'plot')
-    assert opts.kwargs['subcoordinate_y'] is True
+def test_title_dataarray_4d_line_none(hvplot_xarray, da, backend):
+    plot = da.hvplot.line(dynamic=False)  # Line plot with widgets
+    opts = Store.lookup_options(backend, plot.last, 'plot')
+    assert 'title' not in opts.kwargs
 
 
-def test_subcoordinate_y_dict(hvplot_pandas):
-    df = pd.DataFrame(np.random.random((10, 3)), columns=list('ABC'))
-    plot = df.hvplot.line(subcoordinate_y={'subcoordinate_scale': 2})
-    opts = Store.lookup_options('bokeh', plot, 'plot')
-    assert opts.kwargs['subcoordinate_y'] is True
-    assert opts.kwargs['subcoordinate_scale'] == 2
+def test_title_dataarray_3d_histogram(hvplot_xarray, da, backend):
+    plot = da.sel(time=0).hvplot()  # Histogram and no widgets
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['title'] == 'time = 0'
 
 
-class TestChart1D(ComparisonTestCase):
-    def setUp(self):
-        import hvplot.pandas  # noqa: F401
-
-        self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
-
-    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
-    def test_tidy_chart_ranges(self, kind, element):
-        plot = self.df.hvplot(x='x', y='y', kind=kind, xlim=(0, 3), ylim=(5, 10))
-        opts = Store.lookup_options('bokeh', plot, 'plot').options
-        self.assertEqual(opts['xlim'], (0, 3))
-        self.assertEqual(opts['ylim'], (5, 10))
-
-    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
-    def test_wide_chart_ranges(self, kind, element):
-        plot = self.df.hvplot(kind=kind, xlim=(0, 3), ylim=(5, 10))
-        opts = Store.lookup_options('bokeh', plot.last, 'plot').options
-        self.assertEqual(opts['xlim'], (0, 3))
-        self.assertEqual(opts['ylim'], (5, 10))
-
-    def test_histogram_subplots_no_shared_axes(self):
-        plots = self.df.hvplot.hist(subplots=True, shared_axes=False)
-        plot_0 = plots.grid_items()[0, 0][1]
-        plot_1 = plots.grid_items()[0, 1][1]
-        assert plot_0.opts['axiswise']
-        assert plot_0.range('x') == (1, 5)
-        assert plot_1.range('y') == (2, 6)
-
-    def test_histogram_subplots_shared_axes(self):
-        plots = self.df.hvplot.hist(subplots=True, shared_axes=True)
-        plot_0 = plots.grid_items()[0, 0][1]
-        plot_1 = plots.grid_items()[0, 1][1]
-        assert not plot_0.opts['axiswise']
-        assert plot_0.range('x') == (1, 6)
-        assert plot_1.range('y') == (1, 6)
+def test_title_dataset_one_var_like_dataarray(hvplot_xarray, da, backend):
+    ds = xr.Dataset({'foo': da})
+    plot = ds.sel(time=0, band=0).hvplot()  # Image plot
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['title'] == 'time = 0, band = 0'
 
 
-class TestChart1DDask(TestChart1D):
-    def setUp(self):
-        super().setUp()
-        try:
-            import dask.dataframe as dd
-        except ImportError:
-            raise SkipTest('Dask not available')
-        import hvplot.dask  # noqa: F401
+def test_title_dataset_scatter(hvplot_xarray, da, da2, backend):
+    ds = xr.Dataset({'foo': da, 'bar': da2})
+    plot = ds.sel(time=0, band=0, x=0, y=0).hvplot.scatter(x='foo', y='bar')
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['title'] == 'time = 0, y = 0, x = 0, band = 0'
 
-        self.df = dd.from_pandas(self.df, npartitions=2)
+
+def test_cticks(hvplot_xarray, da2):
+    plot = da2.isel(other=0).hvplot(cticks=[5, 10])
+    handles = hv.renderer('bokeh').get_plot(plot).handles
+    assert handles['colorbar'].ticker.ticks == [5, 10]
