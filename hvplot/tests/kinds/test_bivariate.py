@@ -50,6 +50,20 @@ def test_cut(df, hvplot_pandas, backend):
     assert Store.lookup_options(backend, plot, 'plot').kwargs['cut'] == 1
 
 
+@pytest.mark.parametrize(
+    'backend',
+    [
+        'bokeh',
+        'matplotlib',
+        pytest.param(
+            'plotly',
+            marks=pytest.mark.render_xfail(
+                reason='HoloViews: Bivariate fails to render with plotly'
+            ),
+        ),
+    ],
+    indirect=True,
+)
 def test_filled(df, hvplot_pandas, backend):
     plot = df.hvplot.bivariate('x', 'y', filled=True)
     assert Store.lookup_options(backend, plot, 'plot').kwargs['filled'] is True

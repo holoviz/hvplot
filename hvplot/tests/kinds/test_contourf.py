@@ -42,5 +42,6 @@ def test_levels(ds, hvplot_xarray):
 
 @backends
 def test_logz(ds, hvplot_xarray, backend):
-    plot = ds.hvplot.contourf(z='v1', logz=True)
+    # The default levels start at 0, which a log scale cannot render.
+    plot = ds.hvplot.contourf(z='v1', levels=[2, 5, 8], logz=True)
     assert Store.lookup_options(backend, plot, 'plot').kwargs['logz'] is True

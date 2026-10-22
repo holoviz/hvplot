@@ -75,6 +75,18 @@ def test_xaxis_yaxis_position_from_holoviews_defaults(df, backend):
     assert opts.kwargs['yaxis'] == 'right'
 
 
+@pytest.mark.parametrize(
+    'backend',
+    [
+        'bokeh',
+        'matplotlib',
+        pytest.param(
+            'plotly',
+            marks=pytest.mark.render_xfail(reason='HoloViews: plotly does not accept xaxis=True'),
+        ),
+    ],
+    indirect=True,
+)
 def test_xaxis_yaxis_override_holoviews_defaults_none(df, backend):
     hv.opts.defaults(hv.opts.Scatter(xaxis=None, yaxis=None))
     plot = df.hvplot.scatter('x', 'y', c='category', xaxis=True, yaxis=True)

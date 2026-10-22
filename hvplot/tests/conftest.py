@@ -17,6 +17,7 @@ from holoviews.element import Path
 from packaging.version import Version
 
 import hvplot
+from hvplot.plotting.core import hvPlotBase
 
 param.parameterized.warnings_as_exceptions = True
 
@@ -93,16 +94,45 @@ if find_spec('geoviews') and find_spec('cartopy'):
 
 def pytest_addoption(parser):
     parser.addoption('--slow', action='store_true', help='Also run the tests marked as slow.')
+    parser.addoption(
+        '--no-render',
+        action='store_true',
+        help='Do not render the plots returned by hvPlot, which is faster.',
+    )
+
+
+def _render_returned_plot(call):
+    def call_and_render(self, *args, **kwargs):
+        obj = call(self, *args, **kwargs)
+        # A plain Dataset (kind='dataset') has no plotting class.
+        if isinstance(obj, hv.core.Dimensioned) and type(obj) is not Dataset:
+            hv.renderer(Store.current_backend).get_plot(obj)
+        return obj
+
+    return call_and_render
+
+
+def pytest_configure(config):
+    # hvPlot configures HoloViews objects, but an invalid configuration often only
+    # fails when the plot is built. So every plot returned by hvPlot is rendered
+    # with the current backend, unless --no-render is passed.
+    if not config.getoption('--no-render'):
+        hvPlotBase.__call__ = _render_returned_plot(hvPlotBase.__call__)
 
 
 def pytest_collection_modifyitems(config, items):
     skip_slow = pytest.mark.skip(reason='Slow test, run it with --slow.')
     skip_geo = pytest.mark.skip(reason='GeoViews test, requires geoviews and cartopy.')
+    render = not config.getoption('--no-render')
     for item in items:
         if 'slow' in item.keywords and not config.getoption('--slow'):
             item.add_marker(skip_slow)
         if 'geo' in item.keywords and _GEO_HV_STATE is None:
             item.add_marker(skip_geo)
+        # For tests that only fail when the plot is rendered.
+        render_xfail = item.get_closest_marker('render_xfail')
+        if render_xfail and render:
+            item.add_marker(pytest.mark.xfail(*render_xfail.args, **render_xfail.kwargs))
 
 
 def pytest_collection_finish(session):

@@ -16,6 +16,22 @@ def test_x_not_accepted(df, hvplot_pandas):
         df.hvplot.box(x='cat', y='y')
 
 
+@pytest.mark.parametrize(
+    'tabular_lib',
+    [
+        'pandas',
+        'dask',
+        'polars',
+        'duckdb',
+        pytest.param(
+            'ibis',
+            marks=pytest.mark.render_xfail(
+                reason='HoloViews: BoxWhisker of an ibis table fails to render'
+            ),
+        ),
+    ],
+    indirect=True,
+)
 def test_y(df, tabular_lib):
     plot = tabular_lib(df).hvplot.box(y='y')
     assert isinstance(plot, BoxWhisker)

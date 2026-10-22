@@ -173,6 +173,8 @@ pixi run test-unit
 
 The tests run in parallel and in a random order. Slow tests are skipped unless you pass `--slow`, e.g. `pixi run test-unit --slow`.
 
+Every plot returned by hvPlot during the tests is also rendered with the current plotting backend, as a configuration that HoloViews accepts can still fail when the plot is built. Pass `--no-render` for a faster run, e.g. `pixi run test-unit --no-render`.
+
 :::{admonition} Advanced usage
 :class: tip
 
@@ -225,6 +227,7 @@ Other rules:
 - Tests can't access the internet. Use the small datasets of `hvplot/tests/_data.py` or build the data in the test.
 - Mark tests taking more than about a second with `@pytest.mark.slow`.
 - A test exposing a bug in hvPlot that isn't fixed yet is marked with `@pytest.mark.xfail(reason='BUG: <description>')`. xfail marks are strict, so the test fails once the bug is fixed, reminding to remove the mark.
+- A test that only fails when its plot is rendered is marked with `@pytest.mark.render_xfail(reason=...)`, an xfail that doesn't apply with `--no-render`. The reason starts with `BUG:` for an hvPlot bug, or with the name of the library at fault, e.g. `HoloViews:`.
 
 ### Example tests
 

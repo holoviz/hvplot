@@ -111,8 +111,21 @@ def test_marker(df, backend):
     assert Store.lookup_options(backend, plot, 'style').kwargs['marker'] == '^'
 
 
-# Matplotlib and Plotly cannot render a marker mapped to a column.
-@pytest.mark.parametrize('backend', ['bokeh'], indirect=True)
+# hvPlot does not document that matplotlib cannot map a marker to a column.
+@pytest.mark.parametrize(
+    'backend',
+    [
+        'bokeh',
+        pytest.param(
+            'matplotlib',
+            marks=pytest.mark.render_xfail(
+                reason='BUG: marker mapped to a column unsupported by matplotlib, not documented'
+            ),
+        ),
+        'plotly',
+    ],
+    indirect=True,
+)
 def test_marker_dim(df, backend):
     plot = df.hvplot.points('x', 'y', marker='cat')
     assert 'cat' in plot.vdims

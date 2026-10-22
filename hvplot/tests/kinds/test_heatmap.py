@@ -8,7 +8,7 @@ from holoviews.testing import assert_element_equal
 
 @pytest.fixture(scope='module')
 def df():
-    return pd.DataFrame({'x': [1, 1, 2], 'y': ['A', 'A', 'B'], 'value': [1.0, 3.0, 5.0]})
+    return pd.DataFrame({'x': [1, 1, 2], 'y': ['A', 'B', 'B'], 'value': [1.0, 3.0, 5.0]})
 
 
 def test_x(df, hvplot_pandas):
@@ -17,6 +17,22 @@ def test_x(df, hvplot_pandas):
     assert plot.kdims == ['y', 'x']
 
 
+@pytest.mark.parametrize(
+    'tabular_lib',
+    [
+        'pandas',
+        'dask',
+        'polars',
+        'duckdb',
+        pytest.param(
+            'ibis',
+            marks=pytest.mark.render_xfail(
+                reason='HoloViews: HeatMap of an ibis table fails to render'
+            ),
+        ),
+    ],
+    indirect=True,
+)
 def test_y(df, tabular_lib):
     plot = tabular_lib(df).hvplot.heatmap(x='x', y='y', C='value')
     assert isinstance(plot, HeatMap)
@@ -65,7 +81,9 @@ def test_C(hvplot_pandas):
     assert list(plot.dimension_values('v2')) == [3.0, 4.0]
 
 
-def test_reduce_function(df, hvplot_pandas):
+def test_reduce_function(hvplot_pandas):
+    # Two values in the cell (1, A), reduced into one.
+    df = pd.DataFrame({'x': [1, 1, 2], 'y': ['A', 'A', 'B'], 'value': [1.0, 3.0, 5.0]})
     plot = df.hvplot.heatmap(x='x', y='y', C='value', reduce_function=np.mean)
     assert list(plot.dimension_values('value')) == [2.0, 5.0]
 

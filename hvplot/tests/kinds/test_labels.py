@@ -115,7 +115,12 @@ def test_text_font(df, backend):
     'backend',
     [
         'bokeh',
-        'matplotlib',
+        pytest.param(
+            'matplotlib',
+            marks=pytest.mark.render_xfail(
+                reason='BUG: text_font_size is not translated to matplotlib, which rejects 20pt'
+            ),
+        ),
         pytest.param('plotly', marks=pytest.mark.xfail(reason='text_font_size not translated')),
     ],
     indirect=True,

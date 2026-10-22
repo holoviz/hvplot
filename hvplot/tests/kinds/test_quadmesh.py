@@ -37,7 +37,8 @@ def test_z(ds, hvplot_xarray):
 
 
 def test_logz(ds, hvplot_xarray, backend):
-    plot = ds.hvplot.quadmesh(x='lon', y='lat', logz=True)
+    # A log scale cannot render the zeros of the data.
+    plot = (ds + 1).hvplot.quadmesh(x='lon', y='lat', logz=True)
     assert Store.lookup_options(backend, plot, 'plot').kwargs['logz'] is True
 
 

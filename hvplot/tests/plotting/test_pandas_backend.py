@@ -14,9 +14,13 @@ from hvplot.tests._data import makeDataFrame
 
 no_args = ['line', 'area', 'hist', 'box', 'kde', 'density', 'bar', 'barh']
 x_y = ['scatter', 'hexbin']
+# `.box()` of the hvPlot accessor disables the hover, the pandas backend does not.
+box_bug = pytest.mark.render_xfail(
+    reason='BUG: the pandas backend does not disable the hover of box plots, which cannot render'
+)
 frame_specials = [
     # delegates to boxplot_frame
-    ('boxplot', hv.BoxWhisker),
+    pytest.param('boxplot', hv.BoxWhisker, marks=box_bug),
     # delegates to hist_frame
     ('hist', hv.Histogram),
 ]
@@ -25,7 +29,9 @@ series_specials = [
     ('hist', hv.Histogram),
 ]
 no_args_mapping = [
-    (kind, el) for kind, el in HoloViewsConverter._kind_mapping.items() if kind in no_args
+    pytest.param(kind, el, marks=box_bug) if kind == 'box' else (kind, el)
+    for kind, el in HoloViewsConverter._kind_mapping.items()
+    if kind in no_args
 ]
 x_y_mapping = [(kind, el) for kind, el in HoloViewsConverter._kind_mapping.items() if kind in x_y]
 explicit_backends = pytest.mark.parametrize('explicit_backend', ['holoviews', 'hvplot'])

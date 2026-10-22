@@ -111,11 +111,17 @@ def test_geo_crs_inferred_from_data(utm_da):
 
 @pytest.mark.geo
 @skip_windows
-def test_geo_no_crs_on_data_defaults_to_plate_carree(plain_da, utm_crs):
+def test_geo_no_crs_on_data_defaults_to_plate_carree(hvplot_xarray, utm_crs):
     import cartopy.crs as ccrs
 
-    plain_da.attrs = {'bar': utm_crs}
-    plot = plain_da.hvplot.image('x', 'y', geo=True)
+    # Longitudes and latitudes, as the data is plotted with a PlateCarree CRS.
+    da = xr.DataArray(
+        np.random.rand(5, 5),
+        coords={'y': np.linspace(40, 44, 5), 'x': np.linspace(-75, -71, 5)},
+        dims=['y', 'x'],
+        attrs={'bar': utm_crs},
+    )
+    plot = da.hvplot.image('x', 'y', geo=True)
     assert plot.crs == ccrs.PlateCarree()
 
 
@@ -380,6 +386,8 @@ def test_geo_default_data_aspect(hvplot_pandas, simple_df):
 
 
 @pytest.mark.geo
+# bokeh warns (expected) when data_aspect and width are both set.
+@pytest.mark.usefixtures('disable_param_warnings_as_exceptions')
 def test_geo_data_aspect_and_width(hvplot_pandas, simple_df):
     points = simple_df.hvplot.points('x', 'y', geo=True, width=200)
     opts = hv.Store.lookup_options('bokeh', points, 'plot').kwargs

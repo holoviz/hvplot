@@ -74,3 +74,17 @@ def test_network_guard_allows_loopback():
 @requires('a_module_that_does_not_exist')
 def test_requires_skips():
     pytest.fail('should have been skipped')
+
+
+def test_plots_returned_by_hvplot_are_rendered(request, hvplot_pandas, backend, monkeypatch):
+    if request.config.getoption('--no-render'):
+        pytest.skip('Plots are not rendered with --no-render.')
+    rendered = []
+    monkeypatch.setattr(hv.renderer(backend), 'get_plot', rendered.append)
+    plot = pd.DataFrame({'x': [1, 2], 'y': [3, 4]}).hvplot.scatter('x', 'y')
+    assert rendered == [plot]
+
+
+@pytest.mark.render_xfail(reason='Checks that render_xfail is applied when rendering.')
+def test_render_xfail(request):
+    assert request.config.getoption('--no-render')

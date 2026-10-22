@@ -259,7 +259,18 @@ def test_only_includes_num_chart(cat_df, tabular_lib, kind, element):
 
 
 @pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
-@pytest.mark.parametrize(('kind', 'element'), CHART_KINDS)
+@pytest.mark.parametrize(
+    ('kind', 'element'),
+    [
+        ('line', Curve),
+        pytest.param(
+            'area',
+            Area,
+            marks=pytest.mark.render_xfail(reason='HoloViews: Area with string values fails'),
+        ),
+        ('scatter', Scatter),
+    ],
+)
 def test_includes_str_if_no_num_chart(cat_only_df, tabular_lib, kind, element):
     data = tabular_lib(cat_only_df)
     plot = data.hvplot(kind=kind)

@@ -35,6 +35,22 @@ def test_x(ds, gridded_lib):
     assert sorted(set(plot.dimension_values('lon'))) == [0, 1, 2]
 
 
+@pytest.mark.parametrize(
+    'tabular_lib',
+    [
+        'pandas',
+        'dask',
+        'polars',
+        'duckdb',
+        pytest.param(
+            'ibis',
+            marks=pytest.mark.render_xfail(
+                reason='HoloViews: VectorField of an ibis table fails to render'
+            ),
+        ),
+    ],
+    indirect=True,
+)
 def test_y(df, tabular_lib):
     plot = tabular_lib(df).hvplot.vectorfield(x='x', y='y', angle='angle', mag='mag')
     assert isinstance(plot, VectorField)

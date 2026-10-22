@@ -25,6 +25,9 @@ TABULAR_BUGS = {
     ('violin', 'ibis'): 'BUG: violin fails to melt an ibis table',
 }
 
+# step cannot render the string index of the test data, which is the default x.
+NUMERIC_X_KINDS = {'step'}
+
 # A subset of the columns, so that the test fails if y is ignored.
 Y = ['B', 'D']
 # ohlc takes 4 columns: open, high, low, close. Reversed so that the order is checked too.
@@ -33,16 +36,34 @@ OHLC_Y = ['D', 'C', 'B', 'A']
 MELTED_KINDS = {'bar', 'barh', 'box', 'violin'}
 
 
+def render_bug(kind, lib, series=False):
+    """Return the reason why the plot of this kind is built but cannot be rendered, if any."""
+    if kind == 'errorbars':
+        return 'BUG: errorbars without yerr1 builds an ErrorBars with no error dimension'
+    if series and kind == 'box':
+        return 'HoloViews: BoxWhisker without kdims fails to render with the hover tool'
+    if lib == 'ibis' and kind in {'polygons', 'step'}:
+        return 'HoloViews: the Narwhals interface fails to render this element with an ibis table'
+    if lib == 'dask' and kind in {'bar', 'barh'}:
+        return 'HoloViews: Bars of a dask DataFrame with two key dimensions fail to render'
+    return None
+
+
+def render_marks(kind, lib, series=False):
+    reason = render_bug(kind, lib, series)
+    return [pytest.mark.render_xfail(reason=reason)] if reason else []
+
+
 def kind_and_lib_params(kinds):
     params = []
     for kind in sorted(kinds):
         for lib in TABULAR_LIBS:
-            marks = []
+            marks = render_marks(kind, lib)
             x = None
-            if lib == 'ibis' and kind in IBIS_NEEDS_X_KINDS:
+            if kind in NUMERIC_X_KINDS or (lib == 'ibis' and kind in IBIS_NEEDS_X_KINDS):
                 x = 'A'
             if (kind, lib) in TABULAR_BUGS:
-                marks = pytest.mark.xfail(strict=True, reason=TABULAR_BUGS[kind, lib])
+                marks.append(pytest.mark.xfail(strict=True, reason=TABULAR_BUGS[kind, lib]))
             params.append(pytest.param(kind, lib, x, marks=marks))
     return params
 
@@ -84,7 +105,9 @@ def test_dataframe(kind, tabular_lib, x):
 
 
 @pytest.mark.parametrize('tabular_lib', ['polars'], indirect=True)
-@pytest.mark.parametrize('kind', sorted(FRAME_TYPES))
+@pytest.mark.parametrize(
+    'kind', [pytest.param(k, marks=render_marks(k, 'polars')) for k in sorted(FRAME_TYPES)]
+)
 def test_lazyframe_polars(kind, tabular_lib):
     y = OHLC_Y if kind == 'ohlc' else Y
     df = tabular_lib(makeDataFrame()).lazy()
@@ -115,7 +138,10 @@ def test_ibis_requires_x(tabular_lib):
 
 # DuckDB and Ibis have no Series object.
 @pytest.mark.parametrize('tabular_lib', ['pandas', 'dask', 'polars'], indirect=True)
-@pytest.mark.parametrize('kind', sorted(SERIES_TYPES))
+@pytest.mark.parametrize(
+    'kind',
+    [pytest.param(k, marks=render_marks(k, None, series=True)) for k in sorted(SERIES_TYPES)],
+)
 def test_series(kind, tabular_lib):
     ser = tabular_lib(pd.Series(np.random.rand(10), name='A'))
     plot = ser.hvplot(kind=kind)

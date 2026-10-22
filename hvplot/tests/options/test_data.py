@@ -109,7 +109,19 @@ def test_value_label_and_group_label_wide(tabular_lib, xy_df, kind, element):
     assert_element_equal(plot, expected)
 
 
-@pandas_and_dask
+@pytest.mark.parametrize(
+    'tabular_lib',
+    [
+        'pandas',
+        pytest.param(
+            'dask',
+            marks=pytest.mark.render_xfail(
+                reason='dask: projecting a column through rename_axis(columns=...) fails'
+            ),
+        ),
+    ],
+    indirect=True,
+)
 @pytest.mark.parametrize('kind', ['line', 'area', 'scatter'])
 def test_group_label_from_columns_name(tabular_lib, xy_df, kind):
     # Not set in place, dask would share the renamed columns with equal frames.

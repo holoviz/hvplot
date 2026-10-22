@@ -365,11 +365,21 @@ def test_selector(df, operation):
     test_cases = [
         ('first', first()),
         (('min', 'number'), min('number')),
-        (first('category'), first('category')),
     ]
     for selector, expected in test_cases:
         plot = df.hvplot.points('x', 'y', selector=selector, **{operation: True})
         assert _operation(plot).p['selector'] == expected, selector
+
+
+@requires('datashader')
+@pytest.mark.render_xfail(reason='datashader: first() of a pandas string column fails')
+@operations
+def test_selector_reduction_of_string_column(df, operation):
+    from datashader.reductions import first
+
+    selector = first('category')
+    plot = df.hvplot.points('x', 'y', selector=selector, **{operation: True})
+    assert _operation(plot).p['selector'] == selector
 
 
 @requires('datashader')

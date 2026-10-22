@@ -25,6 +25,8 @@ def test_aspect(df, backend):
         assert opts.get('fig_size') is None
 
 
+# bokeh warns (expected) when aspect and width are both set.
+@pytest.mark.usefixtures('disable_param_warnings_as_exceptions')
 def test_aspect_and_width(df, backend):
     plot = df.hvplot(x='x', y='y', width=150, aspect=2)
     opts = Store.lookup_options(backend, plot, 'plot').kwargs
@@ -62,6 +64,8 @@ def test_data_aspect(df, backend):
 
 
 @data_aspect_backends
+# bokeh warns (expected) when aspect and width are both set.
+@pytest.mark.usefixtures('disable_param_warnings_as_exceptions')
 def test_data_aspect_and_width(df, backend):
     plot = df.hvplot(x='x', y='y', width=150, data_aspect=2)
     opts = Store.lookup_options(backend, plot, 'plot').kwargs

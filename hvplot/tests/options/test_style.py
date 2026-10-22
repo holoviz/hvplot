@@ -34,8 +34,40 @@ def test_fontscale(df, backend):
     assert opts.kwargs['fontscale'] == 1.5
 
 
-@pytest.mark.parametrize('fontsize', [12, {'title': '15pt', 'ylabel': '5px', 'ticks': 20}])
-def test_fontsize(df, backend, fontsize):
+@pytest.mark.parametrize(
+    'backend',
+    [
+        'bokeh',
+        'matplotlib',
+        pytest.param(
+            'plotly',
+            marks=pytest.mark.render_xfail(reason='HoloViews: plotly fails on a numeric fontsize'),
+        ),
+    ],
+    indirect=True,
+)
+def test_fontsize_number(df, backend):
+    plot = df.hvplot.scatter('x', 'y', fontsize=12)
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['fontsize'] == 12
+
+
+@pytest.mark.parametrize(
+    'backend',
+    [
+        'bokeh',
+        pytest.param(
+            'matplotlib',
+            marks=pytest.mark.render_xfail(
+                reason='BUG: the documented fontsize dict with 15pt or 5px fails on matplotlib'
+            ),
+        ),
+        'plotly',
+    ],
+    indirect=True,
+)
+def test_fontsize_dict(df, backend):
+    fontsize = {'title': '15pt', 'ylabel': '5px', 'ticks': 20}
     plot = df.hvplot.scatter('x', 'y', fontsize=fontsize)
     opts = Store.lookup_options(backend, plot, 'plot')
     assert opts.kwargs['fontsize'] == fontsize
