@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from holoviews import Store
+from holoviews.element import Scatter
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
 
@@ -29,20 +30,91 @@ def df():
     )
 
 
-@kinds
-def test_logz(df, kind, backend):
-    plot = df.hvplot('x', 'y', c='x', logz=True, kind=kind)
+def size_opt(backend):
+    return 's' if backend == 'matplotlib' else 'size'
+
+
+def test_x(df):
+    plot = df.hvplot.scatter(x='number', y='y')
+    assert isinstance(plot, Scatter)
+    assert plot.kdims == ['number']
+    assert plot.vdims == ['y']
+
+
+def test_y(df, tabular_lib):
+    plot = tabular_lib(df).hvplot.scatter(x='x', y='y')
+    assert isinstance(plot, Scatter)
+    assert plot.kdims == ['x']
+    assert plot.vdims == ['y']
+    assert list(plot.dimension_values('y')) == [2, 4, 6]
+
+
+def test_c(df, backend):
+    plot = df.hvplot.scatter('x', 'y', c='number')
+    assert 'number' in plot.vdims
+    color = Store.lookup_options(backend, plot, 'style').kwargs['color']
+    assert repr(color) == repr(hv.dim('number'))
+    assert Store.lookup_options(backend, plot, 'plot').kwargs['colorbar'] is True
+
+
+def test_logz(df, backend):
+    plot = df.hvplot.scatter('x', 'y', c='x', logz=True)
     opts = Store.lookup_options(backend, plot, 'plot')
     assert opts.kwargs['logz'] is True
 
 
-@kinds
-def test_size_dim(df, kind, backend):
-    plot = df.hvplot('x', 'y', s='number', kind=kind)
-    opts = Store.lookup_options(backend, plot, 'style')
-    param = 's' if backend == 'matplotlib' else 'size'
-    assert opts.kwargs[param] == 'number'
+def test_s(df, backend):
+    # The marker area is proportional to s.
+    plot = df.hvplot.scatter('x', 'y', s=16)
+    assert Store.lookup_options(backend, plot, 'style').kwargs[size_opt(backend)] == 4
+
+
+def test_s_dim(df, backend):
+    plot = df.hvplot.scatter('x', 'y', s='number')
+    size = Store.lookup_options(backend, plot, 'style').kwargs[size_opt(backend)]
+    np.testing.assert_allclose(size.apply(plot), np.sqrt(df['number']))
     assert 'number' in plot.vdims
+
+
+def test_s_dim_overlay(df, backend):
+    plot = df.hvplot.scatter('x', 'y', s='number', by='category')
+    size = Store.lookup_options(backend, plot.last, 'style').kwargs[size_opt(backend)]
+    np.testing.assert_allclose(size.apply(plot.last), np.sqrt([0.3]))
+    assert 'number' in plot.last.vdims
+
+
+def test_s_dim_expression():
+    df = pd.DataFrame({'x': np.linspace(0, 4, 5), 'y': np.linspace(1, 5, 5)})
+    dim_expr = hv.dim('y') * 10
+    scatter = df.hvplot.scatter('x', 'y', s=dim_expr)
+    opts = Store.lookup_options('bokeh', scatter, 'style')
+    assert repr(opts.kwargs['size']) == repr(dim_expr)
+
+
+@pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
+def test_s_series(tabular_lib):
+    df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
+    plot = tabular_lib(df).hvplot.scatter('x', 'y', s=df['y'])
+    opts = Store.lookup_options('bokeh', plot, 'style')
+    assert '_size' in plot.data.columns
+    assert opts.kwargs['size'] == '_size'
+
+
+def test_scale(df, backend):
+    plot = df.hvplot.scatter('x', 'y', s=16, scale=2)
+    assert Store.lookup_options(backend, plot, 'style').kwargs[size_opt(backend)] == 8
+
+
+def test_marker(df, backend):
+    plot = df.hvplot.scatter('x', 'y', marker='^')
+    assert Store.lookup_options(backend, plot, 'style').kwargs['marker'] == '^'
+
+
+def test_marker_dim(df, backend):
+    plot = df.hvplot.scatter('x', 'y', marker='category')
+    opts = Store.lookup_options(backend, plot, 'style')
+    assert opts.kwargs['marker'] == 'category'
+    assert 'category' in plot.vdims
 
 
 @alpha_backends
@@ -54,23 +126,6 @@ def test_alpha_dim(df, kind, backend):
     assert 'number' in plot.vdims
 
 
-@kinds
-def test_marker_dim(df, kind, backend):
-    plot = df.hvplot('x', 'y', marker='category', kind=kind)
-    opts = Store.lookup_options(backend, plot, 'style')
-    assert opts.kwargs['marker'] == 'category'
-    assert 'category' in plot.vdims
-
-
-@kinds
-def test_size_dim_overlay(df, kind, backend):
-    plot = df.hvplot('x', 'y', s='number', by='category', kind=kind)
-    opts = Store.lookup_options(backend, plot.last, 'style')
-    param = 's' if backend == 'matplotlib' else 'size'
-    assert opts.kwargs[param] == 'number'
-    assert 'number' in plot.last.vdims
-
-
 @alpha_backends
 @kinds
 def test_alpha_dim_overlay(df, kind, backend):
@@ -78,20 +133,3 @@ def test_alpha_dim_overlay(df, kind, backend):
     opts = Store.lookup_options(backend, plot.last, 'style')
     assert opts.kwargs['alpha'] == 'number'
     assert 'number' in plot.last.vdims
-
-
-def test_pandas_dim_size_alias():
-    df = pd.DataFrame({'x': np.linspace(0, 4, 5), 'y': np.linspace(1, 5, 5)})
-    dim_expr = hv.dim('y') * 10
-    scatter = df.hvplot.scatter('x', 'y', s=dim_expr)
-    opts = Store.lookup_options('bokeh', scatter, 'style')
-    assert repr(opts.kwargs['size']) == repr(dim_expr)
-
-
-@pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
-def test_scatter_size_set_to_series(tabular_lib):
-    df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
-    plot = tabular_lib(df).hvplot.scatter('x', 'y', s=df['y'])
-    opts = Store.lookup_options('bokeh', plot, 'style')
-    assert '_size' in plot.data.columns
-    assert opts.kwargs['size'] == '_size'

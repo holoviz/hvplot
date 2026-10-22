@@ -2,6 +2,9 @@ import pandas as pd
 import pytest
 from holoviews.streams import Buffer, Pipe
 
+from hvplot.tests._deps import requires
+from hvplot.util import _HV_VERSION
+
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
 
 
@@ -26,3 +29,21 @@ def test_stream_buffer(df):
     new_df = pd.DataFrame([[7, 8], [9, 10]], columns=['x', 'y'])
     stream.send(new_df)
     pd.testing.assert_frame_equal(plot[()].data, pd.concat([df, new_df]))
+
+
+@requires('streamz')
+@pytest.mark.skipif(
+    _HV_VERSION >= (1, 23, 0), reason='streamz support has been removed in HoloViews >= 1.23.0'
+)
+@pytest.mark.filterwarnings('ignore:streamz support has been deprecated:FutureWarning')
+def test_backlog(df):
+    # backlog only applies to streamz data, streamz is optional.
+    from streamz.dataframe import DataFrame as StreamingDataFrame
+
+    import hvplot.streamz  # noqa: F401
+
+    sdf = StreamingDataFrame(example=df)
+    plot = sdf.hvplot('x', 'y', backlog=2)
+    buffer = plot.streams[0]
+    assert isinstance(buffer, Buffer)
+    assert buffer.length == 2

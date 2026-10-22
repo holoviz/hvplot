@@ -1,7 +1,30 @@
 import numpy as np
 import pandas as pd
+import pytest
 import xarray as xr
 from holoviews import Store
+from holoviews.element import Violin
+
+
+@pytest.fixture
+def df():
+    return pd.DataFrame({'x': [1.0, 2.0, 3.0], 'y': [2.0, 4.0, 3.0]})
+
+
+def test_y(df, tabular_lib):
+    plot = tabular_lib(df).hvplot.violin(y='y')
+    assert isinstance(plot, Violin)
+    assert plot.kdims == []
+    assert plot.vdims == ['y']
+    assert list(plot.dimension_values('y')) == [2, 4, 3]
+
+
+def test_y_list(df, hvplot_pandas):
+    plot = df.hvplot.violin(y=['x', 'y'])
+    assert isinstance(plot, Violin)
+    assert plot.kdims == ['Variable']
+    assert plot.vdims == ['value']
+    assert list(plot.dimension_values('Variable')) == ['x', 'x', 'x', 'y', 'y', 'y']
 
 
 def test_violin_from_xarray_with_by_and_color(hvplot_xarray):

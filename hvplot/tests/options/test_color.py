@@ -8,9 +8,13 @@ import xarray as xr
 from holoviews import Store
 from holoviews.testing import assert_element_equal
 
+from hvplot.tests._deps import requires
+
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
 
 pandas_and_dask = pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
+
+plotly_unsupported = pytest.mark.xfail(reason='Not supported by the plotly backend')
 
 
 @pytest.fixture
@@ -217,3 +221,121 @@ def test_check_symmetric_max_big_image(hvplot_xarray, big_symmetric_da):
     assert plot_opts.kwargs.get('symmetric') is True
     style_opts = Store.lookup_options('bokeh', plot, 'style')
     assert style_opts.kwargs['cmap'] == 'coolwarm'
+
+
+def _operation(dmap):
+    """The resampling operation applied by a DynamicMap returned by hvPlot."""
+    return dmap.callback.inputs[0].callback.operation
+
+
+def test_clim_image(hvplot_xarray, symmetric_da):
+    plot = symmetric_da.hvplot.image(clim=(-5, 5))
+    assert plot.get_dimension('foo').range == (-5, 5)
+
+
+def test_clim_one_bound_unset(hvplot_xarray, symmetric_da):
+    plot = symmetric_da.hvplot.image(clim=(None, 5))
+    assert plot.get_dimension('foo').range == (None, 5)
+
+
+def test_colorbar_default_line(df, backend):
+    plot = df.hvplot.line('x', 'y')
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert 'colorbar' not in opts.kwargs
+
+
+def test_colorbar_default_scatter_numeric_c(df, backend):
+    plot = df.hvplot.scatter('x', 'y', c='number')
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['colorbar'] is True
+
+
+def test_colorbar_false_scatter_numeric_c(df, backend):
+    plot = df.hvplot.scatter('x', 'y', c='number', colorbar=False)
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['colorbar'] is False
+
+
+def test_colorbar_default_image(hvplot_xarray, symmetric_da, backend):
+    plot = symmetric_da.hvplot.image()
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['colorbar'] is True
+
+
+def test_colorbar_false_image(hvplot_xarray, symmetric_da, backend):
+    plot = symmetric_da.hvplot.image(colorbar=False)
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['colorbar'] is False
+
+
+def test_color_key_by_name(df, backend):
+    plot = df.hvplot.scatter('x', 'y', c='number', color_key='fire')
+    opts = Store.lookup_options(backend, plot, 'style')
+    assert opts.kwargs['cmap'] == 'fire'
+
+
+@pytest.mark.parametrize('other', ['cmap', 'colormap'])
+def test_color_key_with_other_cmap_option_error(df, other):
+    with pytest.raises(TypeError, match='Specify at most one of'):
+        df.hvplot.scatter('x', 'y', c='number', color_key='fire', **{other: 'fire'})
+
+
+@requires('datashader')
+def test_color_key_dict_datashade(df):
+    color_key = {'A': '#ff0000', 'B': '#00ff00', 'C': '#0000ff'}
+    plot = df.hvplot.points('x', 'y', by='category', color_key=color_key, datashade=True)
+    assert _operation(plot).p.color_key == color_key
+
+
+@pytest.mark.parametrize(
+    'backend',
+    ['bokeh', 'matplotlib', pytest.param('plotly', marks=plotly_unsupported)],
+    indirect=True,
+)
+def test_cnorm(df, backend):
+    plot = df.hvplot.scatter('x', 'y', c='number', cnorm='log')
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['cnorm'] == 'log'
+
+
+@requires('datashader')
+def test_cnorm_rasterize(df):
+    plot = df.hvplot(x='x', y='y', rasterize=True, cnorm='eq_hist')
+    opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
+    assert opts.get('cnorm') == 'eq_hist'
+
+
+@requires('datashader')
+def test_cnorm_datashade(df):
+    plot = df.hvplot(x='x', y='y', datashade=True, cnorm='eq_hist')
+    assert _operation(plot).p['cnorm'] == 'eq_hist'
+
+
+@requires('datashader')
+def test_rescale_discrete_levels_rasterize(df):
+    plot = df.hvplot(x='x', y='y', rasterize=True, cnorm='eq_hist', rescale_discrete_levels=False)
+    opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
+    assert opts.get('rescale_discrete_levels') is False
+
+
+@requires('datashader')
+def test_rescale_discrete_levels_datashade(df):
+    plot = df.hvplot(x='x', y='y', datashade=True, cnorm='eq_hist', rescale_discrete_levels=False)
+    assert _operation(plot).p['rescale_discrete_levels'] is False
+
+
+@requires('datashader')
+def test_rescale_discrete_levels_datashade_default_true(df):
+    plot = df.hvplot(x='x', y='y', datashade=True, cnorm='eq_hist')
+    assert _operation(plot).p['rescale_discrete_levels'] is True
+
+
+@pytest.mark.parametrize(
+    'backend',
+    ['bokeh', 'matplotlib', pytest.param('plotly', marks=plotly_unsupported)],
+    indirect=True,
+)
+def test_rescale_discrete_levels(df, backend):
+    plot = df.hvplot.scatter('x', 'y', c='number', cnorm='eq_hist', rescale_discrete_levels=False)
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['rescale_discrete_levels'] is False

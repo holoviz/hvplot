@@ -1,5 +1,44 @@
 import numpy as np
+import pytest
 import xarray as xr
+from holoviews import Store
+from holoviews.element import QuadMesh
+
+
+@pytest.fixture
+def ds():
+    return xr.Dataset(
+        {
+            'a': (('lat', 'lon'), np.arange(6.0).reshape(2, 3)),
+            'b': (('lat', 'lon'), np.arange(6.0).reshape(2, 3) * 10),
+        },
+        coords={'lat': [10, 20], 'lon': [0, 1, 2]},
+    )
+
+
+def test_x(ds, gridded_lib):
+    plot = gridded_lib(ds).hvplot.quadmesh(x='lon', y='lat')
+    assert isinstance(plot, QuadMesh)
+    assert plot.kdims == ['lon', 'lat']
+    assert plot.vdims == ['a']
+    assert list(plot.dimension_values('lon', expanded=False)) == [0, 1, 2]
+
+
+def test_y(ds, hvplot_xarray):
+    plot = ds.hvplot.quadmesh(x='lat', y='lon')
+    assert plot.kdims == ['lat', 'lon']
+    assert list(plot.dimension_values('lon', expanded=False)) == [0, 1, 2]
+
+
+def test_z(ds, hvplot_xarray):
+    plot = ds.hvplot.quadmesh(x='lon', y='lat', z='b')
+    assert plot.vdims == ['b']
+    assert plot.dimension_values('b').max() == 50
+
+
+def test_logz(ds, hvplot_xarray, backend):
+    plot = ds.hvplot.quadmesh(x='lon', y='lat', logz=True)
+    assert Store.lookup_options(backend, plot, 'plot').kwargs['logz'] is True
 
 
 def test_unindexed_quadmesh(hvplot_xarray):

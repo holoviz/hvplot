@@ -221,6 +221,24 @@ def test_features_overlaid_and_underlaid(hvplot_pandas, simple_df):
 
 
 @pytest.mark.geo
+def test_global_extent(hvplot_pandas, simple_df):
+    import geoviews as gv
+
+    # Also makes the plot geographic.
+    plot = simple_df.hvplot.points('x', 'y', global_extent=True)
+    assert isinstance(plot, gv.Points)
+    opts = hv.Store.lookup_options('bokeh', plot, 'plot')
+    assert opts.kwargs['global_extent'] is True
+
+
+@pytest.mark.geo
+def test_global_extent_default(hvplot_pandas, simple_df):
+    plot = simple_df.hvplot.points('x', 'y', geo=True)
+    opts = hv.Store.lookup_options('bokeh', plot, 'plot')
+    assert not opts.kwargs.get('global_extent')
+
+
+@pytest.mark.geo
 def test_tiles(hvplot_pandas, simple_df):
     plot = simple_df.hvplot.points('x', 'y', geo=False, tiles=True)
     assert len(plot) == 2
@@ -551,3 +569,17 @@ def test_xlim_ylim_out_of_bounds_not_converted_with_tiles(without_geoviews, merc
     assert bk_plot.handles['plot'].x_range.end == 3000
     assert bk_plot.handles['plot'].y_range.start == 400
     assert bk_plot.handles['plot'].y_range.end == 800
+
+
+def test_geo_without_geoviews(without_geoviews, simple_df):
+    with pytest.raises(ModuleNotFoundError, match='`geoviews` package must be installed'):
+        simple_df.hvplot.points('x', 'y', geo=True)
+
+
+def test_tiles_unknown_without_xyzservices(without_geoviews, simple_df, monkeypatch):
+    # hvPlot only uses xyzservices when it is already imported, so it is removed
+    # from sys.modules rather than blocked.
+    monkeypatch.delitem(sys.modules, 'xyzservices', raising=False)
+    with pytest.raises(ValueError, match='not_a_source tiles not recognized'):
+        simple_df.hvplot.points('x', 'y', tiles='not_a_source')
+    assert 'xyzservices' not in sys.modules

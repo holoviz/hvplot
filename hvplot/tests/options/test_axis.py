@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+from bokeh.models import NumeralTickFormatter
 from holoviews import Store
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
@@ -31,17 +32,30 @@ def test_xaxis_yaxis_visible_by_default(df, backend):
 
 
 @pytest.mark.parametrize('value', [None, False])
-def test_xaxis_yaxis_hidden(df, backend, value):
-    plot = df.hvplot.scatter('x', 'y', c='category', xaxis=value, yaxis=value)
+def test_xaxis_hidden(df, backend, value):
+    plot = df.hvplot.scatter('x', 'y', c='category', xaxis=value)
     opts = Store.lookup_options(backend, plot, 'plot')
     assert opts.kwargs['xaxis'] is None
+    assert 'yaxis' not in opts.kwargs
+
+
+@pytest.mark.parametrize('value', [None, False])
+def test_yaxis_hidden(df, backend, value):
+    plot = df.hvplot.scatter('x', 'y', c='category', yaxis=value)
+    opts = Store.lookup_options(backend, plot, 'plot')
     assert opts.kwargs['yaxis'] is None
+    assert 'xaxis' not in opts.kwargs
 
 
-def test_xaxis_yaxis_position(df, backend):
-    plot = df.hvplot.scatter('x', 'y', c='category', xaxis='top', yaxis='right')
+def test_xaxis_position(df, backend):
+    plot = df.hvplot.scatter('x', 'y', c='category', xaxis='top')
     opts = Store.lookup_options(backend, plot, 'plot')
     assert opts.kwargs['xaxis'] == 'top'
+
+
+def test_yaxis_position(df, backend):
+    plot = df.hvplot.scatter('x', 'y', c='category', yaxis='right')
+    opts = Store.lookup_options(backend, plot, 'plot')
     assert opts.kwargs['yaxis'] == 'right'
 
 
@@ -141,6 +155,13 @@ def test_xlim_ylim_wide(tabular_lib, xy_df, kind):
     opts = Store.lookup_options('bokeh', plot.last, 'plot').options
     assert opts['xlim'] == (0, 3)
     assert opts['ylim'] == (5, 10)
+
+
+@pytest.mark.parametrize('ylim', [(None, 10), (5, None)])
+def test_ylim_one_bound_unset(xy_df, ylim, backend):
+    plot = xy_df.hvplot.scatter('x', 'y', ylim=ylim)
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['ylim'] == ylim
 
 
 @pandas_and_dask
@@ -254,3 +275,131 @@ def test_cticks(hvplot_xarray, da2):
     plot = da2.isel(other=0).hvplot(cticks=[5, 10])
     handles = hv.renderer('bokeh').get_plot(plot).handles
     assert handles['colorbar'].ticker.ticks == [5, 10]
+
+
+def test_autorange(df):
+    plot = df.hvplot.scatter('x', 'y', autorange='y')
+    opts = Store.lookup_options('bokeh', plot, 'plot')
+    assert opts.kwargs['autorange'] == 'y'
+
+
+def test_autorange_default_unset(df):
+    plot = df.hvplot.scatter('x', 'y')
+    opts = Store.lookup_options('bokeh', plot, 'plot')
+    assert 'autorange' not in opts.kwargs
+
+
+plotly_unsupported = pytest.mark.xfail(reason='Not supported by the plotly backend')
+
+
+@pytest.mark.parametrize(
+    'backend',
+    ['bokeh', 'matplotlib', pytest.param('plotly', marks=plotly_unsupported)],
+    indirect=True,
+)
+def test_clabel(hvplot_xarray, da2, backend):
+    plot = da2.isel(other=0).hvplot.image(clabel='Temperature')
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['clabel'] == 'Temperature'
+
+
+def test_flip_xaxis(df, backend):
+    plot = df.hvplot.scatter('x', 'y', flip_xaxis=True)
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['invert_xaxis'] is True
+    assert 'invert_yaxis' not in opts.kwargs
+
+
+def test_flip_yaxis(df, backend):
+    plot = df.hvplot.scatter('x', 'y', flip_yaxis=True)
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['invert_yaxis'] is True
+    assert 'invert_xaxis' not in opts.kwargs
+
+
+def test_framewise_default(df, backend):
+    plot = df.hvplot.scatter('x', 'y')
+    opts = Store.lookup_options(backend, plot, 'norm')
+    assert opts.kwargs['framewise'] is True
+
+
+def test_framewise_false(df, backend):
+    plot = df.hvplot.scatter('x', 'y', framewise=False)
+    opts = Store.lookup_options(backend, plot, 'norm')
+    assert opts.kwargs['framewise'] is False
+
+
+def test_invert(df, backend):
+    plot = df.hvplot.scatter('x', 'y', invert=True)
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['invert_axes'] is True
+    assert opts.kwargs['labelled'] == ['y', 'x']
+
+
+def test_rot(df, backend):
+    plot = df.hvplot.scatter('x', 'y', rot=45)
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['xrotation'] == 45
+    assert 'yrotation' not in opts.kwargs
+
+
+def test_rot_with_invert(df, backend):
+    plot = df.hvplot.scatter('x', 'y', rot=45, invert=True)
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['yrotation'] == 45
+    assert 'xrotation' not in opts.kwargs
+
+
+@pytest.mark.parametrize(
+    'backend',
+    ['bokeh', 'matplotlib', pytest.param('plotly', marks=plotly_unsupported)],
+    indirect=True,
+)
+def test_xformatter(df, backend):
+    plot = df.hvplot.scatter('x', 'y', xformatter='%.3f')
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['xformatter'] == '%.3f'
+
+
+@pytest.mark.parametrize(
+    'backend',
+    ['bokeh', 'matplotlib', pytest.param('plotly', marks=plotly_unsupported)],
+    indirect=True,
+)
+def test_yformatter(df, backend):
+    plot = df.hvplot.scatter('x', 'y', yformatter='%.3f')
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['yformatter'] == '%.3f'
+
+
+def test_xformatter_bokeh_formatter(df):
+    formatter = NumeralTickFormatter(format='0.0%')
+    plot = df.hvplot.scatter('x', 'y', xformatter=formatter)
+    opts = Store.lookup_options('bokeh', plot, 'plot')
+    assert opts.kwargs['xformatter'] is formatter
+
+
+def test_xlabel(df, backend):
+    plot = df.hvplot.scatter('x', 'y', xlabel='Distance')
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['xlabel'] == 'Distance'
+
+
+def test_ylabel(df, backend):
+    plot = df.hvplot.scatter('x', 'y', ylabel='Height')
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['ylabel'] == 'Height'
+
+
+@pytest.mark.parametrize('ticks', [3, [1, 3], [(1, 'one'), (3, 'three')]])
+def test_xticks(df, backend, ticks):
+    plot = df.hvplot.scatter('x', 'y', xticks=ticks)
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['xticks'] == ticks
+
+
+@pytest.mark.parametrize('ticks', [3, [2, 4], [(2, 'two'), (4, 'four')]])
+def test_yticks(df, backend, ticks):
+    plot = df.hvplot.scatter('x', 'y', yticks=ticks)
+    opts = Store.lookup_options(backend, plot, 'plot')
+    assert opts.kwargs['yticks'] == ticks

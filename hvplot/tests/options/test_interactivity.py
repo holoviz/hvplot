@@ -43,6 +43,21 @@ def test_autohide_toolbar(cat_df):
     assert opts.kwargs['autohide_toolbar'] is True
 
 
+@pytest.mark.parametrize(
+    ('tools', 'expected'),
+    [
+        ([], ['hover']),
+        (['tap', 'box_select'], ['tap', 'box_select', 'hover']),
+        # The hover tool is not added twice.
+        (['hover', 'tap'], ['hover', 'tap']),
+    ],
+)
+def test_tools(cat_df, tools, expected):
+    plot = cat_df.hvplot.scatter('x', 'y', tools=tools)
+    opts = Store.lookup_options('bokeh', plot, 'plot')
+    assert opts.kwargs['tools'] == expected
+
+
 @pandas_and_dask
 @charts_2d
 def test_hover_cols_list_2d(tabular_lib, cat_df, kind, element):

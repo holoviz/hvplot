@@ -1,6 +1,7 @@
 import pandas as pd
 import pytest
-from holoviews import Store
+from holoviews import NdOverlay, Store
+from holoviews.element import Distribution
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
 
@@ -13,9 +14,54 @@ def df():
     )
 
 
-def test_kde_opts(df, backend):
-    plot = df.hvplot.kde('x', bandwidth=0.2, cut=1, filled=True)
-    opts = Store.lookup_options(backend, plot, 'plot')
-    assert opts.kwargs['bandwidth'] == 0.2
-    assert opts.kwargs['cut'] == 1
-    assert opts.kwargs['filled'] is True
+@pytest.mark.parametrize(
+    'tabular_lib',
+    [
+        'pandas',
+        'dask',
+        'polars',
+        'duckdb',
+        pytest.param(
+            'ibis',
+            marks=pytest.mark.xfail(strict=True, reason='BUG: kde on ibis requires x'),
+        ),
+    ],
+    indirect=True,
+)
+def test_y(df, tabular_lib):
+    plot = tabular_lib(df).hvplot.kde(y='y')
+    assert isinstance(plot, Distribution)
+    assert plot.kdims == ['y']
+    assert list(plot.dimension_values('y')) == [2, 4, 6]
+
+
+def test_y_list(df):
+    plot = df.hvplot.kde(y=['x', 'y'])
+    assert isinstance(plot, NdOverlay)
+    assert list(plot.keys()) == ['x', 'y']
+    assert list(plot['y'].dimension_values(0)) == [2, 4, 6]
+
+
+def test_bw_method_not_supported(df):
+    with pytest.raises(ValueError, match='hvplot does not support bw_method and ind'):
+        df.hvplot.kde(y='y', bw_method=1)
+
+
+def test_ind_not_supported(df):
+    with pytest.raises(ValueError, match='hvplot does not support bw_method and ind'):
+        df.hvplot.kde(y='y', ind=1)
+
+
+def test_bandwidth(df, backend):
+    plot = df.hvplot.kde('x', bandwidth=0.2)
+    assert Store.lookup_options(backend, plot, 'plot').kwargs['bandwidth'] == 0.2
+
+
+def test_cut(df, backend):
+    plot = df.hvplot.kde('x', cut=1)
+    assert Store.lookup_options(backend, plot, 'plot').kwargs['cut'] == 1
+
+
+def test_filled(df, backend):
+    plot = df.hvplot.kde('x', filled=False)
+    assert Store.lookup_options(backend, plot, 'plot').kwargs['filled'] is False

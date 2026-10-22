@@ -258,19 +258,6 @@ def test_aggregator_default_with_c_also_an_axis(df, operation):
 
 
 @requires('datashader')
-def test_cnorm_rasterize(df):
-    plot = df.hvplot(x='x', y='y', rasterize=True, cnorm='eq_hist')
-    opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
-    assert opts.get('cnorm') == 'eq_hist'
-
-
-@requires('datashader')
-def test_cnorm_datashade(df):
-    plot = df.hvplot(x='x', y='y', datashade=True, cnorm='eq_hist')
-    assert _operation(plot).p['cnorm'] == 'eq_hist'
-
-
-@requires('datashader')
 @operations
 def test_pixel_ratio(df, operation):
     plot = df.hvplot(x='x', y='y', pixel_ratio=0.5, **{operation: True})
@@ -278,22 +265,62 @@ def test_pixel_ratio(df, operation):
 
 
 @requires('datashader')
-def test_rescale_discrete_levels_rasterize(df):
-    plot = df.hvplot(x='x', y='y', rasterize=True, cnorm='eq_hist', rescale_discrete_levels=False)
-    opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
-    assert opts.get('rescale_discrete_levels') is False
+@operations
+def test_dynspread(df, operation):
+    from holoviews.operation.datashader import dynspread
+
+    plot = df.hvplot.points('x', 'y', dynspread=True, **{operation: True})
+    assert isinstance(_operation(plot), dynspread)
+    # The resampling operation is applied first, then spread.
+    resampled = plot.callback.inputs[0].callback.inputs[0]
+    assert type(resampled.callback.operation).__name__ == operation
 
 
 @requires('datashader')
-def test_rescale_discrete_levels_datashade(df):
-    plot = df.hvplot(x='x', y='y', datashade=True, cnorm='eq_hist', rescale_discrete_levels=False)
-    assert _operation(plot).p['rescale_discrete_levels'] is False
+@operations
+def test_dynspread_default_disabled(df, operation):
+    from holoviews.operation.datashader import dynspread
+
+    plot = df.hvplot.points('x', 'y', **{operation: True})
+    assert not isinstance(_operation(plot), dynspread)
 
 
 @requires('datashader')
-def test_rescale_discrete_levels_datashade_default_true(df):
-    plot = df.hvplot(x='x', y='y', datashade=True, cnorm='eq_hist')
-    assert _operation(plot).p['rescale_discrete_levels'] is True
+def test_max_px(df):
+    plot = df.hvplot.points('x', 'y', datashade=True, dynspread=True, max_px=5)
+    assert _operation(plot).p.max_px == 5
+
+
+@requires('datashader')
+def test_max_px_default(df):
+    plot = df.hvplot.points('x', 'y', datashade=True, dynspread=True)
+    assert _operation(plot).p.max_px == 3
+
+
+@requires('datashader')
+def test_threshold(df):
+    plot = df.hvplot.points('x', 'y', datashade=True, dynspread=True, threshold=0.8)
+    assert _operation(plot).p.threshold == 0.8
+
+
+@requires('datashader')
+def test_threshold_default(df):
+    plot = df.hvplot.points('x', 'y', datashade=True, dynspread=True)
+    assert _operation(plot).p.threshold == 0.5
+
+
+@requires('datashader')
+@operations
+def test_precompute(df, operation):
+    plot = df.hvplot.points('x', 'y', precompute=True, **{operation: True})
+    assert _operation(plot).p.precompute is True
+
+
+@requires('datashader')
+@operations
+def test_precompute_default_false(df, operation):
+    plot = df.hvplot.points('x', 'y', **{operation: True})
+    assert _operation(plot).p.precompute is False
 
 
 def test_resample_when_without_operation_error(df):
@@ -389,9 +416,15 @@ def test_rasterize_false_keeps_resolution(hvplot_xarray, da, kind):
 
 @requires('datashader')
 @pytest.mark.parametrize('kind', ['image', 'quadmesh'])
-def test_x_sampling_y_sampling(hvplot_xarray, da, kind):
-    plot = da.hvplot(kind=kind, dynamic=False, rasterize=True, x_sampling=5, y_sampling=2)
+def test_x_sampling(hvplot_xarray, da, kind):
+    plot = da.hvplot(kind=kind, dynamic=False, rasterize=True, x_sampling=5)
     assert all(plot.data.x.diff('x').round(0) == 5)
+
+
+@requires('datashader')
+@pytest.mark.parametrize('kind', ['image', 'quadmesh'])
+def test_y_sampling(hvplot_xarray, da, kind):
+    plot = da.hvplot(kind=kind, dynamic=False, rasterize=True, y_sampling=2)
     assert all(plot.data.y.diff('y').round(0) == 2)
 
 
@@ -418,3 +451,11 @@ def test_downsample_minmax(line_df):
     plot = line_df.hvplot.line(downsample='minmax')
     assert isinstance(plot.callback.operation, downsample1d)
     assert plot.callback.operation_kwargs['algorithm'] == 'minmax'
+
+
+@pytest.mark.parametrize('operation', ['rasterize', 'datashade'])
+def test_rasterize_datashade_without_datashader(block_import, hvplot_pandas, operation):
+    block_import('datashader', 'holoviews.operation.datashader')
+    df = pd.DataFrame({'x': [0, 1], 'y': [0, 1]})
+    with pytest.raises(ModuleNotFoundError, match='`datashader` package must be installed'):
+        df.hvplot.points('x', 'y', **{operation: True})

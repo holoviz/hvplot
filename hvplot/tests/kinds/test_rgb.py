@@ -60,3 +60,40 @@ def test_rgb_dataarray_groupby_infer():
     rgb = DA_RGB_BY_TIME.hvplot.rgb('x', 'y', bands='band')
     assert_element_equal(rgb[0], RGB(([0, 1], [0, 1], *DA_RGB_BY_TIME.values[0])))
     assert_element_equal(rgb[1], RGB(([0, 1], [0, 1], *DA_RGB_BY_TIME.values[1])))
+
+
+# Not square, to catch x and y being swapped.
+DA_LATLON = xr.DataArray(
+    np.arange(18).reshape((3, 2, 3)),
+    {'band': [1, 2, 3], 'lat': [0, 1], 'lon': [10, 20, 30]},
+    ['band', 'lat', 'lon'],
+)
+EXPECTED_LATLON = RGB(([10, 20, 30], [0, 1], *DA_LATLON.values), ['lon', 'lat'])
+
+
+def test_x(gridded_lib):
+    rgb = gridded_lib(DA_LATLON).hvplot.rgb(x='lon', y='lat')
+    assert_element_equal(rgb, EXPECTED_LATLON)
+
+
+@pytest.mark.xfail(strict=True, reason='BUG: rgb does not transpose the data when x/y are swapped')
+def test_x_swapped():
+    rgb = DA_LATLON.hvplot.rgb(x='lat', y='lon')
+    assert rgb.kdims == ['lat', 'lon']
+
+
+def test_y():
+    rgb = DA_LATLON.transpose('band', 'lon', 'lat').hvplot.rgb(x='lat', y='lon')
+    assert rgb.kdims == ['lat', 'lon']
+    assert list(rgb.dimension_values('lon', expanded=False)) == [10, 20, 30]
+
+
+def test_z():
+    ds = xr.Dataset({'zeros': DA_LATLON * 0, 'z': DA_LATLON})
+    rgb = ds.hvplot.rgb(z='z')
+    assert_element_equal(rgb, EXPECTED_LATLON)
+
+
+def test_bands():
+    rgb = DA_LATLON.transpose('lat', 'lon', 'band').hvplot.rgb(x='lon', y='lat', bands='band')
+    assert_element_equal(rgb, EXPECTED_LATLON)
