@@ -185,6 +185,9 @@ version-file = "hvplot/_version.py"
 [tool.pytest.ini_options]
 addopts = ["--strict-config", "--strict-markers", "--color=yes", "--pyargs"]
 python_files = "test*.py"
+minversion = "7"
+xfail_strict = "true"
+log_cli_level = "INFO"
 filterwarnings = [
     "error",
     # 2023-09: See https://github.com/matplotlib/matplotlib/issues/25244

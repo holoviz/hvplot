@@ -180,9 +180,6 @@ class TestDatashader:
         assert plot.callback.inputs[0].callback.operation.p.cmap == expected_cmap
         assert plot.callback.inputs[0].callback.operation.p.aggregator.column == cat_col
 
-    @pytest.mark.xfail(
-        reason='Assume this is fixed: https://github.com/holoviz/holoviews/issues/6187'
-    )
     def test_tidy_charts_categorically_rasterized_by(self):
         cat_col = 'category'
         plot = self.df.hvplot.scatter('x', 'y', by=cat_col, rasterize=True)
