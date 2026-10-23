@@ -42,7 +42,7 @@ jobs:
     name: pre-commit
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: holoviz-dev/holoviz_tasks/pre-commit@17107a157b32cc1bd2a09c71fbdbc74603efdb40 # v1
+      - uses: holoviz-dev/holoviz_tasks/pre-commit@17107a157b32cc1bd2a09c71fbdbc74603efdb40 # v1.0.15
         env:
           SKIP: pixi
 
@@ -136,7 +136,7 @@ jobs:
     permissions:
       pull-requests: write
     steps:
-      - uses: holoviz-dev/holoviz_tasks/pixi-diff@17107a157b32cc1bd2a09c71fbdbc74603efdb40 # v1
+      - uses: holoviz-dev/holoviz_tasks/pixi-diff@17107a157b32cc1bd2a09c71fbdbc74603efdb40 # v1.0.15
 
   unit_test_suite:
     name: unit:${{ matrix.environment }}:${{ matrix.os }}
@@ -151,7 +151,7 @@ jobs:
       ENV: ${{ matrix.environment }}
       MATRIX_OPTION: ${{ needs.setup.outputs.matrix_option }}
     steps:
-      - uses: holoviz-dev/holoviz_tasks/pixi-install@17107a157b32cc1bd2a09c71fbdbc74603efdb40 # v1
+      - uses: holoviz-dev/holoviz_tasks/pixi-install@17107a157b32cc1bd2a09c71fbdbc74603efdb40 # v1.0.15
         with:
           environments: ${{ matrix.environment }}
       - name: Update upstream packages
@@ -170,7 +170,7 @@ jobs:
           else
             pixi run -e "${ENV}" test-example
           fi
-      - uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6
+      - uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -188,7 +188,7 @@ jobs:
     env:
       ENV: ${{ matrix.environment }}
     steps:
-      - uses: holoviz-dev/holoviz_tasks/pixi-install@17107a157b32cc1bd2a09c71fbdbc74603efdb40 # v1
+      - uses: holoviz-dev/holoviz_tasks/pixi-install@17107a157b32cc1bd2a09c71fbdbc74603efdb40 # v1.0.15
         with:
           environments: ${{ matrix.environment }}
       - name: Update upstream packages
