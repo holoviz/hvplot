@@ -126,9 +126,11 @@ def check_crs(crs):
     elif isinstance(crs, crs_type):
         out = pyproj.Proj(crs.to_wkt(), preserve_units=True)
     elif isinstance(crs, dict) or isinstance(crs, str):
+        # Normalize spaces after colon (e.g. "EPSG: 4326" -> "EPSG:4326") for PROJ 9.8+
+        crs_normalized = crs.replace(': ', ':') if isinstance(crs, str) else crs
         if isinstance(crs, str):
             try:
-                crs = pyproj.CRS.from_wkt(crs)
+                crs = pyproj.CRS.from_wkt(crs_normalized)
             except RuntimeError:
                 # quick fix for https://github.com/pyproj4/pyproj/issues/345
                 crs = crs.replace(' ', '').replace('+', ' +')

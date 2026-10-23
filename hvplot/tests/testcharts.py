@@ -9,6 +9,8 @@ from packaging.version import Version
 
 from ..util import is_dask
 
+PANDAS_VERSION = Version(pd.__version__).release
+
 
 class TestChart2D:
     def setup_method(self):
@@ -559,9 +561,10 @@ class TestChart1D:
         assert len(time.unique()) == len(time)
 
     def test_time_df_with_groupby_as_derived_datetime(self):
-        plot = self.time_df.hvplot(groupby='time.dayofweek', dynamic=False)
+        var = 'time.day_of_week' if PANDAS_VERSION >= (3, 0, 0) else 'time.dayofweek'
+        plot = self.time_df.hvplot(groupby=var, dynamic=False)
         assert list(plot.keys()) == [0, 1, 2, 3, 4, 5, 6]
-        assert list(plot.dimensions()) == ['time.dayofweek', 'index', 'A']
+        assert list(plot.dimensions()) == [var, 'index', 'A']
 
     def test_time_df_with_by_as_derived_datetime(self):
         plot = self.time_df.hvplot(by='time.month', dynamic=False)

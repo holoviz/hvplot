@@ -273,7 +273,7 @@ def test_process_crs_pyproj_crs():
 def test_process_crs_pyproj_proj():
     pyproj = pytest.importorskip('pyproj')
     ccrs = pytest.importorskip('cartopy.crs')
-    crs = process_crs(pyproj.Proj(init='epsg:4326'))
+    crs = process_crs(pyproj.Proj('epsg:4326'))
     assert isinstance(crs, ccrs.PlateCarree)
 
 

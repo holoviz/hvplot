@@ -186,6 +186,7 @@ version-file = "hvplot/_version.py"
 addopts = ["--strict-config", "--strict-markers", "--color=yes", "--pyargs"]
 python_files = "test*.py"
 filterwarnings = [
+    "error",
     # 2023-09: See https://github.com/matplotlib/matplotlib/issues/25244
     "ignore:Deprecated call to `pkg_resources.+?'mpl_toolkits:DeprecationWarning",
     "ignore:Deprecated call to `pkg_resources.+?'sphinxcontrib:DeprecationWarning",
@@ -201,6 +202,9 @@ filterwarnings = [
     "ignore:pkg_resources is deprecated as an API:UserWarning:fugue_sql_antlr.parser",
     # 2025-12
     "ignore:The 'shapely.geos' module is deprecated:DeprecationWarning:geopandas._compat",
+    # 2026-10
+    "ignore:Use `@` matmul instead of `\\*` mul:Warning:rioxarray", # https://github.com/corteva/rioxarray/issues/937
+    "ignore:numpy.ndarray size changed, may indicate binary incompatibility:RuntimeWarning", # https://github.com/pydata/xarray/issues/7259
 ]
 
 [tool.codespell]

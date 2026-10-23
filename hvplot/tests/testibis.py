@@ -15,6 +15,7 @@ except ImportError:
     pytest.skip(allow_module_level=True)
 
 
+@pytest.mark.filterwarnings("ignore:The 'future.infer_string' option is deprecated")
 def test_ibis_hist():
     import duckdb
 

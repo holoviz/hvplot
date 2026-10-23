@@ -29,8 +29,7 @@ class TestGridPlots:
 
         self.xarr_with_attrs = xr.DataArray(
             np.random.rand(10, 10),
-            coords=[('x', range(10)), ('y', range(10))],
-            dims=['y', 'x'],
+            coords=[('y', range(10)), ('x', range(10))],
             attrs={'long_name': 'luminosity', 'units': 'lm'},
         )
         self.xarr_with_attrs.x.attrs['long_name'] = 'Declination'
