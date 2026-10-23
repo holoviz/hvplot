@@ -210,8 +210,9 @@ class TestChart1D:
         'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
     )
     def test_wide_chart_auto_group_label(self, kind, element):
-        self.df.columns.name = 'My Name'
-        assert self.df.hvplot().kdims == ['My Name']
+        df = self.df.copy()
+        df.columns.name = 'My Name'
+        assert df.hvplot().kdims == ['My Name']
 
     @pytest.mark.parametrize(
         'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
