@@ -24,11 +24,11 @@ class TestScatterMatrix:
         assert isinstance(sm, GridMatrix)
 
     def test_wrong_diagonal(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match='diagonal type must be one of'):
             scatter_matrix(self.df, diagonal='wrong')
 
     def test_wrong_chart(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match='Chart type must be one of'):
             scatter_matrix(self.df, chart='wrong')
 
     def test_diagonal_default(self):
@@ -89,15 +89,15 @@ class TestDatashader:
         self.df = pd.DataFrame(np.random.randn(1000, 3), columns=['a', 'b', 'c'])
 
     def test_rasterize_datashade_mutually_exclusive(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match='Choose to either rasterize or datashade'):
             scatter_matrix(self.df, rasterize=True, datashade=True)
 
     def test_spread_but_no_rasterize_or_datashade(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match='dynspread or spread need'):
             scatter_matrix(self.df, dynspread=True)
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match='dynspread or spread need'):
             scatter_matrix(self.df, spread=True)
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match='dynspread or spread need'):
             scatter_matrix(self.df, dynspread=True, spread=True)
 
     @pytest.mark.parametrize('operation', ['rasterize', 'datashade'])

@@ -27,37 +27,37 @@ class TestChart2D:
             }
         )
 
-    @pytest.mark.parametrize('kind,element', [('points', Points), ('paths', Path)])
+    @pytest.mark.parametrize(('kind', 'element'), [('points', Points), ('paths', Path)])
     def test_2d_defaults(self, kind, element):
         plot = self.df.hvplot(kind=kind)
         assert_element_equal(plot, element(self.df, ['x', 'y']))
 
-    @pytest.mark.parametrize('kind,element', [('points', Points), ('paths', Path)])
+    @pytest.mark.parametrize(('kind', 'element'), [('points', Points), ('paths', Path)])
     def test_2d_chart(self, kind, element):
         plot = self.df.hvplot(x='x', y='y', kind=kind)
         assert_element_equal(plot, element(self.df, ['x', 'y']))
 
-    @pytest.mark.parametrize('kind,element', [('points', Points), ('paths', Path)])
+    @pytest.mark.parametrize(('kind', 'element'), [('points', Points), ('paths', Path)])
     def test_2d_index_and_c(self, kind, element):
         plot = self.df.hvplot(x='index', y='y', c='x', kind=kind)
         assert_element_equal(plot, element(self.df, ['index', 'y'], ['x']))
 
-    @pytest.mark.parametrize('kind,element', [('points', Points), ('paths', Path)])
+    @pytest.mark.parametrize(('kind', 'element'), [('points', Points), ('paths', Path)])
     def test_2d_set_hover_cols_to_list(self, kind, element):
         plot = self.cat_df.hvplot(x='x', y='y', hover_cols=['category'], kind=kind)
         assert_element_equal(plot, element(self.cat_df, ['x', 'y'], ['category']))
 
-    @pytest.mark.parametrize('kind,element', [('points', Points), ('paths', Path)])
+    @pytest.mark.parametrize(('kind', 'element'), [('points', Points), ('paths', Path)])
     def test_2d_set_hover_cols_including_index(self, kind, element):
         plot = self.cat_df.hvplot(x='x', y='y', hover_cols=['index'], kind=kind)
         assert_element_equal(plot, element(self.cat_df, ['x', 'y'], ['index']))
 
-    @pytest.mark.parametrize('kind,element', [('points', Points), ('paths', Path)])
+    @pytest.mark.parametrize(('kind', 'element'), [('points', Points), ('paths', Path)])
     def test_2d_set_hover_cols_to_all(self, kind, element):
         plot = self.cat_df.hvplot(x='x', y='y', hover_cols='all', kind=kind)
         assert_element_equal(plot, element(self.cat_df, ['x', 'y'], ['index', 'category']))
 
-    @pytest.mark.parametrize('kind,element', [('points', Points), ('paths', Path)])
+    @pytest.mark.parametrize(('kind', 'element'), [('points', Points), ('paths', Path)])
     def test_2d_set_hover_cols_to_all_with_use_index_as_false(self, kind, element):
         plot = self.cat_df.hvplot(x='x', y='y', hover_cols='all', use_index=False, kind=kind)
         assert_element_equal(plot, element(self.cat_df, ['x', 'y'], ['category']))
@@ -99,14 +99,14 @@ class TestChart2DDask(TestChart2D):
     def test_heatmap_2d_index_columns(self):
         self.df.hvplot.heatmap()
 
-    @pytest.mark.parametrize('kind,element', [('points', Points), ('paths', Path)])
+    @pytest.mark.parametrize(('kind', 'element'), [('points', Points), ('paths', Path)])
     def test_2d_set_hover_cols_including_index(self, kind, element):
         plot = self.cat_df.hvplot(x='x', y='y', hover_cols=['index'], kind=kind)
         data = plot.data[0] if kind == 'paths' else plot.data
         assert 'index' in data.columns
         assert_element_equal(plot, element(self.cat_df.reset_index(), ['x', 'y'], ['index']))
 
-    @pytest.mark.parametrize('kind,element', [('points', Points), ('paths', Path)])
+    @pytest.mark.parametrize(('kind', 'element'), [('points', Points), ('paths', Path)])
     def test_2d_set_hover_cols_to_all(self, kind, element):
         plot = self.cat_df.hvplot(x='x', y='y', hover_cols='all', kind=kind)
         data = plot.data[0] if kind == 'paths' else plot.data
@@ -160,7 +160,7 @@ class TestChart1D:
         return self.cat_df['y'] / 10
 
     @pytest.mark.parametrize(
-        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+        ('kind', 'element'), [('line', Curve), ('area', Area), ('scatter', Scatter)]
     )
     def test_wide_chart(self, kind, element):
         plot = self.df.hvplot(kind=kind)
@@ -185,7 +185,7 @@ class TestChart1D:
         assert_element_equal(plot, obj)
 
     @pytest.mark.parametrize(
-        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+        ('kind', 'element'), [('line', Curve), ('area', Area), ('scatter', Scatter)]
     )
     def test_wide_chart_labels(self, kind, element):
         plot = self.df.hvplot(kind=kind, value_label='Test', group_label='Category')
@@ -199,7 +199,7 @@ class TestChart1D:
         assert_element_equal(plot, obj)
 
     @pytest.mark.parametrize(
-        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+        ('kind', 'element'), [('line', Curve), ('area', Area), ('scatter', Scatter)]
     )
     def test_wide_chart_legend_position(self, kind, element):
         plot = self.df.hvplot(kind=kind, value_label='Test', group_label='Category', legend='left')
@@ -207,7 +207,7 @@ class TestChart1D:
         assert opts.kwargs['legend_position'] == 'left'
 
     @pytest.mark.parametrize(
-        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+        ('kind', 'element'), [('line', Curve), ('area', Area), ('scatter', Scatter)]
     )
     def test_wide_chart_auto_group_label(self, kind, element):
         df = self.df.copy()
@@ -215,21 +215,21 @@ class TestChart1D:
         assert df.hvplot().kdims == ['My Name']
 
     @pytest.mark.parametrize(
-        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+        ('kind', 'element'), [('line', Curve), ('area', Area), ('scatter', Scatter)]
     )
     def test_tidy_chart(self, kind, element):
         plot = self.df.hvplot(x='x', y='y', kind=kind)
         assert_element_equal(plot, element(self.df, 'x', 'y'))
 
     @pytest.mark.parametrize(
-        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+        ('kind', 'element'), [('line', Curve), ('area', Area), ('scatter', Scatter)]
     )
     def test_tidy_chart_index(self, kind, element):
         plot = self.df.hvplot(x='index', y='y', kind=kind)
         assert_element_equal(plot, element(self.df, 'index', 'y'))
 
     @pytest.mark.parametrize(
-        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+        ('kind', 'element'), [('line', Curve), ('area', Area), ('scatter', Scatter)]
     )
     def test_tidy_chart_index_by(self, kind, element):
         dask = pytest.importorskip('dask')
@@ -250,7 +250,7 @@ class TestChart1D:
         assert_element_equal(plot, obj)
 
     @pytest.mark.parametrize(
-        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+        ('kind', 'element'), [('line', Curve), ('area', Area), ('scatter', Scatter)]
     )
     def test_tidy_chart_index_by_legend_position(self, kind, element):
         plot = self.df.hvplot(x='index', y='y', by='x', kind=kind, legend='left')
@@ -258,7 +258,7 @@ class TestChart1D:
         assert opts.kwargs['legend_position'] == 'left'
 
     @pytest.mark.parametrize(
-        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+        ('kind', 'element'), [('line', Curve), ('area', Area), ('scatter', Scatter)]
     )
     def test_use_index_disabled_uses_first_cols(self, kind, element):
         plot = self.df.hvplot(use_index=False, kind=kind)
@@ -266,7 +266,7 @@ class TestChart1D:
         assert plot.vdims == ['y']
 
     @pytest.mark.parametrize(
-        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+        ('kind', 'element'), [('line', Curve), ('area', Area), ('scatter', Scatter)]
     )
     def test_tidy_chart_ranges(self, kind, element):
         plot = self.df.hvplot(x='x', y='y', kind=kind, xlim=(0, 3), ylim=(5, 10))
@@ -275,7 +275,7 @@ class TestChart1D:
         assert opts['ylim'] == (5, 10)
 
     @pytest.mark.parametrize(
-        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+        ('kind', 'element'), [('line', Curve), ('area', Area), ('scatter', Scatter)]
     )
     def test_wide_chart_ranges(self, kind, element):
         plot = self.df.hvplot(kind=kind, xlim=(0, 3), ylim=(5, 10))
@@ -284,14 +284,14 @@ class TestChart1D:
         assert opts['ylim'] == (5, 10)
 
     @pytest.mark.parametrize(
-        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+        ('kind', 'element'), [('line', Curve), ('area', Area), ('scatter', Scatter)]
     )
     def test_tidy_chart_with_hover_cols(self, kind, element):
         plot = self.cat_df.hvplot(x='x', y='y', kind=kind, hover_cols=['category'])
         assert_element_equal(plot, element(self.cat_df, 'x', ['y', 'category']))
 
     @pytest.mark.parametrize(
-        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+        ('kind', 'element'), [('line', Curve), ('area', Area), ('scatter', Scatter)]
     )
     def test_tidy_chart_with_index_in_hover_cols(self, kind, element):
         plot = self.df.hvplot(x='x', y='y', kind=kind, hover_cols=['index'])
@@ -299,7 +299,7 @@ class TestChart1D:
         assert_element_equal(plot, element(altered_df, 'x', ['y', 'index']))
 
     @pytest.mark.parametrize(
-        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+        ('kind', 'element'), [('line', Curve), ('area', Area), ('scatter', Scatter)]
     )
     def test_tidy_chart_with_hover_cols_as_all(self, kind, element):
         plot = self.cat_df.hvplot(x='x', y='y', kind=kind, hover_cols='all')
@@ -307,7 +307,7 @@ class TestChart1D:
         assert_element_equal(plot, element(altered_df, 'x', ['y', 'index', 'category']))
 
     @pytest.mark.parametrize(
-        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+        ('kind', 'element'), [('line', Curve), ('area', Area), ('scatter', Scatter)]
     )
     def test_tidy_chart_with_hover_cols_as_all_with_use_index_as_false(self, kind, element):
         plot = self.cat_df.hvplot(x='x', y='y', kind=kind, hover_cols='all', use_index=False)
@@ -469,7 +469,7 @@ class TestChart1D:
         assert opts.kwargs['color'].dimension.name == 'red'
 
     @pytest.mark.parametrize(
-        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+        ('kind', 'element'), [('line', Curve), ('area', Area), ('scatter', Scatter)]
     )
     def test_only_includes_num_chart(self, kind, element):
         plot = self.cat_df.hvplot(kind=kind)
@@ -483,7 +483,7 @@ class TestChart1D:
         assert_element_equal(plot, obj)
 
     @pytest.mark.parametrize(
-        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+        ('kind', 'element'), [('line', Curve), ('area', Area), ('scatter', Scatter)]
     )
     def test_includes_str_if_no_num_chart(self, kind, element):
         plot = self.cat_only_df.hvplot(kind=kind)

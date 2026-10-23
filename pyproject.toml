@@ -236,7 +236,7 @@ select = [
     "PLE",  # pylint error
     "PLR",  # pylint refactor
     "PLW",  # pylint warning
-    # "PT",  # flake8-pytest-style
+    "PT",  # flake8-pytest-style
     "RUF",  # ruff
     # "SIM",  # flake8-simplify
     # "TC",  # flake8-type-checking

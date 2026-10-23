@@ -28,7 +28,7 @@ def parse_docstring_for_param_names(section_title):
 
 
 @pytest.mark.parametrize(
-    'section, options',
+    ('section', 'options'),
     [(k, v) for k, v in HoloViewsConverter._options_groups.items()],
 )
 def test_docstring_converter_options_match_per_section(section, options):

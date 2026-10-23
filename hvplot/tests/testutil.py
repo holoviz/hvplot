@@ -284,7 +284,6 @@ def test_process_crs_pyproj_proj():
         4326,
         'epsg:4326',
         'EPSG: 4326',
-        'epsg:4326',
         # Created with pyproj.CRS("EPSG:4326").to_wkt()
         'GEOGCRS["WGS 84",ENSEMBLE["World Geodetic System 1984 ensemble",MEMBER["World Geodetic System 1984 (Transit)"],MEMBER["World Geodetic System 1984 (G730)"],MEMBER["World Geodetic System 1984 (G873)"],MEMBER["World Geodetic System 1984 (G1150)"],MEMBER["World Geodetic System 1984 (G1674)"],MEMBER["World Geodetic System 1984 (G1762)"],MEMBER["World Geodetic System 1984 (G2139)"],ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[2.0]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],CS[ellipsoidal,2],AXIS["geodetic latitude (Lat)",north,ORDER[1],ANGLEUNIT["degree",0.0174532925199433]],AXIS["geodetic longitude (Lon)",east,ORDER[2],ANGLEUNIT["degree",0.0174532925199433]],USAGE[SCOPE["Horizontal component of 3D system."],AREA["World."],BBOX[-90,-180,90,180]],ID["EPSG",4326]]',  # noqa: E501
     ],
@@ -304,7 +303,6 @@ def test_process_crs_platecarree(input):
         3857,
         'epsg:3857',
         'EPSG: 3857',
-        'epsg:3857',
         'PROJCS["WGS 84 / Pseudo-Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Mercator_1SP"],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],EXTENSION["PROJ4","+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs"],AUTHORITY["EPSG","3857"]]',  # noqa: E501
         # Created with pyproj.CRS("EPSG:3857").to_wkt()
         'PROJCRS["WGS 84 / Pseudo-Mercator",BASEGEOGCRS["WGS 84",ENSEMBLE["World Geodetic System 1984 ensemble",MEMBER["World Geodetic System 1984 (Transit)"],MEMBER["World Geodetic System 1984 (G730)"],MEMBER["World Geodetic System 1984 (G873)"],MEMBER["World Geodetic System 1984 (G1150)"],MEMBER["World Geodetic System 1984 (G1674)"],MEMBER["World Geodetic System 1984 (G1762)"],MEMBER["World Geodetic System 1984 (G2139)"],ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[2.0]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["Popular Visualisation Pseudo-Mercator",METHOD["Popular Visualisation Pseudo Mercator",ID["EPSG",1024]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["False easting",0,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["easting (X)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["northing (Y)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["Web mapping and visualisation."],AREA["World between 85.06°S and 85.06°N."],BBOX[-85.06,-180,85.06,180]],ID["EPSG",3857]]',  # noqa: E501
@@ -346,7 +344,7 @@ def test_is_list_like():
     assert is_list_like(np.array(['a', 'b']))
 
 
-@pytest.mark.parametrize('name,uname', [('a', 'a'), ('b', 'b_'), ('c_', 'c__')])
+@pytest.mark.parametrize(('name', 'uname'), [('a', 'a'), ('b', 'b_'), ('c_', 'c__')])
 def test_generate_unique_name(name, uname):
     assert _generate_unique_name(name, ['b', 'c_']) == uname
 
@@ -504,7 +502,8 @@ class TestConvertLatlonToMercator:
         lon = np.array([-180, 0, 180])
         lat = np.array([-45, 0, 45])
         easting, northing = _convert_latlon_to_mercator(lon, lat)
-        assert len(easting) == 3 and len(northing) == 3
+        assert len(easting) == 3
+        assert len(northing) == 3
 
     def test_lon_normalization_180(self):
         """Normalize 180 and -180 to same value."""
@@ -525,7 +524,8 @@ class TestConvertLatlonToMercator:
     def test_returns_tuple(self):
         """Return tuple of easting and northing arrays."""
         result = _convert_latlon_to_mercator(np.array([0, 45, 90]), np.array([0, 30, 60]))
-        assert isinstance(result, tuple) and len(result) == 2
+        assert isinstance(result, tuple)
+        assert len(result) == 2
 
 
 class TestConvertLimitToMercator:
@@ -539,12 +539,16 @@ class TestConvertLimitToMercator:
     def test_valid_x_limits(self):
         """Convert valid x-axis (longitude) limits."""
         result = _convert_limit_to_mercator((-90, 90), is_x_axis=True)
-        assert result is not None and isinstance(result, tuple) and len(result) == 2
+        assert result is not None
+        assert isinstance(result, tuple)
+        assert len(result) == 2
 
     def test_valid_y_limits(self):
         """Convert valid y-axis (latitude) limits."""
         result = _convert_limit_to_mercator((-45, 45), is_x_axis=False)
-        assert result is not None and isinstance(result, tuple) and len(result) == 2
+        assert result is not None
+        assert isinstance(result, tuple)
+        assert len(result) == 2
 
     def test_out_of_range_x_limits(self):
         """Return original limits when x bounds out of range."""
@@ -604,13 +608,15 @@ class TestConvertLimitToMercator:
         """Ensure Mercator conversion changes y-axis limit values."""
         original = (-45, 45)
         result = _convert_limit_to_mercator(original, is_x_axis=False)
-        assert result != original and result[0] != original[0]
+        assert result != original
+        assert result[0] != original[0]
 
     def test_mercator_x_conversion_changes_values(self):
         """Ensure Mercator conversion changes x-axis limit values."""
         original = (-90, 90)
         result = _convert_limit_to_mercator(original, is_x_axis=True)
-        assert result != original and result[0] != original[0]
+        assert result != original
+        assert result[0] != original[0]
 
     @pytest.mark.parametrize('bounds', [(0, 90), (190, 250), (170, -170), (350, 10)])
     def test_converted_x_limits_ordered(self, bounds):

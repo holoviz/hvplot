@@ -1007,7 +1007,6 @@ def test_interactive_pandas_series_operator_unary_invert():  # __invert__
         '>',  # __gt__
         '<=',  # __le__
         '<',  # __lt__
-        '<',  # __lt__
         # '<<',  # __lshift__
         '%',  # __mod__
         '*',  # __mul__
@@ -1016,7 +1015,6 @@ def test_interactive_pandas_series_operator_unary_invert():  # __invert__
         # '>>',  # __rshift__
         '**',  # __pow__
         '-',  # __sub__
-        '/',  # __truediv__
     ],
 )
 def test_interactive_pandas_series_operator_binary(series, op):
@@ -1052,7 +1050,6 @@ def test_interactive_pandas_series_operator_binary(series, op):
         '**',  # __rpow__
         # '>>',  # __rshift__
         '-',  # __rsub__
-        '/',  # __rtruediv__
     ],
 )
 def test_interactive_pandas_series_operator_reverse_binary(op):

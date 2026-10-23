@@ -33,7 +33,7 @@ def test_plotting_plot_duckdb():
 
 def test_converter_argument_hover_formatters():
     df = pd.DataFrame({'x': [0, 1], 'y': [0, 1]})
-    with pytest.warns(DeprecationWarning):
+    with pytest.warns(DeprecationWarning, match='hover_formatters has been deprecated'):
         HoloViewsConverter(df, 'x', 'y', hover_formatters={'@{y}': 'printf'})
 
 
@@ -41,12 +41,9 @@ def test_streamz_patch():
     pytest.importorskip('streamz')
     if _HV_VERSION >= (1, 23, 0):
         pytest.skip('streamz support has been removed in HoloViews >= 1.23.0')
-    with pytest.warns(
-        FutureWarning,
-        match='streamz support has been deprecated',
-    ):
-        from hvplot.streamz import patch
+    from hvplot.streamz import patch
 
+    with pytest.warns(FutureWarning, match='streamz support has been deprecated'):
         patch()
 
 

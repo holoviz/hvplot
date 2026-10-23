@@ -293,7 +293,7 @@ class TestDatashader:
         assert isinstance(scatter, Scatter)
         assert len(scatter.data) == 0
 
-    @pytest.mark.parametrize('kind,eltype', [('points', Points), ('scatter', Scatter)])
+    @pytest.mark.parametrize(('kind', 'eltype'), [('points', Points), ('scatter', Scatter)])
     def test_downsample_resample_when(self, kind, eltype):
         df = pd.DataFrame(
             np.random.multivariate_normal((0, 0), [[0.1, 0.1], [0.1, 1.0]], (5000,))
@@ -369,13 +369,13 @@ class TestChart2D:
         y = np.arange(6)
         self.da = xr.DataArray(data, coords={'y': y, 'x': x}, dims=('y', 'x'))
 
-    @pytest.mark.parametrize('kind,element', [('image', Image), ('quadmesh', QuadMesh)])
+    @pytest.mark.parametrize(('kind', 'element'), [('image', Image), ('quadmesh', QuadMesh)])
     def test_plot_resolution(self, kind, element):
         plot = self.da.hvplot(kind=kind)
         assert all(plot.data.x.diff('x').round(0) == 1)
         assert all(plot.data.y.diff('y').round(0) == 1)
 
-    @pytest.mark.parametrize('kind,element', [('image', Image), ('quadmesh', QuadMesh)])
+    @pytest.mark.parametrize(('kind', 'element'), [('image', Image), ('quadmesh', QuadMesh)])
     def test_plot_resolution_with_rasterize(self, kind, element):
         plot = self.da.hvplot(kind=kind, dynamic=False, rasterize=True, x_sampling=5, y_sampling=2)
         assert all(plot.data.x.diff('x').round(0) == 5)

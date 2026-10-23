@@ -40,21 +40,21 @@ def plotting_backend(request):
         pd.options.plotting.backend = initial_backend
 
 
-@pytest.mark.parametrize('kind,el', no_args_mapping)
+@pytest.mark.parametrize(('kind', 'el'), no_args_mapping)
 def test_pandas_series_plot_returns_holoviews_object(plotting_backend, kind, el):
     series = pd.Series([0, 1, 2])
     plot = getattr(series.plot, kind)()
     assert isinstance(plot, el)
 
 
-@pytest.mark.parametrize('kind,el', no_args_mapping)
+@pytest.mark.parametrize(('kind', 'el'), no_args_mapping)
 def test_pandas_dataframe_plot_returns_holoviews_object(plotting_backend, kind, el):
     df = pd.DataFrame([0, 1, 2])
     plot = getattr(df.plot, kind)()
     assert isinstance(plot, el)
 
 
-@pytest.mark.parametrize('kind,el', x_y_mapping)
+@pytest.mark.parametrize(('kind', 'el'), x_y_mapping)
 def test_pandas_dataframe_plot_returns_holoviews_object_when_x_and_y_set(
     plotting_backend, kind, el
 ):
@@ -69,14 +69,14 @@ def test_pandas_dataframe_plot_does_not_implement_pie(plotting_backend):
         df.plot.pie(y='a')
 
 
-@pytest.mark.parametrize('kind,el', series_specials)
+@pytest.mark.parametrize(('kind', 'el'), series_specials)
 def test_pandas_series_specials_plot_return_holoviews_object(plotting_backend, kind, el):
     series = pd.Series([0, 1, 2])
     plot = getattr(series, kind)()
     assert isinstance(plot, el)
 
 
-@pytest.mark.parametrize('kind,el', frame_specials)
+@pytest.mark.parametrize(('kind', 'el'), frame_specials)
 def test_pandas_frame_specials_plot_return_holoviews_object(plotting_backend, kind, el):
     df = pd.DataFrame([0, 1, 2])
     plot = getattr(df, kind)()
@@ -84,7 +84,7 @@ def test_pandas_frame_specials_plot_return_holoviews_object(plotting_backend, ki
 
 
 @pytest.mark.parametrize('backend', ['holoviews', 'hvplot'])
-@pytest.mark.parametrize('kind,el', no_args_mapping)
+@pytest.mark.parametrize(('kind', 'el'), no_args_mapping)
 def test_pandas_series_plot_explicit_returns_holoviews_object(backend, kind, el):
     series = pd.Series([0, 1, 2])
     plot = getattr(series.plot, kind)(backend=backend)
@@ -92,7 +92,7 @@ def test_pandas_series_plot_explicit_returns_holoviews_object(backend, kind, el)
 
 
 @pytest.mark.parametrize('backend', ['holoviews', 'hvplot'])
-@pytest.mark.parametrize('kind,el', no_args_mapping)
+@pytest.mark.parametrize(('kind', 'el'), no_args_mapping)
 def test_pandas_dataframe_plot_explicit_returns_holoviews_object(backend, kind, el):
     df = pd.DataFrame([0, 1, 2])
     plot = getattr(df.plot, kind)(backend=backend)
@@ -100,7 +100,7 @@ def test_pandas_dataframe_plot_explicit_returns_holoviews_object(backend, kind, 
 
 
 @pytest.mark.parametrize('backend', ['holoviews', 'hvplot'])
-@pytest.mark.parametrize('kind,el', x_y_mapping)
+@pytest.mark.parametrize(('kind', 'el'), x_y_mapping)
 def test_pandas_dataframe_plot_explicit_returns_holoviews_object_when_x_and_y_set(
     backend, kind, el
 ):
@@ -117,7 +117,7 @@ def test_pandas_dataframe_plot_explicit_does_not_implement_pie(backend):
 
 
 @pytest.mark.parametrize('backend', ['holoviews', 'hvplot'])
-@pytest.mark.parametrize('kind,el', series_specials)
+@pytest.mark.parametrize(('kind', 'el'), series_specials)
 def test_pandas_series_specials_plot_explicit_return_holoviews_object(backend, kind, el):
     series = pd.Series([0, 1, 2])
     plot = getattr(series, kind)(backend=backend)
@@ -125,7 +125,7 @@ def test_pandas_series_specials_plot_explicit_return_holoviews_object(backend, k
 
 
 @pytest.mark.parametrize('backend', ['holoviews', 'hvplot'])
-@pytest.mark.parametrize('kind,el', frame_specials)
+@pytest.mark.parametrize(('kind', 'el'), frame_specials)
 def test_pandas_frame_specials_plot_explicit_return_holoviews_object(backend, kind, el):
     df = pd.DataFrame([0, 1, 2])
     plot = getattr(df, kind)(backend=backend)

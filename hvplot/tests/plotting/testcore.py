@@ -37,14 +37,14 @@ series_kinds = pytest.mark.parametrize('kind', sorted(SERIES_TYPES))
 
 y_combinations = pytest.mark.parametrize(
     'y',
-    (
+    [
         ['A', 'B', 'C', 'D'],
         ('A', 'B', 'C', 'D'),
         {'A', 'B', 'C', 'D'},
         np.array(['A', 'B', 'C', 'D']),
         pd.Index(['A', 'B', 'C', 'D']),
         pd.Series(['A', 'B', 'C', 'D']),
-    ),
+    ],
     ids=lambda x: type(x).__name__,
 )
 
@@ -80,7 +80,7 @@ def test_series_dask(kind):
 
 
 @pytest.mark.skipif(skip_polar, reason='polars not installed')
-@pytest.mark.parametrize('cast', (pl.DataFrame, pl.LazyFrame))
+@pytest.mark.parametrize('cast', [pl.DataFrame, pl.LazyFrame])
 @frame_kinds
 @y_combinations
 def test_dataframe_polars(kind, y, cast):
