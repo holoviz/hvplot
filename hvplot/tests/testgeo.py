@@ -4,7 +4,6 @@ These tests depends on GeoViews.
 
 import pathlib
 import sys
-from unittest import SkipTest, TestCase
 
 import holoviews as hv
 import numpy as np
@@ -21,10 +20,10 @@ def simple_df():
     return pd.DataFrame(np.random.rand(10, 2), columns=['x', 'y'])
 
 
-class TestGeo(TestCase):
-    def setUp(self):
+class TestGeo:
+    def setup_method(self):
         if sys.platform == 'win32':
-            raise SkipTest('Skip geo tests on windows for now')
+            pytest.skip('Skip geo tests on windows for now')
         try:
             import cartopy.crs as ccrs  # noqa: F401
             import geoviews  # noqa: F401
@@ -33,9 +32,7 @@ class TestGeo(TestCase):
             import rioxarray as rxr
             import xarray as xr  # noqa: F401
         except ImportError:
-            raise SkipTest(
-                'xarray, rasterio, geoviews, cartopy, pyproj or rioxarray not available'
-            )
+            pytest.skip('xarray, rasterio, geoviews, cartopy, pyproj or rioxarray not available')
         import hvplot.pandas
         import hvplot.xarray  # noqa: F401
 
@@ -45,7 +42,7 @@ class TestGeo(TestCase):
         # UTM zone 18N
         self.crs = proj_to_cartopy(self.da.spatial_ref.attrs['crs_wkt'])
 
-    def assertCRS(self, plot, proj=None):
+    def assert_crs(self, plot, proj=None):
         import cartopy
 
         if proj is None:
@@ -59,34 +56,34 @@ class TestGeo(TestCase):
 
 
 class TestCRSInference(TestGeo):
-    def setUp(self):
+    def setup_method(self):
         if sys.platform == 'win32':
-            raise SkipTest('Skip CRS inference on Windows')
-        super().setUp()
+            pytest.skip('Skip CRS inference on Windows')
+        super().setup_method()
 
     def test_plot_with_crs_as_proj_string(self):
         da = self.da.copy()
         da.rio._crs = False  # To not treat it as a rioxarray
 
         plot = self.da.hvplot.image('x', 'y', crs='epsg:32618')
-        self.assertCRS(plot)
+        self.assert_crs(plot)
 
     def test_plot_with_geo_as_true_crs_undefined(self):
         plot = self.da.hvplot.image('x', 'y', geo=True)
-        self.assertCRS(plot)
+        self.assert_crs(plot)
 
 
 class TestProjections(TestGeo):
     def test_plot_with_crs_as_object(self):
         plot = self.da.hvplot.image('x', 'y', crs=self.crs)
-        self.assertCRS(plot)
+        self.assert_crs(plot)
 
     def test_plot_with_crs_as_attr_str(self):
         da = self.da.copy()
         da.rio._crs = False  # To not treat it as a rioxarray
         da.attrs = {'bar': self.crs}
         plot = da.hvplot.image('x', 'y', crs='bar')
-        self.assertCRS(plot)
+        self.assert_crs(plot)
 
     def test_plot_with_crs_as_pyproj_Proj(self):
         import pyproj
@@ -94,7 +91,7 @@ class TestProjections(TestGeo):
         da = self.da.copy()
         da.rio._crs = False  # To not treat it as a rioxarray
         plot = da.hvplot.image('x', 'y', crs=pyproj.Proj(self.crs))
-        self.assertCRS(plot)
+        self.assert_crs(plot)
 
     def test_plot_with_crs_as_nonexistent_attr_str(self):
         da = self.da.copy()
@@ -103,7 +100,7 @@ class TestProjections(TestGeo):
         # Used to test crs='foo' but this is parsed under-the-hood
         # by PROJ (projinfo) which matches a geographic projection named
         # 'Amersfoort'
-        with self.assertRaisesRegex(ValueError, "'name_of_some_invalid_projection' must be"):
+        with pytest.raises(ValueError, match="'name_of_some_invalid_projection' must be"):
             da.hvplot.image('x', 'y', crs='name_of_some_invalid_projection')
 
     def test_plot_with_geo_as_true_crs_no_crs_on_data_returns_default(self):
@@ -113,7 +110,7 @@ class TestProjections(TestGeo):
         da.rio._crs = False  # To not treat it as a rioxarray
         da.attrs = {'bar': self.crs}
         plot = da.hvplot.image('x', 'y', geo=True)
-        self.assertCRS(plot, ccrs.PlateCarree())
+        self.assert_crs(plot, ccrs.PlateCarree())
 
     def test_plot_with_projection_as_string(self):
         da = self.da.copy()
@@ -126,12 +123,12 @@ class TestProjections(TestGeo):
         self.assert_projection(plot, 'merc')
 
     def test_plot_with_projection_as_invalid_string(self):
-        with self.assertRaisesRegex(ValueError, 'Projection must be defined'):
+        with pytest.raises(ValueError, match='Projection must be defined'):
             self.da.hvplot.image('x', 'y', projection='foo')
 
     def test_plot_with_projection_raises_an_error_when_tiles_set(self):
         da = self.da.copy()
-        with self.assertRaisesRegex(ValueError, 'Tiles can only be used with output projection'):
+        with pytest.raises(ValueError, match='Tiles can only be used with output projection'):
             da.hvplot.image('x', 'y', crs=self.crs, projection='Robinson', tiles=True)
 
     def test_overlay_with_projection(self):
@@ -153,7 +150,7 @@ class TestProjections(TestGeo):
         try:
             from holoviews.operation.datashader import rasterize
         except ImportError:
-            raise SkipTest('datashader not available')
+            pytest.skip('datashader not available')
 
         ds = xr.tutorial.open_dataset('air_temperature')
         hvplot_output = ds.isel(time=0).hvplot.points(
@@ -174,13 +171,13 @@ class TestProjections(TestGeo):
         xr.testing.assert_allclose(hvplot_output.data, expected.data)
 
 
-class TestGeoAnnotation(TestCase):
-    def setUp(self):
+class TestGeoAnnotation:
+    def setup_method(self):
         try:
             import cartopy.crs as ccrs
             import geoviews  # noqa: F401
         except ImportError:
-            raise SkipTest('geoviews or cartopy not available')
+            pytest.skip('geoviews or cartopy not available')
         import hvplot.pandas  # noqa: F401
 
         self.crs = ccrs.PlateCarree()
@@ -190,17 +187,17 @@ class TestGeoAnnotation(TestCase):
         import geoviews as gv
 
         plot = self.df.hvplot.points('x', 'y', geo=True, coastline=True)
-        self.assertEqual(len(plot), 2)
+        assert len(plot) == 2
         coastline = plot.get(1)
-        self.assertIsInstance(coastline, gv.Feature)
+        assert isinstance(coastline, gv.Feature)
 
     def test_plot_with_coastline_sets_geo_by_default(self):
         import geoviews as gv
 
         plot = self.df.hvplot.points('x', 'y', coastline=True)
-        self.assertEqual(len(plot), 2)
+        assert len(plot) == 2
         coastline = plot.get(1)
-        self.assertIsInstance(coastline, gv.Feature)
+        assert isinstance(coastline, gv.Feature)
 
     def test_plot_with_coastline_scale(self):
         plot = self.df.hvplot.points('x', 'y', geo=True, coastline='10m')
@@ -209,9 +206,9 @@ class TestGeoAnnotation(TestCase):
 
     def test_plot_with_tiles(self):
         plot = self.df.hvplot.points('x', 'y', geo=False, tiles=True)
-        self.assertEqual(len(plot), 2)
-        self.assertIsInstance(plot.get(0), hv.Tiles)
-        self.assertIn('openstreetmap', plot.get(0).data)
+        assert len(plot) == 2
+        assert isinstance(plot.get(0), hv.Tiles)
+        assert 'openstreetmap' in plot.get(0).data
 
     def test_plot_with_tiles_with_tiles_opts(self):
         plot = self.df.hvplot.points('x', 'y', geo=False, tiles=True, tiles_opts={'alpha': 0.5})
@@ -225,9 +222,9 @@ class TestGeoAnnotation(TestCase):
         import geoviews as gv
 
         plot = self.df.hvplot.points('x', 'y', geo=True, tiles=True)
-        self.assertEqual(len(plot), 2)
-        self.assertIsInstance(plot.get(0), gv.element.WMTS)
-        self.assertIn('openstreetmap', plot.get(0).data)
+        assert len(plot) == 2
+        assert isinstance(plot.get(0), gv.element.WMTS)
+        assert 'openstreetmap' in plot.get(0).data
 
     def test_plot_with_tiles_with_tiles_opts_with_geo(self):
         import geoviews as gv
@@ -241,50 +238,50 @@ class TestGeoAnnotation(TestCase):
 
     def test_plot_with_specific_tiles(self):
         plot = self.df.hvplot.points('x', 'y', geo=False, tiles='ESRI')
-        self.assertEqual(len(plot), 2)
-        self.assertIsInstance(plot.get(0), hv.Tiles)
-        self.assertIn('ArcGIS', plot.get(0).data)
+        assert len(plot) == 2
+        assert isinstance(plot.get(0), hv.Tiles)
+        assert 'ArcGIS' in plot.get(0).data
 
     def test_plot_with_specific_tiles_geo(self):
         import geoviews as gv
 
         plot = self.df.hvplot.points('x', 'y', geo=True, tiles='ESRI')
-        self.assertEqual(len(plot), 2)
-        self.assertIsInstance(plot.get(0), gv.element.WMTS)
-        self.assertIn('ArcGIS', plot.get(0).data)
+        assert len(plot) == 2
+        assert isinstance(plot.get(0), gv.element.WMTS)
+        assert 'ArcGIS' in plot.get(0).data
 
     def test_plot_with_specific_tile_class(self):
         plot = self.df.hvplot.points('x', 'y', geo=False, tiles=hv.element.tiles.EsriImagery)
-        self.assertEqual(len(plot), 2)
-        self.assertIsInstance(plot.get(0), hv.Tiles)
-        self.assertIn('ArcGIS', plot.get(0).data)
+        assert len(plot) == 2
+        assert isinstance(plot.get(0), hv.Tiles)
+        assert 'ArcGIS' in plot.get(0).data
 
     def test_plot_with_specific_tile_class_with_geo(self):
         import geoviews as gv
 
         plot = self.df.hvplot.points('x', 'y', geo=True, tiles=gv.tile_sources.EsriImagery)
-        self.assertEqual(len(plot), 2)
-        self.assertIsInstance(plot.get(0), gv.element.WMTS)
-        self.assertIn('ArcGIS', plot.get(0).data)
+        assert len(plot) == 2
+        assert isinstance(plot.get(0), gv.element.WMTS)
+        assert 'ArcGIS' in plot.get(0).data
 
     def test_plot_with_specific_tile_obj(self):
         plot = self.df.hvplot.points('x', 'y', geo=False, tiles=hv.element.tiles.EsriImagery())
-        self.assertEqual(len(plot), 2)
-        self.assertIsInstance(plot.get(0), hv.Tiles)
-        self.assertIn('ArcGIS', plot.get(0).data)
+        assert len(plot) == 2
+        assert isinstance(plot.get(0), hv.Tiles)
+        assert 'ArcGIS' in plot.get(0).data
 
     def test_plot_with_specific_tile_obj_with_geo(self):
         plot = self.df.hvplot.points('x', 'y', geo=True, tiles=hv.element.tiles.EsriImagery())
-        self.assertEqual(len(plot), 2)
-        self.assertIsInstance(plot.get(0), hv.Tiles)
-        self.assertIn('ArcGIS', plot.get(0).data)
+        assert len(plot) == 2
+        assert isinstance(plot.get(0), hv.Tiles)
+        assert 'ArcGIS' in plot.get(0).data
 
     def test_plot_with_specific_gv_tile_obj(self):
         import geoviews as gv
 
         plot = self.df.hvplot.points('x', 'y', geo=True, tiles=gv.tile_sources.CartoDark)
-        self.assertEqual(len(plot), 2)
-        self.assertIsInstance(plot.get(0), gv.element.WMTS)
+        assert len(plot) == 2
+        assert isinstance(plot.get(0), gv.element.WMTS)
 
     def test_plot_with_xyzservices_tiles(self):
         xyzservices = pytest.importorskip('xyzservices')
@@ -304,13 +301,13 @@ class TestGeoAnnotation(TestCase):
         assert plot.get(2).group == 'Borders'
 
 
-class TestGeoElements(TestCase):
-    def setUp(self):
+class TestGeoElements:
+    def setup_method(self):
         try:
             import cartopy.crs as ccrs
             import geoviews  # noqa: F401
         except ImportError:
-            raise SkipTest('geoviews or cartopy not available')
+            pytest.skip('geoviews or cartopy not available')
         import hvplot.pandas  # noqa: F401
 
         self.crs = ccrs.PlateCarree()
@@ -318,42 +315,42 @@ class TestGeoElements(TestCase):
 
     def test_geo_hexbin(self):
         hextiles = self.df.hvplot.hexbin('x', 'y', geo=True)
-        self.assertEqual(hextiles.crs, self.crs)
+        assert hextiles.crs == self.crs
 
     def test_geo_points(self):
         points = self.df.hvplot.points('x', 'y', geo=True)
-        self.assertEqual(points.crs, self.crs)
+        assert points.crs == self.crs
 
     def test_geo_points_color_internally_set_to_dim(self):
         altered_df = self.df.copy().assign(red=np.random.choice(['a', 'b'], len(self.df)))
         plot = altered_df.hvplot.points('x', 'y', c='red', geo=True)
         opts = hv.Store.lookup_options('bokeh', plot, 'style')
-        self.assertIsInstance(opts.kwargs['color'], hv.dim)
-        self.assertEqual(opts.kwargs['color'].dimension.name, 'red')
+        assert isinstance(opts.kwargs['color'], hv.dim)
+        assert opts.kwargs['color'].dimension.name == 'red'
 
     def test_geo_opts(self):
         points = self.df.hvplot.points('x', 'y', geo=True)
         opts = hv.Store.lookup_options('bokeh', points, 'plot').kwargs
-        self.assertEqual(opts.get('data_aspect'), 1)
-        self.assertEqual(opts.get('width'), None)
+        assert opts.get('data_aspect') == 1
+        assert opts.get('width') is None
 
     def test_geo_opts_with_width(self):
         points = self.df.hvplot.points('x', 'y', geo=True, width=200)
         opts = hv.Store.lookup_options('bokeh', points, 'plot').kwargs
-        self.assertEqual(opts.get('data_aspect'), 1)
-        self.assertEqual(opts.get('width'), 200)
-        self.assertEqual(opts.get('height'), None)
+        assert opts.get('data_aspect') == 1
+        assert opts.get('width') == 200
+        assert opts.get('height') is None
 
 
-class TestGeoPandas(TestCase):
-    def setUp(self):
+class TestGeoPandas:
+    def setup_method(self):
         try:
             import cartopy.crs as ccrs  # noqa: F401
             import geopandas as gpd
             import geoviews  # noqa: F401
             import shapely  # noqa: F401
         except ImportError:
-            raise SkipTest('geopandas, geoviews, shapely or cartopy not available')
+            pytest.skip('geopandas, geoviews, shapely or cartopy not available')
         from shapely.geometry import Polygon
 
         import hvplot.pandas  # noqa: F401
@@ -453,14 +450,14 @@ class TestGeoPandas(TestCase):
         assert polygons_plot.get(1).data.crs == 'EPSG:3857'
 
 
-class TestGeoUtil(TestCase):
-    def setUp(self):
+class TestGeoUtil:
+    def setup_method(self):
         if sys.platform == 'win32':
-            raise SkipTest('Skip geo tests on windows for now')
+            pytest.skip('Skip geo tests on windows for now')
         try:
             import cartopy.crs as ccrs
         except ImportError:
-            raise SkipTest('cartopy not available')
+            pytest.skip('cartopy not available')
         self.ccrs = ccrs
 
     def test_proj_to_cartopy(self):
@@ -528,11 +525,10 @@ class TestGeoUtil(TestCase):
         ]
 
         for proj4_string, expected_class in test_cases:
-            with self.subTest(proj4=proj4_string):
-                crs = proj_to_cartopy(proj4_string)
-                assert isinstance(crs, expected_class), (
-                    f'Expected {expected_class} for {proj4_string}, got {type(crs)}'
-                )
+            crs = proj_to_cartopy(proj4_string)
+            assert isinstance(crs, expected_class), (
+                f'Expected {expected_class} for {proj4_string}, got {type(crs)}'
+            )
 
     def test_proj_to_cartopy_geostationary_special_case(self):
         """Test Geostationary projection which requires special parameters"""

@@ -2,8 +2,6 @@
 Tests for panel widgets and param objects as arguments
 """
 
-from unittest import TestCase
-
 import panel as pn
 import pytest
 
@@ -24,8 +22,8 @@ def look_for_class(panel, classname, items=None):
     return items
 
 
-class TestPanelObjects(TestCase):
-    def setUp(self):
+class TestPanelObjects:
+    def setup_method(self):
         pytest.importorskip('bokeh_sampledata')
         from bokeh.sampledata.iris import flowers
 

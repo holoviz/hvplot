@@ -14,8 +14,6 @@ except ImportError:
     spd = None
     dd = None
 
-from unittest import SkipTest, TestCase
-
 from hvplot.util import (
     _bounds_in_range,
     _convert_col_names_to_str,
@@ -33,12 +31,9 @@ from hvplot.util import (
 )
 
 
-class TestProcessXarray(TestCase):
-    def setUp(self):
-        try:
-            import xarray as xr
-        except ImportError:
-            raise SkipTest('xarray not available')
+class TestProcessXarray:
+    def setup_method(self):
+        xr = pytest.importorskip('xarray', reason='xarray not available')
         self.default_kwargs = {
             'value_label': 'value',
             'label': None,
@@ -196,7 +191,7 @@ class TestProcessXarray(TestCase):
         assert not groupby
 
 
-class TestDynamicArgs(TestCase):
+class TestDynamicArgs:
     def test_dynamic_and_static(self):
         from hvplot.util import process_dynamic_args
 

@@ -1,20 +1,17 @@
-from unittest import SkipTest, expectedFailure
-
 import numpy as np
 import pandas as pd
 import pytest
 from holoviews import NdLayout, NdOverlay, Store, dim, render
 from holoviews.core.dimension import Dimension
 from holoviews.element import Area, Curve, HeatMap, Path, Points, Scatter
-from holoviews.element.comparison import ComparisonTestCase
+from holoviews.testing import assert_element_equal
 from packaging.version import Version
-from parameterized import parameterized
 
 from ..util import is_dask
 
 
-class TestChart2D(ComparisonTestCase):
-    def setUp(self):
+class TestChart2D:
+    def setup_method(self):
         import hvplot.pandas  # noqa: F401
 
         self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
@@ -28,44 +25,44 @@ class TestChart2D(ComparisonTestCase):
             }
         )
 
-    @parameterized.expand([('points', Points), ('paths', Path)])
+    @pytest.mark.parametrize('kind,element', [('points', Points), ('paths', Path)])
     def test_2d_defaults(self, kind, element):
         plot = self.df.hvplot(kind=kind)
-        self.assertEqual(plot, element(self.df, ['x', 'y']))
+        assert_element_equal(plot, element(self.df, ['x', 'y']))
 
-    @parameterized.expand([('points', Points), ('paths', Path)])
+    @pytest.mark.parametrize('kind,element', [('points', Points), ('paths', Path)])
     def test_2d_chart(self, kind, element):
         plot = self.df.hvplot(x='x', y='y', kind=kind)
-        self.assertEqual(plot, element(self.df, ['x', 'y']))
+        assert_element_equal(plot, element(self.df, ['x', 'y']))
 
-    @parameterized.expand([('points', Points), ('paths', Path)])
+    @pytest.mark.parametrize('kind,element', [('points', Points), ('paths', Path)])
     def test_2d_index_and_c(self, kind, element):
         plot = self.df.hvplot(x='index', y='y', c='x', kind=kind)
-        self.assertEqual(plot, element(self.df, ['index', 'y'], ['x']))
+        assert_element_equal(plot, element(self.df, ['index', 'y'], ['x']))
 
-    @parameterized.expand([('points', Points), ('paths', Path)])
+    @pytest.mark.parametrize('kind,element', [('points', Points), ('paths', Path)])
     def test_2d_set_hover_cols_to_list(self, kind, element):
         plot = self.cat_df.hvplot(x='x', y='y', hover_cols=['category'], kind=kind)
-        self.assertEqual(plot, element(self.cat_df, ['x', 'y'], ['category']))
+        assert_element_equal(plot, element(self.cat_df, ['x', 'y'], ['category']))
 
-    @parameterized.expand([('points', Points), ('paths', Path)])
+    @pytest.mark.parametrize('kind,element', [('points', Points), ('paths', Path)])
     def test_2d_set_hover_cols_including_index(self, kind, element):
         plot = self.cat_df.hvplot(x='x', y='y', hover_cols=['index'], kind=kind)
-        self.assertEqual(plot, element(self.cat_df, ['x', 'y'], ['index']))
+        assert_element_equal(plot, element(self.cat_df, ['x', 'y'], ['index']))
 
-    @parameterized.expand([('points', Points), ('paths', Path)])
+    @pytest.mark.parametrize('kind,element', [('points', Points), ('paths', Path)])
     def test_2d_set_hover_cols_to_all(self, kind, element):
         plot = self.cat_df.hvplot(x='x', y='y', hover_cols='all', kind=kind)
-        self.assertEqual(plot, element(self.cat_df, ['x', 'y'], ['index', 'category']))
+        assert_element_equal(plot, element(self.cat_df, ['x', 'y'], ['index', 'category']))
 
-    @parameterized.expand([('points', Points), ('paths', Path)])
+    @pytest.mark.parametrize('kind,element', [('points', Points), ('paths', Path)])
     def test_2d_set_hover_cols_to_all_with_use_index_as_false(self, kind, element):
         plot = self.cat_df.hvplot(x='x', y='y', hover_cols='all', use_index=False, kind=kind)
-        self.assertEqual(plot, element(self.cat_df, ['x', 'y'], ['category']))
+        assert_element_equal(plot, element(self.cat_df, ['x', 'y'], ['category']))
 
     def test_heatmap_2d_index_columns(self):
         plot = self.df.hvplot.heatmap()
-        self.assertEqual(
+        assert_element_equal(
             plot, HeatMap((['x', 'y'], [0, 1, 2], self.df.values), ['columns', 'index'], 'value')
         )
 
@@ -75,12 +72,8 @@ class TestChart2D(ComparisonTestCase):
         assert plot.vdims == ['temp']
 
     def test_xarray_dataset_with_attrs(self):
-        try:
-            import xarray as xr
-
-            import hvplot.xarray  # noqa: F401
-        except ImportError:
-            raise SkipTest('xarray not available')
+        xr = pytest.importorskip('xarray')
+        import hvplot.xarray  # noqa: F401
 
         dset = xr.Dataset(
             {'u': ('t', [1, 3]), 'v': ('t', [4, 2])},
@@ -92,40 +85,37 @@ class TestChart2D(ComparisonTestCase):
 
 
 class TestChart2DDask(TestChart2D):
-    def setUp(self):
-        super().setUp()
-        try:
-            import dask.dataframe as dd
-        except ImportError:
-            raise SkipTest('Dask not available')
+    def setup_method(self):
+        super().setup_method()
+        dd = pytest.importorskip('dask.dataframe', reason='Dask not available')
         import hvplot.dask  # noqa: F401
 
         self.df = dd.from_pandas(self.df, npartitions=2)
         self.cat_df = dd.from_pandas(self.cat_df, npartitions=3)
 
-    @expectedFailure
+    @pytest.mark.xfail
     def test_heatmap_2d_index_columns(self):
         self.df.hvplot.heatmap()
 
-    @parameterized.expand([('points', Points), ('paths', Path)])
+    @pytest.mark.parametrize('kind,element', [('points', Points), ('paths', Path)])
     def test_2d_set_hover_cols_including_index(self, kind, element):
         plot = self.cat_df.hvplot(x='x', y='y', hover_cols=['index'], kind=kind)
         data = plot.data[0] if kind == 'paths' else plot.data
         assert 'index' in data.columns
-        self.assertEqual(plot, element(self.cat_df.reset_index(), ['x', 'y'], ['index']))
+        assert_element_equal(plot, element(self.cat_df.reset_index(), ['x', 'y'], ['index']))
 
-    @parameterized.expand([('points', Points), ('paths', Path)])
+    @pytest.mark.parametrize('kind,element', [('points', Points), ('paths', Path)])
     def test_2d_set_hover_cols_to_all(self, kind, element):
         plot = self.cat_df.hvplot(x='x', y='y', hover_cols='all', kind=kind)
         data = plot.data[0] if kind == 'paths' else plot.data
         assert 'index' in data.columns
-        self.assertEqual(
+        assert_element_equal(
             plot, element(self.cat_df.reset_index(), ['x', 'y'], ['index', 'category'])
         )
 
 
-class TestChart1D(ComparisonTestCase):
-    def setUp(self):
+class TestChart1D:
+    def setup_method(self):
         import hvplot.pandas  # noqa: F401
 
         self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
@@ -167,7 +157,9 @@ class TestChart1D(ComparisonTestCase):
     def size_series(self):
         return self.cat_df['y'] / 10
 
-    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    @pytest.mark.parametrize(
+        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+    )
     def test_wide_chart(self, kind, element):
         plot = self.df.hvplot(kind=kind)
         obj = NdOverlay(
@@ -177,7 +169,7 @@ class TestChart1D(ComparisonTestCase):
             },
             'Variable',
         )
-        self.assertEqual(plot, obj)
+        assert_element_equal(plot, obj)
 
     def test_by_datetime_accessor(self):
         plot = self.dt_df.hvplot.line('index.dt.day', '0', by='index.dt.month')
@@ -188,9 +180,11 @@ class TestChart1D(ComparisonTestCase):
             },
             'index.dt.month',
         )
-        self.assertEqual(plot, obj)
+        assert_element_equal(plot, obj)
 
-    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    @pytest.mark.parametrize(
+        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+    )
     def test_wide_chart_labels(self, kind, element):
         plot = self.df.hvplot(kind=kind, value_label='Test', group_label='Category')
         obj = NdOverlay(
@@ -200,30 +194,40 @@ class TestChart1D(ComparisonTestCase):
             },
             'Category',
         )
-        self.assertEqual(plot, obj)
+        assert_element_equal(plot, obj)
 
-    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    @pytest.mark.parametrize(
+        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+    )
     def test_wide_chart_legend_position(self, kind, element):
         plot = self.df.hvplot(kind=kind, value_label='Test', group_label='Category', legend='left')
         opts = Store.lookup_options('bokeh', plot, 'plot')
-        self.assertEqual(opts.kwargs['legend_position'], 'left')
+        assert opts.kwargs['legend_position'] == 'left'
 
-    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    @pytest.mark.parametrize(
+        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+    )
     def test_wide_chart_auto_group_label(self, kind, element):
         self.df.columns.name = 'My Name'
-        self.assertEqual(self.df.hvplot().kdims, ['My Name'])
+        assert self.df.hvplot().kdims == ['My Name']
 
-    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    @pytest.mark.parametrize(
+        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+    )
     def test_tidy_chart(self, kind, element):
         plot = self.df.hvplot(x='x', y='y', kind=kind)
-        self.assertEqual(plot, element(self.df, 'x', 'y'))
+        assert_element_equal(plot, element(self.df, 'x', 'y'))
 
-    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    @pytest.mark.parametrize(
+        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+    )
     def test_tidy_chart_index(self, kind, element):
         plot = self.df.hvplot(x='index', y='y', kind=kind)
-        self.assertEqual(plot, element(self.df, 'index', 'y'))
+        assert_element_equal(plot, element(self.df, 'index', 'y'))
 
-    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    @pytest.mark.parametrize(
+        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+    )
     def test_tidy_chart_index_by(self, kind, element):
         dask = pytest.importorskip('dask')
 
@@ -240,55 +244,71 @@ class TestChart1D(ComparisonTestCase):
             'x',
             sort=False,
         )
-        self.assertEqual(plot, obj)
+        assert_element_equal(plot, obj)
 
-    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    @pytest.mark.parametrize(
+        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+    )
     def test_tidy_chart_index_by_legend_position(self, kind, element):
         plot = self.df.hvplot(x='index', y='y', by='x', kind=kind, legend='left')
         opts = Store.lookup_options('bokeh', plot, 'plot')
-        self.assertEqual(opts.kwargs['legend_position'], 'left')
+        assert opts.kwargs['legend_position'] == 'left'
 
-    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    @pytest.mark.parametrize(
+        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+    )
     def test_use_index_disabled_uses_first_cols(self, kind, element):
         plot = self.df.hvplot(use_index=False, kind=kind)
-        self.assertEqual(plot.kdims, ['x'])
-        self.assertEqual(plot.vdims, ['y'])
+        assert plot.kdims == ['x']
+        assert plot.vdims == ['y']
 
-    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    @pytest.mark.parametrize(
+        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+    )
     def test_tidy_chart_ranges(self, kind, element):
         plot = self.df.hvplot(x='x', y='y', kind=kind, xlim=(0, 3), ylim=(5, 10))
         opts = Store.lookup_options('bokeh', plot, 'plot').options
-        self.assertEqual(opts['xlim'], (0, 3))
-        self.assertEqual(opts['ylim'], (5, 10))
+        assert opts['xlim'] == (0, 3)
+        assert opts['ylim'] == (5, 10)
 
-    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    @pytest.mark.parametrize(
+        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+    )
     def test_wide_chart_ranges(self, kind, element):
         plot = self.df.hvplot(kind=kind, xlim=(0, 3), ylim=(5, 10))
         opts = Store.lookup_options('bokeh', plot.last, 'plot').options
-        self.assertEqual(opts['xlim'], (0, 3))
-        self.assertEqual(opts['ylim'], (5, 10))
+        assert opts['xlim'] == (0, 3)
+        assert opts['ylim'] == (5, 10)
 
-    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    @pytest.mark.parametrize(
+        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+    )
     def test_tidy_chart_with_hover_cols(self, kind, element):
         plot = self.cat_df.hvplot(x='x', y='y', kind=kind, hover_cols=['category'])
-        self.assertEqual(plot, element(self.cat_df, 'x', ['y', 'category']))
+        assert_element_equal(plot, element(self.cat_df, 'x', ['y', 'category']))
 
-    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    @pytest.mark.parametrize(
+        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+    )
     def test_tidy_chart_with_index_in_hover_cols(self, kind, element):
         plot = self.df.hvplot(x='x', y='y', kind=kind, hover_cols=['index'])
         altered_df = self.df.reset_index()
-        self.assertEqual(plot, element(altered_df, 'x', ['y', 'index']))
+        assert_element_equal(plot, element(altered_df, 'x', ['y', 'index']))
 
-    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    @pytest.mark.parametrize(
+        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+    )
     def test_tidy_chart_with_hover_cols_as_all(self, kind, element):
         plot = self.cat_df.hvplot(x='x', y='y', kind=kind, hover_cols='all')
         altered_df = self.cat_df.reset_index()
-        self.assertEqual(plot, element(altered_df, 'x', ['y', 'index', 'category']))
+        assert_element_equal(plot, element(altered_df, 'x', ['y', 'index', 'category']))
 
-    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    @pytest.mark.parametrize(
+        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+    )
     def test_tidy_chart_with_hover_cols_as_all_with_use_index_as_false(self, kind, element):
         plot = self.cat_df.hvplot(x='x', y='y', kind=kind, hover_cols='all', use_index=False)
-        self.assertEqual(plot, element(self.cat_df, 'x', ['y', 'category']))
+        assert_element_equal(plot, element(self.cat_df, 'x', ['y', 'category']))
 
     def test_area_stacked(self):
         plot = self.df.hvplot.area(stacked=True)
@@ -299,7 +319,7 @@ class TestChart1D(ComparisonTestCase):
             },
             'Variable',
         )
-        self.assertEqual(plot, Area.stack(obj))
+        assert_element_equal(plot, Area.stack(obj))
 
     def test_scatter_color_set_to_series(self):
         if is_dask(self.df['y']):
@@ -309,7 +329,7 @@ class TestChart1D(ComparisonTestCase):
         actual = self.df.hvplot.scatter('x', 'y', c=y)
         altered_df = self.df.assign(_color=y)
         expected = altered_df.hvplot.scatter('x', 'y', c='_color')
-        self.assertEqual(actual, expected)
+        assert_element_equal(actual, expected)
 
     def test_color_series_excluded_from_default_hover(self):
         color_series = self.color_series()
@@ -399,17 +419,17 @@ class TestChart1D(ComparisonTestCase):
         plot = self.df.hvplot.scatter('x', 'y', s=y)
         opts = Store.lookup_options('bokeh', plot, 'style')
         assert '_size' in plot.data.columns
-        self.assertEqual(opts.kwargs['size'], '_size')
+        assert opts.kwargs['size'] == '_size'
 
     def test_scatter_color_by_legend_position(self):
         plot = self.cat_df.hvplot.scatter('x', 'y', c='category', legend='left')
         opts = Store.lookup_options('bokeh', plot, 'plot')
-        self.assertEqual(opts.kwargs['legend_position'], 'left')
+        assert opts.kwargs['legend_position'] == 'left'
 
     def test_histogram_by_category_legend_position(self):
         plot = self.cat_df.hvplot.hist('y', by='category', legend='left')
         opts = Store.lookup_options('bokeh', plot, 'plot')
-        self.assertEqual(opts.kwargs['legend_position'], 'left')
+        assert opts.kwargs['legend_position'] == 'left'
 
     def test_histogram_wide_set_group_label(self):
         plot = self.df.hvplot.hist(group_label='Test')
@@ -442,10 +462,12 @@ class TestChart1D(ComparisonTestCase):
         altered_df = self.cat_df.copy().rename(columns={'category': 'red'})
         plot = altered_df.hvplot.scatter('x', 'y', c='red')
         opts = Store.lookup_options('bokeh', plot, 'style')
-        self.assertIsInstance(opts.kwargs['color'], dim)
-        self.assertEqual(opts.kwargs['color'].dimension.name, 'red')
+        assert isinstance(opts.kwargs['color'], dim)
+        assert opts.kwargs['color'].dimension.name == 'red'
 
-    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    @pytest.mark.parametrize(
+        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+    )
     def test_only_includes_num_chart(self, kind, element):
         plot = self.cat_df.hvplot(kind=kind)
         obj = NdOverlay(
@@ -455,9 +477,11 @@ class TestChart1D(ComparisonTestCase):
             },
             'Variable',
         )
-        self.assertEqual(plot, obj)
+        assert_element_equal(plot, obj)
 
-    @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
+    @pytest.mark.parametrize(
+        'kind,element', [('line', Curve), ('area', Area), ('scatter', Scatter)]
+    )
     def test_includes_str_if_no_num_chart(self, kind, element):
         plot = self.cat_only_df.hvplot(kind=kind)
         obj = NdOverlay(
@@ -468,7 +492,7 @@ class TestChart1D(ComparisonTestCase):
             'Variable',
             sort=False,
         )
-        self.assertEqual(plot, obj)
+        assert_element_equal(plot, obj)
 
     def test_time_df_sorts_on_plot(self):
         scrambled = self.time_df.sample(frac=1)
@@ -570,22 +594,22 @@ class TestChart1D(ComparisonTestCase):
         bkplot = Store.renderers['bokeh'].get_plot(plot)
         assert not bkplot.tools
 
-    @parameterized.expand(['vline', 'hline'])
+    @pytest.mark.parametrize('hover_mode', ['vline', 'hline'])
     def test_hover_line(self, hover_mode):
         plot = self.df.hvplot('x', 'y', hover=hover_mode)
         opts = Store.lookup_options('bokeh', plot, 'plot')
-        self.assertEqual(opts.kwargs['hover_mode'], hover_mode)
+        assert opts.kwargs['hover_mode'] == hover_mode
 
     def test_hover_tooltips(self):
         plot = self.df.hvplot('x', 'y', hover_tooltips=['x'])
         opts = Store.lookup_options('bokeh', plot, 'plot')
-        self.assertEqual(opts.kwargs['hover_tooltips'], ['x'])
+        assert opts.kwargs['hover_tooltips'] == ['x']
 
     @pytest.mark.filterwarnings('ignore:hover_formatters')
     def test_hover_formatter(self):
         plot = self.df.hvplot('x', 'y', hover_formatters={'x': 'datetime'})
         opts = Store.lookup_options('bokeh', plot, 'plot')
-        self.assertEqual(opts.kwargs['hover_formatters'], {'x': 'datetime'})
+        assert opts.kwargs['hover_formatters'] == {'x': 'datetime'}
 
     @pytest.mark.filterwarnings('ignore:hover_formatters')
     def test_hover_disabled(self):
@@ -593,7 +617,7 @@ class TestChart1D(ComparisonTestCase):
             'x', 'y', hover_tooltips=['x'], hover_formatters={'x': 'datetime'}, hover=False
         )
         opts = Store.lookup_options('bokeh', plot, 'plot')
-        self.assertEqual(opts.kwargs['tools'], [])
+        assert opts.kwargs['tools'] == []
         assert 'hover_formatters' not in opts.kwargs
         assert 'hover_tooltips' not in opts.kwargs
 
@@ -694,12 +718,9 @@ class TestChart1D(ComparisonTestCase):
 
 
 class TestChart1DDask(TestChart1D):
-    def setUp(self):
-        super().setUp()
-        try:
-            import dask.dataframe as dd
-        except ImportError:
-            raise SkipTest('Dask not available')
+    def setup_method(self):
+        super().setup_method()
+        dd = pytest.importorskip('dask.dataframe', reason='Dask not available')
         import hvplot.dask  # noqa: F401
 
         self.df = dd.from_pandas(self.df, npartitions=2)
@@ -719,16 +740,16 @@ class TestChart1DDask(TestChart1D):
         return (self.cat_df['y'] / 10).compute()
 
     def test_by_datetime_accessor(self):
-        raise SkipTest("Can't expand dt accessor columns when using dask")
+        pytest.skip("Can't expand dt accessor columns when using dask")
 
     def test_multi_index_groupby_from_index(self):
-        raise SkipTest('Dask does not support MultiIndex Dataframes.')
+        pytest.skip('Dask does not support MultiIndex Dataframes.')
 
     def test_table_datetime_index_displayed(self):
-        raise SkipTest('Only supported for Pandas DatetimeIndex.')
+        pytest.skip('Only supported for Pandas DatetimeIndex.')
 
     def test_table_multi_index_displayed(self):
-        raise SkipTest('Dask does not support MultiIndex Dataframes.')
+        pytest.skip('Dask does not support MultiIndex Dataframes.')
 
 
 def test_cmap_LinearSegmentedColormap():

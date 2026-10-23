@@ -1,23 +1,20 @@
 import os
 import tempfile
 from collections import OrderedDict
-from unittest import SkipTest
 
 import numpy as np
+import pytest
 from holoviews import Store
 from holoviews.element import RGB, Image
-from holoviews.element.comparison import ComparisonTestCase
+from holoviews.testing import assert_element_equal
 
-try:
-    import xarray as xr
-except ImportError:
-    raise SkipTest('XArray not available')
-else:
-    import hvplot.xarray  # noqa: F401
+xr = pytest.importorskip('xarray')
+
+import hvplot.xarray  # noqa: F401
 
 
-class TestGridPlots(ComparisonTestCase):
-    def setUp(self):
+class TestGridPlots:
+    def setup_method(self):
         coords = OrderedDict([('band', [1, 2, 3]), ('y', [0, 1]), ('x', [0, 1])])
         self.da_rgb = xr.DataArray(np.arange(12).reshape((3, 2, 2)), coords, ['band', 'y', 'x'])
         coords = OrderedDict([('time', [0, 1]), ('band', [1, 2, 3]), ('y', [0, 1]), ('x', [0, 1])])
@@ -66,41 +63,42 @@ class TestGridPlots(ComparisonTestCase):
 
     def test_rgb_dataarray_no_args(self):
         rgb = self.da_rgb.hvplot()
-        self.assertEqual(rgb, RGB(([0, 1], [0, 1], *self.da_rgb.values)))
+        assert_element_equal(rgb, RGB(([0, 1], [0, 1], *self.da_rgb.values)))
 
     def test_rgb_dataarray_explicit_args(self):
         rgb = self.da_rgb.hvplot('x', 'y')
-        self.assertEqual(rgb, RGB(([0, 1], [0, 1], *self.da_rgb.values)))
+        assert_element_equal(rgb, RGB(([0, 1], [0, 1], *self.da_rgb.values)))
 
     def test_rgb_dataarray_explicit_args_and_kind(self):
         rgb = self.da_rgb.hvplot.rgb('x', 'y')
-        self.assertEqual(rgb, RGB(([0, 1], [0, 1], *self.da_rgb.values)))
+        assert_element_equal(rgb, RGB(([0, 1], [0, 1], *self.da_rgb.values)))
 
     def test_rgb_dataset(self):
         rgb = self.da_rgb.to_dataset(name='z').hvplot.rgb()
-        self.assertEqual(rgb, RGB(([0, 1], [0, 1], *self.da_rgb.values)))
+        assert_element_equal(rgb, RGB(([0, 1], [0, 1], *self.da_rgb.values)))
 
     def test_rgb_dataset_explicit_z(self):
         rgb = self.da_rgb.to_dataset(name='z').hvplot.rgb(z='z')
-        self.assertEqual(rgb, RGB(([0, 1], [0, 1], *self.da_rgb.values)))
+        assert_element_equal(rgb, RGB(([0, 1], [0, 1], *self.da_rgb.values)))
 
     def test_rgb_dataset_robust(self):
         rgb = self.da_rgb.to_dataset(name='z').hvplot.rgb(robust=True)
-        self.assertNotEqual(rgb, RGB(([0, 1], [0, 1], *self.da_rgb.values)))
+        with pytest.raises(AssertionError):
+            assert_element_equal(rgb, RGB(([0, 1], [0, 1], *self.da_rgb.values)))
 
     def test_rgb_dataarray_groupby_explicit(self):
         rgb = self.da_rgb_by_time.hvplot.rgb('x', 'y', groupby='time')
-        self.assertEqual(rgb[0], RGB(([0, 1], [0, 1], *self.da_rgb_by_time.values[0])))
-        self.assertEqual(rgb[1], RGB(([0, 1], [0, 1], *self.da_rgb_by_time.values[1])))
+        assert_element_equal(rgb[0], RGB(([0, 1], [0, 1], *self.da_rgb_by_time.values[0])))
+        assert_element_equal(rgb[1], RGB(([0, 1], [0, 1], *self.da_rgb_by_time.values[1])))
 
     def test_rgb_dataarray_groupby_infer(self):
         rgb = self.da_rgb_by_time.hvplot.rgb('x', 'y', bands='band')
-        self.assertEqual(rgb[0], RGB(([0, 1], [0, 1], *self.da_rgb_by_time.values[0])))
-        self.assertEqual(rgb[1], RGB(([0, 1], [0, 1], *self.da_rgb_by_time.values[1])))
+        assert_element_equal(rgb[0], RGB(([0, 1], [0, 1], *self.da_rgb_by_time.values[0])))
+        assert_element_equal(rgb[1], RGB(([0, 1], [0, 1], *self.da_rgb_by_time.values[1])))
 
     def test_img_dataarray_infers_correct_other_dims(self):
         img = self.da_img_by_time[0].hvplot()
-        self.assertEqual(img, Image(self.da_img_by_time[0], ['lon', 'lat'], ['value']))
+        assert_element_equal(img, Image(self.da_img_by_time[0], ['lon', 'lat'], ['value']))
 
     def test_img_dataarray_robust_to_clim_percentile(self):
         img = self.da_img_by_time[0].hvplot(robust=True)
@@ -108,87 +106,87 @@ class TestGridPlots(ComparisonTestCase):
 
     def test_img_dataarray_groupby_infers_correct_other_dims(self):
         img = self.da_img_by_time.hvplot(groupby='time')
-        self.assertEqual(img[0], Image(self.da_img_by_time[0], ['lon', 'lat'], ['value']))
-        self.assertEqual(img[1], Image(self.da_img_by_time[1], ['lon', 'lat'], ['value']))
+        assert_element_equal(img[0], Image(self.da_img_by_time[0], ['lon', 'lat'], ['value']))
+        assert_element_equal(img[1], Image(self.da_img_by_time[1], ['lon', 'lat'], ['value']))
 
     def test_line_infer_dimension_params_from_xarray_attrs(self):
         hmap = self.xarr_with_attrs.hvplot.line(groupby='x', dynamic=False)
-        self.assertEqual(hmap.kdims[0].label, 'Declination')
-        self.assertEqual(hmap.last.kdims[0].label, 'Right Ascension')
-        self.assertEqual(hmap.last.vdims[0].label, 'luminosity')
-        self.assertEqual(hmap.last.vdims[0].unit, 'lm')
+        assert hmap.kdims[0].label == 'Declination'
+        assert hmap.last.kdims[0].label == 'Right Ascension'
+        assert hmap.last.vdims[0].label == 'luminosity'
+        assert hmap.last.vdims[0].unit == 'lm'
 
     def test_img_infer_dimension_params_from_xarray_attrs(self):
         img = self.xarr_with_attrs.hvplot.image(clim=(0, 2))
-        self.assertEqual(img.kdims[0].label, 'Declination')
-        self.assertEqual(img.kdims[1].label, 'Right Ascension')
-        self.assertEqual(img.vdims[0].label, 'luminosity')
-        self.assertEqual(img.vdims[0].unit, 'lm')
-        self.assertEqual(img.vdims[0].range, (0, 2))
+        assert img.kdims[0].label == 'Declination'
+        assert img.kdims[1].label == 'Right Ascension'
+        assert img.vdims[0].label == 'luminosity'
+        assert img.vdims[0].unit == 'lm'
+        assert img.vdims[0].range == (0, 2)
 
     def test_table_infer_dimension_params_from_xarray_ds_attrs(self):
         table = self.xds_with_attrs.hvplot.dataset()
-        self.assertEqual(table.kdims[0].label, 'Declination')
-        self.assertEqual(table.kdims[1].label, 'Right Ascension')
-        self.assertEqual(table.vdims[0].label, 'luminosity')
-        self.assertEqual(table.vdims[0].unit, 'lm')
+        assert table.kdims[0].label == 'Declination'
+        assert table.kdims[1].label == 'Right Ascension'
+        assert table.vdims[0].label == 'luminosity'
+        assert table.vdims[0].unit == 'lm'
 
     def test_points_infer_dimension_params_from_xarray_attrs(self):
         points = self.xarr_with_attrs.hvplot.points(c='value', clim=(0, 2))
-        self.assertEqual(points.kdims[0].label, 'Declination')
-        self.assertEqual(points.kdims[1].label, 'Right Ascension')
-        self.assertEqual(points.vdims[0].label, 'luminosity')
-        self.assertEqual(points.vdims[0].unit, 'lm')
-        self.assertEqual(points.vdims[0].range, (0, 2))
+        assert points.kdims[0].label == 'Declination'
+        assert points.kdims[1].label == 'Right Ascension'
+        assert points.vdims[0].label == 'luminosity'
+        assert points.vdims[0].unit == 'lm'
+        assert points.vdims[0].range == (0, 2)
 
     def test_dataset_infer_dimension_params_from_xarray_attrs(self):
         ds = self.xarr_with_attrs.hvplot.dataset()
-        self.assertEqual(ds.kdims[0].label, 'Declination')
-        self.assertEqual(ds.kdims[1].label, 'Right Ascension')
-        self.assertEqual(ds.vdims[0].label, 'luminosity')
-        self.assertEqual(ds.vdims[0].unit, 'lm')
+        assert ds.kdims[0].label == 'Declination'
+        assert ds.kdims[1].label == 'Right Ascension'
+        assert ds.vdims[0].label == 'luminosity'
+        assert ds.vdims[0].unit == 'lm'
 
     def test_table_infer_dimension_params_from_xarray_attrs(self):
         table = self.xarr_with_attrs.hvplot.dataset()
-        self.assertEqual(table.kdims[0].label, 'Declination')
-        self.assertEqual(table.kdims[1].label, 'Right Ascension')
-        self.assertEqual(table.vdims[0].label, 'luminosity')
-        self.assertEqual(table.vdims[0].unit, 'lm')
+        assert table.kdims[0].label == 'Declination'
+        assert table.kdims[1].label == 'Right Ascension'
+        assert table.vdims[0].label == 'luminosity'
+        assert table.vdims[0].unit == 'lm'
 
     def test_symmetric_img_deduces_symmetric(self):
         plot = self.da_img.hvplot.image()
         plot_opts = Store.lookup_options('bokeh', plot, 'plot')
-        self.assertEqual(plot_opts.kwargs.get('symmetric'), True)
+        assert plot_opts.kwargs.get('symmetric') is True
         style_opts = Store.lookup_options('bokeh', plot, 'style')
-        self.assertEqual(style_opts.kwargs['cmap'], 'coolwarm')
+        assert style_opts.kwargs['cmap'] == 'coolwarm'
 
     def test_symmetric_img_with_symmetric_set_to_false(self):
         plot = self.da_img.hvplot.image(symmetric=False)
         plot_opts = Store.lookup_options('bokeh', plot, 'plot')
-        self.assertEqual(plot_opts.kwargs.get('symmetric'), False)
+        assert plot_opts.kwargs.get('symmetric') is False
         style_opts = Store.lookup_options('bokeh', plot, 'style')
-        self.assertEqual(style_opts.kwargs['cmap'], 'kbc_r')
+        assert style_opts.kwargs['cmap'] == 'kbc_r'
 
     def test_symmetric_img_with_cmap_set(self):
         plot = self.da_img.hvplot.image(cmap='fire')
         plot_opts = Store.lookup_options('bokeh', plot, 'plot')
-        self.assertEqual(plot_opts.kwargs.get('symmetric'), True)
+        assert plot_opts.kwargs.get('symmetric') is True
         style_opts = Store.lookup_options('bokeh', plot, 'style')
-        self.assertEqual(style_opts.kwargs['cmap'], 'fire')
+        assert style_opts.kwargs['cmap'] == 'fire'
 
     def test_symmetric_with_big_img_sets_symmetric_to_false_without_calculating(self):
         plot = self.big_img.hvplot.image()
         plot_opts = Store.lookup_options('bokeh', plot, 'plot')
-        self.assertEqual(plot_opts.kwargs.get('symmetric'), False)
+        assert plot_opts.kwargs.get('symmetric') is False
         style_opts = Store.lookup_options('bokeh', plot, 'style')
-        self.assertEqual(style_opts.kwargs['cmap'], 'kbc_r')
+        assert style_opts.kwargs['cmap'] == 'kbc_r'
 
     def test_symmetric_with_big_img_and_check_symmetric_max_calculates_symmetric(self):
         plot = self.big_img.hvplot.image(check_symmetric_max=int(1e7))
         plot_opts = Store.lookup_options('bokeh', plot, 'plot')
-        self.assertEqual(plot_opts.kwargs.get('symmetric'), True)
+        assert plot_opts.kwargs.get('symmetric') is True
         style_opts = Store.lookup_options('bokeh', plot, 'style')
-        self.assertEqual(style_opts.kwargs['cmap'], 'coolwarm')
+        assert style_opts.kwargs['cmap'] == 'coolwarm'
 
     def test_multiple_zs(self):
         plot = self.ds.hvplot(x='lat', y='lon', z=['temp', 'precip'], dynamic=False)

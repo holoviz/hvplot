@@ -1,9 +1,8 @@
 """Tests for hvplot.xugrid trimesh support."""
 
-from unittest import SkipTest, TestCase
-
 import numpy as np
 import pandas as pd
+import pytest
 
 try:
     import holoviews as hv
@@ -12,7 +11,7 @@ try:
 
     import hvplot.xugrid  # noqa: F401 - patches .hvplot onto xu types
 except ImportError as e:
-    raise SkipTest(f'xugrid or required dependency not available: {e}')
+    pytest.skip(f'xugrid or required dependency not available: {e}', allow_module_level=True)
 
 from holoviews.element import TriMesh
 
@@ -95,10 +94,10 @@ def _make_time_face_uda():
     return xu.UgridDataArray(da, grid)
 
 
-class TestTrimeshNodeData(TestCase):
+class TestTrimeshNodeData:
     """Tests for trimesh plots when data lives on mesh nodes."""
 
-    def setUp(self):
+    def setup_method(self):
         self.uda = _make_simple_node_uda()
 
     def test_returns_trimesh_element(self):
@@ -143,10 +142,10 @@ class TestTrimeshNodeData(TestCase):
         assert plot_opts.get('filled') is True
 
 
-class TestTrimeshFaceData(TestCase):
+class TestTrimeshFaceData:
     """Tests for trimesh plots when data lives on mesh faces."""
 
-    def setUp(self):
+    def setup_method(self):
         self.uda = _make_simple_face_uda()
 
     def test_returns_trimesh_element(self):
@@ -166,7 +165,7 @@ class TestTrimeshFaceData(TestCase):
         assert len(tm) == 2
 
 
-class TestTrimeshExtraDimCoords(TestCase):
+class TestTrimeshExtraDimCoords:
     """Tests for extra dimensions with 2D or missing coordinates."""
 
     def _make_grid(self):
@@ -210,10 +209,10 @@ class TestTrimeshExtraDimCoords(TestCase):
         assert isinstance(plot, hv.DynamicMap)
 
 
-class TestTrimeshTimeDimension(TestCase):
+class TestTrimeshTimeDimension:
     """Tests for trimesh plots with an extra time dimension (groupby slider)."""
 
-    def setUp(self):
+    def setup_method(self):
         self.uda_node = _make_time_node_uda()
         self.uda_face = _make_time_face_uda()
 
@@ -226,7 +225,7 @@ class TestTrimeshTimeDimension(TestCase):
         assert isinstance(plot, hv.DynamicMap)
 
 
-class TestTrimeshUgridDataset(TestCase):
+class TestTrimeshUgridDataset:
     """Tests for trimesh when the input is a UgridDataset."""
 
     def _make_dataset(self):
@@ -257,7 +256,7 @@ class TestTrimeshUgridDataset(TestCase):
         assert isinstance(tm, TriMesh)
 
 
-class TestTrimeshQuadMesh(TestCase):
+class TestTrimeshQuadMesh:
     """Tests for trimesh with non-triangular (quad) faces."""
 
     def test_quad_mesh_triangulated(self):
@@ -277,7 +276,7 @@ class TestTrimeshQuadMesh(TestCase):
         assert len(tm) == 4
 
 
-class TestTrimeshVariableName(TestCase):
+class TestTrimeshVariableName:
     """Tests for variable name propagation."""
 
     def test_named_variable_in_vdim_label(self):
@@ -304,32 +303,32 @@ class TestTrimeshVariableName(TestCase):
         assert 'z' in vdim_names
 
 
-class TestTrimeshNonTrimeshKind(TestCase):
+class TestTrimeshNonTrimeshKind:
     """Tests for non-trimesh plot kinds on xugrid data."""
 
     def test_non_trimesh_kind_raises(self):
         uda = _make_simple_node_uda()
-        with self.assertRaises(NotImplementedError):
+        with pytest.raises(NotImplementedError):
             uda.hvplot.line()
 
     def test_error_message_is_helpful(self):
         uda = _make_simple_node_uda()
-        with self.assertRaises(NotImplementedError) as ctx:
+        with pytest.raises(NotImplementedError) as ctx:
             uda.hvplot.scatter()
-        assert 'trimesh' in str(ctx.exception)
+        assert 'trimesh' in str(ctx.value)
 
 
-class TestTrimeshGeo(TestCase):
+class TestTrimeshGeo:
     """Tests for trimesh with geo=True and CRS options."""
 
-    def setUp(self):
+    def setup_method(self):
         self.uda = _make_simple_node_uda()
 
     def test_geo_default_crs(self):
         try:
             import geoviews  # noqa: F401
         except ImportError:
-            raise SkipTest('geoviews not available')
+            pytest.skip('geoviews not available')
 
         plot = self.uda.hvplot.trimesh(geo=True)
         tm = plot.last if hasattr(plot, 'last') else plot
@@ -340,7 +339,7 @@ class TestTrimeshGeo(TestCase):
             import cartopy.crs as ccrs
             import geoviews  # noqa: F401
         except ImportError:
-            raise SkipTest('geoviews or cartopy not available')
+            pytest.skip('geoviews or cartopy not available')
 
         plot = self.uda.hvplot.trimesh(geo=True, crs=ccrs.Mercator())
         tm = plot.last if hasattr(plot, 'last') else plot

@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 import pytest
 from holoviews import Scatter, Store
-from holoviews.element.comparison import ComparisonTestCase
 
 from hvplot.plotting import hvPlot, hvPlotTabular
 
@@ -14,8 +13,8 @@ except ImportError:
     xr = None
 
 
-class TestOverrides(ComparisonTestCase):
-    def setUp(self):
+class TestOverrides:
+    def setup_method(self):
         import hvplot.pandas  # noqa: F401
 
         self.df = pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
@@ -24,8 +23,8 @@ class TestOverrides(ComparisonTestCase):
         hvplot = hvPlotTabular(self.df, width=42, height=42)
         curve = hvplot(y='y')
         opts = Store.lookup_options('bokeh', curve, 'plot')
-        self.assertEqual(opts.options.get('width'), 42)
-        self.assertEqual(opts.options.get('height'), 42)
+        assert opts.options.get('width') == 42
+        assert opts.options.get('height') == 42
 
     def test_define_custom_method(self):
         hvplot = hvPlotTabular(self.df, {'custom_scatter': {'width': 42, 'height': 42}})
@@ -33,10 +32,10 @@ class TestOverrides(ComparisonTestCase):
         scatter = hvplot.scatter(y='y')
         custom_opts = Store.lookup_options('bokeh', custom_scatter, 'plot')
         opts = Store.lookup_options('bokeh', scatter, 'plot')
-        self.assertEqual(custom_opts.options.get('width'), 42)
-        self.assertEqual(custom_opts.options.get('height'), 42)
-        self.assertNotEqual(opts.options.get('width'), 42)
-        self.assertNotEqual(opts.options.get('height'), 42)
+        assert custom_opts.options.get('width') == 42
+        assert custom_opts.options.get('height') == 42
+        assert opts.options.get('width') != 42
+        assert opts.options.get('height') != 42
 
     def test_define_customize_method(self):
         hvplot = hvPlotTabular(self.df, {'scatter': {'width': 42, 'height': 42}})
@@ -44,15 +43,15 @@ class TestOverrides(ComparisonTestCase):
         curve = hvplot.line(y='y')
         custom_opts = Store.lookup_options('bokeh', custom_scatter, 'plot')
         opts = Store.lookup_options('bokeh', curve, 'plot')
-        self.assertEqual(custom_opts.options.get('width'), 42)
-        self.assertEqual(custom_opts.options.get('height'), 42)
-        self.assertNotEqual(opts.options.get('width'), 42)
-        self.assertNotEqual(opts.options.get('height'), 42)
+        assert custom_opts.options.get('width') == 42
+        assert custom_opts.options.get('height') == 42
+        assert opts.options.get('width') != 42
+        assert opts.options.get('height') != 42
 
     @pytest.mark.usefixtures('disable_param_warnings_as_exceptions')
     def test_attempt_to_override_kind_on_method(self):
         hvplot = hvPlotTabular(self.df, {'scatter': {'kind': 'line'}})
-        self.assertIsInstance(hvplot.scatter(y='y'), Scatter)
+        assert isinstance(hvplot.scatter(y='y'), Scatter)
 
     def test_pandas_query_metadata(self):
         hvplot = hvPlotTabular(self.df, query='x>2')
@@ -60,8 +59,8 @@ class TestOverrides(ComparisonTestCase):
 
 
 @pytest.mark.skipif(xr is None, reason='xarray not available')
-class TestXArrayOverrides(ComparisonTestCase):
-    def setUp(self):
+class TestXArrayOverrides:
+    def setup_method(self):
         coords = OrderedDict([('time', [0, 1]), ('lat', [0, 1]), ('lon', [0, 1])])
         self.da_img_by_time = xr.DataArray(
             np.arange(8).reshape((2, 2, 2)), coords, ['time', 'lat', 'lon']

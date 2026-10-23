@@ -175,7 +175,6 @@ xyzservices = ">=2022.9.0"
 # =================== TESTS ===================
 
 [feature.test-core.dependencies]
-parameterized = "*"
 psutil = "*"
 pytest = "*"
 pytest-cov = "*"

@@ -1,17 +1,15 @@
 from itertools import pairwise
-from unittest import SkipTest, TestCase
 
-try:
-    import networkx as nx
-    import numpy as np
+import numpy as np
+import pytest
 
-    import hvplot.networkx as hvnx
-except ImportError:
-    raise SkipTest('NetworkX not available')
+nx = pytest.importorskip('networkx', reason='NetworkX not available')
+
+import hvplot.networkx as hvnx
 
 
-class TestOptions(TestCase):
-    def setUp(self):
+class TestOptions:
+    def setup_method(self):
         # Create nodes (1-10) in unsorted order
         nodes = np.array([1, 4, 5, 10, 8, 9, 3, 7, 2, 6])
         edges = list(pairwise(nodes))

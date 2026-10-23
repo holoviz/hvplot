@@ -1,5 +1,4 @@
 import sys
-from unittest import SkipTest
 
 import numpy as np
 import pandas as pd
@@ -9,23 +8,18 @@ from holoviews.core.overlay import Overlay
 from holoviews.core.spaces import DynamicMap
 from holoviews.element import Image, Points, QuadMesh
 from holoviews.element.chart import Scatter
-from holoviews.element.comparison import ComparisonTestCase
 from holoviews.element.raster import ImageStack
-from parameterized import parameterized
 
 import hvplot.pandas  # noqa: F401
 from hvplot.converter import HoloViewsConverter
 from hvplot.tests.util import makeTimeDataFrame
 
 
-class TestDatashader(ComparisonTestCase):
-    def setUp(self):
-        try:
-            import datashader  # noqa: F401
-        except ImportError:
-            raise SkipTest('Datashader not available')
+class TestDatashader:
+    def setup_method(self):
+        pytest.importorskip('datashader')
         if sys.maxsize < 2**32:
-            raise SkipTest('Datashader does not support 32-bit systems')
+            pytest.skip('Datashader does not support 32-bit systems')
 
         self.df = pd.DataFrame(
             [[1, 2, 'A', 0.1], [3, 4, 'B', 0.2], [5, 6, 'C', 0.3]],
@@ -37,114 +31,114 @@ class TestDatashader(ComparisonTestCase):
 
         dmap = self.df.hvplot.scatter('x', 'y', by='category', rasterize=True)
         agg = dmap.callback.inputs[0].callback.operation.p.aggregator
-        self.assertIsInstance(agg, count_cat)
-        self.assertEqual(agg.column, 'category')
+        assert isinstance(agg, count_cat)
+        assert agg.column == 'category'
 
     def test_rasterize_by_cat_agg(self):
         from datashader.reductions import count_cat
 
         dmap = self.df.hvplot.scatter('x', 'y', aggregator=count_cat('category'), rasterize=True)
         agg = dmap.callback.inputs[0].callback.operation.p.aggregator
-        self.assertIsInstance(agg, count_cat)
-        self.assertEqual(agg.column, 'category')
+        assert isinstance(agg, count_cat)
+        assert agg.column == 'category'
 
-    @parameterized.expand([('rasterize',), ('datashade',)])
+    @pytest.mark.parametrize('operation', ['rasterize', 'datashade'])
     def test_color_dim_with_default_agg(self, operation):
         from datashader.reductions import mean
 
         dmap = self.df.hvplot.scatter('x', 'y', c='number', **{operation: True})
         agg = dmap.callback.inputs[0].callback.operation.p.aggregator
-        self.assertIsInstance(agg, mean)
-        self.assertEqual(agg.column, 'number')
+        assert isinstance(agg, mean)
+        assert agg.column == 'number'
 
-    @parameterized.expand([('rasterize',), ('datashade',)])
+    @pytest.mark.parametrize('operation', ['rasterize', 'datashade'])
     def test_color_dim_with_string_agg(self, operation):
         from datashader.reductions import sum
 
         dmap = self.df.hvplot.scatter('x', 'y', c='number', aggregator='sum', **{operation: True})
         agg = dmap.callback.inputs[0].callback.operation.p.aggregator
-        self.assertIsInstance(agg, sum)
-        self.assertEqual(agg.column, 'number')
+        assert isinstance(agg, sum)
+        assert agg.column == 'number'
 
-    @parameterized.expand([('rasterize',), ('datashade',)])
+    @pytest.mark.parametrize('operation', ['rasterize', 'datashade'])
     def test_color_dim_also_an_axis(self, operation):
         from datashader.reductions import mean
 
         original_data = self.df.copy(deep=True)
         dmap = self.df.hvplot.scatter('x', 'y', c='y', **{operation: True})
         agg = dmap.callback.inputs[0].callback.operation.p.aggregator
-        self.assertIsInstance(agg, mean)
-        self.assertEqual(agg.column, '_color')
+        assert isinstance(agg, mean)
+        assert agg.column == '_color'
         assert original_data.equals(self.df)
 
     def test_rasterize_color_dim_with_new_column_gets_default_cmap(self):
         plot = self.df.hvplot.scatter('x', 'y', c='y', dynamic=False, rasterize=True)
         opts = Store.lookup_options('bokeh', plot, 'style').kwargs
-        self.assertEqual(opts.get('cmap'), 'kbc_r')
+        assert opts.get('cmap') == 'kbc_r'
 
     def test_rasterize_default_cmap(self):
         plot = self.df.hvplot.scatter('x', 'y', dynamic=False, rasterize=True)
         opts = Store.lookup_options('bokeh', plot, 'style').kwargs
-        self.assertEqual(opts.get('cmap'), 'kbc_r')
+        assert opts.get('cmap') == 'kbc_r'
 
     def test_rasterize_default_colorbar(self):
         plot = self.df.hvplot.scatter('x', 'y', dynamic=False, rasterize=True)
         opts = Store.lookup_options('bokeh', plot, 'plot').kwargs
-        self.assertTrue(opts.get('colorbar'))
+        assert opts.get('colorbar')
 
     def test_rasterize_default_colorbar_with_cmap(self):
         cmap = 'Reds'
         plot = self.df.hvplot.scatter('x', 'y', dynamic=False, rasterize=True, cmap=cmap)
         opts = Store.lookup_options('bokeh', plot, 'style').kwargs
-        self.assertEqual(opts.get('cmap'), cmap)
+        assert opts.get('cmap') == cmap
         opts = Store.lookup_options('bokeh', plot, 'plot').kwargs
-        self.assertTrue(opts.get('colorbar'))
+        assert opts.get('colorbar')
 
     def test_rasterize_set_clim(self):
         plot = self.df.hvplot.scatter('x', 'y', dynamic=False, rasterize=True, clim=(1, 4))
         opts = Store.lookup_options('bokeh', plot, 'plot').kwargs
-        self.assertEqual(opts.get('clim'), (1, 4))
+        assert opts.get('clim') == (1, 4)
 
-    @parameterized.expand([('aspect',), ('data_aspect',)])
+    @pytest.mark.parametrize('opt', ['aspect', 'data_aspect'])
     def test_aspect_with_datashade(self, opt):
         plot = self.df.hvplot(x='x', y='y', datashade=True, **{opt: 2})
         opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
-        self.assertEqual(opts[opt], 2)
-        self.assertEqual(opts.get('height'), None)
-        self.assertEqual(opts.get('frame_height'), None)
+        assert opts[opt] == 2
+        assert opts.get('height') is None
+        assert opts.get('frame_height') is None
 
-    @parameterized.expand([('aspect',), ('data_aspect',)])
+    @pytest.mark.parametrize('opt', ['aspect', 'data_aspect'])
     def test_aspect_with_datashade_and_dynamic_is_false(self, opt):
         plot = self.df.hvplot(x='x', y='y', datashade=True, dynamic=False, **{opt: 2})
         opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
-        self.assertEqual(opts[opt], 2)
-        self.assertEqual(opts.get('height'), None)
-        self.assertEqual(opts.get('frame_height'), None)
+        assert opts[opt] == 2
+        assert opts.get('height') is None
+        assert opts.get('frame_height') is None
 
-    @parameterized.expand([('aspect',), ('data_aspect',)])
+    @pytest.mark.parametrize('opt', ['aspect', 'data_aspect'])
     def test_aspect_and_frame_height_with_datashade(self, opt):
         plot = self.df.hvplot(x='x', y='y', frame_height=150, datashade=True, **{opt: 2})
         opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
-        self.assertEqual(opts[opt], 2)
-        self.assertEqual(opts.get('frame_height'), 150)
-        self.assertEqual(opts.get('height'), None)
-        self.assertEqual(opts.get('frame_width'), None)
+        assert opts[opt] == 2
+        assert opts.get('frame_height') == 150
+        assert opts.get('height') is None
+        assert opts.get('frame_width') is None
 
-    @parameterized.expand([('aspect',), ('data_aspect',)])
+    @pytest.mark.parametrize('opt', ['aspect', 'data_aspect'])
     def test_aspect_and_frame_height_with_datashade_and_dynamic_is_false(self, opt):
         plot = self.df.hvplot(
             x='x', y='y', frame_height=150, datashade=True, dynamic=False, **{opt: 2}
         )
         opts = Store.lookup_options('bokeh', plot[()], 'plot').kwargs
-        self.assertEqual(opts[opt], 2)
-        self.assertEqual(opts.get('frame_height'), 150)
-        self.assertEqual(opts.get('height'), None)
-        self.assertEqual(opts.get('frame_width'), None)
+        assert opts[opt] == 2
+        assert opts.get('frame_height') == 150
+        assert opts.get('height') is None
+        assert opts.get('frame_width') is None
 
     def test_cmap_can_be_color_key(self):
         color_key = {'A': '#ff0000', 'B': '#00ff00', 'C': '#0000ff'}
         self.df.hvplot.points(x='x', y='y', by='category', cmap=color_key, datashade=True)
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             self.df.hvplot.points(
                 x='x', y='y', by='category', datashade=True, cmap='kbc_r', color_key=color_key
             )
@@ -164,7 +158,7 @@ class TestDatashader(ComparisonTestCase):
         img = data.hvplot(xlim=(0, 20000), datashade=True, dynamic=False)
         assert img.range(0) == (0, 20000)
 
-    @parameterized.expand([('scatter',), ('line',), ('area',)])
+    @pytest.mark.parametrize('kind', ['scatter', 'line', 'area'])
     def test_wide_charts_categorically_shaded_explicit_ys(self, kind):
         df = makeTimeDataFrame()
         plot = makeTimeDataFrame().hvplot(y=list(df.columns), datashade=True, kind=kind)
@@ -172,7 +166,7 @@ class TestDatashader(ComparisonTestCase):
         assert plot.callback.inputs[0].callback.operation.p.cmap == expected_cmap
         assert plot.callback.inputs[0].callback.operation.p.aggregator.column == 'Variable'
 
-    @parameterized.expand([('scatter',), ('line',), ('area',)])
+    @pytest.mark.parametrize('kind', ['scatter', 'line', 'area'])
     def test_wide_charts_categorically_shaded_implicit_ys(self, kind):
         plot = makeTimeDataFrame().hvplot(datashade=True, kind=kind)
         expected_cmap = HoloViewsConverter._default_cmaps['categorical']
@@ -282,7 +276,7 @@ class TestDatashader(ComparisonTestCase):
         with pytest.raises(ValueError, match='At least one resampling operation'):
             self.df.hvplot(x='x', y='y', resample_when=10)
 
-    @parameterized.expand([('rasterize',), ('datashade',)])
+    @pytest.mark.parametrize('operation', ['rasterize', 'datashade'])
     def test_operation_resample_when(self, operation):
         df = pd.DataFrame(
             np.random.multivariate_normal((0, 0), [[0.1, 0.1], [0.1, 1.0]], (5000,))
@@ -302,7 +296,7 @@ class TestDatashader(ComparisonTestCase):
         assert isinstance(scatter, Scatter)
         assert len(scatter.data) == 0
 
-    @parameterized.expand([('points', Points), ('scatter', Scatter)])
+    @pytest.mark.parametrize('kind,eltype', [('points', Points), ('scatter', Scatter)])
     def test_downsample_resample_when(self, kind, eltype):
         df = pd.DataFrame(
             np.random.multivariate_normal((0, 0), [[0.1, 0.1], [0.1, 1.0]], (5000,))
@@ -328,7 +322,7 @@ class TestDatashader(ComparisonTestCase):
         ):
             self.df.hvplot.points('x', 'y', selector='first')
 
-    @parameterized.expand([('bad',), (('bad', 'number'),)])
+    @pytest.mark.parametrize('selector', ['bad', ('bad', 'number')])
     def test_selector_error_if_bad_string_value(self, selector):
         with pytest.raises(ValueError, match='Invalid selector value'):
             self.df.hvplot.points('x', 'y', rasterize=True, selector=selector)
@@ -342,10 +336,9 @@ class TestDatashader(ComparisonTestCase):
             (first('category'), first('category')),
         ]
         for selector, expected_selector in test_cases:
-            with self.subTest(selector=str(selector)):
-                plot = self.df.hvplot.points('x', 'y', rasterize=True, selector=selector)
-                actual = plot.callback.inputs[0].callback.operation.p['selector']
-                assert actual == expected_selector
+            plot = self.df.hvplot.points('x', 'y', rasterize=True, selector=selector)
+            actual = plot.callback.inputs[0].callback.operation.p['selector']
+            assert actual == expected_selector, selector
 
     def test_selector_datashade(self):
         from datashader.reductions import first, min
@@ -356,10 +349,9 @@ class TestDatashader(ComparisonTestCase):
             (first('category'), first('category')),
         ]
         for selector, expected_selector in test_cases:
-            with self.subTest(selector=str(selector)):
-                plot = self.df.hvplot.points('x', 'y', datashade=True, selector=selector)
-                actual = plot.callback.inputs[0].callback.operation.p['selector']
-                assert actual == expected_selector
+            plot = self.df.hvplot.points('x', 'y', datashade=True, selector=selector)
+            actual = plot.callback.inputs[0].callback.operation.p['selector']
+            assert actual == expected_selector, selector
 
     def test_selector_when_datashade_is_true_set_hover_to_true_by_default(self):
         plot = self.df.hvplot(x='x', y='y', datashade=True, selector='first')
@@ -367,15 +359,12 @@ class TestDatashader(ComparisonTestCase):
         assert 'hover' in opts.get('tools')
 
 
-class TestChart2D(ComparisonTestCase):
-    def setUp(self):
-        try:
-            import datashader  # noqa: F401
-            import xarray as xr
-        except ImportError:
-            raise SkipTest('xarray or datashader not available')
+class TestChart2D:
+    def setup_method(self):
+        pytest.importorskip('datashader')
+        xr = pytest.importorskip('xarray')
         if sys.maxsize < 2**32:
-            raise SkipTest('Datashader does not support 32-bit systems')
+            pytest.skip('Datashader does not support 32-bit systems')
         import hvplot.xarray  # noqa: F401
 
         data = np.arange(0, 60).reshape(6, 10)
@@ -383,21 +372,21 @@ class TestChart2D(ComparisonTestCase):
         y = np.arange(6)
         self.da = xr.DataArray(data, coords={'y': y, 'x': x}, dims=('y', 'x'))
 
-    @parameterized.expand([('image', Image), ('quadmesh', QuadMesh)])
+    @pytest.mark.parametrize('kind,element', [('image', Image), ('quadmesh', QuadMesh)])
     def test_plot_resolution(self, kind, element):
         plot = self.da.hvplot(kind=kind)
         assert all(plot.data.x.diff('x').round(0) == 1)
         assert all(plot.data.y.diff('y').round(0) == 1)
 
-    @parameterized.expand([('image', Image), ('quadmesh', QuadMesh)])
+    @pytest.mark.parametrize('kind,element', [('image', Image), ('quadmesh', QuadMesh)])
     def test_plot_resolution_with_rasterize(self, kind, element):
         plot = self.da.hvplot(kind=kind, dynamic=False, rasterize=True, x_sampling=5, y_sampling=2)
         assert all(plot.data.x.diff('x').round(0) == 5)
         assert all(plot.data.y.diff('y').round(0) == 2)
 
 
-class TestDownsample(ComparisonTestCase):
-    def setUp(self):
+class TestDownsample:
+    def setup_method(self):
 
         self.df = pd.DataFrame(np.random.random(100))
 
