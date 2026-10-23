@@ -1,7 +1,9 @@
 import numpy as np
 import pandas as pd
-import xarray as xr
+import pytest
 from holoviews import Store
+
+xr = pytest.importorskip('xarray')
 
 import hvplot.xarray  # noqa: F401
 

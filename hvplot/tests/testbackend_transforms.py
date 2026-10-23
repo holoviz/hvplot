@@ -34,6 +34,7 @@ def test_transform_size_to_mpl(width, height, aspect, opts):
     ),
 )
 def test_transfer_opts(element, opt, val, backend, opt_kind, transf_opt, transf_val):
+    pytest.importorskip(backend)
     current_backend = Store.current_backend
     if backend not in Store.registry:
         holoviews.extension(backend)
@@ -59,6 +60,7 @@ def test_transfer_opts(element, opt, val, backend, opt_kind, transf_opt, transf_
     ),
 )
 def test_transfer_opts_compositeoverlay(opt, val, backend, opt_kind, transf_opt, transf_val):
+    pytest.importorskip(backend)
     current_backend = Store.current_backend
     if backend not in Store.registry:
         holoviews.extension(backend)

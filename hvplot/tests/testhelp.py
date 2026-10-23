@@ -28,6 +28,8 @@ def test_help_style_extension_output(reset_default_backend):
         sorted(Store.registry['bokeh'][Curve].style_opts)
     )
 
+    pytest.importorskip('matplotlib')
+    pytest.importorskip('plotly')
     # The current backend becomes matplotlib
     hvplot.extension('matplotlib', 'plotly')
     docstring, _signature = _get_doc_and_signature(

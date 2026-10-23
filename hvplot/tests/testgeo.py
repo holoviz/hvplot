@@ -13,8 +13,6 @@ import pytest
 
 from hvplot.util import proj_to_cartopy
 
-pytestmark = pytest.mark.geo
-
 bk_renderer = hv.Store.renderers['bokeh']
 
 

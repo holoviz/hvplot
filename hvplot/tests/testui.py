@@ -6,7 +6,10 @@ import holoviews as hv
 import numpy as np
 import pandas as pd
 import pytest
-import xarray as xr
+
+xr = pytest.importorskip('xarray')
+pytest.importorskip('bokeh_sampledata')
+
 from bokeh.sampledata import penguins
 
 import hvplot.pandas
@@ -393,8 +396,8 @@ def test_explorer_xarray_multi_var_extra_dims_no_coord():
 
 @pytest.mark.usefixtures('disable_param_warnings_as_exceptions')
 @pytest.mark.parametrize('kind_tuple', [('scatter', 'points'), ('line', 'paths')])
-@pytest.mark.geo
 def test_explorer_geo_revise_kind(kind_tuple):
+    pytest.importorskip('geoviews')
     da = ds_air_temperature['air'].isel(time=0)
     explorer = hvplot.explorer(da, x='lon', y='lat', kind=kind_tuple[0], geo=True)
     assert explorer.kind == kind_tuple[1]

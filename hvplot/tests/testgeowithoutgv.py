@@ -6,6 +6,7 @@ import holoviews as hv
 import numpy as np
 import pandas as pd
 import pytest
+from holoviews.core.options import Compositor
 from holoviews.util.transform import lon_lat_to_easting_northing
 
 import hvplot.pandas
@@ -55,7 +56,30 @@ def mercator_df():
     )
 
 
+def _is_geoviews(obj):
+    return obj.__module__.startswith('geoviews')
+
+
+def _remove_geoviews_from_store(monkeypatch):
+    for backend, registry in list(hv.Store.registry.items()):
+        clean = {
+            element: next(c for c in plot.__mro__ if not _is_geoviews(c))
+            if _is_geoviews(plot)
+            else plot
+            for element, plot in registry.items()
+            if not _is_geoviews(element)
+        }
+        monkeypatch.setitem(hv.Store.registry, backend, clean)
+    definitions = [c for c in Compositor.definitions if not _is_geoviews(c.operation)]
+    monkeypatch.setattr(Compositor, 'definitions', definitions)
+
+
 class TestAnnotationNotGeo:
+    @pytest.fixture(autouse=True)
+    def _unimport_geoviews(self, unimport, monkeypatch):
+        unimport('geoviews')
+        _remove_geoviews_from_store(monkeypatch)
+
     def test_plot_tiles_doesnt_set_geo(self, simple_df):
         plot = simple_df.hvplot.points('x', 'y', tiles=True)
         assert len(plot) == 2

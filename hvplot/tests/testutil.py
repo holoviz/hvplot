@@ -243,7 +243,6 @@ class TestDynamicArgs(TestCase):
         assert len(arg_deps) == 2
 
 
-@pytest.mark.geo
 def test_check_crs():
     pytest.importorskip('pyproj')
     p = check_crs('epsg:26915')
@@ -397,8 +396,8 @@ def test_is_geodataframe_classic_dataframe():
     assert not is_geodataframe(df)
 
 
-@pytest.mark.geo
 def test_geoviews_is_available():
+    pytest.importorskip('geoviews')
     assert import_geoviews()
 
 

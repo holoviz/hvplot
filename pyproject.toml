@@ -184,12 +184,7 @@ include = ["hvplot", "scripts", "doc"]
 version-file = "hvplot/_version.py"
 
 [tool.pytest.ini_options]
-addopts = "-v --pyargs"
-norecursedirs = "*.egg dist build _build jupyter_execute .*"
-# The test suite used to be run with nosetests which collected
-# by default files like `testgeo.py` while pytest's default is
-# to collect files like `test_geo.py`. This setting allows
-# to avoid renaming all the test files.
+addopts = ["--strict-config", "--strict-markers", "--color=yes", "--pyargs"]
 python_files = "test*.py"
 filterwarnings = [
     # 2023-09: See https://github.com/matplotlib/matplotlib/issues/25244
@@ -260,6 +255,7 @@ ignore = [
 "hvplot/tests/*" = [
     "B904",
     "D",
+    "E402",  # Module level import not at top of file
     "NPY002", # Replace legacy `np.random.rand` call with Generator
 ]
 "scripts/*" = ["D"]

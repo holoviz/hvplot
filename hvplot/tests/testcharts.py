@@ -225,7 +225,7 @@ class TestChart1D(ComparisonTestCase):
 
     @parameterized.expand([('line', Curve), ('area', Area), ('scatter', Scatter)])
     def test_tidy_chart_index_by(self, kind, element):
-        import dask
+        dask = pytest.importorskip('dask')
 
         plot = self.df.hvplot(x='index', y='y', by='x', kind=kind)
         # The new dask dataframe implementation that replace the old one

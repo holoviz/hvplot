@@ -35,6 +35,7 @@ defaults:
     shell: bash -e {0}
 
 env:
+  COV: "--cov=hvplot --cov-branch --cov-append"
   UPSTREAM_PACKAGES: "holoviews panel param colorcet datashader geoviews"
 
 jobs:
@@ -159,10 +160,7 @@ jobs:
         run: |
           pixi update ${UPSTREAM_PACKAGES} -e "${ENV}"
       - name: Test Unit
-        run: pixi run -e "${ENV}" test-unit-cov
-      - name: Test Geo
-        if: ${{ matrix.environment != 'test-314' }}
-        run: pixi run -e "${ENV}" test-unit-geo-cov
+        run: pixi run -e "${ENV}" test-unit $COV
       - name: Test Examples
         run: |
           if [[ "${MATRIX_OPTION}" == "full" ]]; then

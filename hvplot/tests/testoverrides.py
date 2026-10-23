@@ -3,11 +3,15 @@ from collections import OrderedDict
 import numpy as np
 import pandas as pd
 import pytest
-import xarray as xr
 from holoviews import Scatter, Store
 from holoviews.element.comparison import ComparisonTestCase
 
 from hvplot.plotting import hvPlot, hvPlotTabular
+
+try:
+    import xarray as xr
+except ImportError:
+    xr = None
 
 
 class TestOverrides(ComparisonTestCase):
@@ -55,6 +59,7 @@ class TestOverrides(ComparisonTestCase):
         assert len(hvplot._data) == 2
 
 
+@pytest.mark.skipif(xr is None, reason='xarray not available')
 class TestXArrayOverrides(ComparisonTestCase):
     def setUp(self):
         coords = OrderedDict([('time', [0, 1]), ('lat', [0, 1]), ('lon', [0, 1])])

@@ -18,48 +18,46 @@ hatch-vcs = "*"
 
 [environments]
 default = [
-    "py312",
     "required",
+    "py312",
+    "optional",
     "test-core",
-    "test",
-    "example",
-    "geo",
-    "graphviz",
     "test-example",
+    "test-unit-task",
     "lint",
     "dev",
 ]
 
 [environments.test-310]
-features = ["py310", "required", "test-core", "test", "example", "geo", "graphviz", "test-example"]
+features = ["required", "py310", "optional", "test-core", "test-example", "test-unit-task"]
 no-default-feature = true
 
 [environments.test-311]
-features = ["py311", "required", "test-core", "test", "example", "geo", "graphviz", "test-example"]
+features = ["required", "py311", "optional", "test-core", "test-example", "test-unit-task"]
 no-default-feature = true
 
 [environments.test-312]
-features = ["py312", "required", "test-core", "test", "example", "geo", "graphviz", "test-example"]
+features = ["required", "py312", "optional", "test-core", "test-example", "test-unit-task"]
 no-default-feature = true
 
 [environments.test-313]
-features = ["py313", "required", "test-core", "test", "example", "geo", "graphviz", "test-example"]
+features = ["required", "py313", "optional", "test-core", "test-example", "test-unit-task"]
 no-default-feature = true
 
 [environments.test-314]
-features = ["py314", "required", "test-core", "test", "example", "geo", "graphviz", "test-example"]
+features = ["required", "py314", "optional", "test-core", "test-example", "test-unit-task"]
 no-default-feature = true
 
 [environments.test-core]
-features = ["py314", "required", "test-core"]
+features = ["required", "py314", "test-core", "test-unit-task"]
 no-default-feature = true
 
 [environments.docs]
-features = ["py313", "required", "doc", "example", "geo", "graphviz"]
+features = ["required", "py313", "optional", "doc"]
 no-default-feature = true
 
 [environments.build]
-features = ["py313", "required", "build"]
+features = ["required", "py313", "build"]
 no-default-feature = true
 
 [environments.lint]
@@ -122,13 +120,17 @@ setuptools_scm = ">=6"
 [feature.dev.tasks]
 lab = 'jupyter lab'
 
-# =================== SHARED DEPS ===================
+# =================== OPTIONAL ===================
 
-# Dependencies required to run the notebooks
-[feature.example.dependencies]
-dask = "*"  # dask[dataframe]
+[feature.optional.dependencies]
+bokeh_sampledata = ">=2025.0"
+cartopy = "*"
+cftime = "*"
+dask-core = "*"
+pyarrow = "*"
 datashader = ">=0.6.5"
 duckdb = "*"
+fiona = "*"
 # In 0.9 fugue added the sql extra but didn't add a fugue-sql conda package,
 # removing the sql deps from core fugue. Adding them manually here.
 fugue-sql-antlr = ">=0.2.4"
@@ -137,101 +139,56 @@ jinja2 = "*"
 # fugue[sql] = "*"
 fugue = "*"
 # end fugue
+geodatasets = ">=2023.12.0"
+geopandas = "*"
+geoviews-core = ">=1.9.0"  # geoviews
+hvsampledata = ">=0.1.4a2"
 ibis-duckdb = ">=9.0.0"  # ibis-framework[duckdb]
+intake = ">=0.6.5,<2.0.0" # Kept only for deprecation tests.
 ipywidgets = "*"
-networkx = ">=2.6.3"
 matplotlib = "*"
-notebook = ">=5.4"
 netcdf4 = "*"
+networkx = ">=2.6.3"
+notebook = ">=5.4"
 numba = ">=0.51.0"
+numpydoc = "*"
 pillow = ">=8.2.0"
 plotly = "*"
 polars = "*"
 pooch = ">=1.6.0"
+# graphviz is difficult to install with pip, ok with conda.
+pygraphviz = "*"
+pyproj = "*"
+rasterio = "*"
+rioxarray = "*"
 s3fs = ">=2022.1.0"
 scikit-image = ">=0.17.2"
 scikit-learn = ">=1.4.0"
 scipy = ">=1.5.3"
-selenium  = ">=3.141.0"
+selenium = ">=3.141.0"
+spatialpandas = ">=0.4.3"
 streamz = ">=0.3.0"
 xarray = ">=0.18.2"
-xyzservices = ">=2022.9.0"
-geodatasets = ">=2023.12.0"
-hvsampledata = ">=0.1.4a2"
-bokeh_sampledata = ">=2025.0"
 xugrid = ">=0.15.0"
+xyzservices = ">=2022.9.0"
 
 # =================== TESTS ===================
 
 [feature.test-core.dependencies]
-# Minimum dependencies required to run the test suite.
-dask = "*"  # dask[dataframe]
-ipywidgets = "*"
-matplotlib = "*"
 parameterized = "*"
-plotly = "*"
-pooch = "*"
-pre-commit = "*"
-pytest-cov = "*"
-pytest = "*"
-ruff = "*"
-scipy = "*"
-xarray = "*"
-bokeh_sampledata = "*"
 psutil = "*"
-cftime = "*"
-numpydoc = "*"
-intake  = ">=0.6.5,<2.0.0" # Kept only for deprecation tests.
+pytest = "*"
+pytest-cov = "*"
+pytest-xdist = "*"
+
+[feature.test-unit-task.tasks] # So it is not showing up in environments without tests
+test-unit = { cmd = 'pytest hvplot/tests -n logical --dist loadgroup', description = "Run the unit tests" }
 
 [feature.test-example.dependencies]
-# Dependencies required to run the examples notebooks.
-pytest-xdist = "*"
 nbval = "*"
 
-[feature.test.dependencies]
-# Optional tests dependencies, i.e. one should be able to run and pass
-# the test suite without installing any of those.
-
-# In 0.9 fugue added the sql extra but didn't add a fugue-sql conda package,
-# removing the sql deps from core fugue. Adding them manually here.
-fugue-sql-antlr = ">=0.2.4"
-sqlglot = "*"
-jinja2 = "*"
-# fugue[sql] = "*"
-fugue = "*"
-# end fugue
-ibis-duckdb = ">=9.0.0"  # ibis-framework[duckdb]
-polars = "*"
-dask = "*"
-spatialpandas = "*"
-duckdb = "*"
-xugrid = ">=0.15.0"
-
-[feature.geo.dependencies]
-# Geo dependencies are always a little special.
-cartopy = "*"
-fiona = "*"
-geopandas = "*"
-geoviews-core = ">=1.9.0"  # geoviews
-pyproj = "*"
-rasterio = "*"
-rioxarray = "*"
-spatialpandas = ">=0.4.3"
-
-[feature.graphviz.dependencies]
-# graphviz is difficult to install with pip, ok with conda.
-pygraphviz = "*"
-
-[feature.test.tasks]
-test-unit-geo = 'pytest -v hvplot --geo'
-test-unit-cov = 'pytest -v hvplot --cov=hvplot --cov-branch --cov-append'
-test-unit-geo-cov = 'pytest -v hvplot --geo --cov=hvplot --cov-branch --cov-append'
-
-[feature.test-core.tasks]
-test-unit = 'pytest -v hvplot'
-
 [feature.test-example.tasks]
-test-example = 'pytest -n logical --dist loadscope --nbval-lax -p no:python doc'
+test-example = { cmd = 'pytest -n logical --dist loadscope --nbval-lax -p no:python doc', description = "Run the example notebooks" }
 
 # =================== DOCS ====================
 

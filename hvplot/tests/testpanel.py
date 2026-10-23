@@ -5,6 +5,7 @@ Tests for panel widgets and param objects as arguments
 from unittest import TestCase
 
 import panel as pn
+import pytest
 
 from hvplot.util import process_xarray  # noqa: F401
 
@@ -25,6 +26,7 @@ def look_for_class(panel, classname, items=None):
 
 class TestPanelObjects(TestCase):
     def setUp(self):
+        pytest.importorskip('bokeh_sampledata')
         from bokeh.sampledata.iris import flowers
 
         import hvplot.pandas  # noqa: F401

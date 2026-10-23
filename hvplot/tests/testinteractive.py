@@ -1,18 +1,21 @@
 import holoviews as hv
-import matplotlib
 import numpy as np
 import pandas as pd
 import panel as pn
 import pytest
-import xarray as xr
 from holoviews.util.transform import dim
 
-import hvplot.pandas
-import hvplot.xarray  # noqa: F401
+import hvplot.pandas  # noqa: F401
 from hvplot import bind
 from hvplot.interactive import Interactive
 from hvplot.tests.util import makeDataFrame, makeMixedDataFrame
-from hvplot.xarray import XArrayInteractive
+
+try:
+    import xarray as xr
+
+    from hvplot.xarray import XArrayInteractive
+except ImportError:
+    xr = None
 
 
 @pytest.fixture(scope='module')
@@ -27,6 +30,7 @@ def df():
 
 @pytest.fixture(scope='module')
 def dataset():
+    pytest.importorskip('xarray')
     return xr.tutorial.load_dataset('air_temperature')
 
 
@@ -132,6 +136,7 @@ def test_interactive_xarray_dataarray(dataarray):
     assert dai._method is None
 
 
+@pytest.mark.skipif(xr is None, reason='xarray not available')
 def test_interactive_xarray_dataarray_no_name():
     dataarray = xr.DataArray(np.random.rand(2, 2))
     with pytest.raises(ValueError, match='Cannot use interactive API on DataArray without name'):
@@ -1097,6 +1102,7 @@ def test_interactive_pandas_series_operator_round(series):
 
 
 def test_interactive_pandas_series_plot(series, clone_spy):
+    matplotlib = pytest.importorskip('matplotlib')
     si = Interactive(series)
 
     si = si.plot()
@@ -1140,6 +1146,7 @@ def test_interactive_pandas_series_plot(series, clone_spy):
 
 
 def test_interactive_pandas_series_plot_kind_attr(series, clone_spy):
+    matplotlib = pytest.importorskip('matplotlib')
     # TODO: Not checking the dim reprs in this test as that was
     # affecting the pipeline.
     si = Interactive(series)

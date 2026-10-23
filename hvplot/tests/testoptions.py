@@ -2,7 +2,6 @@ import holoviews as hv
 import numpy as np
 import pandas as pd
 import pytest
-import xarray as xr
 from holoviews import Store
 from holoviews.core.options import Options, OptionTree
 
@@ -22,6 +21,8 @@ def load_xarray_accessor():
 @pytest.fixture(params=['bokeh', 'matplotlib', 'plotly'], scope='class')
 def backend(request):
     backend = request.param
+    if backend != 'bokeh':
+        pytest.importorskip(backend)
     backend_copy = Store.current_backend
     if backend not in Store.registry:
         hvplot.extension(backend, compatibility='bokeh')
@@ -461,6 +462,7 @@ class TestOptions:
 
 @pytest.fixture(scope='module')
 def da():
+    xr = pytest.importorskip('xarray')
     return xr.DataArray(
         data=np.arange(16).reshape((2, 2, 2, 2)),
         coords={'time': [0, 1], 'y': [0, 1], 'x': [0, 1], 'band': [0, 1]},
@@ -471,6 +473,7 @@ def da():
 
 @pytest.fixture(scope='module')
 def da2():
+    xr = pytest.importorskip('xarray')
     return xr.DataArray(
         data=np.arange(27).reshape((3, 3, 3)),
         coords={'y': [0, 1, 2], 'x': [0, 1, 2]},
@@ -481,11 +484,13 @@ def da2():
 
 @pytest.fixture(scope='module')
 def ds1(da):
+    xr = pytest.importorskip('xarray')
     return xr.Dataset({'foo': da})
 
 
 @pytest.fixture(scope='module')
 def ds2(da, da2):
+    xr = pytest.importorskip('xarray')
     return xr.Dataset({'foo': da, 'bar': da2})
 
 
