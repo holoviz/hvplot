@@ -35,7 +35,7 @@ defaults:
     shell: bash -e {0}
 
 env:
-  UPSTREAM_PACKAGES: "holoviews panel bokeh param colorcet"
+  UPSTREAM_PACKAGES: "holoviews panel param colorcet datashader geoviews"
 
 jobs:
   pre_commit:
