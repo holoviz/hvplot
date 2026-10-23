@@ -21,6 +21,10 @@ defaults:
   run:
     shell: bash -e {0}
 
+env:
+  PACKAGE: "hvplot"
+  PYTHON_VERSION: "3.10"
+
 jobs:
   setup:
     name: setup:build
@@ -43,7 +47,7 @@ jobs:
           if [ "$run" = true ] && [ "$OTHER_LABEL" = true ]; then
             # This run hides the earlier run's checks, so only skip if the packages already built for this commit
             built=$(gh api "repos/$GH_REPO/commits/$HEAD_SHA/check-runs?per_page=100" \
-              --jq '[.check_runs[] | select(.name == "build:conda" or .name == "build:pip") | select(.conclusion != "skipped")]
+              --jq '[.check_runs[] | select(.name == "build:conda" or .name == "install:pip") | select(.conclusion != "skipped")]
                 | group_by(.name) | map(max_by(.started_at).conclusion) == ["success", "success"]')
             [ "$built" = true ] && run=false
           fi
@@ -52,7 +56,7 @@ jobs:
   waiting_room:
     name: Waiting Room
     runs-on: ubuntu-latest
-    needs: [conda_build, pip_build]
+    needs: [conda_build, pip_install]
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     environment:
       name: publish
@@ -69,7 +73,6 @@ jobs:
         with:
           environments: "build"
           download-data: false
-          install: false
       - name: conda build
         run: pixi run -e build build-conda
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -106,7 +109,6 @@ jobs:
         with:
           environments: "build"
           download-data: false
-          install: false
       - name: Build package
         run: pixi run -e build build-pip
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -115,6 +117,26 @@ jobs:
           name: artifacts-pip
           path: dist/
           if-no-files-found: error
+      - name: Annotate PyPI URL
+        run: |
+          echo "::notice::PyPI URL: https://pypi.org/p/$PACKAGE"
+
+  pip_install:
+    name: install:pip
+    runs-on: "ubuntu-latest"
+    needs: [pip_build]
+    steps:
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: artifacts-pip
+          path: dist/
+      - name: Install package
+        run: python -m pip install dist/*.whl
+      - name: Import package
+        run: python -c "import $PACKAGE; print($PACKAGE._version.__version__)"
 
   pip_publish:
     name: publish:pip
@@ -133,7 +155,7 @@ jobs:
 
   result_build:
     name: result:build
-    needs: [setup, waiting_room, conda_build, conda_publish, pip_build, pip_publish]
+    needs: [setup, waiting_room, conda_build, conda_publish, pip_build, pip_install, pip_publish]
     if: always()
     runs-on: ubuntu-latest
     steps:

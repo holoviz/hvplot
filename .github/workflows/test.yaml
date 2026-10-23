@@ -49,10 +49,26 @@ jobs:
   setup:
     name: setup:test
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
     outputs:
+      code_change: ${{ github.event_name != 'pull_request' || steps.filter.outputs.code == 'true' }}
       matrix: ${{ env.MATRIX }}
       matrix_option: ${{ env.MATRIX_OPTION }}
     steps:
+      - name: Check for code changes
+        if: github.event_name == 'pull_request'
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        id: filter
+        with:
+          filters: |
+            code:
+              - 'hvplot/**'
+              - 'doc/**'
+              - 'pixi.toml'
+              - 'pixi.lock'
+              - 'pyproject.toml'
+              - '.github/workflows/test.yaml'
       - name: Set matrix option
         env:
           GITHUB_EVENT_INPUTS_TARGET: ${{ github.event.inputs.target }}
@@ -126,6 +142,7 @@ jobs:
     name: unit:${{ matrix.environment }}:${{ matrix.os }}
     needs: [pre_commit, setup]
     runs-on: ${{ matrix.os }}
+    if: needs.setup.outputs.code_change == 'true'
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
@@ -161,6 +178,7 @@ jobs:
     name: core:${{ matrix.environment }}:${{ matrix.os }}
     needs: [pre_commit, setup]
     runs-on: ${{ matrix.os }}
+    if: needs.setup.outputs.code_change == 'true'
     strategy:
       fail-fast: false
       matrix:
