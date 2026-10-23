@@ -20,8 +20,8 @@ on:
       version:
         description: 'Version tag X.X.X (required if target is main)'
         required: false
-  schedule:
-    - cron: '0 15 * * SUN'
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
 
 permissions: {}
 
@@ -34,16 +34,38 @@ defaults:
     shell: bash -e {0}
 
 jobs:
-  pixi_lock:
-    name: Pixi lock
+  setup:
+    name: setup:docs
     runs-on: ubuntu-latest
+    permissions:
+      checks: read
+    outputs:
+      run: ${{ steps.check.outputs.run }}
     steps:
-      - uses: holoviz-dev/holoviz_tasks/pixi-lock@17107a157b32cc1bd2a09c71fbdbc74603efdb40 # v1
+      - name: check if docs should be built
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          HAS_LABEL: ${{ github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'run-docs-ci') }}
+          OTHER_LABEL: ${{ github.event.action == 'labeled' && github.event.label.name != 'run-docs-ci' }}
+        run: |
+          run=$HAS_LABEL
+          if [ "$run" = true ] && [ "$OTHER_LABEL" = true ]; then
+            # This run hides the earlier run's checks, so only skip if the docs already built for this commit
+            built=$(gh api "repos/$GH_REPO/commits/$HEAD_SHA/check-runs?per_page=100" \
+              --jq '[.check_runs[] | select(.name == "build:docs" or .name == "build:docs-pip") | select(.conclusion != "skipped")]
+                | group_by(.name) | map(max_by(.started_at).conclusion) == ["success", "success"]')
+            [ "$built" = true ] && run=false
+          fi
+          echo "run=$run" >> "$GITHUB_OUTPUT"
 
   docs_build:
-    name: Build Documentation
-    needs: [pixi_lock]
+    name: build:docs
     runs-on: 'macos-latest'
+    needs: [setup]
+    if: needs.setup.outputs.run == 'true'
     timeout-minutes: 120
     env:
       DISPLAY: ":99.0"
@@ -66,9 +88,21 @@ jobs:
         with:
           name: hvplot-docs
           path: ./builtdocs/
+          if-no-files-found: error
       - name: report failure
         if: failure()
         run: cat /tmp/sphinx-*.log | tail -n 100
+
+  docs_publish:
+    name: publish:docs
+    runs-on: 'ubuntu-latest'
+    needs: [docs_build]
+    if: github.event_name != 'pull_request'
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: hvplot-docs
+          path: ./builtdocs/
       - uses: holoviz-dev/holoviz_tasks/docs-publish@17107a157b32cc1bd2a09c71fbdbc74603efdb40 # v1
         with:
           s3-url: s3://hvplot.holoviz.org
@@ -78,8 +112,10 @@ jobs:
           version: ${{ inputs.version }}
 
   pip_build_docs:
-    name: Build Documentation (pip)
+    name: build:docs-pip
     runs-on: 'ubuntu-latest'
+    needs: [setup]
+    if: needs.setup.outputs.run == 'true'
     timeout-minutes: 120
     env:
       DESC: "Documentation build"
@@ -108,3 +144,13 @@ jobs:
       - name: report failure
         if: failure()
         run: cat /tmp/sphinx-*.log | tail -n 100
+
+  result_docs_build:
+    name: result:docs
+    needs: [setup, docs_build, docs_publish, pip_build_docs]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: check for failures
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: echo job failed && exit 1

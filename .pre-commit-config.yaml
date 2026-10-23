@@ -27,6 +27,14 @@ repos:
     rev: 2ccb47ff45ad361a21071a7eedda4c37e6ae8c5a # frozen: v2.4.2
     hooks:
       - id: codespell
-        exclude: (\.min\.js$|\.svg$|\.html$)
+        exclude: (\.min\.js$|\.svg$|\.html$|\.lock$)
         additional_dependencies:
           - tomli
+  - repo: local
+    hooks:
+      - id: pixi
+        name: check pixi
+        entry: pixi lock --check
+        language: system
+        files: ^pixi
+        pass_filenames: false

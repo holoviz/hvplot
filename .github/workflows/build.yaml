@@ -8,8 +8,8 @@ on:
     - 'v[0-9]+.[0-9]+.[0-9]+rc[0-9]+'
   # Dry-run only
   workflow_dispatch:
-  schedule:
-    - cron: '0 15 * * SUN'
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
 
 permissions: {}
 
@@ -22,16 +22,48 @@ defaults:
     shell: bash -e {0}
 
 jobs:
-  pixi_lock:
-    name: Pixi lock
+  setup:
+    name: setup:build
     runs-on: ubuntu-latest
+    permissions:
+      checks: read
+    outputs:
+      run: ${{ steps.check.outputs.run }}
     steps:
-      - uses: holoviz-dev/holoviz_tasks/pixi-lock@17107a157b32cc1bd2a09c71fbdbc74603efdb40 # v1
+      - name: check if packages should be built
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          HAS_LABEL: ${{ github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'run-build-ci') }}
+          OTHER_LABEL: ${{ github.event.action == 'labeled' && github.event.label.name != 'run-build-ci' }}
+        run: |
+          run=$HAS_LABEL
+          if [ "$run" = true ] && [ "$OTHER_LABEL" = true ]; then
+            # This run hides the earlier run's checks, so only skip if the packages already built for this commit
+            built=$(gh api "repos/$GH_REPO/commits/$HEAD_SHA/check-runs?per_page=100" \
+              --jq '[.check_runs[] | select(.name == "build:conda" or .name == "build:pip") | select(.conclusion != "skipped")]
+                | group_by(.name) | map(max_by(.started_at).conclusion) == ["success", "success"]')
+            [ "$built" = true ] && run=false
+          fi
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+
+  waiting_room:
+    name: Waiting Room
+    runs-on: ubuntu-latest
+    needs: [conda_build, pip_build]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    environment:
+      name: publish
+    steps:
+      - run: echo "All builds have finished, have been approved, and ready to publish"
 
   conda_build:
-    name: Build Conda
-    needs: [pixi_lock]
+    name: build:conda
     runs-on: "ubuntu-latest"
+    needs: [setup]
+    if: needs.setup.outputs.run == 'true'
     steps:
       - uses: holoviz-dev/holoviz_tasks/pixi-install@17107a157b32cc1bd2a09c71fbdbc74603efdb40 # v1
         with:
@@ -40,10 +72,23 @@ jobs:
           install: false
       - name: conda build
         run: pixi run -e build build-conda
-      - name: Set environment variables
-        run: |
-          echo "TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-          echo "CONDA_FILE=$(ls dist/*.tar.bz2)" >> $GITHUB_ENV
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: artifacts-conda
+          path: dist/*.tar.bz2
+          if-no-files-found: error
+
+  conda_publish:
+    name: publish:conda
+    runs-on: ubuntu-latest
+    needs: [conda_build, waiting_room]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: artifacts-conda
+          path: dist/
       - uses: anaconda/actions/upload-package@a6f488910b4a1e4f3fe01736241ca1b92b4b355a # v0.3.1
         with:
           token: ${{ secrets.CONDA_UPLOAD_TOKEN }}
@@ -52,11 +97,10 @@ jobs:
           labels: ${{ (contains(github.ref_name, 'a') || contains(github.ref_name, 'b') || contains(github.ref_name, 'rc')) && 'dev' || 'main,dev' }}
 
   pip_build:
-    name: Build PyPI
-    needs: [pixi_lock]
+    name: build:pip
     runs-on: "ubuntu-latest"
-    permissions:
-      id-token: write
+    needs: [setup]
+    if: needs.setup.outputs.run == 'true'
     steps:
       - uses: holoviz-dev/holoviz_tasks/pixi-install@17107a157b32cc1bd2a09c71fbdbc74603efdb40 # v1
         with:
@@ -65,6 +109,34 @@ jobs:
           install: false
       - name: Build package
         run: pixi run -e build build-pip
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: artifacts-pip
+          path: dist/
+          if-no-files-found: error
+
+  pip_publish:
+    name: publish:pip
+    runs-on: ubuntu-latest
+    needs: [pip_build, waiting_room]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: artifacts-pip
+          path: dist/
       - name: Publish to PyPI
-        if: github.event_name == 'push'
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1
+
+  result_build:
+    name: result:build
+    needs: [setup, waiting_room, conda_build, conda_publish, pip_build, pip_publish]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: check for failures
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: echo job failed && exit 1
