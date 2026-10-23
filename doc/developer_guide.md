@@ -77,20 +77,45 @@ This `hvplot` directory is the _source checkout_ for the remainder of this docum
 
 ## Start developing
 
-To start developing, run the following command, this will create an environment called `default` (in `.pixi/envs`), install hvPlot in [editable mode](https://pip.pypa.io/en/stable/topics/local-project-installs/#editable-installs), download test datasets, and install `pre-commit`:
+Running `pixi run <task>` or `pixi shell` will automatically create the `default` environment and install hvPlot in [editable mode](https://pip.pypa.io/en/stable/topics/local-project-installs/#editable-installs).
+
+For example, to download the data hvPlot tests and examples depend upon, run:
+
+```bash
+pixi run download-data
+```
+
+:::{admonition} Advanced usage
+:class: tip
+
+To use a different environment, e.g. `test-core`, add `--environment` / `-e` to the command:
+
+```bash
+pixi run -e test-core test-unit
+```
+
+:::
+
+All available tasks can be found by running `pixi task list`, the following sections will give a brief introduction to the most common tasks.
+
+For setting up a complete development you can run:
 
 ```bash
 pixi run setup-dev
 ```
 
+This will run the `download-data` task, among other tasks deemed necessary for a development environment.
+
 :::{admonition} Note
 :class: info
 
-The first time you run it, it will create a `pixi.lock` file with information for all available environments.
-This command will take a minute or so to run.
-:::
+You may want to update Pixi occasionally, especially when troubleshooting, to get the latest fixes and improvements:
 
-All available tasks can be found by running `pixi task list`, the following sections will give a brief introduction to the most common tasks.
+```bash
+pixi self-update
+```
+
+:::
 
 ### Syncing Git tags with upstream repository
 
@@ -106,9 +131,11 @@ pixi run sync-git-tags
 
 The `default` environment is meant to provide all the tools needed to develop hvPlot.
 
-This environment is created by running `pixi run setup-dev`. Run `pixi shell` to activate it; this is equivalent to `source venv/bin/activate` in a Python virtual environment or `conda activate` in a conda environment.
+This environment is created automatically the first time you run a Pixi command (e.g. `pixi shell` or `pixi run <task>`), which sets up the environment and makes an editable install of hvPlot.
 
-If you need to run a command directly instead of via `pixi`, activate the environment and run the command (e.g. `pixi shell` and `pytest hvplot/tests/<somefile.py>`).
+To activate this environment you can run `pixi shell`, this is equivalent to `source venv/bin/activate` in a virtual environment or `conda activate` in a conda environment.
+
+If you need to run a command directly instead of via `pixi`, you activate the environment and run your command (e.g. `pytest hvplot/tests/<somefile.py>`).
 
 ### VS Code
 
@@ -174,23 +201,12 @@ pixi run test-unit
 :::{admonition} Advanced usage
 :class: tip
 
-The task is available in the following environments: `test-310`, `test-311`, `test-312`, `test-313`, and `test-core`. Where the first ones have the same environments except for different Python versions, and `test-core` only has a core set of dependencies.
+The task is available in the following environments: `test-310`, `test-311`, `test-312`, `test-313`, `test-314`, and `test-core`. Where the first ones have the same environments except for different Python versions, and `test-core` only has a core set of dependencies.
 
 You can run the task in a specific environment with the `-e` flag. For example, to run the `test-unit` task in the `test-313` environment, you can run:
 
 ```bash
 pixi run -e test-313 test-unit
-```
-
-:::
-
-:::{admonition} Advanced usage
-:class: tip
-
-Currently, an editable install needs to be run in each environment. So, if you want to install in the `test-core` environment, you can add `--environment` / `-e` to the command:
-
-```bash
-pixi run -e test-core install
 ```
 
 :::
