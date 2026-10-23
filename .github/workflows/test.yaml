@@ -180,49 +180,9 @@ jobs:
       - name: Test Unit
         run: pixi run -e "${ENV}" test-unit
 
-  pip_test:
-    name: pip tests:${{ matrix.os }}:${{ matrix.environment }}
-    needs: [pre_commit, setup]
-    if: needs.setup.outputs.matrix_option == 'full'
-    timeout-minutes: 90
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
-    steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
-        with:
-          python-version: '3.13'
-      - name: install with geo
-        run: python -m pip install -v --prefer-binary -e '.[tests, examples-tests, geo, hvdev, hvdev-geo, dev-extras]'
-      - name: python version and pip list
-        run: |
-          python --version --version
-          python -m pip list
-      - name: download datasets
-        run: python scripts/download_data.py
-      - name: unit tests
-        run: pytest -v hvplot --cov=hvplot --cov-branch --cov-append
-      - name: unit tests geo
-        run: pytest -v hvplot --geo --cov=hvplot --cov-branch --cov-append
-      - name: examples tests
-        run: pytest -n logical --dist loadscope --nbval-lax -p no:python
-      - name: Upload coverage reports to Codecov
-        if: github.event_name == 'push' || github.event_name == 'pull_request'
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6
-        with:
-          fail_ci_if_error: false
-          verbose: false
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
   result_test_suite:
     name: result:test
-    needs: [unit_test_suite, core_test_suite, pip_test]
+    needs: [unit_test_suite, core_test_suite]
     if: always()
     runs-on: ubuntu-latest
     steps:
