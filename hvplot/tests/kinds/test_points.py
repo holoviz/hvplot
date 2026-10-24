@@ -8,9 +8,23 @@ from holoviews.element import Points
 from holoviews.testing import assert_element_equal
 
 from hvplot.tests._backends import size_opt
-from hvplot.tests._deps import pandas_and_dask
+from hvplot.tests._deps import pandas_and_dask, requires
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
+
+
+@pytest.fixture
+def cities():
+    import geopandas as gpd
+
+    geometry = gpd.points_from_xy(
+        x=[12.45339, 12.44177, 9.51667, 6.13000, 158.14997],
+        y=[41.90328, 43.93610, 47.13372, 49.61166, 6.91664],
+        crs='EPSG:4326',
+    )
+    names = ['Vatican City', 'San Marino', 'Vaduz', 'Luxembourg', 'Palikir']
+    return gpd.GeoDataFrame({'name': names}, geometry=geometry)
+
 
 plotly_alpha_dropped = pytest.mark.xfail(
     reason='BUG: alpha is renamed to opacity, which plotly ignores, so it is dropped',
@@ -188,3 +202,35 @@ def test_alpha_dim_overlay(df, backend):
     assert opts.kwargs['alpha'] == 'number'
     assert 'number' in plot.last.vdims
     hv.render(plot, backend=backend)
+
+
+@pytest.mark.geo
+@requires('geopandas', 'shapely')
+def test_c_positional_geodataframe(cities):
+    points = cities.hvplot('name')
+    assert points.kdims == ['x', 'y']
+    assert points.vdims == ['name']
+    opts = Store.lookup_options('bokeh', points, 'style').kwargs
+    assert repr(opts['color']) == repr(hv.dim('name'))
+
+
+@pytest.mark.geo
+@requires('geopandas', 'shapely')
+def test_c_geodataframe(cities):
+    points = cities.hvplot(c='name')
+    assert points.kdims == ['x', 'y']
+    assert points.vdims == ['name']
+    opts = Store.lookup_options('bokeh', points, 'style').kwargs
+    assert repr(opts['color']) == repr(hv.dim('name'))
+
+
+@pytest.mark.geo
+@requires('geopandas', 'shapely')
+def test_by_geodataframe(cities):
+    points = cities.hvplot(by='name')
+    assert isinstance(points, hv.NdOverlay)
+    assert points.kdims == ['name']
+    assert points.vdims == []
+    for element in points.values():
+        assert element.kdims == ['x', 'y']
+        assert element.vdims == []

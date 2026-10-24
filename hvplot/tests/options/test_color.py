@@ -327,6 +327,25 @@ def test_check_symmetric_max_big_image(hvplot_xarray, big_symmetric_da):
     assert style_opts.kwargs['cmap'] == 'coolwarm'
 
 
+def test_symmetric_not_deduced_not_in_memory(hvplot_xarray, tmp_path):
+    da = xr.DataArray(
+        np.arange(-100, 100).reshape(10, 10, 2),
+        dims=['x', 'y', 'z'],
+        coords={'x': np.arange(10), 'y': np.arange(10), 'z': np.arange(2)},
+        name='value',
+    )
+    # Saved to and loaded from a netCDF file to get a DataArray not in memory.
+    fpath = tmp_path / 'data.nc'
+    da.to_netcdf(fpath)
+    with xr.open_dataarray(fpath) as da:
+        plot = da.hvplot(x='x', y='y', check_symmetric_max=da.size + 1)
+        plot[0]
+        plot_opts = Store.lookup_options('bokeh', plot.last, 'plot')
+        # If a DataArray is not in memory, computing whether it's symmetric should
+        # not be done and return False.
+        assert not plot_opts.kwargs['symmetric']
+
+
 def _operation(dmap):
     """The resampling operation applied by a DynamicMap returned by hvPlot."""
     return dmap.callback.inputs[0].callback.operation

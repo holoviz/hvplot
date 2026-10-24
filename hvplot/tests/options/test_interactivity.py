@@ -7,9 +7,34 @@ from holoviews import Store
 from holoviews.element import Area, Curve, Path, Points, Scatter
 from holoviews.testing import assert_element_equal
 
-from hvplot.tests._deps import pandas_and_dask
+from hvplot.tests._deps import pandas_and_dask, requires
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
+
+
+@pytest.fixture
+def cities():
+    import geopandas as gpd
+
+    geometry = gpd.points_from_xy(
+        x=[12.45339, 12.44177, 9.51667, 6.13000, 158.14997],
+        y=[41.90328, 43.93610, 47.13372, 49.61166, 6.91664],
+        crs='EPSG:4326',
+    )
+    names = ['Vatican City', 'San Marino', 'Vaduz', 'Luxembourg', 'Palikir']
+    return gpd.GeoDataFrame({'name': names}, geometry=geometry)
+
+
+@pytest.fixture
+def polygons():
+    import geopandas as gpd
+    from shapely.geometry import Polygon
+
+    geometry = [
+        Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0))),
+        Polygon(((2, 2), (2, 3), (3, 3), (3, 2), (2, 2))),
+    ]
+    return gpd.GeoDataFrame({'name': ['A', 'B']}, geometry=geometry)
 
 
 charts_1d = pytest.mark.parametrize(
@@ -270,3 +295,44 @@ def test_hover_formatters(tabular_lib, xy_df):
     plot = tabular_lib(xy_df).hvplot('x', 'y', hover_formatters={'x': 'datetime'})
     opts = Store.lookup_options('bokeh', plot, 'plot')
     assert opts.kwargs['hover_formatters'] == {'x': 'datetime'}
+
+
+@pytest.mark.geo
+@requires('geopandas', 'shapely')
+def test_hover_cols_default_geodataframe(cities):
+    points = cities.hvplot()
+    assert points.kdims == ['x', 'y']
+    assert points.vdims == []
+
+
+@pytest.mark.geo
+@requires('geopandas', 'shapely')
+def test_hover_cols_all_geodataframe(cities):
+    """The geometry is not a hover column."""
+    points = cities.hvplot(x='x', y='y', hover_cols='all')
+    assert points.kdims == ['x', 'y']
+    assert points.vdims == ['index', 'name']
+
+
+@pytest.mark.geo
+@requires('geopandas', 'shapely')
+def test_hover_cols_all_no_index_geodataframe(cities):
+    points = cities.hvplot(x='x', hover_cols='all', use_index=False)
+    assert points.kdims == ['x', 'y']
+    assert points.vdims == ['name']
+
+
+@pytest.mark.geo
+@requires('geopandas', 'shapely')
+def test_hover_cols_index_geodataframe(cities):
+    points = cities.hvplot(y='y', hover_cols=['index'])
+    assert points.kdims == ['x', 'y']
+    assert points.vdims == ['index']
+
+
+@pytest.mark.geo
+@requires('geopandas', 'shapely')
+def test_hover_geodataframe_without_fields(polygons):
+    plot = polygons.hvplot(geo=True)
+    opts = Store.lookup_options('bokeh', plot, 'plot').kwargs
+    assert 'hover' not in opts.get('tools')

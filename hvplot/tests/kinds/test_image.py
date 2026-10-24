@@ -40,6 +40,21 @@ def test_z(ds, gridded_lib):
     assert plot.vdims == ['v2']
 
 
+def test_z_list(rng):
+    ds = xr.Dataset(
+        {
+            'temp': (('lon', 'lat'), 15 + 8 * rng.standard_normal((2, 2))),
+            'precip': (('lon', 'lat'), 10 * rng.random((2, 2))),
+        },
+        coords={'lon': [-99.83, -99.32], 'lat': [42.25, 42.21]},
+    )
+    plot = ds.hvplot(x='lat', y='lon', z=['temp', 'precip'], dynamic=False)
+    assert 'temp' in plot.keys()
+    assert 'precip' in plot.keys()
+    assert plot['temp'].kdims == ['lat', 'lon']
+    assert plot['precip'].kdims == ['lat', 'lon']
+
+
 def test_logz(ds, backend):
     plot = ds.hvplot.image(z='v1', logz=True)
     assert Store.lookup_options(backend, plot, 'plot').kwargs['logz'] is True

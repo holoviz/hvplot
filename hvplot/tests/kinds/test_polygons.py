@@ -5,10 +5,24 @@ import pytest
 import xarray as xr
 from holoviews import Store
 from holoviews.element import Polygons
+from packaging.version import Version
 
 from hvplot.tests._deps import requires
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
+
+
+@pytest.fixture
+def polygons():
+    import geopandas as gpd
+    from shapely.geometry import Polygon
+
+    geometry = [
+        Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0))),
+        Polygon(((2, 2), (2, 3), (3, 3), (3, 2), (2, 2))),
+    ]
+    return gpd.GeoDataFrame({'name': ['A', 'B']}, geometry=geometry)
+
 
 # polygons is not supported by the plotly backend.
 bokeh_and_mpl = pytest.mark.parametrize('backend', ['bokeh', 'matplotlib'], indirect=True)
@@ -100,3 +114,23 @@ def test_c(df, backend):
 def test_logz(df, backend):
     plot = df.hvplot.polygons(x='x', y='y', c='v', logz=True)
     assert Store.lookup_options(backend, plot, 'plot').kwargs['logz'] is True
+
+
+@pytest.mark.geo
+@requires('geopandas', 'shapely')
+def test_by_subplots_geodataframe(polygons):
+    plot = polygons.hvplot(geo=True, by='name', subplots=True)
+    assert isinstance(plot, hv.NdLayout)
+
+
+@pytest.mark.geo
+@requires('geopandas', 'shapely')
+@pytest.mark.xfail(
+    Version(pd.__version__).major >= 3,
+    strict=True,
+    raises=TypeError,
+    reason='BUG: with pandas 3 a missing geometry has geom type NaN, not None, and is kept',
+)
+def test_geometry_none_geodataframe(polygons):
+    polygons.loc[1, 'geometry'] = None
+    assert polygons.hvplot(geo=True)

@@ -207,8 +207,10 @@ Tests are written with plain pytest: test functions, fixtures and `pytest.mark.p
 |---|---|
 | a plot option (e.g. `xlabel`) | `hvplot/tests/options/test_<group>.py`, where the group is the option's section in the docstring and the docs (e.g. `axis`). |
 | a kind or a kind-specific option (e.g. `bins` for `hist`) | `hvplot/tests/kinds/test_<kind>.py` |
-| a behavior specific to one data library (e.g. polars LazyFrame) | `hvplot/tests/data_libraries/test_<lib>.py` |
+| a behavior specific to one data library (e.g. hover_cols with a GeoDataFrame) | the kind or option module, as for any library, with the library or its object in the test name, e.g. `test_hover_cols_all_geodataframe` in `hvplot/tests/options/test_interactivity.py` |
 | anything else | the module mirroring the source file, e.g. `hvplot/tests/test_util.py` for `hvplot/util.py` and `hvplot/tests/plotting/test_core.py` for `hvplot/plotting/core.py` |
+
+There is no test module per data library, as there is none per plotting backend: a test goes with the kind or option it is about, whatever the library, and is named after the library or its object when only that library has the behavior, so that `grep -rn geodataframe hvplot/tests` finds all of them. `hvplot/tests/data_libraries/` only holds the tests run over every library: `test_accessors.py` (the `.hvplot` accessor) and `test_tabular_parity.py` (the same plot as pandas). An API of its own that is not a plot of the data, e.g. Fugue SQL, follows the source file rule (`hvplot/tests/test_fugue.py` for `hvplot/fugue.py`).
 
 Option tests are named `test_<option>` or `test_<option>_<detail>`, e.g. `test_xlabel_from_attrs`. Meta tests (`test_options_inventory.py` and `test_kinds_inventory.py`) check that every option and every kind has a test named this way, and their failure message tells you which test to add where.
 
@@ -262,7 +264,7 @@ Other rules:
 
 1. Add its name to `TABULAR_LIBS` (or `GRIDDED_LIBS`) in `hvplot/tests/_deps.py` and a branch to the `tabular_lib` (or `gridded_lib`) fixture of `hvplot/tests/conftest.py`, converting a pandas DataFrame (or an Xarray object) to the library's object and skipping the test if it isn't installed (`pytest.importorskip`).
 2. Add the library to the `test` feature of `pixi.toml` and to the `tests` extra of `pyproject.toml`, so that CI installs it.
-3. Add `hvplot/tests/data_libraries/test_<lib>.py` testing that the accessor is patched and unpatched.
+3. Add the library to the `PATCHED` and `CLASSES` lists of `hvplot/tests/data_libraries/test_accessors.py`, which test that the accessor is patched, unpatched and that patching fails without the library. Don't add a test module for it: the tests of what only this library does go with the kinds and options, see above.
 4. Run the test suite: every test using the fixture now runs with the library. Mark the failures with `lib_xfail` (hvPlot bugs) or `lib_skip` (not applicable), and the new cases of `data_libraries/test_tabular_parity.py` (known failures are in its `BUGS`). Tests restricted with `@pandas_and_dask` don't run with the new library, check `test_tabular_parity.py` covers what is specific to it.
 5. Add the library to the table of `doc/ref/data_libraries.ipynb`.
 

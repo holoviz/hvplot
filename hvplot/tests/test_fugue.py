@@ -82,7 +82,7 @@ def test_fugue_unknown_plot_method(table, fugue_sql, shown):
     assert not shown
 
 
-def test_fugue_patch_without_fugue(fugue_sql, block_import):
+def test_patch_without_fugue(fugue_sql, block_import):
     import hvplot.fugue
 
     block_import('fugue')

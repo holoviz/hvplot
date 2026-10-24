@@ -25,6 +25,31 @@ skip_windows = pytest.mark.skipif(
 
 
 @pytest.fixture
+def cities():
+    import geopandas as gpd
+
+    geometry = gpd.points_from_xy(
+        x=[12.45339, 12.44177, 9.51667, 6.13000, 158.14997],
+        y=[41.90328, 43.93610, 47.13372, 49.61166, 6.91664],
+        crs='EPSG:4326',
+    )
+    names = ['Vatican City', 'San Marino', 'Vaduz', 'Luxembourg', 'Palikir']
+    return gpd.GeoDataFrame({'name': names}, geometry=geometry)
+
+
+@pytest.fixture
+def polygons():
+    import geopandas as gpd
+    from shapely.geometry import Polygon
+
+    geometry = [
+        Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0))),
+        Polygon(((2, 2), (2, 3), (3, 3), (3, 2), (2, 2))),
+    ]
+    return gpd.GeoDataFrame({'name': ['A', 'B']}, geometry=geometry)
+
+
+@pytest.fixture
 def simple_df():
     return pd.DataFrame(np.random.rand(10, 2), columns=['x', 'y'])
 
@@ -703,3 +728,32 @@ def test_tiles_unknown_without_xyzservices(without_geoviews, simple_df, monkeypa
     with pytest.raises(ValueError, match='not_a_source tiles not recognized'):
         simple_df.hvplot.points('x', 'y', tiles='not_a_source')
     assert 'xyzservices' not in sys.modules
+
+
+@pytest.mark.geo
+@requires('geopandas', 'shapely')
+def test_xlim_ylim_geodataframe(hvplot_pandas, cities):
+    points = cities.hvplot(geo=False, xlim=(-10, 10), ylim=(-20, -10))
+    opts = hv.Store.lookup_options('bokeh', points, 'plot').options
+    np.testing.assert_equal(opts['xlim'], (-10, 10))
+    np.testing.assert_equal(opts['ylim'], (-20, -10))
+
+
+@pytest.mark.geo
+@requires('geopandas', 'shapely')
+def test_xlim_ylim_geo_geodataframe(hvplot_pandas, cities):
+    points = cities.hvplot(geo=True, xlim=(-10, 10), ylim=(-20, -10))
+    opts = hv.Store.lookup_options('bokeh', points, 'plot').options
+    np.testing.assert_allclose(opts['xlim'], (-10, 10))
+    np.testing.assert_allclose(opts['ylim'], (-20, -10))
+
+
+@pytest.mark.geo
+@requires('geopandas', 'shapely')
+def test_tiles_geodataframe_crs(hvplot_pandas, polygons):
+    plot = polygons.hvplot(tiles=True)
+    assert plot.get(1).data.crs is None
+
+    polygons.crs = 'EPSG:4326'
+    plot = polygons.hvplot(tiles=True)
+    assert plot.get(1).data.crs == 'EPSG:3857'

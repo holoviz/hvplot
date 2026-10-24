@@ -1394,3 +1394,81 @@ def test_dask_interactive_applies_without_dask_dataframe(monkeypatch):
     monkeypatch.delitem(sys.modules, 'dask.dataframe')
     assert not DaskInteractive.applies(pd.DataFrame({'a': [1, 2]}))
     assert 'dask.dataframe' not in sys.modules
+
+
+@pytest.fixture
+def interactive_da():
+    da = xr.DataArray(
+        [[1, 2, 3], [4, 5, 6]],
+        coords={'x': [10, 20, 30], 'y': [0, 1]},
+        dims=('y', 'x'),
+        name='v',
+    )
+    return da.interactive
+
+
+def test_xarray_interactive_applies(dataarray):
+    # Imported here, the class is recreated each time hvplot.xarray is imported.
+    from hvplot.xarray import XArrayInteractive
+
+    assert XArrayInteractive.applies(dataarray)
+    assert XArrayInteractive.applies(xr.Dataset({'z': dataarray}))
+    assert not XArrayInteractive.applies(dataarray.values)
+
+
+def test_xarray_interactive_sel_value(interactive_da):
+    result = interactive_da.sel(x=20)
+    assert not result.widgets()
+    assert result.eval().values.tolist() == [2, 5]
+
+
+def test_xarray_interactive_sel_slider_class(interactive_da):
+    result = interactive_da.sel(x=pn.widgets.FloatSlider)
+    (slider,) = result.widgets()
+    assert isinstance(slider, pn.widgets.FloatSlider)
+    assert (slider.name, slider.start, slider.end) == ('x', 10, 30)
+    assert result.eval().values.tolist() == [1, 4]
+
+    slider.value = 30
+    assert result.eval().values.tolist() == [3, 6]
+
+
+def test_xarray_interactive_sel_select_class(interactive_da):
+    result = interactive_da.sel(y=pn.widgets.Select)
+    (select,) = result.widgets()
+    assert isinstance(select, pn.widgets.Select)
+    assert select.options == {'0': 0, '1': 1}
+
+    select.value = 1
+    assert result.eval().values.tolist() == [4, 5, 6]
+
+
+def test_xarray_interactive_sel_widget_instance(interactive_da):
+    select = pn.widgets.Select(options=[0, 1], value=1)
+    result = interactive_da.sel(y=select)
+    assert result.widgets()[0] is select
+    assert result.eval().values.tolist() == [4, 5, 6]
+
+
+def test_xarray_interactive_isel_value(interactive_da):
+    result = interactive_da.isel(x=-1)
+    assert result.eval().values.tolist() == [3, 6]
+
+
+def test_xarray_interactive_isel_slider_class(interactive_da):
+    result = interactive_da.isel(x=pn.widgets.IntSlider)
+    (slider,) = result.widgets()
+    assert isinstance(slider, pn.widgets.IntSlider)
+    assert (slider.name, slider.start) == ('x', 0)
+    assert result.eval().values.tolist() == [1, 4]
+
+    slider.value = 2
+    assert result.eval().values.tolist() == [3, 6]
+
+
+@pytest.mark.xfail(
+    strict=True, reason='BUG: isel slider end is len(dim), one past the last valid index'
+)
+def test_xarray_interactive_isel_slider_end(interactive_da):
+    (slider,) = interactive_da.isel(x=pn.widgets.IntSlider).widgets()
+    assert slider.end == 2

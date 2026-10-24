@@ -192,6 +192,12 @@ def test_xarray_dataset_with_attrs():
     assert render(ndoverlay, 'bokeh').xaxis.axis_label == 'time (s)'
 
 
+def test_xarray_dataset_empty_error():
+    ds = xr.Dataset({'foo': (('y', 'x'), [[0, 1], [2, 3]])}, coords={'x': [0, 1], 'y': [0, 1]})
+    with pytest.raises(ValueError, match=r'empty xarray.Dataset'):
+        ds.drop_vars('foo').hvplot()
+
+
 @pandas_and_dask
 @pytest.mark.parametrize(('kind', 'element'), CHART_KINDS)
 def test_wide_chart(df, tabular_lib, kind, element):

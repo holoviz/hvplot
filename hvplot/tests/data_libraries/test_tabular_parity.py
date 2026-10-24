@@ -6,6 +6,7 @@ Ibis tables have no index, so the calls set `x` explicitly.
 """
 
 import holoviews as hv
+import numpy as np
 import pandas as pd
 import pytest
 from holoviews import NdMapping
@@ -172,3 +173,40 @@ def test_rasterize_aggregator_column(request, df, tabular_lib):
     assert_same_plot_as_pandas(
         request, df, tabular_lib, 'rasterize_aggregator_column', 'scatter', kwargs
     )
+
+
+@pytest.fixture
+def duckdb_connection():
+    duckdb = pytest.importorskip('duckdb')
+    import hvplot.duckdb  # noqa: F401
+
+    connection = duckdb.connect(':memory:')
+    yield connection
+    connection.close()
+
+
+@pytest.mark.usefixtures('hvplot_pandas')
+@pytest.mark.parametrize(
+    'kwargs',
+    [
+        {},
+        {'hover_cols': ['z']},
+        pytest.param(
+            {'hover_cols': 'all'},
+            marks=pytest.mark.xfail(reason='BUG: hover_cols="all" raises UnboundLocalError'),
+        ),
+    ],
+    ids=['default', 'hover_cols', 'hover_cols_all'],
+)
+def test_duckdb_connection_result(duckdb_connection, kwargs):
+    df = pd.DataFrame({'x': [1.0, 2.0, 3.0], 'y': [2.0, 4.0, 3.0], 'z': [0.1, 0.2, 0.3]})
+    duckdb_connection.register('test_connection', df)
+
+    plot = duckdb_connection.execute('SELECT * FROM test_connection').hvplot.scatter(
+        x='x', y='y', **kwargs
+    )
+
+    expected = df.hvplot.scatter(x='x', y='y', **kwargs)
+    assert plot.kdims == expected.kdims
+    assert plot.vdims == expected.vdims
+    np.testing.assert_array_equal(plot.dimension_values('y'), df['y'])
