@@ -507,8 +507,8 @@ def test_rasterize_false_keeps_resolution(hvplot_xarray, da, kind):
 @requires('datashader')
 @pytest.mark.slow
 @pytest.mark.parametrize('kind', ['image', 'quadmesh'])
-def test_x_sampling(hvplot_xarray, da, kind):
-    plot = da.hvplot(kind=kind, dynamic=False, rasterize=True, x_sampling=5)
+def test_x_sampling(gridded_lib, da, kind):
+    plot = gridded_lib(da).hvplot(kind=kind, dynamic=False, rasterize=True, x_sampling=5)
     assert all(plot.data.x.diff('x').round(0) == 5)
 
 

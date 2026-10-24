@@ -49,13 +49,13 @@ def test_transforms_pandas():
     assert_data_equal(scatter.data['probability'].values, df['probability'].values * 100)
 
 
-def test_transforms_xarray(hvplot_xarray):
+def test_transforms_xarray(gridded_lib):
     data = np.arange(0, 60).reshape(6, 10)
     da = xr.DataArray(
         data, coords={'y': np.arange(6), 'x': np.arange(10)}, dims=('y', 'x'), name='value'
     )
-    img = da.hvplot.image(transforms={'value': hv.dim('value') * 10})
-    assert_data_equal(img.data.value.data, da.data * 10)
+    img = gridded_lib(da).hvplot.image(transforms={'value': hv.dim('value') * 10})
+    assert_data_equal(img.data.value.values, da.data * 10)
 
 
 @pandas_and_dask
@@ -455,8 +455,8 @@ def test_groupby_multiple_columns(abc_df):
     assert list(plot.keys()) == [('u', 'p'), ('u', 'q'), ('v', 'p'), ('v', 'q')]
 
 
-def test_by_gridded(hvplot_xarray, cube_da):
-    plot = cube_da.hvplot.image('x', 'y', by='t')
+def test_by_gridded(gridded_lib, cube_da):
+    plot = gridded_lib(cube_da).hvplot.image('x', 'y', by='t')
     assert isinstance(plot, NdOverlay)
     assert plot.kdims == ['t']
     assert list(plot.keys()) == [0, 1]

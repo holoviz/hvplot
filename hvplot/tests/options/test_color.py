@@ -277,34 +277,36 @@ def big_symmetric_da():
     return xr.DataArray(np.arange(-1e6, 1e6).reshape(1000, 2000))
 
 
-def test_robust(hvplot_xarray):
+def test_robust(gridded_lib):
     da = xr.DataArray(
         np.arange(8).reshape((2, 2, 2)),
         coords={'time': [0, 1], 'lat': [0, 1], 'lon': [0, 1]},
         dims=['time', 'lat', 'lon'],
     )
-    img = da[0].hvplot(robust=True)
+    img = gridded_lib(da[0]).hvplot(robust=True)
     assert img.opts['clim_percentile'] is True
 
 
-def test_symmetric_deduced_image(hvplot_xarray, symmetric_da):
-    plot = symmetric_da.hvplot.image()
+@pytest.mark.lib_skip('dask', reason='Symmetry is not checked on lazy data')
+def test_symmetric_deduced_image(gridded_lib, symmetric_da):
+    plot = gridded_lib(symmetric_da).hvplot.image()
     plot_opts = Store.lookup_options('bokeh', plot, 'plot')
     assert plot_opts.kwargs.get('symmetric') is True
     style_opts = Store.lookup_options('bokeh', plot, 'style')
     assert style_opts.kwargs['cmap'] == 'coolwarm'
 
 
-def test_symmetric_false_image(hvplot_xarray, symmetric_da):
-    plot = symmetric_da.hvplot.image(symmetric=False)
+def test_symmetric_false_image(gridded_lib, symmetric_da):
+    plot = gridded_lib(symmetric_da).hvplot.image(symmetric=False)
     plot_opts = Store.lookup_options('bokeh', plot, 'plot')
     assert plot_opts.kwargs.get('symmetric') is False
     style_opts = Store.lookup_options('bokeh', plot, 'style')
     assert style_opts.kwargs['cmap'] == 'kbc_r'
 
 
-def test_symmetric_deduced_image_with_cmap(hvplot_xarray, symmetric_da):
-    plot = symmetric_da.hvplot.image(cmap='fire')
+@pytest.mark.lib_skip('dask', reason='Symmetry is not checked on lazy data')
+def test_symmetric_deduced_image_with_cmap(gridded_lib, symmetric_da):
+    plot = gridded_lib(symmetric_da).hvplot.image(cmap='fire')
     plot_opts = Store.lookup_options('bokeh', plot, 'plot')
     assert plot_opts.kwargs.get('symmetric') is True
     style_opts = Store.lookup_options('bokeh', plot, 'style')
@@ -319,8 +321,9 @@ def test_check_symmetric_max_default_skips_big_image(hvplot_xarray, big_symmetri
     assert style_opts.kwargs['cmap'] == 'kbc_r'
 
 
-def test_check_symmetric_max_big_image(hvplot_xarray, big_symmetric_da):
-    plot = big_symmetric_da.hvplot.image(check_symmetric_max=int(1e7))
+@pytest.mark.lib_skip('dask', reason='Symmetry is not checked on lazy data')
+def test_check_symmetric_max_big_image(gridded_lib, big_symmetric_da):
+    plot = gridded_lib(big_symmetric_da).hvplot.image(check_symmetric_max=int(1e7))
     plot_opts = Store.lookup_options('bokeh', plot, 'plot')
     assert plot_opts.kwargs.get('symmetric') is True
     style_opts = Store.lookup_options('bokeh', plot, 'style')
@@ -351,8 +354,8 @@ def _operation(dmap):
     return dmap.callback.inputs[0].callback.operation
 
 
-def test_clim_image(hvplot_xarray, symmetric_da):
-    plot = symmetric_da.hvplot.image(clim=(-5, 5))
+def test_clim_image(gridded_lib, symmetric_da):
+    plot = gridded_lib(symmetric_da).hvplot.image(clim=(-5, 5))
     assert plot.get_dimension('foo').range == (-5, 5)
 
 
@@ -373,8 +376,8 @@ def test_clim_scatter_c_column(df):
 
 
 @pytest.mark.parametrize('kind', ['image', 'quadmesh', 'contour', 'contourf'])
-def test_clim_gridded(hvplot_xarray, symmetric_da, kind):
-    plot = symmetric_da.hvplot(kind=kind, clim=(-5, 5))
+def test_clim_gridded(gridded_lib, symmetric_da, kind):
+    plot = gridded_lib(symmetric_da).hvplot(kind=kind, clim=(-5, 5))
     assert plot.vdims[0].range == (-5, 5)
 
 

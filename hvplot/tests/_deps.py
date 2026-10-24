@@ -24,7 +24,7 @@ POLARS_2 = find_spec('polars') is not None and Version(version('polars')).major 
 TABULAR_LIBS = ['pandas', 'dask', 'polars', 'duckdb', 'ibis']
 GRIDDED_LIBS = ['xarray', 'dask']
 
-# Tests of options that don't depend on the library, or that need an index, run with pandas and
-# dask (the lazy one, handled by hvPlot itself) only. The other libraries are compared to pandas
-# in `data_libraries/test_tabular_parity.py`.
+# These tests come from the old Dask test subclasses: they need an index and the pandas API, and
+# dask has its own code paths in hvPlot (index reset, melt, compute of ranges, persist).
+# The other libraries are compared with pandas in `data_libraries/test_tabular_parity.py`.
 pandas_and_dask = pytest.mark.parametrize('tabular_lib', ['pandas', 'dask'], indirect=True)
