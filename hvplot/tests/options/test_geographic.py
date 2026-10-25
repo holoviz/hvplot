@@ -447,9 +447,7 @@ def test_features_invalid_scale_warning(hvplot_pandas, simple_df, caplog):
 
 
 @pytest.mark.geo
-@pytest.mark.xfail(
-    strict=True, reason='BUG: invalid feature name raises AttributeError, not the ValueError'
-)
+@pytest.mark.xfail(reason='BUG: invalid feature name raises AttributeError, not the ValueError')
 def test_features_invalid_name_error(hvplot_pandas, simple_df):
     with pytest.raises(ValueError, match='not recognized'):
         simple_df.hvplot.points('x', 'y', features=['foo'])
@@ -457,7 +455,7 @@ def test_features_invalid_name_error(hvplot_pandas, simple_df):
 
 @pytest.mark.geo
 @pytest.mark.usefixtures('disable_param_warnings_as_exceptions')
-@pytest.mark.xfail(strict=True, reason='BUG: the coastline scale warning is missing its f prefix')
+@pytest.mark.xfail(reason='BUG: the coastline scale warning is missing its f prefix')
 def test_coastline_invalid_scale_warning(hvplot_pandas, simple_df, caplog):
     simple_df.hvplot.points('x', 'y', coastline='5m')
     assert 'coastline scale of 5m not recognized' in caplog.text

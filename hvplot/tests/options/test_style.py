@@ -56,7 +56,9 @@ def test_fontscale(df, backend):
         pytest.param(
             'plotly',
             marks=pytest.mark.render_xfail(
-                reason='HoloViews: plotly fails on a numeric fontsize', raises=TypeError
+                reason='HoloViews: plotly fails on a numeric fontsize',
+                strict=False,
+                raises=TypeError,
             ),
         ),
     ],

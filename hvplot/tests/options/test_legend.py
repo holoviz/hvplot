@@ -2,7 +2,6 @@ import pandas as pd
 import pytest
 from holoviews import Store
 
-from hvplot.tests._backends import plotly_without
 from hvplot.tests._deps import pandas_and_dask
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
@@ -21,12 +20,26 @@ def xy_df():
     return pd.DataFrame([[1, 2], [3, 4], [5, 6]], columns=['x', 'y'])
 
 
-@pandas_and_dask
-@pytest.mark.parametrize(
+legend_position_backends = pytest.mark.parametrize(
     'backend',
-    ['bokeh', 'matplotlib', plotly_without('legend_position')],
+    [
+        'bokeh',
+        'matplotlib',
+        pytest.param(
+            'plotly',
+            marks=pytest.mark.xfail(
+                reason='HoloViews: plotly has no legend_position option',
+                raises=KeyError,
+                strict=False,
+            ),
+        ),
+    ],
     indirect=True,
 )
+
+
+@pandas_and_dask
+@legend_position_backends
 def test_legend_scatter_c(tabular_lib, df, backend):
     plot = tabular_lib(df).hvplot.scatter('x', 'y', c='category', legend='left')
     opts = Store.lookup_options(backend, plot, 'plot')
@@ -34,11 +47,7 @@ def test_legend_scatter_c(tabular_lib, df, backend):
 
 
 @pandas_and_dask
-@pytest.mark.parametrize(
-    'backend',
-    ['bokeh', 'matplotlib', plotly_without('legend_position')],
-    indirect=True,
-)
+@legend_position_backends
 def test_legend_hist_by(tabular_lib, df, backend):
     plot = tabular_lib(df).hvplot.hist('y', by='category', legend='left')
     opts = Store.lookup_options(backend, plot, 'plot')
@@ -86,11 +95,7 @@ def test_legend_opts(df, backend, legend_opts):
     'position',
     ['top_right', 'top_left', 'bottom_left', 'bottom_right', 'right', 'left', 'top', 'bottom'],
 )
-@pytest.mark.parametrize(
-    'backend',
-    ['bokeh', 'matplotlib', plotly_without('legend_position')],
-    indirect=True,
-)
+@legend_position_backends
 def test_legend_position(df, backend, position):
     plot = df.hvplot.scatter('x', 'y', by='category', legend=position)
     opts = Store.lookup_options(backend, plot, 'plot')

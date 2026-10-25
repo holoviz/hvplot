@@ -232,7 +232,7 @@ def test_draw_nodelist(hvnx, path_graph, pos):
     assert plot.nodes.dimension_values('index').tolist() == [0, 1]
 
 
-@pytest.mark.xfail(strict=True, reason='BUG: nodelist is used as positions, not node ids')
+@pytest.mark.xfail(reason='BUG: nodelist is used as positions, not node ids')
 def test_draw_nodelist_node_ids(hvnx, graph):
     plot = hvnx.draw(graph, nodelist=[4, 10])
     assert plot.nodes.dimension_values('index').tolist() == [4, 10]
@@ -301,7 +301,7 @@ def test_draw_geo_without_geoviews(hvnx, path_graph, pos, block_import):
         hvnx.draw(path_graph, pos, geo=True)
 
 
-@pytest.mark.xfail(strict=True, reason='BUG: draw_networkx hides the axes like draw')
+@pytest.mark.xfail(reason='BUG: draw_networkx hides the axes like draw')
 def test_draw_networkx_shows_axes(hvnx, path_graph, pos):
     plot = hvnx.draw_networkx(path_graph, pos)
     assert 'xaxis' not in plot_opts(plot)

@@ -2,12 +2,17 @@ import pandas as pd
 import pytest
 from holoviews import NdLayout, NdOverlay, Store
 from holoviews.core.dimension import Dimension
+from holoviews.core.options import AbbreviatedException
 from holoviews.element import Labels
 
-from hvplot.tests._backends import matplotlib_labels_bug
 from hvplot.tests._deps import pandas_and_dask
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
+
+matplotlib_labels_bug = pytest.mark.render_xfail(
+    reason='BUG: labels fail to render on matplotlib, Axes.text() gets s twice (converter.py)',
+    raises=AbbreviatedException,
+)
 
 
 @pytest.fixture
@@ -81,19 +86,19 @@ def test_text_template_float(edge_df):
     assert list(plot.data['label']) == ['-58.7E -34.58N', '-47.9E -15.78N', '-70.7E -33.45N']
 
 
-@pytest.mark.xfail(strict=True, reason='BUG: c is not applied to the labels text color')
+@pytest.mark.xfail(reason='BUG: c is not applied to the labels text color')
 def test_c(df):
     plot = df.hvplot.labels('x', 'y', text='name', c='red')
     assert Store.lookup_options('bokeh', plot, 'style').kwargs['text_color'] == 'red'
 
 
-@pytest.mark.xfail(strict=True, reason='BUG: xoffset is dropped')
+@pytest.mark.xfail(reason='BUG: xoffset is dropped')
 def test_xoffset(df):
     plot = df.hvplot.labels('x', 'y', text='name', xoffset=0.5)
     assert Store.lookup_options('bokeh', plot, 'plot').kwargs['xoffset'] == 0.5
 
 
-@pytest.mark.xfail(strict=True, reason='BUG: yoffset is dropped')
+@pytest.mark.xfail(reason='BUG: yoffset is dropped')
 def test_yoffset(df):
     plot = df.hvplot.labels('x', 'y', text='name', yoffset=0.5)
     assert Store.lookup_options('bokeh', plot, 'plot').kwargs['yoffset'] == 0.5

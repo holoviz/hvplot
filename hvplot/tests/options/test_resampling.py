@@ -426,7 +426,7 @@ def small_df():
         pytest.param(
             {'rasterize': True},
             marks=pytest.mark.xfail(
-                reason='HoloViews: apply_when with rasterize empties the raw element', strict=True
+                reason='HoloViews: apply_when with rasterize empties the raw element', strict=False
             ),
         ),
         {'datashade': True},
@@ -473,7 +473,9 @@ def test_selector(df, operation):
 
 @requires('datashader')
 @pytest.mark.slow
-@pytest.mark.render_xfail(reason='datashader: first() of a pandas string column fails')
+@pytest.mark.render_xfail(
+    reason='datashader: first() of a pandas string column fails', strict=False
+)
 @operations
 def test_selector_reduction_of_string_column(df, operation):
     from datashader.reductions import first

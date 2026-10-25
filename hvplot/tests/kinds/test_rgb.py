@@ -85,7 +85,7 @@ def test_x(gridded_lib):
     assert_element_equal(rgb, EXPECTED_LATLON)
 
 
-@pytest.mark.xfail(strict=True, reason='BUG: rgb does not transpose the data when x/y are swapped')
+@pytest.mark.xfail(reason='BUG: rgb does not transpose the data when x/y are swapped')
 def test_x_swapped():
     rgb = DA_LATLON.hvplot.rgb(x='lat', y='lon')
     assert rgb.kdims == ['lat', 'lon']

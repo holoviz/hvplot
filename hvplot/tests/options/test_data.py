@@ -100,7 +100,7 @@ def test_value_label_and_group_label_wide(tabular_lib, xy_df, kind, element):
 
 @pandas_and_dask
 @pytest.mark.lib_render_xfail(
-    'dask', reason='dask: projecting a column through rename_axis(columns=...) fails'
+    'dask', reason='dask: projecting a column through rename_axis(columns=...) fails', strict=False
 )
 @pytest.mark.parametrize('kind', ['line', 'area', 'scatter'])
 def test_group_label_from_columns_name(tabular_lib, xy_df, kind):
@@ -278,7 +278,7 @@ def test_fields_dimension(cat_df):
     assert (plot.vdims[0].label, plot.vdims[0].unit) == ('Why', 'm')
 
 
-@pytest.mark.xfail(strict=True, reason='BUG: fields renaming x or y breaks groupby (and row/col)')
+@pytest.mark.xfail(reason='BUG: fields renaming x or y breaks groupby (and row/col)')
 def test_fields_with_groupby(cat_df):
     plot = cat_df.hvplot.scatter('x', 'y', groupby='category', dynamic=False, fields={'y': 'Y'})
     assert plot.last.vdims == ['Y']
@@ -331,7 +331,7 @@ def test_row(cat_df):
     assert_element_equal(plot['B'], Scatter(cat_df.iloc[[1]], 'x', ['y']))
 
 
-@pytest.mark.xfail(strict=True, reason='BUG: row lays the facets out horizontally')
+@pytest.mark.xfail(reason='BUG: row lays the facets out horizontally')
 def test_row_layout(cat_df):
     plot = cat_df.hvplot.scatter('x', 'y', row='category')
     grid_plot = hv.renderer('bokeh').get_plot(plot)
@@ -350,7 +350,7 @@ def two_cat_df():
     )
 
 
-@pytest.mark.xfail(strict=True, reason='BUG: row and col are swapped in the grid layout')
+@pytest.mark.xfail(reason='BUG: row and col are swapped in the grid layout')
 def test_row_and_col_layout(two_cat_df):
     plot = two_cat_df.hvplot.scatter('x', 'y', row='r', col='c')
     grid_plot = hv.renderer('bokeh').get_plot(plot)

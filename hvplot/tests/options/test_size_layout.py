@@ -4,8 +4,6 @@ import panel as pn
 import pytest
 from holoviews import Store
 
-from hvplot.tests._backends import plotly_without
-
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
 
 
@@ -67,7 +65,12 @@ data_aspect_backends = pytest.mark.parametrize(
     [
         'bokeh',
         'matplotlib',
-        plotly_without('data_aspect'),
+        pytest.param(
+            'plotly',
+            marks=pytest.mark.xfail(
+                reason='HoloViews: plotly has no data_aspect option', raises=KeyError, strict=False
+            ),
+        ),
     ],
     indirect=True,
 )

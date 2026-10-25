@@ -4,6 +4,7 @@ Each call runs on a pandas DataFrame and on the `tabular_lib` equivalent, and th
 compared.
 Ibis tables have no index, so the calls set `x` explicitly.
 `BUGS` lists the known failures and `SKIPS` the documented differences, by (case, library).
+A reason starting with `BUG:` is a bug of hvPlot, the others come from another library.
 """
 
 import holoviews as hv
@@ -242,7 +243,9 @@ def assert_same_plot_as_pandas(request, df, tabular_lib, name, kind, kwargs):
     if (name, library) in SKIPS:
         pytest.skip(SKIPS[(name, library)])
     if (name, library) in BUGS:
-        request.applymarker(pytest.mark.xfail(strict=True, reason=BUGS[(name, library)]))
+        reason = BUGS[(name, library)]
+        # Only the bugs of hvPlot (BUG:) are strict, as the other libraries can fix theirs.
+        request.applymarker(pytest.mark.xfail(reason=reason, strict=reason.startswith('BUG:')))
 
     expected = df.hvplot(kind=kind, **kwargs)
     plot = tabular_lib(df).hvplot(kind=kind, **kwargs)

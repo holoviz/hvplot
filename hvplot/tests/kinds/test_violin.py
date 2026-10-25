@@ -11,7 +11,9 @@ def df():
     return pd.DataFrame({'x': [1.0, 2.0, 3.0], 'y': [2.0, 4.0, 3.0]})
 
 
-@pytest.mark.lib_render_xfail('ibis', reason='HoloViews: Violin of an ibis table fails to render')
+@pytest.mark.lib_render_xfail(
+    'ibis', reason='HoloViews: Violin of an ibis table fails to render', strict=False
+)
 def test_y(df, tabular_lib):
     plot = tabular_lib(df).hvplot.violin(y='y')
     assert isinstance(plot, Violin)

@@ -7,10 +7,14 @@ from holoviews.core.options import AbbreviatedException
 from holoviews.element import Points
 from holoviews.testing import assert_element_equal
 
-from hvplot.tests._backends import size_opt
 from hvplot.tests._deps import pandas_and_dask, requires
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
+
+
+def size_opt(backend):
+    """The name of the size option, as set by hvPlot for the backend."""
+    return 's' if backend == 'matplotlib' else 'size'
 
 
 @pytest.fixture
@@ -38,6 +42,7 @@ alpha_backends = pytest.mark.parametrize(
             'matplotlib',
             marks=pytest.mark.xfail(
                 reason='HoloViews: matplotlib cannot map a dim to alpha',
+                strict=False,
                 raises=AbbreviatedException,
             ),
         ),
@@ -69,17 +74,13 @@ def test_x_default(df, tabular_lib):
     assert_element_equal(plot, Points(data, ['x', 'y'], []))
 
 
-@pytest.mark.xfail(
-    strict=True, reason='BUG: points defaults x/y to the first two columns, not numeric ones'
-)
+@pytest.mark.xfail(reason='BUG: points defaults x/y to the first two columns, not numeric ones')
 def test_x_default_first_numeric(df):
     plot = df.hvplot.points()
     assert plot.kdims == ['x', 'y']
 
 
-@pytest.mark.xfail(
-    strict=True, reason='BUG: a lone x or y is ignored, the first two columns are plotted'
-)
+@pytest.mark.xfail(reason='BUG: a lone x or y is ignored, the first two columns are plotted')
 @pytest.mark.parametrize('kwargs', [{'x': 'number'}, {'y': 'number'}])
 def test_x_or_y_only(df, kwargs):
     plot = df.hvplot.points(**kwargs)
@@ -161,6 +162,7 @@ def test_marker(df, backend):
             'matplotlib',
             marks=pytest.mark.render_xfail(
                 reason='HoloViews: matplotlib cannot map a dim to marker',
+                strict=False,
                 raises=AbbreviatedException,
             ),
         ),

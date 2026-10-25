@@ -158,7 +158,6 @@ def test_hover_cols_string(cat_df):
 
 @pytest.mark.xfail(
     reason='BUG: hover_cols raises on an xarray Dataset, the other data variables are dropped',
-    strict=True,
 )
 @pytest.mark.parametrize('hover_cols', [['w'], 'all'])
 @pytest.mark.parametrize('kind', ['image', 'quadmesh'])
@@ -181,7 +180,6 @@ def test_tools_hover_instance_not_duplicated(cat_df):
 
 @pytest.mark.xfail(
     reason="BUG: hover_mode is dropped when 'hover' is also in tools",
-    strict=True,
 )
 def test_hover_line_mode_with_hover_tool(xy_df):
     plot = xy_df.hvplot('x', 'y', hover='vline', tools=['hover'])

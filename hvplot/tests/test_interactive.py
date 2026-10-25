@@ -1466,9 +1466,7 @@ def test_xarray_interactive_isel_slider_class(interactive_da):
     assert result.eval().values.tolist() == [3, 6]
 
 
-@pytest.mark.xfail(
-    strict=True, reason='BUG: isel slider end is len(dim), one past the last valid index'
-)
+@pytest.mark.xfail(reason='BUG: isel slider end is len(dim), one past the last valid index')
 def test_xarray_interactive_isel_slider_end(interactive_da):
     (slider,) = interactive_da.isel(x=pn.widgets.IntSlider).widgets()
     assert slider.end == 2

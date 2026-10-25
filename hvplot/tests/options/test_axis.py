@@ -13,7 +13,6 @@ from holoviews import Store
 from matplotlib.ticker import PercentFormatter
 
 import hvplot
-from hvplot.tests._backends import plotly_without
 from hvplot.tests._deps import pandas_and_dask, requires
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
@@ -102,7 +101,9 @@ def test_xaxis_yaxis_position_from_holoviews_defaults(df, backend):
         'matplotlib',
         pytest.param(
             'plotly',
-            marks=pytest.mark.render_xfail(reason='HoloViews: plotly does not accept xaxis=True'),
+            marks=pytest.mark.render_xfail(
+                reason='HoloViews: plotly does not accept xaxis=True', strict=False
+            ),
         ),
     ],
     indirect=True,
@@ -372,7 +373,6 @@ def test_cticks_matplotlib_default_compatibility(hvplot_xarray, da2, backend):
 
 
 @pytest.mark.xfail(
-    strict=True,
     reason='BUG: cticks is dropped on matplotlib with compatibility="bokeh" (the style key'
     ' is chosen from _backend instead of _backend_compat, converter.py)',
     raises=AssertionError,
@@ -405,7 +405,16 @@ def test_autorange_default_unset(df):
 
 @pytest.mark.parametrize(
     'backend',
-    ['bokeh', 'matplotlib', plotly_without('clabel')],
+    [
+        'bokeh',
+        'matplotlib',
+        pytest.param(
+            'plotly',
+            marks=pytest.mark.xfail(
+                reason='HoloViews: plotly has no clabel option', raises=KeyError, strict=False
+            ),
+        ),
+    ],
     indirect=True,
 )
 def test_clabel(hvplot_xarray, da2, backend):
@@ -532,22 +541,32 @@ def test_rot_with_invert(df, backend):
     assert 'xrotation' not in opts.kwargs
 
 
-@pytest.mark.parametrize(
+formatter_backends = pytest.mark.parametrize(
     'backend',
-    ['bokeh', 'matplotlib', plotly_without('xformatter')],
+    [
+        'bokeh',
+        'matplotlib',
+        pytest.param(
+            'plotly',
+            marks=pytest.mark.xfail(
+                reason='HoloViews: plotly has no xformatter/yformatter option',
+                raises=KeyError,
+                strict=False,
+            ),
+        ),
+    ],
     indirect=True,
 )
+
+
+@formatter_backends
 def test_xformatter(df, backend):
     plot = df.hvplot.scatter('x', 'y', xformatter='%.3f')
     opts = Store.lookup_options(backend, plot, 'plot')
     assert opts.kwargs['xformatter'] == '%.3f'
 
 
-@pytest.mark.parametrize(
-    'backend',
-    ['bokeh', 'matplotlib', plotly_without('yformatter')],
-    indirect=True,
-)
+@formatter_backends
 def test_yformatter(df, backend):
     plot = df.hvplot.scatter('x', 'y', yformatter='%.3f')
     opts = Store.lookup_options(backend, plot, 'plot')

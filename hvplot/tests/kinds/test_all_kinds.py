@@ -1,32 +1,26 @@
+"""Sweeps over every kind of hvPlot, with each tabular library and with each backend.
+
+A new kind is picked up automatically. If it fails with some libraries or backends, add it
+to the known failures below: the dicts are keyed by (kind, library) or (kind, backend).
+"""
+
 import holoviews as hv
 import numpy as np
 import pandas as pd
 import pytest
+from holoviews.core.options import AbbreviatedException
 
 from hvplot import hvPlotTabular
 from hvplot.converter import HoloViewsConverter
 from hvplot.tests._data import makeDataFrame
 from hvplot.tests._deps import TABULAR_LIBS
 
-TYPES = {t for t in dir(hvPlotTabular) if not t.startswith('_') and t != 'explorer'}
-FRAME_TYPES = TYPES - {'bivariate', 'heatmap', 'hexbin', 'labels', 'vectorfield'}
-SERIES_TYPES = FRAME_TYPES - {'points', 'polygons', 'ohlc', 'paths'}
+BACKENDS = ['bokeh', 'matplotlib', 'plotly']
 
-# Ibis tables have no index, which these kinds use as the default x.
-IBIS_NEEDS_X_KINDS = {'area', 'bar', 'barh', 'errorbars', 'line', 'scatter', 'step'}
-TABULAR_BUGS = {
-    ('bar', 'ibis'): 'BUG: bar fails to melt an ibis table',
-    ('barh', 'ibis'): 'BUG: barh fails to melt an ibis table',
-    ('box', 'ibis'): 'BUG: box fails to melt an ibis table',
-    ('density', 'ibis'): 'BUG: density on ibis requires x, which it does not use',
-    ('kde', 'ibis'): 'BUG: kde on ibis requires x, which it does not use',
-    ('ohlc', 'ibis'): 'BUG: ohlc reads the dtype of an ibis column',
-    ('table', 'ibis'): 'BUG: table reads the index of an ibis table',
-    ('violin', 'ibis'): 'BUG: violin fails to melt an ibis table',
-}
-
-# step cannot render the string index of the test data, which is the default x.
-NUMERIC_X_KINDS = {'step'}
+KINDS = sorted(t for t in dir(hvPlotTabular) if not t.startswith('_') and t != 'explorer')
+# These kinds need other columns than the ones selected by y.
+FRAME_KINDS = sorted(set(KINDS) - {'bivariate', 'heatmap', 'hexbin', 'labels', 'vectorfield'})
+SERIES_KINDS = sorted(set(FRAME_KINDS) - {'points', 'polygons', 'ohlc', 'paths'})
 
 # A subset of the columns, so that the test fails if y is ignored.
 Y = ['B', 'D']
@@ -35,42 +29,94 @@ OHLC_Y = ['D', 'C', 'B', 'A']
 # Kinds that melt y into a `Variable` column rather than make one element per column.
 MELTED_KINDS = {'bar', 'barh', 'box', 'violin'}
 
+# The kinds that do not plot the columns Y, with a backend.
+BACKEND_KWARGS = {
+    'bivariate': {'x': 'A', 'y': 'B'},
+    'heatmap': {'x': 'A', 'y': 'B', 'C': 'C'},
+    'ohlc': {'y': OHLC_Y},
+    'hexbin': {'x': 'A', 'y': 'B'},
+    'labels': {'x': 'A', 'y': 'B', 'text': 'C'},
+    'vectorfield': {'x': 'A', 'y': 'B', 'angle': 'C', 'mag': 'D'},
+}
 
-def render_bug(kind, lib, series=False):
-    """Return the reason why the plot of this kind is built but cannot be rendered, if any."""
-    if kind == 'errorbars':
-        return 'BUG: errorbars without yerr1 builds an ErrorBars with no error dimension'
-    if series and kind == 'box':
-        return 'HoloViews: BoxWhisker without kdims fails to render with the hover tool'
-    if lib == 'ibis' and kind in {'polygons', 'step'}:
-        return 'HoloViews: the Narwhals interface fails to render this element with an ibis table'
-    if lib == 'dask' and kind in {'bar', 'barh'}:
-        return 'HoloViews: Bars of a dask DataFrame with two key dimensions fail to render'
-    return None
+# The default x is the index, which ibis tables don't have, and which step cannot render
+# when it is the string index of the test data.
+X = {(kind, 'ibis'): 'A' for kind in ['area', 'bar', 'barh', 'errorbars', 'line', 'scatter']}
+X |= {('step', lib): 'A' for lib in TABULAR_LIBS}
 
+# The kinds with no hvPlot element for the backend raise an error when called.
+NOT_SUPPORTED = [('hexbin', 'plotly'), ('polygons', 'plotly'), ('vectorfield', 'plotly')]
 
-def render_marks(kind, lib, series=False):
-    reason = render_bug(kind, lib, series)
-    return [pytest.mark.render_xfail(reason=reason)] if reason else []
-
-
-def kind_and_lib_params(kinds):
-    params = []
-    for kind in sorted(kinds):
-        for lib in TABULAR_LIBS:
-            marks = render_marks(kind, lib)
-            x = None
-            if kind in NUMERIC_X_KINDS or (lib == 'ibis' and kind in IBIS_NEEDS_X_KINDS):
-                x = 'A'
-            if (kind, lib) in TABULAR_BUGS:
-                marks.append(pytest.mark.xfail(strict=True, reason=TABULAR_BUGS[kind, lib]))
-            params.append(pytest.param(kind, lib, x, marks=marks))
-    return params
-
-
-frame_kinds = pytest.mark.parametrize(
-    ('kind', 'tabular_lib', 'x'), kind_and_lib_params(FRAME_TYPES), indirect=['tabular_lib']
+# Known failures, as marks: `xfail` when the plot cannot be built, `render_xfail` when it cannot
+# be rendered. They are not strict when the reason names another library instead of `BUG:`.
+errorbars_bug = pytest.mark.render_xfail(
+    reason='BUG: errorbars without yerr1 builds an ErrorBars with no error dimension'
 )
+dask_bars_bug = pytest.mark.render_xfail(
+    reason='HoloViews: Bars of a dask DataFrame with two key dimensions fail to render',
+    strict=False,
+)
+ibis_narwhals_bug = pytest.mark.render_xfail(
+    reason='HoloViews: the Narwhals interface fails to render this element with an ibis table',
+    strict=False,
+)
+LIB_FAILURES = {
+    ('bar', 'ibis'): pytest.mark.xfail(reason='BUG: bar fails to melt an ibis table'),
+    ('barh', 'ibis'): pytest.mark.xfail(reason='BUG: barh fails to melt an ibis table'),
+    ('box', 'ibis'): pytest.mark.xfail(reason='BUG: box fails to melt an ibis table'),
+    ('density', 'ibis'): pytest.mark.xfail(
+        reason='BUG: density on ibis requires x, which it does not use'
+    ),
+    ('kde', 'ibis'): pytest.mark.xfail(
+        reason='BUG: kde on ibis requires x, which it does not use'
+    ),
+    ('ohlc', 'ibis'): pytest.mark.xfail(reason='BUG: ohlc reads the dtype of an ibis column'),
+    ('table', 'ibis'): pytest.mark.xfail(reason='BUG: table reads the index of an ibis table'),
+    ('violin', 'ibis'): pytest.mark.xfail(reason='BUG: violin fails to melt an ibis table'),
+    ('bar', 'dask'): dask_bars_bug,
+    ('barh', 'dask'): dask_bars_bug,
+    ('polygons', 'ibis'): ibis_narwhals_bug,
+    ('step', 'ibis'): ibis_narwhals_bug,
+    **{('errorbars', lib): errorbars_bug for lib in TABULAR_LIBS},
+}
+# Known failures with a series, by kind.
+SERIES_FAILURES = {
+    'box': pytest.mark.render_xfail(
+        reason='HoloViews: BoxWhisker without kdims fails to render with the hover tool',
+        strict=False,
+    ),
+    'errorbars': errorbars_bug,
+}
+dataset_bug = pytest.mark.xfail(
+    reason='BUG: dataset fails with a KeyError, the options of Dataset are not found',
+    raises=KeyError,
+)
+# Known failures with each backend, as marks.
+BACKEND_FAILURES = {
+    ('bivariate', 'plotly'): pytest.mark.render_xfail(
+        reason='BUG: bivariate on plotly fails to render with a KeyError, not NotImplementedError',
+        raises=KeyError,
+    ),
+    ('dataset', 'matplotlib'): dataset_bug,
+    ('dataset', 'plotly'): dataset_bug,
+    ('labels', 'matplotlib'): pytest.mark.render_xfail(
+        reason='BUG: labels fail to render on matplotlib, Axes.text() gets s twice (converter.py)',
+        raises=AbbreviatedException,
+    ),
+    **{('errorbars', backend): errorbars_bug for backend in BACKENDS},
+}
+
+KIND_AND_LIB = [
+    pytest.param(kind, lib, X.get((kind, lib)), marks=LIB_FAILURES.get((kind, lib), []))
+    for kind in FRAME_KINDS
+    for lib in TABULAR_LIBS
+]
+KIND_AND_BACKEND = [
+    pytest.param(kind, backend, marks=BACKEND_FAILURES.get((kind, backend), []))
+    for kind in KINDS
+    for backend in BACKENDS
+    if (kind, backend) not in NOT_SUPPORTED
+]
 
 
 def assert_kind_element(plot, kind):
@@ -96,7 +142,7 @@ def assert_dataframe_plot(plot, kind, y):
         assert [d.name for d in plot.Rectangles.I.kdims][1::2] == [y[0], y[3]]
 
 
-@frame_kinds
+@pytest.mark.parametrize(('kind', 'tabular_lib', 'x'), KIND_AND_LIB, indirect=['tabular_lib'])
 def test_dataframe(kind, tabular_lib, x):
     y = OHLC_Y if kind == 'ohlc' else Y
     df = tabular_lib(makeDataFrame())
@@ -106,7 +152,8 @@ def test_dataframe(kind, tabular_lib, x):
 
 @pytest.mark.parametrize('tabular_lib', ['polars'], indirect=True)
 @pytest.mark.parametrize(
-    'kind', [pytest.param(k, marks=render_marks(k, 'polars')) for k in sorted(FRAME_TYPES)]
+    'kind',
+    [pytest.param(kind, marks=LIB_FAILURES.get((kind, 'polars'), [])) for kind in FRAME_KINDS],
 )
 def test_lazyframe_polars(kind, tabular_lib):
     y = OHLC_Y if kind == 'ohlc' else Y
@@ -138,10 +185,29 @@ def test_ibis_requires_x(tabular_lib):
 
 @pytest.mark.lib_skip('duckdb', 'ibis', reason='DuckDB and Ibis have no Series object.')
 @pytest.mark.parametrize(
-    'kind',
-    [pytest.param(k, marks=render_marks(k, None, series=True)) for k in sorted(SERIES_TYPES)],
+    'kind', [pytest.param(kind, marks=SERIES_FAILURES.get(kind, [])) for kind in SERIES_KINDS]
 )
 def test_series(kind, tabular_lib):
     ser = tabular_lib(pd.Series(np.random.rand(10), name='A'))
     plot = ser.hvplot(kind=kind)
     assert_kind_element(plot, kind)
+
+
+# A numeric index, as the string index of makeDataFrame cannot be rendered by every kind.
+@pytest.fixture
+def numeric_index_df():
+    return makeDataFrame().reset_index(drop=True)
+
+
+@pytest.mark.parametrize(('kind', 'backend'), KIND_AND_BACKEND, indirect=['backend'])
+def test_kind_with_backend(hvplot_pandas, backend, numeric_index_df, kind):
+    plot = numeric_index_df.hvplot(kind=kind, **BACKEND_KWARGS.get(kind, {'y': Y}))
+    assert_kind_element(plot, kind)
+
+
+@pytest.mark.parametrize(('kind', 'backend'), NOT_SUPPORTED, indirect=['backend'])
+def test_kind_not_supported(hvplot_pandas, backend, numeric_index_df, kind):
+    with pytest.raises(
+        NotImplementedError, match=f"'{kind}' plot not supported by the '{backend}'"
+    ):
+        numeric_index_df.hvplot(kind=kind, **BACKEND_KWARGS.get(kind, {'y': Y}))

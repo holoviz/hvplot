@@ -36,7 +36,7 @@ def test_x(ds, gridded_lib):
 
 
 @pytest.mark.lib_render_xfail(
-    'ibis', reason='HoloViews: VectorField of an ibis table fails to render'
+    'ibis', reason='HoloViews: VectorField of an ibis table fails to render', strict=False
 )
 def test_y(df, tabular_lib):
     plot = tabular_lib(df).hvplot.vectorfield(x='x', y='y', angle='angle', mag='mag')

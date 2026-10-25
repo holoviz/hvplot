@@ -43,7 +43,7 @@ def test_x(df):
 
 
 @pytest.mark.lib_render_xfail(
-    'ibis', reason='HoloViews: Polygons of an ibis table fails to render'
+    'ibis', reason='HoloViews: Polygons of an ibis table fails to render', strict=False
 )
 def test_y(df, tabular_lib):
     plot = tabular_lib(df).hvplot.polygons(x='x', y='lon')
@@ -52,9 +52,7 @@ def test_y(df, tabular_lib):
     assert list(plot.dimension_values('lon')) == [5, 6, 6, 5]
 
 
-@pytest.mark.xfail(
-    strict=True, reason='BUG: a lone x or y is ignored, the first two columns are plotted'
-)
+@pytest.mark.xfail(reason='BUG: a lone x or y is ignored, the first two columns are plotted')
 @pytest.mark.parametrize('kwargs', [{'x': 'lon'}, {'y': 'lon'}])
 def test_x_or_y_only(df, kwargs):
     plot = df.hvplot.polygons(**kwargs)
@@ -75,9 +73,7 @@ def test_gridded(grid, gridded_lib):
     assert list(plot.dimension_values('x')) == [10, 20, 30, 10, 20, 30, 10]
 
 
-@pytest.mark.xfail(
-    strict=True, reason='BUG: gridded polygons without x and y have only one key dimension'
-)
+@pytest.mark.xfail(reason='BUG: gridded polygons without x and y have only one key dimension')
 def test_gridded_default(grid):
     plot = grid.hvplot.polygons()
     assert plot.kdims == ['x', 'y']
@@ -127,7 +123,6 @@ def test_by_subplots_geodataframe(polygons):
 @requires('geopandas', 'shapely')
 @pytest.mark.xfail(
     Version(pd.__version__).major >= 3,
-    strict=True,
     raises=TypeError,
     reason='BUG: with pandas 3 a missing geometry has geom type NaN, not None, and is kept',
 )

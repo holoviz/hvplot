@@ -37,9 +37,7 @@ def test_y(df, tabular_lib):
     assert_element_equal(plot, Path(df, ['x', 'z'], []))
 
 
-@pytest.mark.xfail(
-    strict=True, reason='BUG: a lone x or y is ignored, the first two columns are plotted'
-)
+@pytest.mark.xfail(reason='BUG: a lone x or y is ignored, the first two columns are plotted')
 @pytest.mark.parametrize('kwargs', [{'x': 'z'}, {'y': 'z'}])
 def test_x_or_y_only(df, kwargs):
     plot = df.hvplot.paths(**kwargs)
@@ -62,9 +60,7 @@ def test_gridded(grid, gridded_lib):
     assert list(plot.dimension_values('x')) == [10, 20, 30, 10, 20, 30]
 
 
-@pytest.mark.xfail(
-    strict=True, reason='BUG: gridded paths without x and y have only one key dimension'
-)
+@pytest.mark.xfail(reason='BUG: gridded paths without x and y have only one key dimension')
 def test_gridded_default(grid):
     plot = grid.hvplot.paths()
     assert plot.kdims == ['x', 'y']

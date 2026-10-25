@@ -8,7 +8,6 @@ import xarray as xr
 from holoviews import Store
 from holoviews.testing import assert_element_equal
 
-from hvplot.tests._backends import plotly_without
 from hvplot.tests._deps import pandas_and_dask, requires
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
@@ -226,13 +225,10 @@ def test_symmetric_deduced_use_dask_skipped(symmetric_df):
     assert style_opts.kwargs['cmap'] == 'kbc_r'
 
 
-dask_symmetric_bug = pytest.mark.lib_xfail(
+@pandas_and_dask
+@pytest.mark.lib_xfail(
     'dask', reason='BUG: _process_symmetric raises TypeError on a dask DataFrame, swallowed'
 )
-
-
-@pandas_and_dask
-@dask_symmetric_bug
 def test_symmetric_deduced_tabular_lib(tabular_lib, symmetric_df):
     plot = tabular_lib(symmetric_df).hvplot.scatter('x', 'y', c='number')
     plot_opts = Store.lookup_options('bokeh', plot, 'plot')
@@ -242,7 +238,9 @@ def test_symmetric_deduced_tabular_lib(tabular_lib, symmetric_df):
 
 
 @pandas_and_dask
-@dask_symmetric_bug
+@pytest.mark.lib_xfail(
+    'dask', reason='BUG: _process_symmetric raises TypeError on a dask DataFrame, swallowed'
+)
 def test_robust_tabular_lib(tabular_lib, symmetric_df):
     plot = tabular_lib(symmetric_df).hvplot.scatter('x', 'y', c='number', robust=True)
     plot_opts = Store.lookup_options('bokeh', plot, 'plot')
@@ -251,7 +249,6 @@ def test_robust_tabular_lib(tabular_lib, symmetric_df):
 
 @pytest.mark.xfail(
     reason='BUG: check_symmetric_max is ignored for tabular data, only used for xarray',
-    strict=True,
 )
 def test_check_symmetric_max_tabular():
     df = pd.DataFrame({'x': np.arange(100.0), 'y': np.arange(100.0)})
@@ -369,7 +366,7 @@ def test_clim_points_c_column(df):
     assert plot.get_dimension('number').range == (0, 1)
 
 
-@pytest.mark.xfail(reason='BUG: clim is ignored by scatter with c, points honors it', strict=True)
+@pytest.mark.xfail(reason='BUG: clim is ignored by scatter with c, points honors it')
 def test_clim_scatter_c_column(df):
     plot = df.hvplot.scatter('x', 'y', c='number', clim=(0, 1))
     assert plot.get_dimension('number').range == (0, 1)
@@ -462,7 +459,16 @@ def test_color_key_dict_datashade(df):
 
 @pytest.mark.parametrize(
     'backend',
-    ['bokeh', 'matplotlib', plotly_without('cnorm')],
+    [
+        'bokeh',
+        'matplotlib',
+        pytest.param(
+            'plotly',
+            marks=pytest.mark.xfail(
+                reason='HoloViews: plotly has no cnorm option', raises=KeyError, strict=False
+            ),
+        ),
+    ],
     indirect=True,
 )
 @pytest.mark.parametrize('cnorm', ['linear', 'log', 'eq_hist'])
@@ -511,7 +517,18 @@ def test_rescale_discrete_levels_datashade(df):
 
 @pytest.mark.parametrize(
     'backend',
-    ['bokeh', 'matplotlib', plotly_without('rescale_discrete_levels')],
+    [
+        'bokeh',
+        'matplotlib',
+        pytest.param(
+            'plotly',
+            marks=pytest.mark.xfail(
+                reason='HoloViews: plotly has no rescale_discrete_levels option',
+                raises=KeyError,
+                strict=False,
+            ),
+        ),
+    ],
     indirect=True,
 )
 def test_rescale_discrete_levels(df, backend):

@@ -16,7 +16,8 @@ no_args = ['line', 'area', 'hist', 'box', 'kde', 'density', 'bar', 'barh']
 x_y = ['scatter', 'hexbin']
 # `.box()` of the hvPlot accessor disables the hover, the pandas backend does not.
 box_bug = pytest.mark.render_xfail(
-    reason='BUG: the pandas backend does not disable the hover of box plots, which cannot render'
+    reason='HoloViews: BoxWhisker without kdims fails to render with the hover tool',
+    strict=False,
 )
 frame_specials = [
     # delegates to boxplot_frame

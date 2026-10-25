@@ -5,8 +5,6 @@ import pytest
 from holoviews import Store
 from holoviews.element import Bivariate, Contours, Polygons
 
-from hvplot.tests._backends import plotly_bivariate_bug
-
 
 @pytest.fixture
 def df(rng):
@@ -27,7 +25,18 @@ backends = pytest.mark.parametrize(
 )
 filled_backends = pytest.mark.parametrize(
     'backend',
-    ['bokeh', 'matplotlib', pytest.param('plotly', marks=plotly_bivariate_bug)],
+    [
+        'bokeh',
+        'matplotlib',
+        pytest.param(
+            'plotly',
+            marks=pytest.mark.render_xfail(
+                reason='BUG: bivariate on plotly fails to render with a KeyError, '
+                'not a NotImplementedError',
+                raises=KeyError,
+            ),
+        ),
+    ],
     indirect=True,
 )
 

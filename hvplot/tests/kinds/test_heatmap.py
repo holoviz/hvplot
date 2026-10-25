@@ -19,7 +19,9 @@ def test_x(df, hvplot_pandas):
     assert plot.kdims == ['y', 'x']
 
 
-@pytest.mark.lib_render_xfail('ibis', reason='HoloViews: HeatMap of an ibis table fails to render')
+@pytest.mark.lib_render_xfail(
+    'ibis', reason='HoloViews: HeatMap of an ibis table fails to render', strict=False
+)
 def test_y(df, tabular_lib):
     plot = tabular_lib(df).hvplot.heatmap(x='x', y='y', C='value')
     assert isinstance(plot, HeatMap)
@@ -65,9 +67,7 @@ def test_C_default_kind(hvplot_pandas):
     assert list(plot.dimension_values('v')) == [3.0, 4.0]
 
 
-@pytest.mark.xfail(
-    strict=True, reason='BUG: the heatmap method always passes C=None, which raises'
-)
+@pytest.mark.xfail(reason='BUG: the heatmap method always passes C=None, which raises')
 def test_C_default(hvplot_pandas):
     # The docstring says that a count is used without C.
     df = pd.DataFrame({'x': [1, 2], 'y': ['A', 'B'], 'v': [3.0, 4.0]})

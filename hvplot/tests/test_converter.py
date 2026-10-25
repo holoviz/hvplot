@@ -271,7 +271,9 @@ def test_only_includes_num_chart(cat_df, tabular_lib, kind, element):
         pytest.param(
             'area',
             Area,
-            marks=pytest.mark.render_xfail(reason='HoloViews: Area with string values fails'),
+            marks=pytest.mark.render_xfail(
+                reason='HoloViews: Area with string values fails', strict=False
+            ),
         ),
         ('scatter', Scatter),
     ],

@@ -6,10 +6,15 @@ from holoviews import Store
 from holoviews.core.options import AbbreviatedException
 from holoviews.element import Scatter
 
-from hvplot.tests._backends import size_opt
 from hvplot.tests._deps import pandas_and_dask
 
 pytestmark = pytest.mark.usefixtures('hvplot_pandas')
+
+
+def size_opt(backend):
+    """The name of the size option, as set by hvPlot for the backend."""
+    return 's' if backend == 'matplotlib' else 'size'
+
 
 alpha_backends = pytest.mark.parametrize(
     'backend',
@@ -19,6 +24,7 @@ alpha_backends = pytest.mark.parametrize(
             'matplotlib',
             marks=pytest.mark.xfail(
                 reason='HoloViews: matplotlib cannot map a dim to alpha',
+                strict=False,
                 raises=AbbreviatedException,
             ),
         ),
@@ -26,6 +32,7 @@ alpha_backends = pytest.mark.parametrize(
             'plotly',
             marks=pytest.mark.xfail(
                 reason='HoloViews: plotly cannot map a dim to alpha',
+                strict=False,
                 raises=ValueError,
             ),
         ),
@@ -139,6 +146,7 @@ def test_marker(df, backend):
             'matplotlib',
             marks=pytest.mark.render_xfail(
                 reason='HoloViews: matplotlib cannot map a dim to marker',
+                strict=False,
                 raises=AbbreviatedException,
             ),
         ),

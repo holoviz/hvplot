@@ -30,7 +30,6 @@ def test_dataset_gridded(gridded_lib):
 
 
 @pytest.mark.xfail(
-    strict=True,
     reason='BUG: dataset keeps all the columns, `columns` is only used by a dead branch '
     "('dataset' is always handled as gridded)",
 )

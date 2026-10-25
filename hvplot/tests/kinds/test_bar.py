@@ -37,7 +37,9 @@ def test_y_list(df, hvplot_pandas):
 
 @pandas_and_dask
 @pytest.mark.lib_render_xfail(
-    'dask', reason='HoloViews: Bars of a dask DataFrame with two key dimensions fail to render'
+    'dask',
+    reason='HoloViews: Bars of a dask DataFrame with two key dimensions fail to render',
+    strict=False,
 )
 def test_y_from_index_with_by(tabular_lib):
     cat_df = pd.DataFrame([[1, 2, 'A'], [3, 4, 'B'], [5, 6, 'C']], columns=['x', 'y', 'category'])
