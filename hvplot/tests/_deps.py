@@ -19,8 +19,18 @@ def requires(*modules):
 POLARS_2 = find_spec('polars') is not None and Version(version('polars')).major >= 2
 
 
-# The data libraries run by the `tabular_lib` and `gridded_lib` fixtures. A new library is added
-# here and in the fixture, and then runs in every test using the fixture.
+# The data libraries run by the `tabular_lib` and `gridded_lib` fixtures. To add a library:
+# 1. Add it here and a branch to the fixture in `conftest.py`, converting a pandas DataFrame (or an
+#    xarray object) to the library's object and skipping the test if it isn't installed
+#    (`pytest.importorskip`). It now runs in every test using the fixture.
+# 2. Add it to the `test` feature of `pixi.toml` and to the `tests` extra of `pyproject.toml`.
+# 3. Add it to `PATCHED` and `CLASSES` in `data_libraries/test_accessors.py`. Don't add a test
+#    module for it: what only this library does is tested with the kinds and options.
+# 4. Run the test suite and mark the failures: `lib_xfail` (hvPlot bugs) or `lib_skip` (not
+#    applicable) on the tests, `BUGS` or `SKIPS` in `data_libraries/test_tabular_parity.py` and
+#    `LIB_FAILURES` in `kinds/test_all_kinds.py`. The tests restricted with `pandas_and_dask` don't
+#    run with it, check that `test_tabular_parity.py` covers what is specific to it.
+# 5. Add it to the table of `doc/ref/data_libraries.ipynb`.
 TABULAR_LIBS = ['pandas', 'dask', 'polars', 'duckdb', 'ibis']
 GRIDDED_LIBS = ['xarray', 'dask']
 

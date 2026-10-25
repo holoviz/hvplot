@@ -201,29 +201,18 @@ pixi run -e test-core install
 
 #### Writing unit tests
 
-Tests are written with plain pytest: test functions, fixtures and `pytest.mark.parametrize`, no `unittest.TestCase`. Where a test goes depends on what it is about:
+Tests are plain pytest functions. Where a test goes:
 
-| I'm working on... | Add the test to |
+| I'm testing... | Add the test to |
 |---|---|
-| a plot option (e.g. `xlabel`) | `hvplot/tests/options/test_<group>.py`, where the group is the option's section in the docstring and the docs (e.g. `axis`). |
-| a kind or a kind-specific option (e.g. `bins` for `hist`) | `hvplot/tests/kinds/test_<kind>.py` |
-| a behavior specific to one data library (e.g. hover_cols with a GeoDataFrame) | the kind or option module, as for any library, with the library or its object in the test name, e.g. `test_hover_cols_all_geodataframe` in `hvplot/tests/options/test_interactivity.py` |
-| anything else | the module mirroring the source file, e.g. `hvplot/tests/test_util.py` for `hvplot/util.py` and `hvplot/tests/plotting/test_core.py` for `hvplot/plotting/core.py` |
+| a plot option, e.g. `xlabel` | `hvplot/tests/options/test_<group>.py`, the group being the option's section in the docs, e.g. `test_axis.py` |
+| a kind or one of its options, e.g. `bins` of `hist` | `hvplot/tests/kinds/test_<kind>.py` |
+| something only one data library does | the kind or option module, with the library in the test name, e.g. `test_hover_cols_all_geodataframe` |
+| anything else | the module mirroring the source file, e.g. `test_util.py` for `hvplot/util.py` |
 
-There is no test module per data library, as there is none per plotting backend: a test goes with the kind or option it is about, whatever the library, and is named after the library or its object when only that library has the behavior, so that `grep -rn geodataframe hvplot/tests` finds all of them. `hvplot/tests/data_libraries/` only holds the tests run over every library: `test_accessors.py` (the `.hvplot` accessor) and `test_tabular_parity.py` (the same plot as pandas). An API of its own that is not a plot of the data, e.g. Fugue SQL, follows the source file rule (`hvplot/tests/test_fugue.py` for `hvplot/fugue.py`).
+Name option tests `test_<option>` or `test_<option>_<detail>`: `test_options_inventory.py` and `test_kinds_inventory.py` fail when an option or a kind has no test, and tell you which test to add where. A new kind also runs in `kinds/test_all_kinds.py` with every data library and backend, its known failures go in the dicts at the top of that module.
 
-Option tests are named `test_<option>` or `test_<option>_<detail>`, e.g. `test_xlabel_from_attrs`. Meta tests (`test_options_inventory.py` and `test_kinds_inventory.py`) check that every option and every kind has a test named this way, and their failure message tells you which test to add where.
-
-The fixtures shared by all the tests are defined in `hvplot/tests/conftest.py`:
-
-- `hvplot_pandas` and `hvplot_xarray` add the `.hvplot` accessor. Don't `import hvplot.pandas` at the top of a test module, this is reported as an error, the accessors are removed after each test so that tests don't depend on each other.
-- `backend` runs a test with each plotting backend (Bokeh, Matplotlib and Plotly), selected with `hvplot.extension(backend)` like most users do. Restrict it with `@pytest.mark.parametrize('backend', ['bokeh', 'matplotlib'], indirect=True)`. Request it after the accessor fixtures, as importing an accessor switches back to Bokeh (the fixture fails the test otherwise).
-- `tabular_lib` and `gridded_lib` run a test with each tabular (pandas, Dask, Polars, DuckDB, Ibis) or gridded (Xarray, Dask) data library, skipping those not installed. The libraries are listed once, in `hvplot/tests/_deps.py`. Tests that need an index and the pandas API, or that cover the code paths specific to Dask, use `@pandas_and_dask` from `_deps.py` instead.
-- `block_import` makes a module look not installed, to test the code paths without an optional dependency.
-
-If an option reads the data (its value names a column or uses one through a template, `hv.dim`, a derived datetime like `'time.hour'` or a datashader reduction, or it computes on the values), add a `(kind, kwargs)` case to `CASES` in `data_libraries/test_tabular_parity.py`, which runs it on every tabular library and compares it with pandas. A known failure goes to its `BUGS` dict with a `BUG:` reason. The option test in `options/` itself stays pandas only.
-
-A test of an option that depends on the plotting backend reads the options set by hvPlot with `Store.lookup_options(backend, plot, 'plot')` (or `'style'`). The plots returned by hvPlot are rendered with the current backend, so the test also fails if the plot can't be rendered. A backend that doesn't support the option is marked `xfail`, with `raises` set to the exception expected, and the reason starts with `BUG:` or with the name of the library at fault, e.g. `HoloViews:`. If the docs describe the limitation, the test is instead restricted to the backends supporting the option, with a comment pointing to the docs.
+A test of a backend-specific option, with a known failure on one backend:
 
 ```python
 @pytest.mark.parametrize(
@@ -234,41 +223,40 @@ A test of an option that depends on the plotting backend reads the options set b
         pytest.param(
             'plotly',
             marks=pytest.mark.xfail(
-                reason='HoloViews: plotly has no legend_position option', raises=KeyError
+                reason='HoloViews: plotly has no legend_position option',
+                raises=KeyError,
+                strict=False,
             ),
         ),
     ],
     indirect=True,
 )
-def test_legend_position(hvplot_pandas, backend):  # `backend` after the accessor fixture
+def test_legend_position(hvplot_pandas, backend):
     df = pd.DataFrame({'x': [1, 2], 'y': [3, 4], 'category': ['a', 'b']})
     plot = df.hvplot.scatter('x', 'y', by='category', legend='left')
     assert Store.lookup_options(backend, plot, 'plot').kwargs['legend_position'] == 'left'
 ```
 
-When the option has a different name per backend (e.g. `size` and `s` for the size of the points), parametrize `('backend', 'option')` together with `indirect=['backend']`.
+The fixtures are in `hvplot/tests/conftest.py`:
 
-To test the Bokeh option names translated for another backend, call `hvplot.extension(backend, compatibility='bokeh')` in the test, see `test_backend_transforms.py`.
+- `hvplot_pandas` and `hvplot_xarray` add the `.hvplot` accessor. Don't `import hvplot.pandas` at the top of a test module, this is reported as an error.
+- `backend` runs the test with Bokeh, Matplotlib and Plotly. Request it after the accessor fixtures.
+- `tabular_lib` and `gridded_lib` run the test with each data library, converting pandas or Xarray data: `tabular_lib(df).hvplot.scatter(...)`.
+- `block_import('geoviews')` makes a module look not installed.
 
-To test the code paths with an optional dependency, use the `requires` mark from `hvplot/tests/_deps.py`, e.g. `@requires('datashader')`, or `pytest.importorskip` inside a test or a fixture. Tests needing GeoViews are marked with `@pytest.mark.geo`. The `test-core` environment runs the test suite without most optional dependencies.
+The global state (HoloViews options, plotting backend, accessors) is restored after each test.
 
-Other rules:
+Data: write option and kind tests with pandas. Use `tabular_lib` or `gridded_lib` when asserting something that depends on the data library, and `@pandas_and_dask` from `hvplot/tests/_deps.py` when the test needs an index or the pandas API (Dask has its own code paths). If the option reads the data (a column name, a template, `hv.dim`, `'time.hour'`, a Datashader reduction...), also add a case to `CASES` in `data_libraries/test_tabular_parity.py`, which compares every tabular library with pandas. Tests can't access the internet, use `hvplot/tests/_data.py` or build the data in the test.
 
-- The global state changed by a test, e.g. HoloViews options or the current plotting backend, is restored after it. Tests must still not depend on each other, they run in a random order and in parallel.
-- Tests can't access the internet, sockets are blocked with pytest-socket (a test needing a local server can use `@pytest.mark.enable_socket`). Use the small datasets of `hvplot/tests/_data.py` or build the data in the test.
-- Mark tests taking more than about a second with `@pytest.mark.slow`, and always the tests running Datashader (e.g. with `rasterize=True` or `datashade=True`), as numba compiling its kernels takes seconds.
-- A test exposing a bug in hvPlot that isn't fixed yet is marked with `@pytest.mark.xfail(reason='BUG: <description>')`. xfail marks are strict, so the test fails once the bug is fixed, reminding to remove the mark.
-- A test that only fails when its plot is rendered is marked with `@pytest.mark.render_xfail(reason=...)`, an xfail that doesn't apply with `--no-render`. The reason starts with `BUG:` for an hvPlot bug, or with the name of the library at fault, e.g. `HoloViews:`.
-- A test failing with some of the data libraries only is marked with `@pytest.mark.lib_xfail('ibis', reason='BUG: ...')`, which applies an xfail to the test items run with these libraries (the `tabular_lib` or `gridded_lib` parameter). It takes the arguments of `xfail`, e.g. `raises` and `condition` (e.g. `condition=POLARS_2`), and the same rules for the reason. Use `@pytest.mark.lib_render_xfail(...)` for a failure that only happens when the plot is rendered, like `render_xfail`. Don't list the libraries in a `parametrize` to mark one of them.
-- A test that doesn't apply to a library, because of a documented difference and not a bug, is marked with `@pytest.mark.lib_skip('duckdb', 'ibis', reason='DuckDB and Ibis have no Series object.')`. The libraries added later run the test.
+Marks:
 
-#### Adding a data library
+- `@pytest.mark.slow` for tests taking more than about a second and all the tests running Datashader.
+- `@pytest.mark.geo` for tests using GeoViews, `@requires('datashader')` from `_deps.py` for other optional dependencies.
+- `@pytest.mark.xfail(reason='BUG: <description>')` for an hvPlot bug not fixed yet. It is strict, the test fails once the bug is fixed. When another library is at fault, name it in the reason (`'HoloViews: ...'`) and pass `strict=False`, as above.
+- `render_xfail` is the same for a test that only fails when its plot is rendered.
+- `lib_xfail('ibis', reason=...)` and `lib_render_xfail(...)` are the same for the test run with these libraries only. `lib_skip('duckdb', reason=...)` skips a library the test doesn't apply to.
 
-1. Add its name to `TABULAR_LIBS` (or `GRIDDED_LIBS`) in `hvplot/tests/_deps.py` and a branch to the `tabular_lib` (or `gridded_lib`) fixture of `hvplot/tests/conftest.py`, converting a pandas DataFrame (or an Xarray object) to the library's object and skipping the test if it isn't installed (`pytest.importorskip`).
-2. Add the library to the `test` feature of `pixi.toml` and to the `tests` extra of `pyproject.toml`, so that CI installs it.
-3. Add the library to the `PATCHED` and `CLASSES` lists of `hvplot/tests/data_libraries/test_accessors.py`, which test that the accessor is patched, unpatched and that patching fails without the library. Don't add a test module for it: the tests of what only this library does go with the kinds and options, see above.
-4. Run the test suite: every test using the fixture now runs with the library. Mark the failures with `lib_xfail` (hvPlot bugs) or `lib_skip` (not applicable), and the new cases of `data_libraries/test_tabular_parity.py` (known failures are in its `BUGS`). Tests restricted with `@pandas_and_dask` don't run with the new library, check `test_tabular_parity.py` covers what is specific to it.
-5. Add the library to the table of `doc/ref/data_libraries.ipynb`.
+To add a data library, follow the comment above `TABULAR_LIBS` in `hvplot/tests/_deps.py`.
 
 ### Example tests
 
