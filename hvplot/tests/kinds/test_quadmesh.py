@@ -42,7 +42,7 @@ def test_logz(ds, hvplot_xarray, backend):
     assert Store.lookup_options(backend, plot, 'plot').kwargs['logz'] is True
 
 
-def test_unindexed_quadmesh(hvplot_xarray):
+def test_unindexed_quadmesh(hvplot_xarray, rng):
     xs = np.linspace(0, 10, 5)
     lon = xs * xs[np.newaxis, :].T
     lat = xs + xs[:, np.newaxis]
@@ -53,7 +53,7 @@ def test_unindexed_quadmesh(hvplot_xarray):
         'samples': ('nsamples', [0, 1, 2, 3]),
     }
     ds_unindexed = xr.DataArray(
-        np.random.rand(5, 5, 3, 4), coords=coords, dims=('nx', 'ny', 'time', 'nsamples')
+        rng.random((5, 5, 3, 4)), coords=coords, dims=('nx', 'ny', 'time', 'nsamples')
     )
     plot = ds_unindexed.hvplot.quadmesh(x='lon', y='lat')
     assert len(plot.kdims) == 2

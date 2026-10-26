@@ -136,8 +136,8 @@ def test_interactive_xarray_dataarray(dataarray):
     assert dai._method is None
 
 
-def test_interactive_xarray_dataarray_no_name():
-    dataarray = xr.DataArray(np.random.rand(2, 2))
+def test_interactive_xarray_dataarray_no_name(rng):
+    dataarray = xr.DataArray(rng.random((2, 2)))
     with pytest.raises(ValueError, match='Cannot use interactive API on DataArray without name'):
         Interactive(dataarray)
 
@@ -1348,8 +1348,8 @@ def test_clones_dont_reexecute_transforms():
     assert len(msgs) == 3
 
 
-def test_interactive_accept_non_str_columnar_data():
-    df = pd.DataFrame(np.random.random((10, 2)))
+def test_interactive_accept_non_str_columnar_data(rng):
+    df = pd.DataFrame(rng.random((10, 2)))
     assert all(not isinstance(col, str) for col in df.columns)
     dfi = Interactive(df)
 

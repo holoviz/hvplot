@@ -50,8 +50,8 @@ def polygons():
 
 
 @pytest.fixture
-def simple_df():
-    return pd.DataFrame(np.random.rand(10, 2), columns=['x', 'y'])
+def simple_df(rng):
+    return pd.DataFrame(rng.random((10, 2)), columns=['x', 'y'])
 
 
 @pytest.fixture
@@ -136,12 +136,12 @@ def test_geo_crs_inferred_from_data(utm_da):
 
 @pytest.mark.geo
 @skip_windows
-def test_geo_no_crs_on_data_defaults_to_plate_carree(hvplot_xarray, utm_crs):
+def test_geo_no_crs_on_data_defaults_to_plate_carree(hvplot_xarray, utm_crs, rng):
     import cartopy.crs as ccrs
 
     # Longitudes and latitudes, as the data is plotted with a PlateCarree CRS.
     da = xr.DataArray(
-        np.random.rand(5, 5),
+        rng.random((5, 5)),
         coords={'y': np.linspace(40, 44, 5), 'x': np.linspace(-75, -71, 5)},
         dims=['y', 'x'],
         attrs={'bar': utm_crs},
@@ -395,8 +395,8 @@ def test_geo_points(hvplot_pandas, simple_df):
 
 
 @pytest.mark.geo
-def test_geo_points_c_column_named_like_a_color(hvplot_pandas, simple_df):
-    df = simple_df.assign(red=np.random.choice(['a', 'b'], len(simple_df)))
+def test_geo_points_c_column_named_like_a_color(hvplot_pandas, simple_df, rng):
+    df = simple_df.assign(red=rng.choice(['a', 'b'], len(simple_df)))
     plot = df.hvplot.points('x', 'y', c='red', geo=True)
     opts = hv.Store.lookup_options('bokeh', plot, 'style')
     assert isinstance(opts.kwargs['color'], hv.dim)
@@ -631,11 +631,11 @@ def test_tiles_spatialpandas_without_crs(without_geoviews):
     assert bk_plot.projection == 'mercator'  # projection enabled due to `tiles=True`
 
 
-def test_tiles_xarray_without_geoviews(without_geoviews, hvplot_xarray):
+def test_tiles_xarray_without_geoviews(without_geoviews, hvplot_xarray, rng):
     ds = xr.Dataset(
         {
-            'temp': (('lon', 'lat'), 15 + 8 * np.random.randn(2, 2)),
-            'precip': (('lon', 'lat'), 10 * np.random.rand(2, 2)),
+            'temp': (('lon', 'lat'), 15 + 8 * rng.standard_normal((2, 2))),
+            'precip': (('lon', 'lat'), 10 * rng.random((2, 2))),
         },
         coords={'lon': [-99.83, -99.32], 'lat': [42.25, 42.21]},
     )

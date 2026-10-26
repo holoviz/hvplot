@@ -73,8 +73,10 @@ def test_gridded(grid, gridded_lib):
     assert list(plot.dimension_values('x')) == [10, 20, 30, 10, 20, 30, 10]
 
 
-@pytest.mark.xfail(reason='BUG: gridded polygons without x and y have only one key dimension')
-def test_gridded_default(grid):
+@pytest.mark.xfail(
+    reason='BUG: gridded polygons without x and y have only one key dimension, failing to render'
+)
+def test_gridded_default(grid, hvplot_xarray):
     plot = grid.hvplot.polygons()
     assert plot.kdims == ['x', 'y']
 

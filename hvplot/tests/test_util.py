@@ -341,8 +341,8 @@ def test_generate_unique_name(name, uname):
     assert _generate_unique_name(name, ['b', 'c_']) == uname
 
 
-def test_convert_col_names_to_str():
-    df = pd.DataFrame(np.random.random((10, 2)))
+def test_convert_col_names_to_str(rng):
+    df = pd.DataFrame(rng.random((10, 2)))
     assert all(not isinstance(col, str) for col in df.columns)
     df = _convert_col_names_to_str(df)
     assert all(isinstance(col, str) for col in df.columns)

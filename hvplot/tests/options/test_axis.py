@@ -268,15 +268,15 @@ def test_shared_axes_false_hist_subplots(tabular_lib, xy_df):
     assert plot_1.range('y') == (2, 6)
 
 
-def test_subcoordinate_y_bool():
-    df = pd.DataFrame(np.random.random((10, 3)), columns=list('ABC'))
+def test_subcoordinate_y_bool(rng):
+    df = pd.DataFrame(rng.random((10, 3)), columns=list('ABC'))
     plot = df.hvplot.line(subcoordinate_y=True)
     opts = Store.lookup_options('bokeh', plot, 'plot')
     assert opts.kwargs['subcoordinate_y'] is True
 
 
-def test_subcoordinate_y_dict():
-    df = pd.DataFrame(np.random.random((10, 3)), columns=list('ABC'))
+def test_subcoordinate_y_dict(rng):
+    df = pd.DataFrame(rng.random((10, 3)), columns=list('ABC'))
     plot = df.hvplot.line(subcoordinate_y={'subcoordinate_scale': 2})
     opts = Store.lookup_options('bokeh', plot, 'plot')
     assert opts.kwargs['subcoordinate_y'] is True

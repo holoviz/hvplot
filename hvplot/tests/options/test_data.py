@@ -42,8 +42,8 @@ def time_df():
     )
 
 
-def test_transforms_pandas():
-    df = pd.DataFrame({'value': np.random.randn(50), 'probability': np.random.rand(50)})
+def test_transforms_pandas(rng):
+    df = pd.DataFrame({'value': rng.standard_normal(50), 'probability': rng.random(50)})
     percent = hv.dim('probability') * 100
     scatter = df.hvplot.scatter(x='value', y='probability', transforms={'probability': percent})
     assert_data_equal(scatter.data['probability'].values, df['probability'].values * 100)
@@ -62,8 +62,8 @@ def test_transforms_xarray(gridded_lib):
 @pytest.mark.lib_xfail(
     'dask', reason='BUG: dt accessor columns with dask fail on mismatched divisions'
 )
-def test_by_datetime_accessor(tabular_lib):
-    dt_df = pd.DataFrame(np.random.rand(90), index=pd.date_range('2019-01-01', '2019-03-31'))
+def test_by_datetime_accessor(tabular_lib, rng):
+    dt_df = pd.DataFrame(rng.random(90), index=pd.date_range('2019-01-01', '2019-03-31'))
     plot = tabular_lib(dt_df).hvplot.line('index.dt.day', '0', by='index.dt.month')
     expected = NdOverlay(
         {

@@ -187,8 +187,8 @@ def test_ibis_requires_x(tabular_lib):
 @pytest.mark.parametrize(
     'kind', [pytest.param(kind, marks=SERIES_FAILURES.get(kind, [])) for kind in SERIES_KINDS]
 )
-def test_series(kind, tabular_lib):
-    ser = tabular_lib(pd.Series(np.random.rand(10), name='A'))
+def test_series(kind, tabular_lib, rng):
+    ser = tabular_lib(pd.Series(rng.random(10), name='A'))
     plot = ser.hvplot(kind=kind)
     assert_kind_element(plot, kind)
 

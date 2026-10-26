@@ -31,9 +31,9 @@ def df():
 
 
 @pytest.fixture
-def large_df():
+def large_df(rng):
     return pd.DataFrame(
-        np.random.multivariate_normal((0, 0), [[0.1, 0.1], [0.1, 1.0]], (5000,)),
+        rng.multivariate_normal((0, 0), [[0.1, 0.1], [0.1, 1.0]], (5000,)),
         columns=['x', 'y'],
     )
 
@@ -180,8 +180,8 @@ def test_datashade_with_hover_true(df):
 
 @requires('datashader')
 @pytest.mark.slow
-def test_datashade_xlim():
-    data = pd.DataFrame(np.random.randn(100).cumsum())
+def test_datashade_xlim(rng):
+    data = pd.DataFrame(rng.standard_normal(100).cumsum())
     img = data.hvplot(xlim=(0, 20000), datashade=True, dynamic=False)
     assert img.range(0) == (0, 20000)
 
@@ -523,8 +523,8 @@ def test_y_sampling(hvplot_xarray, da, kind):
 
 
 @pytest.fixture
-def line_df():
-    return pd.DataFrame(np.random.random(100))
+def line_df(rng):
+    return pd.DataFrame(rng.random(100))
 
 
 def test_downsample_true(line_df):
