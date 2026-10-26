@@ -29,7 +29,7 @@ def _unpatch(name='hvplot'):
         if name in vars(cls):
             delattr(cls, name)
         # Polars' namespace registration also records the name here.
-        cls._accessors.discard(name)
+        getattr(cls, '_accessors', set()).discard(name)
     _module_extensions.discard('hvplot.polars')
 
 

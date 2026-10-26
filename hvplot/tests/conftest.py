@@ -128,6 +128,10 @@ def _apply_lib_marks(item, render):
         marks['lib_render_xfail'] = pytest.mark.xfail
     for name, make_mark in marks.items():
         for mark in item.iter_markers(name):
+            if lib is None:
+                raise pytest.UsageError(
+                    f'{item.nodeid}: {name} needs a tabular_lib or gridded_lib parameter'
+                )
             if not set(mark.args) <= {*TABULAR_LIBS, *GRIDDED_LIBS}:
                 raise pytest.UsageError(f'{item.nodeid}: unknown library in {name}{mark.args}')
             if lib in mark.args:
@@ -142,9 +146,9 @@ def pytest_collection_modifyitems(config, items):
         # The test suite must never need internet: it would be slow, flaky and fail offline.
         # pytest-socket blocks the creation of sockets, unless the test has `enable_socket`.
         item.add_marker(pytest.mark.disable_socket)
-        if 'slow' in item.keywords and not config.getoption('--slow'):
+        if item.get_closest_marker('slow') and not config.getoption('--slow'):
             item.add_marker(skip_slow)
-        if 'geo' in item.keywords and _GEO_HV_STATE is None:
+        if item.get_closest_marker('geo') and _GEO_HV_STATE is None:
             item.add_marker(skip_geo)
         # For tests that only fail when the plot is rendered.
         render_xfail = item.get_closest_marker('render_xfail')
