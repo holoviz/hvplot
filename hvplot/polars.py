@@ -21,4 +21,16 @@ def patch(name='hvplot', extension='bokeh', logo=False):
     post_patch(extension, logo)
 
 
+def _unpatch(name='hvplot'):
+    """Undo `patch()`. Private, used by the test suite."""
+    import polars as pl
+
+    for cls in (pl.DataFrame, pl.Series, pl.LazyFrame):
+        if name in vars(cls):
+            delattr(cls, name)
+        # Polars' namespace registration also records the name here.
+        getattr(cls, '_accessors', set()).discard(name)
+    _module_extensions.discard('hvplot.polars')
+
+
 patch()

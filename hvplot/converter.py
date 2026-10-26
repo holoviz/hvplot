@@ -786,7 +786,7 @@ class HoloViewsConverter:
         'quadmesh': ['x', 'y', 'z', 'logz'],
         'trimesh': ['x', 'y', 'z', 'filled'],
         'vectorfield': ['x', 'y', 'angle', 'mag'],
-        'violine': ['y'],
+        'violin': ['y'],
     }
 
     # Mapping from kind to HoloViews element type

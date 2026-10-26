@@ -171,10 +171,14 @@ Unit tests can be run with the `test-unit` task:
 pixi run test-unit
 ```
 
+The tests run in parallel and in a random order. Slow tests are skipped unless you pass `--slow`, e.g. `pixi run test-unit --slow`.
+
+Every plot returned by hvPlot during the tests is also rendered with the current plotting backend, as a configuration that HoloViews accepts can still fail when the plot is built. Pass `--no-render` for a faster run, e.g. `pixi run test-unit --no-render`.
+
 :::{admonition} Advanced usage
 :class: tip
 
-The task is available in the following environments: `test-310`, `test-311`, `test-312`, `test-313`, and `test-core`. Where the first ones have the same environments except for different Python versions, and `test-core` only has a core set of dependencies.
+The task is available in the following environments: `test-310`, `test-311`, `test-312`, `test-313`, `test-314`, and `test-core`. Where the first ones have the same environments except for different Python versions, and `test-core` only has a core set of dependencies.
 
 You can run the task in a specific environment with the `-e` flag. For example, to run the `test-unit` task in the `test-313` environment, you can run:
 
@@ -194,6 +198,65 @@ pixi run -e test-core install
 ```
 
 :::
+
+#### Writing unit tests
+
+Tests are plain pytest functions. Where a test goes:
+
+| I'm testing... | Add the test to |
+|---|---|
+| a plot option, e.g. `xlabel` | `hvplot/tests/options/test_<group>.py`, the group being the option's section in the docs, e.g. `test_axis.py` |
+| a kind or one of its options, e.g. `bins` of `hist` | `hvplot/tests/kinds/test_<kind>.py` |
+| something only one data library does | the kind or option module, with the library in the test name, e.g. `test_hover_cols_all_geodataframe` |
+| anything else | the module mirroring the source file, e.g. `test_util.py` for `hvplot/util.py` |
+
+Name option tests `test_<option>` or `test_<option>_<detail>`: `test_options_inventory.py` and `test_kinds_inventory.py` fail when an option or a kind has no test, and tell you which test to add where. A new kind also runs in `kinds/test_all_kinds.py` with every data library and backend, its known failures go in the dicts at the top of that module.
+
+A test of a backend-specific option, with a known failure on one backend:
+
+```python
+@pytest.mark.parametrize(
+    'backend',
+    [
+        'bokeh',
+        'matplotlib',
+        pytest.param(
+            'plotly',
+            marks=pytest.mark.xfail(
+                reason='HoloViews: plotly has no legend_position option',
+                raises=KeyError,
+                strict=False,
+            ),
+        ),
+    ],
+    indirect=True,
+)
+def test_legend_position(hvplot_pandas, backend):
+    df = pd.DataFrame({'x': [1, 2], 'y': [3, 4], 'category': ['a', 'b']})
+    plot = df.hvplot.scatter('x', 'y', by='category', legend='left')
+    assert Store.lookup_options(backend, plot, 'plot').kwargs['legend_position'] == 'left'
+```
+
+The fixtures are in `hvplot/tests/conftest.py`:
+
+- `hvplot_pandas` and `hvplot_xarray` add the `.hvplot` accessor. Don't `import hvplot.pandas` at the top of a test module, this is reported as an error.
+- `backend` runs the test with Bokeh, Matplotlib and Plotly. Request it after the accessor fixtures.
+- `tabular_lib` and `gridded_lib` run the test with each data library, converting pandas or Xarray data: `tabular_lib(df).hvplot.scatter(...)`.
+- `block_import('geoviews')` makes a module look not installed.
+
+The global state (HoloViews options, plotting backend, accessors) is restored after each test.
+
+Data: write option and kind tests with pandas. Use `tabular_lib` or `gridded_lib` when asserting something that depends on the data library, and `@pandas_and_dask` from `hvplot/tests/_deps.py` when the test needs an index or the pandas API (Dask has its own code paths). If the option reads the data (a column name, a template, `hv.dim`, `'time.hour'`, a Datashader reduction...), also add a case to `CASES` in `data_libraries/test_tabular_parity.py`, which compares every tabular library with pandas. Tests can't access the internet, use `hvplot/tests/_data.py` or build the data in the test.
+
+Marks:
+
+- `@pytest.mark.slow` for tests taking more than about a second and all the tests running Datashader.
+- `@pytest.mark.geo` for tests using GeoViews, `@requires('datashader')` from `_deps.py` for other optional dependencies.
+- `@pytest.mark.xfail(reason='BUG: <description>')` for an hvPlot bug not fixed yet. It is strict, the test fails once the bug is fixed. When another library is at fault, name it in the reason (`'HoloViews: ...'`) and pass `strict=False`, as above.
+- `render_xfail` is the same for a test that only fails when its plot is rendered.
+- `lib_xfail('ibis', reason=...)` and `lib_render_xfail(...)` are the same for the test run with these libraries only. `lib_skip('duckdb', reason=...)` skips a library the test doesn't apply to.
+
+To add a data library, follow the comment above `TABULAR_LIBS` in `hvplot/tests/_deps.py`.
 
 ### Example tests
 

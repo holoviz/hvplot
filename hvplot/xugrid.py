@@ -24,4 +24,16 @@ def patch(name='hvplot', extension='bokeh', logo=False):
     post_patch(extension, logo)
 
 
+def _unpatch(name='hvplot'):
+    """Undo `patch()`. Private, used by the test suite."""
+    import xugrid as xu
+
+    from . import _module_extensions
+
+    for cls in (xu.UgridDataArray, xu.UgridDataset):
+        if name in vars(cls):
+            delattr(cls, name)
+    _module_extensions.discard('hvplot.xugrid')
+
+
 patch()
