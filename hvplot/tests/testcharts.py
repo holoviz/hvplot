@@ -684,6 +684,20 @@ class TestChart1D(ComparisonTestCase):
         assert plot.kdims == ['x', 'category']
         assert plot.vdims == ['y']
 
+    @parameterized.expand(['bar', 'barh'])
+    def test_multiindex_bar_explicit_y_preserves_grouping(self, kind):
+        # Specifying the sole value column must not disable the automatic
+        # grouping by the second MultiIndex level (issue #1667).
+        auto = getattr(self.multii_df.hvplot, kind)()
+        explicit_y = getattr(self.multii_df.hvplot, kind)(y='C')
+        assert auto.kdims == ['A', 'B']
+        assert explicit_y.kdims == auto.kdims
+        self.assertEqual(explicit_y, auto)
+
+        # An explicitly selected x dimension must still take precedence.
+        explicit_x = getattr(self.multii_df.hvplot, kind)(x='A', y='C')
+        assert explicit_x.kdims == ['A']
+
     def test_table_datetime_index_displayed(self):
         table = self.dt_df.hvplot.table()
         assert table.kdims[0] == 'index'
