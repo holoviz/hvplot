@@ -101,6 +101,7 @@ def test_numeric_color_column_not_implicitly_grouped(series_data, kind):
     result = getattr(data.hvplot, kind)(x='x', y='y', color='measurement')
     assert not isinstance(result, NdOverlay)
 
+
 @pytest.mark.parametrize('frontend', ['pandas', 'polars', 'polars_lazy'])
 def test_implicit_line_kind_categorical_color_matches_by(series_data, frontend):
     if frontend == 'pandas':
