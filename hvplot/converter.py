@@ -951,6 +951,20 @@ class HoloViewsConverter:
                 stacklevel=_find_stack_level(),
             )
 
+        # A Curve/Area cannot map a categorical dimension directly to color;
+        # create a color cycle over separate groups instead (same as by=).
+        # Literal colors, numerical color fields, and explicit by= are unchanged.
+        color = kwds.get('color')
+        if (
+            kind in ('line', 'step', 'area')
+            and by is None
+            and isinstance(color, str)
+            and hasattr(data, 'columns')
+            and color in data.columns
+            and not pd.api.types.is_numeric_dtype(data[color])
+        ):
+            by = kwds.pop('color')
+
         # Process data and related options
         self._redim = fields
         self.use_index = use_index
