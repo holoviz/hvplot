@@ -955,7 +955,10 @@ class HoloViewsConverter:
         # create a color cycle over separate groups instead (same as by=).
         # Literal colors, numerical color fields, and explicit by= are unchanged.
         color = kwds.get('color')
-        if kind in ('line', 'step', 'area') and by is None and isinstance(color, str):
+        line_like = kind in ('line', 'step', 'area') or (
+            kind is None and isinstance(data, pd.DataFrame)
+        )
+        if line_like and by is None and isinstance(color, str):
             if hasattr(data, 'columns') and color in data.columns:
                 color_dtype = data[color].dtype
             elif hasattr(data, 'index') and color in data.index.names:

@@ -100,3 +100,22 @@ def test_numeric_color_column_not_implicitly_grouped(series_data, kind):
     data = pd.DataFrame({**series_data, 'measurement': [1, 2, 3, 4, 5, 6]})
     result = getattr(data.hvplot, kind)(x='x', y='y', color='measurement')
     assert not isinstance(result, NdOverlay)
+
+@pytest.mark.parametrize('frontend', ['pandas', 'polars', 'polars_lazy'])
+def test_implicit_line_kind_categorical_color_matches_by(series_data, frontend):
+    if frontend == 'pandas':
+        data = pd.DataFrame(series_data)
+    else:
+        pl = pytest.importorskip('polars')
+        pytest.importorskip('pyarrow')
+        import hvplot.polars  # noqa: F401
+
+        data = pl.DataFrame(series_data)
+        if frontend == 'polars_lazy':
+            data = data.lazy()
+
+    chart = data.hvplot(x='x', y='y', color='cat')
+    expected = data.hvplot.line(x='x', y='y', by='cat')
+    assert isinstance(chart, NdOverlay)
+    assert list(chart.keys()) == list(expected.keys()) == ['A', 'B']
+    hv.renderer('bokeh').get_plot(chart)
