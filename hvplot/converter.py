@@ -955,15 +955,18 @@ class HoloViewsConverter:
         # create a color cycle over separate groups instead (same as by=).
         # Literal colors, numerical color fields, and explicit by= are unchanged.
         color = kwds.get('color')
-        if (
-            kind in ('line', 'step', 'area')
-            and by is None
-            and isinstance(color, str)
-            and hasattr(data, 'columns')
-            and color in data.columns
-            and not pd.api.types.is_numeric_dtype(data[color])
-        ):
-            by = kwds.pop('color')
+        if kind in ('line', 'step', 'area') and by is None and isinstance(color, str):
+            if hasattr(data, 'columns') and color in data.columns:
+                color_dtype = data[color].dtype
+            elif hasattr(data, 'index') and color in data.index.names:
+                color_dtype = data.index.get_level_values(color).dtype
+            else:
+                color_dtype = None
+            if color_dtype is not None and (
+                pd.api.types.is_bool_dtype(color_dtype)
+                or not pd.api.types.is_numeric_dtype(color_dtype)
+            ):
+                by = kwds.pop('color')
 
         # Process data and related options
         self._redim = fields
