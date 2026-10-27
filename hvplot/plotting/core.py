@@ -291,6 +291,9 @@ class hvPlotTabular(hvPlotBase):
             for each series recursively. For instance ['green','yellow'] each field's line will be
             filled in green or yellow, alternatively. If there is only a single series to be
             plotted, then only the first color from the color list will be used.
+
+            For a categorical column, ``color="column"`` creates separately colored
+            curves for each category (equivalent to ``by="column"``).
         **kwds : optional
             Additional keyword arguments documented in :ref:`plot-options`.
             Run ``hvplot.help('line')`` for the full method documentation.
@@ -356,6 +359,7 @@ class hvPlotTabular(hvPlotBase):
 
             - A single color string (name, RGB, or RGBA code), e.g., 'red' or '#a98d19'
             - A sequence of color strings used recursively for each series
+            - A categorical column name, coloring its groups as separate curves
         **kwds : optional
             Additional keyword arguments documented in :ref:`plot-options`.
             Run ``hvplot.help('step')`` for the full method documentation.
@@ -479,6 +483,9 @@ class hvPlotTabular(hvPlotBase):
         stacked : bool, default True
             Whether to stack multiple areas on top of each other. When False,
             areas are overlaid with transparency.
+        color : str, optional
+            A literal color or categorical column name. Categorical columns
+            create one area per group, equivalent to ``by="column"``.
         **kwds : optional
             Additional keyword arguments documented in :ref:`plot-options`.
             Run ``hvplot.help('area')`` for the full method documentation.
