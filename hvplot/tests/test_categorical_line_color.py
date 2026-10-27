@@ -59,6 +59,7 @@ def test_direct_kind_dispatches_categorical_color(series_data, kind):
     assert isinstance(plot, NdOverlay)
     assert list(plot.keys()) == ['A', 'B']
 
+
 @pytest.mark.parametrize('kind', ['line', 'step', 'area'])
 @pytest.mark.parametrize('frontend', ['pandas', 'polars', 'polars_lazy'])
 def test_boolean_color_matches_by_and_renders(series_data, kind, frontend):
