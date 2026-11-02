@@ -1669,7 +1669,7 @@ class hvPlotTabularPolars(hvPlotTabular):
     def _get_polars_column_names(data) -> list[str]:
         try:
             return data.collect_schema().names()
-        except Exception:  # `collect_schema` was added in 1.0
+        except AttributeError:  # `collect_schema` was added in 1.0
             return list(data.columns)
 
     def _get_converter(self, x=None, y=None, kind=None, **kwds):

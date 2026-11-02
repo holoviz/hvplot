@@ -1,8 +1,6 @@
-from importlib.metadata import version
 from importlib.util import find_spec
 
 import pytest
-from packaging.version import Version
 
 
 def requires(*modules):
@@ -13,10 +11,6 @@ def requires(*modules):
     """
     missing = [m for m in modules if find_spec(m) is None]
     return pytest.mark.skipif(bool(missing), reason=f'requires {", ".join(missing)}')
-
-
-# pl.NUMERIC_DTYPES, used by hvPlot, was removed in polars 2.0.
-POLARS_2 = find_spec('polars') is not None and Version(version('polars')).major >= 2
 
 
 # The data libraries run by the `tabular_lib` and `gridded_lib` fixtures. To add a library:

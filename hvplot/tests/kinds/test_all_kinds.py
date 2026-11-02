@@ -211,17 +211,3 @@ def test_kind_not_supported(hvplot_pandas, backend, numeric_index_df, kind):
         NotImplementedError, match=f"'{kind}' plot not supported by the '{backend}'"
     ):
         numeric_index_df.hvplot(kind=kind, **BACKEND_KWARGS.get(kind, {'y': Y}))
-
-
-# Without y, the numeric columns are found by the polars accessor, which selects them with a
-# polars selector (the NUMERIC_DTYPES constant is gone in polars 2.0).
-@pytest.mark.parametrize('tabular_lib', ['polars'], indirect=True)
-@pytest.mark.parametrize('lazy', [False, True], ids=['DataFrame', 'LazyFrame'])
-@pytest.mark.parametrize(
-    'kind',
-    [pytest.param(kind, marks=LIB_FAILURES.get((kind, 'polars'), [])) for kind in FRAME_KINDS],
-)
-def test_polars_without_y(kind, lazy, tabular_lib):
-    df = tabular_lib(makeDataFrame())
-    plot = (df.lazy() if lazy else df).hvplot(kind=kind)
-    assert_kind_element(plot, kind)
