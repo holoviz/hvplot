@@ -17,10 +17,6 @@ default = [
     "dev",
 ]
 
-[environments.test-310]
-features = ["py310", "required", "test-core", "test", "example", "geo", "graphviz", "test-example"]
-no-default-feature = true
-
 [environments.test-311]
 features = ["py311", "required", "test-core", "test", "example", "geo", "graphviz", "test-example"]
 no-default-feature = true
@@ -38,7 +34,8 @@ features = ["py314", "required", "test-core", "test", "example", "geo", "graphvi
 no-default-feature = true
 
 [environments.test-core]
-features = ["py314", "required", "test-core"]
+# Core dependencies only, as optional ones (e.g. scikit-image) don't support 3.15 yet.
+features = ["py315", "required", "test-core"]
 no-default-feature = true
 
 [environments.docs]
@@ -75,9 +72,6 @@ sync-git-tags = 'python scripts/sync_git_tags.py hvplot'
 [feature.required.activation.env]
 PYTHONIOENCODING = "utf-8"
 
-[feature.py310.dependencies]
-python = "3.10.*"
-
 [feature.py311.dependencies]
 python = "3.11.*"
 # GeoViews 1.15, the last for Python 3.11, fails to render with cartopy 0.26.
@@ -99,6 +93,12 @@ COVERAGE_CORE = "sysmon"
 python = "3.14.*"
 
 [feature.py314.activation.env]
+COVERAGE_CORE = "sysmon"
+
+[feature.py315.dependencies]
+python = "3.15.*"
+
+[feature.py315.activation.env]
 COVERAGE_CORE = "sysmon"
 
 # =================== DEV ===================
