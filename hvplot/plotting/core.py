@@ -1699,7 +1699,7 @@ class hvPlotTabularPolars(hvPlotTabular):
                     # When y is not specified HoloViewsConverter finds all the numeric
                     # columns and use them as y values (see _process_chart_y). We need
                     # to include these columns too.
-                    if Version(pl.__version__).release >= (2, 0, 0):
+                    if Version(pl.__version__).release >= (1, 0, 0):
                         num_dtypes = pl.selectors.numeric()
                     else:
                         num_dtypes = pl.col(pl.NUMERIC_DTYPES)
