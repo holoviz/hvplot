@@ -178,7 +178,7 @@ Every plot returned by hvPlot during the tests is also rendered with the current
 :::{admonition} Advanced usage
 :class: tip
 
-The task is available in the following environments: `test-310`, `test-311`, `test-312`, `test-313`, `test-314`, and `test-core`. Where the first ones have the same environments except for different Python versions, and `test-core` only has a core set of dependencies.
+The task is available in the following environments: `test-311`, `test-312`, `test-313`, `test-314`, and `test-core`. Where the first ones have the same environments except for different Python versions, and `test-core` only has a core set of dependencies.
 
 You can run the task in a specific environment with the `-e` flag. For example, to run the `test-unit` task in the `test-313` environment, you can run:
 
