@@ -46,13 +46,29 @@ jobs:
   setup:
     name: Setup workflow
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
     outputs:
       matrix: ${{ env.MATRIX }}
       matrix_option: ${{ env.MATRIX_OPTION }}
     steps:
+      - name: Check for code changes
+        if: github.event_name == 'pull_request'
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        id: filter
+        with:
+          filters: |
+            code:
+              - 'hvplot/**'
+              - 'scripts/**'
+              - 'pixi.toml'
+              - 'pixi.lock'
+              - 'pyproject.toml'
+              - '.github/workflows/test.yaml'
       - name: Set matrix option
         env:
           GITHUB_EVENT_INPUTS_TARGET: ${{ github.event.inputs.target }}
+          CODE_CHANGE: ${{ steps.filter.outputs.code }}
         run: |
           if [[ "${GITHUB_EVENT_NAME}" == 'workflow_dispatch' ]]; then
             OPTION=${GITHUB_EVENT_INPUTS_TARGET}
@@ -60,6 +76,9 @@ jobs:
             OPTION="full"
           elif [[ "${GITHUB_EVENT_NAME}" == 'push' && "${GITHUB_REF_TYPE}" == 'tag' ]]; then
             OPTION="full"
+          elif [[ "${GITHUB_EVENT_NAME}" == 'pull_request' && "${CODE_CHANGE}" != 'true' ]]; then
+            # No code change (e.g. docs only), only run the examples tests
+            OPTION="docs"
           else
             OPTION="default"
           fi
@@ -98,6 +117,14 @@ jobs:
               ]
           }')
           echo "MATRIX=$MATRIX" >> $GITHUB_ENV
+      - name: Set test matrix with 'docs' option
+        if: env.MATRIX_OPTION == 'docs'
+        run: |
+          MATRIX=$(jq -nsc '{
+              "os": ["ubuntu-latest"],
+              "environment": ["test-314"]
+          }')
+          echo "MATRIX=$MATRIX" >> $GITHUB_ENV
       - name: Set test matrix with 'downstream' option
         if: env.MATRIX_OPTION == 'downstream'
         run: |
@@ -130,6 +157,7 @@ jobs:
         with:
           environments: ${{ matrix.environment }}
       - name: Test Unit
+        if: needs.setup.outputs.matrix_option != 'docs'
         run: pixi run -e "${ENV}" test-unit-cov
       - name: Test Examples
         # Examples are slow, on regular runs they only run on Linux
@@ -141,12 +169,14 @@ jobs:
             pixi run -e "${ENV}" test-example
           fi
       - uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6
+        if: needs.setup.outputs.matrix_option != 'docs'
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
   core_test_suite:
     name: core:${{ matrix.environment }}:${{ matrix.os }}
     needs: [pre_commit, setup, pixi_lock]
+    if: needs.setup.outputs.matrix_option != 'docs'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
