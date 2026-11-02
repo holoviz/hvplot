@@ -32,4 +32,17 @@ def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=Fals
     post_patch(extension, logo)
 
 
+def _unpatch(name='hvplot', interactive='interactive'):
+    """Undo `patch()`. Private, used by the test suite."""
+    import cudf
+
+    from . import _module_extensions
+
+    for cls in (cudf.DataFrame, cudf.Series):
+        for attr in (name, interactive):
+            if attr in vars(cls):
+                delattr(cls, attr)
+    _module_extensions.discard('hvplot.cudf')
+
+
 patch()

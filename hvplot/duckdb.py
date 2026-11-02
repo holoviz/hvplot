@@ -26,4 +26,16 @@ def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=Fals
     post_patch(extension, logo)
 
 
+def _unpatch(name='hvplot'):
+    """Undo `patch()`. Private, used by the test suite."""
+    import duckdb
+
+    from . import _module_extensions
+
+    for cls in (duckdb.DuckDBPyRelation, duckdb.DuckDBPyConnection):
+        if name in vars(cls):
+            delattr(cls, name)
+    _module_extensions.discard('hvplot.duckdb')
+
+
 patch()
