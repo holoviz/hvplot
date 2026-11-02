@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+from holoviews import Store
 from holoviews.element import VectorField
 
 
@@ -57,3 +58,10 @@ def test_mag(df, hvplot_pandas):
     # VectorField expects the magnitude as its second value dimension.
     assert plot.vdims[1] == 'mag'
     assert list(plot.dimension_values('mag')) == [2, 4, 6, 8]
+
+
+@pytest.mark.parametrize('backend', ['bokeh', 'matplotlib'], indirect=True)
+def test_mag_scales_arrows(df, hvplot_pandas, backend):
+    plot = df.hvplot.vectorfield(x='x', y='y', angle='angle', mag='mag')
+    # HoloViews scales the arrows by a dimension named 'Magnitude' unless told otherwise.
+    assert Store.lookup_options(backend, plot, 'plot').kwargs['magnitude'] == 'mag'
