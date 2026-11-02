@@ -3420,7 +3420,7 @@ class HoloViewsConverter:
         params = dict(self._relabel)
 
         element = self._get_element('vectorfield')
-        cur_opts, compat_opts = self._get_compat_opts('VectorField')
+        cur_opts, compat_opts = self._get_compat_opts('VectorField', magnitude=mag)
         if self.geo:
             params['crs'] = self.crs
         return redim_(
