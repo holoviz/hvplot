@@ -132,6 +132,8 @@ jobs:
       - name: Test Unit
         run: pixi run -e "${ENV}" test-unit-cov
       - name: Test Examples
+        # Examples are slow, on regular runs they only run on Linux
+        if: needs.setup.outputs.matrix_option != 'default' || matrix.os == 'ubuntu-latest'
         run: |
           if [[ "${{ github.event_name }}" == "schedule" ]]; then
             HVPLOT_INCLUDE_SLOW_EXAMPLES=1 pixi run -e "${ENV}" test-example
