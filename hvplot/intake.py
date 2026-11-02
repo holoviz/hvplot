@@ -38,6 +38,15 @@ def patch(name='hvplot', extension='bokeh', logo=False):
     post_patch(extension, logo)
 
 
+def _unpatch(name='hvplot'):
+    """Undo `patch()`. Private, used by the test suite."""
+    import intake
+
+    if name in vars(intake.source.base.DataSource):
+        delattr(intake.source.base.DataSource, name)
+    _module_extensions.discard('hvplot.intake')
+
+
 try:
     import intake.plotting
 
