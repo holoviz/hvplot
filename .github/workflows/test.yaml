@@ -163,10 +163,7 @@ jobs:
         with:
           environments: ${{ matrix.environment }}
       - name: Test Unit
-        run: pixi run -e "${ENV}" test-unit-cov
-      - uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+        run: pixi run -e "${ENV}" test-unit
 
   pip_test:
     name: pip tests:${{ matrix.os }}:${{ matrix.environment }}
