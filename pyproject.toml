@@ -58,11 +58,13 @@ tests-core = [
     "dask[dataframe]",
     "ipywidgets",
     "matplotlib",
-    "parameterized",
     "plotly",
     "pooch",
     "pre-commit",
     "pytest-cov",
+    "pytest-randomly",
+    "pytest-socket",
+    "pytest-xdist",
     "pytest",
     "ruff",
     "scipy",
@@ -184,13 +186,18 @@ include = ["hvplot", "scripts", "doc"]
 version-file = "hvplot/_version.py"
 
 [tool.pytest.ini_options]
-addopts = "-v --pyargs"
+addopts = "--pyargs --strict-markers"
 norecursedirs = "*.egg dist build _build jupyter_execute .*"
-# The test suite used to be run with nosetests which collected
-# by default files like `testgeo.py` while pytest's default is
-# to collect files like `test_geo.py`. This setting allows
-# to avoid renaming all the test files.
-python_files = "test*.py"
+xfail_strict = true
+markers = [
+    "slow: slow tests, run with --slow (always run on CI)",
+    "geo: tests using GeoViews, skipped when geoviews or cartopy are missing",
+    "render_xfail: xfail that only applies when the plots are rendered (i.e. without --no-render)",
+    "lib_xfail(*libs, **xfail_kwargs): xfail for the tests run with these data libraries (tabular_lib or gridded_lib)",
+    "lib_render_xfail(*libs, **xfail_kwargs): lib_xfail that only applies when the plots are rendered",
+    "lib_skip(*libs, reason): skip the tests run with these data libraries, which they don't apply to",
+]
+python_files = "test_*.py"
 filterwarnings = [
     # 2023-09: See https://github.com/matplotlib/matplotlib/issues/25244
     "ignore:Deprecated call to `pkg_resources.+?'mpl_toolkits:DeprecationWarning",
