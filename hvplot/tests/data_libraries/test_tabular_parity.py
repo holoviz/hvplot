@@ -13,7 +13,7 @@ import pandas as pd
 import pytest
 from holoviews import NdMapping
 
-from hvplot.tests._deps import POLARS_2, requires
+from hvplot.tests._deps import requires
 
 
 @pytest.fixture
@@ -186,16 +186,8 @@ BUGS = {
     ('hist_logx', 'ibis'): 'BUG: the histogram compares an ibis table with a number for logx',
     ('heatmap_C_reduce_function', 'ibis'): 'BUG: reduce_function fails on an ibis table',
 }
-if POLARS_2:
-    BUGS[('line_default_y', 'polars')] = 'BUG: pl.NUMERIC_DTYPES was removed in polars 2.0'
-    BUGS[('table', 'polars')] = 'BUG: pl.NUMERIC_DTYPES was removed in polars 2.0'
-    BUGS[('table_columns', 'polars')] = 'BUG: pl.NUMERIC_DTYPES was removed in polars 2.0'
-    BUGS[('table_strings_only', 'polars')] = 'BUG: pl.NUMERIC_DTYPES was removed in polars 2.0'
-else:
-    BUGS[('table', 'polars')] = TABLE_NUMERIC_ONLY
-    BUGS[('table_strings_only', 'polars')] = (
-        'BUG: the column selection keeps only the first column'
-    )
+BUGS[('table', 'polars')] = TABLE_NUMERIC_ONLY
+BUGS[('table_strings_only', 'polars')] = 'BUG: the column selection keeps only the first column'
 
 # (case, library): reason. Differences that are documented, or that come from the library.
 SKIPS = {
