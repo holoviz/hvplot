@@ -101,6 +101,13 @@ def test_multiindex_y(long_df, hvplot_pandas):
     assert plot.vdims == ['Downloads']
 
 
+def test_multiindex_y_list(long_df, hvplot_pandas):
+    df = long_df.assign(Stars=[3.0, 2.0, 1.0, 0.0]).set_index(['Project', 'Source'])
+    plot = df.hvplot.bar(y=['Downloads', 'Stars'])
+    assert plot.kdims == ['Project', 'Variable']
+    assert plot.vdims == ['value']
+
+
 def test_multiindex_x(long_df, hvplot_pandas):
     plot = long_df.set_index(['Project', 'Source']).hvplot.bar(x='Project', y='Downloads')
     assert plot.kdims == ['Project']

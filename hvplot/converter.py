@@ -1697,7 +1697,7 @@ class HoloViewsConverter:
             if len(indexes) == 2 and not (x or by):
                 if kind == 'heatmap' and not y:
                     x, y = indexes
-                elif kind in ('bar', 'barh'):
+                elif kind in ('bar', 'barh') and not isinstance(y, list):
                     x, by = indexes
 
             self.variables = indexes + list(self.data.columns)
