@@ -108,6 +108,40 @@ myst_enable_extensions = [
     'html_image',
 ]
 
+API_PLOT_METHODS = [
+    'hvPlot.area',
+    'hvPlot.bar',
+    'hvPlot.barh',
+    'hvPlot.bivariate',
+    'hvPlot.box',
+    'hvPlot.contour',
+    'hvPlot.contourf',
+    'hvPlot.density',
+    'hvPlot.errorbars',
+    'hvPlot.heatmap',
+    'hvPlot.hexbin',
+    'hvPlot.hist',
+    'hvPlot.image',
+    'hvPlot.kde',
+    'hvPlot.labels',
+    'hvPlot.line',
+    'hvPlot.ohlc',
+    'hvPlot.paths',
+    'hvPlot.points',
+    'hvPlot.polygons',
+    'hvPlot.quadmesh',
+    'hvPlot.rgb',
+    'hvPlot.scatter',
+    'hvPlot.step',
+    'hvPlot.table',
+    'hvPlot.vectorfield',
+    'hvPlot.violin',
+    'plotting.andrews_curves',
+    'plotting.lag_plot',
+    'plotting.parallel_coordinates',
+    'plotting.scatter_matrix',
+]
+
 nbsite_gallery_conf = {
     'github_org': 'holoviz',
     'github_project': 'hvplot',
@@ -123,6 +157,21 @@ nbsite_gallery_conf = {
                 '`HoloViz Examples website <https://examples.holoviz.org>`_.'
             ),
             'sections': [
+                {
+                    'path': 'api',
+                    'title': 'API Reference',
+                    'description': (
+                        'One example per plotting method, linking to its API reference page.'
+                    ),
+                    'items': [
+                        {
+                            'title': method.split('.')[-1],
+                            # Relative URL so the link stays in the same docs version.
+                            'url': f'../ref/api/manual/hvplot.{method}.html',
+                        }
+                        for method in API_PLOT_METHODS
+                    ],
+                },
                 {
                     'path': 'basic-charts',
                     'title': 'Basic Charts',
