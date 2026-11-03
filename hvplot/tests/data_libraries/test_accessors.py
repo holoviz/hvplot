@@ -6,6 +6,7 @@ classes patched and unpatched). Adding a library is adding its entries and nothi
 
 import importlib
 
+import holoviews as hv
 import numpy as np
 import pandas as pd
 import pytest
@@ -190,3 +191,39 @@ def test_patch_without_library(library, block_import, monkeypatch):
     monkeypatch.setattr(hvplot, '_module_extensions', set())
     with pytest.raises(ImportError, match=f'(?i){library} could not be imported'):
         ext.patch()
+
+
+@pytest.mark.parametrize('library', ['pandas', 'xarray'])
+@pytest.mark.parametrize('backend', ['matplotlib', 'plotly'])
+def test_import_preserves_selected_backend(library, backend):
+    ext = importlib.import_module(f'hvplot.{library}')
+    hvplot.extension(backend, compatibility='bokeh')
+
+    importlib.reload(ext)
+    assert hv.Store.current_backend == backend
+    assert hvplot.extension.compatibility == 'bokeh'
+
+
+@pytest.mark.parametrize('library', ['pandas', 'xarray'])
+def test_patch_loads_default_backend(library):
+    ext = importlib.import_module(f'hvplot.{library}')
+    # The _isolate_hvplot fixture restores it after the test.
+    hv.extension._loaded = False
+    hv.Store.set_current_backend('bokeh')
+
+    ext.patch()
+    assert hv.Store.current_backend == 'bokeh'
+    if library == 'pandas':
+        data = pd.Series([1, 2])
+    else:
+        data = xr.DataArray([1, 2], dims=['x'], name='value')
+    assert hv.render(data.hvplot.line()) is not None
+
+
+@pytest.mark.parametrize('library', ['pandas', 'xarray'])
+def test_patch_honors_explicit_backend(library):
+    ext = importlib.import_module(f'hvplot.{library}')
+    hvplot.extension('matplotlib')
+
+    ext.patch(extension='plotly')
+    assert hv.Store.current_backend == 'plotly'
