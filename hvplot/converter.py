@@ -2701,6 +2701,12 @@ class HoloViewsConverter:
     def area(self, x=None, y=None, data=None):
         """Area plot."""
         self._error_if_unavailable('area')
+        # Stacking replaces y2 with a computed baseline, so the two are exclusive.
+        if self.stacked and self.kwds.get('y2'):
+            raise ValueError(
+                "'stacked' cannot be combined with 'y2', as a stacked area is "
+                'filled from a computed baseline instead of from y2.'
+            )
         areas = self.chart(Area, x, y, data)
         if self.stacked:
             areas = areas.map(Area.stack, NdOverlay)

@@ -67,3 +67,23 @@ def test_stacked_default(df, hvplot_pandas):
     assert list(plot['y2'].dimension_values('Baseline')) == [1.0, 4.0, 2.0]
     kind_plot = df.hvplot(kind='area', x='x', y=['y', 'y2'])
     assert list(kind_plot['y2'].dimension_values('value')) == [0.5, 1.0, 1.5]
+
+
+def test_y2_by_not_stacked(hvplot_pandas):
+    df = pd.DataFrame(
+        {
+            'x': [0, 1, 0, 1],
+            'lower': [0, 1, 10, 11],
+            'upper': [1, 2, 11, 12],
+            'cat': ['A', 'A', 'B', 'B'],
+        }
+    )
+    plot = df.hvplot.area(x='x', y='lower', y2='upper', by='cat')
+    # Each area keeps its own y2 instead of being stacked on the previous one.
+    assert list(plot['B'].dimension_values('lower')) == [10, 11]
+    assert list(plot['B'].dimension_values('upper')) == [11, 12]
+
+
+def test_y2_stacked_error(df, hvplot_pandas):
+    with pytest.raises(ValueError, match="'stacked' cannot be combined with 'y2'"):
+        df.hvplot.area(x='x', y='y', y2='y2', stacked=True)
