@@ -45,7 +45,13 @@ X = {(kind, 'ibis'): 'A' for kind in ['area', 'bar', 'barh', 'errorbars', 'line'
 X |= {('step', lib): 'A' for lib in TABULAR_LIBS}
 
 # The kinds with no hvPlot element for the backend raise an error when called.
-NOT_SUPPORTED = [('hexbin', 'plotly'), ('polygons', 'plotly'), ('vectorfield', 'plotly')]
+NOT_SUPPORTED = [
+    ('donut', 'plotly'),
+    ('hexbin', 'plotly'),
+    ('polygons', 'plotly'),
+    ('vectorfield', 'plotly'),
+    ('waterfall', 'plotly'),
+]
 
 # Known failures, as marks: `xfail` when the plot cannot be built, `render_xfail` when it cannot
 # be rendered. They are not strict when the reason names another library instead of `BUG:`.
@@ -122,8 +128,8 @@ KIND_AND_BACKEND = [
 def assert_kind_element(plot, kind):
     """Assert the plot is made of the element the kind maps to."""
     element = plot
-    if isinstance(plot, hv.NdOverlay):  # one element per column
-        element = plot.last
+    if isinstance(plot, (hv.NdOverlay, hv.NdLayout)):  # one element per column
+        element = plot.values()[-1]
     elif kind == 'ohlc':  # Rectangles for the boxes, overlaid with Segments for the whiskers
         element = plot.Rectangles.I
     assert isinstance(element, HoloViewsConverter._kind_mapping[kind])
@@ -132,7 +138,7 @@ def assert_kind_element(plot, kind):
 def assert_dataframe_plot(plot, kind, y):
     """Assert the plot is made of the element of the kind and of the columns selected by y."""
     assert_kind_element(plot, kind)
-    if isinstance(plot, hv.NdOverlay):
+    if isinstance(plot, (hv.NdOverlay, hv.NdLayout)):
         # Compared as a set as the order of y given as a set is arbitrary.
         assert set(plot.keys()) == set(y)
     elif kind in MELTED_KINDS:
