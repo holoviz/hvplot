@@ -23,4 +23,15 @@ def patch(name='hvplot', extension='bokeh', logo=False):
     post_patch(extension, logo)
 
 
+def _unpatch(name='hvplot'):
+    """Undo `patch()`. Private, used by the test suite."""
+    import ibis
+
+    from . import _module_extensions
+
+    if name in vars(ibis.Expr):
+        delattr(ibis.Expr, name)
+    _module_extensions.discard('hvplot.ibis')
+
+
 patch()
