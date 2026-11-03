@@ -5,6 +5,9 @@ from panel.widgets import Widget
 
 from .interactive import Interactive
 
+# Panel 1.9 deprecated Widget.name in favor of label.
+_WIDGET_LABEL = 'label' if 'label' in Widget.param else 'name'
+
 
 class XArrayInteractive(Interactive):
     """Interactive pipeline wrapper for xarray objects."""
@@ -21,9 +24,11 @@ class XArrayInteractive(Interactive):
             if isinstance(v, type) and issubclass(v, Widget):
                 if hasattr(v, 'end'):
                     values = self._current[k].values
-                    v = v(name=k, start=values.min(), end=values.max())
+                    v = v(**{_WIDGET_LABEL: k}, start=values.min(), end=values.max())
                 if hasattr(v, 'options'):
-                    v = v(name=k, options={str(v): v for v in self._current[k].values})
+                    v = v(
+                        **{_WIDGET_LABEL: k}, options={str(v): v for v in self._current[k].values}
+                    )
             processed[k] = v
         self._method = 'sel'
         return self.__call__(**processed)
@@ -36,7 +41,7 @@ class XArrayInteractive(Interactive):
         for k, v in kwargs.items():
             if isinstance(v, type) and issubclass(v, Widget):
                 if hasattr(v, 'end'):
-                    v = v(name=k, end=len(self._current[k]))
+                    v = v(**{_WIDGET_LABEL: k}, end=len(self._current[k]))
             processed[k] = v
         self._method = 'isel'
         return self.__call__(**processed)

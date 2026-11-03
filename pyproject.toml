@@ -214,6 +214,11 @@ filterwarnings = [
     "ignore:pkg_resources is deprecated as an API:UserWarning:fugue_sql_antlr.parser",
     # 2025-12
     "ignore:The 'shapely.geos' module is deprecated:DeprecationWarning:geopandas._compat",
+    # 2026-11: HoloViews calls .values and np.ix_ on dask objects when rendering Bars/Histogram
+    "ignore:Dask currently has limited support for converting pandas extension dtypes:UserWarning:dask.dataframe",
+    "ignore:The `numpy.ix_` function is not implemented by Dask array:FutureWarning:dask.array",
+    # 2026-11: Harmless Cython/NumPy ABI check, raised by the abi3 netCDF4 build
+    "ignore:numpy.ndarray size changed:RuntimeWarning",
 ]
 
 [tool.codespell]

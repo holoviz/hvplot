@@ -260,7 +260,7 @@ def test_process_crs_pyproj_proj():
     import cartopy.crs as ccrs
     import pyproj
 
-    crs = process_crs(pyproj.Proj(init='epsg:4326'))
+    crs = process_crs(pyproj.Proj('epsg:4326'))
     assert isinstance(crs, ccrs.PlateCarree)
 
 
