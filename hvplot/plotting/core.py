@@ -405,14 +405,16 @@ class hvPlotTabular(hvPlotBase):
             Field name(s) to draw y-positions from. If not specified, all numerical
             fields are used.
         marker : str, optional
-            The marker shape. Options depend on the plotting backend:
+        The marker shape. Options depend on the plotting backend:
 
-            - Bokeh: 'circle' (default), 'dot', 'cross', 'x', 'square', etc.
-              See https://docs.bokeh.org/en/latest/docs/examples/basic/scatters/markertypes.html
-              for the complete list of Bokeh markers.
-            - Matplotlib: 's' (square), 'x' (cross), '+', 'o' (circle), etc.
-              See https://matplotlib.org/stable/api/markers_api.html
-              for the complete list of Matplotlib markers.
+        - Bokeh: Supports standard Bokeh marker names (e.g., 'circle', 'square', 'triangle', 
+          'cross', 'diamond', 'asterisk') as well as Matplotlib short aliases mapped via HoloViews 
+          (e.g., '+', 's', 'd', '^', '>', 'v', '<', '1', '2', '3', '4', 'o', '*').
+          See https://docs.bokeh.org/en/latest/docs/examples/basic/scatters/markertypes.html
+          for the complete list of Bokeh markers.
+        - Matplotlib: 's' (square), 'x' (cross), '+', 'o' (circle), etc.
+          See https://matplotlib.org/stable/api/markers_api.html
+          for the complete list of Matplotlib markers.
         c : str, optional
             Field name to color markers by, or a single color name. Alias for ``color``.
         s : int, optional
@@ -1338,8 +1340,11 @@ class hvPlotTabular(hvPlotBase):
         s : int, optional
             The size of the marker. Also available as 'size'.
         marker : str, optional
-            The marker shape specified above can be any supported by matplotlib, e.g. s, d, o etc.
-            See https://matplotlib.org/stable/api/markers_api.html.
+        The marker shape style to use. Supports standard Bokeh marker names 
+        (e.g., 'circle', 'square', 'triangle', 'cross', 'diamond', 'asterisk') as well as 
+        Matplotlib short aliases mapped via HoloViews (e.g., '+', 's', 'd', '^', '>', 'v', '<', '1', '2', '3', '4', 'o', '*').
+        See https://docs.bokeh.org/en/latest/docs/examples/basic/scatters/markertypes.html 
+        and https://matplotlib.org/stable/api/markers_api.html.
         scale : float, optional
             Scaling factor to apply to point scaling. Default is 1.
         logz : bool, optional
