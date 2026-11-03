@@ -62,7 +62,7 @@ def test_geo_marker_geoviews_state():
 
 
 def test_sockets_blocked():
-    with pytest.raises(SocketBlockedError):
+    with pytest.raises(SocketBlockedError), pytest.warns(UserWarning, match='socket'):
         socket.socket()
 
 
