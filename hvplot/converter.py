@@ -786,7 +786,7 @@ class HoloViewsConverter:
         'quadmesh': ['x', 'y', 'z', 'logz'],
         'trimesh': ['x', 'y', 'z', 'filled'],
         'vectorfield': ['x', 'y', 'angle', 'mag'],
-        'violine': ['y'],
+        'violin': ['y'],
     }
 
     # Mapping from kind to HoloViews element type
@@ -2721,6 +2721,12 @@ class HoloViewsConverter:
     def area(self, x=None, y=None, data=None):
         """Area plot."""
         self._error_if_unavailable('area')
+        # Stacking replaces y2 with a computed baseline, so the two are exclusive.
+        if self.stacked and self.kwds.get('y2'):
+            raise ValueError(
+                "'stacked' cannot be combined with 'y2', as a stacked area is "
+                'filled from a computed baseline instead of from y2.'
+            )
         areas = self.chart(Area, x, y, data)
         if self.stacked:
             areas = areas.map(Area.stack, NdOverlay)
@@ -3440,7 +3446,7 @@ class HoloViewsConverter:
         params = dict(self._relabel)
 
         element = self._get_element('vectorfield')
-        cur_opts, compat_opts = self._get_compat_opts('VectorField')
+        cur_opts, compat_opts = self._get_compat_opts('VectorField', magnitude=mag)
         if self.geo:
             params['crs'] = self.crs
         return redim_(

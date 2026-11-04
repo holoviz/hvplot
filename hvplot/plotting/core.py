@@ -458,7 +458,7 @@ class hvPlotTabular(hvPlotBase):
         """
         return self(x, y, kind='scatter', **kwds)
 
-    def area(self, x=None, y=None, y2=None, stacked=True, **kwds):
+    def area(self, x=None, y=None, y2=None, stacked=None, **kwds):
         """
         Create an area plot that fills the region between curves and axes.
 
@@ -480,9 +480,11 @@ class hvPlotTabular(hvPlotBase):
         y2 : str, optional
             Field name for secondary y-positions. When specified, the area is
             filled between ``y`` and ``y2`` curves.
-        stacked : bool, default True
+        stacked : bool, optional
             Whether to stack multiple areas on top of each other. When False,
-            areas are overlaid with transparency.
+            areas are overlaid with transparency. Defaults to True, or to False
+            when ``y2`` is specified; passing True together with ``y2`` is an
+            error.
         color : str, optional
             A literal color or categorical column name. Categorical columns
             create one area per group, equivalent to ``by="column"``.
@@ -512,8 +514,10 @@ class hvPlotTabular(hvPlotBase):
         - Matplotlib:  https://matplotlib.org/stable/gallery/lines_bars_and_markers/fill_between_demo.html
         - Wiki: https://en.wikipedia.org/wiki/Area_chart
         """
-        if 'alpha' not in kwds and not stacked:
+        if 'alpha' not in kwds and stacked is False:
             kwds['alpha'] = 0.5
+        if stacked is None:
+            stacked = y2 is None
         return self(x, y, y2=y2, kind='area', stacked=stacked, **kwds)
 
     def errorbars(self, x=None, y=None, yerr1=None, yerr2=None, **kwds):
@@ -1672,6 +1676,13 @@ class hvPlotTabularDuckDB(hvPlotTabular):
 class hvPlotTabularPolars(hvPlotTabular):
     """hvPlot accessor for polars DataFrame, LazyFrame and Series."""
 
+    @staticmethod
+    def _get_polars_column_names(data) -> list[str]:
+        try:
+            return data.collect_schema().names()
+        except AttributeError:  # `collect_schema` was added in 1.0
+            return list(data.columns)
+
     def _get_converter(self, x=None, y=None, kind=None, **kwds):
         import polars as pl
 
@@ -1682,10 +1693,7 @@ class hvPlotTabularPolars(hvPlotTabular):
 
         # Find columns which should be converted for LazyDataFrame and DataFrame
         if isinstance(self._data, (pl.LazyFrame, pl.DataFrame)):
-            try:
-                column_names = self._data.collect_schema().names()
-            except Exception:  # Maybe not always supported, has been there since 1.7.1
-                column_names = list(self._data.columns)
+            column_names = self._get_polars_column_names(self._data)
 
             if params.get('hover_cols') == 'all':
                 columns = column_names
@@ -1702,7 +1710,11 @@ class hvPlotTabularPolars(hvPlotTabular):
                     # When y is not specified HoloViewsConverter finds all the numeric
                     # columns and use them as y values (see _process_chart_y). We need
                     # to include these columns too.
-                    columns |= set(self._data.select(pl.col(pl.NUMERIC_DTYPES)).columns)
+                    if Version(pl.__version__).release >= (1, 0, 0):
+                        num_dtypes = pl.selectors.numeric()
+                    else:
+                        num_dtypes = pl.col(pl.NUMERIC_DTYPES)
+                    columns |= set(self._get_polars_column_names(self._data.select(num_dtypes)))
                 xs = x if is_list_like(x) else (x,)
                 ys = y if is_list_like(y) else (y,)
                 columns |= {*xs, *ys}

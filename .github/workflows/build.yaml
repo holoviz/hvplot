@@ -44,7 +44,9 @@ jobs:
         run: |
           echo "TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
           echo "CONDA_FILE=$(ls dist/*.tar.bz2)" >> $GITHUB_ENV
-      - uses: anaconda/actions/upload-package@a6f488910b4a1e4f3fe01736241ca1b92b4b355a # v0.3.1
+      - name: Upload to anaconda.org
+        if: github.event_name == 'push'
+        uses: anaconda/actions/upload-package@a6f488910b4a1e4f3fe01736241ca1b92b4b355a # v0.3.1
         with:
           token: ${{ secrets.CONDA_UPLOAD_TOKEN }}
           channel: pyviz

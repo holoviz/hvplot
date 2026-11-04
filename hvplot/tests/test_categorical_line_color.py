@@ -5,7 +5,9 @@ import pandas as pd
 import pytest
 from holoviews.core.overlay import NdOverlay
 
-import hvplot.pandas  # noqa: F401
+# Test modules must not import hvplot extensions at import time; the
+# hvplot_pandas fixture adds the accessor and removes it after each test.
+pytestmark = pytest.mark.usefixtures('hvplot_pandas')
 
 
 @pytest.fixture
@@ -95,6 +97,10 @@ def test_categorical_color_named_index_matches_by(series_data, kind, multi_index
     hv.renderer('bokeh').get_plot(actual)
 
 
+@pytest.mark.render_xfail(
+    reason='Curve and Area cannot map a numeric dimension to color with Bokeh; '
+    'this only checks that a numeric color field is not grouped like by=',
+)
 @pytest.mark.parametrize('kind', ['line', 'step', 'area'])
 def test_numeric_color_column_not_implicitly_grouped(series_data, kind):
     data = pd.DataFrame({**series_data, 'measurement': [1, 2, 3, 4, 5, 6]})
