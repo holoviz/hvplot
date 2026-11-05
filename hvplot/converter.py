@@ -1694,10 +1694,10 @@ class HoloViewsConverter:
             else:
                 indexes = [c for c in self.data.columns if c not in self.data.columns]
 
-            if len(indexes) == 2 and not (x or y or by):
-                if kind == 'heatmap':
+            if len(indexes) == 2 and not (x or by):
+                if kind == 'heatmap' and not y:
                     x, y = indexes
-                elif kind in ('bar', 'barh'):
+                elif kind in ('bar', 'barh') and not isinstance(y, list):
                     x, by = indexes
 
             self.variables = indexes + list(self.data.columns)

@@ -37,3 +37,15 @@ def test_y(df, tabular_lib):
 def test_stacked(df, hvplot_pandas, backend):
     plot = df.hvplot.barh(x='cat', y=['y', 'y2'], stacked=True)
     assert Store.lookup_options(backend, plot, 'plot').kwargs['stacked'] is True
+
+
+def test_multiindex_y(hvplot_pandas):
+    df = pd.DataFrame(
+        {
+            'Project': ['hvPlot', 'hvPlot', 'Panel'],
+            'Source': ['Conda', 'PyPI', 'Conda'],
+            'Downloads': [1.0, 4.0, 2.0],
+        }
+    ).set_index(['Project', 'Source'])
+    plot = df.hvplot.barh(y='Downloads')
+    assert plot.kdims == ['Project', 'Source']
