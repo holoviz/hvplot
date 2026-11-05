@@ -241,6 +241,8 @@ class hvPlotTabular(hvPlotBase):
         'bivariate',
         'bar',
         'barh',
+        'waterfall',
+        'donut',
         'box',
         'violin',
         'hist',
@@ -966,6 +968,136 @@ class hvPlotTabular(hvPlotBase):
         - Wiki: https://en.wikipedia.org/wiki/Bar_chart
         """
         return self(x, y, kind='barh', stacked=stacked, **kwds)
+
+    def waterfall(self, x=None, y=None, **kwds):
+        """
+        Create a waterfall chart.
+
+        A waterfall chart shows how an initial value is increased and decreased by a series of
+        intermediate changes. Each bar floats from the running total of the previous steps, is
+        colored by the direction of its change and, by default, a final bar shows the total.
+
+        Requires HoloViews >= 1.23.0.
+
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.waterfall.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
+
+        Parameters
+        ----------
+        x : str, optional
+            Field name to draw the categories from. If not specified, the index is used.
+        y : str, optional
+            Field name of the incremental changes. If not specified, the first numerical
+            field is used.
+        by : str or list of str, optional
+            Field(s) to group by, laying out one waterfall chart per group.
+        show_total : bool, default True
+            Whether to append a final bar running from 0 to the cumulative sum.
+        total_label : str, default 'Total'
+            Category label of the total bar.
+        positive_color : str, optional
+            Color of the bars of positive changes.
+        negative_color : str, optional
+            Color of the bars of negative changes.
+        start_color : str or None, optional
+            Color of the first bar. If None, it is colored by its sign.
+        total_color : str or None, optional
+            Color of the total bar. If None, it uses the color of the first bar.
+        show_connectors : bool, default True
+            Whether to draw lines connecting the bars.
+        **kwds : optional
+            Additional keyword arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('waterfall')`` for the full method documentation.
+
+        Returns
+        -------
+        :class:`holoviews:holoviews.element.Waterfall` or Panel object
+            You can `print` the object to study its composition and run:
+
+            .. code-block:: python
+
+                import holoviews as hv
+                hv.help(the_holoviews_object)
+
+            to learn more about its parameters and options.
+
+        See Also
+        --------
+        :meth:`bar` : Vertical bar plot.
+
+        References
+        ----------
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Waterfall.html
+        - Plotly: https://plotly.com/python/waterfall-charts/
+        - Wikipedia: https://en.wikipedia.org/wiki/Waterfall_chart
+        """
+        return self(x, y, kind='waterfall', **kwds)
+
+    def donut(self, x=None, y=None, **kwds):
+        """
+        Create a donut chart.
+
+        A donut chart shows the proportions of a whole as the wedges of a ring, the angle of
+        each wedge being proportional to its value. Set ``inner_radius=0`` to draw a pie chart.
+
+        Requires HoloViews >= 1.23.0.
+
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.donut.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
+
+        Parameters
+        ----------
+        x : str, optional
+            Field name to draw the categories of the wedges from. If not specified, the index
+            is used.
+        y : str, optional
+            Field name of the wedge sizes. If not specified, the first numerical field is used.
+        by : str or list of str, optional
+            Field(s) to group by, laying out one donut chart per group.
+        inner_radius : float, default 0.8
+            Inner radius of the ring, between 0 and 1. Set to 0 for a pie chart.
+        outer_radius : float, default 1.0
+            Outer radius of the ring.
+        start_angle : float, default 0
+            Rotation of the first wedge, in radians.
+        show_labels : bool or str, default False
+            Whether to draw a label on each wedge. A string is used as a template formatted
+            with the field names, e.g. ``'{category}: {value}'``.
+        label_radius : float, default 0.7
+            Radial position of the wedge labels, as a multiple of ``outer_radius``.
+        center_label : str or None, default None
+            Text displayed in the center of the ring. ``'total'`` shows the sum of the values,
+            other strings are templates formatted with ``total`` and the ``y`` field name.
+        cmap : str, list or dict, optional
+            Colormap of the wedges, which are colored by category.
+        **kwds : optional
+            Additional keyword arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('donut')`` for the full method documentation.
+
+        Returns
+        -------
+        :class:`holoviews:holoviews.element.Donut` or Panel object
+            You can `print` the object to study its composition and run:
+
+            .. code-block:: python
+
+                import holoviews as hv
+                hv.help(the_holoviews_object)
+
+            to learn more about its parameters and options.
+
+        References
+        ----------
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/annular_wedge.html
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Donut.html
+        - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.pie.html
+        - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.pie.html
+        - Plotly: https://plotly.com/python/pie-charts/
+        - Wikipedia: https://en.wikipedia.org/wiki/Pie_chart#Doughnut_chart
+        """
+        return self(x, y, kind='donut', **kwds)
 
     def box(self, y=None, by=None, **kwds):
         """
