@@ -11,6 +11,7 @@ import pytest
 from hvplot.converter import HoloViewsConverter
 from hvplot.plotting import plot
 from hvplot.tests._data import makeDataFrame
+from hvplot.util import _HV_GE_1_24_0
 
 no_args = ['line', 'area', 'hist', 'box', 'kde', 'density', 'bar', 'barh']
 x_y = ['scatter', 'hexbin']
@@ -35,6 +36,9 @@ no_args_mapping = [
     if kind in no_args
 ]
 x_y_mapping = [(kind, el) for kind, el in HoloViewsConverter._kind_mapping.items() if kind in x_y]
+pie_requires_hv_1_24 = pytest.mark.skipif(
+    not _HV_GE_1_24_0, reason='pie requires HoloViews >= 1.24.0'
+)
 explicit_backends = pytest.mark.parametrize('explicit_backend', ['holoviews', 'hvplot'])
 
 
@@ -68,10 +72,11 @@ def test_pandas_dataframe_plot_returns_holoviews_object_when_x_and_y_set(
     assert isinstance(plot, el)
 
 
-def test_pandas_dataframe_plot_does_not_implement_pie(plotting_backend):
+@pie_requires_hv_1_24
+def test_pandas_dataframe_plot_pie_returns_holoviews_object(plotting_backend):
     df = pd.DataFrame({'a': [0, 1, 2], 'b': [5, 7, 2]})
-    with pytest.raises(NotImplementedError, match='pie'):
-        df.plot.pie(y='a')
+    plot = df.plot.pie(y='a')
+    assert isinstance(plot, HoloViewsConverter._kind_mapping['pie'])
 
 
 @pytest.mark.parametrize('kind,el', series_specials)
@@ -115,10 +120,11 @@ def test_pandas_dataframe_plot_explicit_returns_holoviews_object_when_x_and_y_se
 
 
 @explicit_backends
-def test_pandas_dataframe_plot_explicit_does_not_implement_pie(explicit_backend):
+@pie_requires_hv_1_24
+def test_pandas_dataframe_plot_explicit_pie_returns_holoviews_object(explicit_backend):
     df = pd.DataFrame({'a': [0, 1, 2], 'b': [5, 7, 2]})
-    with pytest.raises(NotImplementedError, match='pie'):
-        df.plot.pie(y='a', backend=explicit_backend)
+    plot = df.plot.pie(y='a', backend=explicit_backend)
+    assert isinstance(plot, HoloViewsConverter._kind_mapping['pie'])
 
 
 @explicit_backends

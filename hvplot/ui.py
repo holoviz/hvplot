@@ -18,6 +18,7 @@ KINDS = {
     # these are for the kind selector
     'dataframe': sorted(
         set(_hvConverter._kind_mapping)
+        - {'pie', 'donut'}  # not supported by the explorer
         - set(_hvConverter._gridded_types)
         - set(_hvConverter._geom_types)
         | {'points', 'paths'}

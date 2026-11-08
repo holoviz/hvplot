@@ -14,10 +14,13 @@ from hvplot import hvPlotTabular
 from hvplot.converter import HoloViewsConverter
 from hvplot.tests._data import makeDataFrame
 from hvplot.tests._deps import TABULAR_LIBS
+from hvplot.util import _HV_GE_1_24_0
 
 BACKENDS = ['bokeh', 'matplotlib', 'plotly']
 
 KINDS = sorted(t for t in dir(hvPlotTabular) if not t.startswith('_') and t != 'explorer')
+if not _HV_GE_1_24_0:  # pie and donut need HoloViews >= 1.24.0
+    KINDS = sorted(set(KINDS) - {'donut', 'pie'})
 # These kinds need other columns than the ones selected by y.
 FRAME_KINDS = sorted(set(KINDS) - {'bivariate', 'heatmap', 'hexbin', 'labels', 'vectorfield'})
 SERIES_KINDS = sorted(set(FRAME_KINDS) - {'points', 'polygons', 'ohlc', 'paths'})
@@ -41,11 +44,18 @@ BACKEND_KWARGS = {
 
 # The default x is the index, which ibis tables don't have, and which step cannot render
 # when it is the string index of the test data.
-X = {(kind, 'ibis'): 'A' for kind in ['area', 'bar', 'barh', 'errorbars', 'line', 'scatter']}
+X = {
+    (kind, 'ibis'): 'A'
+    for kind in ['area', 'bar', 'barh', 'donut', 'errorbars', 'line', 'pie', 'scatter']
+}
 X |= {('step', lib): 'A' for lib in TABULAR_LIBS}
 
 # The kinds with no hvPlot element for the backend raise an error when called.
-NOT_SUPPORTED = [('hexbin', 'plotly'), ('polygons', 'plotly'), ('vectorfield', 'plotly')]
+NOT_SUPPORTED = [
+    (kind, 'plotly')
+    for kind in ['donut', 'hexbin', 'pie', 'polygons', 'vectorfield']
+    if kind in KINDS
+]
 
 # Known failures, as marks: `xfail` when the plot cannot be built, `render_xfail` when it cannot
 # be rendered. They are not strict when the reason names another library instead of `BUG:`.
@@ -119,11 +129,17 @@ KIND_AND_BACKEND = [
 ]
 
 
+def make_frame(kind):
+    """Pie and donut need non-negative values."""
+    df = makeDataFrame()
+    return df.abs() if kind in ('pie', 'donut') else df
+
+
 def assert_kind_element(plot, kind):
     """Assert the plot is made of the element the kind maps to."""
     element = plot
-    if isinstance(plot, hv.NdOverlay):  # one element per column
-        element = plot.last
+    if isinstance(plot, (hv.NdOverlay, hv.NdLayout)):  # one element per column
+        element = plot.values()[-1]
     elif kind == 'ohlc':  # Rectangles for the boxes, overlaid with Segments for the whiskers
         element = plot.Rectangles.I
     assert isinstance(element, HoloViewsConverter._kind_mapping[kind])
@@ -132,7 +148,7 @@ def assert_kind_element(plot, kind):
 def assert_dataframe_plot(plot, kind, y):
     """Assert the plot is made of the element of the kind and of the columns selected by y."""
     assert_kind_element(plot, kind)
-    if isinstance(plot, hv.NdOverlay):
+    if isinstance(plot, (hv.NdOverlay, hv.NdLayout)):
         # Compared as a set as the order of y given as a set is arbitrary.
         assert set(plot.keys()) == set(y)
     elif kind in MELTED_KINDS:
@@ -145,7 +161,7 @@ def assert_dataframe_plot(plot, kind, y):
 @pytest.mark.parametrize(('kind', 'tabular_lib', 'x'), KIND_AND_LIB, indirect=['tabular_lib'])
 def test_dataframe(kind, tabular_lib, x):
     y = OHLC_Y if kind == 'ohlc' else Y
-    df = tabular_lib(makeDataFrame())
+    df = tabular_lib(make_frame(kind))
     plot = df.hvplot(x=x, y=y, kind=kind)
     assert_dataframe_plot(plot, kind, y)
 
@@ -157,7 +173,7 @@ def test_dataframe(kind, tabular_lib, x):
 )
 def test_lazyframe_polars(kind, tabular_lib):
     y = OHLC_Y if kind == 'ohlc' else Y
-    df = tabular_lib(makeDataFrame()).lazy()
+    df = tabular_lib(make_frame(kind)).lazy()
     plot = df.hvplot(y=y, kind=kind)
     assert_dataframe_plot(plot, kind, y)
 
@@ -201,6 +217,8 @@ def numeric_index_df():
 
 @pytest.mark.parametrize(('kind', 'backend'), KIND_AND_BACKEND, indirect=['backend'])
 def test_kind_with_backend(hvplot_pandas, backend, numeric_index_df, kind):
+    if kind in ('pie', 'donut'):
+        numeric_index_df = numeric_index_df.abs()
     plot = numeric_index_df.hvplot(kind=kind, **BACKEND_KWARGS.get(kind, {'y': Y}))
     assert_kind_element(plot, kind)
 

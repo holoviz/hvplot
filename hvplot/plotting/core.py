@@ -241,6 +241,8 @@ class hvPlotTabular(hvPlotBase):
         'bivariate',
         'bar',
         'barh',
+        'pie',
+        'donut',
         'box',
         'violin',
         'hist',
@@ -966,6 +968,150 @@ class hvPlotTabular(hvPlotBase):
         - Wiki: https://en.wikipedia.org/wiki/Bar_chart
         """
         return self(x, y, kind='barh', stacked=stacked, **kwds)
+
+    def pie(self, x=None, y=None, **kwds):
+        """
+        Create a pie chart.
+
+        A pie chart shows how a whole is split into parts, the angle of each wedge being
+        proportional to its value. It works best with a few categories adding up to a
+        meaningful total. Use :meth:`donut` for a pie chart with a hole.
+
+        Requires HoloViews >= 1.24.0. Not supported by the Plotly backend.
+
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.pie.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
+
+        Parameters
+        ----------
+        x : str, optional
+            Field name to draw the wedge categories from. If not specified, the index is used.
+        y : str or list of str, optional
+            Field name(s) to draw the wedge values from. If not specified, all numerical
+            fields are used. Several fields lay out one pie per field.
+        by : str or list of str, optional
+            Field name(s) to group by, laying out one pie per group. Cannot be combined with
+            several ``y`` fields.
+        groupby : str or list of str, optional
+            Field name(s) to group and filter by. Adds one or more widgets to
+            select the subgroup(s) to visualize.
+        show_labels : bool or str, default False
+            Whether to draw a label on each wedge. ``True`` draws the category. A string is a
+            template formatted with the ``x`` and ``y`` field names and ``fraction``, the
+            share of the wedge between 0 and 1, e.g. ``'{fraction:.0%}'``.
+        cmap : str, list or dict, optional
+            Colors of the wedges, mapped to the categories: a colormap name, a list of colors
+            or a dictionary mapping each category to a color. Default is
+            ``'glasbey_category10'``.
+        **kwds : optional
+            Additional keyword arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('pie')`` for the full method documentation.
+
+        Returns
+        -------
+        :class:`holoviews:holoviews.element.Donut` or Panel object
+            A HoloViews Donut element, a layout of them, or a Panel object if using Panel
+            widgets. You can ``print`` the object to study its composition and run:
+
+            .. code-block:: python
+
+                import holoviews as hv
+                hv.help(the_holoviews_object)
+
+            to learn more about its parameters and options.
+
+        See Also
+        --------
+        :meth:`donut` : Pie chart with a hole.
+        :meth:`bar` : Bar chart, to compare the values more precisely.
+
+        Notes
+        -----
+        Each row is drawn as a wedge, in the order of the data and without aggregation:
+        aggregate the data first, e.g. with ``value_counts``, to get one row per category.
+        Rows with a missing value are not drawn and the values must not be negative.
+
+        References
+        ----------
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/wedge.html
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Donut.html
+        - Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.pie.html
+        - Pandas: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.pie.html
+        - Wikipedia: https://en.wikipedia.org/wiki/Pie_chart
+        """
+        return self(x, y, kind='pie', **kwds)
+
+    def donut(self, x=None, y=None, **kwds):
+        """
+        Create a donut chart.
+
+        A donut chart is a :meth:`pie` chart with a hole in its center. It shows how a whole
+        is split into parts, the angle of each wedge being proportional to its value.
+
+        Requires HoloViews >= 1.24.0. Not supported by the Plotly backend.
+
+        Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.donut.html
+
+        Plotting options: https://hvplot.holoviz.org/ref/plotting_options/index.html
+
+        Parameters
+        ----------
+        x : str, optional
+            Field name to draw the wedge categories from. If not specified, the index is used.
+        y : str or list of str, optional
+            Field name(s) to draw the wedge values from. If not specified, all numerical
+            fields are used. Several fields lay out one donut per field.
+        by : str or list of str, optional
+            Field name(s) to group by, laying out one donut per group. Cannot be combined
+            with several ``y`` fields.
+        groupby : str or list of str, optional
+            Field name(s) to group and filter by. Adds one or more widgets to
+            select the subgroup(s) to visualize.
+        inner_radius : float, default 0.5
+            Radius of the hole, as a fraction of the radius of the donut, between 0 and 1.
+        show_labels : bool or str, default False
+            Whether to draw a label on each wedge. ``True`` draws the category. A string is a
+            template formatted with the ``x`` and ``y`` field names and ``fraction``, the
+            share of the wedge between 0 and 1, e.g. ``'{fraction:.0%}'``.
+        cmap : str, list or dict, optional
+            Colors of the wedges, mapped to the categories: a colormap name, a list of colors
+            or a dictionary mapping each category to a color. Default is
+            ``'glasbey_category10'``.
+        **kwds : optional
+            Additional keyword arguments are documented in :ref:`plot-options`.
+            Run ``hvplot.help('donut')`` for the full method documentation.
+
+        Returns
+        -------
+        :class:`holoviews:holoviews.element.Donut` or Panel object
+            A HoloViews Donut element, a layout of them, or a Panel object if using Panel
+            widgets. You can ``print`` the object to study its composition and run:
+
+            .. code-block:: python
+
+                import holoviews as hv
+                hv.help(the_holoviews_object)
+
+            to learn more about its parameters and options.
+
+        See Also
+        --------
+        :meth:`pie` : Pie chart, without a hole.
+
+        Notes
+        -----
+        Each row is drawn as a wedge, in the order of the data and without aggregation:
+        aggregate the data first, e.g. with ``value_counts``, to get one row per category.
+        Rows with a missing value are not drawn and the values must not be negative.
+
+        References
+        ----------
+        - Bokeh: https://docs.bokeh.org/en/latest/docs/reference/models/glyphs/annular_wedge.html
+        - HoloViews: https://holoviews.org/reference/elements/bokeh/Donut.html
+        - Wikipedia: https://en.wikipedia.org/wiki/Pie_chart#Doughnut_chart
+        """
+        return self(x, y, kind='donut', **kwds)
 
     def box(self, y=None, by=None, **kwds):
         """

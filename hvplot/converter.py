@@ -55,6 +55,7 @@ from pandas import DatetimeIndex, MultiIndex
 from .backend_transforms import _transfer_opts_cur_backend
 from .util import (
     _HV_GE_1_21_0,
+    _HV_GE_1_24_0,
     _HV_VERSION,
     _PD_GE_2_1_0,
     _convert_col_names_to_str,
@@ -93,6 +94,11 @@ from .util import (
     support_index,
 )
 from .utilities import hvplot_extension
+
+if _HV_GE_1_24_0:
+    from holoviews.element import Donut
+else:
+    Donut = None
 
 renderer = hv.renderer('bokeh')
 
@@ -768,6 +774,7 @@ class HoloViewsConverter:
         'contourf': ['x', 'y', 'z', 'levels', 'logz'],
         'dataset': ['columns'],
         'density': ['y', 'bw_method', 'ind', 'bandwidth', 'cut', 'filled'],
+        'donut': ['x', 'y', 'inner_radius', 'show_labels'],
         'heatmap': ['x', 'y', 'C', 'reduce_function', 'logz'],
         'hexbin': ['x', 'y', 'C', 'reduce_function', 'gridsize', 'logz', 'min_count'],
         'hist': ['y', 'bins', 'bin_range', 'normed', 'cumulative'],
@@ -777,6 +784,7 @@ class HoloViewsConverter:
         'line': ['x', 'y'],
         'ohlc': ['x', 'y', 'bar_width', 'pos_color', 'neg_color', 'line_color'],
         'paths': ['x', 'y'],
+        'pie': ['x', 'y', 'show_labels'],
         'points': ['x', 'y', 's', 'marker', 'c', 'scale', 'logz'],
         'polygons': ['x', 'y', 'logz', 'c'],
         'rgb': ['x', 'y', 'z', 'bands'],
@@ -800,6 +808,7 @@ class HoloViewsConverter:
         'contourf': Polygons,
         'dataset': Dataset,
         'density': Distribution,
+        'donut': Donut,
         'errorbars': ErrorBars,
         'heatmap': HeatMap,
         'hexbin': HexTiles,
@@ -810,6 +819,7 @@ class HoloViewsConverter:
         'line': Curve,
         'ohlc': Rectangles,
         'paths': Path,
+        'pie': Donut,
         'points': Points,
         'polygons': Polygons,
         'quadmesh': QuadMesh,
@@ -950,6 +960,9 @@ class HoloViewsConverter:
                 FutureWarning,
                 stacklevel=_find_stack_level(),
             )
+
+        if kind in ('pie', 'donut') and not _HV_GE_1_24_0:
+            raise ImportError(f'{kind!r} plot requires HoloViews >= 1.24.0.')
 
         # Process data and related options
         self._redim = fields
@@ -1159,6 +1172,12 @@ class HoloViewsConverter:
 
         if self.geo and not plot_opts.get('data_aspect'):
             plot_opts['data_aspect'] = 1
+
+        if self.kind in ('pie', 'donut'):
+            # Same categorical colors on both backends, HoloViews' defaults differ.
+            self._style_opts.setdefault('cmap', self._default_cmaps['categorical'])
+            # A pie has no axes, framewise would only reassign the colors of the categories.
+            framewise = False
 
         ignore_opts = ['responsive', 'aspect', 'data_aspect', 'frame_height', 'frame_width']
         if not any(plot_opts.get(opt) for opt in ignore_opts):
@@ -1795,6 +1814,12 @@ class HoloViewsConverter:
 
         if kind.startswith('bar'):
             plot_opts['stacked'] = self.stacked
+
+        if kind in ('pie', 'donut'):
+            # HoloViews puts the legend in the hole, which hides a pie, and adds the
+            # hover tool, which hvPlot adds itself depending on the `hover` option.
+            plot_opts.pop('legend_position', None)
+            plot_opts.pop('tools', None)
 
         if kind == 'hist':
             if self.stacked:
@@ -2769,6 +2794,32 @@ class HoloViewsConverter:
     def barh(self, x=None, y=None, data=None):
         """Horizontal bar plot."""
         return self.bar(x, y, data).opts('Bars', invert_axes=True)
+
+    def donut(self, x=None, y=None, data=None):
+        """Donut chart."""
+        self._error_if_unavailable(self.kind)
+        data, x, y = self._process_chart_args(data, x, y)
+        # Overlaid donuts would hide each other, so they are laid out instead.
+        self.subplots = True
+        if isinstance(y, list) and len(y) > 1:
+            if self.by:
+                raise ValueError(
+                    f'{self.kind} plot does not support multiple y columns combined with by, '
+                    'y must be a single column (omitting y selects all the numeric columns).'
+                )
+            donuts = [(c, self.single_chart(Donut, x, c, data)) for c in y]
+            plot = NdLayout(donuts, self.group_label, sort=False)
+        else:
+            y = y[0] if isinstance(y, list) else y
+            plot = self.single_chart(Donut, x, y, data)
+        opts = {'inner_radius': self.kwds.get('inner_radius', 0.5)}
+        if 'show_labels' in self.kwds:
+            opts['show_labels'] = self.kwds['show_labels']
+        return plot.opts('Donut', **opts)
+
+    def pie(self, x=None, y=None, data=None):
+        """Pie chart, a donut chart without a hole."""
+        return self.donut(x, y, data).opts('Donut', inner_radius=0)
 
     ##########################
     #   Statistical charts   #
