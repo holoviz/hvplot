@@ -21,18 +21,11 @@ Get started with hvPlot using this quick tutorial.
 Get started with hvPlot as a Pandas user.
 :::
 
-:::{grid-item-card} {octicon}`telescope;2.5em;sd-mr-1 sd-animate-grow50` Explorer Basics
-:link: explorer_getting_started
+:::{grid-item-card} {octicon}`telescope;2.5em;sd-mr-1 sd-animate-grow50` Explorer
+:link: explorer
 :link-type: doc
 
-Learn to use the interactive Explorer interface.
-:::
-
-:::{grid-item-card} {octicon}`graph;2.5em;sd-mr-1 sd-animate-grow50` Interactive Exploration
-:link: explorer_interactive
-:link-type: doc
-
-Master data exploration workflows with the Explorer.
+Learn to use the Explorer interface to intuitively explore datasets.
 :::
 
 ::::
@@ -57,7 +50,6 @@ Explore all the HoloViz tools in this comprehensive tutorial.
 
 Getting Started <getting_started>
 Using hvPlot as a Pandas user <getting_started_pandas>
-Explorer Basics <explorer_getting_started>
-Interactive Exploration <explorer_interactive>
+Explorer <explorer>
 HoloViz Tutorial <https://holoviz.org/tutorial/index.html>
 ```
