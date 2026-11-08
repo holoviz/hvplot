@@ -96,6 +96,8 @@ jobs:
           python-version: '3.13'
       - name: install
         run: pip install -v --prefer-binary -e ."[doc, examples, geo]"
+      - name: install browser
+        run: playwright install --only-shell chromium
       - name: pip list
         run: pip list
       - name: Set and echo git ref
