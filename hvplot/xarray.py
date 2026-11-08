@@ -1,24 +1,34 @@
-import xarray as xr
+"""Xarray data backend."""
 
+import xarray as xr
 from panel.widgets import Widget
 
 from .interactive import Interactive
 
+# Panel 1.9 deprecated Widget.name in favor of label.
+_WIDGET_LABEL = 'label' if 'label' in Widget.param else 'name'
+
 
 class XArrayInteractive(Interactive):
+    """Interactive pipeline wrapper for xarray objects."""
+
     @classmethod
     def applies(cls, obj):
+        """Return whether the object is an xarray DataArray or Dataset."""
         return isinstance(obj, (xr.DataArray, xr.Dataset))
 
     def sel(self, **kwargs):
+        """Select data by label, with widgets supported as values."""
         processed = {}
         for k, v in kwargs.items():
             if isinstance(v, type) and issubclass(v, Widget):
                 if hasattr(v, 'end'):
                     values = self._current[k].values
-                    v = v(name=k, start=values.min(), end=values.max())
+                    v = v(**{_WIDGET_LABEL: k}, start=values.min(), end=values.max())
                 if hasattr(v, 'options'):
-                    v = v(name=k, options={str(v): v for v in self._current[k].values})
+                    v = v(
+                        **{_WIDGET_LABEL: k}, options={str(v): v for v in self._current[k].values}
+                    )
             processed[k] = v
         self._method = 'sel'
         return self.__call__(**processed)
@@ -26,11 +36,12 @@ class XArrayInteractive(Interactive):
     sel.__doc__ = xr.DataArray.sel.__doc__
 
     def isel(self, **kwargs):
+        """Select data by integer position, with widgets supported as values."""
         processed = {}
         for k, v in kwargs.items():
             if isinstance(v, type) and issubclass(v, Widget):
                 if hasattr(v, 'end'):
-                    v = v(name=k, end=len(self._current[k]))
+                    v = v(**{_WIDGET_LABEL: k}, end=len(self._current[k]))
             processed[k] = v
         self._method = 'isel'
         return self.__call__(**processed)
@@ -39,14 +50,15 @@ class XArrayInteractive(Interactive):
 
 
 def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=False):
-    from . import hvPlot, post_patch, _module_extensions
+    """Patch xarray objects with the hvplot accessors."""
+    from . import _module_extensions, hvPlot, post_patch
 
     try:
         import xarray as xr
-    except ImportError:
+    except ImportError as e:
         raise ImportError(
             'Could not patch plotting API onto xarray. xarray could not be imported.'
-        )
+        ) from e
 
     # Remove the class docstring as it very developer focused
     XArrayInteractive.__doc__ = ''
@@ -59,6 +71,17 @@ def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=Fals
         _module_extensions.add('hvplot.xarray')
 
     post_patch(extension, logo)
+
+
+def _unpatch(name='hvplot', interactive='interactive'):
+    """Undo `patch()`. Private, used by the test suite."""
+    from . import _module_extensions
+
+    for cls in (xr.Dataset, xr.DataArray):
+        for attr in (name, interactive):
+            if attr in vars(cls):
+                delattr(cls, attr)
+    _module_extensions.discard('hvplot.xarray')
 
 
 patch()

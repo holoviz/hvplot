@@ -1,15 +1,16 @@
-"""
-Experimental support for ibis.
-"""
+"""Experimental support for ibis."""
 
 
 def patch(name='hvplot', extension='bokeh', logo=False):
-    from . import hvPlotTabular, post_patch, _module_extensions
+    """Patch the hvPlot plotting API onto ibis expressions."""
+    from . import _module_extensions, hvPlotTabular, post_patch
 
     try:
         import ibis
-    except ImportError:
-        raise ImportError('Could not patch plotting API onto ibis. Ibis could not be imported.')
+    except ImportError as e:
+        raise ImportError(
+            'Could not patch plotting API onto ibis. Ibis could not be imported.'
+        ) from e
 
     if 'hvplot.ibis' not in _module_extensions:
         _patch_plot = lambda self: hvPlotTabular(self)  # noqa: E731
@@ -20,6 +21,17 @@ def patch(name='hvplot', extension='bokeh', logo=False):
         _module_extensions.add('hvplot.ibis')
 
     post_patch(extension, logo)
+
+
+def _unpatch(name='hvplot'):
+    """Undo `patch()`. Private, used by the test suite."""
+    import ibis
+
+    from . import _module_extensions
+
+    if name in vars(ibis.Expr):
+        delattr(ibis.Expr, name)
+    _module_extensions.discard('hvplot.ibis')
 
 
 patch()

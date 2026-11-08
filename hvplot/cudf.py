@@ -1,13 +1,18 @@
+"""Patch the hvPlot plotting API onto cuDF objects."""
+
 from .interactive import Interactive
 
 
 def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=False):
-    from . import hvPlotTabular, post_patch, _module_extensions
+    """Patch the hvPlot plotting API onto cuDF DataFrame and Series."""
+    from . import _module_extensions, hvPlotTabular, post_patch
 
     try:
         import cudf
-    except ImportError:
-        raise ImportError('Could not patch plotting API onto cuDF. cuDF could not be imported.')
+    except ImportError as e:
+        raise ImportError(
+            'Could not patch plotting API onto cuDF. cuDF could not be imported.'
+        ) from e
 
     if 'hvplot.cudf' not in _module_extensions:
         _patch_plot = lambda self: hvPlotTabular(self)  # noqa: E731
@@ -25,6 +30,19 @@ def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=Fals
         _module_extensions.add('hvplot.cudf')
 
     post_patch(extension, logo)
+
+
+def _unpatch(name='hvplot', interactive='interactive'):
+    """Undo `patch()`. Private, used by the test suite."""
+    import cudf
+
+    from . import _module_extensions
+
+    for cls in (cudf.DataFrame, cudf.Series):
+        for attr in (name, interactive):
+            if attr in vars(cls):
+                delattr(cls, attr)
+    _module_extensions.discard('hvplot.cudf')
 
 
 patch()

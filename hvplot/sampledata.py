@@ -1,6 +1,7 @@
 """
-This module provides access to sample datasets for use with hvPlot. The
-``hvsampledata`` package needs to be installed for these datasets to be
+Provides access to sample datasets for use with hvPlot.
+
+The ``hvsampledata`` package needs to be installed for these datasets to be
 available.
 """
 
@@ -20,5 +21,5 @@ def __getattr__(name):
             "Install the package 'hvsampledata' to access datasets from the "
             "'sampledata' module of hvPlot."
         )
-        raise ImportError(msg)
+        raise AttributeError(msg)
     raise AttributeError(f'module {__name__!r} has no attribute {name!r}')
