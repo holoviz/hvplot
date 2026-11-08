@@ -243,9 +243,7 @@ numpydoc = "*"
 sphinxcontrib-mermaid = "*"
 
 [feature.doc.activation.env]
-MOZ_HEADLESS = "1"
 MPLBACKEND = "Agg"
-DISPLAY = ":99.0"
 HVPLOT_PATCH_PLOT_DOCSTRING_SIGNATURE = "false"
 
 [feature.doc.tasks]

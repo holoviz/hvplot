@@ -2,7 +2,6 @@ import os
 from importlib.util import find_spec
 
 import dask
-from bokeh.io.webdriver import webdriver_control
 from packaging.version import Version, parse
 
 from hvplot.util import _PD_GE_3_0_0
@@ -65,17 +64,13 @@ try:
 except ImportError:
     pass
 
-if find_spec('selenium'):
-    try:
-        webdriver_control.create()
-    except RuntimeError:
-        # hvplot.save() with bokeh
-        collect_ignore_glob += [
-            'user_guide/Viewing.ipynb',
-            'user_guide/NetworkX.ipynb',
-        ]
-    finally:
-        webdriver_control.cleanup()
+# Bokeh PNG export (hvplot.save) needs Playwright and a browser, which are only
+# installed when building the docs, not when running the examples tests.
+collect_ignore_glob += [
+    'how_to/save_bokeh_plots.ipynb',
+    'user_guide/Viewing.ipynb',
+    'user_guide/NetworkX.ipynb',
+]
 
 pygraphviz = None
 

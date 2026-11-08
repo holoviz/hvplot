@@ -150,6 +150,8 @@ examples-tests = [
 # Additional packages required to build the docs
 doc = [
     "hvplot[examples]",
+    # PNG export with Playwright
+    "bokeh >=3.10",
     "nbsite >=0.9.0a12",
     "sphinxext-rediraffe",
     "numpydoc",
