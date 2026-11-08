@@ -114,6 +114,10 @@ lab = 'jupyter lab'
 # =================== SHARED DEPS ===================
 
 # Dependencies required to run the notebooks
+[feature.example.tasks]
+# Needed for Bokeh PNG export (Playwright)
+install-browsers = 'playwright install --only-shell chromium'
+
 [feature.example.dependencies]
 dask = "*"  # dask[dataframe]
 datashader = ">=0.6.5"
@@ -141,7 +145,7 @@ s3fs = ">=2022.1.0"
 scikit-image = ">=0.17.2"
 scikit-learn = ">=1.4.0"
 scipy = ">=1.5.3"
-selenium  = ">=3.141.0"
+playwright-python = "*"
 streamz = ">=0.3.0"
 xarray = ">=0.18.2"
 xyzservices = ">=2022.9.0"
@@ -231,6 +235,8 @@ channels = [
     "conda-forge"
 ]
 [feature.doc.dependencies]
+# Bokeh PNG export (hvplot.save) uses Playwright since Bokeh 3.10 (requires Python >=3.12)
+bokeh = ">=3.10"
 nbsite = ">=0.10.0a11"
 sphinxext-rediraffe = "*"
 numpydoc = "*"
@@ -248,7 +254,7 @@ _docs-install = 'python -m pip install --no-deps --disable-pip-version-check -e 
 _docs_markdown = 'python -m nbsite build-llms --config scripts/llms_config.py'
 # Depends on _docs-install instead of install as install
 # in the default environment
-docs-build = { depends-on = ["_docs-install", "docs-build-sphinx", "_docs_markdown"] }
+docs-build = { depends-on = ["_docs-install", "install-browsers", "docs-build-sphinx", "_docs_markdown"] }
 docs-server = 'python -m http.server 5500 --directory ./builtdocs'
 
 # ================== BUILD ====================
