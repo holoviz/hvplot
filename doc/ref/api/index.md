@@ -69,6 +69,7 @@ This section documents all the plotting methods of the `hvPlot` class, which as 
    hvPlot.bivariate
    hvPlot.dataset
    hvPlot.density
+   hvPlot.donut
    hvPlot.errorbars
    hvPlot.heatmap
    hvPlot.hexbin
@@ -78,6 +79,7 @@ This section documents all the plotting methods of the `hvPlot` class, which as 
    hvPlot.line
    hvPlot.ohlc
    hvPlot.paths
+   hvPlot.pie
    hvPlot.points
    hvPlot.polygons
    hvPlot.scatter
@@ -130,6 +132,7 @@ hvplot.hvPlot.contour <manual/hvplot.hvPlot.contour>
 hvplot.hvPlot.contourf <manual/hvplot.hvPlot.contourf>
 hvplot.hvPlot.dataset <manual/hvplot.hvPlot.dataset>
 hvplot.hvPlot.density <manual/hvplot.hvPlot.density>
+hvplot.hvPlot.donut <manual/hvplot.hvPlot.donut>
 hvplot.hvPlot.errorbars <manual/hvplot.hvPlot.errorbars>
 hvplot.hvPlot.heatmap <manual/hvplot.hvPlot.heatmap>
 hvplot.hvPlot.hexbin <manual/hvplot.hvPlot.hexbin>
@@ -140,6 +143,7 @@ hvplot.hvPlot.labels <manual/hvplot.hvPlot.labels>
 hvplot.hvPlot.line <manual/hvplot.hvPlot.line>
 hvplot.hvPlot.ohlc <manual/hvplot.hvPlot.ohlc>
 hvplot.hvPlot.paths <manual/hvplot.hvPlot.paths>
+hvplot.hvPlot.pie <manual/hvplot.hvPlot.pie>
 hvplot.hvPlot.points <manual/hvplot.hvPlot.points>
 hvplot.hvPlot.polygons <manual/hvplot.hvPlot.polygons>
 hvplot.hvPlot.quadmesh <manual/hvplot.hvPlot.quadmesh>
