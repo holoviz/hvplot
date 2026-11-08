@@ -26,14 +26,14 @@ jobs:
     name: Pixi lock
     runs-on: ubuntu-latest
     steps:
-      - uses: holoviz-dev/holoviz_tasks/pixi-lock@ffddda04b2894fea39b407f64d3622d2f19e5a9f # v1
+      - uses: holoviz-dev/holoviz_tasks/pixi-lock@17107a157b32cc1bd2a09c71fbdbc74603efdb40 # v1
 
   conda_build:
     name: Build Conda
     needs: [pixi_lock]
     runs-on: "ubuntu-latest"
     steps:
-      - uses: holoviz-dev/holoviz_tasks/pixi-install@ffddda04b2894fea39b407f64d3622d2f19e5a9f # v1
+      - uses: holoviz-dev/holoviz_tasks/pixi-install@17107a157b32cc1bd2a09c71fbdbc74603efdb40 # v1
         with:
           environments: "build"
           download-data: false
@@ -44,7 +44,9 @@ jobs:
         run: |
           echo "TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
           echo "CONDA_FILE=$(ls dist/*.tar.bz2)" >> $GITHUB_ENV
-      - uses: anaconda/actions/upload-package@a6f488910b4a1e4f3fe01736241ca1b92b4b355a # v0.3.1
+      - name: Upload to anaconda.org
+        if: github.event_name == 'push'
+        uses: anaconda/actions/upload-package@a6f488910b4a1e4f3fe01736241ca1b92b4b355a # v0.3.1
         with:
           token: ${{ secrets.CONDA_UPLOAD_TOKEN }}
           channel: pyviz
@@ -58,7 +60,7 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: holoviz-dev/holoviz_tasks/pixi-install@ffddda04b2894fea39b407f64d3622d2f19e5a9f # v1
+      - uses: holoviz-dev/holoviz_tasks/pixi-install@17107a157b32cc1bd2a09c71fbdbc74603efdb40 # v1
         with:
           environments: "build"
           download-data: false
@@ -67,4 +69,4 @@ jobs:
         run: pixi run -e build build-pip
       - name: Publish to PyPI
         if: github.event_name == 'push'
-        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # release/v1
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1
