@@ -1,5 +1,7 @@
-import holoviews as hv
+"""Parallel coordinates plot for visualizing multivariate data."""
+
 import colorcet as cc
+import holoviews as hv
 
 from ..backend_transforms import _transfer_opts_cur_backend
 from ..util import with_hv_extension
@@ -52,7 +54,7 @@ def parallel_coordinates(
     """
     # Transform the dataframe to be used in Vega-Lite
     if cols is not None:
-        data = data[list(cols) + [class_column]]
+        data = data[[*list(cols), class_column]]
     cols = data.columns
     df = data.reset_index()
     index = (set(df.columns) - set(cols)).pop()
@@ -64,7 +66,7 @@ def parallel_coordinates(
         labelled.append('y')
     options = {
         'Curve': dict(kwds, labelled=labelled, alpha=alpha, width=width, height=height),
-        'Overlay': dict(legend_limit=5000),
+        'Overlay': {'legend_limit': 5000},
     }
 
     dataset = hv.Dataset(df)
@@ -78,7 +80,7 @@ def parallel_coordinates(
     el = hv.Overlay(
         [
             curve.relabel(k).options('Curve', color=c, backend='bokeh')
-            for c, (k, v) in zip(colors, groups)
+            for c, (k, v) in zip(colors, groups, strict=True)
             for curve in v
         ]
     ).options(options, backend='bokeh')

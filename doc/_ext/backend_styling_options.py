@@ -1,11 +1,9 @@
+import holoviews as hv
 from docutils import nodes
 from docutils.statemachine import StringList
 from sphinx.util.docutils import SphinxDirective
 
-import holoviews as hv
-
 from hvplot.util import _get_backend_style_options
-
 
 hv.extension('bokeh', 'matplotlib')
 

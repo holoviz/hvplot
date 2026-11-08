@@ -156,20 +156,6 @@ align: center
 ```
 
 :::
-:::{tab-item} Intake
-```python
-import hvplot.intake
-from hvplot.sample_data import catalogue as cat
-
-cat.us_crime.hvplot.line(x='Year', y='Violent Crime rate')
-```
-```{image} ./_static/home/intake.gif
----
-alt: Works with Intake
-align: center
----
-:::
-
 :::{tab-item} NetworkX
 ```python
 import hvplot.networkx as hvnx
@@ -181,21 +167,6 @@ hvnx.draw(G, with_labels=True)
 ```{image} ./_static/home/networkx.gif
 ---
 alt: Works with Networkx
-align: center
----
-:::
-
-:::{tab-item} Streamz
-```python
-import hvplot.streamz
-from streamz.dataframe import Random
-
-df_streamz = Random(interval='200ms', freq='50ms')
-df_streamz.hvplot()
-```
-```{image} ./assets/streamz_demo.gif
----
-alt: Works with Streamz
 align: center
 ---
 :::
@@ -263,13 +234,14 @@ align: center
 :::{tab-item} Layout
 ```python
 import hvplot.pandas
-from hvplot.sample_data import us_crime as df
+from hvplot.sampledata import stocks
 
-plot1 = df.hvplot(x='Year', y='Violent Crime rate', width=400)
-plot2 = df.hvplot(x='Year', y='Burglary rate', width=400)
+df = stocks('pandas')
+plot1 = df.hvplot(x='date', y='Apple', width=400)
+plot2 = df.hvplot(x='date', y='Google', width=400)
 plot1 + plot2
 ```
-```{image} ./_static/home/layout.gif
+```{image} ./_static/home/layout.png
 ---
 alt: laying out plots
 align: center
@@ -312,10 +284,10 @@ align: center
 :::{tab-item} Large Data
 ```python
 import hvplot.pandas
-from hvplot.sample_data import catalogue as cat
+from hvplot.sampledata import synthetic_clusters
 
-df = cat.airline_flights.read()
-df.hvplot.scatter(x='distance', y='airtime', rasterize=True, cnorm='eq_hist', width=500)
+df = synthetic_clusters('pandas')
+df.hvplot.points(datashade=True, by='cat', width=500)
 ```
 ```{image} ./_static/home/large_data.gif
 ---
@@ -360,8 +332,8 @@ import hvplot.pandas
 import panel as pn
 from bokeh.sampledata.penguins import data as df
 
-w_sex = pn.widgets.MultiSelect(name='Sex', value=['MALE'], options=['MALE', 'FEMALE'])
-w_body_mass = pn.widgets.FloatSlider(name='Min body mass', start=2700, end=6300, step=50)
+w_sex = pn.widgets.MultiSelect(label='Sex', value=['MALE'], options=['MALE', 'FEMALE'])
+w_body_mass = pn.widgets.FloatSlider(label='Min body mass', start=2700, end=6300, step=50)
 
 dfi = df.interactive(loc='left')
 dfi.loc[(dfi['sex'].isin(w_sex)) & (dfi['body_mass_g'] > w_body_mass)]['bill_length_mm'].describe()
@@ -380,7 +352,7 @@ import hvplot.xarray
 import panel as pn
 import xarray as xr
 
-w_time = pn.widgets.IntSlider(name='time', start=0, end=10)
+w_time = pn.widgets.IntSlider(label='time', start=0, end=10)
 
 da = xr.tutorial.open_dataset('air_temperature').air
 da.interactive.isel(time=w_time).mean().item() - da.mean().item()
@@ -403,8 +375,8 @@ import panel as pn
 import xarray as xr
 
 da = xr.tutorial.open_dataset('air_temperature').air
-w_quantile = pn.widgets.FloatSlider(name='quantile', start=0, end=1)
-w_time = pn.widgets.IntSlider(name='time', start=0, end=10)
+w_quantile = pn.widgets.FloatSlider(label='quantile', start=0, end=1)
+w_time = pn.widgets.IntSlider(label='time', start=0, end=10)
 
 da.interactive(loc='left') \
 .isel(time=w_time) \

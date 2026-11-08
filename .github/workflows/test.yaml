@@ -26,6 +26,8 @@ on:
   schedule:
     - cron: '0 15 * * SUN'
 
+permissions: {}
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -39,23 +41,44 @@ jobs:
     name: Run pre-commit
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: holoviz-dev/holoviz_tasks/pre-commit@v0
+      - uses: holoviz-dev/holoviz_tasks/pre-commit@17107a157b32cc1bd2a09c71fbdbc74603efdb40 # v1
 
   setup:
     name: Setup workflow
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
     outputs:
       matrix: ${{ env.MATRIX }}
       matrix_option: ${{ env.MATRIX_OPTION }}
     steps:
+      - name: Check for code changes
+        if: github.event_name == 'pull_request'
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        id: filter
+        with:
+          filters: |
+            code:
+              - 'hvplot/**'
+              - 'scripts/**'
+              - 'pixi.toml'
+              - 'pixi.lock'
+              - 'pyproject.toml'
+              - '.github/workflows/test.yaml'
       - name: Set matrix option
+        env:
+          GITHUB_EVENT_INPUTS_TARGET: ${{ github.event.inputs.target }}
+          CODE_CHANGE: ${{ steps.filter.outputs.code }}
         run: |
-          if [[ '${{ github.event_name }}' == 'workflow_dispatch' ]]; then
-            OPTION=${{ github.event.inputs.target }}
-          elif [[ '${{ github.event_name }}' == 'schedule' ]]; then
+          if [[ "${GITHUB_EVENT_NAME}" == 'workflow_dispatch' ]]; then
+            OPTION=${GITHUB_EVENT_INPUTS_TARGET}
+          elif [[ "${GITHUB_EVENT_NAME}" == 'schedule' ]]; then
             OPTION="full"
-          elif [[ '${{ github.event_name }}' == 'push' && '${{ github.ref_type }}' == 'tag' ]]; then
+          elif [[ "${GITHUB_EVENT_NAME}" == 'push' && "${GITHUB_REF_TYPE}" == 'tag' ]]; then
             OPTION="full"
+          elif [[ "${GITHUB_EVENT_NAME}" == 'pull_request' && "${CODE_CHANGE}" != 'true' ]]; then
+            # No code change (e.g. docs only), only run the examples tests
+            OPTION="docs"
           else
             OPTION="default"
           fi
@@ -65,10 +88,10 @@ jobs:
         run: |
           MATRIX=$(jq -nsc '{
               "os": ["ubuntu-latest", "macos-latest", "windows-latest"],
-              "environment": ["test-310", "test-314"],
+              "environment": ["test-311", "test-314"],
               "exclude": [
                 {
-                  "environment": "test-310",
+                  "environment": "test-311",
                   "os": "macos-latest"
                 }
               ]
@@ -79,12 +102,8 @@ jobs:
         run: |
           MATRIX=$(jq -nsc '{
               "os": ["ubuntu-latest", "macos-latest", "windows-latest"],
-              "environment": ["test-310", "test-313", "test-314"],
+              "environment": ["test-311", "test-313", "test-314"],
               "include": [
-                {
-                  "environment": "test-311",
-                  "os": "ubuntu-latest"
-                },
                 {
                   "environment": "test-312",
                   "os": "ubuntu-latest"
@@ -92,10 +111,18 @@ jobs:
               ],
               "exclude": [
                 {
-                  "environment": "test-310",
+                  "environment": "test-311",
                   "os": "macos-latest"
                 }
               ]
+          }')
+          echo "MATRIX=$MATRIX" >> $GITHUB_ENV
+      - name: Set test matrix with 'docs' option
+        if: env.MATRIX_OPTION == 'docs'
+        run: |
+          MATRIX=$(jq -nsc '{
+              "os": ["ubuntu-latest"],
+              "environment": ["test-314"]
           }')
           echo "MATRIX=$MATRIX" >> $GITHUB_ENV
       - name: Set test matrix with 'downstream' option
@@ -111,7 +138,7 @@ jobs:
     name: Pixi lock
     runs-on: ubuntu-latest
     steps:
-      - uses: holoviz-dev/holoviz_tasks/pixi_lock@v0
+      - uses: holoviz-dev/holoviz_tasks/pixi-lock@17107a157b32cc1bd2a09c71fbdbc74603efdb40 # v1
         with:
           cache: ${{ github.event.inputs.cache == 'true' || github.event.inputs.cache == '' }}
 
@@ -123,30 +150,33 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
     timeout-minutes: 90
-
+    env:
+      ENV: ${{ matrix.environment }}
     steps:
-      - uses: holoviz-dev/holoviz_tasks/pixi_install@v0
+      - uses: holoviz-dev/holoviz_tasks/pixi-install@17107a157b32cc1bd2a09c71fbdbc74603efdb40 # v1
         with:
           environments: ${{ matrix.environment }}
       - name: Test Unit
-        run: pixi run -e ${{ matrix.environment }} test-unit-cov
-      - name: Test Geo
-        if: ${{ matrix.environment != 'test-314' }}
-        run: pixi run -e ${{ matrix.environment }} test-unit-geo-cov
+        if: needs.setup.outputs.matrix_option != 'docs'
+        run: pixi run -e "${ENV}" test-unit-cov
       - name: Test Examples
+        # Examples are slow, on regular runs they only run on Linux
+        if: needs.setup.outputs.matrix_option != 'default' || matrix.os == 'ubuntu-latest'
         run: |
           if [[ "${{ github.event_name }}" == "schedule" ]]; then
-            HVPLOT_INCLUDE_SLOW_EXAMPLES=1 pixi run -e ${{ matrix.environment }} test-example
+            HVPLOT_INCLUDE_SLOW_EXAMPLES=1 pixi run -e "${ENV}" test-example
           else
-            pixi run -e ${{ matrix.environment }} test-example
+            pixi run -e "${ENV}" test-example
           fi
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6
+        if: needs.setup.outputs.matrix_option != 'docs'
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
   core_test_suite:
     name: core:${{ matrix.environment }}:${{ matrix.os }}
     needs: [pre_commit, setup, pixi_lock]
+    if: needs.setup.outputs.matrix_option != 'docs'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -154,12 +184,14 @@ jobs:
         os: ["ubuntu-latest"]
         environment: ["test-core"]
     timeout-minutes: 120
+    env:
+      ENV: ${{ matrix.environment }}
     steps:
-      - uses: holoviz-dev/holoviz_tasks/pixi_install@v0
+      - uses: holoviz-dev/holoviz_tasks/pixi-install@17107a157b32cc1bd2a09c71fbdbc74603efdb40 # v1
         with:
           environments: ${{ matrix.environment }}
       - name: Test Unit
-        run: pixi run -e ${{ matrix.environment }} test-unit
+        run: pixi run -e "${ENV}" test-unit
 
   pip_test:
     name: pip tests:${{ matrix.os }}:${{ matrix.environment }}
@@ -171,10 +203,11 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v6
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.13'
       - name: install with geo
@@ -186,14 +219,12 @@ jobs:
       - name: download datasets
         run: python scripts/download_data.py
       - name: unit tests
-        run: pytest -v hvplot --cov=hvplot --cov-branch --cov-append
-      - name: unit tests geo
-        run: pytest -v hvplot --geo --cov=hvplot --cov-branch --cov-append
+        run: pytest -v hvplot -n logical --slow --cov=hvplot --cov-branch
       - name: examples tests
-        run: pytest -n logical --dist loadscope --nbval-lax -p no:python
+        run: pytest -n logical --dist loadscope --nbval-lax -p no:python -p no:randomly doc
       - name: Upload coverage reports to Codecov
         if: github.event_name == 'push' || github.event_name == 'pull_request'
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6
         with:
           fail_ci_if_error: false
           verbose: false

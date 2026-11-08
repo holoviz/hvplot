@@ -1,15 +1,31 @@
+"""Patch the hvPlot plotting API onto Intake catalog entries (deprecated).
+
+.. deprecated:: 0.13
+"""
+
+import warnings
+
 from packaging.version import Version
 
-from . import hvPlot, post_patch, _module_extensions
+from . import _module_extensions, hvPlot, post_patch
+from .util import _find_stack_level
+
+warnings.warn(
+    'hvplot.intake is deprecated and will be removed in a future version. '
+    'Use pandas, xarray, or other supported libraries to read your data directly.',
+    FutureWarning,
+    stacklevel=_find_stack_level(),
+)
 
 
 def patch(name='hvplot', extension='bokeh', logo=False):
+    """Patch the hvPlot plotting API onto Intake catalog entries."""
     try:
         import intake
-    except ImportError:
+    except ImportError as e:
         raise ImportError(
             'Could not patch plotting API onto intake. intake could not be imported.'
-        )
+        ) from e
 
     if 'hvplot.intake' not in _module_extensions:
         _patch_plot = lambda self: hvPlot(self)  # noqa: E731
@@ -22,8 +38,17 @@ def patch(name='hvplot', extension='bokeh', logo=False):
     post_patch(extension, logo)
 
 
+def _unpatch(name='hvplot'):
+    """Undo `patch()`. Private, used by the test suite."""
+    import intake
+
+    if name in vars(intake.source.base.DataSource):
+        delattr(intake.source.base.DataSource, name)
+    _module_extensions.discard('hvplot.intake')
+
+
 try:
-    import intake.plotting  # noqa
+    import intake.plotting
 
     patch()
 except Exception:

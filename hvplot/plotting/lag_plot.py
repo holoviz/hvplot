@@ -1,3 +1,5 @@
+"""Lag plot for visualizing autocorrelation in time series."""
+
 import numpy as np
 import pandas as pd
 

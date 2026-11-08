@@ -36,7 +36,7 @@ df.hvplot(kind='scatter')
 
 Under the hood, these special imports like `import hvplot.pandas` register an accessor that returns an instance of an `hvPlotBase` class. Tabular-like data sources rely on the `hvPlotTabular` class and gridded-like sources on `hvPlot` (subclass of `hvPlotTabular` extended with methods like {meth}`image  <hvplot.hvPlot.image>`):
 
-- `hvPlotTabular`: cuDF, Dask, Fugue, Ibis, Pandas, Streamz
+- `hvPlotTabular`: cuDF, Dask, Fugue, Ibis, Pandas
 - `hvPlotTabularDuckDB`: DuckDB
 - `hvPlotTabularPolars`: Polars
 - `hvPlot`: Xarray
