@@ -7,21 +7,21 @@ Welcome to the Tutorials section. Here, you will find clear, step-by-step guides
 ::::{grid} 1 2 2 3
 :gutter: 1 1 1 2
 
-:::{grid-item-card} {octicon}`book;2.5em;sd-mr-1 sd-animate-grow50` Getting Started
+:::{grid-item-card} {octicon}`book;2.5em;sd-mr-1` Getting Started
 :link: getting_started
 :link-type: doc
 
 Get started with hvPlot using this quick tutorial.
 :::
 
-:::{grid-item-card} {octicon}`repo-template;2.5em;sd-mr-1 sd-animate-grow50` Coming From Pandas?
+:::{grid-item-card} {octicon}`repo-template;2.5em;sd-mr-1` Coming From Pandas?
 :link: getting_started_pandas
 :link-type: doc
 
 Get started with hvPlot as a Pandas user.
 :::
 
-:::{grid-item-card} {octicon}`telescope;2.5em;sd-mr-1 sd-animate-grow50` Explorer
+:::{grid-item-card} {octicon}`telescope;2.5em;sd-mr-1` Explorer
 :link: explorer
 :link-type: doc
 
@@ -35,7 +35,7 @@ Learn to use the Explorer interface to intuitively explore datasets.
 ::::{grid} 1 2 2 3
 :gutter: 1 1 1 2
 
-:::{grid-item-card} {octicon}`link;2.5em;sd-mr-1 sd-animate-grow50` Holoviz Tutorial
+:::{grid-item-card} {octicon}`link;2.5em;sd-mr-1` Holoviz Tutorial
 :link: https://holoviz.org/tutorial/index.html
 
 Explore all the HoloViz tools in this comprehensive tutorial.

@@ -26,14 +26,60 @@ width: 70%
 
 ---
 
-```{button-ref} tutorials/getting_started
-:ref-type: doc
-:align: center
-:color: primary
-:class: getting-started-button
+::::{grid} 1 2 2 3
+:gutter: 1 1 1 2
 
-Get Started
-```
+:::{grid-item-card} {octicon}`rocket;2.5em;sd-mr-1` Get Started
+:link: tutorials/getting_started
+:link-type: doc
+:class-card: sd-border-primary
+
+Learn the basics with a quick tutorial.
+:::
+
+:::{grid-item-card} {octicon}`mortar-board;2.5em;sd-mr-1` Tutorials
+:link: tutorials/index
+:link-type: doc
+
+Step-by-step lessons to learn hvPlot.
+:::
+
+:::{grid-item-card} {octicon}`checklist;2.5em;sd-mr-1` How-To
+:link: how_to/index
+:link-type: doc
+
+Recipes to solve specific tasks.
+:::
+
+:::{grid-item-card} {octicon}`image;2.5em;sd-mr-1` Gallery
+:link: gallery/index
+:link-type: doc
+
+Browse examples of what you can plot.
+:::
+
+:::{grid-item-card} {octicon}`code-square;2.5em;sd-mr-1` API
+:link: ref/api/index
+:link-type: doc
+
+Functions, classes and methods reference.
+:::
+
+:::{grid-item-card} {octicon}`sliders;2.5em;sd-mr-1` Plotting Options
+:link: ref/plotting_options/index
+:link-type: doc
+
+All the options to customize your plots.
+:::
+
+:::{grid-item-card} {octicon}`light-bulb;2.5em;sd-mr-1` Explanation
+:link: explanation/index
+:link-type: doc
+
+Background and concepts behind hvPlot.
+:::
+
+::::
 
 ---
 
@@ -97,6 +143,7 @@ df_dask.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
 alt: Works with Dask
 align: center
 ---
+```
 :::
 
 :::{tab-item} GeoPandas
@@ -112,6 +159,7 @@ chicago.hvplot.polygons(geo=True, c='POP2010', hover_cols='all')
 alt: Works with GeoPandas
 align: center
 ---
+```
 :::
 
 :::{tab-item} Polars
@@ -127,6 +175,7 @@ df_polars.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
 alt: Works with Polars
 align: center
 ---
+```
 :::
 
 :::{tab-item} DuckDB
@@ -169,6 +218,7 @@ hvnx.draw(G, with_labels=True)
 alt: Works with Networkx
 align: center
 ---
+```
 :::
 
 ::::
@@ -223,6 +273,7 @@ df.hvplot.scatter(x='bill_length_mm', y='bill_depth_mm', by='species')
 alt: Works with Plotly
 align: center
 ---
+```
 :::
 
 ::::
@@ -256,7 +307,7 @@ import pandas
 from bokeh.sampledata.penguins import data
 
 df = data.groupby('species')['bill_length_mm'].describe().sort_values('mean')
-df.hvplot.scatter(y='mean') * dff.hvplot.errorbars(y='mean', yerr1='std')
+df.hvplot.scatter(y='mean') * df.hvplot.errorbars(y='mean', yerr1='std')
 ```
 ```{image} ./_static/home/overlay.png
 ---
@@ -415,12 +466,12 @@ align: center
 
 Tutorials <tutorials/index>
 User Guide <user_guide/index>
-How-To Guides <how_to/index>
+How-To <how_to/index>
 Gallery <gallery/index>
 Reference <ref/index>
 Explanation <explanation/index>
-Developer Guide <developer_guide>
 Releases <releases>
+Contributing <developer_guide>
 Roadmap <roadmap>
 About <about>
 ```
