@@ -1,6 +1,7 @@
 """
-This module provides access to sample datasets for use with hvPlot. The
-``hvsampledata`` package needs to be installed for these datasets to be
+Provides access to sample datasets for use with hvPlot.
+
+The ``hvsampledata`` package needs to be installed for these datasets to be
 available.
 """
 

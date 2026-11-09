@@ -1,92 +1,70 @@
 # Roadmap
 
-This page includes an ambitious roadmap for hvPlot for 2024.
+hvPlot was released in 2018 and has gained many features since then, becoming a super-charged version of Pandas `.plot()` API, with support for many data structures of the PyData ecosystem (Pandas, Dask, Xarray, GeoPandas, etc.), for multiple plotting backends, and for many powerful features (plotting large datasets with Datashader, geographic data with GeoViews, plotting streaming data, etc.). Despite this, hvPlot isn't currently as widely known as some of the alternatives and has huge room to grow.
 
-## 1. Documentation, documentation, documentation
+## hvPlot development principles
 
-### Context
+The following principles are derived from the goal of improving hvPlot's stability and user-friendliness.
 
-hvPlot's website currently has the following structure:
+1. Reliability first
 
-- A landing page describing its main features.
-- A *Getting Started* guide (recently added) that is a short tutorial demonstrating its basic capabilities.
-- Many *User Guides*, focusing on a domain (e.g. *Geographic Data*), on a data type (*Gridded Data*), on a feature (e.g. *Interactive*), or on a specific part of the API (e.g. *Customization*).
-- A *Reference Gallery* with a page per plot method (actually incomplete), separated by these categories: Pandas, GeoPandas, and Xarray. Each reference page is usually short, only uses Bokeh, and doesn't include the whole API applicable to the plot method.
-- A *Topics* short page containing a few links to other websites using hvPlot
-- A *Developer Guide*, a *Releases* page and an *About* page
+Prioritize reducing bugs over introducing new features. New features and enhancements are welcome, but only when they do not compromise overall stability. Bugs originating in hvPlot's dependencies, particularly HoloViews, should be easy for users to discover, track, and see resolved through clear GitHub issues and coordinated fixes.
 
-hvPlot users have repeatedly complained about the quality of its documentation, which seems to mostly stem from:
+2. Documentation as a core feature
 
-- The API is not being documented.
-- The API is not being enough demonstrated in a single place; users have to assemble examples from different pages.
-- An implicit reliance on HoloViews' documentation (e.g. for the options) that itself isn't in great shape.
-- The difficulty to run locally all or parts of the documentation (that relies on somewhat complex datasets and many libraries).
+Treat documentation as a first-class part of the project. Continuously improve clarity, coverage, and examples, such as by expanding the gallery, until the documentation meets or exceeds the quality of comparable libraries (e.g. Altair, Plotly Express, plotnine). Ensure documentation remains accurate and up to date as the codebase evolves.
 
-### Goals
+3. Strong, accessible testing
 
-The main priority of the hvPlot project should be to improve its documentation. Some of the guiding principles of the documentation update should be:
+Maintain a test suite that meaningfully catches regressions and common user errors. Make writing and extending tests straightforward so that contributors can easily add coverage alongside bug fixes and new functionality.
 
-- To adopt the [Diataxis framework](https://diataxis.fr). [Panel](https://panel.holoviz.org/) recently overhauled part of its documentation, dividing the documentation into tutorials, how-to guides, explanations, and references. Note however that the experience from Panel revealed that changes need to happen gradually and that existing documentation should be removed when newer documentation is in place.
-- The code on the website should be easy to execute locally, using simple datasets to fetch and not relying on special libraries.
+4. User-centered developer experience
 
-1. The most important focus should be on the *Reference*:
-    - The API should be fully and automatically documented, see for example how [Plotly](https://plotly.com/python-api-reference/generated/plotly.express.line) and [Pandas](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.line.html) document their `line` function.
-    - The plot methods should be documented with many more examples, Plotly again does this in a great way, collecting on a [single page many examples](https://plotly.com/python/line-charts/) which allow the user to quickly find. These examples should be automatically built for the three supported plotting backends (Bokeh, Matplotlib, Plotly).
-    - The style options should all be documented automatically, for each plotting backend.
-2. hvPlot users very often come from another library (Pandas, GeoPandas, Xarray, Polars, etc.), and the documentation should guide them better and help them to migrate:
-    - Dedicated entry points should be created for these users, in the form of tutorials.
-    - The landing page should point them to these tutorials.
-3. An advanced plotting tutorial should be created, which users would follow once they have completed the Getting Started and/or Migration tutorials, to deepen their understanding of hvPlot.
-4. hvPlot is not just a plotting library, it is a platform for advanced data analysis through visualization. Some of the more advanced concepts, such as the processing done by Datashader, should be explained in a new top-level *Explanation* section.
-5. The previous tasks should often need to reuse content from the *User Guides*. Once they are completed it should appear more clearly how to re-structure them.
+Improve the day-to-day experience of using hvPlot by adding type hints to support IDE tooling and by providing clearer, more actionable error messages when things go wrong.
 
-## 2. Streamline the developer experience
+5. Deep integration with the PyData ecosystem
 
-hvPlot, and the HoloViz projects in general, do not make it very easy for its potential contributors to set up a development environment and contribute.
+Actively increase hvPlot’s visibility and adoption across the PyData ecosystem. Engage maintainers of related libraries through issues and discussions to explore deeper integration or exposure of hvPlot, and support those efforts with documentation updates and ongoing collaboration.
 
-1. hvPlot should no longer use [pyctdev](https://github.com/holoviz-dev/pyctdev) and instead adopt a more common framework (e.g. hatch, pdm, poetry, tox)
-2. The *Developer Guide* should be adapted accordingly.
+6. Thoughtful feature completeness
 
-## 3. Bug fixes
+Expose stable, relevant HoloViews capabilities through hvPlot when they add clear user value (e.g. dual axes, native Polars support). Identify and implement essential plotting features expected of a general-purpose plotting library when they are missing (e.g. pie charts), while maintaining hvPlot's simplicity and reliability.
 
-hvPlot provides already many (many!) features to its users. However, it also has many bugs that prevent its adoption.
+Based on these principles, we aim to release 1.0 in early 2026, signaling to hvPlot's user base that it is a stable project already for a few years.
 
-1. hvPlot's development should favor bug fixes vs. new features or feature enhancements.
-2. hvPlot's test suite should be re-factored and improved to catch bugs before users have to report them and to prevent potential regressions.
-3. Bugs reported by hvPlot users regularly come from one of its dependencies, typically HoloViews. It should be made easy for hvPlot users to find these bugs on GitHub. These bugs should be fixed too.
+## hvPlot 1.0
 
-## 4. Figure out the future of the `.interactive` API
+### 1. Documentation
 
-Param 2.0 added a new API for [reactive expressions](https://param.holoviz.org/user_guide/Reactive_Expressions.html), allowing Param users and users of libraries leveraging this feature (like Panel) to write purely reactive code. Reactive expressions are in fact a generalized and improved re-implementation of `.interactive()` from hvPlot.
+In 2025, we obtained a Small Development Grant from NumFocus that allowed us to significantly update the documentation, adding a new Reference section with a description of all plotting options and an automated API reference, a new examples gallery, and new tutorials.
 
-1. hvPlot should determine whether the `.interactive` API even still has its place in the project.
+To complete this documentation update, we now need to convert the user guides into How-To guides, Tutorials, and Explanation pages.
+
+### 2. Refactor the test suite
+
+The test suite should be refactored and improved to catch bugs before users have to report them and to prevent potential regressions.
+
+### 3. Add donut and pie charts
+
+There are many references in the literature that argue that pie charts do not communicate data precisely enough (humans judge length better than angle, so it’s difficult to compare slices accurately). For this reason, pie charts have not been added to HoloViews, which instead recommends bar charts. Yet pie charts are very commonly used, and not offering this option in hvPlot is a significant gap we aim to fill by adding a Donut plot type in HoloViews and `donut` and `pie` methods to hvPlot.
+
+### 4. Native support for more dataframe libraries like Polars
+
+HoloViews added support in version 1.22.0 for Narwhals as a data backend. Narwhals is a library that provides a unified interface to many DataFrame libraries (its API being heavily inspired by Polars). hvPlot already provides good support for various DataFrame libraries, like Pandas and Dask, when these libraries have a data backend implemented in HoloViews. When they do not — as was the case for Polars, for example — hvPlot previously cast the user's DataFrame to a supported type (usually Pandas). With HoloViews' Narwhals backend, hvPlot can now avoid upfront casting and pass DataFrames directly to HoloViews, which can handle them via Narwhals.
+
+## Post hvPlot 1.0
+
+### 1. Figure out the future of the `.interactive` API
+
+Param 2.0 introduced a new API for reactive expressions, allowing Param users and users of libraries leveraging this feature (like Panel) to write purely reactive code. Reactive expressions are, in fact, a generalized and improved re-implementation of `.interactive()` from hvPlot.
+
+1. hvPlot should determine whether the `.interactive()` API still has a place in the project.
 2. If so, its implementation should be updated to use Param's implementation. If not, the feature should be deprecated.
 
-## 5. Expose features from HoloViews
+## 2. Improve the Explorer
 
-While the focus of hvPlot's development should be to shoot for stability, an easy way (usually) to add features to hvPlot is to expose new features added to HoloViews. For instance, hvPlot could add support for [dual-axis plots](https://holoviews.org/user_guide/Customizing_Plots.html#supported-multi-y-options), a feature added to HoloViews in 2023. This is a good way for the HoloViz ecosystem to expose more of its new features, that sometimes end up being somewhat hidden in the documentation of HoloViews.
+The Explorer is still in development and needs improvements in several areas.
 
-1. hvPlot should track with *enhancement feature* issues the new features added to HoloViews and adapted to the project.
-2. Features that are easy to implement, test, and document should be implemented.
-
-## 6. Improve the Explorer
-
-The Explorer, still in the development phase, needs to be improved in various ways.
-
-1. hvPlot should draw inspiration from other similar components (e.g. Tableau, Excel, Superset) for guiding its design and user experience.
+1. The Explorer's design and user experience should draw inspiration from other similar components (e.g. Tableau, Excel, Superset).
 2. The Explorer should work well with all the data types supported by hvPlot.
 3. The Explorer should be better integrated into the documentation, both as a tool to explore hvPlot's API and to explore data.
-
-## 7. Increase hvPlot's presence within PyData
-
-hvPlot is a library that integrates with many data libraries of the PyData ecosystem and should ideally be more exposed in the documentation of these libraries.
-
-1. Issues/Discussions should be opened with the maintainers of these libraries to gauge how interested they would be in exposing more hvPlot.
-2. For the interested libraries, updates to their documentation should be made, with support provided to the maintainers over time.
-
-## 8. Prepare for hvPlot `1.0` in 2025
-
-hvPlot was released in 2018 and has gained a decent level of adoption since then with about 270,000 downloads per month (aggregating downloads from [PyPI and Anaconda.org](https://pyviz.org/tools.html#high-level-shared-api)). Its API has been lately stable and there is no major change coming up. Releasing hvPlot `1.0` in 2025 would be a good signal to its current and future users, in particular, if in 2024 a focus is made on improving its documentation and reducing its number of bugs.
-
-1. Potential major API changes that can only happen in a *major* release should be discussed this year.
-2. Potential deprecations should be implemented this year.

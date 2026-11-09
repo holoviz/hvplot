@@ -1,15 +1,27 @@
 """
+Deprecated. Use ``hvplot.sampledata`` instead.
+
 Loads hvPlot sample data using intake catalogue.
 """
 
 import os
+import warnings
+
+from .util import _find_stack_level
+
+warnings.warn(
+    "The 'hvplot.sample_data' module is deprecated and will be removed in a "
+    "future version. Use 'hvplot.sampledata' instead.",
+    FutureWarning,
+    stacklevel=_find_stack_level(),
+)
 
 try:
+    import intake_parquet  # noqa: F401
+    import intake_xarray  # noqa: F401
+    import s3fs  # noqa: F401
     from intake import open_catalog
-    import intake_parquet  # noqa
-    import intake_xarray  # noqa
-    import s3fs  # noqa
-except ImportError:
+except ImportError as e:
     raise ImportError(
         """Loading hvPlot sample data requires:
                 * intake
@@ -17,7 +29,7 @@ except ImportError:
                 * intake-xarray
                 * s3fs
              Install these using conda or pip before loading data."""
-    )
+    ) from e
 
 _file_path = os.path.dirname(__file__)
 _cat_path = os.path.join(_file_path, 'datasets.yaml')

@@ -7,4 +7,7 @@ Explanation guides provide in-depth understanding of key concepts in hvPlot. The
 :hidden:
 :maxdepth: 2
 
+plotting_backend_support
+grouping_options
+statistical_plot_types
 ```
