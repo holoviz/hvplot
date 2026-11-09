@@ -14,6 +14,14 @@ from sphinx.util.docutils import SphinxDirective
 
 from hvplot.util import _get_docstring_group_parameters
 
+# Deprecated options that have no definition section to link to
+OPTIONS_WITHOUT_DEFINITION = {'hover_formatters'}
+
+
+def option_label(name):
+    """Label of an option definition, e.g. 'xlim/ylim' -> 'option-xlim__ylim'."""
+    return 'option-' + name.replace('/', '__')
+
 
 class PlottingOptionsTableDirective(SphinxDirective):
     """
@@ -29,16 +37,27 @@ class PlottingOptionsTableDirective(SphinxDirective):
         # Get the key passed to the directive
         options_group = self.arguments[0]
         parameters = _get_docstring_group_parameters(options_group)
-        table_rst = ['.. list-table::', '   :header-rows: 1', '   :widths: 25 70', '']
+        table_rst = [
+            '.. list-table::',
+            '   :header-rows: 1',
+            '   :widths: 25 70',
+            '   :class: plotting-options-table',
+            '',
+        ]
         table_rst.append('   * - ')
         table_rst.append('       Parameters')
         table_rst.append('     - ')
         table_rst.append('       Description')
 
         for param in parameters:
+            if param.name in OPTIONS_WITHOUT_DEFINITION:
+                name = f'**{param.name}**'
+            else:
+                # A role cannot be nested in **bold**, custom.css makes the link bold
+                name = f':ref:`{param.name} <{option_label(param.name)}>`'
             desc = '\n'.join(param.desc)
             table_rst.append('   * - ')
-            table_rst.append(f'       **{param.name}** *({param.type})*')
+            table_rst.append(f'       {name} *({param.type})*')
             table_rst.append('     - ')
             table_rst.append(indent(desc, ' ' * 7))
 
