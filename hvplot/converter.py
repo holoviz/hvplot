@@ -182,7 +182,7 @@ class HoloViewsConverter:
     sort_date : bool, default=True
         Whether to sort the x-axis by date before plotting
     subplots : bool, default=False
-        Whether to display data in separate subplots when using the ``by`` parameter.
+        Whether to display each group (``by``) or each column (``y``) in its own subplot.
     transforms : dict, default={}
         A dictionary of HoloViews dim transforms to apply before plotting
     use_dask : bool, default=False

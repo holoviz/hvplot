@@ -12,6 +12,9 @@ style_plots_by_backend
 display_plots
 layout_plots
 overlay_plots
+split_into_subplots
+facet_into_grid
+build_custom_layouts
 plot_lines_with_markers
 choose_backend_for_saving_plots
 save_bokeh_plots
