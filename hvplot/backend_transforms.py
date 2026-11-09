@@ -52,6 +52,10 @@ def _transfer_opts(element, backend):
                 continue
             new_opts[opt] = val
     if backend == 'matplotlib':
+        if elname == 'Area' and 'color' in new_opts:
+            # Area's default facecolor takes precedence over color in fill_between.
+            # Preserve an explicitly transferred facecolor when one was supplied.
+            new_opts.setdefault('facecolor', new_opts.pop('color'))
         size_opts = _transform_size_to_mpl(
             el_options.get('width'), el_options.get('height'), el_options.get('aspect')
         )

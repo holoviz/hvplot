@@ -1,9 +1,12 @@
+import holoviews as hv
+import numpy as np
 import pandas as pd
 import pytest
 from holoviews import NdOverlay, Store
 from holoviews.core.dimension import Dimension
 from holoviews.element import Area
 from holoviews.testing import assert_element_equal
+from matplotlib.colors import to_rgba
 
 from hvplot.tests._deps import pandas_and_dask
 
@@ -87,3 +90,30 @@ def test_y2_by_not_stacked(hvplot_pandas):
 def test_y2_stacked_error(df, hvplot_pandas):
     with pytest.raises(ValueError, match="'stacked' cannot be combined with 'y2'"):
         df.hvplot.area(x='x', y='y', y2='y2', stacked=True)
+
+
+@pytest.mark.parametrize('backend', ['matplotlib'], indirect=True)
+@pytest.mark.parametrize('stacked', [True, False])
+@pytest.mark.parametrize('color', ['pink', ['pink', '#d62728']])
+def test_color_matplotlib(df, hvplot_pandas, backend, stacked, color):
+    obj = df.hvplot.area(x='x', y=['y', 'y2'], stacked=stacked, color=color)
+    plot = hv.renderer('matplotlib').get_plot(obj)
+    expected = [color, color] if isinstance(color, str) else color
+    try:
+        for subplot, requested in zip(plot.subplots.values(), expected, strict=True):
+            rgba = subplot.handles['artist'].get_facecolors()[0]
+            np.testing.assert_allclose(rgba[:3], to_rgba(requested)[:3])
+    finally:
+        plot.cleanup()
+
+
+@pytest.mark.parametrize('backend', ['matplotlib'], indirect=True)
+@pytest.mark.parametrize('stacked', [True, False])
+def test_default_color_matplotlib(df, hvplot_pandas, backend, stacked):
+    obj = df.hvplot.area(x='x', y=['y', 'y2'], stacked=stacked)
+    plot = hv.renderer('matplotlib').get_plot(obj)
+    try:
+        colors = [p.handles['artist'].get_facecolors()[0] for p in plot.subplots.values()]
+        assert not np.allclose(colors[0][:3], colors[1][:3])
+    finally:
+        plot.cleanup()
