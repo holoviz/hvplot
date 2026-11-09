@@ -295,7 +295,7 @@ The build produces:
 - `builtdocs/markdown/` - a Markdown rendering of the documentation
 - `builtdocs/llms.txt` - an index of the most useful documentation pages for LLM-assisted development
 
-See [Using hvPlot with an AI assistant](how_to/use_llms.md) for how to consume these docs with an AI assistant.
+See [How to Use hvPlot with an AI Assistant](how_to/use_ai_assistant.md) for how to consume these docs with an AI assistant.
 
 ### Link to hvPlot objects
 

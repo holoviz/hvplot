@@ -28,3 +28,5 @@ hvplot.extension('matplotlib')
 ```
 
 See [How to Save Matplotlib Plots](save_matplotlib_plots.ipynb).
+
+See also [How to Save Bokeh Plots](save_bokeh_plots.ipynb) and [How to Display Plots](display_plots.ipynb).
