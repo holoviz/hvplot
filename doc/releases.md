@@ -2,7 +2,7 @@
 
 See [the HoloViz blog](https://blog.holoviz.org/#category=hvplot) for a visual summary of the major features added in a selection of releases.
 
-## Version 0.13.0 (2026-11-09)
+## Version 0.13.0 (2026-11-10)
 
 The 0.13.0 release is a minor release that adds experimental support for plotting [Xugrid](https://deltares.github.io/xugrid/) unstructured grids as trimeshes, fixes a couple of bugs, and continues the documentation overhaul with new and reorganized guides and enhanced docstrings. The documentation is now also easier for AI assistants to consume, with an `llms.txt` file, every page published as Markdown, and a pointer to the [holoviz-skills](https://skills.holoviz.org/). This release also deprecates the `streamz` and `intake` data sources and drops support for Python 3.10. Many thanks to @Azaya89, @hoxbro, @Laxman-Rajpurohit-coder (first contribution!), @maximlt, and @Mrun25 (first contribution!) for their contributions!
 
