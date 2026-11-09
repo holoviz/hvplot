@@ -50,6 +50,8 @@ html_theme_options.update(  # noqa: F405
     {
         'navbar_start': ['navbar-logo', 'version-switcher'],
         'use_edit_page_button': True,
+        # Tutorials, User Guide, How-To, Gallery, Reference and Explanation inline
+        'header_links_before_dropdown': 7,
         'github_url': 'https://github.com/holoviz/hvplot',
         'icon_links': [
             {
@@ -69,7 +71,6 @@ html_theme_options.update(  # noqa: F405
             },
         ],
         'pygments_dark_style': 'material',
-        'announcement': "hvPlot 0.12 has just been released! Checkout the <a href='https://blog.holoviz.org/posts/hvplot_release_0.12/'>blog post</a> and support hvPlot by giving it a 🌟 on <a href='https://github.com/holoviz/hvplot'>Github</a>.",  # noqa: E501
         'switcher': {
             'json_url': 'https://hvplot.holoviz.org/switcher.json',
             'version_match': switcher_version,
@@ -206,6 +207,8 @@ nbsite_analytics = {
 }
 
 rediraffe_redirects = {
+    # Rename of the AI assistant how-to
+    'how_to/use_llms': 'how_to/use_ai_assistant',
     # Removal of the developer testing page
     'developer_guide/testing': 'developer_guide',
     # Removal of the developer_guide folder
@@ -222,6 +225,13 @@ rediraffe_redirects = {
     'user_guide/Customization': 'ref/plotting_options/index',
     # Pandas API viz user guide moved to the reference
     'user_guide/pandas_api': 'ref/api_compatibility/pandas/Pandas_API',
+    # User guides replaced by tutorials, how-to and explanation guides
+    'user_guide/Introduction': 'tutorials/getting_started',
+    'user_guide/Explorer': 'tutorials/explorer',
+    'user_guide/Plotting_Extensions': 'how_to/load_switch_plotting_extensions',
+    'user_guide/Viewing': 'how_to/display_plots',
+    'user_guide/Subplots': 'how_to/split_into_subplots',
+    'user_guide/Statistical_Plots': 'explanation/statistical_plot_types',
 }
 
 html_extra_path = ['topics.html']

@@ -34,7 +34,6 @@ if not find_spec('geoviews'):  # geo examples
         'ref/api/manual/hvplot.hvPlot.vectorfield.ipynb',
         'ref/data_libraries.ipynb',
         'ref/plotting_options/geographic.ipynb',
-        'user_guide/Explorer.ipynb',
         'user_guide/Geographic_Data.ipynb',
         'user_guide/Integrations.ipynb',
     ]
@@ -68,7 +67,6 @@ except ImportError:
 # installed when building the docs, not when running the examples tests.
 collect_ignore_glob += [
     'how_to/save_bokeh_plots.ipynb',
-    'user_guide/Viewing.ipynb',
     'user_guide/NetworkX.ipynb',
 ]
 
