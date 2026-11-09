@@ -2,6 +2,59 @@
 
 See [the HoloViz blog](https://blog.holoviz.org/#category=hvplot) for a visual summary of the major features added in a selection of releases.
 
+## Version 0.13.0 (2026-11-09)
+
+The 0.13.0 release is a minor release that adds experimental support for plotting [Xugrid](https://deltares.github.io/xugrid/) unstructured grids as trimeshes, fixes a couple of bugs, and continues the documentation overhaul with new and reorganized guides and enhanced docstrings. The documentation is now also easier for AI assistants to consume, with an `llms.txt` file, every page published as Markdown, and a pointer to the [holoviz-skills](https://skills.holoviz.org/). This release also deprecates the `streamz` and `intake` data sources and drops support for Python 3.10. Many thanks to @Azaya89, @hoxbro, @Laxman-Rajpurohit-coder (first contribution!), @maximlt, and @Mrun25 (first contribution!) for their contributions!
+
+New features:
+
+- Add experimental support for [Xugrid](https://deltares.github.io/xugrid/)-based trimesh plot ([#1737](https://github.com/holoviz/hvplot/pull/1737), [#1740](https://github.com/holoviz/hvplot/pull/1740), [#1778](https://github.com/holoviz/hvplot/pull/1778))
+
+Bug Fixes:
+
+- Fix handling of area plots with `stacked` and `y2` ([#1762](https://github.com/holoviz/hvplot/pull/1762))
+- Fix vectorfield magnitude scaling ([#1770](https://github.com/holoviz/hvplot/pull/1770))
+
+Documentation:
+
+- Enhance docstrings of plotting methods ([#1658](https://github.com/holoviz/hvplot/pull/1658))
+- Publish `llms.txt` and pages as Markdown ([#1746](https://github.com/holoviz/hvplot/pull/1746))
+- Document `llms.txt`, Markdown pages, and [holoviz-skills](https://skills.holoviz.org/) ([#1751](https://github.com/holoviz/hvplot/pull/1751))
+- Add an API reference section to the gallery ([#1775](https://github.com/holoviz/hvplot/pull/1775))
+- Reorganize the widgets documentation ([#1654](https://github.com/holoviz/hvplot/pull/1654))
+- Add Explorer tutorial ([#1660](https://github.com/holoviz/hvplot/pull/1660))
+- Add how-to and explanation guides for statistical plots ([#1665](https://github.com/holoviz/hvplot/pull/1665))
+- Add how-to guides for saving and displaying plots ([#1659](https://github.com/holoviz/hvplot/pull/1659))
+- Reorganize the plotting extension documentation ([#1656](https://github.com/holoviz/hvplot/pull/1656))
+- Add how-to guides for subplots ([#1657](https://github.com/holoviz/hvplot/pull/1657))
+- Various smaller changes ([#1710](https://github.com/holoviz/hvplot/pull/1710), [#1717](https://github.com/holoviz/hvplot/pull/1717), [#1744](https://github.com/holoviz/hvplot/pull/1744), [#1779](https://github.com/holoviz/hvplot/pull/1779), [#1728](https://github.com/holoviz/hvplot/pull/1728))
+
+Deprecation:
+
+- Deprecate support for the `streamz` data source ([#1714](https://github.com/holoviz/hvplot/pull/1714))
+- Deprecate support for the `intake` data source ([#1727](https://github.com/holoviz/hvplot/pull/1727))
+- Deprecate the internal `sample_data` module (use the newer `sampledata` module) ([#1725](https://github.com/holoviz/hvplot/pull/1725))
+
+Compatibility:
+
+- Drop Python 3.10 and add support for Python 3.15 ([#1771](https://github.com/holoviz/hvplot/pull/1771))
+- Polars 2.0 ([#1764](https://github.com/holoviz/hvplot/pull/1764))
+
+Code quality:
+
+- Enable many more ruff rules ([#1738](https://github.com/holoviz/hvplot/pull/1738))
+
+Infrastructure / Tests:
+
+- Refactor the test suite ([#1766](https://github.com/holoviz/hvplot/pull/1766))
+- Analyze the CI with zizmor ([#1726](https://github.com/holoviz/hvplot/pull/1726))
+- Publish conda package with the Anaconda `upload-package` action ([#1748](https://github.com/holoviz/hvplot/pull/1748))
+- Add renovate config ([#1747](https://github.com/holoviz/hvplot/pull/1747))
+- Smaller changes ([#1720](https://github.com/holoviz/hvplot/pull/1720), [#1731](https://github.com/holoviz/hvplot/pull/1731), [#1739](https://github.com/holoviz/hvplot/pull/1739), [#1772](https://github.com/holoviz/hvplot/pull/1772), [#1773](https://github.com/holoviz/hvplot/pull/1773))
+
+[Full Changelog](https://github.com/holoviz/hvplot/compare/v0.12.2...v0.13.0)
+
+
 ## Version 0.12.2 (2025-12-18)
 
 The 0.12.2 release is a patch release that brings a few bugfixes and enhancements. Many thanks to @ahuang11, @Azaya89, @hoxbro, @MarcSkovMadsen, @maximlt, and @MridulS for their contributions!
