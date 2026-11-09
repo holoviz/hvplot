@@ -207,8 +207,6 @@ nbsite_analytics = {
 }
 
 rediraffe_redirects = {
-    # Rename of the AI assistant how-to
-    'how_to/use_llms': 'how_to/use_ai_assistant',
     # Removal of the developer testing page
     'developer_guide/testing': 'developer_guide',
     # Removal of the developer_guide folder
