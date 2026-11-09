@@ -2,23 +2,19 @@
 
 How-to guides are practical, problem-oriented instructions that help you accomplish specific tasks with hvPlot. These guides assume you're already familiar with the basics and want to solve particular problems or achieve specific goals.
 
-## Plot Layout and Organization
-
-Learn how to organize and arrange your plots for better visualization and comparison.
-
 ```{toctree}
 :titlesonly:
 :hidden:
 :maxdepth: 2
 
-create_basic_subplots
-create_plot_grids
-create_advanced_layouts
 load_switch_plotting_extensions
 style_plots_by_backend
 display_plots
 layout_plots
 overlay_plots
+split_into_subplots
+facet_into_grid
+build_custom_layouts
 plot_lines_with_markers
 choose_backend_for_saving_plots
 save_bokeh_plots

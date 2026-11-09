@@ -9,5 +9,6 @@ Explanation guides provide in-depth understanding of key concepts in hvPlot. The
 
 plotting_backend_support
 grouping_options
+wide_vs_long_data
 statistical_plot_types
 ```
