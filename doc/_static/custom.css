@@ -26,3 +26,8 @@
     padding: 0.7em 3em !important;
     font-size: 1.2em;
 }
+
+/* Option names are links in the plotting options tables */
+.plotting-options-table td:first-child a {
+  font-weight: bold;
+}

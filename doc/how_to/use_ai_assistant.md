@@ -1,4 +1,4 @@
-# Using hvPlot with an AI assistant
+# How to Use hvPlot with an AI Assistant
 
 AI assistants (like Claude, GitHub Copilot, or OpenAI Codex) can write hvPlot code much more reliably when they have access to up-to-date, structured documentation instead of guessing from stale training data. This guide shows you how to give your assistant that context, either by pointing it at hvPlot's generated `llms.txt` and Markdown docs, or by installing the HoloViz Agent Skills.
 

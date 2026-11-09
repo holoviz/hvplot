@@ -1,6 +1,6 @@
 # API compatibility
 
-This section aims to provide more precise information about the compatibility of hvPlot's plotting API with other libraries.
+This section aims to provide more precise information about the compatibility of hvPlot with other libraries (Pandas, Panel, etc.).
 
 ```{toctree}
 :titlesonly:
