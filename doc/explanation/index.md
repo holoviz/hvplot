@@ -26,6 +26,13 @@ The differences between `groupby`, `by` and `color`, and how to choose the right
 What each statistical plot shows, when to use it and how to read it.
 :::
 
+:::{grid-item-card} {octicon}`question;2.5em;sd-mr-1` When to use pie charts
+:link: pie_charts
+:link-type: doc
+
+When a pie or donut chart is a good choice, and when a bar chart is better.
+:::
+
 :::{grid-item-card} {octicon}`stack;2.5em;sd-mr-1` Plotting backend support
 :link: plotting_backend_support
 :link-type: doc
@@ -43,5 +50,6 @@ How hvPlot draws with Bokeh, Matplotlib and Plotly, and why styling options diff
 Wide and long data <wide_vs_long_data>
 Grouping and coloring options <grouping_options>
 Statistical plot types <statistical_plot_types>
+When to use pie charts <pie_charts>
 Plotting backend support <plotting_backend_support>
 ```
