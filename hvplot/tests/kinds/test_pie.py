@@ -83,6 +83,17 @@ def test_by_subplots_false_still_laid_out():
     assert isinstance(plot, hv.NdLayout)
 
 
+def test_by_with_row_raises():
+    with pytest.raises(ValueError, match='by combined with row/col'):
+        df.hvplot.pie(x='expense', y='amount', by='year', row='year')
+
+
+def test_col_grid():
+    plot = df.hvplot.pie(x='expense', y='amount', col='year')
+    assert isinstance(plot, hv.GridSpace)
+    assert all(isinstance(el, hv.Donut) for el in plot)
+
+
 def test_groupby():
     plot = df.hvplot.pie(x='expense', y='amount', groupby='year', dynamic=False)
     assert isinstance(plot, hv.HoloMap)

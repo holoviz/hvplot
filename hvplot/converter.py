@@ -2045,6 +2045,12 @@ class HoloViewsConverter:
         kind = self.kind or kind
         method = getattr(self, kind)
 
+        # Checked here as row/col become groupby below, which would only fail at render time.
+        if kind in ('pie', 'donut') and self.by and self.grid:
+            raise ValueError(
+                f'{kind} plot does not support by combined with row/col, use one or the other.'
+            )
+
         groups = self.groupby
         zs = self.kwds.get('z', [])
         if not isinstance(zs, list):

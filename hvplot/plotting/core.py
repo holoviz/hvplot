@@ -994,7 +994,8 @@ class hvPlotTabular(hvPlotBase):
             fields are used. Several fields lay out one pie per field.
         by : str or list of str, optional
             Field name(s) to group by, laying out one pie per group. Cannot be combined with
-            several ``y`` fields.
+            several ``y`` fields or with ``row``/``col``. ``subplots`` is ignored, the pies
+            are always laid out side by side.
         groupby : str or list of str, optional
             Field name(s) to group and filter by. Adds one or more widgets to
             select the subgroup(s) to visualize.
@@ -1068,7 +1069,8 @@ class hvPlotTabular(hvPlotBase):
             fields are used. Several fields lay out one donut per field.
         by : str or list of str, optional
             Field name(s) to group by, laying out one donut per group. Cannot be combined
-            with several ``y`` fields.
+            with several ``y`` fields or with ``row``/``col``. ``subplots`` is ignored, the
+            donuts are always laid out side by side.
         groupby : str or list of str, optional
             Field name(s) to group and filter by. Adds one or more widgets to
             select the subgroup(s) to visualize.
