@@ -1081,9 +1081,10 @@ class hvPlotTabular(hvPlotBase):
             template formatted with the ``x`` and ``y`` field names and ``fraction``, the
             share of the wedge between 0 and 1, e.g. ``'{fraction:.0%}'``.
         center_label : str, optional
-            Text displayed in the hole. ``'total'`` displays the sum of the values. Any other
-            string is a template formatted with ``total`` and the ``y`` field name, both the
-            sum of the values, e.g. ``'Total: {total:,.0f}'``.
+            Text displayed in the hole. ``'total'`` displays the sum of the values as is,
+            without formatting. To control the formatting, use a template formatted with
+            ``total`` and the ``y`` field name, both the sum of the values, e.g.
+            ``'Total: {total:,.0f}'``.
         cmap : str, list or dict, optional
             Colors of the wedges, mapped to the categories: a colormap name, a list of colors
             or a dictionary mapping each category to a color. Default is
