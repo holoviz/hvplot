@@ -69,6 +69,7 @@ This section documents all the plotting methods of the `hvPlot` class, which as 
    hvPlot.bivariate
    hvPlot.dataset
    hvPlot.density
+   hvPlot.donut
    hvPlot.errorbars
    hvPlot.heatmap
    hvPlot.hexbin
@@ -85,6 +86,7 @@ This section documents all the plotting methods of the `hvPlot` class, which as 
    hvPlot.table
    hvPlot.vectorfield
    hvPlot.violin
+   hvPlot.waterfall
 ```
 
 #### Gridded
@@ -130,6 +132,7 @@ hvplot.hvPlot.contour <manual/hvplot.hvPlot.contour>
 hvplot.hvPlot.contourf <manual/hvplot.hvPlot.contourf>
 hvplot.hvPlot.dataset <manual/hvplot.hvPlot.dataset>
 hvplot.hvPlot.density <manual/hvplot.hvPlot.density>
+hvplot.hvPlot.donut <manual/hvplot.hvPlot.donut>
 hvplot.hvPlot.errorbars <manual/hvplot.hvPlot.errorbars>
 hvplot.hvPlot.heatmap <manual/hvplot.hvPlot.heatmap>
 hvplot.hvPlot.hexbin <manual/hvplot.hvPlot.hexbin>
@@ -149,6 +152,7 @@ hvplot.hvPlot.step <manual/hvplot.hvPlot.step>
 hvplot.hvPlot.table <manual/hvplot.hvPlot.table>
 hvplot.hvPlot.vectorfield <manual/hvplot.hvPlot.vectorfield>
 hvplot.hvPlot.violin <manual/hvplot.hvPlot.violin>
+hvplot.hvPlot.waterfall <manual/hvplot.hvPlot.waterfall>
 hvplot.plotting.andrews_curves <manual/hvplot.plotting.andrews_curves>
 hvplot.plotting.lag_plot <manual/hvplot.plotting.lag_plot>
 hvplot.plotting.parallel_coordinates <manual/hvplot.plotting.parallel_coordinates>

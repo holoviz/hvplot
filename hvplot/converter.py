@@ -55,6 +55,7 @@ from pandas import DatetimeIndex, MultiIndex
 from .backend_transforms import _transfer_opts_cur_backend
 from .util import (
     _HV_GE_1_21_0,
+    _HV_GE_1_23_0,
     _HV_VERSION,
     _PD_GE_2_1_0,
     _convert_col_names_to_str,
@@ -93,6 +94,11 @@ from .util import (
     support_index,
 )
 from .utilities import hvplot_extension
+
+if _HV_GE_1_23_0:
+    from holoviews.element import Donut, Waterfall
+else:
+    Donut = Waterfall = None
 
 renderer = hv.renderer('bokeh')
 
@@ -768,6 +774,16 @@ class HoloViewsConverter:
         'contourf': ['x', 'y', 'z', 'levels', 'logz'],
         'dataset': ['columns'],
         'density': ['y', 'bw_method', 'ind', 'bandwidth', 'cut', 'filled'],
+        'donut': [
+            'x',
+            'y',
+            'inner_radius',
+            'outer_radius',
+            'start_angle',
+            'show_labels',
+            'label_radius',
+            'center_label',
+        ],
         'heatmap': ['x', 'y', 'C', 'reduce_function', 'logz'],
         'hexbin': ['x', 'y', 'C', 'reduce_function', 'gridsize', 'logz', 'min_count'],
         'hist': ['y', 'bins', 'bin_range', 'normed', 'cumulative'],
@@ -787,6 +803,17 @@ class HoloViewsConverter:
         'trimesh': ['x', 'y', 'z', 'filled'],
         'vectorfield': ['x', 'y', 'angle', 'mag'],
         'violin': ['y'],
+        'waterfall': [
+            'x',
+            'y',
+            'show_total',
+            'total_label',
+            'positive_color',
+            'negative_color',
+            'start_color',
+            'total_color',
+            'show_connectors',
+        ],
     }
 
     # Mapping from kind to HoloViews element type
@@ -800,6 +827,7 @@ class HoloViewsConverter:
         'contourf': Polygons,
         'dataset': Dataset,
         'density': Distribution,
+        'donut': Donut,
         'errorbars': ErrorBars,
         'heatmap': HeatMap,
         'hexbin': HexTiles,
@@ -820,6 +848,7 @@ class HoloViewsConverter:
         'trimesh': TriMesh,
         'vectorfield': VectorField,
         'violin': Violin,
+        'waterfall': Waterfall,
     }
 
     # Types which have a colorbar by default
@@ -950,6 +979,9 @@ class HoloViewsConverter:
                 FutureWarning,
                 stacklevel=_find_stack_level(),
             )
+
+        if kind in self._kind_mapping and self._kind_mapping[kind] is None:
+            raise ImportError(f'{kind!r} plot requires HoloViews >= 1.23.0.')
 
         # Process data and related options
         self._redim = fields
@@ -1159,6 +1191,18 @@ class HoloViewsConverter:
 
         if self.geo and not plot_opts.get('data_aspect'):
             plot_opts['data_aspect'] = 1
+        elif self.kind == 'donut' and not (
+            plot_opts.get('aspect')
+            or plot_opts.get('data_aspect')
+            or ('width' in plot_opts and 'height' in plot_opts)
+        ):
+            # Keep the ring circular. The width or height is set on the frame
+            # as bokeh warns that it is reinterpreted when an aspect is set.
+            plot_opts['aspect'] = 1
+            if self._backend == 'bokeh':
+                for dim in ('width', 'height'):
+                    if dim in plot_opts and f'frame_{dim}' not in plot_opts:
+                        plot_opts[f'frame_{dim}'] = plot_opts.pop(dim)
 
         ignore_opts = ['responsive', 'aspect', 'data_aspect', 'frame_height', 'frame_width']
         if not any(plot_opts.get(opt) for opt in ignore_opts):
@@ -2769,6 +2813,32 @@ class HoloViewsConverter:
     def barh(self, x=None, y=None, data=None):
         """Horizontal bar plot."""
         return self.bar(x, y, data).opts('Bars', invert_axes=True)
+
+    def _category_chart(self, element, x, y, data):
+        """Generate a chart of a single value per category.
+
+        Overlaying these charts is not meaningful, so one chart per `by` group
+        or per `y` column is laid out instead.
+        """
+        self._error_if_unavailable(self.kind)
+        data, x, y = self._process_chart_args(data, x, y, single_y=True)
+        for opt in self._kind_options[self.kind]:
+            if opt not in ('x', 'y') and opt in self.kwds:
+                self._plot_opts[opt] = self.kwds[opt]
+        if isinstance(y, list) and len(y) > 1:
+            self.subplots = True
+            return self._category_plot(element, x, y, data)
+        y = y[0] if isinstance(y, list) else y
+        self.subplots = bool(self.by)
+        return self.single_chart(element, x, y, data)
+
+    def donut(self, x=None, y=None, data=None):
+        """Donut chart."""
+        return self._category_chart(Donut, x, y, data)
+
+    def waterfall(self, x=None, y=None, data=None):
+        """Waterfall chart."""
+        return self._category_chart(Waterfall, x, y, data)
 
     ##########################
     #   Statistical charts   #
