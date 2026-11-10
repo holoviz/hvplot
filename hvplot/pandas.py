@@ -3,7 +3,7 @@
 from .interactive import Interactive
 
 
-def patch(name='hvplot', interactive='interactive', extension='bokeh', logo=False):
+def patch(name='hvplot', interactive='interactive', extension=None, logo=False):
     """Patch the hvPlot plotting API onto pandas DataFrame and Series."""
     from . import _module_extensions, hvPlotTabular, post_patch
 

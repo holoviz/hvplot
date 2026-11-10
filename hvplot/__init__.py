@@ -146,7 +146,14 @@ except Exception:
 
 def post_patch(extension='bokeh', logo=False, check_loaded=False):
     """Load the HoloViews extension after patching a plotting API."""
-    if not check_loaded:
+    if extension is None:
+        if not getattr(_hv.extension, '_loaded', False):
+            hvplot_extension(
+                _hv.Store.current_backend,
+                logo=logo,
+                compatibility=hvplot_extension.compatibility,
+            )
+    elif not check_loaded:
         hvplot_extension(extension, logo=logo)
     elif not getattr(_hv.extension, '_loaded', False):
         hvplot_extension(extension, logo=logo)
