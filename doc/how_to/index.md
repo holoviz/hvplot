@@ -154,20 +154,9 @@ How to give AI coding assistants current hvPlot guidance with HoloViz skills and
 :hidden:
 :maxdepth: 2
 
-Display plots <display_plots>
-Load and switch plotting extensions <load_switch_plotting_extensions>
-Choose a backend for saving plots <choose_backend_for_saving_plots>
-Save Bokeh plots <save_bokeh_plots>
-Save Matplotlib plots <save_matplotlib_plots>
-Save plots as animated GIFs <save_plots_as_gif>
-Style plots by backend <style_plots_by_backend>
-Customize the underlying figure <customize_underlying_figure>
-Plot lines with markers <plot_lines_with_markers>
-Overlay plots <overlay_plots>
-Lay out plots <layout_plots>
-Split a plot into subplots <split_into_subplots>
-Facet plots into a grid <facet_into_grid>
-Build custom plot layouts <build_custom_layouts>
+Display and save plots <display_and_save_plots>
+Style plots <style_plots>
+Combine and arrange plots <combine_and_arrange_plots>
 Explore multidimensional datasets <explore_with_widgets>
 Use hvPlot with an AI assistant <use_ai_assistant>
 ```
