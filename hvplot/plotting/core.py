@@ -977,6 +977,8 @@ class hvPlotTabular(hvPlotBase):
         proportional to its value. It works best with a few categories adding up to a
         meaningful total. Use :meth:`donut` for a pie chart with a hole.
 
+        .. versionadded:: 0.14.0
+
         Requires HoloViews >= 1.24.0. Not supported by the Plotly backend.
 
         Reference: https://hvplot.holoviz.org/ref/api/manual/hvplot.hvPlot.pie.html
@@ -1048,6 +1050,8 @@ class hvPlotTabular(hvPlotBase):
 
         A donut chart is a :meth:`pie` chart with a hole in its center. It shows how a whole
         is split into parts, the angle of each wedge being proportional to its value.
+
+        .. versionadded:: 0.14.0
 
         Requires HoloViews >= 1.24.0. Not supported by the Plotly backend.
 
