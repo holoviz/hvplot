@@ -67,6 +67,11 @@ def test_show_labels():
     assert plot_opts(plot)['show_labels'] is True
 
 
+def test_center_label():
+    plot = df.hvplot.donut(x='expense', y='amount', center_label='Total: {total:,.0f}')
+    assert plot_opts(plot)['center_label'] == 'Total: {total:,.0f}'
+
+
 def test_legend_right():
     plot = df.hvplot.donut(x='expense', y='amount')
     assert plot_opts(plot)['legend_position'] == 'right'

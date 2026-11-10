@@ -774,7 +774,7 @@ class HoloViewsConverter:
         'contourf': ['x', 'y', 'z', 'levels', 'logz'],
         'dataset': ['columns'],
         'density': ['y', 'bw_method', 'ind', 'bandwidth', 'cut', 'filled'],
-        'donut': ['x', 'y', 'inner_radius', 'show_labels'],
+        'donut': ['x', 'y', 'inner_radius', 'show_labels', 'center_label'],
         'heatmap': ['x', 'y', 'C', 'reduce_function', 'logz'],
         'hexbin': ['x', 'y', 'C', 'reduce_function', 'gridsize', 'logz', 'min_count'],
         'hist': ['y', 'bins', 'bin_range', 'normed', 'cumulative'],
@@ -2819,13 +2819,14 @@ class HoloViewsConverter:
             y = y[0] if isinstance(y, list) else y
             plot = self.single_chart(Donut, x, y, data)
         opts = {'inner_radius': self.kwds.get('inner_radius', 0.5)}
-        if 'show_labels' in self.kwds:
-            opts['show_labels'] = self.kwds['show_labels']
+        for opt in ('show_labels', 'center_label'):
+            if opt in self.kwds:
+                opts[opt] = self.kwds[opt]
         return plot.opts('Donut', **opts)
 
     def pie(self, x=None, y=None, data=None):
         """Pie chart, a donut chart without a hole."""
-        return self.donut(x, y, data).opts('Donut', inner_radius=0)
+        return self.donut(x, y, data).opts('Donut', inner_radius=0, center_label=None)
 
     ##########################
     #   Statistical charts   #

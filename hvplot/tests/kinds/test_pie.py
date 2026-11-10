@@ -153,6 +153,13 @@ def test_inner_radius_not_an_option(caplog):
     assert 'inner_radius option not found for pie plot' in caplog.text
 
 
+@pytest.mark.usefixtures('disable_param_warnings_as_exceptions')
+def test_center_label_not_an_option(caplog):
+    plot = df.hvplot.pie(x='expense', y='amount', center_label='total')
+    assert plot_opts(plot)['center_label'] is None
+    assert 'center_label option not found for pie plot' in caplog.text
+
+
 def test_round():
     plot = df.hvplot.pie(x='expense', y='amount')
     opts = plot_opts(plot)
