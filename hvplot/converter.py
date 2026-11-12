@@ -2670,9 +2670,13 @@ class HoloViewsConverter:
             ),
         }
 
+        # HoloViews links axes across a layout by dimension label, so labelling
+        # every overlaid column with the generic default value_label would link
+        # the y-axis of unrelated multi-column plots.
+        label_ydims = self.subplots or self.value_label != 'value'
         charts = []
         for c in y:
-            ydim = hv.Dimension(c, label=self.value_label)
+            ydim = hv.Dimension(c, label=self.value_label) if label_ydims else c
             kdims, vdims = self._get_dimensions([x], [ydim])
             chart = element(data, kdims, vdims)
             chart = relabel_redim(chart, self._relabel, self._redim)

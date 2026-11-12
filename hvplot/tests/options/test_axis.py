@@ -480,6 +480,53 @@ def test_shared_axes_scatter_subplots(grouped_df, shared_axes, axiswise):
     assert (x_ranges[0].end == x_ranges[1].end) == shared_axes
 
 
+@pytest.fixture
+def wide_df():
+    return pd.DataFrame(
+        {
+            'a': [0, 1, 2, 3],
+            'b': [10, 11, 12, 13],
+            'c': [100, 101, 102, 103],
+            'd': [10, 11, 12, 13],
+            'e': [20, 21, 22, 23],
+        }
+    )
+
+
+def _layout_ranges(layout):
+    grid = hv.render(layout, backend='bokeh')
+    return [(fig.x_range, fig.y_range) for fig, *_ in grid.children]
+
+
+@pytest.mark.parametrize(
+    ('kwargs1', 'kwargs2', 'shared_y'),
+    [
+        pytest.param({'y': ['b', 'c']}, {'y': ['d', 'e']}, False, id='distinct_wide'),
+        pytest.param({'y': ['b', 'c']}, {'y': 'e'}, False, id='distinct_wide_and_single'),
+        pytest.param({'y': ['b', 'c']}, {'y': ['b', 'c']}, True, id='same_wide'),
+        pytest.param({'y': 'b'}, {'y': 'b'}, True, id='same_single'),
+        pytest.param(
+            {'y': ['b', 'c'], 'value_label': 'T'},
+            {'y': ['d', 'e'], 'value_label': 'T'},
+            True,
+            id='distinct_wide_same_value_label',
+        ),
+    ],
+)
+def test_shared_axes_wide_layout(wide_df, kwargs1, kwargs2, shared_y):
+    layout = wide_df.hvplot.line(x='a', **kwargs1) + wide_df.hvplot.line(x='a', **kwargs2)
+    (x1, y1), (x2, y2) = _layout_ranges(layout)
+    assert x1 is x2
+    assert (y1 is y2) == shared_y
+
+
+def test_shared_axes_wide_subplots(wide_df):
+    layout = wide_df.hvplot.line(x='a', y=['b', 'c'], subplots=True)
+    (x1, y1), (x2, y2) = _layout_ranges(layout)
+    assert x1 is x2
+    assert y1 is y2
+
+
 def test_invert(df, backend):
     plot = df.hvplot.scatter('x', 'y', invert=True)
     opts = Store.lookup_options(backend, plot, 'plot')
