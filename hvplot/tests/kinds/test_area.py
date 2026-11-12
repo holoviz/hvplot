@@ -1,7 +1,6 @@
 import pandas as pd
 import pytest
 from holoviews import NdOverlay, Store
-from holoviews.core.dimension import Dimension
 from holoviews.element import Area
 from holoviews.testing import assert_element_equal
 
@@ -44,8 +43,8 @@ def test_stacked(tabular_lib):
     plot = df.hvplot.area(stacked=True)
     obj = NdOverlay(
         {
-            'x': Area(df, 'index', Dimension('x', label='value')),
-            'y': Area(df, 'index', Dimension('y', label='value')),
+            'x': Area(df, 'index', 'x'),
+            'y': Area(df, 'index', 'y'),
         },
         'Variable',
     )
@@ -55,7 +54,7 @@ def test_stacked(tabular_lib):
 def test_stacked_false(df, hvplot_pandas):
     plot = df.hvplot.area(x='x', y=['y', 'y2'], stacked=False)
     # Not stacked: the second area keeps its own values.
-    assert list(plot['y2'].dimension_values('value')) == [0.5, 1.0, 1.5]
+    assert list(plot['y2'].dimension_values('y2')) == [0.5, 1.0, 1.5]
     # Overlaid areas are made transparent.
     assert Store.lookup_options('bokeh', plot['y'], 'style').kwargs['alpha'] == 0.5
 
@@ -63,10 +62,10 @@ def test_stacked_false(df, hvplot_pandas):
 def test_stacked_default(df, hvplot_pandas):
     # Unlike kind='area', the area method stacks by default.
     plot = df.hvplot.area(x='x', y=['y', 'y2'])
-    assert list(plot['y2'].dimension_values('value')) == [1.5, 5.0, 3.5]
+    assert list(plot['y2'].dimension_values('y2')) == [1.5, 5.0, 3.5]
     assert list(plot['y2'].dimension_values('Baseline')) == [1.0, 4.0, 2.0]
     kind_plot = df.hvplot(kind='area', x='x', y=['y', 'y2'])
-    assert list(kind_plot['y2'].dimension_values('value')) == [0.5, 1.0, 1.5]
+    assert list(kind_plot['y2'].dimension_values('y2')) == [0.5, 1.0, 1.5]
 
 
 def test_y2_by_not_stacked(hvplot_pandas):

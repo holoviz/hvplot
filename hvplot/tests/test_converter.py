@@ -11,7 +11,6 @@ import panel as pn
 import pytest
 import xarray as xr
 from holoviews import NdOverlay, Store, render
-from holoviews.core.dimension import Dimension
 from holoviews.element import Area, Curve, Scatter
 from holoviews.testing import assert_element_equal
 
@@ -205,8 +204,8 @@ def test_wide_chart(df, tabular_lib, kind, element):
     plot = data.hvplot(kind=kind)
     obj = NdOverlay(
         {
-            'x': element(data, 'index', Dimension('x', label='value')),
-            'y': element(data, 'index', Dimension('y', label='value')),
+            'x': element(data, 'index', 'x'),
+            'y': element(data, 'index', 'y'),
         },
         'Variable',
     )
@@ -255,8 +254,8 @@ def test_only_includes_num_chart(cat_df, tabular_lib, kind, element):
     plot = data.hvplot(kind=kind)
     obj = NdOverlay(
         {
-            'x': element(data, 'index', Dimension('x', label='value')),
-            'y': element(data, 'index', Dimension('y', label='value')),
+            'x': element(data, 'index', 'x'),
+            'y': element(data, 'index', 'y'),
         },
         'Variable',
     )
@@ -283,8 +282,8 @@ def test_includes_str_if_no_num_chart(cat_only_df, tabular_lib, kind, element):
     plot = data.hvplot(kind=kind)
     obj = NdOverlay(
         {
-            'upper': element(data, 'index', Dimension('upper', label='value')),
-            'lower': element(data, 'index', Dimension('lower', label='value')),
+            'upper': element(data, 'index', 'upper'),
+            'lower': element(data, 'index', 'lower'),
         },
         'Variable',
         sort=False,
