@@ -50,7 +50,7 @@ from holoviews.plotting.bokeh import OverlayPlot, colormap_generator
 from holoviews.plotting.util import process_cmap
 from holoviews.streams import Buffer, Pipe
 from holoviews.util.transform import dim
-from pandas import DatetimeIndex, MultiIndex
+from pandas import MultiIndex
 
 from .backend_transforms import _transfer_opts_cur_backend
 from .util import (
@@ -128,6 +128,20 @@ class StreamingCallable(Callable):
             self.periodic.stop()
         else:
             raise RuntimeError('PeriodicCallback not running.')
+
+
+def _table_shows_index(index):
+    """Whether a table should display the index as columns.
+
+    Bokeh does not show the index of a DataFrame, so a table only shows it
+    when it is reset into columns. An unnamed integer index only holds row
+    numbers, which the table already shows. Any other index, such as a
+    MultiIndex, a named index, or an index of strings or datetimes, carries
+    information.
+    """
+    if isinstance(index, MultiIndex) or index.name is not None:
+        return True
+    return not pd.api.types.is_integer_dtype(index.dtype)
 
 
 class HoloViewsConverter:
@@ -3127,7 +3141,7 @@ class HoloViewsConverter:
         """Table."""
         self._error_if_unavailable('table')
         data = self.data if data is None else data
-        if isinstance(data.index, (DatetimeIndex, MultiIndex)):
+        if isinstance(data.index, pd.Index) and _table_shows_index(data.index):
             # To get the index displayed in the table as Bokeh doesn't show it.
             data = data.reset_index()
 
