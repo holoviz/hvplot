@@ -55,6 +55,17 @@ hvPlot(df)(kind='scatter')
 
 This section documents all the plotting methods of the `hvPlot` class, which as described above are also available via the `hvplot` namespace.
 
+#### Generic call
+
+```{eval-rst}
+.. currentmodule:: hvplot
+
+.. autosummary::
+   :toctree: generated/
+
+   hvPlot.__call__
+```
+
 #### Common
 
 ```{eval-rst}
