@@ -63,23 +63,23 @@ import sys
 
 import holoviews as _hv
 import panel as _pn
-from holoviews import render  # noqa: F401
+from holoviews import render
 
-from . import sampledata  # noqa: F401
-from .converter import HoloViewsConverter  # noqa: F401
+from . import sampledata
+from .converter import HoloViewsConverter
 from .interactive import Interactive
 from .plotting import (
-    andrews_curves,  # noqa: F401
-    hvPlot,  # noqa: F401
-    hvPlotTabular,  # noqa: F401
-    lag_plot,  # noqa: F401
-    parallel_coordinates,  # noqa: F401
-    plot,  # noqa: F401
-    scatter_matrix,  # noqa: F401
+    andrews_curves,
+    hvPlot,
+    hvPlotTabular,
+    lag_plot,
+    parallel_coordinates,
+    plot,
+    scatter_matrix,
 )
-from .ui import explorer  # noqa: F401
+from .ui import explorer
 from .util import _in_ipython, _PatchHvplotDocstrings
-from .utilities import help, hvplot_extension, output, save, show  # noqa: F401
+from .utilities import help, hvplot_extension, output, save, show
 
 # Define '__version__'
 try:
@@ -115,6 +115,30 @@ except (ImportError, LookupError, FileNotFoundError):
             # The user is probably trying to run this without having installed
             # the package.
             __version__ = '0.0.0+unknown'
+
+__all__ = [
+    'HoloViewsConverter',
+    'Interactive',
+    '__version__',
+    'andrews_curves',
+    'bind',
+    'explorer',
+    'extension',
+    'help',
+    'hvPlot',
+    'hvPlotTabular',
+    'hvplot_extension',
+    'lag_plot',
+    'output',
+    'parallel_coordinates',
+    'plot',
+    'post_patch',
+    'render',
+    'sampledata',
+    'save',
+    'scatter_matrix',
+    'show',
+]
 
 _PATCH_PLOT_SIGNATURES = _in_ipython() or (
     os.getenv('HVPLOT_PATCH_PLOT_DOCSTRING_SIGNATURE', 'false').lower() in ('1', 'true')
